@@ -1,0 +1,6 @@
+uid=27_0 RootWebArea "商品管理中台" url="http://localhost:3001/"
+  uid=27_1 heading "应用出现错误" level="1"
+  uid=27_2 StaticText "抱歉，应用遇到了一个错误。"
+  uid=27_3 DisclosureTriangle "详情"
+  uid=27_4 button "重新加载页面"
+  uid=27_5 button "Open Tanstack query devtools"

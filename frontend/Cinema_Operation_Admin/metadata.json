@@ -1,0 +1,7 @@
+{
+  "name": "CinePrime Admin",
+  "description": "Enterprise-grade omnichannel management platform for premium cinema halls, featuring reservation, inventory, BOM, and financial settlement modules.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

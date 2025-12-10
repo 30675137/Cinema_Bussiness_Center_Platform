@@ -1,0 +1,1262 @@
+openapi: 3.0.3
+info:
+  title: 商品工作台API
+  description: 耀莱影城商品管理中台 - 商品工作台接口文档
+  version: 1.0.0
+  contact:
+    name: 开发团队
+    email: dev@cinema-platform.com
+servers:
+  - url: https://api.cinema-platform.com/v1
+    description: 生产环境
+  - url: https://staging-api.cinema-platform.com/v1
+    description: 测试环境
+  - url: http://localhost:3000/v1
+    description: 开发环境
+
+tags:
+  - name: 认证授权
+    description: 用户认证和权限验证
+  - name: 商品管理
+    description: 商品CRUD操作
+  - name: 商品审核
+    description: 商品审核流程
+  - name: 批量操作
+    description: 批量商品操作
+  - name: 基础数据
+    description: 类目、品牌、单位等基础数据
+
+paths:
+  # 认证授权
+  /auth/login:
+    post:
+      tags:
+        - 认证授权
+      summary: 用户登录
+      description: 用户登录获取访问令牌
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: 用户名
+                password:
+                  type: string
+                  description: 密码
+                rememberMe:
+                  type: boolean
+                  description: 记住登录状态
+                  default: false
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 登录成功
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        description: 访问令牌
+                      refreshToken:
+                        type: string
+                        description: 刷新令牌
+                      expiresIn:
+                        type: integer
+                        description: 令牌过期时间(秒)
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          description: 登录失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - 认证授权
+      summary: 刷新令牌
+      description: 使用刷新令牌获取新的访问令牌
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: 刷新令牌
+      responses:
+        '200':
+          description: 刷新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 刷新成功
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      expiresIn:
+                        type: integer
+
+  # 商品管理
+  /products:
+    get:
+      tags:
+        - 商品管理
+      summary: 商品列表
+      description: 获取商品列表，支持分页、筛选和排序
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 20
+            enum: [10, 20, 50, 100]
+        - name: keyword
+          in: query
+          description: 商品名称关键词
+          schema:
+            type: string
+        - name: sku
+          in: query
+          description: 商品SKU
+          schema:
+            type: string
+        - name: categoryIds
+          in: query
+          description: 类目ID列表，逗号分隔
+          schema:
+            type: string
+        - name: brandIds
+          in: query
+          description: 品牌ID列表，逗号分隔
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 商品状态
+          schema:
+            type: string
+            enum: [draft, pending_review, published, rejected, abnormal, offline]
+        - name: materialType
+          in: query
+          description: 物料类型
+          schema:
+            type: string
+            enum: [finished_good, raw_material, consumable]
+        - name: createdBy
+          in: query
+          description: 创建人ID
+          schema:
+            type: string
+        - name: updateTimeStart
+          in: query
+          description: 更新时间开始
+          schema:
+            type: string
+            format: date-time
+        - name: updateTimeEnd
+          in: query
+          description: 更新时间结束
+          schema:
+            type: string
+            format: date-time
+        - name: sortBy
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, name, basePrice, currentStock]
+            default: updatedAt
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        description: 总数量
+                      page:
+                        type: integer
+                        description: 当前页码
+                      pageSize:
+                        type: integer
+                        description: 每页数量
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Product'
+
+    post:
+      tags:
+        - 商品管理
+      summary: 创建商品
+      description: 创建新商品
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: 创建成功
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{productId}:
+    get:
+      tags:
+        - 商品管理
+      summary: 商品详情
+      description: 获取指定商品的详细信息
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    $ref: '#/components/schemas/ProductDetail'
+        '404':
+          description: 商品不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - 商品管理
+      summary: 更新商品
+      description: 更新商品信息
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 更新成功
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 商品不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - 商品管理
+      summary: 删除商品
+      description: 删除指定商品（仅管理员）
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '403':
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 商品不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # 商品状态操作
+  /products/{productId}/submit-review:
+    post:
+      tags:
+        - 商品管理
+      summary: 提交审核
+      description: 将草稿商品提交审核
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 提交成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 提交成功
+
+  /products/{productId}/approve:
+    post:
+      tags:
+        - 商品审核
+      summary: 审核通过
+      description: 审核员通过商品审核
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: 审核意见
+      responses:
+        '200':
+          description: 审核通过
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 审核通过
+
+  /products/{productId}/reject:
+    post:
+      tags:
+        - 商品审核
+      summary: 审核驳回
+      description: 审核员驳回商品审核
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 商品ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  description: 驳回原因
+                comment:
+                  type: string
+                  description: 驳回意见
+      responses:
+        '200':
+          description: 审核驳回
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 审核驳回
+
+  # 批量操作
+  /products/batch:
+    post:
+      tags:
+        - 批量操作
+      summary: 批量操作
+      description: 批量操作商品
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchOperationRequest'
+      responses:
+        '200':
+          description: 操作完成
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 操作完成
+                  data:
+                    $ref: '#/components/schemas/BatchOperationResult'
+
+  # 基础数据
+  /categories:
+    get:
+      tags:
+        - 基础数据
+      summary: 商品类目树
+      description: 获取商品类目树结构
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+
+  /brands:
+    get:
+      tags:
+        - 基础数据
+      summary: 品牌列表
+      description: 获取品牌列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: keyword
+          in: query
+          description: 品牌关键词
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Brand'
+
+  /units:
+    get:
+      tags:
+        - 基础数据
+      summary: 单位列表
+      description: 获取计量单位列表
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: 获取成功
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Unit'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 用户ID
+        username:
+          type: string
+          description: 用户名
+        name:
+          type: string
+          description: 真实姓名
+        email:
+          type: string
+          description: 邮箱
+        avatar:
+          type: string
+          description: 头像URL
+        status:
+          type: string
+          enum: [active, inactive, locked]
+          description: 用户状态
+        roles:
+          type: array
+          items:
+            type: string
+          description: 用户角色
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 商品ID
+        sku:
+          type: string
+          description: 商品SKU
+        name:
+          type: string
+          description: 商品名称
+        categoryId:
+          type: string
+          description: 类目ID
+        category:
+          $ref: '#/components/schemas/Category'
+        brandId:
+          type: string
+          description: 品牌ID
+        brand:
+          $ref: '#/components/schemas/Brand'
+        unitId:
+          type: string
+          description: 单位ID
+        unit:
+          $ref: '#/components/schemas/Unit'
+        materialType:
+          type: string
+          enum: [finished_good, raw_material, consumable]
+          description: 物料类型
+        status:
+          type: string
+          enum: [draft, pending_review, published, rejected, abnormal, offline]
+          description: 商品状态
+        basePrice:
+          type: number
+          description: 基础价格
+        costPrice:
+          type: number
+          description: 成本价格
+        currentStock:
+          type: number
+          description: 当前库存
+        safetyStock:
+          type: number
+          description: 安全库存
+        barcode:
+          type: string
+          description: 条码
+        description:
+          type: string
+          description: 商品描述
+        auditStatus:
+          type: string
+          enum: [none, pending, approved, rejected]
+          description: 审核状态
+        version:
+          type: integer
+          description: 版本号
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        publishedAt:
+          type: string
+          format: date-time
+          description: 发布时间
+        createdBy:
+          type: string
+          description: 创建人ID
+        updatedBy:
+          type: string
+          description: 更新人ID
+
+    ProductDetail:
+      allOf:
+        - $ref: '#/components/schemas/Product'
+        - type: object
+          properties:
+            content:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductImage'
+                richText:
+                  type: string
+                  description: 富文本描述
+                specifications:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductSpecification'
+            bom:
+              $ref: '#/components/schemas/BOM'
+            auditRecords:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductAuditRecord'
+
+    CreateProductRequest:
+      type: object
+      required:
+        - sku
+        - name
+        - categoryId
+        - unitId
+        - materialType
+        - basePrice
+        - currentStock
+      properties:
+        sku:
+          type: string
+          description: 商品SKU
+        name:
+          type: string
+          description: 商品名称
+        categoryId:
+          type: string
+          description: 类目ID
+        brandId:
+          type: string
+          description: 品牌ID
+        unitId:
+          type: string
+          description: 单位ID
+        materialType:
+          type: string
+          enum: [finished_good, raw_material, consumable]
+          description: 物料类型
+        basePrice:
+          type: number
+          description: 基础价格
+        costPrice:
+          type: number
+          description: 成本价格
+        currentStock:
+          type: number
+          description: 当前库存
+        safetyStock:
+          type: number
+          description: 安全库存
+        barcode:
+          type: string
+          description: 条码
+        description:
+          type: string
+          description: 商品描述
+        content:
+          type: object
+          properties:
+            images:
+              type: array
+              items:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  altText:
+                    type: string
+                  isPrimary:
+                    type: boolean
+            richText:
+              type: string
+            specifications:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  values:
+                    type: object
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 商品名称
+        brandId:
+          type: string
+          description: 品牌ID
+        basePrice:
+          type: number
+          description: 基础价格
+        costPrice:
+          type: number
+          description: 成本价格
+        currentStock:
+          type: number
+          description: 当前库存
+        safetyStock:
+          type: number
+          description: 安全库存
+        barcode:
+          type: string
+          description: 条码
+        description:
+          type: string
+          description: 商品描述
+        content:
+          type: object
+          properties:
+            images:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  url:
+                    type: string
+                  altText:
+                    type: string
+                  sortOrder:
+                    type: integer
+                  isPrimary:
+                    type: boolean
+            richText:
+              type: string
+            specifications:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  values:
+                    type: object
+                  sortOrder:
+                    type: integer
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 类目ID
+        name:
+          type: string
+          description: 类目名称
+        code:
+          type: string
+          description: 类目编码
+        parentId:
+          type: string
+          description: 父类目ID
+        level:
+          type: integer
+          description: 类目层级
+        allowedMaterialTypes:
+          type: array
+          items:
+            type: string
+            enum: [finished_good, raw_material, consumable]
+          description: 允许的物料类型
+        sortOrder:
+          type: integer
+          description: 排序顺序
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 类目状态
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+          description: 子类目
+
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 品牌ID
+        name:
+          type: string
+          description: 品牌名称
+        code:
+          type: string
+          description: 品牌编码
+        logo:
+          type: string
+          description: 品牌Logo
+        description:
+          type: string
+          description: 品牌描述
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 品牌状态
+
+    Unit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 单位ID
+        name:
+          type: string
+          description: 单位名称
+        code:
+          type: string
+          description: 单位编码
+        symbol:
+          type: string
+          description: 单位符号
+        type:
+          type: string
+          enum: [weight, volume, count, length, area, time]
+          description: 单位类型
+
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 图片ID
+        url:
+          type: string
+          description: 图片URL
+        altText:
+          type: string
+          description: 图片描述
+        sortOrder:
+          type: integer
+          description: 排序顺序
+        isPrimary:
+          type: boolean
+          description: 是否主图
+
+    ProductSpecification:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 规格ID
+        name:
+          type: string
+          description: 规格名称
+        type:
+          type: string
+          enum: [text, number, select, multiselect, boolean]
+          description: 规格类型
+        values:
+          type: object
+          description: 规格值
+        sortOrder:
+          type: integer
+          description: 排序顺序
+
+    BOM:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BOM ID
+        name:
+          type: string
+          description: BOM名称
+        totalCost:
+          type: number
+          description: 总成本
+        status:
+          type: string
+          enum: [active, inactive, draft]
+          description: BOM状态
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOMItem'
+
+    BOMItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: BOM明细ID
+        materialId:
+          type: string
+          description: 物料ID
+        material:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            code:
+              type: string
+            unit:
+              $ref: '#/components/schemas/Unit'
+        quantity:
+          type: number
+          description: 用量
+        unitCost:
+          type: number
+          description: 单位成本
+        totalCost:
+          type: number
+          description: 总成本
+        sortOrder:
+          type: integer
+          description: 排序顺序
+
+    ProductAuditRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 审核记录ID
+        action:
+          type: string
+          enum: [CREATE, UPDATE, DELETE, STATUS_CHANGE, PUBLISH]
+          description: 操作类型
+        beforeState:
+          type: object
+          description: 变更前状态
+        afterState:
+          type: object
+          description: 变更后状态
+        reason:
+          type: string
+          description: 操作原因
+        operatorId:
+          type: string
+          description: 操作人ID
+        operator:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: 操作时间
+
+    BatchOperationRequest:
+      type: object
+      required:
+        - productIds
+        - operation
+      properties:
+        productIds:
+          type: array
+          items:
+            type: string
+          description: 商品ID列表
+        operation:
+          type: string
+          enum: [submit_review, approve, reject, offline, delete]
+          description: 批量操作类型
+        params:
+          type: object
+          description: 操作参数
+          properties:
+            reason:
+              type: string
+              description: 驳回原因等
+
+    BatchOperationResult:
+      type: object
+      properties:
+        totalCount:
+          type: integer
+          description: 总数量
+        successCount:
+          type: integer
+          description: 成功数量
+        failedCount:
+          type: integer
+          description: 失败数量
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: 商品ID
+              success:
+                type: boolean
+                description: 是否成功
+              message:
+                type: string
+                description: 操作结果消息
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 错误代码
+        message:
+          type: string
+          description: 错误消息
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: 错误字段
+              message:
+                type: string
+                description: 错误详情
+          description: 详细错误信息
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT访问令牌
+
+# 全局响应定义
+responses:
+  UnauthorizedError:
+    description: 未授权访问
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 401
+            message: 未授权访问
+
+  ForbiddenError:
+    description: 权限不足
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 403
+            message: 权限不足
+
+  NotFoundError:
+    description: 资源不存在
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 404
+            message: 资源不存在
+
+  ValidationError:
+    description: 请求参数验证失败
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 400
+            message: 请求参数错误
+            errors:
+              - field: name
+                message: 商品名称不能为空
+              - field: basePrice
+                message: 基础价格必须大于0
+
+  ServerError:
+    description: 服务器内部错误
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 500
+            message: 服务器内部错误
