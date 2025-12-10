@@ -33,12 +33,51 @@ import BomTab from '@/components/product/ProductForm/BomTab';
 import ChannelOverrideTab from '@/components/product/ProductForm/ChannelOverrideTab';
 
 import {
-  ProductFormSchema,
-  ProductFormData,
-  FormStep,
-  FormStepConfig,
-  ProductFormInput
-} from '@/types/product';
+  ProductFormSchema
+} from '../../../types/product';
+import { FormStep } from '../../../types/product';
+
+// 临时内联定义需要的类型以解决导入问题
+interface FormStepConfig {
+  key: FormStep;
+  title: string;
+  description: string;
+  required: boolean;
+  completed: boolean;
+  valid: boolean;
+}
+
+interface ProductFormData {
+  // 基础信息
+  name: string;
+  shortTitle?: string;
+  description?: string;
+  categoryId: string;
+  materialType: any;
+  basePrice: number;
+  barcode?: string;
+  unit?: string;
+  brand?: string;
+  weight?: number;
+  volume?: number;
+  shelfLife?: number;
+  storageCondition?: string;
+
+  // 内容管理
+  content: any;
+
+  // 规格属性
+  specifications: any[];
+
+  // BOM配方（仅成品）
+  bom?: any;
+
+  // 渠道覆写
+  channelOverrides?: any[];
+
+  // 状态
+  status: any;
+}
 import { useAppActions } from '@/stores/appStore';
 import { useProductsQuery, useCreateProductMutation, useUpdateProductMutation } from '@/stores/productStore';
 

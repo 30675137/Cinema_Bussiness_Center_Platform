@@ -10,7 +10,7 @@ import type {
   ProductFilters,
   ProductFormData,
   ProductQueryParams,
-} from '@/types';
+} from '@/types/product';
 
 // 商品列表状态接口
 interface ProductListStore extends ProductListState {

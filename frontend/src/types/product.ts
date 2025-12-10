@@ -261,22 +261,6 @@ export interface ProductListState {
   sortOrder: 'asc' | 'desc';
 }
 
-// 商品表单状态
-export interface ProductFormState {
-  formData: Partial<ProductFormData>;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-  activeTab: 'basic' | 'content' | 'specs' | 'bom';
-  isDirty: boolean;
-  isSubmitting: boolean;
-  validation: {
-    isValid: boolean;
-    isValidating: boolean;
-  };
-  specifications: ProductSpec[];
-  generatedSkus: string[];
-  bomMaterials: BOMComponent[];
-}
 
 // Zod验证Schema
 export const ProductBasicInfoSchema = z.object({
@@ -413,11 +397,11 @@ export const ProductFormSchema = z.object({
   ...ProductBasicInfoSchema.shape,
   content: ProductContentSchema,
   specifications: ProductSpecsSchema,
-  bom: materialType === 'finished_goods' ? BOMRecipeSchema.optional() : z.undefined().optional(),
+  bom: BOMRecipeSchema.optional(),
   channelOverrides: ChannelOverridesSchema
 }).superRefine((data, ctx) => {
   // 如果是成品且没有BOM配方，添加错误
-  if (data.materialType === 'finished_goods' && !data.bom) {
+  if (data.materialType === 'finished_good' && !data.bom) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: '成品必须配置BOM配方',
@@ -435,7 +419,7 @@ export type ProductContentInput = z.infer<typeof ProductContentSchema>;
 export type ProductSpecsInput = z.infer<typeof ProductSpecsSchema>;
 export type BOMRecipeInput = z.infer<typeof BOMRecipeSchema>;
 export type ChannelOverridesInput = z.infer<typeof ChannelOverridesSchema>;
-export type ProductBaseFormData = z.infer<typeof ProductBaseSchema>;
+export type ProductBaseFormData = z.infer<typeof ProductBasicInfoSchema>;
 export type ProductFullFormData = z.infer<typeof ProductFormSchema>;
 
 // 工具函数

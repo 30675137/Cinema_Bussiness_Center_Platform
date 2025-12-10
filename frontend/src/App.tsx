@@ -15,6 +15,23 @@ const HomePage = lazy(() => import('./pages/HomePage'));
 const PerformanceDashboard = lazy(() => import('./monitoring/PerformanceDashboard'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 
+// 商品管理相关页面
+const ProductList = lazy(() => import('./pages/product/ProductList'));
+const ProductForm = lazy(() => import('./pages/product/ProductForm'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+
+// 价格管理页面
+const PriceManagement = lazy(() => import('./pages/price/PriceManagement'));
+
+// 审核流程页面
+const ReviewPanel = lazy(() => import('./pages/review/ReviewPanel'));
+
+// 库存追溯页面
+const InventoryTrace = lazy(() => import('./pages/inventory/InventoryTrace'));
+
+// 登录页面
+const LoginPage = lazy(() => import('./pages/auth/Login'));
+
 // 初始化性能监控
 const initializePerformanceMonitoring = () => {
   if (!PERFORMANCE_CONFIG.monitoring.enabled) {
@@ -102,7 +119,31 @@ const App: React.FC = () => {
           <div className="App">
             <Suspense fallback={<LoadingSpinner />}>
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                {/* 默认首页重定向到商品管理 */}
+                <Route path="/" element={<ProductList />} />
+
+                {/* 商品管理路由 */}
+                <Route path="/products" element={<ProductList />} />
+                <Route path="/products/new" element={<ProductForm />} />
+                <Route path="/products/:id" element={<ProductForm />} />
+                <Route path="/products/:id/edit" element={<ProductForm />} />
+
+                {/* 仪表板 */}
+                <Route path="/dashboard" element={<Dashboard />} />
+
+                {/* 价格管理 */}
+                <Route path="/pricing" element={<PriceManagement />} />
+                <Route path="/price-management" element={<PriceManagement />} />
+
+                {/* 审核流程 */}
+                <Route path="/review" element={<ReviewPanel />} />
+                <Route path="/review-panel" element={<ReviewPanel />} />
+
+                {/* 库存追溯 */}
+                <Route path="/inventory" element={<InventoryTrace />} />
+                <Route path="/inventory-trace" element={<InventoryTrace />} />
+
+                {/* 性能监控 */}
                 <Route
                   path="/performance"
                   element={
@@ -111,7 +152,10 @@ const App: React.FC = () => {
                     />
                   }
                 />
+
+                {/* 其他页面 */}
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/login" element={<LoginPage />} />
               </Routes>
             </Suspense>
           </div>

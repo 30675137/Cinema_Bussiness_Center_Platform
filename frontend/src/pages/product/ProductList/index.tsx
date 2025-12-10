@@ -39,7 +39,7 @@ import { Drawer } from 'antd';
 
 import { useProductsQuery, useDeleteProductMutation } from '@/stores/productStore';
 import { useAppActions } from '@/stores/appStore';
-import { Product, ProductStatus, MaterialType, ProductFilters } from '@/types/product';
+import { Product, ProductStatus, MaterialType, ProductFilters } from '@/types';
 import ProductForm from '../ProductForm';
 
 const { Title, Text } = Typography;

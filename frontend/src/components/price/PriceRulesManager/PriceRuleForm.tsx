@@ -402,7 +402,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
           {conditions.length === 0 ? (
             <Alert
               message="暂无触发条件"
-              description="点击"添加条件"按钮来创建触发条件，当满足条件时将应用此价格规则。"
+              description="点击&quot;添加条件&quot;按钮来创建触发条件，当满足条件时将应用此价格规则。"
               type="info"
               style={{ marginBottom: 16 }}
             />
