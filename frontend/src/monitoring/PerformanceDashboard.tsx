@@ -10,7 +10,7 @@ import {
   LineChartOutlined
 } from '@ant-design/icons';
 import { usePerformance } from './PerformanceProvider';
-import { PerformanceMetrics, PerformanceAlert } from './types';
+import type { PerformanceMetrics, PerformanceAlert } from './types';
 
 const { TabPane } = Tabs;
 

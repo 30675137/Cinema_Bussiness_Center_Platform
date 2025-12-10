@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { PerformanceProvider } from './monitoring/PerformanceProvider';
@@ -99,24 +99,22 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <ConfigProvider locale={zhCN}>
         <PerformanceProvider>
-          <Router>
-            <div className="App">
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route
-                    path="/performance"
-                    element={
-                      <LazyLoadWrapper
-                        loader={() => import('./monitoring/PerformanceDashboard')}
-                      />
-                    }
-                  />
-                  <Route path="/about" element={<AboutPage />} />
-                </Routes>
-              </Suspense>
-            </div>
-          </Router>
+          <div className="App">
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                  path="/performance"
+                  element={
+                    <LazyLoadWrapper
+                      loader={() => import('./monitoring/PerformanceDashboard')}
+                    />
+                  }
+                />
+                <Route path="/about" element={<AboutPage />} />
+              </Routes>
+            </Suspense>
+          </div>
         </PerformanceProvider>
       </ConfigProvider>
     </ErrorBoundary>

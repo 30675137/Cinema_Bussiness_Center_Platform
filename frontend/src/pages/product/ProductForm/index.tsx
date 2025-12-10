@@ -343,12 +343,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }
 
   return (
-    <div className="product-form">
+    <div className="product-form" data-testid="product-form">
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={12}>
           <Button
             icon={<ArrowLeftOutlined />}
             onClick={handleCancel}
+            data-testid="cancel-button"
           >
             返回
           </Button>
@@ -367,6 +368,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onClick={handleSubmit(handleSave)}
               loading={saving}
               disabled={!isDirty}
+              data-testid="save-button"
             >
               {mode === 'create' ? '创建商品' : '保存更改'}
             </Button>
@@ -386,7 +388,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {/* 步骤指示器 */}
           <Steps
             current={steps.findIndex(step => step.key === currentStep)}
-            items={steps.map(step => ({
+            items={steps.map((step, index) => ({
               title: step.title,
               description: step.description,
               icon: step.completed ? <CheckCircleOutlined /> : undefined,
@@ -394,11 +396,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
                      currentStep === step.key ? 'process' : 'wait'
             }))}
             style={{ marginBottom: 32 }}
+            data-testid="product-tabs"
           />
 
           {/* 表单内容 */}
           <div style={{ minHeight: 400 }}>
-            {renderStepContent()}
+            <div
+              data-testid="basic-info-tab"
+              style={{ display: currentStep === FormStep.BASIC_INFO ? 'block' : 'none' }}
+            >
+              {currentStep === FormStep.BASIC_INFO && renderStepContent()}
+            </div>
+            <div
+              data-testid="content-tab"
+              style={{ display: currentStep === FormStep.CONTENT ? 'block' : 'none' }}
+            >
+              {currentStep === FormStep.CONTENT && renderStepContent()}
+            </div>
+            <div
+              data-testid="specs-tab"
+              style={{ display: currentStep === FormStep.SPECS ? 'block' : 'none' }}
+            >
+              {currentStep === FormStep.SPECS && renderStepContent()}
+            </div>
+            <div
+              data-testid="bom-tab"
+              style={{ display: currentStep === FormStep.BOM ? 'block' : 'none' }}
+            >
+              {currentStep === FormStep.BOM && renderStepContent()}
+            </div>
           </div>
 
           {/* 步骤操作按钮 */}

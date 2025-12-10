@@ -82,20 +82,8 @@ export const usePerformanceTracking = (
       }
     }
 
-    // 更新状态
-    setPerformanceData(prev => ({
-      ...prev,
-      renderCount: renderCountRef.current,
-      totalRenderTime: totalRenderTimeRef.current,
-      averageRenderTime: renderCountRef.current > 0
-        ? totalRenderTimeRef.current / renderCountRef.current
-        : 0,
-      lastRenderTime: actualDuration,
-      mountTime: mountTimeRef.current,
-      mountTimestamp: isMountedRef.current ? now : prev.mountTimestamp,
-      lastUpdateTimestamp: now,
-      isStale: now - prev.lastUpdateTimestamp > 30000, // 30秒无更新认为是stale
-    }));
+    // 避免在onRender中更新状态以防止无限循环
+    // 状态更新可以通过useEffect来处理
 
     // 警告渲染时间过长
     if (actualDuration > 16) { // 超过一帧的时间

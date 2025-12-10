@@ -1,4 +1,4 @@
-import { PerformanceMetrics, PerformanceThresholds, PerformanceAlert, WebVitals } from './types';
+import type { PerformanceMetrics, PerformanceThresholds, PerformanceAlert, WebVitals } from './types';
 
 class PerformanceMonitor {
   private metrics: PerformanceMetrics;

@@ -1,5 +1,5 @@
 import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
-import { WebVitals } from './types';
+import type { WebVitals } from './types';
 
 export interface WebVitalsConfig {
   onReport?: (metric: any) => void;
