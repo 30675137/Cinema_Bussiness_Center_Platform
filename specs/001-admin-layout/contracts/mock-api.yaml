@@ -1,0 +1,676 @@
+# Mock API 合约 - 管理后台基础框架
+
+# OpenAPI 3.0 specification for mock APIs used in the admin layout framework
+
+openapi: 3.0.3
+info:
+  title: 管理后台基础框架 Mock API
+  description: 前端Demo使用的模拟API接口定义
+  version: 1.0.0
+  contact:
+    name: 耀莱影城商品管理中台
+
+servers:
+  - url: /api/mock
+    description: Mock API基础路径
+
+tags:
+  - name: 菜单管理
+    description: 导航菜单相关接口
+  - name: 布局配置
+    description: 布局状态相关接口
+  - name: 业务数据
+    description: 各模块业务数据接口
+
+paths:
+  /menu/list:
+    get:
+      tags:
+        - 菜单管理
+      summary: 获取导航菜单列表
+      description: 获取完整的导航菜单树结构
+      operationId: getMenuList
+      responses:
+        '200':
+          description: 成功返回菜单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuItem'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /menu/{menuId}:
+    get:
+      tags:
+        - 菜单管理
+      summary: 获取单个菜单项详情
+      description: 根据菜单ID获取菜单项详细信息
+      operationId: getMenuItem
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          description: 菜单项ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回菜单项详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    $ref: '#/components/schemas/MenuItem'
+        '404':
+          description: 菜单项不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /layout/state:
+    get:
+      tags:
+        - 布局配置
+      summary: 获取布局状态
+      description: 获取当前布局配置状态
+      operationId: getLayoutState
+      responses:
+        '200':
+          description: 成功返回布局状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    $ref: '#/components/schemas/LayoutState'
+
+    put:
+      tags:
+        - 布局配置
+      summary: 更新布局状态
+      description: 更新布局配置状态（仅客户端状态，不涉及持久化）
+      operationId: updateLayoutState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LayoutStateUpdateRequest'
+      responses:
+        '200':
+          description: 成功更新布局状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    $ref: '#/components/schemas/LayoutState'
+
+  /routes/list:
+    get:
+      tags:
+        - 布局配置
+      summary: 获取路由配置
+      description: 获取完整的路由配置列表
+      operationId: getRouteList
+      responses:
+        '200':
+          description: 成功返回路由配置
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RouteConfig'
+
+  /products/list:
+    get:
+      tags:
+        - 业务数据
+      summary: 获取商品列表
+      description: 获取商品管理页面的数据列表（Mock数据）
+      operationId: getProductList
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页大小
+          schema:
+            type: integer
+            default: 20
+        - name: category
+          in: query
+          description: 商品分类筛选
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 商品状态筛选
+          schema:
+            type: string
+            enum: [active, inactive, pending]
+      responses:
+        '200':
+          description: 成功返回商品列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      list:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProductItem'
+                      total:
+                        type: integer
+                        example: 100
+                      page:
+                        type: integer
+                        example: 1
+                      pageSize:
+                        type: integer
+                        example: 20
+
+  /pricing/list:
+    get:
+      tags:
+        - 业务数据
+      summary: 获取定价规则列表
+      description: 获取定价中心页面的数据列表（Mock数据）
+      operationId: getPricingList
+      responses:
+        '200':
+          description: 成功返回定价规则列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PricingItem'
+
+  /reviews/list:
+    get:
+      tags:
+        - 业务数据
+      summary: 获取审核记录列表
+      description: 获取审核管理页面的数据列表（Mock数据）
+      operationId: getReviewList
+      responses:
+        '200':
+          description: 成功返回审核记录列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewItem'
+
+  /inventory/list:
+    get:
+      tags:
+        - 业务数据
+      summary: 获取库存追溯列表
+      description: 获取库存追溯页面的数据列表（Mock数据）
+      operationId: getInventoryList
+      responses:
+        '200':
+          description: 成功返回库存追溯列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryItem'
+
+components:
+  schemas:
+    MenuItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 菜单项唯一标识
+          example: "dashboard"
+        title:
+          type: string
+          description: 菜单显示标题
+          example: "仪表盘"
+        icon:
+          type: string
+          description: 菜单图标（Ant Design图标名称）
+          example: "DashboardOutlined"
+        path:
+          type: string
+          description: 路由路径
+          example: "/dashboard"
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+          description: 子菜单项
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 权限标识（为未来扩展保留）
+        visible:
+          type: boolean
+          description: 是否在菜单中显示
+          example: true
+        order:
+          type: integer
+          description: 菜单排序
+          example: 1
+        group:
+          type: string
+          description: 菜单分组
+          example: "main"
+      required:
+        - id
+        - title
+        - path
+        - visible
+        - order
+
+    RouteConfig:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 路由唯一标识
+          example: "dashboard"
+        path:
+          type: string
+          description: 路由路径
+          example: "/dashboard"
+        component:
+          type: string
+          description: 页面组件标识
+          example: "Dashboard"
+        title:
+          type: string
+          description: 页面标题
+          example: "仪表盘"
+        parentId:
+          type: string
+          description: 父级路由ID
+        meta:
+          $ref: '#/components/schemas/RouteMeta'
+      required:
+        - id
+        - path
+        - component
+        - title
+
+    RouteMeta:
+      type: object
+      properties:
+        hideInMenu:
+          type: boolean
+          description: 是否在菜单中隐藏
+        icon:
+          type: string
+          description: 页面图标
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 权限要求
+        breadcrumbTitle:
+          type: string
+          description: 面包屑标题
+
+    LayoutState:
+      type: object
+      properties:
+        sidebarCollapsed:
+          type: boolean
+          description: 侧边栏折叠状态
+          example: false
+        selectedMenuKeys:
+          type: array
+          items:
+            type: string
+          description: 当前选中的菜单项
+          example: ["dashboard"]
+        openMenuKeys:
+          type: array
+          items:
+            type: string
+          description: 当前展开的菜单项
+          example: ["product"]
+        breadcrumbs:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreadcrumbItem'
+        theme:
+          type: string
+          enum: [light, dark]
+          description: 主题模式
+          example: "light"
+        breakpoint:
+          type: string
+          enum: [xs, sm, md, lg, xl, xxl]
+          description: 屏幕尺寸断点
+          example: "lg"
+
+    LayoutStateUpdateRequest:
+      type: object
+      properties:
+        sidebarCollapsed:
+          type: boolean
+        selectedMenuKeys:
+          type: array
+          items:
+            type: string
+        openMenuKeys:
+          type: array
+          items:
+            type: string
+        theme:
+          type: string
+          enum: [light, dark]
+
+    BreadcrumbItem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: 面包屑节点标题
+          example: "仪表盘"
+        path:
+          type: string
+          description: 导航路径
+          example: "/dashboard"
+        current:
+          type: boolean
+          description: 是否为当前页面
+          example: true
+      required:
+        - title
+        - path
+        - current
+
+    ProductItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 商品ID
+          example: "1"
+        name:
+          type: string
+          description: 商品名称
+          example: "电影票-成人票"
+        sku:
+          type: string
+          description: 商品编码
+          example: "TICKET-ADULT-001"
+        category:
+          type: string
+          description: 商品分类
+          example: "电影票"
+        status:
+          type: string
+          enum: [active, inactive, pending]
+          description: 商品状态
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-12-10T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-10T10:00:00Z"
+      required:
+        - id
+        - name
+        - sku
+        - category
+        - status
+        - createdAt
+        - updatedAt
+
+    PricingItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 定价规则ID
+          example: "1"
+        name:
+          type: string
+          description: 规则名称
+          example: "成人票标准价格"
+        sku:
+          type: string
+          description: 商品SKU
+          example: "TICKET-ADULT-001"
+        priceType:
+          type: string
+          enum: [regular, promotion, member]
+          description: 价格类型
+          example: "regular"
+        amount:
+          type: number
+          description: 价格金额
+          example: 45.00
+        effectiveDate:
+          type: string
+          format: date
+          description: 生效时间
+          example: "2025-12-10"
+        expiryDate:
+          type: string
+          format: date
+          description: 过期时间
+          example: "2025-12-31"
+        status:
+          type: string
+          enum: [active, inactive, pending]
+          description: 状态
+          example: "active"
+
+    ReviewItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 审核记录ID
+          example: "1"
+        type:
+          type: string
+          enum: [product, pricing, inventory]
+          description: 审核类型
+          example: "product"
+        targetId:
+          type: string
+          description: 审核对象ID
+          example: "1"
+        title:
+          type: string
+          description: 审核标题
+          example: "新增商品审核"
+        applicant:
+          type: string
+          description: 申请人
+          example: "张三"
+        applyTime:
+          type: string
+          format: date-time
+          description: 申请时间
+          example: "2025-12-10T10:00:00Z"
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          description: 审核状态
+          example: "pending"
+        reviewer:
+          type: string
+          description: 审核人
+        reviewTime:
+          type: string
+          format: date-time
+          description: 审核时间
+        comment:
+          type: string
+          description: 审核意见
+
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 库存记录ID
+          example: "1"
+        sku:
+          type: string
+          description: 商品SKU
+          example: "TICKET-ADULT-001"
+        productName:
+          type: string
+          description: 商品名称
+          example: "电影票-成人票"
+        location:
+          type: string
+          description: 仓库位置
+          example: "A-01-01"
+        quantity:
+          type: integer
+          description: 当前库存数量
+          example: 100
+        operation:
+          type: string
+          enum: [in, out, adjust]
+          description: 操作类型
+          example: "in"
+        operationQty:
+          type: integer
+          description: 操作数量
+          example: 50
+        operationTime:
+          type: string
+          format: date-time
+          description: 操作时间
+          example: "2025-12-10T10:00:00Z"
+        operator:
+          type: string
+          description: 操作人
+          example: "李四"
+        remark:
+          type: string
+          description: 备注说明
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 500
+        message:
+          type: string
+          example: "Internal Server Error"
+        data:
+          type: object
+          nullable: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
