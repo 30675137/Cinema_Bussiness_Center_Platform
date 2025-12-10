@@ -1,0 +1,824 @@
+{
+  "config": {
+    "configFile": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/playwright.config.ts",
+    "rootDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "product-management.spec.ts",
+      "file": "product-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "用户故事1: 商品管理主界面",
+          "file": "product-management.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "US1-1: 验证商品管理页面正常加载",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6443,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:18:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:18:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:49:59.515Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-1-验证商品管理页面正常加载-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-1-验证商品管理页面正常加载-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-671248b396366ace3a14",
+              "file": "product-management.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "US1-2: 验证商品搜索功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "timedOut",
+                      "duration": 31731,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 28,
+                            "line": 57
+                          },
+                          "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"search-input\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:57\n\n  55 |   // 搜索商品\n  56 |   async searchProduct(searchTerm: string) {\n> 57 |     await this.searchInput.fill(searchTerm);\n     |                            ^\n  58 |     await this.page.keyboard.press('Enter');\n  59 |     await this.page.waitForTimeout(1000); // 等待搜索结果\n  60 |   }\n    at ProductPage.searchProduct (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:57:28)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:45:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:49:59.615Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-2-验证商品搜索功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-2-验证商品搜索功能-chromium/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-d46892f0817397b7f564",
+              "file": "product-management.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "US1-3: 验证商品筛选功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 31608,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 33,
+                            "line": 65
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"category-filter\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:65\n\n  63 |   async filterProducts(category?: string, status?: string, materialType?: string) {\n  64 |     if (category) {\n> 65 |       await this.categoryFilter.click();\n     |                                 ^\n  66 |       await this.page.click(`[data-value=\"${category}\"]`);\n  67 |     }\n  68 |     if (status) {\n    at ProductPage.filterProducts (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:65:33)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:71:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:49:59.573Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-3-验证商品筛选功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-3-验证商品筛选功能-chromium/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-ba0b7e7cd62c79569ec2",
+              "file": "product-management.spec.ts",
+              "line": 65,
+              "column": 3
+            },
+            {
+              "title": "US1-4: 验证新建商品导航",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 31673,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 36,
+                            "line": 81
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"create-product-button\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:81\n\n  79 |   // 点击创建商品按钮\n  80 |   async clickCreateProduct() {\n> 81 |     await this.createProductButton.click();\n     |                                    ^\n  82 |     await this.waitForPageLoad();\n  83 |   }\n  84 |\n    at ProductPage.clickCreateProduct (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:81:36)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:97:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:49:59.571Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-4-验证新建商品导航-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-4-验证新建商品导航-chromium/video.webm"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-7815ab3d43cf5fb54a12",
+              "file": "product-management.spec.ts",
+              "line": 92,
+              "column": 3
+            },
+            {
+              "title": "US1-5: 验证商品列表数据展示",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 6353,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:114:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:114:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:49:59.566Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-5-验证商品列表数据展示-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-5-验证商品列表数据展示-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-0ec6ad89a19588d2b78a",
+              "file": "product-management.spec.ts",
+              "line": 110,
+              "column": 3
+            },
+            {
+              "title": "US1-6: 验证批量选择功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6343,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:144:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:144:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:50:06.864Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-6-验证批量选择功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-6-验证批量选择功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-1f0396a2d2d02b470544",
+              "file": "product-management.spec.ts",
+              "line": 139,
+              "column": 3
+            },
+            {
+              "title": "US1-7: 验证移动端响应式设计",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 6790,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:174:65",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts",
+                          "column": 65,
+                          "line": 174
+                        },
+                        "snippet": "  172 |\n  173 |     // 验证移动端布局\n> 174 |     await expect(page.locator('[data-testid=\"product-table\"]')).toBeVisible();\n      |                                                                 ^\n  175 |\n  176 |     // 验证移动端特有的交互元素\n  177 |     await expect(page.locator('[data-testid=\"mobile-filter-toggle\"]')).toBeVisible();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts",
+                            "column": 65,
+                            "line": 174
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n  172 |\n  173 |     // 验证移动端布局\n> 174 |     await expect(page.locator('[data-testid=\"product-table\"]')).toBeVisible();\n      |                                                                 ^\n  175 |\n  176 |     // 验证移动端特有的交互元素\n  177 |     await expect(page.locator('[data-testid=\"mobile-filter-toggle\"]')).toBeVisible();\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:174:65"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:50:06.864Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-7-验证移动端响应式设计-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-7-验证移动端响应式设计-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts",
+                        "column": 65,
+                        "line": 174
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-a317a0eb14f823b86e0b",
+              "file": "product-management.spec.ts",
+              "line": 164,
+              "column": 3
+            },
+            {
+              "title": "US1-8: 验证页面加载状态和错误处理",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6362,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:203:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:203:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:50:13.866Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-8-验证页面加载状态和错误处理-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-8-验证页面加载状态和错误处理-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-91890b466c80a05b2a14",
+              "file": "product-management.spec.ts",
+              "line": 186,
+              "column": 3
+            },
+            {
+              "title": "US1-9: 验证面包屑导航",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 6128,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:213:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:213:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:50:14.851Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-9-验证面包屑导航-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-9-验证面包屑导航-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-f5d2a0969236f64f9213",
+              "file": "product-management.spec.ts",
+              "line": 209,
+              "column": 3
+            },
+            {
+              "title": "US1-10: 验证分页功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 6076,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:226:23",
+                        "location": {
+                          "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                          "column": 37,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mpages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                            "column": 37,
+                            "line": 50
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-testid=\"product-table\"]')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid=\"product-table\"]')\u001b[22m\n\n\n   at pages/ProductPage.ts:50\n\n  48 |   // 验证页面加载完成\n  49 |   async verifyPageLoaded() {\n> 50 |     await expect(this.productTable).toBeVisible();\n     |                                     ^\n  51 |     await expect(this.createProductButton).toBeVisible();\n  52 |     await expect(this.searchInput).toBeVisible();\n  53 |   }\n    at ProductPage.verifyPageLoaded (/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts:50:37)\n    at /Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/product-management.spec.ts:226:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-10T03:50:21.248Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-10-验证分页功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/test-results/product-management-用户故事1-商品管理主界面-US1-10-验证分页功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/Documents/javaPrject/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/pages/ProductPage.ts",
+                        "column": 37,
+                        "line": 50
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b466968b1dcc758469a-a40552b843b6ed594392",
+              "file": "product-management.spec.ts",
+              "line": 221,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-12-10T03:49:58.841Z",
+    "duration": 33136.875,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 10,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,97 @@
+/* 基础样式重置 */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* 导入全局样式 */
+@import './styles/globals.css';
+
+/* 代码字体 */
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 自定义基础样式 */
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  body {
+    background-color: #f9fafb;
+    color: #111827;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* 自定义组件样式 */
+@layer components {
+  /* 卡片样式 */
+  .card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    padding: 1.5rem;
+  }
+
+  /* 按钮样式 */
+  .btn-primary {
+    background-color: #1890ff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: background-color 250ms;
+  }
+
+  .btn-primary:hover {
+    background-color: #096dd9;
+  }
+
+  .btn-secondary {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: background-color 250ms;
+  }
+
+  .btn-secondary:hover {
+    background-color: #d1d5db;
+  }
+
+  /* 状态标签样式 */
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .status-success {
+    background-color: #d9f7be;
+    color: #389e0d;
+  }
+
+  .status-warning {
+    background-color: #fff1b8;
+    color: #d48806;
+  }
+
+  .status-error {
+    background-color: #ffccc7;
+    color: #cf1322;
+  }
+
+  .status-pending {
+    background-color: #bae7ff;
+    color: #096dd9;
+  }
+}

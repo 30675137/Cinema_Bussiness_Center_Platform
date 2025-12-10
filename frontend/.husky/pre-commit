@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-commit hooks..."
+
+# 运行ESLint检查
+echo "📋 Running ESLint..."
+npm run lint
+
+# 运行Prettier格式检查
+echo "🎨 Running Prettier..."
+npm run format:check
+
+# 运行类型检查
+echo "🔍 Running TypeScript type checking..."
+npx tsc --noEmit
+
+echo "✅ Pre-commit hooks completed successfully!"
