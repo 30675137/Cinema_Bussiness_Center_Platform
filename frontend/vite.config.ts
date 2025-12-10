@@ -1,52 +1,27 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import path from 'path'
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      '@/components': resolve(__dirname, 'src/components'),
-      '@/pages': resolve(__dirname, 'src/pages'),
-      '@/features': resolve(__dirname, 'src/features'),
-      '@/stores': resolve(__dirname, 'src/stores'),
-      '@/services': resolve(__dirname, 'src/services'),
-      '@/types': resolve(__dirname, 'src/types'),
-      '@/utils': resolve(__dirname, 'src/utils'),
-      '@/constants': resolve(__dirname, 'src/constants'),
+      '@': path.resolve(__dirname, './src'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      '@/hooks': path.resolve(__dirname, './src/hooks'),
+      '@/stores': path.resolve(__dirname, './src/stores'),
+      '@/types': path.resolve(__dirname, './src/types'),
+      '@/utils': path.resolve(__dirname, './src/utils'),
+      '@/styles': path.resolve(__dirname, './src/styles'),
     },
-  },
-  build: {
-    target: 'esnext',
-    minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          antd: ['antd', '@ant-design/icons'],
-          query: ['@tanstack/react-query'],
-          router: ['react-router-dom'],
-          forms: ['react-hook-form', 'zod', '@hookform/resolvers'],
-          utils: ['axios', 'lodash-es'],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', 'react-router-dom'],
   },
   server: {
     port: 3000,
     host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+  },
+  css: {
+    postcss: './postcss.config.js',
   },
 })

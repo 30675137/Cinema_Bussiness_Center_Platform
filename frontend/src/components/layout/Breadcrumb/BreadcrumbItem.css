@@ -1,0 +1,37 @@
+/**
+ * BreadcrumbItem样式
+ */
+
+.breadcrumb-wrapper {
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-link {
+  color: var(--ant-color-text-secondary);
+  text-decoration: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--ant-color-primary);
+  background-color: var(--ant-color-primary-bg);
+  text-decoration: none;
+}
+
+.breadcrumb-current {
+  color: var(--ant-color-text);
+  font-weight: 500;
+}
+
+/* 暗色主题适配 */
+.ant-layout.dark .breadcrumb-link:hover {
+  background-color: rgba(24, 144, 255, 0.1);
+}

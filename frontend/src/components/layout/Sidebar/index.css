@@ -1,0 +1,188 @@
+/**
+ * Sidebar样式
+ */
+
+.layout-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  background: var(--ant-color-bg-container);
+  border-right: 1px solid var(--ant-color-border);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.sidebar-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--ant-color-border);
+  padding: 0 16px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ant-color-primary);
+  text-align: center;
+}
+
+.logo-text {
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu {
+  flex: 1;
+  border-right: none;
+  background: transparent;
+  overflow-y: auto;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: var(--ant-color-border);
+  border-radius: 3px;
+}
+
+.sidebar-footer {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--ant-color-border);
+  padding: 8px;
+}
+
+.collapse-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--ant-color-border);
+  background: var(--ant-color-bg-container);
+  border-radius: 4px;
+  color: var(--ant-color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.collapse-btn:hover {
+  color: var(--ant-color-primary);
+  border-color: var(--ant-color-primary);
+  background: var(--ant-color-primary-bg);
+}
+
+/* 折叠状态样式 */
+.layout-sidebar.collapsed .sidebar-header {
+  padding: 0 12px;
+}
+
+.layout-sidebar.collapsed .logo-text {
+  font-size: 16px;
+}
+
+.layout-sidebar.collapsed .sidebar-menu .ant-menu-item {
+  padding-left: 24px !important;
+}
+
+.layout-sidebar.collapsed .sidebar-menu .ant-menu-submenu-title {
+  padding-left: 24px !important;
+}
+
+/* 菜单项样式 */
+.sidebar-menu .ant-menu-item {
+  margin: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu .ant-menu-item:hover {
+  background-color: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary);
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  background-color: var(--ant-color-primary);
+  color: #fff;
+}
+
+.sidebar-menu .ant-menu-item-selected:hover {
+  background-color: var(--ant-color-primary-hover);
+  color: #fff;
+}
+
+.sidebar-menu .ant-menu-submenu-title {
+  margin: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-menu .ant-menu-submenu-title:hover {
+  background-color: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary);
+}
+
+.sidebar-menu .ant-menu-submenu-open > .ant-menu-submenu-title {
+  background-color: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary);
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .layout-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .layout-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* 移动端菜单样式调整 */
+  .layout-sidebar .sidebar-menu .ant-menu-item {
+    margin: 2px 4px;
+  }
+
+  .layout-sidebar .sidebar-menu .ant-menu-submenu-title {
+    margin: 2px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout-sidebar {
+    width: 240px !important; /* 移动端展开时保持宽度 */
+  }
+
+  .layout-sidebar.collapsed {
+    transform: translateX(-100%);
+    width: 0 !important;
+  }
+
+  .sidebar-header {
+    padding: 0 12px;
+  }
+
+  .logo-text {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .layout-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,75 @@
+uid=5_0 RootWebArea "耀莱影城商品管理中台" url="http://localhost:3001/dashboard"
+  uid=5_1 ignored
+    uid=5_2 generic
+      uid=5_3 generic
+        uid=5_4 ignored
+          uid=5_5 ignored
+            uid=5_6 ignored
+              uid=5_7 complementary
+                uid=5_8 ignored
+                  uid=5_9 ignored
+                    uid=5_10 generic
+                      uid=5_11 StaticText "耀"
+                        uid=5_12 InlineTextBox "耀"
+                  uid=5_13 menu orientation="vertical"
+                    uid=5_14 menuitem "dashboard 仪表盘"
+                      uid=5_15 image "dashboard"
+                      uid=5_16 generic
+                        uid=5_17 StaticText "仪表盘"
+                          uid=5_18 InlineTextBox "仪表盘"
+                    uid=5_19 menuitem "shop 商品管理" expandable haspopup="menu"
+                      uid=5_20 image "shop"
+                      uid=5_21 generic
+                        uid=5_22 StaticText "商品管理"
+                          uid=5_23 InlineTextBox "商品管理"
+                      uid=5_24 generic
+                    uid=5_25 menuitem "dollar 定价中心" expandable haspopup="menu"
+                      uid=5_26 image "dollar"
+                      uid=5_27 generic
+                        uid=5_28 StaticText "定价中心"
+                          uid=5_29 InlineTextBox "定价中心"
+                      uid=5_30 generic
+                    uid=5_31 menuitem "audit 审核管理" expandable haspopup="menu"
+                      uid=5_32 image "audit"
+                      uid=5_33 generic
+                        uid=5_34 StaticText "审核管理"
+                          uid=5_35 InlineTextBox "审核管理"
+                      uid=5_36 generic
+                    uid=5_37 menuitem "eye 库存追溯" expandable haspopup="menu"
+                      uid=5_38 image "eye"
+                      uid=5_39 generic
+                        uid=5_40 StaticText "库存追溯"
+                          uid=5_41 InlineTextBox "库存追溯"
+                      uid=5_42 generic
+                  uid=5_43 ignored
+                    uid=5_44 button "menu-unfold"
+                      uid=5_45 image "menu-unfold"
+              uid=5_46 ignored
+                uid=5_47 banner
+                  uid=5_48 ignored
+                    uid=5_49 button "menu-unfold"
+                      uid=5_50 ignored
+                        uid=5_51 image "menu-unfold"
+                  uid=5_52 ignored
+                    uid=5_53 ignored
+                      uid=5_54 ignored
+                        uid=5_55 button "user"
+                          uid=5_56 ignored
+                            uid=5_57 image "user"
+                uid=5_58 ignored
+                  uid=5_59 navigation
+                    uid=5_60 list
+                      uid=5_61 listitem level="1"
+                        uid=5_62 link "home" url="http://localhost:3001/"
+                          uid=5_63 ignored
+                            uid=5_64 image "home"
+                      uid=5_65 listitem level="1"
+                        uid=5_66 StaticText "仪表盘"
+                          uid=5_67 InlineTextBox "仪表盘"
+                uid=5_68 main
+                  uid=5_69 ignored
+      uid=5_70 generic
+        uid=5_71 ignored
+          uid=5_72 ignored
+      uid=5_73 generic
+        uid=5_74 ignored

@@ -1,64 +1,38 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { BrowserRouter } from 'react-router-dom'
-import { ConfigProvider } from 'antd'
-import zhCN from 'antd/locale/zh_CN'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
+/**
+ * 应用入口文件
+ */
 
-import App from './App.tsx'
-import ErrorBoundary from './components/ErrorBoundary'
-import './locales' // 初始化国际化
-import './index.css'
-
-// 导入性能监控系统
-import './monitoring/PerformanceInterceptor'
-import './monitoring/WebVitalsMonitor'
-
-// 设置dayjs中文语言
-dayjs.locale('zh-cn')
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { App as AntdApp } from 'antd';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import App from './App';
+import './index.css';
 
 // 创建React Query客户端
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5分钟内数据认为新鲜
-      gcTime: 10 * 60 * 1000, // 10分钟缓存时间
-      retry: (failureCount, error) => {
-        // 对于4xx错误不重试
-        if (error && typeof error === 'object' && 'status' in error) {
-          const status = error.status as number;
-          if (status >= 400 && status < 500) return false;
-        }
-        return failureCount < 3;
-      },
+      retry: 1,
       refetchOnWindowFocus: false,
     },
-    mutations: {
-      retry: 1,
-    },
   },
-})
+});
 
-// 导入自定义主题配置
-import { antdTheme } from './theme'
+// 获取根元素
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ConfigProvider
-            locale={zhCN}
-            theme={antdTheme}
-          >
-            <App />
-          </ConfigProvider>
-        </BrowserRouter>
-        {import.meta.env.DEV && <ReactQueryDevtools />}
-      </QueryClientProvider>
-    </ErrorBoundary>
-  </StrictMode>,
-)
+const root = ReactDOM.createRoot(rootElement);
+
+root.render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <AntdApp>
+        <App />
+      </AntdApp>
+    </QueryClientProvider>
+  </React.StrictMode>
+);

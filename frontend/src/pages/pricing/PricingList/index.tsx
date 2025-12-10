@@ -1,23 +1,23 @@
 /**
- * 商品列表页面
+ * 定价中心页面
  */
 
 import React, { useState, useEffect } from 'react';
-import { Tag, Button, Space, Input, Select, message } from 'antd';
+import { Tag, Button, Space, Input, Select, DatePicker, message } from 'antd';
 import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import DataTable from '@/components/common/DataTable';
 import { mockApi } from '@/services/mockApi';
-import type { ProductItem } from '@/types/mock';
+import type { PricingItem } from '@/types/mock';
 
 const { Search } = Input;
 const { Option } = Select;
 
 /**
- * 商品列表页面组件
+ * 定价中心页面组件
  */
-const ProductList: React.FC = () => {
-  const [data, setData] = useState<ProductItem[]>([]);
+const PricingList: React.FC = () => {
+  const [data, setData] = useState<PricingItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -25,21 +25,21 @@ const ProductList: React.FC = () => {
     total: 0,
   });
   const [filters, setFilters] = useState({
-    category: '',
+    priceType: '',
     status: '',
     search: '',
   });
 
   /**
-   * 加载商品数据
+   * 加载定价数据
    */
   const loadData = async (params?: any) => {
     setLoading(true);
     try {
-      const response = await mockApi.getProducts({
+      const response = await mockApi.getPricing({
         page: params?.current || pagination.current,
         pageSize: params?.pageSize || pagination.pageSize,
-        category: params?.category || filters.category,
+        priceType: params?.priceType || filters.priceType,
         status: params?.status || filters.status,
       });
 
@@ -52,11 +52,11 @@ const ProductList: React.FC = () => {
           pageSize: params?.pageSize || prev.pageSize,
         }));
       } else {
-        message.error('加载商品数据失败');
+        message.error('加载定价数据失败');
       }
     } catch (error) {
       message.error('网络错误，请稍后重试');
-      console.error('加载商品数据错误:', error);
+      console.error('加载定价数据错误:', error);
     } finally {
       setLoading(false);
     }
@@ -107,24 +107,37 @@ const ProductList: React.FC = () => {
   };
 
   /**
-   * 新增商品
+   * 新增定价规则
    */
   const handleAdd = () => {
-    message.info('新增商品功能开发中...');
+    message.info('新增定价规则功能开发中...');
   };
 
   /**
-   * 编辑商品
+   * 编辑定价规则
    */
-  const handleEdit = (record: ProductItem) => {
-    message.info(`编辑商品: ${record.name}`);
+  const handleEdit = (record: PricingItem) => {
+    message.info(`编辑定价规则: ${record.name}`);
   };
 
   /**
-   * 删除商品
+   * 删除定价规则
    */
-  const handleDelete = (record: ProductItem) => {
-    message.info(`删除商品: ${record.name}`);
+  const handleDelete = (record: PricingItem) => {
+    message.info(`删除定价规则: ${record.name}`);
+  };
+
+  /**
+   * 价格类型标签渲染
+   */
+  const renderPriceType = (type: string) => {
+    const typeConfig = {
+      regular: { color: 'blue', text: '标准价格' },
+      promotion: { color: 'orange', text: '促销价格' },
+      member: { color: 'purple', text: '会员价格' },
+    };
+    const config = typeConfig[type as keyof typeof typeConfig];
+    return <Tag color={config.color}>{config.text}</Tag>;
   };
 
   /**
@@ -132,8 +145,8 @@ const ProductList: React.FC = () => {
    */
   const renderStatus = (status: string) => {
     const statusConfig = {
-      active: { color: 'green', text: '已发布' },
-      inactive: { color: 'red', text: '已下架' },
+      active: { color: 'green', text: '已生效' },
+      inactive: { color: 'red', text: '已失效' },
       pending: { color: 'orange', text: '待审核' },
     };
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -143,43 +156,50 @@ const ProductList: React.FC = () => {
   /**
    * 表格列配置
    */
-  const columns: ColumnsType<ProductItem> = [
+  const columns: ColumnsType<PricingItem> = [
     {
-      title: '商品ID',
+      title: '规则ID',
       dataIndex: 'id',
       key: 'id',
       width: 100,
     },
     {
-      title: '商品名称',
+      title: '规则名称',
       dataIndex: 'name',
       key: 'name',
       width: 180,
     },
     {
-      title: '商品编码',
+      title: '商品SKU',
       dataIndex: 'sku',
       key: 'sku',
-      width: 140,
+      width: 160,
     },
     {
-      title: '商品分类',
-      dataIndex: 'category',
-      key: 'category',
+      title: '价格类型',
+      dataIndex: 'priceType',
+      key: 'priceType',
+      width: 120,
+      render: renderPriceType,
+    },
+    {
+      title: '价格金额',
+      dataIndex: 'amount',
+      key: 'amount',
+      width: 120,
+      render: (amount: number) => `¥${amount.toFixed(2)}`,
+    },
+    {
+      title: '生效时间',
+      dataIndex: 'effectiveDate',
+      key: 'effectiveDate',
       width: 120,
     },
     {
-      title: '价格',
-      dataIndex: 'price',
-      key: 'price',
-      width: 100,
-      render: (price: number) => `¥${price?.toFixed(2) || '0.00'}`,
-    },
-    {
-      title: '库存',
-      dataIndex: 'stock',
-      key: 'stock',
-      width: 80,
+      title: '过期时间',
+      dataIndex: 'expiryDate',
+      key: 'expiryDate',
+      width: 120,
     },
     {
       title: '状态',
@@ -187,12 +207,6 @@ const ProductList: React.FC = () => {
       key: 'status',
       width: 100,
       render: renderStatus,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 120,
     },
     {
       title: '操作',
@@ -228,29 +242,29 @@ const ProductList: React.FC = () => {
   const filterToolbar = (
     <Space style={{ marginBottom: 16 }}>
       <Search
-        placeholder="搜索商品名称或编码"
+        placeholder="搜索规则名称或SKU"
         allowClear
         style={{ width: 240 }}
         onSearch={handleSearch}
       />
       <Select
-        placeholder="商品分类"
+        placeholder="价格类型"
         allowClear
         style={{ width: 120 }}
-        onChange={(value) => handleFilter('category', value || '')}
+        onChange={(value) => handleFilter('priceType', value || '')}
       >
-        <Option value="电影票">电影票</Option>
-        <Option value="小食">小食</Option>
-        <Option value="饮料">饮料</Option>
+        <Option value="regular">标准价格</Option>
+        <Option value="promotion">促销价格</Option>
+        <Option value="member">会员价格</Option>
       </Select>
       <Select
-        placeholder="商品状态"
+        placeholder="规则状态"
         allowClear
         style={{ width: 120 }}
         onChange={(value) => handleFilter('status', value || '')}
       >
-        <Option value="active">已发布</Option>
-        <Option value="inactive">已下架</Option>
+        <Option value="active">已生效</Option>
+        <Option value="inactive">已失效</Option>
         <Option value="pending">待审核</Option>
       </Select>
       <Button
@@ -258,15 +272,15 @@ const ProductList: React.FC = () => {
         icon={<PlusOutlined />}
         onClick={handleAdd}
       >
-        新增商品
+        新增规则
       </Button>
     </Space>
   );
 
   return (
-    <div className="product-list-page">
+    <div className="pricing-list-page">
       <DataTable
-        title="商品管理"
+        title="定价中心"
         data={data}
         columns={columns}
         loading={loading}
@@ -280,4 +294,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default PricingList;
