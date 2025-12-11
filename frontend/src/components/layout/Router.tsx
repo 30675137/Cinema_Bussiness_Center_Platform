@@ -23,7 +23,7 @@ const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements')
 const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const TransferManagement = lazy(() => import('@/pages/inventory/TransferManagement'));
 const ProcurementTransfer = lazy(() => import('@/pages/inventory/TransferManagement'));
-const Stocktaking = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const Stocktaking = lazy(() => import('@/pages/inventory/Stocktaking'));
 const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryMovements'));
 
 // 暂时使用现有组件替代
