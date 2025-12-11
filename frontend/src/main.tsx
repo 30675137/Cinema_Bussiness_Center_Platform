@@ -2,13 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { BrowserRouter } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 import { ConfigProvider } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 
-import App from './App.tsx'
+import router from './components/layout/Router'
 import ErrorBoundary from './components/ErrorBoundary'
 import './locales' // 初始化国际化
 import './index.css'
@@ -49,14 +49,12 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <ConfigProvider
-            locale={zhCN}
-            theme={antdTheme}
-          >
-            <App />
-          </ConfigProvider>
-        </BrowserRouter>
+        <ConfigProvider
+          locale={zhCN}
+          theme={antdTheme}
+        >
+          <RouterProvider router={router} />
+        </ConfigProvider>
         {import.meta.env.DEV && <ReactQueryDevtools />}
       </QueryClientProvider>
     </ErrorBoundary>

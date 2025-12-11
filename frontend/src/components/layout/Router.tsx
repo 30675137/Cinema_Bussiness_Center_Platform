@@ -9,6 +9,11 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ProductList = lazy(() => import('@/pages/product/ProductList'));
 const ProductForm = lazy(() => import('@/pages/product/ProductForm'));
 const PricingConfig = lazy(() => import('@/pages/pricing/PricingConfig'));
+const PriceManagement = lazy(() => import('@/pages/price/PriceManagement'));
+const ReviewPanel = lazy(() => import('@/pages/review/ReviewPanel'));
+const InventoryTrace = lazy(() => import('@/pages/inventory/InventoryTrace'));
+const InventoryLedger = lazy(() => import('@/pages/inventory/InventoryLedger'));
+const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovements'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -151,7 +156,7 @@ export const router = createBrowserRouter([
         <AppLayout>
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              <ProductForm mode="view" />
+              <ProductForm mode="edit" />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>
@@ -159,6 +164,34 @@ export const router = createBrowserRouter([
     ),
   },
   // 价格配置路由
+  {
+    path: '/pricing',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PriceManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/price-management',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PriceManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
   {
     path: '/pricing/configs',
     element: (
@@ -189,6 +222,34 @@ export const router = createBrowserRouter([
   },
   // 审核流程路由
   {
+    path: '/review',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReviewPanel />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/review-panel',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReviewPanel />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/audit/pending',
     element: (
       <ProtectedRoute>
@@ -217,6 +278,62 @@ export const router = createBrowserRouter([
     ),
   },
   // 库存追溯路由
+  {
+    path: '/inventory',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryTrace />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/inventory-trace',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryTrace />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/inventory/ledger',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryLedger />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/inventory/movements',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryMovements />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
   {
     path: '/inventory/query',
     element: (

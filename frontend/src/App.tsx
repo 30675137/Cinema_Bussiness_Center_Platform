@@ -9,6 +9,7 @@ import { bundleAnalyzer } from './monitoring/BundleAnalyzer';
 import { PERFORMANCE_CONFIG } from './monitoring/config';
 import { LazyLoadWrapper } from './optimization/LazyLoadWrapper';
 import LoadingSpinner from './components/LoadingSpinner';
+import AppLayout from './components/layout/AppLayout';
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/HomePage'));
