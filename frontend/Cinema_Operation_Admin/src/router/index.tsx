@@ -22,6 +22,9 @@ const InventoryList = React.lazy(() => import('@/pages/inventory/InventoryList')
 const PricingList = React.lazy(() => import('@/pages/pricing/PricingList'));
 const ReviewList = React.lazy(() => import('@/pages/review/ReviewList'));
 
+// 采购管理页面组件
+const PurchaseOrderPage = React.lazy(() => import('@/pages/procurement/SimplePurchaseOrderPage'));
+
 // 布局组件
 const AppLayout = React.lazy(() => import('@/components/layout/AppLayout'));
 const LoginPage = React.lazy(() => import('@/pages/Login'));
@@ -459,7 +462,7 @@ const router = createBrowserRouter([
             path: 'purchase-order',
             element: (
               <Suspense fallback={<LoadingFallback />}>
-                <div>采购订单管理</div>
+                <PurchaseOrderPage />
               </Suspense>
             )
           },
