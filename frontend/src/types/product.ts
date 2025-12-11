@@ -408,8 +408,6 @@ export const ProductFormSchema = z.object({
       path: ['bom']
     });
   }
-
-  return data;
 });
 
 // 导出类型推导
@@ -452,5 +450,6 @@ export const createEmptyProductForm = (): ProductFormData => ({
     productId: '',
     title: '',
     images: []
-  }
+  },
+  status: ProductStatus.DRAFT
 });
