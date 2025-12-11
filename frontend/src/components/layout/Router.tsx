@@ -21,6 +21,8 @@ const AuditHistory = lazy(() => import('@/pages/product/ProductList'));
 const InventoryOperations = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const TransferManagement = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const ProcurementTransfer = lazy(() => import('@/pages/inventory/InventoryMovements'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
@@ -371,6 +373,36 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <InventoryTransactions />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 采购管理路由
+  {
+    path: '/procurement/transfer',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ProcurementTransfer />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 库存调拨路由
+  {
+    path: '/inventory/transfer',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <TransferManagement />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>
