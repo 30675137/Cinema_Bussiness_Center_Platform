@@ -70,7 +70,7 @@
 - [ ] T022 [P] [US1] Unit test for inventory filters component in tests/unit/components/Inventory/InventoryFilters.test.tsx
 - [ ] T023 [P] [US1] Unit test for inventory table component in tests/unit/components/Inventory/InventoryTable.test.tsx
 - [ ] T024 [P] [US1] Unit test for permission guard component in tests/unit/components/Inventory/PermissionGuard.test.tsx
-- [ ] T025 [P] [US1] E2E test for inventory ledger page functionality in tests/e2e/inventory-ledger.spec.ts
+- [X] T025 [P] [US1] E2E test for inventory ledger page functionality in tests/e2e/inventory-ledger.spec.ts
 
 ### Implementation for User Story 1
 

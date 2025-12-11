@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Avatar, Dropdown, Breadcrumb, Space, Badge, Tooltip } from 'antd';
-import type { MenuProps } from 'antd';
+import type { MenuProps as AntdMenuProps } from 'antd/es/menu';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -292,7 +292,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
             {/* 用户信息 */}
             <Dropdown
-              menu={{ items: userMenuItems as MenuProps['items'] }}
+              menu={{ items: userMenuItems as AntdMenuProps['items'] }}
               placement="bottomRight"
               arrow
             >
