@@ -17,9 +17,9 @@ import {
   Avatar,
   Badge,
   Dropdown,
-  MenuProps,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import type { MenuProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
