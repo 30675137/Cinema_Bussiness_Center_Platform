@@ -1,6 +1,6 @@
 # Feature Specification: 库存与仓店库存管理系统
 
-**Feature Branch**: `001-inventory-management`
+**Feature Branch**: `0703-inventory-management`
 **Created**: 2025-12-11
 **Status**: Draft
 **Input**: User description: "库存 & 仓店库存管理前端设计要求，包含库存台账和库存流水两个核心模块"
@@ -13,6 +13,10 @@
 - Q: 权限控制模拟方式 → A: 前端硬编码权限角色，通过用户选择器切换
 - Q: 数据持久化和状态管理 → A: 无状态设计，每次操作都是独立的mock响应
 - Q: 库存调整操作的反馈模拟 → A: 固定成功模式，所有库存调整操作都显示成功结果
+
+### Session 2025-12-11
+
+- Q: 功能分支和文件夹重命名 → A: 从 001-inventory-management 更改为 0703-inventory-management
 
 ## User Scenarios & Testing *(mandatory)*
 
