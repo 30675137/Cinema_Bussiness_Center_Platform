@@ -29,6 +29,9 @@ const ReviewPanel = lazy(() => import('./pages/review/ReviewPanel'));
 // 库存追溯页面
 const InventoryTrace = lazy(() => import('./pages/inventory/InventoryTrace'));
 
+// 库存台账页面
+const InventoryLedger = lazy(() => import('./pages/inventory/InventoryLedger'));
+
 // 登录页面
 const LoginPage = lazy(() => import('./pages/auth/Login'));
 
@@ -142,6 +145,9 @@ const App: React.FC = () => {
                 {/* 库存追溯 */}
                 <Route path="/inventory" element={<InventoryTrace />} />
                 <Route path="/inventory-trace" element={<InventoryTrace />} />
+
+                {/* 库存台账 */}
+                <Route path="/inventory/ledger" element={<InventoryLedger />} />
 
                 {/* 性能监控 */}
                 <Route
