@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, Table, Button, Space, Input, Select, Tag, InputNumber, Modal, Form } from 'antd';
+import { Card, Table, Button, Space, Input, Select, Tag, InputNumber, Form } from 'antd';
 import { PlusOutlined, EditOutlined, SearchOutlined, CopyOutlined, HistoryOutlined } from '@ant-design/icons';
 import { cn } from '@/utils/cn';
+import { FormModal } from '@/components/common/Modal';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -10,12 +11,12 @@ const { Option } = Select;
  * 价格管理页面
  * 显示和管理商品价格信息
  */
-const PricingList: React.FC = () => {
+const PricingList: React.FC = React.memo(() => {
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  // 模拟数据
-  const dataSource = [
+  // 模拟数据 - 使用useMemo避免每次渲染重新计算
+  const dataSource = React.useMemo(() => [
     {
       key: '1',
       id: 'PRICE001',
@@ -58,9 +59,9 @@ const PricingList: React.FC = () => {
       effectiveDate: '2025-12-15',
       lastUpdate: '2025-12-08',
     }
-  ];
+  ], []);
 
-  const columns = [
+  const columns = React.useMemo(() => [
     {
       title: '价格编号',
       dataIndex: 'id',
@@ -168,28 +169,28 @@ const PricingList: React.FC = () => {
         </Space>
       ),
     },
-  ];
+  ], []);
 
-  const handleAddPrice = () => {
+  const handleAddPrice = React.useCallback(() => {
     setModalVisible(true);
     form.resetFields();
-  };
+  }, [form]);
 
-  const handleModalOk = () => {
+  const handleModalOk = React.useCallback(() => {
     form.validateFields().then((values) => {
       console.log('Form values:', values);
       setModalVisible(false);
       // 这里可以添加提交逻辑
     });
-  };
+  }, [form]);
 
-  // 价格统计
-  const priceStats = {
+  // 价格统计 - 使用useMemo优化计算
+  const priceStats = React.useMemo(() => ({
     total: dataSource.length,
     active: dataSource.filter(item => item.status === '生效').length,
     pending: dataSource.filter(item => item.status === '待审核').length,
     expired: dataSource.filter(item => item.status === '已过期').length,
-  };
+  }), [dataSource]);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -283,12 +284,12 @@ const PricingList: React.FC = () => {
       </Card>
 
       {/* 新增价格弹窗 */}
-      <Modal
+      <FormModal
         title="新增价格"
         open={modalVisible}
         onOk={handleModalOk}
         onCancel={() => setModalVisible(false)}
-        width={800}
+        performanceMonitoring={process.env.NODE_ENV === 'development'}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -386,9 +387,11 @@ const PricingList: React.FC = () => {
             <input type="date" style={{ width: '100%', padding: '8px' }} />
           </Form.Item>
         </Form>
-      </Modal>
+      </FormModal>
     </div>
   );
-};
+});
+
+PricingList.displayName = 'PricingList';
 
 export default PricingList;

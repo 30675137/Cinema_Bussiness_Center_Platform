@@ -21,11 +21,11 @@ const { Title, Text } = Typography;
 /**
  * 仪表盘页面组件
  */
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC = React.memo(() => {
   const currentUser = useCurrentUser();
 
-  // 模拟数据
-  const statistics = [
+  // 模拟数据 - 使用useMemo避免每次渲染重新计算
+  const statistics = React.useMemo(() => [
     {
       title: '商品总数',
       value: 1234,
@@ -54,14 +54,14 @@ const Dashboard: React.FC = () => {
       suffix: '%',
       trend: { value: 5.1, isPositive: true }
     }
-  ];
+  ], []);
 
-  const quickActions = [
+  const quickActions = React.useMemo(() => [
     { title: '新增商品', icon: <PlusOutlined />, path: '/product/add' },
     { title: '库存盘点', icon: <BarChartOutlined />, path: '/inventory/check' },
     { title: '价格管理', icon: <DollarOutlined />, path: '/pricing' },
     { title: '用户管理', icon: <UserOutlined />, path: '/system/user' }
-  ];
+  ], []);
 
   return (
     <div className="dashboard">
@@ -225,6 +225,8 @@ const Dashboard: React.FC = () => {
       </Row>
     </div>
   );
-};
+});
+
+Dashboard.displayName = 'Dashboard';
 
 export default Dashboard;

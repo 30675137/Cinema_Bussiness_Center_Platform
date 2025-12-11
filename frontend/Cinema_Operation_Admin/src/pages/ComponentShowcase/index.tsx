@@ -12,7 +12,15 @@ import {
 import { DataTable, FormField, Card as UICard, StatCard } from '@/components/ui';
 import { FormFieldType } from '@/components/ui/FormField/types';
 import { CardSize, CardVariant } from '@/components/ui/Card/types';
-import { cn } from '@/utils/cn';
+import {
+  cn,
+  tw,
+  tailwindPreset,
+  createGridLayout,
+  createStateVariants,
+  conditionalClasses,
+  createAntdStyles
+} from '@/utils';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -203,7 +211,7 @@ function ComponentShowcase() {
         {/* 统计卡片展示 */}
         <div className="mb-8">
           <Title level={3}>统计卡片组件</Title>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className={tw(createGridLayout({ base: 1, sm: 2, lg: 4 }), 'mb-6')}>
             {statData.map((data, index) => (
               <StatCard
                 key={index}
@@ -257,7 +265,7 @@ function ComponentShowcase() {
           <Title level={3}>表单字段组件</Title>
           <Card title="商品信息录入" className="mb-4">
             <Form layout="vertical">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={tw(createGridLayout({ base: 1, md: 2 }), 'gap-4')}>
                 {formFields.map((field) => (
                   <FormField
                     key={field.name}
@@ -274,6 +282,7 @@ function ComponentShowcase() {
                   <Button
                     type="primary"
                     onClick={() => message.success('表单提交成功')}
+                    className={createAntdStyles('button', 'primary')}
                     classNames={{
                       root: "save-button"
                     }}
@@ -281,6 +290,10 @@ function ComponentShowcase() {
                     保存商品
                   </Button>
                   <Button
+                    className={createStateVariants('base-button', {
+                      hover: 'bg-gray-100',
+                      focus: 'ring-2 ring-gray-300'
+                    })}
                     classNames={{
                       root: "cancel-button"
                     }}
@@ -296,7 +309,7 @@ function ComponentShowcase() {
         {/* 卡片组件展示 */}
         <div className="mb-8">
           <Title level={3}>通用卡片组件</Title>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className={tw(createGridLayout({ base: 1, md: 2, lg: 3 }), 'gap-4')}>
             <UICard
               title="默认卡片"
               subtitle="这是一个默认样式的卡片"
@@ -340,38 +353,38 @@ function ComponentShowcase() {
         <div>
           <Title level={3}>组件特性</Title>
           <Card>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
+            <div className={tw(createGridLayout({ base: 1, md: 2, lg: 3 }), 'gap-6')}>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>✨ 统一设计</Title>
                 <Text type="secondary">
                   所有组件遵循统一的设计规范，确保视觉一致性
                 </Text>
               </div>
-              <div>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>📱 响应式布局</Title>
                 <Text type="secondary">
                   组件支持响应式设计，适配不同屏幕尺寸
                 </Text>
               </div>
-              <div>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>🎨 主题定制</Title>
                 <Text type="secondary">
                   支持主题颜色定制，满足不同业务场景需求
                 </Text>
               </div>
-              <div>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>🔧 高度可配置</Title>
                 <Text type="secondary">
                   提供丰富的配置选项，满足各种使用场景
                 </Text>
               </div>
-              <div>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>♿ 无障碍支持</Title>
                 <Text type="secondary">
                   遵循无障碍设计规范，提升用户体验
                 </Text>
               </div>
-              <div>
+              <div className={conditionalClasses(true, tailwindPreset('card-compact'))}>
                 <Title level={5}>🚀 性能优化</Title>
                 <Text type="secondary">
                   组件经过性能优化，确保流畅的用户体验

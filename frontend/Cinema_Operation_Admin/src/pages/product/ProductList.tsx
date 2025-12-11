@@ -9,9 +9,9 @@ const { Option } = Select;
  * 商品列表页面
  * 显示和管理商品信息
  */
-const ProductList: React.FC = () => {
-  // 模拟数据
-  const dataSource = [
+const ProductList: React.FC = React.memo(() => {
+  // 模拟数据 - 使用useMemo避免每次渲染重新计算
+  const dataSource = React.useMemo(() => [
     {
       key: '1',
       id: 'P001',
@@ -45,9 +45,9 @@ const ProductList: React.FC = () => {
       createTime: '2025-12-01',
       updateTime: '2025-12-08'
     }
-  ];
+  ], []);
 
-  const columns = [
+  const columns = React.useMemo(() => [
     {
       title: '商品编号',
       dataIndex: 'id',
@@ -108,7 +108,7 @@ const ProductList: React.FC = () => {
         </Space>
       ),
     },
-  ];
+  ], []);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -158,6 +158,8 @@ const ProductList: React.FC = () => {
       </Card>
     </div>
   );
-};
+});
+
+ProductList.displayName = 'ProductList';
 
 export default ProductList;
