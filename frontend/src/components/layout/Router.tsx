@@ -29,6 +29,10 @@ const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryReser
 const PurchaseOrders = lazy(() => import('@/pages/procurement/PurchaseOrders'));
 const PurchaseOrderList = lazy(() => import('@/pages/procurement/PurchaseOrderList'));
 const ReceivingList = lazy(() => import('@/pages/procurement/ReceivingList'));
+const ReceivingForm = lazy(() => import('@/pages/procurement/ReceivingForm'));
+const ReceivingDetail = lazy(() => import('@/pages/procurement/ReceivingDetail'));
+const SupplierList = lazy(() => import('@/pages/procurement/SupplierList'));
+const SupplierDetail = lazy(() => import('@/pages/procurement/SupplierDetail'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
@@ -400,6 +404,36 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // 供应商管理路由
+  {
+    path: '/purchase-management/suppliers',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SupplierList />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 供应商详情路由
+  {
+    path: '/purchase-management/suppliers/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SupplierDetail />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
   // 采购订单列表路由
   {
     path: '/purchase-management/orders/list',
@@ -415,9 +449,39 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // 收货入库列表路由
+  // 新建收货入库路由
   {
-    path: '/procurement/receiving/list',
+    path: '/purchase-management/receipts/create',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReceivingForm />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 收货入库详情路由
+  {
+    path: '/purchase-management/receipts/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReceivingDetail />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 到货验收 & 收货入库列表路由
+  {
+    path: '/purchase-management/receipts',
     element: (
       <ProtectedRoute>
         <AppLayout>

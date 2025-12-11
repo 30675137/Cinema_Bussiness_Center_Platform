@@ -202,7 +202,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '采购与入库管理',
       children: [
         {
-          key: '/procurement/suppliers',
+          key: '/purchase-management/suppliers',
           label: '供应商管理',
         },
         {
@@ -214,12 +214,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '采购订单列表',
         },
         {
-          key: '/procurement/receiving',
-          label: '到货验收 & 收货入库',
+          key: '/purchase-management/receipts/create',
+          label: '新建收货入库',
         },
         {
-          key: '/procurement/receiving/list',
-          label: '收货入库列表',
+          key: '/purchase-management/receipts',
+          label: '到货验收 & 收货入库',
         },
         {
           key: '/procurement/exceptions',

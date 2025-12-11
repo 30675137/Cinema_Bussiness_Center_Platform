@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col, Badge } from 'antd';
 import { PlusOutlined, ExportOutlined, ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Search } = Input;
@@ -26,6 +27,8 @@ interface ReceivingRecord {
  * 路由: /procurement/receiving/list
  */
 const ReceivingList: React.FC = () => {
+  const navigate = useNavigate();
+  
   // Mock数据
   const mockData: ReceivingRecord[] = [
     {
@@ -172,7 +175,7 @@ const ReceivingList: React.FC = () => {
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button type="link" size="small" icon={<EyeOutlined />}>
+          <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => navigate(`/purchase-management/receipts/${record.id}`)}>
             查看
           </Button>
           {record.status === 'pending' && (
@@ -208,7 +211,7 @@ const ReceivingList: React.FC = () => {
   };
 
   const handleCreate = () => {
-    console.log('创建收货单');
+    navigate('/purchase-management/receipts/create');
   };
 
   return (
