@@ -32,6 +32,9 @@ const InventoryTrace = lazy(() => import('./pages/inventory/InventoryTrace'));
 // 库存台账页面
 const InventoryLedger = lazy(() => import('./pages/inventory/InventoryLedger'));
 
+// 库存流水页面
+const InventoryMovements = lazy(() => import('./pages/inventory/InventoryMovements'));
+
 // 登录页面
 const LoginPage = lazy(() => import('./pages/auth/Login'));
 
@@ -148,6 +151,9 @@ const App: React.FC = () => {
 
                 {/* 库存台账 */}
                 <Route path="/inventory/ledger" element={<InventoryLedger />} />
+
+                {/* 库存流水 */}
+                <Route path="/inventory/movements" element={<InventoryMovements />} />
 
                 {/* 性能监控 */}
                 <Route
