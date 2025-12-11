@@ -1,0 +1,91 @@
+/* 导航搜索组件样式 */
+.navigation-search {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* 搜索输入框包装器 */
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.navigation-search-input {
+  width: 100%;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.navigation-search-input:focus {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* 搜索后缀图标区域 */
+.search-suffix {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.search-icon {
+  color: #bfbfbf;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.navigation-search-input:focus .search-icon {
+  color: #1890ff;
+}
+
+/* 清除按钮 */
+.clear-button {
+  color: #bfbfbf;
+  transition: color 0.3s ease;
+}
+
+.clear-button:hover {
+  color: #ff4d4f;
+}
+
+/* 加载动画 */
+.search-loading {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 搜索结果下拉框 */
+.search-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .navigation-search {
+    max-width: 100%;
+  }
+
+  .search-results-dropdown {
+    max-height: 300px;
+  }
+}

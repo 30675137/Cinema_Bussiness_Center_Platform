@@ -1,0 +1,315 @@
+/**
+ * API客户端配置
+ * 使用TanStack Query进行服务端状态管理
+ */
+
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+/**
+ * API响应基础接口
+ */
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data: T;
+  message: string;
+  code?: number;
+}
+
+/**
+ * 分页响应接口
+ */
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+/**
+ * API错误接口
+ */
+export interface ApiError {
+  message: string;
+  code?: number;
+  details?: any;
+}
+
+/**
+ * HTTP客户端配置
+ */
+class HttpClient {
+  private baseURL: string;
+  private defaultHeaders: Record<string, string>;
+
+  constructor(baseURL: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api') {
+    this.baseURL = baseURL;
+    this.defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+  }
+
+  /**
+   * 获取认证头
+   */
+  private getAuthHeaders(): Record<string, string> {
+    const token = localStorage.getItem('auth_token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
+  /**
+   * 构建完整URL
+   */
+  private buildUrl(endpoint: string): string {
+    return `${this.baseURL}${endpoint}`;
+  }
+
+  /**
+   * 处理响应
+   */
+  private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * GET请求
+   */
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+    const url = new URL(this.buildUrl(endpoint));
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        ...this.defaultHeaders,
+        ...this.getAuthHeaders(),
+      },
+    });
+
+    return this.handleResponse<T>(response);
+  }
+
+  /**
+   * POST请求
+   */
+  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    const response = await fetch(this.buildUrl(endpoint), {
+      method: 'POST',
+      headers: {
+        ...this.defaultHeaders,
+        ...this.getAuthHeaders(),
+      },
+      body: data ? JSON.stringify(data) : undefined,
+    });
+
+    return this.handleResponse<T>(response);
+  }
+
+  /**
+   * PUT请求
+   */
+  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    const response = await fetch(this.buildUrl(endpoint), {
+      method: 'PUT',
+      headers: {
+        ...this.defaultHeaders,
+        ...this.getAuthHeaders(),
+      },
+      body: data ? JSON.stringify(data) : undefined,
+    });
+
+    return this.handleResponse<T>(response);
+  }
+
+  /**
+   * PATCH请求
+   */
+  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    const response = await fetch(this.buildUrl(endpoint), {
+      method: 'PATCH',
+      headers: {
+        ...this.defaultHeaders,
+        ...this.getAuthHeaders(),
+      },
+      body: data ? JSON.stringify(data) : undefined,
+    });
+
+    return this.handleResponse<T>(response);
+  }
+
+  /**
+   * DELETE请求
+   */
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    const response = await fetch(this.buildUrl(endpoint), {
+      method: 'DELETE',
+      headers: {
+        ...this.defaultHeaders,
+        ...this.getAuthHeaders(),
+      },
+    });
+
+    return this.handleResponse<T>(response);
+  }
+}
+
+/**
+ * 创建HTTP客户端实例
+ */
+export const httpClient = new HttpClient();
+
+/**
+ * 导出apiClient别名（向后兼容）
+ */
+export const apiClient = httpClient;
+
+/**
+ * 创建QueryClient实例
+ */
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // 5分钟缓存时间
+      staleTime: 5 * 60 * 1000,
+      // 10秒重新获取间隔
+      refetchInterval: 10 * 1000,
+      // 窗口聚焦时重新获取
+      refetchOnWindowFocus: true,
+      // 网络重连时重新获取
+      refetchOnReconnect: true,
+      // 重试次数
+      retry: (failureCount, error) => {
+        // 401错误不重试（认证失败）
+        if (error instanceof Error && error.message.includes('401')) {
+          return false;
+        }
+        // 最多重试3次
+        return failureCount < 3;
+      },
+      // 重试延迟
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    },
+    mutations: {
+      // 变更失败时不重试
+      retry: false,
+    },
+  },
+});
+
+/**
+ * Query选项创建器
+ */
+export const createQueryOptions = <T>(options: {
+  enabled?: boolean;
+  staleTime?: number;
+  refetchInterval?: number;
+  select?: (data: any) => T;
+} = {}) => ({
+  staleTime: options.staleTime || 5 * 60 * 1000,
+  refetchInterval: options.refetchInterval,
+  enabled: options.enabled !== false,
+  select: options.select,
+});
+
+/**
+ * Mutation选项创建器
+ */
+export const createMutationOptions = <T, V>(options: {
+  onSuccess?: (data: T, variables: V) => void | Promise<void>;
+  onError?: (error: Error, variables: V) => void;
+  onSettled?: (data: T | undefined, error: Error | null, variables: V) => void;
+  invalidateQueries?: string[][];
+} = {}) => ({
+  onSuccess: async (data: T, variables: V) => {
+    // 成功后使相关查询失效
+    if (options.invalidateQueries) {
+      options.invalidateQueries.forEach(queryKey => {
+        queryClient.invalidateQueries({ queryKey: [queryKey] });
+      });
+    }
+    // 调用自定义成功回调
+    if (options.onSuccess) {
+      await options.onSuccess(data, variables);
+    }
+  },
+  onError: options.onError,
+  onSettled: options.onSettled,
+});
+
+/**
+ * React Query Provider组件
+ */
+export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    {children}
+  </QueryClientProvider>
+);
+
+/**
+ * 查询键工厂
+ */
+export const queryKeys = {
+  // 导航相关查询键
+  navigation: {
+    all: ['navigation'] as const,
+    menus: () => ['navigation', 'menus'] as const,
+    menu: (id: string) => ['navigation', 'menus', id] as const,
+    permissions: () => ['navigation', 'permissions'] as const,
+  },
+
+  // 用户相关查询键
+  user: {
+    all: ['user'] as const,
+    profile: () => ['user', 'profile'] as const,
+    permissions: () => ['user', 'permissions'] as const,
+    preferences: () => ['user', 'preferences'] as const,
+  },
+
+  // 系统相关查询键
+  system: {
+    all: ['system'] as const,
+    config: () => ['system', 'config'] as const,
+    health: () => ['system', 'health'] as const,
+  },
+};
+
+/**
+ * 错误处理工具
+ */
+export const handleApiError = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message);
+  }
+  return '未知错误';
+};
+
+/**
+ * 导出默认实例
+ */
+export default {
+  client: httpClient,
+  queryClient,
+  ApiProvider,
+  queryKeys,
+  createQueryOptions,
+  createMutationOptions,
+  handleApiError,
+};
