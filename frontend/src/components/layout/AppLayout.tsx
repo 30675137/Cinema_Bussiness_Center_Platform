@@ -218,6 +218,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '到货验收 & 收货入库',
         },
         {
+          key: '/procurement/receiving/list',
+          label: '收货入库列表',
+        },
+        {
           key: '/procurement/exceptions',
           label: '异常/短缺/拒收/报损登记',
         },
