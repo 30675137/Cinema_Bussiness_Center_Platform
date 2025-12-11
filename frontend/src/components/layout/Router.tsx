@@ -18,8 +18,9 @@ const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovemen
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
 const AuditHistory = lazy(() => import('@/pages/product/ProductList'));
-const InventoryQuery = lazy(() => import('@/pages/product/ProductList'));
-const InventoryTransactions = lazy(() => import('@/pages/product/ProductList'));
+const InventoryOperations = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
@@ -328,6 +329,20 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <InventoryMovements />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/inventory/operations',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryOperations />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

@@ -142,7 +142,7 @@
           "column": 6,
           "specs": [
             {
-              "title": "US1-11: 验证分页功能",
+              "title": "US1-3: 验证门店/仓库筛选功能",
               "ok": false,
               "tags": [],
               "tests": [
@@ -157,7 +157,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 394,
+                      "duration": 510,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
@@ -166,7 +166,7 @@
                           "column": 16,
                           "line": 5
                         },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
                       },
                       "errors": [
                         {
@@ -175,13 +175,496 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:19:33.447Z",
+                      "startTime": "2025-12-11T11:19:55.639Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-3-验证门店-仓库筛选功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-3-验证门店-仓库筛选功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-2df8cddb6676ba788dab",
+              "file": "inventory-ledger.spec.ts",
+              "line": 9,
+              "column": 3
+            },
+            {
+              "title": "US1-4: 验证库存状态筛选功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 526,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:55.641Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-4-验证库存状态筛选功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-4-验证库存状态筛选功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-333914926128845f5005",
+              "file": "inventory-ledger.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "US1-5: 验证表格排序功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 531,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:55.633Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-5-验证表格排序功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-5-验证表格排序功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-0577ce7bb0fe4f3b47f4",
+              "file": "inventory-ledger.spec.ts",
+              "line": 72,
+              "column": 3
+            },
+            {
+              "title": "US1-6: 验证库存详情查看功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 529,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:55.633Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-6-验证库存详情查看功能-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-6-验证库存详情查看功能-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-ad4697da10a906ea0934",
+              "file": "inventory-ledger.spec.ts",
+              "line": 95,
+              "column": 3
+            },
+            {
+              "title": "US1-7: 验证权限控制 - 查看者角色",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 507,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:55.636Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-7-验证权限控制---查看者角色-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-7-验证权限控制---查看者角色-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-f4dc79417ff093f10dd2",
+              "file": "inventory-ledger.spec.ts",
+              "line": 132,
+              "column": 3
+            },
+            {
+              "title": "US1-8: 验证权限控制 - 操作员角色可以调整库存",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 322,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:57.287Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-8-验证权限控制---操作员角色可以调整库存-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-8-验证权限控制---操作员角色可以调整库存-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-39919874e799d48efedb",
+              "file": "inventory-ledger.spec.ts",
+              "line": 161,
+              "column": 3
+            },
+            {
+              "title": "US1-9: 验证库存调整功能 - 盘盈操作",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 334,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:57.287Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-9-验证库存调整功能---盘盈操作-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-9-验证库存调整功能---盘盈操作-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                        "column": 16,
+                        "line": 5
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e35e7ce05321a50b8636-9b64a2d07267441015aa",
+              "file": "inventory-ledger.spec.ts",
+              "line": 187,
+              "column": 3
+            },
+            {
+              "title": "US1-11: 验证分页功能",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 333,
+                      "error": {
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "location": {
+                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                          "column": 16,
+                          "line": 5
+                        },
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
+                            "column": 16,
+                            "line": 5
+                          },
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-11T11:19:57.287Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -223,10 +706,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 8,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 397,
+                      "duration": 320,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
@@ -235,7 +718,7 @@
                           "column": 16,
                           "line": 5
                         },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
+                        "snippet": "  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |"
                       },
                       "errors": [
                         {
@@ -244,13 +727,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n  3 | test.describe('用户故事1: 库存台账查看与筛选', () => {\n  4 |   test.beforeEach(async ({ page }) => {\n> 5 |     await page.goto('/inventory/ledger');\n    |                ^\n  6 |     await page.waitForLoadState('networkidle');\n  7 |   });\n  8 |\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:19:33.443Z",
+                      "startTime": "2025-12-11T11:19:57.284Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -278,568 +761,6 @@
               "file": "inventory-ledger.spec.ts",
               "line": 294,
               "column": 3
-            },
-            {
-              "title": "US1-11: 验证分页功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "failed",
-                      "duration": 1494,
-                      "error": {
-                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:33.442Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-firefox/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-firefox/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-firefox/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-4323a9888b919184fdaf",
-              "file": "inventory-ledger.spec.ts",
-              "line": 265,
-              "column": 3
-            },
-            {
-              "title": "US1-12: 验证数据导出功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "firefox",
-                  "projectName": "firefox",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 3,
-                      "status": "failed",
-                      "duration": 1314,
-                      "error": {
-                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:33.470Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-firefox/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-firefox/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-firefox/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-42757c3d478d9db9d392",
-              "file": "inventory-ledger.spec.ts",
-              "line": 294,
-              "column": 3
-            },
-            {
-              "title": "US1-11: 验证分页功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 4,
-                      "status": "failed",
-                      "duration": 659,
-                      "error": {
-                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:33.451Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-webkit/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-webkit/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-c6e01ac6da2d1f057ed9",
-              "file": "inventory-ledger.spec.ts",
-              "line": 265,
-              "column": 3
-            },
-            {
-              "title": "US1-12: 验证数据导出功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "webkit",
-                  "projectName": "webkit",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 437,
-                      "error": {
-                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:34.687Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-webkit/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-webkit/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-99573814308fb8bdb53e",
-              "file": "inventory-ledger.spec.ts",
-              "line": 294,
-              "column": 3
-            },
-            {
-              "title": "US1-11: 验证分页功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 359,
-                      "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:34.691Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-Mobile-Chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-Mobile-Chrome/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-92e18579d15517c12cff",
-              "file": "inventory-ledger.spec.ts",
-              "line": 265,
-              "column": 3
-            },
-            {
-              "title": "US1-12: 验证数据导出功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Chrome",
-                  "projectName": "Mobile Chrome",
-                  "results": [
-                    {
-                      "workerIndex": 7,
-                      "parallelIndex": 4,
-                      "status": "failed",
-                      "duration": 340,
-                      "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:34.748Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-Mobile-Chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-Mobile-Chrome/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-d23322a46d4cb467d052",
-              "file": "inventory-ledger.spec.ts",
-              "line": 294,
-              "column": 3
-            },
-            {
-              "title": "US1-11: 验证分页功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 8,
-                      "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 507,
-                      "error": {
-                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:35.760Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-Mobile-Safari/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-11-验证分页功能-Mobile-Safari/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-54b48da7c1353660c8e1",
-              "file": "inventory-ledger.spec.ts",
-              "line": 265,
-              "column": 3
-            },
-            {
-              "title": "US1-12: 验证数据导出功能",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "Mobile Safari",
-                  "projectName": "Mobile Safari",
-                  "results": [
-                    {
-                      "workerIndex": 9,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 508,
-                      "error": {
-                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
-                        "location": {
-                          "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                          "column": 16,
-                          "line": 5
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                            "column": 16,
-                            "line": 5
-                          },
-                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-12-11T11:19:35.777Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-Mobile-Safari/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-12-验证数据导出功能-Mobile-Safari/video.webm"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
-                        "column": 16,
-                        "line": 5
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "e35e7ce05321a50b8636-c6ea4f32296e026b8f03",
-              "file": "inventory-ledger.spec.ts",
-              "line": 294,
-              "column": 3
             }
           ]
         }
@@ -848,11 +769,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-11T11:19:32.965Z",
-    "duration": 3751.8529999999996,
+    "startTime": "2025-12-11T11:19:54.894Z",
+    "duration": 2985.54,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 10,
+    "unexpected": 9,
     "flaky": 0
   }
 }
