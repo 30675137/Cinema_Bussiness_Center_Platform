@@ -40,7 +40,7 @@ export {
   DatePicker,
   TimePicker,
   Upload,
-  Modal,
+  Modal as AntModal,
   Drawer,
   Table,
   Form,
@@ -55,7 +55,37 @@ export {
   Popconfirm,
   message,
   notification,
+  List as AntList,
 } from 'antd';
+
+// 导出优化的Modal组件
+export {
+  OptimizedModal as Modal,
+  FormModal,
+  ConfirmModal,
+  LargeModal,
+  FullScreenModal,
+  ModalPresets,
+} from '@/components/common/Modal';
+
+// 导出优化的List组件
+export {
+  OptimizedList as List,
+  StandardList,
+  LargeList,
+  CardList,
+  ListPresets,
+} from '@/components/common/List';
+
+// 导出优化的Image组件
+export {
+  OptimizedImage as Image,
+  ProductImage,
+  ThumbnailImage,
+  AvatarImage,
+  BannerImage,
+  ImagePresets,
+} from '@/components/common/Image';
 
 // 重新导出图标
 export * from '@ant-design/icons';

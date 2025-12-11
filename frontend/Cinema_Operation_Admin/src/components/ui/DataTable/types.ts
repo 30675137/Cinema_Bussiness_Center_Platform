@@ -95,6 +95,32 @@ export interface DataTableActions {
 }
 
 /**
+ * 虚拟滚动配置接口
+ */
+export interface VirtualScrollConfig {
+  /** 是否启用虚拟滚动 */
+  enabled?: boolean;
+  /** 每行高度 */
+  itemHeight?: number;
+  /** 缓冲区行数 */
+  bufferSize?: number;
+  /** 预渲染行数 */
+  overscan?: number;
+}
+
+/**
+ * 性能监控配置接口
+ */
+export interface PerformanceConfig {
+  /** 是否启用性能监控 */
+  enabled?: boolean;
+  /** 渲染时间阈值（毫秒） */
+  renderThreshold?: number;
+  /** 是否记录重渲染 */
+  logRerenders?: boolean;
+}
+
+/**
  * DataTable组件Props接口
  */
 export interface DataTableProps<T = any> extends Omit<TableProps<T>, 'columns' | 'dataSource' | 'pagination' | 'title'> {
@@ -140,4 +166,10 @@ export interface DataTableProps<T = any> extends Omit<TableProps<T>, 'columns' |
   headerExtra?: ReactNode;
   /** 底部插件 */
   footerExtra?: ReactNode;
+  /** 虚拟滚动配置 */
+  virtualScroll?: VirtualScrollConfig;
+  /** 性能监控配置 */
+  performance?: PerformanceConfig;
+  /** 是否启用严格模式（更严格的优化） */
+  strictMode?: boolean;
 }

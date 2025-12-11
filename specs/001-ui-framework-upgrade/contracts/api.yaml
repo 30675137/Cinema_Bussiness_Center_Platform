@@ -1,0 +1,753 @@
+openapi: 3.0.3
+info:
+  title: 影院商品管理中台 Mock API
+  description: UI框架统一升级功能的Mock数据API接口规范
+  version: 1.0.0
+  contact:
+    name: 开发团队
+    email: dev@cinema-platform.com
+
+servers:
+  - url: http://localhost:3001/api/v1
+    description: 开发环境Mock服务
+
+paths:
+  # 仪表板相关接口
+  /dashboard/stats:
+    get:
+      tags:
+        - 仪表板
+      summary: 获取仪表板统计数据
+      description: 获取仪表板显示的关键统计数据
+      responses:
+        '200':
+          description: 成功获取统计数据
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+              example:
+                totalProducts: 1250
+                activeProducts: 1180
+                totalUsers: 5680
+                activeUsers: 5420
+                totalOrders: 8960
+                pendingOrders: 45
+                revenue: 156780.50
+                monthlyGrowth: 12.5
+
+  # 导航菜单相关接口
+  /navigation/menu:
+    get:
+      tags:
+        - 导航
+      summary: 获取用户导航菜单
+      description: 根据用户权限获取可访问的导航菜单
+      responses:
+        '200':
+          description: 成功获取导航菜单
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NavigationMenu'
+
+  # 产品管理相关接口
+  /products:
+    get:
+      tags:
+        - 产品管理
+      summary: 获取产品列表
+      description: 分页获取产品列表，支持搜索和筛选
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: keyword
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: 产品分类筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 产品状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive, pending]
+      responses:
+        '200':
+          description: 成功获取产品列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+    post:
+      tags:
+        - 产品管理
+      summary: 创建新产品
+      description: 创建新的产品记录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: 产品创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: 请求参数错误
+        '422':
+          description: 数据验证失败
+
+  /products/{productId}:
+    get:
+      tags:
+        - 产品管理
+      summary: 获取产品详情
+      description: 根据产品ID获取产品详细信息
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 产品ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取产品详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: 产品不存在
+
+    put:
+      tags:
+        - 产品管理
+      summary: 更新产品信息
+      description: 更新指定产品的信息
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 产品ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: 产品更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: 产品不存在
+        '422':
+          description: 数据验证失败
+
+    delete:
+      tags:
+        - 产品管理
+      summary: 删除产品
+      description: 删除指定的产品记录
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: 产品ID
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 产品删除成功
+        '404':
+          description: 产品不存在
+
+  /products/batch-delete:
+    delete:
+      tags:
+        - 产品管理
+      summary: 批量删除产品
+      description: 批量删除多个产品记录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: string
+                  description: 要删除的产品ID列表
+      responses:
+        '204':
+          description: 批量删除成功
+        '400':
+          description: 请求参数错误
+
+  # 产品分类相关接口
+  /categories:
+    get:
+      tags:
+        - 产品分类
+      summary: 获取产品分类列表
+      description: 获取所有产品分类，支持层级结构
+      responses:
+        '200':
+          description: 成功获取分类列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductCategory'
+
+    post:
+      tags:
+        - 产品分类
+      summary: 创建产品分类
+      description: 创建新的产品分类
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: 分类创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductCategory'
+        '422':
+          description: 数据验证失败
+
+  # 用户管理相关接口
+  /users:
+    get:
+      tags:
+        - 用户管理
+      summary: 获取用户列表
+      description: 分页获取用户列表
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: keyword
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+        - name: role
+          in: query
+          description: 角色筛选
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取用户列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+
+  # 用户角色相关接口
+  /roles:
+    get:
+      tags:
+        - 用户角色
+      summary: 获取用户角色列表
+      description: 获取所有用户角色
+      responses:
+        '200':
+          description: 成功获取角色列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserRole'
+
+components:
+  schemas:
+    # 基础响应结构
+    BaseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+        message:
+          type: string
+          description: 响应消息
+        code:
+          type: integer
+          description: 响应代码
+
+    # 分页响应结构
+    PaginationResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+          description: 数据列表
+        pagination:
+          type: object
+          properties:
+            current:
+              type: integer
+              description: 当前页码
+            pageSize:
+              type: integer
+              description: 每页数量
+            total:
+              type: integer
+              description: 总记录数
+            totalPages:
+              type: integer
+              description: 总页数
+
+    # 仪表板统计数据
+    DashboardStats:
+      type: object
+      properties:
+        totalProducts:
+          type: integer
+          description: 产品总数
+          example: 1250
+        activeProducts:
+          type: integer
+          description: 激活产品数
+          example: 1180
+        totalUsers:
+          type: integer
+          description: 用户总数
+          example: 5680
+        activeUsers:
+          type: integer
+          description: 激活用户数
+          example: 5420
+        totalOrders:
+          type: integer
+          description: 订单总数
+          example: 8960
+        pendingOrders:
+          type: integer
+          description: 待处理订单数
+          example: 45
+        revenue:
+          type: number
+          format: float
+          description: 总收入
+          example: 156780.50
+        monthlyGrowth:
+          type: number
+          format: float
+          description: 月增长率(%)
+          example: 12.5
+
+    # 产品相关模型
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - category
+        - price
+        - status
+        - inventory
+      properties:
+        id:
+          type: string
+          description: 产品唯一标识
+          example: "prod-001"
+        name:
+          type: string
+          description: 产品名称
+          example: "3D眼镜标准版"
+        description:
+          type: string
+          description: 产品描述
+          example: "影院专用3D眼镜，舒适佩戴，高清体验"
+        category:
+          type: string
+          description: 产品分类
+          example: "equipments"
+        price:
+          type: number
+          format: float
+          description: 产品价格
+          example: 15.00
+        status:
+          type: string
+          enum: [active, inactive, pending]
+          description: 产品状态
+          example: "active"
+        imageUrl:
+          type: string
+          format: uri
+          description: 产品图片URL
+          example: "/images/products/3d-glasses.jpg"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2024-01-15T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2024-12-10T08:20:00Z"
+        inventory:
+          type: integer
+          description: 库存数量
+          example: 500
+        tags:
+          type: array
+          items:
+            type: string
+          description: 产品标签
+          example: ["3D", "眼镜", "标准"]
+
+    ProductListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - category
+        - price
+        - inventory
+      properties:
+        name:
+          type: string
+          description: 产品名称
+          example: "新3D眼镜"
+        description:
+          type: string
+          description: 产品描述
+        category:
+          type: string
+          description: 产品分类
+        price:
+          type: number
+          format: float
+          description: 产品价格
+        inventory:
+          type: integer
+          description: 库存数量
+        tags:
+          type: array
+          items:
+            type: string
+          description: 产品标签
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 产品名称
+        description:
+          type: string
+          description: 产品描述
+        category:
+          type: string
+          description: 产品分类
+        price:
+          type: number
+          format: float
+          description: 产品价格
+        status:
+          type: string
+          enum: [active, inactive, pending]
+          description: 产品状态
+        inventory:
+          type: integer
+          description: 库存数量
+        tags:
+          type: array
+          items:
+            type: string
+          description: 产品标签
+
+    # 产品分类相关模型
+    ProductCategory:
+      type: object
+      required:
+        - id
+        - name
+        - level
+        - sortOrder
+        - isActive
+      properties:
+        id:
+          type: string
+          description: 分类唯一标识
+          example: "cat-001"
+        name:
+          type: string
+          description: 分类名称
+          example: "设备用品"
+        parentId:
+          type: string
+          description: 父分类ID
+        level:
+          type: integer
+          description: 分类层级
+          example: 1
+        sortOrder:
+          type: integer
+          description: 排序顺序
+          example: 1
+        icon:
+          type: string
+          description: 分类图标
+        isActive:
+          type: boolean
+          description: 是否激活
+          example: true
+
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+        - level
+        - sortOrder
+      properties:
+        name:
+          type: string
+          description: 分类名称
+        parentId:
+          type: string
+          description: 父分类ID
+        level:
+          type: integer
+          description: 分类层级
+        sortOrder:
+          type: integer
+          description: 排序顺序
+        icon:
+          type: string
+          description: 分类图标
+
+    # 导航菜单相关模型
+    NavigationMenu:
+      type: object
+      required:
+        - id
+        - key
+        - title
+        - sortOrder
+        - isVisible
+      properties:
+        id:
+          type: string
+          description: 菜单唯一标识
+          example: "nav-dashboard"
+        key:
+          type: string
+          description: 菜单键值
+          example: "dashboard"
+        title:
+          type: string
+          description: 菜单标题
+          example: "仪表板"
+        path:
+          type: string
+          description: 菜单路径
+          example: "/dashboard"
+        icon:
+          type: string
+          description: 菜单图标
+          example: "DashboardOutlined"
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationMenu'
+          description: 子菜单
+        sortOrder:
+          type: integer
+          description: 排序顺序
+          example: 1
+        isVisible:
+          type: boolean
+          description: 是否可见
+          example: true
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 访问权限
+          example: ["dashboard:read"]
+
+    # 用户相关模型
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - role
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: 用户唯一标识
+          example: "user-001"
+        username:
+          type: string
+          description: 用户名
+          example: "admin"
+        email:
+          type: string
+          format: email
+          description: 邮箱
+          example: "admin@cinema.com"
+        avatar:
+          type: string
+          format: uri
+          description: 头像URL
+        role:
+          type: string
+          description: 用户角色
+          example: "admin"
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 用户状态
+          example: "active"
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最后登录时间
+          example: "2024-12-10T09:30:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2024-01-01T00:00:00Z"
+
+    UserListResponse:
+      allOf:
+        - $ref: '#/components/schemas/PaginationResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+
+    # 用户角色相关模型
+    UserRole:
+      type: object
+      required:
+        - id
+        - name
+        - permissions
+        - level
+      properties:
+        id:
+          type: string
+          description: 角色唯一标识
+          example: "role-001"
+        name:
+          type: string
+          description: 角色名称
+          example: "管理员"
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 权限列表
+          example: ["products:read", "products:write", "users:read"]
+        description:
+          type: string
+          description: 角色描述
+          example: "系统管理员，拥有所有权限"
+        level:
+          type: integer
+          description: 角色级别
+          example: 1
+
+tags:
+  - name: 仪表板
+    description: 仪表板相关接口
+  - name: 导航
+    description: 导航菜单相关接口
+  - name: 产品管理
+    description: 产品管理相关接口
+  - name: 产品分类
+    description: 产品分类相关接口
+  - name: 用户管理
+    description: 用户管理相关接口
+  - name: 用户角色
+    description: 用户角色相关接口

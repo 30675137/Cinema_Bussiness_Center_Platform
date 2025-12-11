@@ -1,0 +1,848 @@
+openapi: 3.0.3
+info:
+  title: 影院商品管理中台导航系统API
+  description: 导航系统相关接口，包括菜单管理、用户偏好、导航日志等功能
+  version: 1.0.0
+  contact:
+    name: 开发团队
+    email: dev@cinema-platform.com
+servers:
+  - url: http://localhost:3000/api
+    description: 开发环境
+  - url: https://api.cinema-platform.com
+    description: 生产环境
+
+tags:
+  - name: 导航菜单
+    description: 导航菜单相关接口
+  - name: 用户偏好
+    description: 用户偏好设置相关接口
+  - name: 导航日志
+    description: 导航行为日志相关接口
+
+paths:
+  # 导航菜单相关接口
+  /navigation/menus:
+    get:
+      tags:
+        - 导航菜单
+      summary: 获取完整的导航菜单结构
+      description: 返回所有10个一级菜单和对应二级子功能页面的完整导航结构
+      operationId: getCompleteMenus
+      parameters:
+        - name: level
+          in: query
+          description: 菜单层级过滤（1: 一级菜单, 2: 二级菜单, 不提供则返回所有层级）
+          required: false
+          schema:
+            type: integer
+            enum: [1, 2]
+        - name: functionalArea
+          in: query
+          description: 功能区域过滤
+          required: false
+          schema:
+            type: string
+            enum: [basic_settings, product_management, bom_management, scenario_package, pricing_system, procurement, inventory, scheduling, order_management, operations, system_management]
+        - name: isActive
+          in: query
+          description: 是否只返回启用的菜单
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: 成功返回菜单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuItem'
+                  message:
+                    type: string
+                    example: "获取菜单成功"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /navigation/menus/{menuId}:
+    get:
+      tags:
+        - 导航菜单
+      summary: 获取指定菜单详情
+      description: 根据菜单ID获取菜单详细信息
+      operationId: getMenuById
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          description: 菜单ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回菜单详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/MenuItem'
+                  message:
+                    type: string
+                    example: "获取菜单详情成功"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /navigation/search:
+    get:
+      tags:
+        - 导航菜单
+      summary: 搜索菜单
+      description: 根据关键词搜索菜单，支持菜单名称、代码、路径搜索
+      operationId: searchMenus
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: 搜索关键词
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 100
+        - name: limit
+          in: query
+          description: 返回结果数量限制
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: 成功返回搜索结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MenuItem'
+                      total:
+                        type: integer
+                        description: 匹配结果总数
+                        example: 5
+                  message:
+                    type: string
+                    example: "搜索完成"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # 用户偏好相关接口
+  /navigation/user/preferences:
+    get:
+      tags:
+        - 用户偏好
+      summary: 获取用户偏好设置
+      description: 获取当前用户的导航偏好设置
+      operationId: getUserPreferences
+      responses:
+        '200':
+          description: 成功返回用户偏好
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserPreference'
+                  message:
+                    type: string
+                    example: "获取用户偏好成功"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 用户偏好不存在，返回默认设置
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserPreference'
+                  message:
+                    type: string
+                    example: "返回默认偏好设置"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - 用户偏好
+      summary: 更新用户偏好设置
+      description: 更新当前用户的导航偏好设置
+      operationId: updateUserPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sidebarCollapsed:
+                  type: boolean
+                  description: 侧边栏折叠状态
+                favoriteMenus:
+                  type: array
+                  items:
+                    type: string
+                  description: 收藏的菜单ID列表
+                theme:
+                  type: string
+                  enum: [light, dark]
+                  description: 主题设置
+                expandedMenuIds:
+                  type: array
+                  items:
+                    type: string
+                  description: 展开的菜单ID列表
+              example:
+                sidebarCollapsed: false
+                favoriteMenus: ["menu-001", "menu-002"]
+                theme: "light"
+                expandedMenuIds: ["menu-001", "menu-003"]
+      responses:
+        '200':
+          description: 成功更新用户偏好
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/UserPreference'
+                  message:
+                    type: string
+                    example: "更新用户偏好成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /navigation/user/favorites:
+    post:
+      tags:
+        - 用户偏好
+      summary: 添加收藏菜单
+      description: 将指定菜单添加到用户收藏列表
+      operationId: addFavoriteMenu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - menuId
+              properties:
+                menuId:
+                  type: string
+                  description: 菜单ID
+              example:
+                menuId: "menu-001"
+      responses:
+        '200':
+          description: 成功添加收藏
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      favoriteMenus:
+                        type: array
+                        items:
+                          type: string
+                        example: ["menu-001", "menu-002"]
+                  message:
+                    type: string
+                    example: "添加收藏成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 菜单不存在
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - 用户偏好
+      summary: 取消收藏菜单
+      description: 从用户收藏列表中移除指定菜单
+      operationId: removeFavoriteMenu
+      parameters:
+        - name: menuId
+          in: query
+          required: true
+          description: 菜单ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功取消收藏
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      favoriteMenus:
+                        type: array
+                        items:
+                          type: string
+                        example: ["menu-002"]
+                  message:
+                    type: string
+                    example: "取消收藏成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 收藏记录不存在
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # 导航日志相关接口
+  /navigation/logs:
+    post:
+      tags:
+        - 导航日志
+      summary: 记录导航行为
+      description: 记录用户的导航行为日志
+      operationId: logNavigationAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - menuPath
+              properties:
+                action:
+                  $ref: '#/components/schemas/NavigationAction'
+                menuId:
+                  type: string
+                  description: 菜单ID
+                menuPath:
+                  type: string
+                  description: 菜单路径
+                  example: "/product_management"
+                duration:
+                  type: integer
+                  description: 页面停留时间（毫秒）
+                searchQuery:
+                  type: string
+                  description: 搜索关键词（搜索行为时）
+              example:
+                action: "menu_click"
+                menuId: "menu-001"
+                menuPath: "/dashboard"
+                duration: 5000
+      responses:
+        '201':
+          description: 成功记录日志
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      logId:
+                        type: string
+                        description: 日志ID
+                  message:
+                    type: string
+                    example: "日志记录成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags:
+        - 导航日志
+      summary: 获取用户导航日志
+      description: 获取当前用户的导航行为日志（分页）
+      operationId: getUserNavigationLogs
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: action
+          in: query
+          description: 行为类型过滤
+          required: false
+          schema:
+            type: string
+            enum: [menu_click, breadcrumb_click, search_select, favorite_click, page_view, page_exit]
+        - name: startDate
+          in: query
+          description: 开始日期
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: 结束日期
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 成功返回日志列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      logs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NavigationLog'
+                      pagination:
+                        type: object
+                        properties:
+                          page:
+                            type: integer
+                            example: 1
+                          limit:
+                            type: integer
+                            example: 20
+                          total:
+                            type: integer
+                            example: 156
+                          totalPages:
+                            type: integer
+                            example: 8
+                  message:
+                    type: string
+                    example: "获取日志成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    MenuItem:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - level
+        - sortOrder
+        - isActive
+        - functionalArea
+      properties:
+        id:
+          type: string
+          description: 菜单唯一标识
+          example: "menu-001"
+        parentId:
+          type: string
+          description: 父菜单ID
+          example: "menu-001"
+          nullable: true
+        name:
+          type: string
+          description: 菜单显示名称（中文）
+          example: "基础设置与主数据"
+          maxLength: 50
+        code:
+          type: string
+          description: 菜单代码（英文，用于路由）
+          example: "basic_settings"
+          pattern: '^[a-z][a-z0-9_]*$'
+        icon:
+          type: string
+          description: 菜单图标名称
+          example: "SettingOutlined"
+          nullable: true
+        path:
+          type: string
+          description: 菜单路由路径
+          example: "/basic-settings"
+          pattern: '^\/[a-z0-9\-_\/]*$'
+          nullable: true
+        level:
+          type: integer
+          description: 菜单层级（1: 一级菜单, 2: 二级菜单）
+          enum: [1, 2]
+          example: 1
+        sortOrder:
+          type: integer
+          description: 排序序号
+          minimum: 0
+          maximum: 9999
+          example: 1
+        isActive:
+          type: boolean
+          description: 是否启用
+          example: true
+        isVisible:
+          type: boolean
+          description: 是否可见
+          example: true
+        functionalArea:
+          type: string
+          description: 所属功能区域
+          enum: [basic_settings, product_management, bom_management, scenario_package, pricing_system, procurement, inventory, scheduling, order_management, operations, system_management]
+          example: "basic_settings"
+        description:
+          type: string
+          description: 菜单描述
+          example: "组织/门店/仓库管理、单位换算规则、字典与规则配置等"
+          nullable: true
+        children:
+          type: array
+          description: 子菜单列表
+          items:
+            $ref: '#/components/schemas/MenuItem'
+          nullable: true
+
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - displayName
+        - isActive
+      properties:
+        id:
+          type: string
+          description: 用户唯一标识
+          example: "user-001"
+        username:
+          type: string
+          description: 用户名
+          example: "admin"
+        email:
+          type: string
+          format: email
+          description: 邮箱
+          example: "admin@cinema.com"
+        displayName:
+          type: string
+          description: 显示名称（中文）
+          example: "系统管理员"
+        avatar:
+          type: string
+          format: uri
+          description: 头像URL
+          example: "https://example.com/avatar.jpg"
+          nullable: true
+        isActive:
+          type: boolean
+          description: 是否启用
+          example: true
+        lastLoginAt:
+          type: string
+          format: date-time
+          description: 最后登录时间
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    UserPreference:
+      type: object
+      required:
+        - id
+        - userId
+        - language
+      properties:
+        id:
+          type: string
+          description: 偏好设置唯一标识
+          example: "pref-001"
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        sidebarCollapsed:
+          type: boolean
+          description: 侧边栏是否收起
+          example: false
+        favoriteMenus:
+          type: array
+          description: 收藏的菜单ID列表
+          items:
+            type: string
+          example: ["menu-001", "menu-003", "menu-005"]
+        recentMenus:
+          type: array
+          description: 最近访问的菜单ID列表（按时间排序，最多10个）
+          items:
+            type: string
+          example: ["menu-002", "menu-007", "menu-001"]
+        searchHistory:
+          type: array
+          description: 搜索历史记录（最多20条）
+          items:
+            type: string
+          example: ["商品管理", "库存查询", "价格设置"]
+        theme:
+          type: string
+          enum: [light, dark]
+          description: 主题设置
+          example: "light"
+        language:
+          type: string
+          description: 语言设置
+          enum: [zh-CN]
+          example: "zh-CN"
+        expandedMenuIds:
+          type: array
+          description: 展开的菜单ID列表
+          items:
+            type: string
+          example: ["menu-001", "menu-003"]
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    NavigationAction:
+      type: string
+      enum: [menu_click, breadcrumb_click, search_select, favorite_click, page_view, page_exit]
+      description: 导航动作类型
+
+    NavigationLog:
+      type: object
+      required:
+        - id
+        - userId
+        - action
+        - menuPath
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: 日志唯一标识
+          example: "log-001"
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        menuId:
+          type: string
+          description: 访问的菜单ID
+          example: "menu-001"
+        menuPath:
+          type: string
+          description: 菜单路径
+          example: "/dashboard"
+        action:
+          $ref: '#/components/schemas/NavigationAction'
+        duration:
+          type: integer
+          description: 页面停留时间（毫秒）
+          example: 5000
+        userAgent:
+          type: string
+          description: 用户代理
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          nullable: true
+        ipAddress:
+          type: string
+          description: IP地址
+          example: "192.168.1.100"
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 访问时间
+          example: "2025-12-10T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          description: 错误信息
+          example: "请求参数错误"
+        error:
+          type: string
+          description: 错误代码
+          example: "INVALID_PARAMS"
+        details:
+          type: array
+          description: 详细错误信息
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "menuId"
+              message:
+                type: string
+                example: "菜单ID不能为空"
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "请求参数错误"
+            error: "INVALID_PARAMS"
+
+    Unauthorized:
+      description: 未授权访问
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "未授权访问，请先登录"
+            error: "UNAUTHORIZED"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "请求的资源不存在"
+            error: "NOT_FOUND"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "服务器内部错误"
+            error: "INTERNAL_ERROR"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT认证token
+
+security:
+  - BearerAuth: []

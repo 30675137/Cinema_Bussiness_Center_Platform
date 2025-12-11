@@ -7,12 +7,11 @@
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { type ClassValue as TailwindClassValue } from 'tailwind-merge';
 
 /**
  * 类型定义
  */
-export type { ClassValue, TailwindClassValue };
+export type { ClassValue };
 
 /**
  * Tailwind CSS类名合并工具函数

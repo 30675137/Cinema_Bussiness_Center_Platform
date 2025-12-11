@@ -1,0 +1,1039 @@
+# Mock API 接口规范
+# 影院商品管理中台功能导航系统
+
+# API版本信息
+openapi: 3.0.0
+info:
+  title: 影院商品管理中台导航系统 Mock API
+  description: 基于用户澄清要求，使用Mock数据替代真实的后端API服务
+  version: 1.0.0
+  contact:
+    name: 开发团队
+    email: dev@cinema-platform.com
+  license:
+      name: MIT
+
+# 服务器配置
+servers:
+  - url: http://localhost:3000/api
+    description: Mock API 服务器
+  - url: http://mock-api.cinema-platform.com/api
+    description: 备用 Mock API 服务器
+
+# 数据标签
+tags:
+  - name: 用户管理
+    description: Mock用户身份相关接口
+  - name: 导航菜单
+    description: 菜单数据相关接口
+  - name: 用户偏好
+    description: 用户个性化设置接口
+  - name: 系统管理
+    description: 系统相关接口
+
+# 路径定义
+paths:
+  # 用户相关接口
+  /user/profile:
+    get:
+      tags:
+        - 用户管理
+      summary: 获取当前用户信息
+      description: 获取当前登录用户的详细信息（Mock数据）
+      responses:
+        '200':
+          description: 成功获取用户信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  # 菜单相关接口
+  /navigation/menus:
+    get:
+      tags:
+        - 导航菜单
+      summary: 获取完整菜单结构
+      description: 获取所有一级和二级菜单的层次结构数据
+      responses:
+        '200':
+          description: 成功获取菜单数据
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuResponse'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /navigation/menus/{menuId}:
+    get:
+      tags:
+        - 导航菜单
+      summary: 获取特定菜单详情
+      description: 根据菜单ID获取菜单的详细信息
+      parameters:
+        - name: menuId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 菜单唯一标识符
+      responses:
+        '200':
+          description: 成功获取菜单详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '404':
+          description: 菜单不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  # 搜索相关接口
+  /navigation/search:
+    get:
+      tags:
+        - 导航菜单
+      summary: 搜索菜单项
+      description: 根据关键词搜索相关的菜单项
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 搜索关键词
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+          description: 返回结果数量限制
+      responses:
+        '200':
+          description: 成功搜索菜单
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: 搜索参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  # 用户偏好相关接口
+  /user/preferences:
+    get:
+      tags:
+        - 用户偏好
+      summary: 获取用户偏好设置
+      description: 获取当前用户的个性化导航设置
+      responses:
+        '200':
+          description: 成功获取用户偏好
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+    put:
+      tags:
+        - 用户偏好
+      summary: 更新用户偏好设置
+      description: 更新用户的个性化导航设置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesRequest'
+      responses:
+        '200':
+          description: 成功更新用户偏好
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+        '400':
+          description: 请求数据格式错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  # 导航日志相关接口
+  /navigation/logs:
+    post:
+      tags:
+        - 系统管理
+      summary: 记录导航行为
+      description: 记录用户的导航行为日志，用于分析和优化用户体验
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NavigationLogRequest'
+      responses:
+        '201':
+          description: 成功记录日志
+          content:
+            application/json:
+              schema:
+                $        '#/components/schemas/NavigationLogResponse'
+        '400':
+          description: 日志数据格式错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  /navigation/logs:
+    get:
+      tags:
+        - 系统管理
+      summary: 获取导航日志
+      description: 获取用户的导航行为日志记录
+      parameters:
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 用户ID过滤
+        - name: menuId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 菜单ID过滤
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [menu_click, breadcrumb_click, search_select, favorite_click, page_view, page_exit, search_query, menu_expand, menu_collapse]
+          description: 导航动作过滤
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: 返回结果数量限制
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 开始时间过滤
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: 结束时间过滤
+      responses:
+        '200':
+          description: 成功获取导航日志
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationLogListResponse'
+        '400':
+          description: 查询参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+        '500':
+          description: 服务器错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+  # 系统健康检查
+  /health:
+    get:
+      tags:
+        - 系统管理
+      summary: 系统健康检查
+      description: 检查Mock API服务的健康状态
+      responses:
+        '200':
+          description: 系统健康
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: 系统不可用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSchema'
+
+# 数据模型定义
+components:
+  schemas:
+    # 用户相关模型
+    MockUser:
+      type: object
+      required:
+        - id
+        - username
+        - displayName
+        - role
+        - department
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 用户唯一标识符
+          example: "user-001"
+        username:
+          type: string
+          description: 用户登录名
+          example: "admin"
+        displayName:
+          type: string
+          description: 用户显示名称
+          example: "系统管理员"
+        role:
+          type: string
+          enum: [admin, operator, manager, viewer]
+          description: 用户角色
+          example: "admin"
+        department:
+          type: string
+          description: 所属部门
+          example: "信息部"
+        avatar:
+          type: string
+          description: 用户头像URL（可选）
+          example: "https://example.com/avatar.jpg"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-11T00:00:00.000Z"
+
+    # 菜单相关模型
+    MenuItem:
+      type: object
+      required:
+        - id
+        - name
+        - level
+        - order
+        - enabled
+        - hidden
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 菜单唯一标识符
+          example: "menu-001"
+        name:
+          type: string
+          description: 菜单显示名称
+          example: "基础设置与主数据"
+        icon:
+          type: string
+          description: 菜单图标名称（可选）
+          example: "SettingOutlined"
+        path:
+          type: string
+          description: 菜单路径（可选）
+          example: "/settings/organization"
+        description:
+          type: string
+          description: 菜单描述（可选）
+          example: "管理组织、门店和仓库信息"
+        level:
+          type: integer
+          enum: [1, 2]
+          description: 菜单层级：1为一级菜单，2为二级菜单
+          example: 1
+        order:
+          type: integer
+          minimum: 0
+          description: 菜单排序
+          example: 1
+        enabled:
+          type: boolean
+          description: 是否启用
+          example: true
+        hidden:
+          type: boolean
+          description: 是否隐藏
+          example: false
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+          description: 子菜单项
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-11T00:00:00.000Z"
+
+    # 用户偏好模型
+    UserPreferences:
+      type: object
+      required:
+        - userId
+        - sidebarExpanded
+        - expandedMenuIds
+        - favoriteMenuIds
+        - theme
+        - navigation
+        - ui
+        - lastUpdated
+      properties:
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        sidebarExpanded:
+          type: boolean
+          description: 侧边栏默认展开状态
+          example: true
+        expandedMenuIds:
+          type: array
+          items:
+            type: string
+          description: 默认展开的菜单ID列表
+          example: ["menu-001", "menu-002"]
+        favoriteMenuIds:
+          type: array
+          items:
+            type: string
+          description: 收藏的菜单ID列表
+          example: ["menu-002-001", "menu-003-001"]
+        theme:
+          type: object
+          required:
+            - mode
+            - primaryColor
+          properties:
+            mode:
+              type: string
+              enum: [light, dark, auto]
+              description: 主题模式
+              example: "light"
+            primaryColor:
+              type: string
+              description: 主题颜色
+              example: "#1890ff"
+        navigation:
+          type: object
+          required:
+            - showBreadcrumb
+            - enableSearch
+            - recentItemsLimit
+            - searchHistoryLimit
+          properties:
+            showBreadcrumb:
+              type: boolean
+              description: 面包屑显示
+              example: true
+            enableSearch:
+              type: boolean
+              description: 菜单搜索启用
+              example: true
+            recentItemsLimit:
+              type: integer
+              minimum: 1
+              maximum: 50
+              description: 最近访问数量限制
+              example: 10
+            searchHistoryLimit:
+              type: integer
+              minimum: 1
+              maximum: 100
+              description: 搜索历史数量限制
+              example: 20
+        ui:
+          type: object
+          required:
+            - compactMode
+            - fixedSidebar
+            - enableAnimation
+          properties:
+            compactMode:
+              type: boolean
+              description: 紧凑模式
+              example: false
+            fixedSidebar:
+              type: boolean
+              description: 固定侧边栏
+              example: true
+            enableAnimation:
+              type: boolean
+              description: 动画效果
+              example: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: 最后更新时间
+          example: "2025-12-11T00:00:00.000Z"
+
+    # 导航日志模型
+    NavigationLog:
+      type: object
+      required:
+        - id
+        - userId
+        - menuId
+        - menuPath
+        - action
+        - timestamp
+      properties:
+        id:
+          type: string
+          description: 日志唯一标识符
+          example: "log-001"
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        menuId:
+          type: string
+          description: 菜单ID
+          example: "menu-002"
+        menuPath:
+          type: string
+          description: 菜单路径
+          example: "/product/spu"
+        action:
+          type: string
+          enum: [menu_click, breadcrumb_click, search_select, favorite_click, page_view, page_exit, search_query, menu_expand, menu_collapse]
+          description: 导航动作类型
+          example: "menu_click"
+        duration:
+          type: integer
+          description: 页面停留时间（毫秒）
+          example: 15000
+        userAgent:
+          type: string
+          description: 用户代理信息
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        screenSize:
+          type: string
+          enum: [mobile, tablet, desktop]
+          description: 屏幕尺寸
+          example: "desktop"
+        navigationMode:
+          type: string
+          enum: [drawer, collapsed, expanded]
+          description: 导航模式
+          example: "expanded"
+        timestamp:
+          type: string
+          format: date-time
+          description: 访问时间戳
+          example: "2025-12-11T10:30:00.000Z"
+        metadata:
+          type: object
+          description: 额外的元数据
+          example:
+            searchQuery: "搜索关键词"
+            fromFavorite: true
+
+    # 面包屑项模型
+    BreadcrumbItem:
+      type: object
+      required:
+        - title
+        - path
+        - isCurrent
+        - clickable
+      properties:
+        title:
+          type: string
+          description: 面包屑标题
+          example: "SPU管理"
+        path:
+          type: string
+          description: 面包屑路径
+          example: "/product/spu"
+        icon:
+          type: string
+          description: 面包屑图标名称（可选）
+          example: "ShopOutlined"
+        isCurrent:
+          type: boolean
+          description: 是否为当前页面
+          example: false
+        clickable:
+          type: boolean
+          description: 是否可点击
+          example: true
+
+    # 路由信息模型
+    RouteInfo:
+      type: object
+      required:
+        - path
+        - title
+        - breadcrumbs
+      properties:
+        path:
+          type: string
+          description: 路由路径
+          example: "/product/spu"
+        title:
+          type: string
+          description: 路由标题
+          example: "SPU管理"
+        menuItem:
+          $ref: '#/components/schemas/MenuItem'
+          description: 关联的菜单项
+        breadcrumbs:
+          type: array
+          items:
+            $ref: '#/components/schemas/BreadcrumbItem'
+          description: 面包屑导航
+        params:
+          type: object
+          description: 路由参数
+          example:
+            id: "123"
+        query:
+          type: object
+          description: 查询参数
+          example:
+            status: "active"
+        meta:
+          type: object
+          description: 页面元数据
+          properties:
+            title:
+              type: string
+              description: 页面标题
+            description:
+              type: string
+              description: 页面描述
+            keywords:
+              type: array
+              items:
+                type: string
+              description: 页面关键字
+          example:
+            title: "SPU管理页面"
+            description: "商品SPU信息管理"
+            keywords: ["商品", "SPU", "管理"]
+
+    # 响应模型
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - data
+        - message
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          description: 响应数据
+          example: "success"
+        message:
+          type: string
+          description: 响应消息
+          example: "操作成功"
+        code:
+          type: integer
+          description: 响应代码（可选）
+          example: 200
+
+    UserResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/MockUser'
+          - type: object
+          description: 用户数据
+
+    MenuResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+          description: 菜单数据列表
+
+    MenuItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/MenuItem'
+          - type: object
+          description: 菜单项数据
+
+    PreferencesResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/UserPreferences'
+          - type: object
+          description: 用户偏好数据
+
+    PreferencesRequest:
+      type: object
+      required:
+        - userId
+        - sidebarExpanded
+        - expandedMenuIds
+        - favoriteMenuIds
+        - theme
+        - navigation
+        - ui
+      properties:
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        sidebarExpanded:
+          type: boolean
+          description: 侧边栏展开状态
+          example: true
+        expandedMenuIds:
+          type: array
+          items:
+            type: string
+          description: 展开的菜单ID列表
+          example: ["menu-001", "menu-002"]
+        favoriteMenuIds:
+          type: array
+          items:
+            type: string
+          description: 收藏的菜单ID列表
+          example: ["menu-002-001"]
+        theme:
+          type: object
+          required:
+            - mode
+            - primaryColor
+          properties:
+            mode:
+              type: string
+              enum: [light, dark, auto]
+              description: 主题模式
+              example: "light"
+            primaryColor:
+              type: string
+              description: 主题颜色
+              example: "#1890ff"
+        navigation:
+          type: object
+          required:
+            - showBreadcrumb
+            - enableSearch
+            - recentItemsLimit
+            - searchHistoryLimit
+          properties:
+            showBreadcrumb:
+              type: boolean
+              description: 面包屑显示
+              example: true
+            enableSearch:
+              type: boolean
+              description: 菜单搜索启用
+              example: true
+            recentItemsLimit:
+              type: integer
+              minimum: 1
+              maximum: 50
+              description: 最近访问数量限制
+              example: 10
+            searchHistoryLimit:
+              type: integer
+              minimum: 1
+              maximum: 100
+              description: 搜索历史数量限制
+              example: 20
+        ui:
+          type: object
+          required:
+            - compactMode
+            - fixedSidebar
+            - enableAnimation
+          properties:
+            compactMode:
+              type: boolean
+              description: 紧凑模式
+              example: false
+            fixedSidebar:
+              type: boolean
+              description: 固定侧边栏
+              example: true
+            enableAnimation:
+              type: boolean
+              description: 动画效果
+              example: true
+        lastUpdated:
+          type: string
+          format: date-time
+          description: 最后更新时间
+          example: "2025-12-11T00:00:00.000Z"
+
+    SearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItem'
+          description: 搜索结果菜单项列表
+
+    NavigationLogRequest:
+      type: object
+      required:
+        - userId
+        - menuId
+        - menuPath
+        - action
+        - timestamp
+      properties:
+        userId:
+          type: string
+          description: 用户ID
+          example: "user-001"
+        menuId:
+          type: string
+          description: 菜单ID
+          example: "menu-002"
+        menuPath:
+          type: string
+          description: 菜单路径
+          example: "/product/spu"
+        action:
+          type: string
+          enum: [menu_click, breadcrumb_click, search_select, favorite_click, page_view, page_exit, search_query, menu_expand, menu_collapse]
+          description: 导航动作类型
+          example: "menu_click"
+        duration:
+          type: integer
+          description: 页面停留时间（毫秒）
+          example: 15000
+        userAgent:
+          type: string
+          description: 用户代理信息
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        screenSize:
+          type: string
+          enum: [mobile, tablet, desktop]
+          description: 屏幕尺寸
+          example: "desktop"
+        navigationMode:
+          type: string
+          enum: [drawer, collapsed, expanded]
+          description: 导航模式
+          example: "expanded"
+        timestamp:
+          type: string
+          format: date-time
+          description: 访问时间戳
+          example: "2025-12-11T10:30:00.000Z"
+        metadata:
+          type: object
+          description: 额外的元数据
+          example:
+            searchQuery: "搜索关键词"
+            fromFavorite: true
+
+    NavigationLogResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/NavigationLog'
+          - type: object
+          description: 导航日志数据
+          additionalProperties: true
+
+    NavigationLogListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/NavigationLog'
+              description: 导航日志列表
+            total:
+              type: integer
+              description: 总数量
+              example: 100
+            page:
+              type: integer
+              description: 当前页码
+              example: 1
+            pageSize:
+              type: integer
+              description: 每页数量
+              example: 20
+            hasMore:
+              type: boolean
+              description: 是否有更多数据
+              example: false
+
+    HealthResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+      properties:
+        data:
+          type: object
+          required:
+            - status
+            - timestamp
+          properties:
+            status:
+              type: string
+              enum: [healthy, unhealthy, degraded]
+              description: 系统状态
+              example: "healthy"
+            timestamp:
+              type: string
+              format: date-time
+              description: 检查时间
+              example: "2025-12-11T10:30:00.000Z"
+            services:
+              type: object
+              description: 各服务状态
+              properties:
+                user:
+                  type: string
+                  enum: [healthy, unhealthy, degraded]
+                  description: 用户服务状态
+                  example: "healthy"
+                navigation:
+                  type: string
+                  enum: [healthy, unhealthy, degraded]
+                  description: 导航服务状态
+                  example: "healthy"
+                storage:
+                  type: string
+                  enum: [healthy, unhealthy, degraded]
+                  description: 存储服务状态
+                  example: "healthy"
+
+    ErrorSchema:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: false
+        message:
+          type: string
+          description: 错误消息
+          example: "服务器内部错误"
+        code:
+          type: integer
+          description: 错误代码
+          example: 500
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误发生时间
+          example: "2025-12-11T10:30:00.000Z"
+        details:
+          type: object
+          description: 错误详细信息
+          example:
+            field: "menuId"
+            value: "invalid-menu-id"
+            expected: "string uuid format"

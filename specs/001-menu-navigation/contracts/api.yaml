@@ -1,0 +1,953 @@
+# 影院商品管理中台功能导航系统 API 契约
+
+**Feature Branch**: `001-menu-navigation`
+**Date**: 2025-12-10
+**API Version**: v1
+**Base URL**: `/api/v1`
+
+## API 概览
+
+本文档定义了影院商品管理中台功能导航系统的API接口契约，包括菜单管理、用户偏好、导航日志等功能模块的API规范。
+
+## 通用规范
+
+### 请求头
+
+```
+Content-Type: application/json
+Authorization: Bearer <token>
+X-Client-Version: 1.0.0
+X-Request-ID: <unique-request-id>
+```
+
+### 响应格式
+
+```json
+{
+  "success": true,
+  "data": {},
+  "message": "操作成功",
+  "code": 200,
+  "timestamp": "2025-12-10T10:00:00Z",
+  "requestId": "req-123456789"
+}
+```
+
+### 错误响应格式
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "请求参数验证失败",
+    "details": [
+      {
+        "field": "name",
+        "message": "菜单名称不能为空"
+      }
+    ]
+  },
+  "timestamp": "2025-12-10T10:00:00Z",
+  "requestId": "req-123456789"
+}
+```
+
+## 1. 菜单管理 API
+
+### 1.1 获取菜单结构
+
+获取用户可访问的完整菜单结构。
+
+**接口**: `GET /api/v1/navigation/menus`
+
+**请求参数**:
+```yaml
+parameters:
+  - name: includeInactive
+    in: query
+    description: 是否包含非活跃菜单
+    required: false
+    schema:
+      type: boolean
+      default: false
+  - name: userId
+    in: query
+    description: 用户ID（可选，默认为当前用户）
+    required: false
+    schema:
+      type: string
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "basic-settings",
+      "name": "基础设置与主数据",
+      "code": "basic_settings",
+      "icon": "SettingOutlined",
+      "level": 1,
+      "sortOrder": 1,
+      "isActive": true,
+      "isVisible": true,
+      "functionalArea": "basic_settings",
+      "children": [
+        {
+          "id": "organization-management",
+          "parentId": "basic-settings",
+          "name": "组织/门店/仓库管理",
+          "code": "organization_management",
+          "path": "/basic-settings/organization",
+          "level": 2,
+          "sortOrder": 1,
+          "isActive": true,
+          "isVisible": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 1.2 获取菜单详情
+
+获取指定菜单的详细信息。
+
+**接口**: `GET /api/v1/navigation/menus/{menuId}`
+
+**路径参数**:
+```yaml
+parameters:
+  - name: menuId
+    in: path
+    required: true
+    schema:
+      type: string
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "basic-settings",
+    "name": "基础设置与主数据",
+    "code": "basic_settings",
+    "icon": "SettingOutlined",
+    "description": "系统基础设置和主数据管理模块",
+    "level": 1,
+    "sortOrder": 1,
+    "isActive": true,
+    "isVisible": true,
+    "functionalArea": "basic_settings",
+    "permissions": ["basic_settings.view"],
+    "createdAt": "2025-12-10T10:00:00Z",
+    "updatedAt": "2025-12-10T10:00:00Z"
+  }
+}
+```
+
+### 1.3 搜索菜单
+
+根据关键词搜索菜单项。
+
+**接口**: `GET /api/v1/navigation/menus/search`
+
+**请求参数**:
+```yaml
+parameters:
+  - name: q
+    in: query
+    description: 搜索关键词
+    required: true
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 50
+  - name: limit
+    in: query
+    description: 返回结果数量限制
+    required: false
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 50
+      default: 10
+  - name: level
+    in: query
+    description: 菜单层级筛选
+    required: false
+    schema:
+      type: integer
+      enum: [1, 2]
+  - name: functionalArea
+    in: query
+    description: 功能区域筛选
+    required: false
+    schema:
+      type: string
+      enum: [
+        "basic_settings", "product_management", "bom_management",
+        "scenario_package", "pricing_system", "procurement",
+        "inventory", "scheduling", "order_management",
+        "operations", "system_management"
+      ]
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "results": [
+      {
+        "id": "organization-management",
+        "name": "组织/门店/仓库管理",
+        "code": "organization_management",
+        "path": "/basic-settings/organization",
+        "level": 2,
+        "functionalArea": "basic_settings",
+        "highlight": "组织/<mark>门店</mark>/仓库管理"
+      }
+    ],
+    "total": 1,
+    "query": "门店"
+  }
+}
+```
+
+## 2. 用户偏好管理 API
+
+### 2.1 获取用户偏好
+
+获取当前用户的导航偏好设置。
+
+**接口**: `GET /api/v1/users/preferences`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "sidebarCollapsed": false,
+    "favoriteMenus": ["dashboard", "product-management"],
+    "recentMenus": [
+      {
+        "menuId": "product-management",
+        "visitCount": 5,
+        "lastVisitedAt": "2025-12-10T09:30:00Z"
+      }
+    ],
+    "searchHistory": ["商品管理", "库存查询"],
+    "theme": "light",
+    "language": "zh-CN"
+  }
+}
+```
+
+### 2.2 更新用户偏好
+
+更新当前用户的导航偏好设置。
+
+**接口**: `PUT /api/v1/users/preferences`
+
+**请求体**:
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          sidebarCollapsed:
+            type: boolean
+            description: 侧边栏是否收起
+          favoriteMenus:
+            type: array
+            items:
+              type: string
+            description: 收藏的菜单ID列表
+            maxItems: 20
+          searchHistory:
+            type: array
+            items:
+              type: string
+            description: 搜索历史记录
+            maxItems: 100
+          theme:
+            type: string
+            enum: ["light", "dark"]
+            description: 主题设置
+        example:
+          sidebarCollapsed: true
+          favoriteMenus: ["dashboard", "inventory-management"]
+          theme: "dark"
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "sidebarCollapsed": true,
+    "favoriteMenus": ["dashboard", "inventory-management"],
+    "recentMenus": [
+      {
+        "menuId": "product-management",
+        "visitCount": 5,
+        "lastVisitedAt": "2025-12-10T09:30:00Z"
+      }
+    ],
+    "searchHistory": ["商品管理", "库存查询"],
+    "theme": "dark",
+    "language": "zh-CN",
+    "updatedAt": "2025-12-10T10:00:00Z"
+  },
+  "message": "用户偏好更新成功"
+}
+```
+
+### 2.3 添加收藏菜单
+
+将菜单添加到用户收藏列表。
+
+**接口**: `POST /api/v1/users/favorites`
+
+**请求体**:
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - menuId
+        properties:
+          menuId:
+            type: string
+            description: 菜单ID
+        example:
+          menuId: "product-management"
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "menuId": "product-management",
+    "addedAt": "2025-12-10T10:00:00Z"
+  },
+  "message": "菜单已添加到收藏"
+}
+```
+
+### 2.4 移除收藏菜单
+
+从用户收藏列表中移除菜单。
+
+**接口**: `DELETE /api/v1/users/favorites/{menuId}`
+
+**路径参数**:
+```yaml
+parameters:
+  - name: menuId
+    in: path
+    required: true
+    schema:
+      type: string
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": null,
+  "message": "菜单已从收藏中移除"
+}
+```
+
+## 3. 导航日志 API
+
+### 3.1 记录导航行为
+
+记录用户的导航行为日志。
+
+**接口**: `POST /api/v1/navigation/logs`
+
+**请求体**:
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - action
+          - menuPath
+        properties:
+          action:
+            type: string
+            enum: [
+              "menu_click", "breadcrumb_click", "search_select",
+              "favorite_click", "page_view", "page_exit"
+            ]
+            description: 导航动作类型
+          menuId:
+            type: string
+            description: 菜单ID
+          menuPath:
+            type: string
+            description: 菜单路径
+          duration:
+            type: integer
+            description: 页面停留时间（毫秒）
+          metadata:
+            type: object
+            description: 扩展数据
+        example:
+          action: "menu_click"
+          menuId: "product-management"
+          menuPath: "/product-management"
+          duration: 30000
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "logId": "log-123456789",
+    "timestamp": "2025-12-10T10:00:00Z"
+  },
+  "message": "导航日志记录成功"
+}
+```
+
+### 3.2 获取导航统计
+
+获取用户导航行为统计数据。
+
+**接口**: `GET /api/v1/navigation/stats`
+
+**请求参数**:
+```yaml
+parameters:
+  - name: startDate
+    in: query
+    description: 开始日期
+    required: false
+    schema:
+      type: string
+      format: date
+  - name: endDate
+    in: query
+    description: 结束日期
+    required: false
+    schema:
+      type: string
+      format: date
+  - name: userId
+    in: query
+    description: 用户ID（可选，默认为当前用户）
+    required: false
+    schema:
+      type: string
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "totalVisits": 150,
+    "uniqueMenus": 25,
+    "averageSessionDuration": 120000,
+    "topMenus": [
+      {
+        "menuId": "dashboard",
+        "menuName": "首页仪表板",
+        "visitCount": 45
+      },
+      {
+        "menuId": "product-management",
+        "menuName": "商品管理",
+        "visitCount": 32
+      }
+    ],
+    "dailyStats": [
+      {
+        "date": "2025-12-10",
+        "visits": 15,
+        "uniqueMenus": 8,
+        "totalDuration": 1800000
+      }
+    ]
+  }
+}
+```
+
+## 4. 快速操作 API
+
+### 4.1 获取快速操作列表
+
+获取用户可用的快速操作入口。
+
+**接口**: `GET /api/v1/quick-actions`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "create-product",
+      "name": "创建商品",
+      "icon": "PlusOutlined",
+      "description": "快速创建新的商品",
+      "path": "/product-management/create",
+      "category": "product",
+      "sortOrder": 1,
+      "visible": true,
+      "permissions": ["product.create"]
+    }
+  ]
+}
+```
+
+### 4.2 执行快速操作
+
+执行快速操作（可能包含预设参数）。
+
+**接口**: `POST /api/v1/quick-actions/{actionId}/execute`
+
+**路径参数**:
+```yaml
+parameters:
+  - name: actionId
+    in: path
+    required: true
+    schema:
+      type: string
+```
+
+**请求体**:
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          parameters:
+            type: object
+            description: 操作参数
+        example:
+          parameters:
+            productType: "movie_ticket"
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "actionId": "create-product",
+    "result": {
+      "redirectUrl": "/product-management/create?productType=movie_ticket",
+      "message": "正在跳转到创建商品页面"
+    }
+  },
+  "message": "快速操作执行成功"
+}
+```
+
+## 5. 首页仪表板 API
+
+### 5.1 获取仪表板配置
+
+获取用户个性化仪表板配置。
+
+**接口**: `GET /api/v1/dashboard/config`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "layoutVersion": "1.0.0",
+    "widgetConfigs": [
+      {
+        "id": "sales-stats",
+        "type": "sales_stats",
+        "title": "销售数据统计",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "width": 6,
+          "height": 4
+        },
+        "visible": true,
+        "refreshInterval": 300
+      }
+    ],
+    "quickActions": [
+      {
+        "id": "create-product",
+        "name": "创建商品",
+        "icon": "PlusOutlined",
+        "path": "/product-management/create"
+      }
+    ],
+    "refreshInterval": 60,
+    "theme": {
+      "primaryColor": "#1890ff",
+      "secondaryColor": "#52c41a"
+    }
+  }
+}
+```
+
+### 5.2 更新仪表板配置
+
+更新用户仪表板配置。
+
+**接口**: `PUT /api/v1/dashboard/config`
+
+**请求体**:
+```yaml
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          widgetConfigs:
+            type: array
+            items:
+              $ref: '#/components/schemas/WidgetConfig'
+          quickActions:
+            type: array
+            items:
+              $ref: '#/components/schemas/QuickActionConfig'
+          refreshInterval:
+            type: integer
+            minimum: 30
+            maximum: 300
+            description: 数据刷新间隔（秒）
+```
+
+### 5.3 获取仪表板数据
+
+获取仪表板显示的业务数据。
+
+**接口**: `GET /api/v1/dashboard/data`
+
+**请求参数**:
+```yaml
+parameters:
+  - name: widgets
+    in: query
+    description: 指定需要获取数据的组件ID列表
+    required: false
+    schema:
+      type: array
+      items:
+        type: string
+  - name: refresh
+    in: query
+    description: 是否强制刷新数据
+    required: false
+    schema:
+      type: boolean
+      default: false
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "widgets": {
+      "sales-stats": {
+        "totalSales": 1250000,
+        "todaySales": 45000,
+        "growth": 12.5,
+        "lastUpdated": "2025-12-10T10:00:00Z"
+      },
+      "inventory-overview": {
+        "totalProducts": 856,
+        "lowStockProducts": 23,
+        "outOfStockProducts": 5,
+        "lastUpdated": "2025-12-10T10:00:00Z"
+      }
+    },
+    "timestamp": "2025-12-10T10:00:00Z"
+  }
+}
+```
+
+## 错误代码定义
+
+| 错误代码 | HTTP状态码 | 描述 |
+|---------|-----------|------|
+| VALIDATION_ERROR | 400 | 请求参数验证失败 |
+| UNAUTHORIZED | 401 | 未授权访问 |
+| FORBIDDEN | 403 | 权限不足 |
+| NOT_FOUND | 404 | 资源不存在 |
+| RATE_LIMITED | 429 | 请求频率超限 |
+| INTERNAL_ERROR | 500 | 服务器内部错误 |
+| SERVICE_UNAVAILABLE | 503 | 服务暂时不可用 |
+
+## 数据类型定义
+
+```yaml
+components:
+  schemas:
+    MenuItem:
+      type: object
+      required:
+        - id
+        - name
+        - code
+        - level
+        - sortOrder
+        - isActive
+        - functionalArea
+      properties:
+        id:
+          type: string
+          description: 菜单唯一标识
+        parentId:
+          type: string
+          description: 父菜单ID
+        name:
+          type: string
+          maxLength: 50
+          description: 菜单显示名称
+        code:
+          type: string
+          maxLength: 30
+          pattern: '^[a-z][a-z0-9_]*$'
+          description: 菜单代码
+        icon:
+          type: string
+          description: 菜单图标名称
+        path:
+          type: string
+          pattern: '^\/[a-z0-9\-_\/]*$'
+          description: 菜单路径
+        level:
+          type: integer
+          enum: [1, 2]
+          description: 菜单层级
+        sortOrder:
+          type: integer
+          minimum: 0
+          maximum: 9999
+          description: 排序权重
+        isActive:
+          type: boolean
+          description: 是否启用
+        isVisible:
+          type: boolean
+          description: 是否可见
+        functionalArea:
+          type: string
+          enum: [
+            "basic_settings", "product_management", "bom_management",
+            "scenario_package", "pricing_system", "procurement",
+            "inventory", "scheduling", "order_management",
+            "operations", "system_management"
+          ]
+          description: 功能区域
+        description:
+          type: string
+          maxLength: 200
+          description: 菜单描述
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 权限要求列表
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    UserPreference:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: 用户ID
+        sidebarCollapsed:
+          type: boolean
+          description: 侧边栏是否收起
+        favoriteMenus:
+          type: array
+          items:
+            type: string
+          maxItems: 20
+          description: 收藏的菜单ID列表
+        recentMenus:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentMenu'
+          maxItems: 10
+          description: 最近访问的菜单
+        searchHistory:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          maxItems: 100
+          description: 搜索历史记录
+        theme:
+          type: string
+          enum: ["light", "dark"]
+          description: 主题设置
+        language:
+          type: string
+          enum: ["zh-CN"]
+          description: 语言设置
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    RecentMenu:
+      type: object
+      required:
+        - menuId
+        - visitCount
+        - lastVisitedAt
+      properties:
+        menuId:
+          type: string
+          description: 菜单ID
+        visitCount:
+          type: integer
+          minimum: 1
+          description: 访问次数
+        lastVisitedAt:
+          type: string
+          format: date-time
+          description: 最后访问时间
+        source:
+          type: string
+          enum: ["navigation", "search", "favorite", "breadcrumb"]
+          description: 访问来源
+
+    WidgetConfig:
+      type: object
+      required:
+        - id
+        - type
+        - title
+        - position
+      properties:
+        id:
+          type: string
+          description: 组件唯一标识
+        type:
+          type: string
+          enum: [
+            "sales_stats", "inventory_overview", "order_status",
+            "trend_chart", "resource_utilization", "quick_actions",
+            "notifications", "kpi_cards"
+          ]
+          description: 组件类型
+        title:
+          type: string
+          maxLength: 50
+          description: 组件标题
+        position:
+          type: object
+          required:
+            - x
+            - y
+            - width
+            - height
+          properties:
+            x:
+              type: integer
+              minimum: 0
+            y:
+              type: integer
+              minimum: 0
+            width:
+              type: integer
+              minimum: 1
+            height:
+              type: integer
+              minimum: 1
+        visible:
+          type: boolean
+          default: true
+          description: 是否可见
+        refreshInterval:
+          type: integer
+          minimum: 30
+          maximum: 300
+          description: 刷新间隔（秒）
+        config:
+          type: object
+          description: 组件配置参数
+
+    QuickActionConfig:
+      type: object
+      required:
+        - id
+        - name
+        - path
+        - category
+      properties:
+        id:
+          type: string
+          description: 操作唯一标识
+        name:
+          type: string
+          maxLength: 30
+          description: 操作显示名称
+        icon:
+          type: string
+          description: 操作图标
+        description:
+          type: string
+          maxLength: 100
+          description: 操作描述
+        path:
+          type: string
+          description: 目标路径
+        category:
+          type: string
+          enum: ["product", "inventory", "order", "procurement", "report", "system"]
+          description: 操作分类
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序权重
+        visible:
+          type: boolean
+          default: true
+          description: 是否显示
+        permissions:
+          type: array
+          items:
+            type: string
+          description: 权限要求列表
+```
+
+## 修订历史
+
+| 版本 | 日期 | 修订内容 | 作者 |
+|------|------|----------|------|
+| v1.0 | 2025-12-10 | 初始版本，定义导航系统API契约 | Claude |
