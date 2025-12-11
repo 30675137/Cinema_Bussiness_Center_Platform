@@ -14,6 +14,7 @@ const ReviewPanel = lazy(() => import('@/pages/review/ReviewPanel'));
 const InventoryTrace = lazy(() => import('@/pages/inventory/InventoryTrace'));
 const InventoryLedger = lazy(() => import('@/pages/inventory/InventoryLedger'));
 const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryAudit = lazy(() => import('@/pages/inventory/InventoryAudit'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -332,7 +333,7 @@ export const router = createBrowserRouter([
         <AppLayout>
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              <InventoryMovements />
+              <InventoryAudit />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>
