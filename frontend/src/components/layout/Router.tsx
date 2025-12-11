@@ -18,7 +18,7 @@ const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovemen
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
 const AuditHistory = lazy(() => import('@/pages/product/ProductList'));
-const InventoryOperations = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryOperations = lazy(() => import('@/pages/inventory/InventoryOperations'));
 const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const TransferManagement = lazy(() => import('@/pages/inventory/InventoryMovements'));
