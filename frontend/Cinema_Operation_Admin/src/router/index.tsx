@@ -18,12 +18,15 @@ import { useUserStore } from '@/stores/userStore';
 // 懒加载页面组件
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 const ProductList = React.lazy(() => import('@/pages/product/ProductList'));
-const InventoryList = React.lazy(() => import('@/pages/inventory/InventoryList'));
+const InventoryManagePage = React.lazy(() => import('@/pages/inventory/InventoryManagePage'));
 const PricingList = React.lazy(() => import('@/pages/pricing/PricingList'));
 const ReviewList = React.lazy(() => import('@/pages/review/ReviewList'));
 
 // 采购管理页面组件
-const PurchaseOrderPage = React.lazy(() => import('@/pages/procurement/SimplePurchaseOrderPage'));
+const PurchaseOrderManagePage = React.lazy(() => import('@/pages/procurement/PurchaseOrderManagePage'));
+const SupplierManagePage = React.lazy(() => import('@/pages/procurement/SupplierManagePage'));
+const TransferManagePage = React.lazy(() => import('@/pages/procurement/TransferManagePage'));
+const ReceivingManagePage = React.lazy(() => import('@/pages/procurement/receiving'));
 
 // 布局组件
 const AppLayout = React.lazy(() => import('@/components/layout/AppLayout'));
@@ -452,35 +455,122 @@ const router = createBrowserRouter([
           },
           {
             path: 'supplier',
-            element: (
-              <Suspense fallback={<LoadingFallback />}>
-                <div>供应商管理</div>
-              </Suspense>
-            )
+            children: [
+              {
+                index: true,
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <SupplierManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: 'create',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <SupplierManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':supplierId',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <SupplierManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':supplierId/edit',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <SupplierManagePage />
+                  </Suspense>
+                )
+              }
+            ]
           },
           {
             path: 'purchase-order',
-            element: (
-              <Suspense fallback={<LoadingFallback />}>
-                <PurchaseOrderPage />
-              </Suspense>
-            )
+            children: [
+              {
+                index: true,
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <PurchaseOrderManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: 'create',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <PurchaseOrderManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':orderId',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <PurchaseOrderManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':orderId/edit',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <PurchaseOrderManagePage />
+                  </Suspense>
+                )
+              }
+            ]
           },
           {
             path: 'receiving',
             element: (
               <Suspense fallback={<LoadingFallback />}>
-                <div>到货验收与收货</div>
+                <ReceivingManagePage />
               </Suspense>
             )
           },
           {
             path: 'transfer',
-            element: (
-              <Suspense fallback={<LoadingFallback />}>
-                <div>调拨管理</div>
-              </Suspense>
-            )
+            children: [
+              {
+                index: true,
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <TransferManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: 'create',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <TransferManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':transferId',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <TransferManagePage />
+                  </Suspense>
+                )
+              },
+              {
+                path: ':transferId/edit',
+                element: (
+                  <Suspense fallback={<LoadingFallback />}>
+                    <TransferManagePage />
+                  </Suspense>
+                )
+              }
+            ]
           }
         ]
       },
@@ -492,7 +582,39 @@ const router = createBrowserRouter([
             index: true,
             element: (
               <Suspense fallback={<LoadingFallback />}>
-                <InventoryList />
+                <InventoryManagePage />
+              </Suspense>
+            )
+          },
+          {
+            path: 'create',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <InventoryManagePage />
+              </Suspense>
+            )
+          },
+          {
+            path: 'edit',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <InventoryManagePage />
+              </Suspense>
+            )
+          },
+          {
+            path: ':inventoryId',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <InventoryManagePage />
+              </Suspense>
+            )
+          },
+          {
+            path: ':inventoryId/edit',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <InventoryManagePage />
               </Suspense>
             )
           },
@@ -525,6 +647,22 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<LoadingFallback />}>
                 <div>库存预占管理</div>
+              </Suspense>
+            )
+          },
+          {
+            path: 'analytics',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <div>库存数据分析</div>
+              </Suspense>
+            )
+          },
+          {
+            path: 'settings',
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <div>库存设置</div>
               </Suspense>
             )
           }

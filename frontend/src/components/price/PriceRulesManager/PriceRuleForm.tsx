@@ -479,7 +479,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
           {actions.length === 0 ? (
             <Alert
               message="暂无执行动作"
-              description="点击"添加动作"按钮来创建执行动作，当规则触发时将执行这些动作。"
+              description="点击“添加动作”按钮来创建执行动作，当规则触发时将执行这些动作。"
               type="info"
               style={{ marginBottom: 16 }}
             />

@@ -9,7 +9,7 @@ import { SearchOutlined, CloseOutlined, HistoryOutlined } from '@ant-design/icon
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useNavigation } from '@/hooks/useNavigation';
 import { MenuItem, SearchResult } from '@/types/navigation';
-import { debounce } from '@/utils/navigation';
+import { debounce } from '@/utils/helpers';
 import SearchInput from './SearchInput';
 import SearchResults from './SearchResults';
 import './index.css';

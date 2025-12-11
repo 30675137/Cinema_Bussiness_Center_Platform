@@ -1,96 +1,58 @@
 /**
- * 计算工具函数
+ * 计算工具函数库
  */
 
 /**
  * 计算订单总金额
  */
-export const calculateOrderTotal = (items: Array<{
-  quantity: number;
-  unitPrice: number;
-  taxRate: number;
-}>): {
-  subtotal: number;
-  taxAmount: number;
-  totalAmount: number;
-} => {
-  let subtotal = 0;
-  let taxAmount = 0;
+export const calculateOrderTotal = (items: any[]): number => {
+  if (!items || items.length === 0) {
+    return 0;
+  }
 
-  items.forEach(item => {
-    const itemSubtotal = item.quantity * item.unitPrice;
-    const itemTaxAmount = itemSubtotal * (item.taxRate / 100);
-
-    subtotal += itemSubtotal;
-    taxAmount += itemTaxAmount;
-  });
-
-  return {
-    subtotal,
-    taxAmount,
-    totalAmount: subtotal + taxAmount
-  };
+  return items.reduce((total, item) => {
+    const subtotal = item.quantity * item.unitPrice - (item.discountAmount || 0);
+    const taxAmount = item.subtotal * (item.taxRate || 0);
+    return total + subtotal + taxAmount;
+  }, 0);
 };
 
 /**
- * 计算折扣后金额
+ * 计算折扣金额
  */
 export const calculateDiscountedAmount = (
-  originalAmount: number,
+  amount: number,
   discountRate: number
 ): number => {
-  if (discountRate <= 0 || discountRate >= 1) {
-    return originalAmount;
+  if (amount <= 0 || discountRate <= 0 || discountRate > 100) {
+    return 0;
   }
 
-  return originalAmount * (1 - discountRate);
+  return Math.round((amount * discountRate / 100) * 100) / 100;
 };
 
 /**
- * 计算订单收货进度
+ * 计算收货进度
  */
-export const calculateReceiptProgress = (orderItems: Array<{
-  quantity: number;
-  receivedQuantity: number;
-}>): {
-  totalQuantity: number;
-  receivedQuantity: number;
-  percentage: number;
-  status: 'pending' | 'partial' | 'completed';
-} => {
-  let totalQuantity = 0;
-  let receivedQuantity = 0;
-
-  orderItems.forEach(item => {
-    totalQuantity += item.quantity;
-    receivedQuantity += item.receivedQuantity;
-  });
-
-  const percentage = totalQuantity > 0 ? Math.round((receivedQuantity / totalQuantity) * 100) / 100 : 0;
-
-  let status: 'pending' | 'partial' | 'completed' = 'pending';
-  if (percentage > 0 && percentage < 1) {
-    status = 'partial';
-  } else if (percentage >= 1) {
-    status = 'completed';
+export const calculateReceiptProgress = (
+  receivedQuantity: number,
+  orderedQuantity: number
+): number => {
+  if (orderedQuantity === 0) {
+    return 0;
   }
 
-  return {
-    totalQuantity,
-    receivedQuantity,
-    percentage,
-    status
-  };
+  return Math.round((receivedQuantity / orderedQuantity) * 100);
 };
 
 /**
  * 计算剩余数量
  */
 export const calculateRemainingQuantity = (
-  totalQuantity: number,
+  orderedQuantity: number,
   receivedQuantity: number
 ): number => {
-  return Math.max(0, totalQuantity - receivedQuantity);
+  return Math.max(0, orderedQuantity - receivedQuantity);
 };
 
 /**
@@ -108,105 +70,106 @@ export const calculateInventoryTurnover = (
 };
 
 /**
- * 计算毛利率
+ * 计算毛利
  */
 export const calculateGrossMargin = (
   revenue: number,
-  cost: number
-): {
-  margin: number;
-  marginPercentage: number;
-} => {
-  const margin = revenue - cost;
-  const marginPercentage = revenue > 0 ? Math.round((margin / revenue) * 10000) / 100 : 0;
-
-  return {
-    margin,
-    marginPercentage
-  };
+  costOfGoodsSold: number
+): number => {
+  return revenue - costOfGoodsSold;
 };
 
 /**
- * 计算毛利率百分比
+ * 计算毛利率
  */
 export const calculateGrossMarginPercentage = (
-  grossMargin: number,
-  revenue: number
+  revenue: number,
+  costOfGoodsSold: number
 ): number => {
-  return revenue > 0 ? Math.round((grossMargin / revenue) * 10000) / 100 : 0;
+  if (revenue === 0) {
+    return 0;
+  }
+
+  return Math.round(((revenue - costOfGoodsSold) / revenue) * 10000) / 100;
 };
 
 /**
  * 计算净利率
  */
 export const calculateNetMargin = (
-  netProfit: number,
+  netIncome: number,
   revenue: number
 ): number => {
-  return revenue > 0 ? Math.round((netProfit / revenue) * 10000) / 100 : 0;
-};
-
-/**
- * 计算ROI (投资回报率)
- */
-export const calculateROI = (
-  netProfit: number,
-  investment: number
-): number => {
-  if (investment === 0) {
+  if (revenue === 0) {
     return 0;
   }
 
-  return Math.round(((netProfit / investment) * 10000) / 100);
+  return Math.round((netIncome / revenue) * 10000) / 100;
+};
+
+/**
+ * 计算投资回报率
+ */
+export const calculateROI = (
+  netProfit: number,
+  investmentCost: number
+): number => {
+  if (investmentCost === 0) {
+    return 0;
+  }
+
+  return Math.round((netProfit / investmentCost) * 10000) / 100;
 };
 
 /**
  * 计算百分比变化
  */
 export const calculatePercentageChange = (
-  current: number,
-  previous: number
+  oldValue: number,
+  newValue: number
 ): number => {
-  if (previous === 0) {
-    return current > 0 ? 100 : 0;
+  if (oldValue === 0) {
+    return newValue > 0 ? Infinity : 0;
   }
 
-  return Math.round(((current - previous) / Math.abs(previous)) * 10000) / 100;
+  return Math.round(((newValue - oldValue) / oldValue) * 10000) / 100;
 };
 
 /**
- * 计算复利终值
+ * 计算复利
  */
 export const calculateCompoundInterest = (
   principal: number,
   rate: number,
-  periods: number,
-  isAnnual = true
+  time: number,
+  compoundsPerYear = 1
 ): number => {
-  const adjustedRate = isAnnual ? rate : rate * 12;
-    const adjustedPeriods = isAnnual ? periods : periods / 12;
-
-    return principal * Math.pow(1 + adjustedRate / 100, adjustedPeriods);
+  return Math.round(
+    principal * Math.pow(1 + rate / compoundsPerYear, compoundsPerYear * time) * 100
+  ) / 100;
 };
 
 /**
  * 计算分期付款金额
  */
 export const calculateInstallmentAmount = (
-  principal: number,
-  rate: number,
-  periods: number,
-  isAnnual = true
+  totalAmount: number,
+  interestRate: number,
+  numberOfPayments: number
 ): number => {
-  const adjustedRate = isAnnual ? rate / 100 : rate / 1200;
-    const adjustedPeriods = isAnnual ? periods : periods * 12;
-
-  if (adjustedRate === 0) {
-    return principal / adjustedPeriods;
+  if (numberOfPayments === 0) {
+    return 0;
   }
 
-  return (principal * adjustedRate * Math.pow(1 + adjustedRate, adjustedPeriods)) /
-         (Math.pow(1 + adjustedRate, adjustedPeriods) - 1);
+  const monthlyRate = interestRate / 100 / 12;
+  const denominator = Math.pow(1 + monthlyRate, numberOfPayments) - 1;
+
+  if (monthlyRate === 0) {
+    return Math.round((totalAmount / numberOfPayments) * 100) / 100;
+  }
+
+  const installment = totalAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / denominator;
+  return Math.round(installment * 100) / 100;
 };
 
 /**
@@ -255,26 +218,6 @@ export const calculatePayablesTurnover = (
 };
 
 /**
- * 计算运营周期 (Cash Conversion Cycle)
- */
-export = () => {
-  const inventoryDays = calculateInventoryDays(
-    arguments[0].averageInventory,
-    arguments[0].costOfGoodsSold
-  );
-  const receivablesDays = calculateReceivablesTurnover(
-    arguments[0].netCreditSales,
-    arguments[0].averageReceivables
-  );
-  const payablesDays = calculatePayablesTurnover(
-    arguments[0].costOfGoodsSold,
-    arguments[0].averagePayables
-  );
-
-  return inventoryDays + receivablesDays - payablesDays;
-};
-
-/**
  * 计算标准差
  */
 export const calculateStandardDeviation = (values: number[]): number => {
@@ -286,7 +229,7 @@ export const calculateStandardDeviation = (values: number[]): number => {
   const squaredDifferences = values.map(value => Math.pow(value - mean, 2));
   const variance = squaredDifferences.reduce((sum, value) => sum + value, 0) / values.length;
 
-  return Math.sqrt(variance);
+  return Math.round(Math.sqrt(variance) * 100) / 100;
 };
 
 /**
@@ -297,7 +240,7 @@ export const calculateAverage = (values: number[]): number => {
     return 0;
   }
 
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 100) / 100;
 };
 
 /**
@@ -312,9 +255,9 @@ export const calculateMedian = (values: number[]): number => {
   const middle = Math.floor(sorted.length / 2);
 
   if (sorted.length % 2 === 0) {
-    return (sorted[middle - 1] + sorted[middle]) / 2;
+    return Math.round(((sorted[middle - 1] + sorted[middle]) / 2) * 100) / 100;
   } else {
-    return sorted[middle];
+    return Math.round(sorted[middle] * 100) / 100;
   }
 };
 
@@ -332,7 +275,7 @@ export const calculateWeightedAverage = (
   const weightedSum = values.reduce((sum, value, index) => sum + value * weights[index], 0);
   const weightSum = weights.reduce((sum, weight) => sum + weight, 0);
 
-  return weightSum > 0 ? weightedSum / weightSum : 0;
+  return Math.round((weightSum > 0 ? weightedSum / weightSum : 0) * 100) / 100;
 };
 
 /**
@@ -374,7 +317,7 @@ export const calculatePreTaxPrice = (
     return totalPrice;
   }
 
-  return totalPrice / (1 + taxRate / 100);
+  return Math.round((totalPrice / (1 + taxRate / 100)) * 100) / 100;
 };
 
 /**
@@ -384,7 +327,7 @@ export const calculatePostTaxPrice = (
   preTaxPrice: number,
   taxRate: number
 ): number => {
-  return preTaxPrice * (1 + taxRate / 100);
+  return Math.round((preTaxPrice * (1 + taxRate / 100)) * 100) / 100;
 };
 
 /**
@@ -432,68 +375,6 @@ export const calculateBusinessDays = (
   return businessDays;
 };
 
-/**
- * 计算年龄
- */
-export const calculateAge = (birthDate: Date | string): {
-  years: number;
-  months: number;
-  days: number;
-} => {
-  const birth = new Date(birthDate);
-  const now = new Date();
-
-  let years = now.getFullYear() - birth.getFullYear();
-  let months = now.getMonth() - birth.getMonth();
-  let days = now.getDate() - birth.getDate();
-
-  // 调整负数的情况
-  if (days < 0) {
-    months--;
-    days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-  }
-
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
-
-  return { years, months, days };
-};
-
-/**
- * 计算BMI (身体质量指数)
- */
-export const calculateBMI = (
-  weight: number, // 体重(kg)
-  height: number  // 身高(m)
-): number => {
-  if (height === 0) {
-    return 0;
-  }
-
-  return Math.round((weight / (height * height)) * 100) / 100;
-};
-
-/**
- * 计算费用分摊
- */
-export const calculateExpenseAllocation = (
-  totalExpense: number,
-  quantity1: number,
-  quantity2: number,
-  ...otherQuantities: number[]
-): number[] => {
-  const quantities = [quantity1, quantity2, ...otherQuantities];
-  const totalQuantity = quantities.reduce((sum, qty) => sum + qty, 0);
-
-  if (totalQuantity === 0) {
-    return quantities.map(() => 0);
-  }
-
-  return quantities.map(qty => Math.round((qty / totalQuantity) * totalExpense));
-};
-
 export default {
   calculateOrderTotal,
   calculateDiscountedAmount,
@@ -520,7 +401,4 @@ export default {
   calculatePostTaxPrice,
   calculateDateDifference,
   calculateBusinessDays,
-  calculateAge,
-  calculateBMI,
-  calculateExpenseAllocation,
 };

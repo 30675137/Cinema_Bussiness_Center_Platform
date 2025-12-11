@@ -572,7 +572,7 @@ const mockMenus: MenuItem[] = [
       {
         id: 'menu_purchase_order',
         parentId: 'menu_procurement',
-        name: '采购订单管理',
+        name: 'Claude 采购订单管理',
         code: 'purchase_order',
         path: '/procurement/purchase-order',
         level: MenuLevel.SUB,

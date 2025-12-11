@@ -112,6 +112,11 @@ export const formatPhone = (phone: string): string => {
 };
 
 /**
+ * 格式化手机号（别名）
+ */
+export const formatPhoneNumber = formatPhone;
+
+/**
  * 格式化身份证号
  */
 export const formatIdCard = (idCard: string): string => {

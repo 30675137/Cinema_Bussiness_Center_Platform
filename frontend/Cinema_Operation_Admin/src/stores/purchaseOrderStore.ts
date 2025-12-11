@@ -113,6 +113,10 @@ export const purchaseOrderStore = {
   get filteredOrders() {
     const { orders, statusFilters, priorityFilter, supplierFilter, dateRange } = usePurchaseOrderStore.getState();
 
+    if (!orders || !Array.isArray(orders)) {
+      return [];
+    }
+
     return orders.filter(order => {
       // 状态过滤
       if (statusFilters.length > 0 && !statusFilters.includes(order.status)) {
@@ -147,6 +151,9 @@ export const purchaseOrderStore = {
   // 获取选中的订单
   get selectedOrders() {
     const { orders, selectedOrderIds } = usePurchaseOrderStore.getState();
+    if (!orders || !Array.isArray(orders) || !selectedOrderIds) {
+      return [];
+    }
     return orders.filter(order => selectedOrderIds.includes(order.id));
   },
 
@@ -161,6 +168,10 @@ export const purchaseOrderStore = {
   getStatusStatistics() {
     const { orders } = usePurchaseOrderStore.getState();
 
+    if (!orders || !Array.isArray(orders)) {
+      return {};
+    }
+
     return orders.reduce((stats, order) => {
       const status = order.status;
       stats[status] = (stats[status] || 0) + 1;
@@ -171,6 +182,15 @@ export const purchaseOrderStore = {
   // 获取订单金额统计
   getAmountStatistics() {
     const { orders } = usePurchaseOrderStore.getState();
+
+    if (!orders || !Array.isArray(orders)) {
+      return {
+        totalAmount: 0,
+        averageAmount: 0,
+        maxAmount: 0,
+        minAmount: 0,
+      };
+    }
 
     return {
       totalAmount: orders.reduce((sum, order) => sum + order.totalAmount, 0),
