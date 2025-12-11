@@ -20,6 +20,13 @@ import './monitoring/WebVitalsMonitor'
 // 设置dayjs中文语言
 dayjs.locale('zh-cn')
 
+// 开发环境下自动设置 Mock Token（方便测试）
+if (import.meta.env.DEV && !localStorage.getItem('access_token')) {
+  console.log('🔧 开发模式：自动设置 Mock Token')
+  localStorage.setItem('access_token', 'mock-token-for-testing')
+  localStorage.setItem('refresh_token', 'mock-refresh-token')
+}
+
 // 创建React Query客户端
 const queryClient = new QueryClient({
   defaultOptions: {
