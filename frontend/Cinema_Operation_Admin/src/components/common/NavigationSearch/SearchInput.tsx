@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Input, Button } from 'antd';
 import { SearchOutlined, CloseOutlined, LoadingOutlined } from '@ant-design/icons';
-import { debounce } from 'lodash-es';
+import { debounce } from '@/utils/helpers';
 import './SearchInput.css';
 
 const { Search } = Input;

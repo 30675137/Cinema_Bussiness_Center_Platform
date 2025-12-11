@@ -1,16 +1,18 @@
 @tailwind base;
-@layer antd {
-  /* Ant Design 样式层级 */
-}
 @tailwind components;
 @tailwind utilities;
 
+/* 基础样式重置 */
+* {
+  box-sizing: border-box;
+}
+
 /* 统一的颜色系统 */
 :root {
-  --color-primary: theme('colors.primary.500');
-  --color-success: theme('colors.antSuccess');
-  --color-warning: theme('colors.antWarning');
-  --color-error: theme('colors.antError');
+  --color-primary: #3b82f6;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+  --color-error: #ff4d4f;
 }
 
 /* 滚动条样式 */
@@ -34,13 +36,16 @@
 
 /* 状态颜色系统 */
 .status-active {
-  @apply bg-green-100 text-green-800;
+  background-color: #dcfce7;
+  color: #14532d;
 }
 
 .status-pending {
-  @apply bg-blue-100 text-blue-800;
+  background-color: #dbeafe;
+  color: #1e3a8a;
 }
 
 .status-inactive {
-  @apply bg-red-100 text-red-800;
+  background-color: #fecaca;
+  color: #7f1d1d;
 }
