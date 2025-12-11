@@ -14,7 +14,7 @@ import {
   Space,
 } from 'antd';
 import { UploadOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { cn } from '../../../utils/cn';
+import { cn } from '@/utils/cn';
 import type { FormFieldProps, FormFieldConfig } from './types';
 import { FormFieldType } from './types';
 
@@ -353,7 +353,13 @@ function FormField({
             {...finalConfig.inputProps}
             disabled={finalConfig.disabled}
           >
-            <Button icon={<UploadOutlined />} disabled={finalConfig.disabled}>
+            <Button
+              icon={<UploadOutlined />}
+              disabled={finalConfig.disabled}
+              classNames={{
+                root: "upload-button"
+              }}
+            >
               上传文件
             </Button>
           </Upload>

@@ -7,6 +7,7 @@ import { Form, Input, Button, Card, Typography, Space, Divider } from 'antd';
 import { UserOutlined, LockOutlined, ShopOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '@/stores/userStore';
+import { cn } from '@/utils/cn';
 
 const { Title, Text } = Typography;
 
@@ -95,7 +96,9 @@ const Login: React.FC = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                className="w-full h-12 text-lg"
+                classNames={{
+                  root: "w-full h-12 text-lg"
+                }}
               >
                 登录
               </Button>
