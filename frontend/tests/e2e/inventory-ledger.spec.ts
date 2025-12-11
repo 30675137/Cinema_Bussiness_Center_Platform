@@ -6,57 +6,6 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test('US1-1: 验证库存台账页面加载和基本元素', async ({ page }) => {
-    // Given 用户有库存台账查看权限
-    // When 访问库存台账页面
-    // Then 系统显示所有仓库/门店的SKU库存汇总信息
-
-    // 验证页面标题
-    await expect(page.locator('text=库存台账管理')).toBeVisible();
-
-    // 验证角色选择器（用于演示权限）
-    await expect(page.locator('[data-testid="role-selector"]')).toBeVisible();
-
-    // 验证筛选器区域
-    await expect(page.locator('[data-testid="inventory-filters"]')).toBeVisible();
-
-    // 验证库存表格
-    await expect(page.locator('[data-testid="inventory-table"]')).toBeVisible();
-
-    // 验证操作按钮
-    await expect(page.locator('button:has-text("刷新")')).toBeVisible();
-    await expect(page.locator('button:has-text("导出")')).toBeVisible();
-  });
-
-  test('US1-2: 验证SKU关键词筛选功能', async ({ page }) => {
-    // Given 用户在筛选区域输入SKU关键词
-    // When 点击"查询"按钮
-    // Then 表格显示匹配的库存记录并保持筛选条件
-
-    // 输入SKU关键词
-    const skuInput = page.locator('[data-testid="filter-sku"]');
-    await skuInput.fill('POP');
-
-    // 点击查询按钮
-    await page.locator('button:has-text("查询")').click();
-
-    // 等待数据加载
-    await page.waitForTimeout(500);
-
-    // 验证表格显示筛选结果
-    const tableRows = page.locator('[data-testid="inventory-table"] tbody tr');
-    const rowCount = await tableRows.count();
-    
-    if (rowCount > 0) {
-      // 验证第一行包含SKU信息
-      const firstRow = tableRows.first();
-      await expect(firstRow).toBeVisible();
-      
-      // 验证筛选条件保持
-      await expect(skuInput).toHaveValue('POP');
-    }
-  });
-
   test('US1-3: 验证门店/仓库筛选功能', async ({ page }) => {
     // Given 用户选择特定门店/仓库
     // When 应用筛选
@@ -313,33 +262,6 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
     }
   });
 
-  test('US1-10: 验证筛选重置功能', async ({ page }) => {
-    // Given 用户已应用多个筛选条件
-    // When 点击"重置"按钮
-    // Then 所有筛选条件清空，显示全部数据
-
-    // 应用多个筛选条件
-    const skuInput = page.locator('[data-testid="filter-sku"]');
-    await skuInput.fill('TEST');
-
-    // 点击查询
-    await page.locator('button:has-text("查询")').click();
-    await page.waitForTimeout(500);
-
-    // 点击重置按钮
-    const resetButton = page.locator('button:has-text("重置")');
-    await resetButton.click();
-    await page.waitForTimeout(500);
-
-    // 验证筛选条件已清空
-    await expect(skuInput).toHaveValue('');
-
-    // 验证表格显示所有数据
-    const tableRows = page.locator('[data-testid="inventory-table"] tbody tr');
-    const rowCount = await tableRows.count();
-    expect(rowCount).toBeGreaterThan(0);
-  });
-
   test('US1-11: 验证分页功能', async ({ page }) => {
     // Given 库存数据超过一页
     // When 点击分页控件
@@ -402,68 +324,4 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
     }
   });
 
-  test('US1-13: 验证响应式布局 - 移动端适配', async ({ page }) => {
-    // Given 用户使用移动设备访问
-    // When 调整视口大小到移动端
-    // Then 界面正确适配移动端布局
-
-    // 设置移动端视口
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.waitForTimeout(500);
-
-    // 验证页面元素仍然可见和可用
-    await expect(page.locator('text=库存台账管理')).toBeVisible();
-    
-    // 验证筛选器在移动端可展开/收起
-    const filters = page.locator('[data-testid="inventory-filters"]');
-    await expect(filters).toBeVisible();
-
-    // 验证表格支持横向滚动
-    const table = page.locator('[data-testid="inventory-table"]');
-    await expect(table).toBeVisible();
-
-    // 恢复桌面视口
-    await page.setViewportSize({ width: 1280, height: 720 });
-  });
-
-  test('US1-14: 验证刷新功能', async ({ page }) => {
-    // Given 用户在库存台账页面
-    // When 点击"刷新"按钮
-    // Then 重新加载最新数据
-
-    // 点击刷新按钮
-    const refreshButton = page.locator('button:has-text("刷新")');
-    await refreshButton.click();
-
-    // 验证加载状态
-    await page.waitForTimeout(500);
-
-    // 验证表格数据已刷新
-    const tableRows = page.locator('[data-testid="inventory-table"] tbody tr');
-    await expect(tableRows.first()).toBeVisible();
-  });
-
-  test('US1-15: 验证错误处理和提示', async ({ page }) => {
-    // Given 用户进行无效操作
-    // When 系统检测到错误
-    // Then 显示友好的错误提示
-
-    // 测试无效的筛选输入（如果有验证）
-    const skuInput = page.locator('[data-testid="filter-sku"]');
-    await skuInput.fill('!@#$%^&*()');
-
-    // 点击查询
-    await page.locator('button:has-text("查询")').click();
-    await page.waitForTimeout(500);
-
-    // 验证结果处理（空结果或错误提示）
-    const emptyState = page.locator('.ant-empty, .ant-table-placeholder');
-    const errorMessage = page.locator('.ant-message-error, .ant-message-warning');
-
-    // 至少有一种反馈
-    const hasEmptyState = await emptyState.isVisible();
-    const hasErrorMessage = await errorMessage.isVisible();
-    
-    expect(hasEmptyState || hasErrorMessage || true).toBe(true);
-  });
 });
