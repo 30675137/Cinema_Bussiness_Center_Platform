@@ -1,6 +1,6 @@
 # Feature Specification: 库存与仓店库存管理系统
 
-**Feature Branch**: `0703-inventory-management`
+**Feature Branch**: `003-inventory-management`
 **Created**: 2025-12-11
 **Status**: Draft
 **Input**: User description: "库存 & 仓店库存管理前端设计要求，包含库存台账和库存流水两个核心模块"
@@ -17,6 +17,10 @@
 ### Session 2025-12-11
 
 - Q: 功能分支和文件夹重命名 → A: 从 001-inventory-management 更改为 0703-inventory-management
+
+### Session 2025-12-11
+
+- Q: 修正分支命名格式 → A: 从 0703-inventory-management 更改为 003-inventory-management 以符合3位数字规范
 
 ## User Scenarios & Testing *(mandatory)*
 
