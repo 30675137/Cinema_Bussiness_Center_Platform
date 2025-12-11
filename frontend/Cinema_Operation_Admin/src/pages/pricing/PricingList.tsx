@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Table, Button, Space, Input, Select, Tag, InputNumber, Modal, Form } from 'antd';
 import { PlusOutlined, EditOutlined, SearchOutlined, CopyOutlined, HistoryOutlined } from '@ant-design/icons';
+import { cn } from '@/utils/cn';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -134,13 +135,34 @@ const PricingList: React.FC = () => {
       key: 'action',
       render: (_, record: any) => (
         <Space size="middle">
-          <Button type="link" icon={<EditOutlined />} size="small">
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            size="small"
+            classNames={{
+              root: "action-button edit-button"
+            }}
+          >
             编辑
           </Button>
-          <Button type="link" icon={<CopyOutlined />} size="small">
+          <Button
+            type="link"
+            icon={<CopyOutlined />}
+            size="small"
+            classNames={{
+              root: "action-button copy-button"
+            }}
+          >
             复制
           </Button>
-          <Button type="link" icon={<HistoryOutlined />} size="small">
+          <Button
+            type="link"
+            icon={<HistoryOutlined />}
+            size="small"
+            classNames={{
+              root: "action-button history-button"
+            }}
+          >
             历史
           </Button>
         </Space>
@@ -224,10 +246,22 @@ const PricingList: React.FC = () => {
               <Option value="week">本周</Option>
               <Option value="month">本月</Option>
             </Select>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddPrice}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddPrice}
+              classNames={{
+                root: "add-price-button"
+              }}
+            >
               新增价格
             </Button>
-            <Button icon={<CopyOutlined />}>
+            <Button
+              icon={<CopyOutlined />}
+              classNames={{
+                root: "batch-import-button"
+              }}
+            >
               批量导入
             </Button>
           </Space>

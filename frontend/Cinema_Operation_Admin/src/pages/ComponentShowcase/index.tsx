@@ -9,9 +9,10 @@ import {
   ShoppingOutlined,
   DollarOutlined,
 } from '@ant-design/icons';
-import { DataTable, FormField, Card as UICard, StatCard } from '../../components/ui';
-import { FormFieldType } from '../../components/ui/FormField/types';
-import { CardSize, CardVariant } from '../../components/ui/Card/types';
+import { DataTable, FormField, Card as UICard, StatCard } from '@/components/ui';
+import { FormFieldType } from '@/components/ui/FormField/types';
+import { CardSize, CardVariant } from '@/components/ui/Card/types';
+import { cn } from '@/utils/cn';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -189,8 +190,8 @@ function ComponentShowcase() {
   ];
 
   return (
-    <div className="component-showcase p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+    <div className={cn('component-showcase p-6 bg-gray-50 min-h-screen')}>
+      <div className={cn('max-w-7xl mx-auto')}>
         {/* 页面标题 */}
         <div className="mb-8">
           <Title level={2}>组件库展示</Title>
@@ -237,7 +238,13 @@ function ComponentShowcase() {
               actions={tableActions}
               striped
               headerExtra={
-                <Button type="primary" icon={<PlusOutlined />}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  classNames={{
+                    root: "add-product-button"
+                  }}
+                >
                   添加商品
                 </Button>
               }
@@ -264,10 +271,22 @@ function ComponentShowcase() {
               </div>
               <div className="mt-6">
                 <Space>
-                  <Button type="primary" onClick={() => message.success('表单提交成功')}>
+                  <Button
+                    type="primary"
+                    onClick={() => message.success('表单提交成功')}
+                    classNames={{
+                      root: "save-button"
+                    }}
+                  >
                     保存商品
                   </Button>
-                  <Button>取消</Button>
+                  <Button
+                    classNames={{
+                      root: "cancel-button"
+                    }}
+                  >
+                    取消
+                  </Button>
                 </Space>
               </div>
             </Form>
