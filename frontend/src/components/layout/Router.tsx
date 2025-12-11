@@ -24,7 +24,7 @@ const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMove
 const TransferManagement = lazy(() => import('@/pages/inventory/TransferManagement'));
 const ProcurementTransfer = lazy(() => import('@/pages/inventory/TransferManagement'));
 const Stocktaking = lazy(() => import('@/pages/inventory/Stocktaking'));
-const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryReservation'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
