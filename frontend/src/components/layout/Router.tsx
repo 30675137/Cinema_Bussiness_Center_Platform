@@ -23,6 +23,8 @@ const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements')
 const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const TransferManagement = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const ProcurementTransfer = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const Stocktaking = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryMovements'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
@@ -403,6 +405,36 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <TransferManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 库存预占/释放管理路由
+  {
+    path: '/inventory/reservation',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryReservation />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 盘点模块路由
+  {
+    path: '/inventory/stocktaking',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Stocktaking />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>
