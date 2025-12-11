@@ -4,10 +4,19 @@
 
 /* 侧边栏容器 */
 .sidebar {
-  background: #001529;
-  border-right: 1px solid #f0f0f0;
-  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+  background: #1f2937 !important;
+  border-right: 1px solid #374151 !important;
+  box-shadow: 2px 0 8px 0 rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
+}
+
+/* Ant Design Sider组件样式覆盖 */
+.ant-layout-sider {
+  background: #1f2937 !important;
+}
+
+.ant-layout-sider-dark {
+  background: #1f2937 !important;
 }
 
 .sidebar-content {
@@ -19,7 +28,7 @@
 /* 头部区域 */
 .sidebar-header {
   padding: 16px;
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid #374151;
   flex-shrink: 0;
 }
 
@@ -76,6 +85,173 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px 0;
+}
+
+/* 修复Ant Design Menu组件样式覆盖问题 */
+.sidebar-menu .ant-menu {
+  background: transparent !important;
+  border: none !important;
+}
+
+.sidebar-menu .ant-menu-item {
+  background: transparent !important;
+  color: #ffffff !important;
+  margin: 0 8px 1px 8px !important;
+  border-radius: 4px !important;
+  width: calc(100% - 16px) !important;
+  transition: all 0.2s !important;
+}
+
+.sidebar-menu .ant-menu-item:hover {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  background-color: #1890ff !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-item-selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ffffff;
+}
+
+.sidebar-menu .ant-menu-submenu {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-submenu-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  margin: 0 8px 1px 8px !important;
+  border-radius: 4px !important;
+  width: calc(100% - 16px) !important;
+  transition: all 0.2s !important;
+}
+
+.sidebar-menu .ant-menu-submenu-title:hover {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-submenu-open > .ant-menu-submenu-title {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+.sidebar-menu .ant-menu-sub {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.sidebar-menu .ant-menu-item.ant-menu-item-level-1 {
+  padding-left: 32px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.sidebar-menu .ant-menu-item.ant-menu-item-level-2 {
+  padding-left: 48px !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+}
+
+.sidebar-menu .ant-menu-submenu.ant-menu-submenu-open > .ant-menu-submenu-title .ant-menu-submenu-arrow {
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-submenu .ant-menu-submenu-arrow {
+  color: #8c8c8c !important;
+}
+
+/* 修复折叠状态下的菜单样式 */
+.sidebar-menu .ant-menu-inline-collapsed {
+  background: transparent !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item {
+  background: transparent !important;
+  color: #ffffff !important;
+  margin: 0 8px 4px 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 16px) !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item:hover {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item-selected {
+  background-color: #1890ff !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item-selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #ffffff;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-title {
+  background: transparent !important;
+  color: #ffffff !important;
+  margin: 0 8px 4px 8px !important;
+  padding: 0 !important;
+  width: calc(100% - 16px) !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-title:hover {
+  background-color: rgba(24, 144, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-open > .ant-menu-submenu-title {
+  background-color: rgba(24, 144, 255, 0.1) !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu .ant-menu-submenu-arrow {
+  color: #ffffff !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item-icon,
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-title-icon {
+  color: #ffffff !important;
+  font-size: 16px !important;
+}
+
+/* 确保折叠状态下的文字隐藏但图标可见 */
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item .ant-menu-title-content,
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-title .ant-menu-title-content {
+  display: none !important;
+}
+
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-item .ant-menu-item-icon,
+.sidebar-menu .ant-menu-inline-collapsed .ant-menu-submenu-title .ant-menu-submenu-title-icon {
+  display: inline-flex !important;
+  margin: 0 !important;
 }
 
 .sidebar-menu::-webkit-scrollbar {
@@ -340,24 +516,24 @@
 
 /* 子菜单 */
 .menu-children {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   border-radius: 0 0 4px 4px;
   margin-top: 1px;
 }
 
 .menu-item-level-1 {
   padding-left: 24px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .menu-item-level-2 {
   padding-left: 32px;
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 /* 底部区域 */
 .sidebar-footer {
-  border-top: 1px solid #1f2937;
+  border-top: 1px solid #374151;
   padding: 16px;
   flex-shrink: 0;
 }

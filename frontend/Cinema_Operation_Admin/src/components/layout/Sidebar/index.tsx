@@ -68,7 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
   const { user } = useUserStore();
   const { isMobile, isTablet, width } = useResponsive();
-  const { sidebarExpanded } = useUserPreferences();
+  const { sidebarExpanded, toggleSidebar: toggleUserSidebar } = useUserPreferences();
 
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [showFavoritePanel, setShowFavoritePanel] = useState(false);
@@ -79,16 +79,17 @@ const Sidebar: React.FC<SidebarProps> = ({
     error,
     activeMenu,
     expandedMenuIds,
-    sidebarCollapsed,
     searchQuery,
     navigateToMenu,
     toggleMenuExpansion,
-    toggleSidebar,
     setSearchQuery,
     searchResults,
     isFavorite,
     toggleFavorite
   } = useNavigation();
+
+  // 使用用户偏好的侧边栏状态
+  const sidebarCollapsed = !sidebarExpanded;
 
   // 响应式侧边栏配置
   const isMobileMode = forceMobile || isMobile;
@@ -97,10 +98,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   // 自动折叠移动端侧边栏
   useEffect(() => {
-    if (isMobileMode && !sidebarCollapsed) {
-      toggleSidebar();
+    if (isMobileMode && sidebarExpanded) {
+      toggleUserSidebar();
     }
-  }, [isMobileMode, sidebarCollapsed, toggleSidebar]);
+  }, [isMobileMode, sidebarExpanded, toggleUserSidebar]);
 
   // 处理移动端抽屉关闭
   const handleMobileDrawerClose = () => {
@@ -296,7 +297,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Button
                 type="text"
                 icon={sidebarCollapsed ? <RightOutlined /> : <LeftOutlined />}
-                onClick={toggleSidebar}
+                onClick={toggleUserSidebar}
                 className="collapse-button"
               />
             </Tooltip>
@@ -370,6 +371,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           left: 0,
           top: 0,
           bottom: 0,
+          background: '#1f2937',
           ...style
         }
       }}
