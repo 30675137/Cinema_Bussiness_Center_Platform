@@ -157,10 +157,10 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8841,
+                      "duration": 507,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -175,13 +175,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:03.830Z",
+                      "startTime": "2025-12-11T11:08:22.971Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -226,10 +226,10 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8905,
+                      "duration": 526,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -244,13 +244,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:03.772Z",
+                      "startTime": "2025-12-11T11:08:22.967Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -295,10 +295,10 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8884,
+                      "duration": 499,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -313,13 +313,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:03.817Z",
+                      "startTime": "2025-12-11T11:08:22.972Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -364,10 +364,10 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8836,
+                      "duration": 500,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -382,13 +382,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:03.803Z",
+                      "startTime": "2025-12-11T11:08:22.970Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -433,10 +433,10 @@
                       "workerIndex": 4,
                       "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 8838,
+                      "duration": 538,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -451,13 +451,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:03.793Z",
+                      "startTime": "2025-12-11T11:08:22.970Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -499,13 +499,13 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
-                      "parallelIndex": 3,
+                      "workerIndex": 7,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8550,
+                      "duration": 248,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -520,13 +520,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:13.516Z",
+                      "startTime": "2025-12-11T11:08:24.663Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -569,12 +569,12 @@
                   "results": [
                     {
                       "workerIndex": 6,
-                      "parallelIndex": 4,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8551,
+                      "duration": 248,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -589,13 +589,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:13.507Z",
+                      "startTime": "2025-12-11T11:08:24.653Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -637,13 +637,13 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 7,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 9178,
+                      "duration": 1361,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -658,13 +658,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:13.537Z",
+                      "startTime": "2025-12-11T11:08:24.660Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -712,12 +712,12 @@
                   "results": [
                     {
                       "workerIndex": 8,
-                      "parallelIndex": 2,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 9253,
+                      "duration": 1340,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -732,13 +732,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:13.526Z",
+                      "startTime": "2025-12-11T11:08:24.653Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -788,10 +788,10 @@
                       "workerIndex": 9,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 9051,
+                      "duration": 1240,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -806,13 +806,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:13.597Z",
+                      "startTime": "2025-12-11T11:08:24.649Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -862,10 +862,10 @@
                       "workerIndex": 10,
                       "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 9235,
+                      "duration": 1400,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -880,13 +880,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:22.743Z",
+                      "startTime": "2025-12-11T11:08:25.667Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -934,12 +934,12 @@
                   "results": [
                     {
                       "workerIndex": 11,
-                      "parallelIndex": 4,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 9179,
+                      "duration": 1334,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -954,13 +954,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:22.739Z",
+                      "startTime": "2025-12-11T11:08:25.684Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1008,12 +1008,12 @@
                   "results": [
                     {
                       "workerIndex": 12,
-                      "parallelIndex": 1,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 8906,
+                      "duration": 1491,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1028,13 +1028,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:24.641Z",
+                      "startTime": "2025-12-11T11:08:28.013Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1084,10 +1084,10 @@
                       "workerIndex": 13,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8911,
+                      "duration": 1337,
                       "error": {
-                        "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1102,13 +1102,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: NS_ERROR_NET_TIMEOUT\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: NS_ERROR_CONNECTION_REFUSED\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:25.101Z",
+                      "startTime": "2025-12-11T11:08:28.459Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1156,12 +1156,12 @@
                   "results": [
                     {
                       "workerIndex": 14,
-                      "parallelIndex": 2,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8628,
+                      "duration": 591,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1176,13 +1176,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:25.638Z",
+                      "startTime": "2025-12-11T11:08:28.885Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1225,12 +1225,12 @@
                   "results": [
                     {
                       "workerIndex": 15,
-                      "parallelIndex": 3,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8372,
+                      "duration": 364,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1245,13 +1245,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:33.041Z",
+                      "startTime": "2025-12-11T11:08:29.520Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1294,12 +1294,12 @@
                   "results": [
                     {
                       "workerIndex": 16,
-                      "parallelIndex": 4,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8448,
+                      "duration": 450,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1314,13 +1314,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:33.640Z",
+                      "startTime": "2025-12-11T11:08:30.120Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1363,12 +1363,12 @@
                   "results": [
                     {
                       "workerIndex": 17,
-                      "parallelIndex": 1,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8376,
+                      "duration": 378,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1383,13 +1383,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:34.815Z",
+                      "startTime": "2025-12-11T11:08:30.326Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1434,10 +1434,10 @@
                       "workerIndex": 18,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8339,
+                      "duration": 337,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1452,13 +1452,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:35.152Z",
+                      "startTime": "2025-12-11T11:08:30.831Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1501,12 +1501,12 @@
                   "results": [
                     {
                       "workerIndex": 19,
-                      "parallelIndex": 0,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 8377,
+                      "duration": 479,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1521,13 +1521,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:35.468Z",
+                      "startTime": "2025-12-11T11:08:31.332Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1570,12 +1570,12 @@
                   "results": [
                     {
                       "workerIndex": 20,
-                      "parallelIndex": 3,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8454,
+                      "duration": 558,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1590,13 +1590,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:41.949Z",
+                      "startTime": "2025-12-11T11:08:31.391Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1639,12 +1639,12 @@
                   "results": [
                     {
                       "workerIndex": 21,
-                      "parallelIndex": 4,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8610,
+                      "duration": 316,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1659,13 +1659,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:42.624Z",
+                      "startTime": "2025-12-11T11:08:31.583Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1708,12 +1708,12 @@
                   "results": [
                     {
                       "workerIndex": 22,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8476,
+                      "duration": 252,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1728,13 +1728,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:43.672Z",
+                      "startTime": "2025-12-11T11:08:31.866Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1779,10 +1779,10 @@
                       "workerIndex": 23,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8427,
+                      "duration": 202,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1797,13 +1797,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:44.048Z",
+                      "startTime": "2025-12-11T11:08:32.268Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1846,12 +1846,12 @@
                   "results": [
                     {
                       "workerIndex": 24,
-                      "parallelIndex": 0,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 8426,
+                      "duration": 226,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1866,13 +1866,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:44.421Z",
+                      "startTime": "2025-12-11T11:08:32.592Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1915,12 +1915,12 @@
                   "results": [
                     {
                       "workerIndex": 25,
-                      "parallelIndex": 3,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8454,
+                      "duration": 209,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -1935,24 +1935,19 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:50.958Z",
+                      "startTime": "2025-12-11T11:08:32.660Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
                           "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-13-验证响应式布局---移动端适配-Mobile-Chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-13-验证响应式布局---移动端适配-Mobile-Chrome/video.webm"
                         }
                       ],
                       "errorLocation": {
@@ -1984,12 +1979,12 @@
                   "results": [
                     {
                       "workerIndex": 26,
-                      "parallelIndex": 4,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8468,
+                      "duration": 198,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2004,24 +1999,19 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:51.928Z",
+                      "startTime": "2025-12-11T11:08:32.765Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
                           "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-14-验证刷新功能-Mobile-Chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results/inventory-ledger-用户故事1-库存台账查看与筛选-US1-14-验证刷新功能-Mobile-Chrome/video.webm"
                         }
                       ],
                       "errorLocation": {
@@ -2053,12 +2043,12 @@
                   "results": [
                     {
                       "workerIndex": 27,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8505,
+                      "duration": 219,
                       "error": {
-                        "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2073,13 +2063,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: net::ERR_CONNECTION_TIMED_OUT at http://localhost:3000/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3003/inventory/ledger\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:52.609Z",
+                      "startTime": "2025-12-11T11:08:32.852Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2124,10 +2114,10 @@
                       "workerIndex": 28,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8446,
+                      "duration": 398,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2142,13 +2132,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:52.970Z",
+                      "startTime": "2025-12-11T11:08:33.189Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2191,12 +2181,12 @@
                   "results": [
                     {
                       "workerIndex": 29,
-                      "parallelIndex": 0,
+                      "parallelIndex": 4,
                       "status": "failed",
-                      "duration": 8393,
+                      "duration": 641,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2211,13 +2201,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:53.331Z",
+                      "startTime": "2025-12-11T11:08:33.531Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2260,12 +2250,12 @@
                   "results": [
                     {
                       "workerIndex": 30,
-                      "parallelIndex": 3,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8473,
+                      "duration": 589,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2280,13 +2270,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:01:59.857Z",
+                      "startTime": "2025-12-11T11:08:33.574Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2329,12 +2319,12 @@
                   "results": [
                     {
                       "workerIndex": 31,
-                      "parallelIndex": 4,
+                      "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 8439,
+                      "duration": 573,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2349,13 +2339,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:02:00.865Z",
+                      "startTime": "2025-12-11T11:08:33.715Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2398,12 +2388,12 @@
                   "results": [
                     {
                       "workerIndex": 32,
-                      "parallelIndex": 1,
+                      "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8389,
+                      "duration": 441,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2418,13 +2408,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:02:01.592Z",
+                      "startTime": "2025-12-11T11:08:33.871Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2469,10 +2459,10 @@
                       "workerIndex": 33,
                       "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 8366,
+                      "duration": 267,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2487,13 +2477,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:02:02.009Z",
+                      "startTime": "2025-12-11T11:08:34.655Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2536,12 +2526,12 @@
                   "results": [
                     {
                       "workerIndex": 34,
-                      "parallelIndex": 0,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 8362,
+                      "duration": 276,
                       "error": {
-                        "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
-                        "stack": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
+                        "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n",
+                        "stack": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16",
                         "location": {
                           "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts",
                           "column": 16,
@@ -2556,13 +2546,13 @@
                             "column": 16,
                             "line": 5
                           },
-                          "message": "Error: page.goto: The request timed out.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3000/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
+                          "message": "Error: page.goto: Could not connect to the server.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3003/inventory/ledger\", waiting until \"load\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 3 |\u001b[39m test\u001b[33m.\u001b[39mdescribe(\u001b[32m'用户故事1: 库存台账查看与筛选'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 4 |\u001b[39m   test\u001b[33m.\u001b[39mbeforeEach(\u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 5 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m'/inventory/ledger'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 6 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 7 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m\u001b[0m\n\u001b[2m    at /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-ledger.spec.ts:5:16\u001b[22m"
                         }
                       ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-11T11:02:02.309Z",
+                      "startTime": "2025-12-11T11:08:34.882Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2598,8 +2588,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-11T11:01:03.257Z",
-    "duration": 67600.848,
+    "startTime": "2025-12-11T11:08:22.185Z",
+    "duration": 13131.81,
     "expected": 0,
     "skipped": 0,
     "unexpected": 35,

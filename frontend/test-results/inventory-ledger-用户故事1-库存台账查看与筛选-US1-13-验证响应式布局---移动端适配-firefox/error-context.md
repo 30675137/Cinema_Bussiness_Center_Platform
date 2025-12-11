@@ -3,8 +3,8 @@
 ```yaml
 - generic [ref=e2]:
   - generic [ref=e3]:
-    - heading "The connection has timed out" [level=1] [ref=e5]
-    - paragraph [ref=e6]: The server at localhost is taking too long to respond.
+    - heading "Unable to connect" [level=1] [ref=e5]
+    - paragraph [ref=e6]: Firefox can’t establish a connection to the server at localhost:3003.
     - paragraph
     - list [ref=e8]:
       - listitem [ref=e9]: The site could be temporarily unavailable or too busy. Try again in a few moments.
