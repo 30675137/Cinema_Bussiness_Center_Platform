@@ -1,21 +1,63 @@
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+
+## Core Principles
+
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+
+## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
 <!--
 同步影响报告
-版本变更: v0.0.0 → v1.0.0
+版本变更: v1.0.0 → v1.1.0
 修改原则:
-- 新增: 单体架构原则 (SpringBoot单体架构)
-- 新增: 技术栈规范 (React 18 + TypeScript 5.0 + Ant Design 6.1.0)
-- 新增: 开发规范 (Git工作流、代码风格)
-- 新增: 质量保证 (测试要求、代码审查)
-- 新增: 性能要求 (前后端性能指标)
-- 新增: 安全规范 (数据安全、应用安全)
-- 新增: 团队协作规范
-- 新增: 项目管理规范
-- 新增: 持续改进机制
-- 新增: 决策记录机制
-- 新增: 宪章更新流程
+- 新增: 文档语言规范 (所有项目文档必须使用中文编写)
 
 模板文件检查:
-- ✅ 无其他模板文件需要更新 (未找到.specify/templates/目录)
+- ⚠ 待检查: .specify/templates/spec-template.md (需要确保支持中文文档)
+- ⚠ 待检查: .specify/templates/plan-template.md (需要确保支持中文文档)
+- ⚠ 待检查: .specify/templates/tasks-template.md (需要确保支持中文文档)
 
 后续TODO:
 - 无未处理的占位符
@@ -28,7 +70,7 @@
 
 **项目名称**: 影院商品管理中台
 **项目描述**: 影院商品管理中台 - 为影院行业提供统一的商品管理、销售分析和运营支持的中台系统
-**版本**: v1.0.0
+**版本**: v1.1.0
 **创建日期**: 2025-12-11
 **最后更新**: 2025-12-11
 
@@ -139,43 +181,6 @@
 
 ## 性能要求
 
-### 1. 前端性能要求 (硬性指标)
-- **首屏加载时间**: < 2秒 (95%分位)
-- **页面切换响应时间**: < 300ms
-- **动画流畅性**: 保持60fps
-- **内存使用**: 合理控制内存占用，避免内存泄漏
-- **包大小**: 生产环境bundle大小 < 2MB
-
-### 2. 后端性能要求 (硬性指标)
-- **API响应时间**: < 500ms (95%分位)
-- **并发处理**: 支持1000+并发用户
-- **数据库查询**: 单次查询 < 100ms
-- **缓存命中率**: > 80%
-- **CPU使用率**: 正常负载下 < 70%
-
-### 3. 系统性能要求 (SLA)
-- **可用性**: 99.9% (年停机时间 < 8.76小时)
-- **数据一致性**: 强一致性保证
-- **故障恢复**: RTO < 1小时，RPO < 15分钟
-
-## 安全规范
-
-### 1. 数据安全 (必须执行)
-- **敏感数据**: 加密存储和传输，使用AES-256加密
-- **访问控制**: 基于角色的权限控制(RBAC)
-- **审计日志**: 关键操作记录审计日志，保存90天
-- **备份恢复**: 定期数据备份和恢复演练，异地备份
-
-### 2. 应用安全 (必须执行)
-- **输入验证**: 严格的输入参数验证，防止注入攻击
-- **SQL注入防护**: 使用参数化查询，禁止字符串拼接
-- **XSS防护**: 输出内容转义，使用Content Security Policy
-- **CSRF防护**: 使用CSRF Token，SameSite Cookie
-
-### 3. 网络安全
-- **HTTPS**: 生产环境强制使用HTTPS
-- **API安全**: 使用JWT认证，API限流
-- **端口管理**: 关闭不必要的端口，使用防火墙
 
 ## 团队协作
 
@@ -186,17 +191,20 @@
 - **知识分享**: 定期技术分享和培训，每月至少一次
 
 ### 2. 文档管理规范
-- **API文档**: 自动生成和维护API文档，使用Swagger
-- **开发文档**: 详细的环境搭建和开发指南
-- **用户手册**: 完整的用户操作手册，包含截图和视频
-- **运维文档**: 部署和运维相关文档，包含故障处理指南
+- **文档语言**: 所有项目文档必须使用中文编写，包括但不限于：功能规范、技术设计文档、API文档、用户手册、开发指南、运维文档
+- **API文档**: 自动生成和维护API文档，使用Swagger，文档注释和说明使用中文
+- **开发文档**: 详细的环境搭建和开发指南，使用中文编写
+- **用户手册**: 完整的用户操作手册，包含截图和视频，使用中文编写
+- **运维文档**: 部署和运维相关文档，包含故障处理指南，使用中文编写
+- **代码注释**: 关键业务逻辑和复杂算法必须使用中文注释，注释率不低于30%
+- **提交信息**: Git提交信息可以使用中文，格式为：`类型(范围): 中文描述`
+
 
 ## 项目管理
 
 ### 1. 需求管理规范
 - **需求优先级**: 基于业务价值和技术可行性评估
 - **变更控制**: 严格的需求变更控制流程，使用变更申请表
-- **进度跟踪**: 使用Jira进行项目进度跟踪
 - **风险管理**: 定期识别和应对项目风险，建立风险清单
 
 ### 2. 迭代规划规范
@@ -213,11 +221,6 @@
 - **架构演进**: 基于业务发展适度架构调整，每季度评估
 - **工具升级**: 定期升级开发工具和依赖，保持技术栈现代化
 
-### 2. 流程改进机制
-- **效率提升**: 持续优化开发流程，消除浪费
-- **质量提升**: 完善质量保证体系，提高首次通过率
-- **技能提升**: 团队技能培训和提升，制定个人发展计划
-- **创新探索**: 鼓励技术创新和探索，每月Hackathon
 
 ## 决策记录 (Architecture Decision Records)
 
@@ -276,6 +279,11 @@
 
 ## 版本历史
 
+- **v1.1.0** (2025-12-11): 新增文档语言规范
+  - 要求所有项目文档必须使用中文编写
+  - 明确代码注释和提交信息的中文使用规范
+  - 更新文档管理规范，确保文档一致性
+
 - **v1.0.0** (2025-12-11): 初始版本，确立SpringBoot单体架构原则
   - 建立完整的技术栈规范
   - 制定开发规范和质量标准
@@ -288,4 +296,4 @@
 **下次审查日期**: 2026-03-11
 **维护负责人**: 技术负责人
 **审批人**: 项目经理
-**文档版本**: v1.0.0
+**文档版本**: v1.1.0
