@@ -26,6 +26,7 @@ const TransferManagement = lazy(() => import('@/pages/inventory/TransferManageme
 const ProcurementTransfer = lazy(() => import('@/pages/inventory/TransferManagement'));
 const Stocktaking = lazy(() => import('@/pages/inventory/Stocktaking'));
 const InventoryReservation = lazy(() => import('@/pages/inventory/InventoryReservation'));
+const PurchaseOrders = lazy(() => import('@/pages/procurement/PurchaseOrders'));
 
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
@@ -376,6 +377,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <InventoryTransactions />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 采购订单管理路由
+  {
+    path: '/purchase-management/orders',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PurchaseOrders />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

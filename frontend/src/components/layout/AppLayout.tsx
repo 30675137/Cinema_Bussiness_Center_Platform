@@ -206,7 +206,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '供应商管理',
         },
         {
-          key: '/procurement/orders',
+          key: '/purchase-management/orders',
           label: '采购订单 (PO)',
         },
         {
