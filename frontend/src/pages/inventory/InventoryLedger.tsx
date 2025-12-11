@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Card, Space, Button, Alert, Drawer } from 'antd';
+import { Card, Space, Button, Alert } from 'antd';
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { InventoryFilters } from '@/components/Inventory/InventoryFilters';
 import { InventoryTable } from '@/components/Inventory/InventoryTable';
 import { UserRoleSelector } from '@/components/Inventory/UserRoleSelector';
 import { PermissionGuard, PermissionHide } from '@/components/Inventory/PermissionGuard';
+import { AdjustmentModal } from '@/components/Inventory/AdjustmentModal';
+import { InventoryDetails } from '@/components/Inventory/InventoryDetails';
 import { useInventoryLedger, useExportInventory } from '@/hooks/useInventoryData';
 import { useResponsivePageSize, useResponsive } from '@/hooks/useResponsive';
-import { Permission } from '@/hooks/usePermissions';
+import { Permission, usePermissions } from '@/hooks/usePermissions';
 import type { InventoryQueryParams, CurrentInventory } from '@/types/inventory';
 
 /**
@@ -17,12 +19,15 @@ import type { InventoryQueryParams, CurrentInventory } from '@/types/inventory';
 export const InventoryLedger: React.FC = () => {
   const { isMobile } = useResponsive();
   const defaultPageSize = useResponsivePageSize();
+  const { canAdjustInventory } = usePermissions();
   
   const [filters, setFilters] = useState<Partial<InventoryQueryParams>>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [selectedRecord, setSelectedRecord] = useState<CurrentInventory | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [adjustmentVisible, setAdjustmentVisible] = useState(false);
+  const [adjustmentRecord, setAdjustmentRecord] = useState<CurrentInventory | null>(null);
 
   // 获取库存数据
   const { data, isLoading, refetch } = useInventoryLedger({
@@ -52,6 +57,15 @@ export const InventoryLedger: React.FC = () => {
   const handleViewDetails = (record: CurrentInventory) => {
     setSelectedRecord(record);
     setDrawerVisible(true);
+  };
+
+  const handleAdjustment = (record: CurrentInventory) => {
+    setAdjustmentRecord(record);
+    setAdjustmentVisible(true);
+  };
+
+  const handleAdjustmentSuccess = () => {
+    refetch(); // 刷新列表
   };
 
   const handleExport = () => {
@@ -123,30 +137,25 @@ export const InventoryLedger: React.FC = () => {
             pagination={pagination}
             onPaginationChange={handlePaginationChange}
             onViewDetails={handleViewDetails}
+            onAdjustment={handleAdjustment}
+            canAdjust={canAdjustInventory}
           />
         </Card>
 
+        {/* 调整对话框 */}
+        <AdjustmentModal
+          open={adjustmentVisible}
+          inventory={adjustmentRecord}
+          onClose={() => setAdjustmentVisible(false)}
+          onSuccess={handleAdjustmentSuccess}
+        />
+
         {/* 详情抽屉 */}
-        <Drawer
-          title="库存详情"
-          placement="right"
-          width={isMobile ? '100%' : 600}
+        <InventoryDetails
           open={drawerVisible}
+          inventory={selectedRecord}
           onClose={() => setDrawerVisible(false)}
-        >
-          {selectedRecord && (
-            <div>
-              <p><strong>SKU编码:</strong> {selectedRecord.sku?.skuCode}</p>
-              <p><strong>SKU名称:</strong> {selectedRecord.sku?.name}</p>
-              <p><strong>门店/仓库:</strong> {selectedRecord.store?.name}</p>
-              <p><strong>现存数量:</strong> {selectedRecord.onHandQty}</p>
-              <p><strong>可用数量:</strong> {selectedRecord.availableQty}</p>
-              <p><strong>预占数量:</strong> {selectedRecord.reservedQty}</p>
-              <p><strong>在途数量:</strong> {selectedRecord.inTransitQty}</p>
-              <p><strong>安全库存:</strong> {selectedRecord.safetyStock}</p>
-            </div>
-          )}
-        </Drawer>
+        />
       </div>
     </PermissionGuard>
   );

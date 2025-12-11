@@ -4,3 +4,5 @@ export { PermissionGuard, PermissionHide } from './PermissionGuard';
 export { UserRoleSelector } from './UserRoleSelector';
 export { MovementsFilters } from './MovementsFilters';
 export { MovementsTable } from './MovementsTable';
+export { AdjustmentModal } from './AdjustmentModal';
+export { InventoryDetails } from './InventoryDetails';

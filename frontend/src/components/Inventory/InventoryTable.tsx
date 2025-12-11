@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Tag, Space, Button, Tooltip, Typography } from 'antd';
-import { EyeOutlined, DownloadOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { CurrentInventory } from '@/types/inventory';
 import {
@@ -18,6 +18,8 @@ interface InventoryTableProps {
   pagination: TablePaginationConfig;
   onPaginationChange: (page: number, pageSize: number) => void;
   onViewDetails?: (record: CurrentInventory) => void;
+  onAdjustment?: (record: CurrentInventory) => void;
+  canAdjust?: boolean;
 }
 
 /**
@@ -30,6 +32,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   pagination,
   onPaginationChange,
   onViewDetails,
+  onAdjustment,
+  canAdjust = false,
 }) => {
   const { isMobile } = useResponsive();
   const scroll = useResponsiveTableScroll();
@@ -139,7 +143,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     {
       title: '操作',
       key: 'action',
-      width: 100,
+      width: canAdjust ? 150 : 100,
       fixed: isMobile ? undefined : 'right',
       render: (_, record) => (
         <Space size="small">
@@ -151,6 +155,16 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
           >
             详情
           </Button>
+          {canAdjust && (
+            <Button
+              type="link"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => onAdjustment?.(record)}
+            >
+              调整
+            </Button>
+          )}
         </Space>
       ),
     },
