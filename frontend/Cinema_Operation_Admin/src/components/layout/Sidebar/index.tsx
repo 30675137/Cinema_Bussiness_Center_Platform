@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Tooltip, Input, Badge, Drawer } from 'antd';
+import { cn } from '@/utils/cn';
 import {
   MenuOutlined,
   LeftOutlined,
@@ -336,8 +337,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           open={mobileDrawerOpen}
           width="80%"
           closable={false}
-          className={`sidebar-drawer ${className || ''}`}
-          bodyStyle={{ padding: 0 }}
+          classNames={{
+            root: cn('sidebar-drawer', className)
+          }}
+          styles={{
+            body: { padding: 0 }
+          }}
         >
           {renderSidebarContent()}
         </Drawer>
@@ -351,15 +356,22 @@ const Sidebar: React.FC<SidebarProps> = ({
       width={getResponsiveWidth()}
       collapsed={sidebarCollapsed}
       collapsedWidth={getResponsiveCollapsedWidth()}
-      className={`sidebar ${isCompactMode ? 'compact' : ''} ${isMobileMode ? 'mobile' : ''} ${className || ''}`}
-      style={{
-        overflow: 'hidden',
-        position: fixedWidth ? 'fixed' : 'relative',
-        height: '100vh',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        ...style
+      classNames={{
+        root: cn('sidebar', {
+          'compact': isCompactMode,
+          'mobile': isMobileMode
+        }, className)
+      }}
+      styles={{
+        root: {
+          overflow: 'hidden',
+          position: fixedWidth ? 'fixed' : 'relative',
+          height: '100vh',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          ...style
+        }
       }}
       trigger={null}
     >

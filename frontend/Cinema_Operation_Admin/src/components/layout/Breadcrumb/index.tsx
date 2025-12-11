@@ -16,6 +16,7 @@ import { useNavigation } from '@/hooks/useNavigation';
 import { logNavigationAction } from '@/services/navigationLogService';
 import { NavigationAction } from '@/types/navigation';
 import { useCurrentUser } from '@/stores/userStore';
+import { cn } from '@/utils/cn';
 import './styles.css';
 
 /**
@@ -316,7 +317,9 @@ const BreadcrumbNavigation: React.FC<BreadcrumbProps> = ({
             size="small"
             icon={<HomeOutlined />}
             onClick={handleHomeClick}
-            className="breadcrumb-home-button"
+            classNames={{
+              root: "breadcrumb-home-button"
+            }}
           />
         </Tooltip>
       )
@@ -329,7 +332,9 @@ const BreadcrumbNavigation: React.FC<BreadcrumbProps> = ({
           type="link"
           size="small"
           onClick={() => handleItemClick(item, index)}
-          className="breadcrumb-item-clickable"
+          classNames={{
+            root: "breadcrumb-item-clickable"
+          }}
         >
           {item.icon}
           {item.title}
@@ -355,7 +360,9 @@ const BreadcrumbNavigation: React.FC<BreadcrumbProps> = ({
             size="small"
             icon={<MoreOutlined />}
             onClick={() => setExpanded(!expanded)}
-            className="breadcrumb-ellipsis-button"
+            classNames={{
+              root: "breadcrumb-ellipsis-button"
+            }}
           />
         </Dropdown>
       )
@@ -364,7 +371,11 @@ const BreadcrumbNavigation: React.FC<BreadcrumbProps> = ({
 
   return (
     <div
-      className={`breadcrumb-navigation ${theme === 'dark' ? 'breadcrumb-dark' : 'breadcrumb-light'} ${className || ''}`}
+      className={cn(
+        'breadcrumb-navigation',
+        theme === 'dark' ? 'breadcrumb-dark' : 'breadcrumb-light',
+        className
+      )}
       style={style}
     >
       <Breadcrumb

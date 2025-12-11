@@ -1,0 +1,562 @@
+# API 契约: Ant Design 6 现代化工具集
+
+**说明**: 本文档定义现代化改造过程中使用的工具 API 契约
+**版本**: 1.0.0
+**日期**: 2025-12-11
+
+## 组件现代化 API
+
+### POST /api/v1/components/{componentId}/modernize
+现代化指定组件
+
+**路径参数:**
+- `componentId` (string, required): 组件唯一标识
+
+**请求体:**
+```yaml
+modernization:
+  type: object
+  properties:
+    targetFeatures:
+      type: array
+      items:
+        type: string
+        enum: [classNames-api, styles-api, virtual-scrolling, lazy-loading, typescript-strict]
+      description: 要应用的现代化特性
+    styleConfig:
+      type: object
+      properties:
+        tailwindClasses:
+          type: object
+          description: Tailwind CSS 类名映射
+        customStyles:
+          type: object
+          description: 自定义样式配置
+        themeTokens:
+          type: object
+          description: 主题配置
+    performanceConfig:
+      type: object
+      properties:
+        virtualScrolling:
+          type: boolean
+          description: 启用虚拟滚动
+        lazyLoading:
+          type: boolean
+          description: 启用懒加载
+        destroyOnHidden:
+          type: boolean
+          description: 隐藏时销毁组件
+  required: [targetFeatures]
+```
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    success:
+      type: boolean
+    componentId:
+      type: string
+    appliedFeatures:
+      type: array
+      items:
+        type: string
+    performanceMetrics:
+      type: object
+      properties:
+        bundleSizeReduction:
+          type: number
+          format: percentage
+        performanceImprovement:
+          type: number
+          format: percentage
+    warnings:
+      type: array
+      items:
+        type: string
+```
+
+### GET /api/v1/components/{componentId}/status
+获取组件现代化状态
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    componentId:
+      type: string
+    modernizationStatus:
+      type: string
+      enum: [pending, in-progress, completed]
+    usedFeatures:
+      type: array
+      items:
+        type: string
+    lastUpdated:
+      type: string
+      format: date-time
+    owner:
+      type: string
+```
+
+### GET /api/v1/components
+获取所有组件现代化状态列表
+
+**查询参数:**
+- `status` (string, optional): 按状态过滤
+- `feature` (string, optional): 按特性过滤
+- `page` (integer, optional): 页码，默认 1
+- `limit` (integer, optional): 每页数量，默认 20
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    components:
+      type: array
+      items:
+        $ref: '#/components/schemas/ComponentStatus'
+    pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+```
+
+## 性能监控 API
+
+### POST /api/v1/performance/metrics
+上报性能指标
+
+**请求体:**
+```yaml
+metrics:
+  type: object
+  properties:
+    componentId:
+      type: string
+    timestamp:
+      type: string
+      format: date-time
+    renderingMetrics:
+      type: object
+      properties:
+        firstRender:
+          type: number
+          description: 首次渲染时间 (ms)
+        reRenderTime:
+          type: number
+          description: 重渲染时间 (ms)
+        memoryUsage:
+          type: number
+          description: 内存使用量 (MB)
+    interactionMetrics:
+      type: object
+      properties:
+        responseTime:
+          type: number
+          description: 交互响应时间 (ms)
+        animationFrameRate:
+          type: number
+          description: 动画帧率 (fps)
+        scrollPerformance:
+          type: number
+          description: 滚动性能评分 (0-100)
+  required: [componentId, timestamp, renderingMetrics]
+```
+
+### GET /api/v1/performance/metrics/{componentId}
+获取组件性能历史数据
+
+**路径参数:**
+- `componentId` (string, required): 组件唯一标识
+
+**查询参数:**
+- `startDate` (string, optional): 开始日期
+- `endDate` (string, optional): 结束日期
+- `limit` (integer, optional): 数据点数量限制
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    componentId:
+      type: string
+    metrics:
+      type: array
+      items:
+        $ref: '#/components/schemas/PerformanceMetrics'
+    summary:
+      type: object
+      properties:
+        averageFirstRender:
+          type: number
+        averageResponseTime:
+          type: number
+        performanceTrend:
+          type: string
+          enum: [improving, stable, degrading]
+```
+
+## 配置管理 API
+
+### GET /api/v1/config/typescript
+获取 TypeScript 配置
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    strictMode:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        noImplicitAny:
+          type: boolean
+        strictNullChecks:
+          type: boolean
+    typeDefinitions:
+      type: object
+      properties:
+        enhancedComponentTypes:
+          type: boolean
+        strictPropTypes:
+          type: boolean
+    compilerOptions:
+      type: object
+      properties:
+        target:
+          type: string
+        lib:
+          type: array
+          items:
+            type: string
+        moduleResolution:
+          type: string
+```
+
+### PUT /api/v1/config/typescript
+更新 TypeScript 配置
+
+**请求体:**
+```yaml
+config:
+  type: object
+  properties:
+    strictMode:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        noImplicitAny:
+          type: boolean
+        strictNullChecks:
+          type: boolean
+        strictFunctionTypes:
+          type: boolean
+    typeDefinitions:
+      type: object
+      properties:
+        enhancedComponentTypes:
+          type: boolean
+        strictPropTypes:
+          type: boolean
+        genericOptimization:
+          type: boolean
+    compilerOptions:
+      type: object
+      properties:
+        target:
+          type: string
+          enum: [ES3, ES5, ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ES2021, ES2022]
+        lib:
+          type: array
+          items:
+            type: string
+        moduleResolution:
+          type: string
+          enum: [node, classic]
+        allowSyntheticDefaultImports:
+          type: boolean
+        esModuleInterop:
+          type: boolean
+```
+
+### GET /api/v1/config/theme
+获取主题配置
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    tailwind:
+      type: object
+      properties:
+        version:
+          type: string
+        prefix:
+          type: string
+        customTheme:
+          type: object
+      antdTheme:
+        type: object
+        properties:
+          token:
+            type: object
+            properties:
+              colorPrimary:
+                type: string
+              colorSuccess:
+                type: string
+              borderRadius:
+                type: number
+          algorithm:
+            type: array
+            items:
+              type: string
+          components:
+            type: array
+            items:
+              type: object
+```
+
+## 进度跟踪 API
+
+### GET /api/v1/progress
+获取现代化整体进度
+
+**响应:**
+```yaml
+response:
+  type: object
+  properties:
+    projectId:
+      type: string
+    overallProgress:
+      type: object
+      properties:
+        totalComponents:
+          type: integer
+        modernizedComponents:
+          type: integer
+        completionPercentage:
+          type: number
+          format: percentage
+    phaseProgress:
+      type: object
+      properties:
+        codeModernization:
+          $ref: '#/components/schemas/PhaseStatus'
+        performanceOptimization:
+          $ref: '#/components/schemas/PhaseStatus'
+        developerExperience:
+          $ref: '#/components/schemas/PhaseStatus'
+    qualityMetrics:
+      type: object
+      properties:
+        typeScriptErrors:
+          type: integer
+        testCoverage:
+          type: number
+          format: percentage
+        performanceScore:
+          type: number
+        codeQualityScore:
+          type: number
+    milestones:
+      type: array
+      items:
+        $ref: '#/components/schemas/Milestone'
+```
+
+### POST /api/v1/progress/milestones/{milestoneId}/complete
+标记里程碑完成
+
+**路径参数:**
+- `milestoneId` (string, required): 里程碑唯一标识
+
+**请求体:**
+```yaml
+completion:
+  type: object
+  properties:
+    completedAt:
+      type: string
+      format: date-time
+    notes:
+      type: string
+    nextSteps:
+      type: array
+      items:
+        type: string
+  required: [completedAt]
+```
+
+## 数据模型定义
+
+### ComponentStatus
+```yaml
+ComponentStatus:
+  type: object
+  properties:
+    componentId:
+      type: string
+    componentName:
+      type: string
+    modernizationStatus:
+      type: string
+      enum: [pending, in-progress, completed]
+    usedFeatures:
+      type: array
+      items:
+        type: string
+    lastUpdated:
+      type: string
+      format: date-time
+    owner:
+      type: string
+    performanceScore:
+      type: number
+      minimum: 0
+      maximum: 100
+  required: [componentId, componentName, modernizationStatus]
+```
+
+### PerformanceMetrics
+```yaml
+PerformanceMetrics:
+  type: object
+  properties:
+    componentId:
+      type: string
+    timestamp:
+      type: string
+      format: date-time
+    renderingMetrics:
+      type: object
+      properties:
+        firstRender:
+          type: number
+        reRenderTime:
+          type: number
+        memoryUsage:
+          type: number
+    interactionMetrics:
+      type: object
+      properties:
+        responseTime:
+          type: number
+        animationFrameRate:
+          type: number
+        scrollPerformance:
+          type: number
+    optimizationResults:
+      type: object
+      properties:
+        bundleSizeReduction:
+          type: number
+          format: percentage
+        performanceImprovement:
+          type: number
+          format: percentage
+        memoryOptimization:
+          type: number
+          format: percentage
+  required: [componentId, timestamp, renderingMetrics]
+```
+
+### PhaseStatus
+```yaml
+PhaseStatus:
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [not-started, in-progress, completed]
+    progress:
+      type: number
+      minimum: 0
+      maximum: 100
+    estimatedCompletion:
+      type: string
+      format: date-time
+  required: [status, progress]
+```
+
+### Milestone
+```yaml
+Milestone:
+  type: object
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+    description:
+      type: string
+    dueDate:
+      type: string
+      format: date-time
+    status:
+      type: string
+      enum: [pending, completed, delayed]
+    dependencies:
+      type: array
+      items:
+        type: string
+    completedAt:
+      type: string
+      format: date-time
+    notes:
+      type: string
+  required: [id, name, description, dueDate, status]
+```
+
+## 错误响应
+
+所有 API 在出错时返回统一格式：
+
+```yaml
+error:
+  type: object
+  properties:
+    error:
+      type: string
+      description: 错误代码
+    message:
+      type: string
+      description: 错误描述
+    details:
+      type: object
+      description: 错误详细信息
+    timestamp:
+      type: string
+      format: date-time
+    requestId:
+      type: string
+  required: [error, message, timestamp, requestId]
+```
+
+## 状态码
+
+- `200 OK`: 请求成功
+- `201 Created`: 资源创建成功
+- `400 Bad Request`: 请求参数错误
+- `401 Unauthorized`: 未授权
+- `404 Not Found`: 资源不存在
+- `409 Conflict`: 资源冲突
+- `500 Internal Server Error`: 服务器内部错误

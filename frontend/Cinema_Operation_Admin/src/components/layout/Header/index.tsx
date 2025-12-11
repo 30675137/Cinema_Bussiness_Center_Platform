@@ -8,7 +8,7 @@ import {
   SettingOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
-import { cn } from '../../../utils/cn';
+import { cn } from '@/utils/cn';
 import type { UserInfo } from '../AppLayout/types';
 
 const { Header } = Layout;
@@ -115,21 +115,25 @@ function HeaderComponent({
 
   return (
     <Header
-      className={cn(
-        'custom-header flex items-center justify-between px-4 shadow-sm',
-        theme === 'dark' && 'custom-header-dark',
-        className
-      )}
-      style={{
-        height,
-        backgroundColor: backgroundColor || (theme === 'dark' ? '#001529' : '#ffffff'),
-        position: fixed ? 'fixed' : 'relative',
-        top: fixed ? 0 : undefined,
-        left: fixed ? left : undefined,
-        width: fixed ? '100%' : undefined,
-        zIndex: 1000,
-        transition: 'left 0.2s, background-color 0.3s',
-        ...style,
+      classNames={{
+        root: cn(
+          'custom-header flex items-center justify-between px-4 shadow-sm',
+          theme === 'dark' && 'custom-header-dark',
+          className
+        )
+      }}
+      styles={{
+        root: {
+          height,
+          backgroundColor: backgroundColor || (theme === 'dark' ? '#001529' : '#ffffff'),
+          position: fixed ? 'fixed' : 'relative',
+          top: fixed ? 0 : undefined,
+          left: fixed ? left : undefined,
+          width: fixed ? '100%' : undefined,
+          zIndex: 1000,
+          transition: 'left 0.2s, background-color 0.3s',
+          ...style,
+        }
       }}
     >
       {/* 左侧区域 */}
@@ -148,7 +152,9 @@ function HeaderComponent({
               )
             }
             onClick={isMobile ? onMobileMenuClick : onSidebarToggle}
-            className="mr-4"
+            classNames={{
+              root: 'mr-4'
+            }}
           />
         )}
 
@@ -195,7 +201,9 @@ function HeaderComponent({
                 size="small"
                 src={user.avatar}
                 icon={<UserOutlined />}
-                className="mr-2"
+                classNames={{
+                  root: 'mr-2'
+                }}
               />
               <div className="hidden sm:block">
                 <div className={cn(
