@@ -159,6 +159,16 @@ export class NotificationService {
  */
 export class SPUNotificationService {
   /**
+   * 成功消息
+   * @param action 操作类型（如：创建、更新、删除等）
+   * @param entity 实体名称（可选，如：SPU名称）
+   */
+  static success(action: string, entity?: string) {
+    const message = entity ? `${action}${entity}成功` : action
+    NotificationService.success(message)
+  }
+
+  /**
    * SPU创建成功通知
    * @param spuData SPU数据
    * @param callback 回调函数
