@@ -301,9 +301,6 @@ export const initTheme = () => {
     }
   }
 
-  // 应用主题到文档
-  themeManager.applyTheme();
-
   return themeManager;
 };
 

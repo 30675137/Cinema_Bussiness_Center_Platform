@@ -256,6 +256,11 @@ export class ThemeManager {
    * 应用主题到DOM
    */
   private applyTheme(): void {
+    // 检查 DOM 是否准备好
+    if (typeof document === 'undefined' || !document.documentElement) {
+      return;
+    }
+    
     const root = document.documentElement;
     const variables = this.getCSSVariables();
 

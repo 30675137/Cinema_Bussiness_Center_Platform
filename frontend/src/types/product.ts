@@ -2,6 +2,9 @@ import { z } from 'zod';
 import type { BaseEntity } from './index';
 import { MaterialType, ProductStatus } from './index';
 
+// 重新导出常用的枚举类型，方便其他文件直接从 product.ts 导入
+export { MaterialType, ProductStatus };
+
 // 商品接口定义
 export interface Product extends BaseEntity {
   id: string;
