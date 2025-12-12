@@ -15,6 +15,10 @@ const InventoryTrace = lazy(() => import('@/pages/inventory/InventoryTrace'));
 const InventoryLedger = lazy(() => import('@/pages/inventory/InventoryLedger'));
 const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const InventoryAudit = lazy(() => import('@/pages/inventory/InventoryAudit'));
+// SPU 和 SKU 管理页面
+const SPUListPage = lazy(() => import('@/pages/SPUList'));
+const SPUDetailPage = lazy(() => import('@/pages/SPUDetail'));
+const SkuListPage = lazy(() => import('@/pages/product/sku/SkuListPage'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -128,6 +132,65 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <ProductList />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // SPU 管理页面（必须在 /products/:id 之前，避免被匹配）
+  {
+    path: '/products/spu',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SPUListPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // SPU 详情和编辑路由（必须在 /products/:id 之前，避免被匹配）
+  {
+    path: '/spu/:id/edit',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SPUDetailPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/spu/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SPUDetailPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // SKU 管理页面（必须在 /products/:id 之前，避免被匹配）
+  {
+    path: '/products/sku',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SkuListPage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Button, Space, message, Breadcrumb, Typography, Row, Col } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { Card, Button, Space, message, Breadcrumb, Typography, Row, Col, Spin } from 'antd'
 import {
   ArrowLeftOutlined,
   EditOutlined,
@@ -22,33 +22,87 @@ interface SPUDetailPageProps {}
 
 const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams<{ id: string }>()
-  const [mode, setMode] = useState<'view' | 'edit'>('view')
+  // 根据 URL 路径自动设置模式
+  const isEditPath = location.pathname.endsWith('/edit')
+  const [mode, setMode] = useState<'view' | 'edit'>(isEditPath ? 'edit' : 'view')
   const [currentSPU, setCurrentSPU] = useState<SPUItem | null>(null)
   const [loading, setLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true)
+
+  // 加载 SPU 数据
+  useEffect(() => {
+    const loadSPUData = async () => {
+      if (!id) return
+
+      try {
+        setDataLoading(true)
+        const response = await spuService.getSPUDetail(id)
+        if (response.success && response.data) {
+          setCurrentSPU(response.data)
+        } else {
+          message.error(response.message || '获取SPU详情失败')
+          navigate('/products/spu')
+        }
+      } catch (error) {
+        console.error('Load SPU error:', error)
+        message.error('获取SPU详情失败，请重试')
+        navigate('/products/spu')
+      } finally {
+        setDataLoading(false)
+      }
+    }
+
+    loadSPUData()
+  }, [id, navigate])
+
+  // 当 URL 路径变化时，同步更新模式
+  useEffect(() => {
+    if (isEditPath && mode !== 'edit') {
+      setMode('edit')
+    } else if (!isEditPath && mode !== 'view') {
+      setMode('view')
+    }
+  }, [isEditPath, mode])
 
   // 面包屑导航
   const breadcrumbItems = [
     { title: '首页', path: '/dashboard' },
-    { title: 'SPU管理', path: '/spu' },
-    { title: 'SPU详情' },
+    { title: 'SPU管理', path: '/products/spu' },
+    { title: mode === 'edit' ? '编辑SPU' : 'SPU详情' },
   ]
 
   // 处理编辑
   const handleEdit = () => {
-    setMode('edit')
+    navigate(`/spu/${id}/edit`)
   }
 
   // 处理保存
-  const handleSave = (updatedData: SPUItem) => {
-    setCurrentSPU(updatedData)
-    setMode('view')
-    message.success('SPU更新成功')
+  const handleSave = async (updatedData: SPUItem) => {
+    if (!id) return
+
+    try {
+      setLoading(true)
+      const response = await spuService.updateSPU(id, updatedData)
+      if (response.success) {
+        setCurrentSPU(response.data || updatedData)
+        message.success('SPU更新成功')
+        navigate(`/spu/${id}`) // 保存后跳转到详情页
+      } else {
+        message.error(response.message || '更新失败')
+      }
+    } catch (error) {
+      console.error('Update SPU error:', error)
+      message.error('更新失败，请重试')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // 处理取消
   const handleCancel = () => {
-    setMode('view')
+    navigate(`/spu/${id}`)
   }
 
   // 处理状态变更
@@ -63,7 +117,7 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
 
   // 处理返回
   const handleBack = () => {
-    navigate('/spu')
+    navigate('/products/spu')
   }
 
   // 处理分享
@@ -180,24 +234,33 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
       </div>
 
       {/* 主要内容区域 */}
-      {mode === 'view' ? (
+      {dataLoading ? (
+        <Card>
+          <div style={{ textAlign: 'center', padding: '48px 0' }}>
+            <Spin size="large" />
+            <div style={{ marginTop: 16, color: '#666' }}>加载中...</div>
+          </div>
+        </Card>
+      ) : mode === 'view' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* SPU详情组件 */}
-          <SPUDetail
-            spuId={id}
-            mode="page"
-            onEdit={handleEdit}
-            onClose={handleBack}
-          />
-
-          {/* 状态管理组件 */}
           {currentSPU && (
-            <StatusManager
-              spuId={id!}
-              currentStatus={currentSPU.status}
-              onStatusChange={handleStatusChange}
-              compact={false}
-            />
+            <>
+              <SPUDetail
+                spuId={id}
+                mode="page"
+                onEdit={handleEdit}
+                onClose={handleBack}
+              />
+
+              {/* 状态管理组件 */}
+              <StatusManager
+                spuId={id!}
+                currentStatus={currentSPU.status}
+                onStatusChange={handleStatusChange}
+                compact={false}
+              />
+            </>
           )}
         </div>
       ) : (
@@ -205,8 +268,10 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
         <SPUEditForm
           spuId={id}
           mode="edit"
+          initialData={currentSPU || undefined}
           onSave={handleSave}
           onCancel={handleCancel}
+          loading={loading}
         />
       )}
     </div>

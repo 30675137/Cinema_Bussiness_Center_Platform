@@ -40,7 +40,7 @@ import { spuService } from '@/services/spuService'
 import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers'
 import { statusColors } from '@/theme'
 import { SPUNotificationService } from '@/components/common/Notification'
-import { AttributeDisplay } from './AttributeDisplay'
+import AttributeDisplay from './AttributeDisplay'
 
 const { Title, Paragraph, Text } = Typography
 const { TabPane } = Tabs

@@ -32,7 +32,7 @@ import {
   CopyOutlined
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-import { AttributeTemplateItem, AttributeOption, AttributeType, AttributeValidation } from '@/types/spu'
+import type { AttributeTemplateItem, AttributeOption, AttributeType, AttributeValidation } from '@/types/spu'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography

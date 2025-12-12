@@ -35,7 +35,7 @@ import type { SPUItem, SPUStatus, SPUAttribute, AttributeType } from '@/types/sp
 import { spuService } from '@/services/spuService'
 import { BrandSelect } from '@/components/forms/BrandSelect'
 import { CategorySelector } from '@/components/forms/CategorySelector'
-import { AttributeEditor } from '@/components/Attribute/AttributeEditor'
+import AttributeEditor from '@/components/Attribute/AttributeEditor'
 import SPUAttributeTemplate from '@/components/Attribute/SPUAttributeTemplate'
 import { SPUNotificationService } from '@/components/common/Notification'
 
@@ -152,8 +152,8 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
       }
     }
 
-    const unsubscribe = form.onFieldsChange(handleFormChange)
-    return unsubscribe
+    // Ant Design Form 没有 onFieldsChange API
+    // 表单变化通过 Form 的 onValuesChange prop 处理
   }, [form, currentData, fileList])
 
   // 处理保存

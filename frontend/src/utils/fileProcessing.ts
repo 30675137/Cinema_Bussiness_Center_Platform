@@ -1,4 +1,4 @@
-import { ExportFormat, ImportFormat, ExportDataType, ImportDataType } from '@/types/spu'
+import type { ExportFormat, ImportFormat, ExportDataType, ImportDataType } from '@/types/spu'
 
 // 文件处理配置
 export interface FileProcessingConfig {

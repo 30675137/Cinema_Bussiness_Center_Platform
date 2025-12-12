@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Card, Button, Space, message, Typography, Breadcrumb } from 'antd'
 import { PlusOutlined, ExportOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category } from '@/types/spu'
 import type { PaginatedResponse } from '@/services/spuService'
 import { spuService } from '@/services/spuService'
-import { SPUFilter } from '@/components/SPU/SPUFilter'
-import { SPUList } from '@/components/SPU/SPUList'
-import { BatchOperations } from '@/components/SPU/BatchOperations'
+import SPUFilter from '@/components/SPU/SPUFilter'
+import SPUList from '@/components/SPU/SPUList'
+import BatchOperations from '@/components/SPU/BatchOperations'
 import { Breadcrumb as CustomBreadcrumb } from '@/components/common'
 
 const { Title } = Typography
@@ -51,6 +51,9 @@ const SPUListPage: React.FC<SPUListProps> = () => {
   // 基础数据
   const [brands, setBrands] = useState<Brand[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+
+  // 使用 ref 来跟踪是否已经初始化加载
+  const hasInitialized = useRef(false)
 
   // 加载基础数据
   useEffect(() => {
@@ -218,7 +221,7 @@ const SPUListPage: React.FC<SPUListProps> = () => {
           pageSize: response.data.pageSize,
           total: response.data.total,
         }))
-        setQueryParams(prev => ({ ...prev, page: response.data.page, pageSize: response.data.pageSize }))
+        // 移除这行以避免无限循环：setQueryParams(prev => ({ ...prev, page: response.data.page, pageSize: response.data.pageSize }))
       } else {
         message.error(response.message || '获取SPU列表失败')
       }
@@ -230,12 +233,14 @@ const SPUListPage: React.FC<SPUListProps> = () => {
     }
   }, [])
 
-  // 初始化加载数据
+  // 初始化加载数据 - 只在 dataLoading 变为 false 且未初始化时加载一次
   useEffect(() => {
-    if (!dataLoading) {
+    if (!dataLoading && !hasInitialized.current) {
+      hasInitialized.current = true
       loadSPUList(queryParams)
     }
-  }, [dataLoading, queryParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataLoading]) // 移除 queryParams 依赖，避免无限循环
 
   // 处理搜索
   const handleSearch = useCallback((filters: Partial<SPUQueryParams>) => {
@@ -511,7 +516,7 @@ const SPUListPage: React.FC<SPUListProps> = () => {
           data={dataSource}
           loading={loading || dataLoading}
           selectedRowKeys={selectedRowKeys}
-          onSelectChange={handleRowSelection}
+          onSelectChange={handleRowSelectionChange}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onView={handleView}

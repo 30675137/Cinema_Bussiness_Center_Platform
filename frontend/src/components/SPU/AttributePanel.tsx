@@ -18,8 +18,8 @@ import {
   PlusOutlined
 } from '@ant-design/icons'
 import type { SPUAttribute } from '@/types/spu'
-import { AttributeDisplay } from '@/components/SPU/AttributeDisplay'
-import { AttributeEditor } from '@/components/Attribute/AttributeEditor'
+import AttributeDisplay from '@/components/SPU/AttributeDisplay'
+import AttributeEditor from '@/components/Attribute/AttributeEditor'
 import { SPUNotificationService } from '@/components/common/Notification'
 
 const { Title, Text } = Typography
