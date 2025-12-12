@@ -50,13 +50,13 @@ import {
   InventoryStatus
 } from '@/types/inventory';
 
-import { InventorySearchPanel } from './components/InventorySearchPanel';
-import { RealTimeInventoryCard } from './components/RealTimeInventoryCard';
-import { TransactionHistoryTable } from './components/TransactionHistoryTable';
-import { TransactionDetailModal } from './components/TransactionDetailModal';
-import { InventoryStatisticsCard } from './components/InventoryStatisticsCard';
-import { InventoryTrendsChart } from './components/InventoryTrendsChart';
-import { ReplenishmentSuggestions } from './components/ReplenishmentSuggestions';
+import InventorySearchPanel from './components/InventorySearchPanel';
+import RealTimeInventoryCard from './components/RealTimeInventoryCard';
+import TransactionHistoryTable from './components/TransactionHistoryTable';
+import TransactionDetailModal from './components/TransactionDetailModal';
+import InventoryStatisticsCard from './components/InventoryStatisticsCard';
+import InventoryTrendsChart from './components/InventoryTrendsChart';
+import ReplenishmentSuggestions from './components/ReplenishmentSuggestions';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;

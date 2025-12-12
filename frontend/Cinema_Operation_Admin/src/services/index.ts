@@ -36,6 +36,7 @@ export {
   notificationKeys,
   uploadKeys,
   reportKeys,
+  skuKeys,
   queryKeysManager,
   queryKeysUtils,
   QueryKeyFactory,
@@ -300,6 +301,7 @@ export default {
   notificationKeys,
   uploadKeys,
   reportKeys,
+  skuKeys,
 
   // 配置和工具
   servicesConfig,

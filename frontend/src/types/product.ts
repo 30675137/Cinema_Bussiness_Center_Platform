@@ -2,6 +2,21 @@ import { z } from 'zod';
 import type { BaseEntity } from './index';
 import { MaterialType, ProductStatus } from './index';
 
+// 确保枚举已定义（延迟检查，避免循环导入问题）
+const getMaterialType = () => {
+  if (!MaterialType || typeof MaterialType !== 'object' || Object.keys(MaterialType).length === 0) {
+    return null;
+  }
+  return MaterialType;
+};
+
+const getProductStatus = () => {
+  if (!ProductStatus || typeof ProductStatus !== 'object' || Object.keys(ProductStatus).length === 0) {
+    return null;
+  }
+  return ProductStatus;
+};
+
 // 商品接口定义
 export interface Product extends BaseEntity {
   id: string;
@@ -280,9 +295,12 @@ export const ProductBasicInfoSchema = z.object({
   categoryId: z.string()
     .min(1, '请选择商品类目'),
 
-  materialType: z.nativeEnum(MaterialType, {
-    message: '请选择物料类型'
-  }),
+  materialType: (() => {
+    const mt = getMaterialType();
+    return mt
+      ? z.nativeEnum(mt, { message: '请选择物料类型' })
+      : z.enum(['raw_material', 'semi_finished', 'finished_good'], { message: '请选择物料类型' });
+  })(),
 
   basePrice: z.number()
     .min(0, '价格必须大于等于0')
@@ -320,9 +338,12 @@ export const ProductBasicInfoSchema = z.object({
     .max(200, '储存条件不能超过200个字符')
     .optional(),
 
-  status: z.nativeEnum(ProductStatus, {
-    message: '请选择商品状态'
-  })
+  status: (() => {
+    const ps = getProductStatus();
+    return ps
+      ? z.nativeEnum(ps, { message: '请选择商品状态' })
+      : z.enum(['draft', 'pending_review', 'approved', 'published', 'disabled', 'archived'], { message: '请选择商品状态' });
+  })()
 });
 
 export const ProductContentSchema = z.object({

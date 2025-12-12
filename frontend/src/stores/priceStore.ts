@@ -391,6 +391,30 @@ export const useUpdatePriceRuleMutation = () => {
   });
 };
 
+export const useDeletePriceRuleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => priceService.deletePriceRule(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['price-rules'] });
+    },
+  });
+};
+
+export const useApplyPriceRuleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ ruleId, productIds }: { ruleId: string; productIds: string[] }) =>
+      priceService.applyPriceRule(ruleId, productIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['price-rules'] });
+      queryClient.invalidateQueries({ queryKey: ['prices'] });
+    },
+  });
+};
+
 // 价格历史查询hooks
 export const usePriceHistoryQuery = (priceConfigId: string) => {
   return useQuery({
@@ -474,4 +498,32 @@ export const usePriceCountByType = () => {
     acc[price.priceType] = (acc[price.priceType] || 0) + 1;
     return acc;
   }, {} as Record<PriceType, number>);
+};
+
+// 价格统计hooks
+export const usePriceStatistics = (filters?: PriceQueryParams) => {
+  const { data: pricesData } = usePricesQuery(filters);
+  const prices = pricesData?.items || [];
+  
+  const activePrices = prices.filter(p => p.status === PriceStatus.ACTIVE).length;
+  const totalPrices = prices.length;
+  const averagePrice = totalPrices > 0 
+    ? prices.reduce((sum, p) => sum + p.currentPrice, 0) / totalPrices 
+    : 0;
+  const upcomingChanges = prices.filter(p => p.status === PriceStatus.PENDING).length;
+  
+  return {
+    totalPrices,
+    averagePrice,
+    activePrices,
+    upcomingChanges,
+    byStatus: prices.reduce((acc, price) => {
+      acc[price.status] = (acc[price.status] || 0) + 1;
+      return acc;
+    }, {} as Record<PriceStatus, number>),
+    byType: prices.reduce((acc, price) => {
+      acc[price.priceType] = (acc[price.priceType] || 0) + 1;
+      return acc;
+    }, {} as Record<PriceType, number>),
+  };
 };
