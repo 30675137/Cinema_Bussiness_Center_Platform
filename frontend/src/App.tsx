@@ -39,6 +39,18 @@ const InventoryMovements = lazy(() => import('./pages/inventory/InventoryMovemen
 // 登录页面
 const LoginPage = lazy(() => import('./pages/auth/Login'));
 
+// SPU管理页面
+const SPUListPage = lazy(() => import('./pages/SPUList'));
+const SPUListTest = lazy(() => import('./pages/SPUList/test'));
+const SPUDetailPage = lazy(() => import('./pages/SPUDetail'));
+
+// 基础数据管理页面
+const CategoryManagementPage = lazy(() => import('./pages/CategoryManagement'));
+const BrandManagementPage = lazy(() => import('./pages/BrandManagement'));
+
+// 属性模板管理页面
+const AttributeTemplatePage = lazy(() => import('./pages/AttributeTemplate'));
+
 // 初始化性能监控
 const initializePerformanceMonitoring = () => {
   if (!PERFORMANCE_CONFIG.monitoring.enabled) {
@@ -165,6 +177,19 @@ const App: React.FC = () => {
                     />
                   }
                 />
+
+                {/* SPU管理 */}
+                <Route path="/spu" element={<SPUListPage />} />
+                <Route path="/spu/test" element={<SPUListTest />} />
+                <Route path="/spu/:id" element={<SPUDetailPage />} />
+                <Route path="/spu/:id/edit" element={<SPUDetailPage />} />
+
+                {/* 基础数据管理 */}
+                <Route path="/categories" element={<CategoryManagementPage />} />
+                <Route path="/brands" element={<BrandManagementPage />} />
+
+                {/* 属性模板管理 */}
+                <Route path="/attribute-templates" element={<AttributeTemplatePage />} />
 
                 {/* 其他页面 */}
                 <Route path="/about" element={<AboutPage />} />

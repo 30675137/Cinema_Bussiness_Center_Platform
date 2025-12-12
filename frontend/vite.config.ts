@@ -36,7 +36,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', 'react-router-dom'],
+    include: ['react', 'react-dom', 'antd', 'react-router-dom', 'zustand', '@tanstack/react-query'],
   },
   server: {
     port: 3000,
@@ -48,5 +48,10 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  // Vitest configuration
+  define: {
+    __VUE_OPTIONS_API__: false,
+    __VUE_PROD_DEVTOOLS__: false,
   },
 })
