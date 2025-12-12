@@ -1,4 +1,4 @@
-import {
+import type {
   AttributeTemplate,
   AttributeTemplateItem,
   AttributeTemplateQueryParams,
@@ -678,12 +678,4 @@ class AttributeTemplateService {
 // 创建服务实例
 export const attributeService = new AttributeTemplateService()
 
-// 导出类型
-export type {
-  AttributeTemplate,
-  AttributeTemplateItem,
-  AttributeTemplateQueryParams,
-  AttributeTemplateListResponse,
-  AttributeTemplateOperationResponse,
-  AttributeTemplateForm
-}
+// 类型已在 @/types/spu 中导出，无需重复导出

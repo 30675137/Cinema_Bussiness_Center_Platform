@@ -1,4 +1,4 @@
-import { AttributeTemplateItem, AttributeType, AttributeValidation, AttributeOption } from '@/types/spu'
+import type { AttributeTemplateItem, AttributeType, AttributeValidation, AttributeOption } from '@/types/spu'
 
 // 验证结果接口
 export interface ValidationResult {

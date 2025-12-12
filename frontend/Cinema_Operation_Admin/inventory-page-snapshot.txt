@@ -1,1 +1,0 @@
-uid=44_0 RootWebArea "库存管理系统 - 影院商品管理中台" url="http://localhost:3001/inventory"

@@ -32,7 +32,7 @@ import {
   CloseCircleOutlined
 } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
-import { AttributeTemplate, AttributeTemplateItem, AttributeTemplateQueryParams } from '@/types/spu'
+import type { AttributeTemplate, AttributeTemplateItem, AttributeTemplateQueryParams } from '@/types/spu'
 
 const { Title, Text, Paragraph } = Typography
 const { Option } = Select

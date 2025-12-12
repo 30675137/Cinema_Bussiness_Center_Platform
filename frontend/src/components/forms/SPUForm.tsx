@@ -2,12 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { Form, Input, Select, Upload, Button, Card, Row, Col, Space, message, Divider, Alert } from 'antd'
 import { PlusOutlined, MinusCircleOutlined, UploadOutlined, SettingOutlined } from '@ant-design/icons'
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface'
-import type { SPUItem, SPUStatus, Brand, Category, AttributeTemplate } from '@/types/spu'
+import type { SPUItem, SPUStatus, Brand, Category, AttributeTemplate, AttributeTemplateItem } from '@/types/spu'
 import { BrandSelect } from './BrandSelect'
 import { CategorySelector } from './CategorySelector'
 import AttributeEditor from '@/components/Attribute/AttributeEditor'
 import { attributeService } from '@/services/attributeService'
-import { AttributeTemplateItem } from '@/types/spu'
 
 const { TextArea } = Input
 const { Option } = Select

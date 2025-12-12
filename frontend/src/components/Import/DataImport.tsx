@@ -33,7 +33,7 @@ import {
   SettingOutlined,
   DeleteOutlined,
   EyeOutlined,
-  RefreshOutlined,
+  ReloadOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   CloseCircleOutlined,
@@ -661,7 +661,7 @@ const DataImport: React.FC<DataImportProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>导入任务历史</span>
             <Button
-              icon={<RefreshOutlined />}
+              icon={<ReloadOutlined />}
               onClick={loadImportTasks}
               size="small"
             >

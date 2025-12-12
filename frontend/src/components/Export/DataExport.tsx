@@ -28,7 +28,7 @@ import {
   SettingOutlined,
   DeleteOutlined,
   EyeOutlined,
-  RefreshOutlined,
+  ReloadOutlined,
   FileExcelOutlined,
   FileTextOutlined,
   FileOutlined
@@ -518,7 +518,7 @@ const DataExport: React.FC<DataExportProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>导出任务历史</span>
             <Button
-              icon={<RefreshOutlined />}
+              icon={<ReloadOutlined />}
               onClick={handleRefresh}
               size="small"
             >
