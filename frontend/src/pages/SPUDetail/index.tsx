@@ -87,7 +87,7 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
       const response = await spuService.updateSPU(id, updatedData)
       if (response.success) {
         setCurrentSPU(response.data || updatedData)
-        message.success('SPU更新成功')
+    message.success('SPU更新成功')
         navigate(`/spu/${id}`) // 保存后跳转到详情页
       } else {
         message.error(response.message || '更新失败')
@@ -246,20 +246,20 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
           {/* SPU详情组件 */}
           {currentSPU && (
             <>
-              <SPUDetail
-                spuId={id}
-                mode="page"
-                onEdit={handleEdit}
-                onClose={handleBack}
-              />
+          <SPUDetail
+            spuId={id}
+            mode="page"
+            onEdit={handleEdit}
+            onClose={handleBack}
+          />
 
-              {/* 状态管理组件 */}
-              <StatusManager
-                spuId={id!}
-                currentStatus={currentSPU.status}
-                onStatusChange={handleStatusChange}
-                compact={false}
-              />
+          {/* 状态管理组件 */}
+            <StatusManager
+              spuId={id!}
+              currentStatus={currentSPU.status}
+              onStatusChange={handleStatusChange}
+              compact={false}
+            />
             </>
           )}
         </div>
