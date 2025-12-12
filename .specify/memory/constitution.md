@@ -1,11 +1,10 @@
 
 
 <!-- Sync Impact Report
-Version change: v1.1.0 → v1.2.0
-Modified principles:
-- 测试要求 (强制要求 → 质量保证指导)
-- 文档管理规范 (强制要求 → 文档管理指导)
-Added sections: None
+Version change: v1.2.0 → v1.3.0
+Modified principles: None
+Added sections:
+- TanStack Query v5 使用规范 (开发规范第4节)
 Removed sections: None
 Templates requiring updates: ✅ All templates already aligned with new principles
 Follow-up TODOs: None
@@ -17,9 +16,9 @@ Follow-up TODOs: None
 
 **项目名称**: 影院商品管理中台
 **项目描述**: 影院商品管理中台 - 为影院行业提供统一的商品管理、销售分析和运营支持的中台系统
-**版本**: v1.2.0
+**版本**: v1.3.0
 **创建日期**: 2025-12-11
-**最后更新**: 2025-12-11
+**最后更新**: 2025-12-12
 
 ## 核心架构原则
 
@@ -104,6 +103,101 @@ Follow-up TODOs: None
 - **类型**: feat(新功能), fix(修复), docs(文档), style(格式), refactor(重构), test(测试), chore(构建)
 - **示例**: `feat(product): 添加商品管理功能`
 - **禁止**: 不符合规范的提交将被CI/CD拒绝
+
+### 4. TanStack Query v5 使用规范 (强制执行)
+
+#### 4.1 职责划分原则
+- **TanStack Query**: 必须且仅用于管理服务器状态（API数据、缓存、同步）
+- **Zustand**: 必须用于管理客户端状态（UI状态、表单数据、模态框状态）
+- **禁止混用**: 禁止将服务器状态存储在Zustand中，禁止将客户端状态存储在TanStack Query中
+
+#### 4.2 查询键管理规范
+- **统一管理**: 所有查询键必须在 `src/services/queryKeys.ts` 中统一管理
+- **使用工厂模式**: 必须使用 `QueryKeyFactory` 类创建查询键，确保一致性
+- **命名规范**: 查询键必须使用有意义的名称，遵循 `[模块名, 操作类型, ...参数]` 格式
+- **类型安全**: 查询键必须使用 `as const` 确保类型安全
+- **示例**:
+```typescript
+// ✅ 正确：使用查询键工厂
+export const skuKeys = new QueryKeyFactory('skus');
+skuKeys.skusPaginated(page, pageSize, filters)
+
+// ❌ 错误：直接使用字符串数组
+['skus', page, pageSize]
+```
+
+#### 4.3 Query Hooks 规范
+- **命名规范**: Query Hooks 必须以 `use` 开头，以 `Query` 结尾，如 `useSkuListQuery`
+- **参数处理**: 必须清理 `undefined` 和 `null` 值，避免不必要的重新获取
+- **缓存配置**: 必须根据数据特性设置合理的 `staleTime` 和 `gcTime`（v5中 `cacheTime` 已重命名为 `gcTime`）
+- **错误处理**: 必须使用统一的错误处理函数 `showError` 和 `getFriendlyErrorMessage`
+- **类型定义**: 必须为所有 Query Hooks 定义明确的返回类型
+- **示例**:
+```typescript
+// ✅ 正确：完整的 Query Hook 实现
+export const useSkuListQuery = (params: SkuQueryParams, enabled: boolean = true) => {
+  const cleanParams = cleanQueryParams(params);
+  return useQuery({
+    queryKey: skuKeys.skusPaginated(cleanParams.page, cleanParams.pageSize, cleanParams.filters),
+    queryFn: () => skuService.getSkus(cleanParams),
+    enabled,
+    staleTime: 2 * 60 * 1000, // 2分钟
+    gcTime: 10 * 60 * 1000, // 10分钟
+  });
+};
+```
+
+#### 4.4 Mutation Hooks 规范
+- **命名规范**: Mutation Hooks 必须以 `use` 开头，以 `Mutation` 结尾，如 `useCreateSkuMutation`
+- **缓存失效**: Mutation 成功后必须使用 `queryClient.invalidateQueries` 失效相关查询
+- **乐观更新**: 对于频繁操作，应该使用乐观更新提升用户体验
+- **错误处理**: 必须使用统一的错误处理，显示友好的错误消息
+- **成功提示**: 必须使用统一的成功提示函数 `showSuccess`
+- **示例**:
+```typescript
+// ✅ 正确：完整的 Mutation Hook 实现
+export const useCreateSkuMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SkuFormData) => skuService.createSku(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: skuKeys.all() });
+      showSuccess('SKU创建成功');
+    },
+    onError: (error) => {
+      showError(getFriendlyErrorMessage(error));
+    },
+  });
+};
+```
+
+#### 4.5 缓存策略规范
+- **staleTime 设置**: 
+  - 实时数据（如库存、订单）: `staleTime: 0` 或 `30 * 1000`（30秒）
+  - 半静态数据（如商品列表）: `staleTime: 2 * 60 * 1000`（2分钟）
+  - 静态数据（如分类、品牌）: `staleTime: 10 * 60 * 1000`（10分钟）
+- **gcTime 设置**: 必须根据数据访问频率设置，默认 `10 * 60 * 1000`（10分钟）
+- **refetchOnWindowFocus**: 默认 `false`，仅在需要实时数据的场景启用
+- **refetchOnReconnect**: 必须设置为 `true`，确保网络重连后数据同步
+
+#### 4.6 查询选项工具函数规范
+- **统一使用**: 必须使用 `createQueryOptions` 和 `createMutationOptions` 工具函数
+- **位置**: 这些函数定义在 `src/services/index.ts` 中
+- **目的**: 确保所有查询和变更使用一致的配置模式
+
+#### 4.7 禁止事项
+- **禁止**: 在组件中直接使用 `useQuery` 和 `useMutation`，必须封装为自定义 Hooks
+- **禁止**: 在 Zustand Store 中存储从 API 获取的数据
+- **禁止**: 使用 `cacheTime`（v5已废弃），必须使用 `gcTime`
+- **禁止**: 在查询键中包含函数或对象引用，必须序列化为字符串
+- **禁止**: 忽略错误处理，所有查询和变更必须有错误处理逻辑
+
+#### 4.8 最佳实践
+- **自定义 Hooks**: 将业务逻辑封装在自定义 Hooks 中，组件只负责展示
+- **查询键工厂**: 使用 `QueryKeyFactory` 确保查询键的一致性和可维护性
+- **类型安全**: 充分利用 TypeScript 类型系统，为所有查询和变更定义类型
+- **错误边界**: 在关键组件中使用错误边界处理查询错误
+- **加载状态**: 合理使用 `isLoading`、`isFetching`、`isPending` 区分不同的加载状态
 
 ## 质量保证
 
@@ -223,6 +317,13 @@ Follow-up TODOs: None
 
 ## 版本历史
 
+- **v1.3.0** (2025-12-12): 新增 TanStack Query v5 使用规范
+  - 添加 TanStack Query v5 的完整使用规范
+  - 明确职责划分原则（TanStack Query vs Zustand）
+  - 规范查询键管理、Query Hooks、Mutation Hooks 的使用
+  - 定义缓存策略和最佳实践
+  - 列出禁止事项和最佳实践指导
+
 - **v1.2.0** (2025-12-11): 优化质量保证和文档管理策略
   - 将强制测试要求改为灵活的测试策略指导
   - 将强制文档要求改为实用的文档管理指导
@@ -246,4 +347,4 @@ Follow-up TODOs: None
 **下次审查日期**: 2026-03-11
 **维护负责人**: 技术负责人
 **审批人**: 项目经理
-**文档版本**: v1.2.0
+**文档版本**: v1.3.0
