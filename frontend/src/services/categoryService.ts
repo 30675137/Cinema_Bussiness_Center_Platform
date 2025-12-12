@@ -1,4 +1,4 @@
-import type { Category } from '@/types/spu'
+import type { Category, CategoryTree } from '@/types/category'
 
 // API 响应类型定义
 export interface ApiResponse<T = any> {
@@ -163,13 +163,20 @@ class CategoryService {
   async getCategoryDetail(id: string): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 300))
 
-      const allCategories = this.generateMockCategories()
-      const category = allCategories.find(cat => cat.id === id)
+      // 使用新的 Mock 数据生成器
+      const { getCategoryById } = await import('@/mocks/data/categoryMockData')
+      const category = getCategoryById(id)
 
       if (!category) {
-        throw new Error('分类不存在')
+        return {
+          success: false,
+          data: null as any,
+          message: '分类不存在',
+          code: 404,
+          timestamp: Date.now(),
+        }
       }
 
       return {
@@ -191,6 +198,80 @@ class CategoryService {
   }
 
   /**
+   * 获取子类目列表（懒加载）
+   * @param parentId 父类目ID
+   * @returns 子类目列表
+   */
+  async getCategoryChildren(parentId: string): Promise<ApiResponse<Category[]>> {
+    try {
+      // 模拟API请求延迟
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      // 使用新的 Mock 数据生成器
+      const { getCategoryChildren } = await import('@/mocks/data/categoryMockData')
+      const children = getCategoryChildren(parentId)
+
+      return {
+        success: true,
+        data: children,
+        message: '获取成功',
+        code: 200,
+        timestamp: Date.now(),
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: [],
+        message: error instanceof Error ? error.message : '获取失败',
+        code: 500,
+        timestamp: Date.now(),
+      }
+    }
+  }
+
+  /**
+   * 搜索类目
+   * @param keyword 搜索关键词
+   * @returns 匹配的类目列表
+   */
+  async searchCategories(keyword: string): Promise<ApiResponse<Category[]>> {
+    try {
+      // 模拟API请求延迟
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      if (!keyword || keyword.trim() === '') {
+        return {
+          success: false,
+          data: [],
+          message: '搜索关键词不能为空',
+          code: 400,
+          timestamp: Date.now(),
+        }
+      }
+
+      // 使用新的 Mock 数据生成器
+      const { searchCategories } = await import('@/mocks/data/categoryMockData')
+      const results = searchCategories(keyword)
+
+      return {
+        success: true,
+        data: results,
+        message: '搜索成功',
+        code: 200,
+        timestamp: Date.now(),
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: [],
+        message: error instanceof Error ? error.message : '搜索失败',
+        code: 500,
+        timestamp: Date.now(),
+      }
+    }
+  }
+
+  /**
    * 创建分类
    * @param data 分类创建数据
    * @returns 创建的分类信息
@@ -198,58 +279,72 @@ class CategoryService {
   async createCategory(data: CreateCategoryRequest): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise(resolve => setTimeout(resolve, 600))
 
       // 验证必填字段
       if (!data.name || data.name.trim() === '') {
-        throw new Error('分类名称不能为空')
+        return {
+          success: false,
+          data: null as any,
+          message: '类目名称不能为空',
+          code: 400,
+          timestamp: Date.now(),
+        }
       }
 
-      if (!data.code || data.code.trim() === '') {
-        throw new Error('分类编码不能为空')
-      }
-
-      // 检查编码唯一性
-      const allCategories = this.generateMockCategories()
-      const existingCategory = allCategories.find(cat => cat.code === data.code.trim())
-      if (existingCategory) {
-        throw new Error('分类编码已存在')
-      }
-
-      // 检查级别限制
-      if (data.level < 1 || data.level > 3) {
-        throw new Error('分类级别必须在1-3之间')
-      }
-
-      // 如果指定了父级，验证父级存在且级别合法
+      // 使用新的 Mock 数据生成器
+      const { createCategory: createCategoryData, getCategoryById } = await import('@/mocks/data/categoryMockData')
+      
+      // 确定层级
+      let level: 1 | 2 | 3 = 1
+      let parentName: string | undefined
       if (data.parentId) {
-        const parentCategory = allCategories.find(cat => cat.id === data.parentId)
-        if (!parentCategory) {
-          throw new Error('父级分类不存在')
+        const parent = getCategoryById(data.parentId)
+        if (!parent) {
+          return {
+            success: false,
+            data: null as any,
+            message: '父类目不存在',
+            code: 400,
+            timestamp: Date.now(),
+          }
         }
-        if (parentCategory.level >= data.level) {
-          throw new Error('子分类级别必须大于父分类级别')
+        level = (parent.level + 1) as 1 | 2 | 3
+        if (level > 3) {
+          return {
+            success: false,
+            data: null as any,
+            message: '类目层级不能超过三级',
+            code: 400,
+            timestamp: Date.now(),
+          }
         }
+        parentName = parent.name
       }
 
-      // 生成新分类
-      const newCategory: Category = {
-        id: `cat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        name: data.name.trim(),
-        code: data.code.trim(),
-        level: data.level,
-        parentId: data.parentId,
-        status: data.status,
-        description: data.description?.trim(),
-        sortOrder: data.sortOrder || 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      // 构建路径
+      const path: string[] = []
+      if (data.parentId) {
+        const parent = getCategoryById(data.parentId)
+        if (parent) {
+          path.push(...parent.path)
+        }
       }
+      path.push(data.name)
+
+      const newCategory = createCategoryData({
+        ...data,
+        level,
+        parentName,
+        path,
+        status: data.status || 'active',
+        sortOrder: data.sortOrder || 0,
+      })
 
       return {
         success: true,
         data: newCategory,
-        message: '分类创建成功',
+        message: '类目创建成功',
         code: 200,
         timestamp: Date.now(),
       }
@@ -272,38 +367,55 @@ class CategoryService {
   async updateCategory(data: UpdateCategoryRequest): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise(resolve => setTimeout(resolve, 500))
 
       if (!data.id) {
-        throw new Error('分类ID不能为空')
+        return {
+          success: false,
+          data: null as any,
+          message: '类目ID不能为空',
+          code: 400,
+          timestamp: Date.now(),
+        }
       }
 
       // 验证必填字段
       if (data.name && data.name.trim() === '') {
-        throw new Error('分类名称不能为空')
+        return {
+          success: false,
+          data: null as any,
+          message: '类目名称不能为空',
+          code: 400,
+          timestamp: Date.now(),
+        }
       }
 
-      if (data.code && data.code.trim() === '') {
-        throw new Error('分类编码不能为空')
+      // 使用新的 Mock 数据生成器
+      const { updateCategory: updateCategoryData, getCategoryById } = await import('@/mocks/data/categoryMockData')
+      
+      const existingCategory = getCategoryById(data.id)
+      if (!existingCategory) {
+        return {
+          success: false,
+          data: null as any,
+          message: '类目不存在',
+          code: 404,
+          timestamp: Date.now(),
+        }
       }
 
-      // Mock更新逻辑
-      const updatedCategory: Category = {
-        id: data.id,
+      // 使用新的 Mock 数据生成器更新
+      const updatedCategory = updateCategoryData(data.id, {
         name: data.name,
-        code: data.code,
-        level: data.level,
-        parentId: data.parentId,
-        status: data.status,
         description: data.description,
         sortOrder: data.sortOrder,
-        updatedAt: new Date().toISOString()
-      } as Category
+        status: data.status,
+      })
 
       return {
         success: true,
         data: updatedCategory,
-        message: '分类更新成功',
+        message: '类目更新成功',
         code: 200,
         timestamp: Date.now(),
       }
@@ -328,17 +440,59 @@ class CategoryService {
       // 模拟API请求延迟
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      // 检查是否有子分类
-      const allCategories = this.generateMockCategories()
-      const hasChildren = allCategories.some(cat => cat.parentId === id)
-      if (hasChildren) {
-        throw new Error('无法删除包含子分类的分类')
+      // 使用新的 Mock 数据生成器
+      const { deleteCategory: deleteCategoryData, getCategoryById, getCategoryChildren } = await import('@/mocks/data/categoryMockData')
+      
+      const category = getCategoryById(id)
+      if (!category) {
+        return {
+          success: false,
+          data: null,
+          message: '类目不存在',
+          code: 404,
+          timestamp: Date.now(),
+        }
+      }
+
+      // 检查是否被SPU使用
+      if (category.spuCount > 0) {
+        return {
+          success: false,
+          data: null,
+          message: '该类目已有 SPU 使用，不可删除',
+          code: 400,
+          timestamp: Date.now(),
+        }
+      }
+
+      // 检查是否有子类目
+      const children = getCategoryChildren(id)
+      if (children.length > 0) {
+        return {
+          success: false,
+          data: null,
+          message: '无法删除包含子类目的类目',
+          code: 400,
+          timestamp: Date.now(),
+        }
+      }
+
+      // 执行删除
+      const success = deleteCategoryData(id)
+      if (!success) {
+        return {
+          success: false,
+          data: null,
+          message: '删除失败',
+          code: 500,
+          timestamp: Date.now(),
+        }
       }
 
       return {
         success: true,
         data: null,
-        message: '分类删除成功',
+        message: '类目删除成功',
         code: 200,
         timestamp: Date.now(),
       }
@@ -383,26 +537,22 @@ class CategoryService {
   }
 
   /**
-   * 获取分类树形结构
-   * @param level 获取层级深度，默认获取全部
+   * 获取分类树形结构（支持懒加载）
+   * @param lazy 是否懒加载，默认 true（只返回一级类目）
    * @returns 树形结构数据
    */
-  async getCategoryTree(level?: number): Promise<ApiResponse<Category[]>> {
+  async getCategoryTree(lazy: boolean = true): Promise<ApiResponse<CategoryTree[]>> {
     try {
       // 模拟API请求延迟
       await new Promise(resolve => setTimeout(resolve, 400))
 
-      const allCategories = this.generateMockCategories()
-
-      // 如果指定了层级，过滤数据
-      let filteredCategories = allCategories
-      if (level && level > 0) {
-        filteredCategories = allCategories.filter(cat => cat.level <= level)
-      }
+      // 使用新的 Mock 数据生成器
+      const { generateCategoryTree } = await import('@/mocks/data/categoryMockData')
+      const tree = generateCategoryTree(lazy)
 
       return {
         success: true,
-        data: filteredCategories,
+        data: tree,
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
@@ -429,13 +579,25 @@ class CategoryService {
       // 模拟API请求延迟
       await new Promise(resolve => setTimeout(resolve, 400))
 
+      // 使用新的 Mock 数据生成器
+      const { updateCategoryStatus: updateStatusData, getCategoryById } = await import('@/mocks/data/categoryMockData')
+      
+      const category = getCategoryById(id)
+      if (!category) {
+        return {
+          success: false,
+          data: null as any,
+          message: '类目不存在',
+          code: 404,
+          timestamp: Date.now(),
+        }
+      }
+
+      const updatedCategory = updateStatusData(id, status)
+
       return {
         success: true,
-        data: {
-          id,
-          status,
-          updatedAt: new Date().toISOString()
-        } as Category,
+        data: updatedCategory,
         message: '状态更新成功',
         code: 200,
         timestamp: Date.now(),

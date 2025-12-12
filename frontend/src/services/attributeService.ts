@@ -6,6 +6,19 @@ import type {
   AttributeTemplateOperationResponse,
   AttributeTemplateForm
 } from '@/types/spu'
+import type { 
+  AttributeTemplate as CategoryAttributeTemplate, 
+  CategoryAttribute 
+} from '@/types/category'
+
+// API 响应类型定义
+interface ApiResponse<T = any> {
+  success: boolean
+  data: T
+  message: string
+  code: number
+  timestamp?: number
+}
 
 // 模拟数据
 const generateMockTemplates = (): AttributeTemplate[] => {
@@ -679,3 +692,327 @@ class AttributeTemplateService {
 export const attributeService = new AttributeTemplateService()
 
 // 类型已在 @/types/spu 中导出，无需重复导出
+
+/**
+ * 类目属性模板服务方法
+ * 基于 CategoryAttribute 和 AttributeTemplate 类型（data-model.md 规范）
+ */
+class CategoryAttributeTemplateService {
+  private baseUrl = '/api/attribute-templates'
+  private templates: Map<string, CategoryAttributeTemplate> = new Map()
+
+  /**
+   * 获取类目的属性模板
+   * @param categoryId 类目ID
+   * @returns 属性模板
+   */
+  async getAttributeTemplate(categoryId: string): Promise<ApiResponse<CategoryAttributeTemplate | null>> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // 从 Mock 数据中获取
+      const template = this.templates.get(categoryId) || null
+      
+      return {
+        success: true,
+        data: template,
+        message: template ? '获取成功' : '属性模板不存在',
+        code: template ? 200 : 404,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        message: error instanceof Error ? error.message : '获取失败',
+        code: 500,
+      }
+    }
+  }
+
+  /**
+   * 创建或更新属性模板
+   * @param categoryId 类目ID
+   * @param attributes 属性列表
+   * @returns 保存后的属性模板
+   */
+  async saveAttributeTemplate(
+    categoryId: string,
+    attributes: CategoryAttribute[]
+  ): Promise<ApiResponse<CategoryAttributeTemplate>> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // 验证属性
+      for (const attr of attributes) {
+        if (!attr.name || attr.name.trim() === '') {
+          throw new Error('属性名称不能为空')
+        }
+        if (!attr.displayName || attr.displayName.trim() === '') {
+          throw new Error('显示名称不能为空')
+        }
+        if ((attr.type === 'single-select' || attr.type === 'multi-select') && 
+            (!attr.optionalValues || attr.optionalValues.length === 0)) {
+          throw new Error(`${attr.type} 类型必须提供可选值`)
+        }
+      }
+
+      const now = new Date().toISOString()
+      const existingTemplate = this.templates.get(categoryId)
+      
+      const template: CategoryAttributeTemplate = {
+        id: existingTemplate?.id || `template-${Date.now()}`,
+        categoryId,
+        attributes: attributes.map(attr => ({
+          ...attr,
+          createdAt: attr.createdAt || now,
+          updatedAt: now,
+        })),
+        createdAt: existingTemplate?.createdAt || now,
+        updatedAt: now,
+      }
+      
+      this.templates.set(categoryId, template)
+      
+      return {
+        success: true,
+        data: template,
+        message: '保存成功',
+        code: 200,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: null as any,
+        message: error instanceof Error ? error.message : '保存失败',
+        code: 500,
+      }
+    }
+  }
+
+  /**
+   * 添加属性到模板
+   * @param categoryId 类目ID
+   * @param attribute 属性定义
+   * @returns 更新后的属性模板
+   */
+  async addAttribute(
+    categoryId: string,
+    attribute: Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<ApiResponse<CategoryAttributeTemplate>> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 400))
+      
+      // 验证属性
+      if (!attribute.name || attribute.name.trim() === '') {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性名称不能为空',
+          code: 400,
+        }
+      }
+      
+      if ((attribute.type === 'single-select' || attribute.type === 'multi-select') && 
+          (!attribute.optionalValues || attribute.optionalValues.length === 0)) {
+        return {
+          success: false,
+          data: null as any,
+          message: `${attribute.type} 类型必须提供可选值`,
+          code: 400,
+        }
+      }
+
+      const template = this.templates.get(categoryId)
+      if (!template) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性模板不存在，请先创建模板',
+          code: 404,
+        }
+      }
+
+      // 检查属性名称是否重复
+      if (template.attributes.some(attr => attr.name === attribute.name)) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性名称已存在',
+          code: 400,
+        }
+      }
+
+      const now = new Date().toISOString()
+      const newAttribute: CategoryAttribute = {
+        ...attribute,
+        id: `attr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        createdAt: now,
+        updatedAt: now,
+      }
+
+      const updatedTemplate: CategoryAttributeTemplate = {
+        ...template,
+        attributes: [...template.attributes, newAttribute],
+        updatedAt: now,
+      }
+
+      this.templates.set(categoryId, updatedTemplate)
+
+      return {
+        success: true,
+        data: updatedTemplate,
+        message: '添加成功',
+        code: 200,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: null as any,
+        message: error instanceof Error ? error.message : '添加失败',
+        code: 500,
+      }
+    }
+  }
+
+  /**
+   * 更新模板中的属性
+   * @param categoryId 类目ID
+   * @param attributeId 属性ID
+   * @param attribute 更新的属性数据
+   * @returns 更新后的属性模板
+   */
+  async updateAttribute(
+    categoryId: string,
+    attributeId: string,
+    attribute: Partial<Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>>
+  ): Promise<ApiResponse<CategoryAttributeTemplate>> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 400))
+      
+      const template = this.templates.get(categoryId)
+      if (!template) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性模板不存在',
+          code: 404,
+        }
+      }
+
+      const attributeIndex = template.attributes.findIndex(attr => attr.id === attributeId)
+      if (attributeIndex === -1) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性不存在',
+          code: 404,
+        }
+      }
+
+      // 验证更新后的属性
+      const updatedAttribute = { ...template.attributes[attributeIndex], ...attribute }
+      if (updatedAttribute.name && updatedAttribute.name.trim() === '') {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性名称不能为空',
+          code: 400,
+        }
+      }
+
+      const now = new Date().toISOString()
+      const updatedAttributes = [...template.attributes]
+      updatedAttributes[attributeIndex] = {
+        ...updatedAttribute,
+        id: attributeId,
+        updatedAt: now,
+      }
+
+      const updatedTemplate: CategoryAttributeTemplate = {
+        ...template,
+        attributes: updatedAttributes,
+        updatedAt: now,
+      }
+
+      this.templates.set(categoryId, updatedTemplate)
+
+      return {
+        success: true,
+        data: updatedTemplate,
+        message: '更新成功',
+        code: 200,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: null as any,
+        message: error instanceof Error ? error.message : '更新失败',
+        code: 500,
+      }
+    }
+  }
+
+  /**
+   * 从模板中删除属性
+   * @param categoryId 类目ID
+   * @param attributeId 属性ID
+   * @returns 更新后的属性模板
+   */
+  async deleteAttribute(
+    categoryId: string,
+    attributeId: string
+  ): Promise<ApiResponse<CategoryAttributeTemplate>> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 400))
+      
+      const template = this.templates.get(categoryId)
+      if (!template) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性模板不存在',
+          code: 404,
+        }
+      }
+
+      const attribute = template.attributes.find(attr => attr.id === attributeId)
+      if (!attribute) {
+        return {
+          success: false,
+          data: null as any,
+          message: '属性不存在',
+          code: 404,
+        }
+      }
+
+      // 检查属性是否被SPU使用（Mock数据中暂时跳过此检查）
+      // 在实际实现中，需要检查 SPU 是否使用了该属性
+
+      const now = new Date().toISOString()
+      const updatedTemplate: CategoryAttributeTemplate = {
+        ...template,
+        attributes: template.attributes.filter(attr => attr.id !== attributeId),
+        updatedAt: now,
+      }
+
+      this.templates.set(categoryId, updatedTemplate)
+
+      return {
+        success: true,
+        data: updatedTemplate,
+        message: '删除成功',
+        code: 200,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        data: null as any,
+        message: error instanceof Error ? error.message : '删除失败',
+        code: 500,
+      }
+    }
+  }
+}
+
+// 创建类目属性模板服务实例
+export const categoryAttributeTemplateService = new CategoryAttributeTemplateService()

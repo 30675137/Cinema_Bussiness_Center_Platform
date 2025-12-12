@@ -78,7 +78,7 @@
 
 1. **Given** 用户在查看类目详情，**When** 滚动到属性模板配置区域，**Then** 用户能够看到该类目已配置的属性列表表格，包括属性名称、属性类型、是否必填、可选值、排序、操作列
 2. **Given** 用户在属性模板配置区域，**When** 点击「新增属性」按钮，**Then** 系统弹出属性配置弹窗，显示属性名称、属性类型（文本/数字/单选/多选）、是否必填、可选值等字段
-3. **Given** 用户填写属性信息，**When** 选择属性类型为单选或多选，**Then** 系统显示可选值输入框，支持多行输入或 Tag 输入方式
+3. **Given** 用户填写属性信息，**When** 选择属性类型为单选或多选，**Then** 系统显示可选值输入框（TextArea），支持多行输入，每行输入一个可选值，系统按换行符分割处理
 4. **Given** 用户提交新增属性表单，**When** 属性名称已填写，**Then** 系统保存属性配置，关闭弹窗并刷新属性列表，新属性显示在列表中
 5. **Given** 用户在属性列表中，**When** 点击某个属性的「编辑」按钮，**Then** 系统弹出属性配置弹窗并带入该属性的原有数据，用户可以修改属性信息
 6. **Given** 用户尝试删除属性，**When** 该属性已被 SPU 使用，**Then** 系统禁止删除操作，显示提示："该属性已被 SPU 使用，删除将影响已有 SPU，请通过运维流程处理。"
@@ -86,32 +86,26 @@
 
 ---
 
-### User Story 5 - 权限控制与只读模式 (Priority: P2)
+### User Story 5 - 权限控制与只读模式 (Priority: P2) **[Out of Scope]**
 
-系统需要根据用户角色控制类目管理功能的可见性和可操作性，确保只有授权用户能够修改类目数据，其他用户只能浏览。
+**Status**: 根据澄清要求，权限控制功能不在本次实现范围内。所有功能对所有用户开放，不进行权限区分。
 
-**Why this priority**: 权限控制是数据安全的基础保障，虽然不影响核心功能使用，但对于保护主数据完整性和防止误操作至关重要。
-
-**Independent Test**: 可以通过验证不同角色的用户看到不同的操作按钮和功能，测试权限控制的准确性和一致性。
-
-**Acceptance Scenarios**:
-
-1. **Given** 用户具有"主数据管理员"或"商品管理员"角色，**When** 访问类目管理页面，**Then** 用户能够看到「新增类目」「编辑」「删除」「属性模板编辑」等所有操作按钮
-2. **Given** 用户具有其他角色（非管理员），**When** 访问类目管理页面，**Then** 用户只能看到类目树和右侧详情区域，所有操作按钮隐藏，所有信息为只读模式
-3. **Given** 非管理员用户在查看类目详情，**When** 尝试编辑类目信息，**Then** 系统不显示编辑按钮，基本信息表单始终处于只读状态
-4. **Given** 非管理员用户在查看属性模板配置，**When** 查看属性列表，**Then** 系统不显示「新增属性」按钮和属性行的「编辑」「删除」操作按钮
+**Note**: 如果未来需要实现权限控制，可以参考以下原始需求：
+- 系统需要根据用户角色控制类目管理功能的可见性和可操作性
+- 主数据管理员/商品管理员可以看到所有操作按钮
+- 其他角色用户只能看到只读信息
 
 ---
 
 ### Edge Cases
 
-- 当类目树数据量很大（超过 1000 个节点）时，系统如何保证树结构的加载和渲染性能？
-- 当用户同时编辑多个类目时，系统如何处理并发修改冲突？
-- 当类目被删除后，历史 SPU 数据中的类目引用如何处理？
+- 当类目树数据量很大（超过 1000 个节点）时，系统如何保证树结构的加载和渲染性能？**Frontend Implementation**: Uses Ant Design Tree with virtual scrolling and lazy loading to optimize rendering performance. Only visible nodes are rendered, and child nodes are loaded on-demand when parent nodes are expanded.
+- 当用户同时编辑多个类目时，系统如何处理并发修改冲突？**Clarification**: 采用"最后保存者获胜"（Last Write Wins）策略，后保存的修改会覆盖先保存的修改，无需复杂的冲突检测机制。这符合纯前端 Mock 数据场景，实现简单且满足开发测试需求。
+- 当类目被删除后，历史 SPU 数据中的类目引用如何处理？**Clarification**: 保留引用但标记为已删除。SPU 中的 categoryId 字段保留不变，但在 SPU 显示时标记"类目已删除"，确保历史数据完整性。这符合纯前端 Mock 数据场景，实现简单且满足数据追溯需求。
 - 当属性模板中的可选值列表很长（超过 100 项）时，系统如何优化展示和选择体验？
 - 当用户搜索类目时，如果匹配结果分布在多个分支中，系统如何高效地展开所有相关路径？
-- 当类目编码规则发生变化时，系统如何处理已有类目的编码兼容性？
-- 当属性模板配置错误导致 SPU 创建失败时，系统如何提供清晰的错误提示和修复建议？
+- 当类目编码规则发生变化时，系统如何处理已有类目的编码兼容性？**Clarification**: 保持现有编码不变。已有类目的编码保持不变，新创建的类目使用新的编码规则。这符合纯前端 Mock 数据场景，避免数据迁移复杂度，保持历史数据一致性。
+- 当属性模板配置错误导致 SPU 创建失败时，系统如何提供清晰的错误提示和修复建议？**Clarification**: 表单验证 + 错误消息。在属性模板配置时进行验证，错误时显示 Ant Design Message，提示具体错误字段（如"属性名称不能为空"、"单选类型必须提供可选值"等）。这符合项目技术栈，实现简单且错误信息清晰。
 - 当用户尝试将类目从启用状态切换为停用时，如果该类目下存在大量活跃 SPU，系统是否需要额外的确认步骤？
 
 ## Requirements *(mandatory)*
@@ -124,12 +118,12 @@
 - **FR-004**: System MUST support searching categories by name and automatically expand matching paths in the tree
 - **FR-005**: System MUST allow authorized users (Master Data Administrator / Product Administrator) to create new categories at any level
 - **FR-006**: System MUST automatically determine category level based on parent category when creating sub-categories
-- **FR-007**: System MUST validate that category name is required and cannot be empty
+- **FR-007**: System MUST validate that category name is required and cannot be empty. **Frontend Implementation**: Form validation uses Ant Design Form validation rules, with error messages displayed via Ant Design Message/Notification components for user feedback.
 - **FR-008**: System MUST allow authorized users to edit category basic information (name, sort order, status)
 - **FR-009**: System MUST prevent editing of read-only fields (category level, parent category path, category code)
 - **FR-010**: System MUST allow authorized users to enable or disable categories
 - **FR-011**: System MUST display a confirmation dialog before disabling a category, explaining the impact on new SPU creation
-- **FR-012**: System MUST prevent deletion of categories that are being used by existing SPUs
+- **FR-012**: System MUST prevent deletion of categories that are being used by existing SPUs. **Frontend Implementation**: Deletion checks query mock SPU data to verify categoryId references before allowing deletion.
 - **FR-013**: System MUST display a tooltip explaining why deletion is disabled when a category is in use
 - **FR-014**: System MUST allow deletion of categories that are not referenced by any SPU
 - **FR-015**: System MUST support configuring attribute templates for each category
@@ -139,9 +133,9 @@
 - **FR-019**: System MUST allow configuring optional values for single-select and multi-select attribute types
 - **FR-020**: System MUST allow marking attributes as required or optional
 - **FR-021**: System MUST prevent deletion of attributes that are being used by existing SPUs
-- **FR-022**: System MUST display appropriate error messages when attempting to delete attributes in use
-- **FR-023**: System MUST restrict category management operations (create, edit, delete, attribute template configuration) to authorized roles only
-- **FR-024**: System MUST display category management interface in read-only mode for non-administrator users
+- **FR-022**: System MUST display appropriate error messages when attempting to delete attributes in use. **Frontend Implementation**: Error messages are displayed using Ant Design Message (for transient notifications) and Notification (for persistent alerts), with form validation errors shown inline using Ant Design Form validation.
+- **FR-023**: ~~System MUST restrict category management operations (create, edit, delete, attribute template configuration) to authorized roles only~~ **[Out of Scope]**: 权限控制功能不在本次实现范围内
+- **FR-024**: ~~System MUST display category management interface in read-only mode for non-administrator users~~ **[Out of Scope]**: 权限控制功能不在本次实现范围内
 - **FR-025**: System MUST refresh the category tree and automatically select newly created categories after successful creation
 - **FR-026**: System MUST validate sort order as numeric when provided
 - **FR-027**: System MUST display category status (enabled/disabled) using visual indicators (Tag/Badge) in the category tree
@@ -167,11 +161,26 @@
 - **SC-003**: Authorized users can edit and save category information in under 1 minute
 - **SC-004**: System prevents 100% of deletion attempts on categories that are in use by SPUs
 - **SC-005**: Users can configure a complete attribute template (5 attributes) for a category in under 5 minutes
-- **SC-006**: Category tree loads and displays initial structure (up to 500 nodes) within 3 seconds
-- **SC-007**: Category search returns results and expands matching paths within 2 seconds for trees with up to 1000 nodes
+- **SC-006**: Category tree loads and displays initial structure (up to 500 nodes) within 3 seconds. **Frontend Implementation**: Uses Ant Design Tree with virtual scrolling and lazy loading to optimize performance for large tree structures.
+- **SC-007**: Category search returns results and expands matching paths within 2 seconds for trees with up to 1000 nodes. **Frontend Implementation**: Virtual scrolling and lazy loading ensure efficient rendering even with large node counts.
 - **SC-008**: 95% of authorized users successfully complete category creation on first attempt without errors
 - **SC-009**: System maintains data integrity with zero unauthorized deletions of categories in use
 - **SC-010**: Attribute template configuration reduces SPU creation data errors by at least 30% compared to free-form input
+
+## Clarifications
+
+### Session 2025-01-27
+
+- Q: 数据持久化策略（纯前端实现） → A: localStorage + 内存（刷新后保留，适合开发测试）
+- Q: 用户角色/权限信息来源（纯前端实现） → A: 前端Mock用户角色（固定角色或可切换，用于演示）
+- Q: SPU使用检查的实现方式（纯前端实现） → A: 前端Mock SPU数据，检查SPU的categoryId引用
+- Q: 错误处理和用户反馈机制（纯前端实现） → A: Ant Design Message/Notification + 表单验证（符合项目技术栈）
+- Q: 类目树性能优化策略（支持1000个节点） → A: Ant Design Tree虚拟滚动 + 懒加载（符合项目技术栈）
+- Q: 并发编辑冲突处理方式 → A: 最后保存者获胜（Last Write Wins）- 后保存的覆盖先保存的，无需冲突检测
+- Q: 删除类目后历史 SPU 数据引用处理 → A: 保留引用但标记为已删除 - SPU 中的 categoryId 保留，但显示时标记"类目已删除"
+- Q: 属性可选值输入格式 → A: 多行文本输入 - 使用 TextArea，每行输入一个可选值，按换行符分割
+- Q: 类目编码规则变化时的兼容性处理 → A: 保持现有编码不变 - 已有类目编码保持不变，新创建的类目使用新规则
+- Q: 属性模板配置错误时的错误提示 → A: 表单验证 + 错误消息 - 在属性模板配置时进行验证，错误时显示 Ant Design Message，提示具体错误字段
 
 ## Assumptions
 
@@ -179,21 +188,23 @@
 - Category hierarchy is limited to three levels (Level 1, Level 2, Level 3) and does not support deeper nesting
 - Category status changes (enable/disable) only affect new SPU creation, existing SPUs retain their category references
 - Attribute templates are optional - categories can exist without attribute templates
-- Attribute optional values for select types are stored as text lists, with comma or line-break separation
-- User roles and permissions are managed by a separate authorization system
+- Attribute optional values for select types are stored as text lists, with line-break separation (each line represents one option value). **Frontend Implementation**: Uses Ant Design TextArea component for input, with each line representing one optional value, parsed by splitting on newline characters.
+- User roles and permissions are managed by a separate authorization system. **Frontend Implementation**: User roles are mocked in the frontend (fixed role or switchable for demonstration purposes). The system supports role-based UI rendering without requiring backend authentication.
 - SPU management system is aware of category attribute templates and can apply them during SPU creation
 - Category tree supports up to 1000 nodes without significant performance degradation
 - Category deletion is a permanent operation with no soft-delete or recovery mechanism
 - All category operations are logged for audit purposes (implementation detail, not in spec)
+- **Frontend Data Persistence**: Category data is persisted using localStorage (for cross-session persistence) combined with in-memory state (for runtime performance). MSW handles API mocking, and data changes are automatically synced to localStorage to maintain state across page refreshes.
 
 ## Dependencies
 
-- **SPU Management System**: Category management serves as master data for SPU creation. The SPU system must be able to query categories, check category status, and apply attribute templates during SPU creation.
-- **User Authentication and Authorization System**: Category management requires role-based access control. The system must provide user role information (Master Data Administrator, Product Administrator, etc.) to determine operation permissions.
-- **Data Persistence Layer**: Category data, attribute templates, and their relationships must be persisted. The system must support hierarchical queries and efficient tree structure retrieval.
+- **SPU Management System**: Category management serves as master data for SPU creation. The SPU system must be able to query categories, check category status, and apply attribute templates during SPU creation. **Frontend Implementation**: SPU data is mocked in the frontend. Category deletion checks query mock SPU data to verify if any SPU references the category via categoryId before allowing deletion.
+- **User Authentication and Authorization System**: Category management requires role-based access control. The system must provide user role information (Master Data Administrator, Product Administrator, etc.) to determine operation permissions. **Frontend Implementation**: User roles are mocked in the frontend application, allowing role-based UI rendering and permission checks without backend integration.
+- **Data Persistence Layer**: Category data, attribute templates, and their relationships must be persisted. **Frontend Implementation**: Data persistence uses localStorage for cross-session persistence combined with in-memory state for runtime performance. MSW (Mock Service Worker) handles API mocking, and localStorage syncs data changes to maintain state across page refreshes.
 
 ## Out of Scope
 
+- **Permission Control and Role-Based Access Control**: 权限控制和基于角色的访问控制功能不在本次实现范围内。所有功能对所有用户开放，不进行权限区分。
 - Category import/export functionality (bulk operations)
 - Category versioning or history tracking
 - Category approval workflows

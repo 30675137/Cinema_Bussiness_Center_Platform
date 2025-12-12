@@ -1,7 +1,7 @@
 # 实现任务：类目管理功能
 
 **分支**: `007-category-management` | **日期**: 2025-01-27 | **规格**: [spec.md](./spec.md)
-**总任务数**: 67 | **已完成**: 0 (0%) | **预估时长**: 4-6周
+**总任务数**: 107 | **已完成**: 89 (83%) | **预估时长**: 4-6周
 **实施策略**: MVP优先，增量交付
 
 ## 用户故事优先级
@@ -35,13 +35,13 @@
 
 ### 设置阶段任务
 
-- [ ] T001 验证frontend/目录项目结构符合实施计划
-- [ ] T002 验证package.json包含所需依赖（React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4）
-- [ ] T003 [P] 验证TypeScript配置（tsconfig.json）启用严格模式
-- [ ] T004 [P] 验证Vite构建工具（vite.config.ts）配置正确
-- [ ] T005 [P] 验证ESLint和Prettier配置进行代码格式化
-- [ ] T006 验证MSW（Mock Service Worker）已配置用于API模拟
-- [ ] T007 验证测试环境（Vitest + React Testing Library + Playwright）已设置
+- [X] T001 验证frontend/目录项目结构符合实施计划
+- [X] T002 验证package.json包含所需依赖（React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4）
+- [X] T003 [P] 验证TypeScript配置（tsconfig.json）启用严格模式
+- [X] T004 [P] 验证Vite构建工具（vite.config.ts）配置正确
+- [X] T005 [P] 验证ESLint和Prettier配置进行代码格式化
+- [X] T006 验证MSW（Mock Service Worker）已配置用于API模拟
+- [X] T007 验证测试环境（Vitest + React Testing Library + Playwright）已设置
 
 ---
 
@@ -53,19 +53,19 @@
 
 ### 基础阶段任务
 
-- [ ] T008 [P] 完善Category类型定义在frontend/src/types/category.ts（基于data-model.md）
-- [ ] T009 [P] 完善CategoryTree类型定义在frontend/src/types/category.ts
-- [ ] T010 [P] 完善AttributeTemplate和CategoryAttribute类型定义在frontend/src/types/category.ts
-- [ ] T011 [P] 创建CreateCategoryRequest和UpdateCategoryRequest类型在frontend/src/types/category.ts
-- [ ] T012 [P] 在frontend/src/services/queryKeys.ts中添加categoryKeys查询键工厂
-- [ ] T013 [P] 在frontend/src/stores/categoryStore.ts中创建Zustand Store管理UI状态（expandedKeys, selectedCategoryId, searchKeyword, isEditing）
-- [ ] T014 [P] 在frontend/src/mocks/data/categoryMockData.ts中实现类目Mock数据生成器（支持三级类目结构）
-- [ ] T015 [P] 在frontend/src/mocks/handlers/categoryHandlers.ts中创建类目API端点的MSW处理器
-- [ ] T016 [P] 在frontend/src/services/categoryService.ts中增强getCategoryTree方法支持懒加载
-- [ ] T017 [P] 在frontend/src/services/categoryService.ts中增强getCategoryDetail方法
-- [ ] T018 [P] 在frontend/src/services/categoryService.ts中添加getCategoryChildren方法（懒加载）
-- [ ] T019 [P] 在frontend/src/services/categoryService.ts中添加searchCategories方法
-- [ ] T020 [P] 在frontend/src/services/attributeService.ts中实现属性模板相关API服务方法
+- [X] T008 [P] 完善Category类型定义在frontend/src/types/category.ts（基于data-model.md）
+- [X] T009 [P] 完善CategoryTree类型定义在frontend/src/types/category.ts
+- [X] T010 [P] 完善AttributeTemplate和CategoryAttribute类型定义在frontend/src/types/category.ts
+- [X] T011 [P] 创建CreateCategoryRequest和UpdateCategoryRequest类型在frontend/src/types/category.ts
+- [X] T012 [P] 在frontend/src/services/queryKeys.ts中添加categoryKeys查询键工厂
+- [X] T013 [P] 在frontend/src/stores/categoryStore.ts中创建Zustand Store管理UI状态（expandedKeys, selectedCategoryId, searchKeyword, isEditing）
+- [X] T014 [P] 在frontend/src/mocks/data/categoryMockData.ts中实现类目Mock数据生成器（支持三级类目结构）
+- [X] T015 [P] 在frontend/src/mocks/handlers/categoryHandlers.ts中创建类目API端点的MSW处理器
+- [X] T016 [P] 在frontend/src/services/categoryService.ts中增强getCategoryTree方法支持懒加载
+- [X] T017 [P] 在frontend/src/services/categoryService.ts中增强getCategoryDetail方法
+- [X] T018 [P] 在frontend/src/services/categoryService.ts中添加getCategoryChildren方法（懒加载）
+- [X] T019 [P] 在frontend/src/services/categoryService.ts中添加searchCategories方法
+- [X] T020 [P] 在frontend/src/services/attributeService.ts中实现属性模板相关API服务方法
 
 **检查点**: 基础任务完成 - 用户故事实现可以开始并行进行
 
@@ -83,21 +83,21 @@
 
 ### US1实现任务
 
-- [ ] T021 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryTreeQuery Hook
-- [ ] T022 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryDetailQuery Hook
-- [ ] T023 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryChildrenQuery Hook（懒加载）
-- [ ] T024 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategorySearchQuery Hook
-- [ ] T025 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现类目树组件（使用Ant Design Tree，启用虚拟滚动）
-- [ ] T026 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现树节点展开/收起功能
-- [ ] T027 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现节点选择功能（与Zustand Store集成）
-- [ ] T028 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现懒加载功能（loadData）
-- [ ] T029 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现搜索功能（自动展开匹配路径并高亮）
-- [ ] T030 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中创建类目详情组件
-- [ ] T031 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中实现基本信息展示（名称、等级、路径、编码、排序、状态）
-- [ ] T032 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中实现状态显示（使用Tag/Badge标记启用/停用）
-- [ ] T033 [US1] 在frontend/src/pages/CategoryManagement/index.tsx中集成CategoryTree和CategoryDetail组件（左右分栏布局）
-- [ ] T034 [US1] 在frontend/src/pages/CategoryManagement/index.tsx中实现搜索框功能
-- [ ] T035 [US1] 验证类目树浏览和详情查看功能正常工作
+- [X] T021 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryTreeQuery Hook
+- [X] T022 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryDetailQuery Hook
+- [X] T023 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategoryChildrenQuery Hook（懒加载）
+- [X] T024 [P] [US1] 在frontend/src/hooks/api/useCategoryQuery.ts中创建useCategorySearchQuery Hook
+- [X] T025 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现类目树组件（使用Ant Design Tree，启用虚拟滚动）
+- [X] T026 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现树节点展开/收起功能
+- [X] T027 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现节点选择功能（与Zustand Store集成）
+- [X] T028 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现懒加载功能（loadData）
+- [X] T029 [US1] 在frontend/src/components/Category/CategoryTree.tsx中实现搜索功能（自动展开匹配路径并高亮）
+- [X] T030 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中创建类目详情组件
+- [X] T031 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中实现基本信息展示（名称、等级、路径、编码、排序、状态）
+- [X] T032 [US1] 在frontend/src/components/Category/CategoryDetail.tsx中实现状态显示（使用Tag/Badge标记启用/停用）
+- [X] T033 [US1] 在frontend/src/pages/CategoryManagement/index.tsx中集成CategoryTree和CategoryDetail组件（左右分栏布局）
+- [X] T034 [US1] 在frontend/src/pages/CategoryManagement/index.tsx中实现搜索框功能（已在CategoryTree组件中实现）
+- [X] T035 [US1] 验证类目树浏览和详情查看功能正常工作
 
 **检查点**: 此时，用户故事1应该完全功能正常且可独立测试
 
@@ -115,22 +115,22 @@
 
 ### US2实现任务
 
-- [ ] T036 [P] [US2] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useCreateCategoryMutation Hook
-- [ ] T037 [P] [US2] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useUpdateCategoryMutation Hook
-- [ ] T038 [US2] 在frontend/src/components/Category/CategoryForm.tsx中创建类目表单组件
-- [ ] T039 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现表单字段（名称、描述、排序序号、状态）
-- [ ] T040 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现表单验证（类目名称必填、排序序号为数字）
-- [ ] T041 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现只读字段显示（类目等级、上级类目路径、类目编码）
-- [ ] T042 [US2] 在frontend/src/services/categoryService.ts中实现createCategory方法
-- [ ] T043 [US2] 在frontend/src/services/categoryService.ts中实现updateCategory方法
-- [ ] T044 [US2] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加POST /api/categories处理器
-- [ ] T045 [US2] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加PUT /api/categories/:id处理器
+- [X] T036 [P] [US2] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useCreateCategoryMutation Hook
+- [X] T037 [P] [US2] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useUpdateCategoryMutation Hook
+- [X] T038 [US2] 在frontend/src/components/Category/CategoryForm.tsx中创建类目表单组件
+- [X] T039 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现表单字段（名称、描述、排序序号、状态）
+- [X] T040 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现表单验证（类目名称必填、排序序号为数字）
+- [X] T041 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现只读字段显示（类目等级、上级类目路径、类目编码）
+- [X] T042 [US2] 在frontend/src/services/categoryService.ts中实现createCategory方法
+- [X] T043 [US2] 在frontend/src/services/categoryService.ts中实现updateCategory方法
+- [X] T044 [US2] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加POST /api/categories处理器
+- [X] T045 [US2] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加PUT /api/categories/:id处理器
 - [ ] T046 [US2] 在frontend/src/components/Category/CategoryDetail.tsx中添加「编辑」按钮（仅管理员可见）
 - [ ] T047 [US2] 在frontend/src/components/Category/CategoryDetail.tsx中实现编辑模式切换功能
-- [ ] T048 [US2] 在frontend/src/pages/CategoryManagement/index.tsx中添加「新增一级类目」按钮
-- [ ] T049 [US2] 在frontend/src/components/Category/CategoryTree.tsx中实现右键菜单「新增子类目」功能
-- [ ] T050 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现创建成功后自动刷新树并选中新节点
-- [ ] T051 [US2] 验证类目创建和编辑功能正常工作
+- [X] T048 [US2] 在frontend/src/pages/CategoryManagement/index.tsx中添加「新增一级类目」按钮
+- [X] T049 [US2] 在frontend/src/components/Category/CategoryTree.tsx中实现右键菜单「新增子类目」功能
+- [X] T050 [US2] 在frontend/src/components/Category/CategoryForm.tsx中实现创建成功后自动刷新树并选中新节点
+- [X] T051 [US2] 验证类目创建和编辑功能正常工作
 
 **检查点**: 此时，用户故事1和2应该都能独立工作
 
@@ -148,18 +148,18 @@
 
 ### US3实现任务
 
-- [ ] T052 [P] [US3] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useUpdateCategoryStatusMutation Hook
-- [ ] T053 [P] [US3] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useDeleteCategoryMutation Hook
-- [ ] T054 [US3] 在frontend/src/services/categoryService.ts中实现updateCategoryStatus方法
-- [ ] T055 [US3] 在frontend/src/services/categoryService.ts中实现deleteCategory方法（包含spuCount检查）
-- [ ] T056 [US3] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加PUT /api/categories/:id/status处理器
-- [ ] T057 [US3] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加DELETE /api/categories/:id处理器（包含删除约束逻辑）
-- [ ] T058 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现「启用/停用」按钮
-- [ ] T059 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现停用确认对话框（显示影响说明）
-- [ ] T060 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现「删除」按钮（仅管理员可见）
-- [ ] T061 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现删除按钮禁用逻辑（spuCount > 0时禁用并显示Tooltip）
-- [ ] T062 [US3] 在frontend/src/components/Category/CategoryTree.tsx中实现状态显示（使用Tag/Badge标记）
-- [ ] T063 [US3] 验证类目状态管理和删除控制功能正常工作
+- [X] T052 [P] [US3] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useUpdateCategoryStatusMutation Hook
+- [X] T053 [P] [US3] 在frontend/src/hooks/api/useCategoryMutation.ts中创建useDeleteCategoryMutation Hook
+- [X] T054 [US3] 在frontend/src/services/categoryService.ts中实现updateCategoryStatus方法
+- [X] T055 [US3] 在frontend/src/services/categoryService.ts中实现deleteCategory方法（包含spuCount检查）
+- [X] T056 [US3] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加PUT /api/categories/:id/status处理器
+- [X] T057 [US3] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加DELETE /api/categories/:id处理器（包含删除约束逻辑）
+- [X] T058 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现「启用/停用」按钮
+- [X] T059 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现停用确认对话框（显示影响说明）
+- [X] T060 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现「删除」按钮（仅管理员可见）
+- [X] T061 [US3] 在frontend/src/components/Category/CategoryDetail.tsx中实现删除按钮禁用逻辑（spuCount > 0时禁用并显示Tooltip）
+- [X] T062 [US3] 在frontend/src/components/Category/CategoryTree.tsx中实现状态显示（使用Tag/Badge标记）
+- [X] T063 [US3] 验证类目状态管理和删除控制功能正常工作
 
 **检查点**: 此时，用户故事1、2和3应该都能独立工作
 
@@ -177,28 +177,28 @@
 
 ### US4实现任务
 
-- [ ] T064 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useAttributeTemplateQuery Hook
-- [ ] T065 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useSaveAttributeTemplateMutation Hook
-- [ ] T066 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useAddAttributeMutation Hook
-- [ ] T067 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useUpdateAttributeMutation Hook
-- [ ] T068 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useDeleteAttributeMutation Hook
-- [ ] T069 [US4] 在frontend/src/services/attributeService.ts中实现getAttributeTemplate方法
-- [ ] T070 [US4] 在frontend/src/services/attributeService.ts中实现saveAttributeTemplate方法
-- [ ] T071 [US4] 在frontend/src/services/attributeService.ts中实现addAttribute、updateAttribute、deleteAttribute方法
-- [ ] T072 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加GET /api/attribute-templates/:categoryId处理器
-- [ ] T073 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加POST /api/attribute-templates/:categoryId处理器
-- [ ] T074 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加属性CRUD处理器
-- [ ] T075 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中创建属性模板配置面板组件
-- [ ] T076 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性列表表格展示
-- [ ] T077 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中创建属性表单组件
-- [ ] T078 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现属性类型选择（文本/数字/单选/多选）
-- [ ] T079 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现可选值输入（单选/多选类型时显示）
-- [ ] T080 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现表单验证（属性名称必填）
-- [ ] T081 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现「新增属性」按钮和弹窗
-- [ ] T082 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性编辑功能
-- [ ] T083 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性删除功能（包含使用检查）
-- [ ] T084 [US4] 在frontend/src/pages/CategoryManagement/index.tsx中集成AttributeTemplatePanel组件
-- [ ] T085 [US4] 验证属性模板配置功能正常工作
+- [X] T064 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useAttributeTemplateQuery Hook
+- [X] T065 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useSaveAttributeTemplateMutation Hook
+- [X] T066 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useAddAttributeMutation Hook
+- [X] T067 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useUpdateAttributeMutation Hook
+- [X] T068 [P] [US4] 在frontend/src/hooks/api/useAttributeTemplateQuery.ts中创建useDeleteAttributeMutation Hook
+- [X] T069 [US4] 在frontend/src/services/attributeService.ts中实现getAttributeTemplate方法
+- [X] T070 [US4] 在frontend/src/services/attributeService.ts中实现saveAttributeTemplate方法
+- [X] T071 [US4] 在frontend/src/services/attributeService.ts中实现addAttribute、updateAttribute、deleteAttribute方法
+- [X] T072 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加GET /api/attribute-templates/:categoryId处理器
+- [X] T073 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加POST /api/attribute-templates/:categoryId处理器
+- [X] T074 [US4] 在frontend/src/mocks/handlers/categoryHandlers.ts中添加属性CRUD处理器
+- [X] T075 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中创建属性模板配置面板组件
+- [X] T076 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性列表表格展示
+- [X] T077 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中创建属性表单组件
+- [X] T078 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现属性类型选择（文本/数字/单选/多选）
+- [X] T079 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现可选值输入（单选/多选类型时显示）
+- [X] T080 [US4] 在frontend/src/components/Attribute/AttributeForm.tsx中实现表单验证（属性名称必填）
+- [X] T081 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现「新增属性」按钮和弹窗
+- [X] T082 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性编辑功能
+- [X] T083 [US4] 在frontend/src/components/Category/AttributeTemplatePanel.tsx中实现属性删除功能（包含使用检查）
+- [X] T084 [US4] 在frontend/src/pages/CategoryManagement/index.tsx中集成AttributeTemplatePanel组件
+- [X] T085 [US4] 验证属性模板配置功能正常工作
 
 **检查点**: 此时，用户故事1、2、3和4应该都能独立工作
 
@@ -236,11 +236,11 @@
 
 ### 完善阶段任务
 
-- [ ] T096 [P] 优化类目树渲染性能（虚拟滚动、懒加载、防抖搜索）
-- [ ] T097 [P] 添加错误处理和用户友好的错误提示
-- [ ] T098 [P] 添加加载状态指示器
-- [ ] T099 [P] 实现乐观更新提升用户体验
-- [ ] T100 [P] 添加表单验证错误提示
+- [X] T096 [P] 优化类目树渲染性能（虚拟滚动、懒加载、防抖搜索）
+- [X] T097 [P] 添加错误处理和用户友好的错误提示
+- [X] T098 [P] 添加加载状态指示器
+- [X] T099 [P] 实现乐观更新提升用户体验（已通过 TanStack Query 的 setQueryData 和 invalidateQueries 实现）
+- [X] T100 [P] 添加表单验证错误提示（已通过 Ant Design Form rules 实现）
 - [ ] T101 [P] 优化移动端响应式布局
 - [ ] T102 [P] 添加无障碍访问支持（ARIA标签、键盘导航）
 - [ ] T103 [P] 更新文档（README.md、API文档）

@@ -410,6 +410,45 @@ export const skuKeys = new (class extends QueryKeyFactory {
 })();
 
 /**
+ * 类目查询键
+ */
+export const categoryKeys = new (class extends QueryKeyFactory {
+  constructor() {
+    super('categories');
+  }
+
+  // 类目树
+  tree() {
+    return this.custom('tree');
+  }
+
+  // 类目详情
+  detail(id: string | number) {
+    return super.detail(id);
+  }
+
+  // 类目子节点（懒加载）
+  children(parentId: string) {
+    return this.custom('children', parentId);
+  }
+
+  // 类目搜索
+  search(keyword: string) {
+    return super.search(keyword);
+  }
+
+  // 类目列表
+  list(params?: Record<string, any>) {
+    return super.list(params);
+  }
+
+  // 属性模板
+  attributeTemplates(categoryId: string) {
+    return this.custom('attribute-templates', categoryId);
+  }
+})();
+
+/**
  * 查询键管理器
  */
 export const queryKeysManager = {
@@ -529,6 +568,7 @@ export default {
   uploadKeys,
   reportKeys,
   skuKeys,
+  categoryKeys,
   queryKeysManager,
   queryKeysUtils,
 };

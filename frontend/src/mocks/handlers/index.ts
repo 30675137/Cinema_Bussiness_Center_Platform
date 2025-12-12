@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { generateMockSPUList, generateMockCategories, generateMockBrands } from '../data/generators'
+import { categoryHandlers } from './categoryHandlers'
 
 // 基础API延迟模拟
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -147,8 +148,8 @@ export const spuHandlers = [
   })
 ]
 
-// 分类相关API处理器
-export const categoryHandlers = [
+// 分类相关API处理器（旧版，保留兼容性）
+export const legacyCategoryHandlers = [
   http.get('/api/category/list', async () => {
     await delay(300)
     const categories = generateMockCategories()
@@ -176,7 +177,8 @@ export const brandHandlers = [
 // 导出所有处理器
 export const handlers = [
   ...spuHandlers,
-  ...categoryHandlers,
+  ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
+  ...legacyCategoryHandlers, // 旧版兼容处理器
   ...brandHandlers
 ]
 
