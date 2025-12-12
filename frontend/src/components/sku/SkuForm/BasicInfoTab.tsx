@@ -4,10 +4,11 @@
  */
 import React, { useEffect } from 'react';
 import { Form, Input, Select } from 'antd';
-import { Controller, Control, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { SPU } from '@/types/sku';
+import { Controller } from 'react-hook-form';
+import type { Control, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import type { SPU } from '@/types/sku';
 import { useSpusQuery } from '@/hooks/useSku';
-import { SkuFormValues } from './schema';
+import type { SkuFormValues } from './schema';
 
 const { Option } = Select;
 

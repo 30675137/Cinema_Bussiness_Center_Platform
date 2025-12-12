@@ -5,10 +5,11 @@
 import React from 'react';
 import { Form, Select, Input, InputNumber, Button, Space, Switch } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { Controller, Control, FieldErrors, UseFormSetValue, UseFormWatch, useFieldArray } from 'react-hook-form';
+import { Controller, useFieldArray } from 'react-hook-form';
+import type { Control, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { useUnitsQuery, useCheckBarcodeMutation } from '@/hooks/useSku';
 import { validateBarcodeFormat, validateConversionRate } from '@/utils/skuHelpers';
-import { SkuFormValues } from './schema';
+import type { SkuFormValues } from './schema';
 
 const { Option } = Select;
 

@@ -11,7 +11,8 @@ import {
   StopOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { SKU, SkuStatus } from '@/types/sku';
+import type { SKU } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import {
   getSkuStatusText,
   getSkuStatusColor,

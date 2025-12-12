@@ -4,9 +4,10 @@
  */
 import React from 'react';
 import { Form, Switch, InputNumber, Radio } from 'antd';
-import { Controller, Control, FieldErrors } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
+import type { Control, FieldErrors } from 'react-hook-form';
 import { SkuStatus } from '@/types/sku';
-import { SkuFormValues } from './schema';
+import type { SkuFormValues } from './schema';
 
 interface OtherConfigTabProps {
   control: Control<SkuFormValues>;

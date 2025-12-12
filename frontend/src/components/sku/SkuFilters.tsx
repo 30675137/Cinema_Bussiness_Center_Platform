@@ -5,7 +5,8 @@
 import React, { useEffect } from 'react';
 import { Form, Input, Select, Button, Space, Card } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import { SkuQueryParams, SkuStatus } from '@/types/sku';
+import type { SkuQueryParams } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSpusQuery } from '@/hooks/useSku';
 import { useResponsive } from '@/hooks/useResponsive';

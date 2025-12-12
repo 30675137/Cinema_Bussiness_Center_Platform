@@ -19,7 +19,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showError, showSuccess } from '@/utils/errorHandler';
-import { SkuFormData, SKU, SkuStatus } from '@/types/sku';
+import type { SkuFormData, SKU } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import {
   useCreateSkuMutation,
@@ -507,7 +508,7 @@ export const SkuForm: React.FC<SkuFormProps> = ({
         showError(error, errorMessage);
       }
     }
-  }, [mode, skuId, spus, checkBarcodeMutation, createMutation, updateMutation, reset, closeFormDrawer, onClose, onSuccess, scrollToField]);
+  }, [mode, skuId, spus, createMutation, updateMutation, reset, closeFormDrawer, onClose, onSuccess, scrollToField]);
 
   // 处理保存（直接提交）
   const handleSave = useCallback(async () => {
