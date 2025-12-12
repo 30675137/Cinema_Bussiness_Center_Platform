@@ -457,7 +457,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   // 渲染面包屑
   const renderBreadcrumb = () => {
-    if (breadcrumbs.length === 0) return null;
+    // 安全检查：确保 breadcrumbs 存在且是数组
+    if (!breadcrumbs || !Array.isArray(breadcrumbs) || breadcrumbs.length === 0) {
+      return null;
+    }
 
     return (
       <Breadcrumb

@@ -35,9 +35,19 @@ export class QueryKeyFactory {
    * 列表查询键
    */
   list(params?: Record<string, any>): string[] {
-    return params
-      ? [...this.base(), 'list', JSON.stringify(params)]
-      : [...this.base(), 'list'];
+    if (params && typeof params === 'object') {
+      // 清理 undefined 和 null 值
+      const cleanParams = Object.keys(params).reduce((result, key) => {
+        if (params[key] !== undefined && params[key] !== null) {
+          result[key] = params[key];
+        }
+        return result;
+      }, {} as Record<string, any>);
+      if (Object.keys(cleanParams).length > 0) {
+        return [...this.base(), 'list', JSON.stringify(cleanParams)];
+      }
+    }
+    return [...this.base(), 'list'];
   }
 
   /**
@@ -45,8 +55,17 @@ export class QueryKeyFactory {
    */
   paginated(page: number, pageSize: number, filters?: Record<string, any>): string[] {
     const key = [...this.base(), 'paginated', page, pageSize];
-    if (filters) {
-      key.push(JSON.stringify(filters));
+    if (filters && typeof filters === 'object') {
+      // 清理 undefined 和 null 值
+      const cleanFilters = Object.keys(filters).reduce((result, key) => {
+        if (filters[key] !== undefined && filters[key] !== null) {
+          result[key] = filters[key];
+        }
+        return result;
+      }, {} as Record<string, any>);
+      if (Object.keys(cleanFilters).length > 0) {
+        key.push(JSON.stringify(cleanFilters));
+      }
     }
     return key;
   }
@@ -56,8 +75,17 @@ export class QueryKeyFactory {
    */
   search(query: string, filters?: Record<string, any>): string[] {
     const key = [...this.base(), 'search', query];
-    if (filters) {
-      key.push(JSON.stringify(filters));
+    if (filters && typeof filters === 'object') {
+      // 清理 undefined 和 null 值
+      const cleanFilters = Object.keys(filters).reduce((result, key) => {
+        if (filters[key] !== undefined && filters[key] !== null) {
+          result[key] = filters[key];
+        }
+        return result;
+      }, {} as Record<string, any>);
+      if (Object.keys(cleanFilters).length > 0) {
+        key.push(JSON.stringify(cleanFilters));
+      }
     }
     return key;
   }
@@ -343,6 +371,45 @@ export const reportKeys = new (class extends QueryKeyFactory {
 })();
 
 /**
+ * SKU查询键
+ */
+export const skuKeys = new (class extends QueryKeyFactory {
+  constructor() {
+    super('skus');
+  }
+
+  // SKU列表
+  skus(filters?: Record<string, any>) {
+    return this.list(filters);
+  }
+
+  // SKU详情
+  sku(id: string | number) {
+    return this.detail(id);
+  }
+
+  // SKU分页
+  skusPaginated(page: number, pageSize: number, filters?: Record<string, any>) {
+    return this.paginated(page, pageSize, filters);
+  }
+
+  // SKU搜索
+  searchSkus(query: string, filters?: Record<string, any>) {
+    return this.search(query, filters);
+  }
+
+  // SPU列表
+  spus() {
+    return this.custom('spus');
+  }
+
+  // 单位列表
+  units() {
+    return this.custom('units');
+  }
+})();
+
+/**
  * 查询键管理器
  */
 export const queryKeysManager = {
@@ -404,6 +471,9 @@ export const queryKeysUtils = {
    * 创建动态查询键
    */
   createDynamic(base: string, params: Record<string, any>): string[] {
+    if (!params || typeof params !== 'object') {
+      return [base];
+    }
     const sortedParams = Object.keys(params)
       .sort()
       .reduce((result, key) => {
@@ -418,6 +488,9 @@ export const queryKeysUtils = {
    * 序列化查询参数
    */
   serializeParams(params: Record<string, any>): string {
+    if (!params || typeof params !== 'object') {
+      return JSON.stringify({});
+    }
     return JSON.stringify(
       Object.keys(params)
         .sort()
@@ -455,6 +528,7 @@ export default {
   notificationKeys,
   uploadKeys,
   reportKeys,
+  skuKeys,
   queryKeysManager,
   queryKeysUtils,
 };

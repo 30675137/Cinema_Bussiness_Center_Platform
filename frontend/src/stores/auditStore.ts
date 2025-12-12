@@ -17,6 +17,9 @@ import {
   AuditType
 } from '@/types/audit';
 
+// 重新导出 AuditStatus 供其他模块使用
+export type { AuditStatus } from '@/types/audit';
+
 // 审核列表状态接口
 interface AuditListState {
   audits: AuditRecord[];

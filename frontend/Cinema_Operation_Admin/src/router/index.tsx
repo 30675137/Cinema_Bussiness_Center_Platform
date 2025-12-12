@@ -18,6 +18,7 @@ import { useUserStore } from '@/stores/userStore';
 // 懒加载页面组件
 const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
 const ProductList = React.lazy(() => import('@/pages/product/ProductList'));
+const SkuListPage = React.lazy(() => import('@/pages/product/sku/SkuListPage'));
 const InventoryManagePage = React.lazy(() => import('@/pages/inventory/InventoryManagePage'));
 const PricingList = React.lazy(() => import('@/pages/pricing/PricingList'));
 const ReviewList = React.lazy(() => import('@/pages/review/ReviewList'));
@@ -233,7 +234,7 @@ const router = createBrowserRouter([
             path: 'sku',
             element: (
               <Suspense fallback={<LoadingFallback />}>
-                <div>SKU 管理</div>
+                <SkuListPage />
               </Suspense>
             )
           },

@@ -242,6 +242,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 2,
         requiredPermissions: ['product.read'],
         isActive: true,
+        isVisible: true,
         functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
       },
       {
