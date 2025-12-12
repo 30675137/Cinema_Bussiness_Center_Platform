@@ -470,7 +470,7 @@ class SPUService {
   async batchUpdateSPUStatus(
     ids: string[],
     status: SPUStatus
-  ): Promise<ApiResponse<{ success: number; failed: number }> {
+  ): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
       // 模拟API请求延迟
       await new Promise(resolve => setTimeout(resolve, 800))

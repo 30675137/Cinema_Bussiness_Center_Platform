@@ -7,6 +7,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - 无后端存储，前端Mock数据服务 (005-sku-management)
 - TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13 (005-sku-management)
 - 前端 Mock 数据（内存存储），不依赖后端数据库 (005-sku-management)
+- TypeScript 5.0.4, React 18.2.0 + Vite 6.0.7, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13 (006-frontend-structure-refactor)
+- N/A (前端文件系统重构，不涉及数据存储) (006-frontend-structure-refactor)
 
 - (003-inventory-management)
 
@@ -27,10 +29,10 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 006-frontend-structure-refactor: Added TypeScript 5.0.4, React 18.2.0 + Vite 6.0.7, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13
 - 005-sku-management: Added TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13
 - 005-sku-management: Added TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand, TanStack Query, React Router 6
 
-- 003-inventory-management: Added
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->

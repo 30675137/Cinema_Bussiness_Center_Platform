@@ -26,10 +26,10 @@ import {
   SettingOutlined,
   PlusOutlined,
   EyeOutlined,
-  RefreshOutlined,
+  ReloadOutlined,
   InfoCircleOutlined
 } from '@ant-design/icons'
-import { AttributeTemplate, AttributeTemplateItem, SPUAttribute } from '@/types/spu'
+import type { AttributeTemplate, AttributeTemplateItem, SPUAttribute } from '@/types/spu'
 import { AttributeValidator } from '@/utils/attributeValidation'
 import { attributeService } from '@/services/attributeService'
 
@@ -387,7 +387,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
               </Select>
 
               <Button
-                icon={<RefreshOutlined />}
+                icon={<ReloadOutlined />}
                 onClick={loadTemplates}
                 loading={loading}
                 title="刷新模板列表"

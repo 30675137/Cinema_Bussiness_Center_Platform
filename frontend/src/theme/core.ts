@@ -2,7 +2,7 @@
  * 主题系统核心类
  */
 
-import {
+import type {
   ThemeMode,
   ThemeConfig,
   ThemeSettings,
