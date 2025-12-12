@@ -1,4 +1,5 @@
-import { SPUItem, SPUQueryParams, SPUCreationForm, SPUUpdateForm, SPUBatchOperation, ApiResponse, SPUListResponse } from '@/types/spu'
+import type { SPUItem, SPUQueryParams, SPUCreationForm, SPUUpdateForm, SPUBatchOperation, SPUListResponse } from '@/types/spu'
+import type { ApiResponse } from '@/types/common'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 

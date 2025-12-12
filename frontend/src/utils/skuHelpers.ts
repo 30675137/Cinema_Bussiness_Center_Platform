@@ -1,7 +1,8 @@
 /**
  * SKU工具函数
  */
-import { SKU, SkuStatus } from '@/types/sku';
+import type { SKU } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 
 /**
  * 获取SKU状态文本

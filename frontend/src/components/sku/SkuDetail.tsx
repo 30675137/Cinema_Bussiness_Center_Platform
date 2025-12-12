@@ -23,7 +23,8 @@ import {
   StopOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { SKU, SkuStatus } from '@/types/sku';
+import type { SKU } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSkuQuery, useToggleSkuStatusMutation } from '@/hooks/useSku';
 import { canEnableSku, canDisableSku } from '@/utils/skuHelpers';

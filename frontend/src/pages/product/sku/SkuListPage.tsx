@@ -15,7 +15,8 @@ import {
   useSkuListQuery,
   useToggleSkuStatusMutation,
 } from '@/hooks/useSku';
-import { SKU, SkuQueryParams, SkuStatus } from '@/types/sku';
+import type { SKU, SkuQueryParams } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import { useNavigate } from 'react-router-dom';
 
 /**

@@ -3,9 +3,8 @@
  * 用于开发阶段的模拟数据和API响应
  */
 
-import {
+import type {
   SKU,
-  SkuStatus,
   SkuQueryParams,
   SkuListResponse,
   SkuFormData,
@@ -14,6 +13,7 @@ import {
   SPU,
   Unit,
 } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import {
   generateId,
   generateRandomNumber,

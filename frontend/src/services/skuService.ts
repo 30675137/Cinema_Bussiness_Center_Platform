@@ -3,13 +3,15 @@
  * 提供SKU相关的业务逻辑封装
  */
 
-import {
+import type {
   SKU,
   SkuQueryParams,
   SkuListResponse,
   SkuFormData,
-  SkuStatus,
+  SPU,
+  Unit,
 } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import {
   getSkus as mockGetSkus,
   getSkuById as mockGetSkuById,
@@ -20,8 +22,6 @@ import {
   checkSkuNameDuplicate as mockCheckSkuNameDuplicate,
   getSpus as mockGetSpus,
   getUnits as mockGetUnits,
-  SPU,
-  Unit,
 } from './mockSkuApi';
 
 /**

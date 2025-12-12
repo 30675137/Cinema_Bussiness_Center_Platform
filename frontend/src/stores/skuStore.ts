@@ -4,7 +4,8 @@
  */
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { SkuQueryParams, SkuStatus } from '@/types/sku';
+import type { SkuQueryParams } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 
 /**
  * SKU Store状态接口

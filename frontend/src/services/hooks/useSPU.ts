@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { UseQueryOptions } from '@tanstack/react-query'
 import { spuService } from '../api/spuApi'
-import { SPUItem, SPUQueryParams, SPUCreationForm, SPUUpdateForm, SPUBatchOperation } from '@/types/spu'
+import type { SPUItem, SPUQueryParams, SPUCreationForm, SPUUpdateForm, SPUBatchOperation } from '@/types/spu'
 
 // Query Keys
 export const spuQueryKeys = {
@@ -18,8 +19,8 @@ export const useSPUList = (
 ) => {
   return useQuery({
     queryKey: spuQueryKeys.list(params),
-    queryFn: () => {
-      const result = spuService.getSPUList(params)
+    queryFn: async () => {
+      const result = await spuService.getSPUList(params)
       return result.list
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

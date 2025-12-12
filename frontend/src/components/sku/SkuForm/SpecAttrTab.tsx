@@ -4,8 +4,9 @@
  */
 import React from 'react';
 import { Form, Input, Select } from 'antd';
-import { Controller, Control, FieldErrors } from 'react-hook-form';
-import { SkuFormValues } from './schema';
+import { Controller } from 'react-hook-form';
+import type { Control, FieldErrors } from 'react-hook-form';
+import type { SkuFormValues } from './schema';
 
 const { Option } = Select;
 

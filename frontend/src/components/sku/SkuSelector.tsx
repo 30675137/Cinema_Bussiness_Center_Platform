@@ -15,7 +15,8 @@ import {
 } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { SKU, SkuQueryParams, SkuStatus } from '@/types/sku';
+import type { SKU, SkuQueryParams } from '@/types/sku';
+import { SkuStatus } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSkuListQuery } from '@/hooks/useSku';
 import { SkuFilters } from './SkuFilters';
@@ -368,13 +369,11 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
         }}
         onRow={(record) => ({
           'data-testid': `sku-selector-row-${record.id}`,
-        })}
-        scroll={{ x: 1000, y: 400 }}
-        size="middle"
-        onRow={(record) => ({
           onClick: mode === 'single' ? () => handleSingleSelect(record) : undefined,
           style: mode === 'single' ? { cursor: 'pointer' } : undefined,
         })}
+        scroll={{ x: 1000, y: 400 }}
+        size="middle"
       />
     </Modal>
   );
