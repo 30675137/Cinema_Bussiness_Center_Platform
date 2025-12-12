@@ -25,12 +25,14 @@
       "@/features/*": ["src/features/*"],
       "@/stores/*": ["src/stores/*"],
       "@/services/*": ["src/services/*"],
+      "@/services/mock/*": ["src/services/mock/*"],
       "@/types/*": ["src/types/*"],
       "@/utils/*": ["src/utils/*"],
       "@/constants/*": ["src/constants/*"],
       "@/monitoring/*": ["src/monitoring/*"],
       "@/optimization/*": ["src/optimization/*"],
-      "@/hooks/*": ["src/hooks/*"]
+      "@/hooks/*": ["src/hooks/*"],
+      "@/mocks/*": ["src/mocks/*"]
     },
 
     /* Linting */
