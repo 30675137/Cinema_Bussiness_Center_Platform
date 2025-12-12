@@ -1,0 +1,1049 @@
+openapi: 3.0.0
+info:
+  title: 类目管理 API 规范
+  description: 类目管理功能的 RESTful API 接口规范，包括类目 CRUD、属性模板配置等操作
+  version: 1.0.0
+  contact:
+    name: 影院商品管理中台开发团队
+
+servers:
+  - url: /api
+    description: 本地开发环境（Mock）
+
+tags:
+  - name: categories
+    description: 类目管理相关接口
+  - name: attribute-templates
+    description: 属性模板管理相关接口
+
+paths:
+  /categories/tree:
+    get:
+      tags:
+        - categories
+      summary: 获取类目树
+      description: 获取完整的类目树结构，支持懒加载（初始只返回一级类目）
+      operationId: getCategoryTree
+      parameters:
+        - name: lazy
+          in: query
+          description: 是否懒加载（只返回一级类目）
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: 成功返回类目树
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategoryTree'
+                  message:
+                    type: string
+                    example: '获取成功'
+                  code:
+                    type: integer
+                    example: 200
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories:
+    get:
+      tags:
+        - categories
+      summary: 获取类目列表
+      description: 分页获取类目列表，支持搜索和筛选
+      operationId: getCategoryList
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: keyword
+          in: query
+          description: 搜索关键词（类目名称、编码）
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/CategoryStatus'
+        - name: level
+          in: query
+          description: 层级筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/CategoryLevel'
+        - name: parentId
+          in: query
+          description: 父类目ID筛选
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            enum: [name, code, sortOrder, createdAt]
+            default: sortOrder
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: 成功返回类目列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - categories
+      summary: 创建类目
+      description: 创建新的类目（一级、二级或三级）
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '200':
+          description: 成功创建类目
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '创建成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/{id}:
+    get:
+      tags:
+        - categories
+      summary: 获取类目详情
+      description: 根据ID获取类目详细信息
+      operationId: getCategoryDetail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回类目详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '获取成功'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - categories
+      summary: 更新类目
+      description: 更新类目基本信息（名称、描述、排序、状态等）
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: 成功更新类目
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '更新成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - categories
+      summary: 删除类目
+      description: 删除类目（仅当类目未被SPU使用时允许删除）
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功删除类目
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: '删除成功'
+        '400':
+          description: 删除失败（类目已被使用）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/{id}/children:
+    get:
+      tags:
+        - categories
+      summary: 获取子类目列表
+      description: 获取指定类目的直接子类目（用于懒加载）
+      operationId: getCategoryChildren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 父类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回子类目列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '获取成功'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/search:
+    get:
+      tags:
+        - categories
+      summary: 搜索类目
+      description: 根据关键词搜索类目，返回匹配的类目列表（包含完整路径）
+      operationId: searchCategories
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          description: 搜索关键词
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: 成功返回搜索结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '搜索成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /categories/{id}/status:
+    put:
+      tags:
+        - categories
+      summary: 更新类目状态
+      description: 启用或停用类目
+      operationId: updateCategoryStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: '#/components/schemas/CategoryStatus'
+      responses:
+        '200':
+          description: 成功更新状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Category'
+                  message:
+                    type: string
+                    example: '状态更新成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /attribute-templates/{categoryId}:
+    get:
+      tags:
+        - attribute-templates
+      summary: 获取属性模板
+      description: 根据类目ID获取属性模板
+      operationId: getAttributeTemplate
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回属性模板
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/AttributeTemplate'
+                  message:
+                    type: string
+                    example: '获取成功'
+        '404':
+          description: 属性模板不存在
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: '属性模板不存在'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - attribute-templates
+      summary: 创建或更新属性模板
+      description: 为类目创建或更新属性模板
+      operationId: saveAttributeTemplate
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveAttributeTemplateRequest'
+      responses:
+        '200':
+          description: 成功保存属性模板
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/AttributeTemplate'
+                  message:
+                    type: string
+                    example: '保存成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /attribute-templates/{categoryId}/attributes:
+    post:
+      tags:
+        - attribute-templates
+      summary: 添加属性
+      description: 为属性模板添加新属性
+      operationId: addAttribute
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddAttributeRequest'
+      responses:
+        '200':
+          description: 成功添加属性
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CategoryAttribute'
+                  message:
+                    type: string
+                    example: '添加成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /attribute-templates/{categoryId}/attributes/{attributeId}:
+    put:
+      tags:
+        - attribute-templates
+      summary: 更新属性
+      description: 更新属性模板中的属性定义
+      operationId: updateAttribute
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+        - name: attributeId
+          in: path
+          required: true
+          description: 属性ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAttributeRequest'
+      responses:
+        '200':
+          description: 成功更新属性
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/CategoryAttribute'
+                  message:
+                    type: string
+                    example: '更新成功'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - attribute-templates
+      summary: 删除属性
+      description: 从属性模板中删除属性（仅当属性未被SPU使用时允许删除）
+      operationId: deleteAttribute
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+        - name: attributeId
+          in: path
+          required: true
+          description: 属性ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功删除属性
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: '删除成功'
+        '400':
+          description: 删除失败（属性已被使用）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Category:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - level
+        - status
+        - sortOrder
+        - spuCount
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 类目唯一标识
+          example: 'cat-001'
+        code:
+          type: string
+          description: 类目编码（系统生成）
+          example: 'CAT-1-001'
+        name:
+          type: string
+          description: 类目名称
+          minLength: 1
+          maxLength: 50
+          example: '饮料'
+        description:
+          type: string
+          description: 类目描述
+          example: '各类饮料商品'
+        level:
+          $ref: '#/components/schemas/CategoryLevel'
+        parentId:
+          type: string
+          nullable: true
+          description: 父类目ID（一级类目为空）
+          example: null
+        parentName:
+          type: string
+          nullable: true
+          description: 父类目名称
+          example: null
+        path:
+          type: array
+          items:
+            type: string
+          description: 类目路径
+          example: ['饮料']
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 0
+        spuCount:
+          type: integer
+          description: 关联的SPU数量
+          example: 15
+        attributeTemplateId:
+          type: string
+          nullable: true
+          description: 属性模板ID
+          example: 'template-001'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: '2025-01-27T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: '2025-01-27T10:00:00Z'
+        createdBy:
+          type: string
+          nullable: true
+          description: 创建人
+        updatedBy:
+          type: string
+          nullable: true
+          description: 更新人
+
+    CategoryTree:
+      allOf:
+        - $ref: '#/components/schemas/Category'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoryTree'
+              description: 子节点列表
+            hasChildren:
+              type: boolean
+              description: 是否有子节点
+              example: true
+            isLeaf:
+              type: boolean
+              description: 是否为叶子节点
+              example: false
+
+    CategoryStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+      description: 类目状态
+      example: 'active'
+
+    CategoryLevel:
+      type: integer
+      enum:
+        - 1
+        - 2
+        - 3
+      description: 类目层级
+      example: 1
+
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: '饮料'
+        parentId:
+          type: string
+          nullable: true
+          description: 父类目ID（用于创建子类目）
+          example: null
+        description:
+          type: string
+          example: '各类饮料商品'
+        sortOrder:
+          type: integer
+          default: 0
+          example: 0
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+          default: active
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: '饮料（更新）'
+        description:
+          type: string
+          example: '各类饮料商品（更新）'
+        sortOrder:
+          type: integer
+          example: 1
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+
+    AttributeTemplate:
+      type: object
+      required:
+        - id
+        - categoryId
+        - attributes
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 模板唯一标识
+          example: 'template-001'
+        categoryId:
+          type: string
+          description: 关联的类目ID
+          example: 'cat-001'
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryAttribute'
+          description: 属性定义列表
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    CategoryAttribute:
+      type: object
+      required:
+        - id
+        - name
+        - displayName
+        - type
+        - required
+        - sortOrder
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 属性唯一标识
+          example: 'attr-001'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 属性名称
+          example: 'capacity'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 显示名称
+          example: '容量'
+        type:
+          $ref: '#/components/schemas/AttributeType'
+        required:
+          type: boolean
+          description: 是否必填
+          example: true
+        optionalValues:
+          type: array
+          items:
+            type: string
+          description: 可选值列表（用于 select 类型）
+          example: ['250ml', '500ml', '1L']
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 0
+        description:
+          type: string
+          description: 属性描述
+          example: '商品容量'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    AttributeType:
+      type: string
+      enum:
+        - text
+        - number
+        - single-select
+        - multi-select
+      description: 属性类型
+      example: 'text'
+
+    SaveAttributeTemplateRequest:
+      type: object
+      required:
+        - attributes
+      properties:
+        attributes:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - displayName
+              - type
+              - required
+              - sortOrder
+            properties:
+              name:
+                type: string
+                minLength: 1
+                maxLength: 50
+              displayName:
+                type: string
+                minLength: 1
+                maxLength: 50
+              type:
+                $ref: '#/components/schemas/AttributeType'
+              required:
+                type: boolean
+              optionalValues:
+                type: array
+                items:
+                  type: string
+              sortOrder:
+                type: integer
+              description:
+                type: string
+
+    AddAttributeRequest:
+      type: object
+      required:
+        - name
+        - displayName
+        - type
+        - required
+        - sortOrder
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        type:
+          $ref: '#/components/schemas/AttributeType'
+        required:
+          type: boolean
+        optionalValues:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        description:
+          type: string
+
+    UpdateAttributeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        type:
+          $ref: '#/components/schemas/AttributeType'
+        required:
+          type: boolean
+        optionalValues:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        description:
+          type: string
+
+    PaginatedCategoryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+            total:
+              type: integer
+              example: 100
+            page:
+              type: integer
+              example: 1
+            pageSize:
+              type: integer
+              example: 20
+            totalPages:
+              type: integer
+              example: 5
+        message:
+          type: string
+          example: '获取成功'
+        code:
+          type: integer
+          example: 200
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: '操作失败'
+        code:
+          type: integer
+          example: 400
+        errors:
+          type: array
+          items:
+            type: string
+          description: 错误详情列表
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
