@@ -17,6 +17,11 @@
 - Q: Claude Code CLI 的安装方式支持范围？ → A: 安装时仅支持 npm（官方推荐方式），卸载时支持所有方式（npm、Homebrew、Native）以清理历史安装
 - Q: API key 配置方式的支持范围？ → A: 仅支持环境变量方式（写入 `~/.zshrc` 或 `~/.zshenv`），使用 `export ANTHROPIC_API_KEY=...` 格式，不支持配置文件方式（`~/.claude/settings.json`）
 - Q: 配置文件应该保存为默认的 settings.json 文件并默认读取？ → A: 使用 `~/.claude/settings.json` 作为默认配置文件，所有相关命令（`set-config`、`install`、`uninstall`）在启动时自动读取，命令行参数优先于配置文件
+- Q: 用户常见的 Claude alias（如 `cc` 代表 `claude --dangerously-skip-permissions`）应该如何处理？ → A: Yes - The script should detect and remove common aliases (`cc`, `c`, `claude-dev`) during uninstall, and optionally create them during install with user confirmation
+- Q: 脚本执行破坏性操作（卸载包、删除文件）前是否应支持预览模式？ → A: Yes - Add `--dry-run` flag that shows all operations that would be performed without executing them
+- Q: 脚本应支持什么级别的日志详细程度？ → A: Multiple levels: `--verbose` for detailed output, default for normal, `--quiet` for minimal output
+- Q: 如果检测到 Claude 通过多种方式同时安装（如 npm 和 Homebrew），卸载时应如何处理？ → A: Detect and remove ALL installations found across all methods during uninstall
+- Q: 脚本修改 shell 配置文件时，应该修改所有常见的 zsh 配置文件还是只修改用户实际使用的文件？ → A: Detect and modify active file only
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -35,6 +40,11 @@
 3. **Given** 系统通过 Homebrew 安装了 Claude，**When** 用户执行清理脚本，**Then** 脚本成功卸载 Homebrew 包
 4. **Given** 系统使用 NVM 管理多个 Node 版本，**When** 用户执行清理脚本，**Then** 脚本在所有 Node 版本中清理 Claude 相关包
 5. **Given** 系统存在用户级配置文件和项目级残留，**When** 用户执行清理脚本，**Then** 脚本清理所有配置文件和项目残留
+6. **Given** 用户的 shell 配置文件中存在常见的 Claude alias（如 `cc`, `c`, `claude-dev`），**When** 用户执行清理脚本，**Then** 脚本检测并移除这些 alias 定义
+7. **Given** 用户使用 `--dry-run` 标志执行清理脚本，**When** 脚本运行，**Then** 脚本显示所有将要执行的操作但不实际执行任何破坏性操作
+8. **Given** 用户使用 `--verbose` 标志执行清理脚本，**When** 脚本运行，**Then** 脚本显示详细的执行日志，包括每个命令的输出和调试信息
+9. **Given** 用户使用 `--quiet` 标志执行清理脚本，**When** 脚本运行，**Then** 脚本仅显示最终结果和错误信息，适合自动化场景
+10. **Given** 系统同时通过多种方式安装了 Claude（如 npm 全局和 Homebrew），**When** 用户执行清理脚本，**Then** 脚本检测并移除所有安装方式的 Claude，确保完全清理
 
 ---
 
@@ -68,6 +78,8 @@
 2. **Given** 系统已安装 npm，**When** 用户执行安装命令，**Then** 脚本使用 npm 方式安装选定的组件（Claude Code CLI: `npm install -g @anthropic-ai/claude-code`，Router: `npm install -g @musistudio/claude-code-router`）
 3. **Given** 系统未安装 npm，**When** 用户执行安装命令，**Then** 脚本提示用户需要先安装 Node.js 和 npm
 4. **Given** 安装完成后，**When** 用户运行 `claude --version`，**Then** 命令返回已安装的版本号，验证安装成功
+5. **Given** Claude Code CLI 安装完成后，**When** 脚本询问是否创建常见 alias（如 `cc` 代表 `claude --dangerously-skip-permissions`），**Then** 用户确认后脚本将 alias 定义写入 shell 配置文件
+6. **Given** 用户使用 `--dry-run` 标志执行安装命令，**When** 脚本运行，**Then** 脚本显示所有将要执行的安装操作（npm 包安装、alias 创建等）但不实际执行
 
 ---
 
@@ -87,6 +99,7 @@
 4. **Given** 用户执行 `set-config` 子命令，**When** 用户提供配置信息，**Then** 脚本将配置保存到 `~/.claude/settings.json` 文件
 5. **Given** 存在 `~/.claude/settings.json` 配置文件，**When** 用户执行 `install` 或 `uninstall` 命令，**Then** 脚本自动读取配置文件中的环境变量设置（如 `ANTHROPIC_AUTH_TOKEN`、`ANTHROPIC_BASE_URL` 等）
 6. **Given** 用户同时提供命令行参数和配置文件，**When** 脚本执行命令，**Then** 命令行参数优先于配置文件中的设置
+7. **Given** 用户的 shell 使用特定的配置文件（如 `~/.zshrc` 或 `~/.zshenv`），**When** 脚本需要修改 shell 配置，**Then** 脚本检测并仅修改用户实际使用的配置文件
 
 ---
 
@@ -121,11 +134,12 @@
 - **FR-002**: 脚本 MUST 能够卸载 npm 全局安装的 Claude Code CLI 和 Claude Code Router
 - **FR-003**: 脚本 MUST 能够卸载 Homebrew 安装的 Claude Code（如果存在）
 - **FR-004**: 脚本 MUST 能够清理 Native 安装的残留文件（`~/.local/bin/claude`、`~/.claude-code`）
+- **FR-035**: 脚本在卸载时 MUST 检测所有安装方式（npm、Homebrew、Native），并移除所有检测到的安装，无论用户通过几种方式安装了 Claude
 - **FR-005**: 脚本 MUST 支持清理 NVM 管理的所有 Node 版本中的 Claude 相关包
 - **FR-006**: 脚本 MUST 能够清理用户级配置文件（`~/.claude`、`~/.claude.json`、`~/.claude-code-router`、`~/.claude-code`）
 - **FR-007**: 脚本 MUST 能够查找并清理项目级残留（`.claude/`、`.mcp.json`）
 - **FR-008**: 脚本 MUST 能够清理当前终端会话的环境变量（`ANTHROPIC_*`、`SILICONFLOW_*`）
-- **FR-009**: 脚本 MUST 能够从 shell 配置文件中移除 Claude 相关的环境变量和 alias
+- **FR-009**: 脚本 MUST 能够从 shell 配置文件中移除 Claude 相关的环境变量和 alias（包括常见的 alias 如 `cc`, `c`, `claude-dev` 等）
 - **FR-010**: 脚本 MUST 能够验证命令是否已从 PATH 中移除（`claude`、`ccr`）
 - **FR-011**: 脚本 MUST 能够验证 npm 全局包是否已卸载
 - **FR-012**: 脚本 MUST 能够验证用户配置目录是否已清理
@@ -135,6 +149,7 @@
 - **FR-016**: 脚本 MUST 使用 Python 实现，通过子命令模式支持不同操作（如 `install`、`uninstall`、`set-api-key`）
 - **FR-020**: 脚本 MUST 支持安装 Claude Code CLI 和 Claude Code Router，通过交互式提示让用户选择要安装的组件
 - **FR-021**: 脚本 MUST 支持设置 API key，将 API key 存储在环境变量文件中（如 `~/.zshrc` 或 `~/.zshenv`），使用 `export ANTHROPIC_API_KEY=...` 格式
+- **FR-036**: 脚本 MUST 检测用户当前 shell 实际使用的配置文件（通过检查 `$ZDOTDIR`、`~/.zshenv`、`~/.zshrc` 等的存在和使用情况），仅修改检测到的活跃配置文件，避免造成配置不一致
 - **FR-027**: 脚本 MUST 使用 `~/.claude/settings.json` 作为默认配置文件，支持保存和读取完整的配置（包括环境变量和权限设置）
 - **FR-028**: 脚本的所有相关命令（`set-config`、`install`、`uninstall`）MUST 在启动时自动读取 `~/.claude/settings.json` 配置文件（如果存在）
 - **FR-029**: 脚本 MUST 遵循配置优先级：命令行参数 > 配置文件 > 默认值
@@ -142,8 +157,13 @@
 - **FR-026**: 脚本 MUST 在安装前检查 npm 是否可用，如果不可用则提示用户需要先安装 Node.js 和 npm
 - **FR-023**: 脚本 MUST 支持通过 `set-api-key` 子命令设置 API key，可以在任何时候单独执行
 - **FR-024**: 脚本 MUST 在设置 API key 时，将 API key 安全地写入环境变量配置文件，如果已存在则更新
+- **FR-030**: 脚本 MUST 在安装 Claude Code CLI 后，通过交互式提示询问用户是否创建常见 alias（如 `alias cc='claude --dangerously-skip-permissions'`），用户确认后将其写入 shell 配置文件
+- **FR-031**: 脚本 MUST 支持 `--dry-run` 标志，在该模式下显示所有将要执行的操作（包括停止进程、卸载包、删除文件、修改配置等）但不实际执行任何破坏性操作
+- **FR-032**: 脚本在 `--dry-run` 模式下 MUST 清晰标识每个操作的类型（如 [DRY-RUN] 前缀）和影响范围，便于用户评估
 - **FR-025**: 脚本 MUST 在 macOS/zsh 环境下运行
-- **FR-017**: 脚本 MUST 提供清晰的执行日志，显示每个步骤的执行状态
+- **FR-017**: 脚本 MUST 提供清晰的执行日志，默认模式下显示主要步骤和结果
+- **FR-033**: 脚本 MUST 支持 `--verbose` 标志，在该模式下显示详细的执行日志，包括每个命令的完整输出、调试信息和中间状态
+- **FR-034**: 脚本 MUST 支持 `--quiet` 标志，在该模式下仅显示最终结果摘要和错误信息，适合自动化和脚本集成场景
 - **FR-018**: 脚本 MUST 在遇到错误时继续执行后续步骤，而不是立即退出
 - **FR-019**: 脚本 MUST 在最后提供验证报告，总结清理结果
 
