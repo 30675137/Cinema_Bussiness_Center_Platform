@@ -543,21 +543,23 @@ class CategoryService {
    */
   async getCategoryTree(lazy: boolean = true): Promise<ApiResponse<CategoryTree[]>> {
     try {
-      // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 400))
+      // 使用 fetch 发送请求，让 MSW 拦截
+      const url = `${this.baseUrl}/tree?lazy=${lazy}`
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
-      // 使用新的 Mock 数据生成器
-      const { generateCategoryTree } = await import('@/mocks/data/categoryMockData')
-      const tree = generateCategoryTree(lazy)
-
-      return {
-        success: true,
-        data: tree,
-        message: '获取成功',
-        code: 200,
-        timestamp: Date.now(),
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
+
+      const result = await response.json()
+      return result
     } catch (error) {
+      console.error('getCategoryTree error:', error)
       return {
         success: false,
         data: [],

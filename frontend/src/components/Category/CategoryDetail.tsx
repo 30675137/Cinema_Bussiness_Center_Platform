@@ -266,6 +266,8 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
           )}
         </Space>
       }
+      role="region"
+      aria-label="类目详情信息"
       style={{ height: '100%' }}
     >
       <Descriptions

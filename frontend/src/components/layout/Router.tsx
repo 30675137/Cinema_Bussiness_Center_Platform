@@ -19,6 +19,9 @@ const InventoryAudit = lazy(() => import('@/pages/inventory/InventoryAudit'));
 const SPUListPage = lazy(() => import('@/pages/SPUList'));
 const SPUDetailPage = lazy(() => import('@/pages/SPUDetail'));
 const SkuListPage = lazy(() => import('@/pages/product/sku/SkuListPage'));
+// 类目和品牌管理页面
+const CategoryManagement = lazy(() => import('@/pages/CategoryManagement'));
+const BrandManagement = lazy(() => import('@/pages/BrandManagement'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -191,6 +194,36 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <SkuListPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 类目管理页面
+  {
+    path: '/category',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <CategoryManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 品牌管理页面
+  {
+    path: '/brand',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <BrandManagement />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

@@ -17,53 +17,86 @@ import './index.css'
 import './monitoring/PerformanceInterceptor'
 import './monitoring/WebVitalsMonitor'
 
-// 设置dayjs中文语言
-dayjs.locale('zh-cn')
-
-// 开发环境下自动设置 Mock Token（方便测试）
-if (import.meta.env.DEV && !localStorage.getItem('access_token')) {
-  console.log('🔧 开发模式：自动设置 Mock Token')
-  localStorage.setItem('access_token', 'mock-token-for-testing')
-  localStorage.setItem('refresh_token', 'mock-refresh-token')
+// 启动应用（先启动 MSW，再渲染应用）
+async function initApp() {
+  console.log('🚀 Starting application initialization...')
+  
+  // 在开发环境中，先启动 MSW
+  if (import.meta.env.DEV) {
+    console.log('🔧 Development mode: Initializing MSW...')
+    try {
+      const { startMSW } = await import('./mocks/browser')
+      console.log('📦 MSW module loaded, starting worker...')
+      await startMSW()
+      console.log('✅ MSW initialization completed')
+    } catch (error) {
+      console.error('❌ Failed to initialize MSW:', error)
+      if (error instanceof Error) {
+        console.error('Error details:', error.message, error.stack)
+      }
+      // 即使 MSW 启动失败，也继续启动应用
+    }
+  } else {
+    console.log('ℹ️ Production mode: MSW disabled')
+  }
+  
+  // MSW 启动完成后，渲染应用
+  console.log('🎨 Rendering application...')
+  renderApp()
 }
 
-// 创建React Query客户端
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5分钟内数据认为新鲜
-      gcTime: 10 * 60 * 1000, // 10分钟缓存时间
-      retry: (failureCount, error) => {
-        // 对于4xx错误不重试
-        if (error && typeof error === 'object' && 'status' in error) {
-          const status = error.status as number;
-          if (status >= 400 && status < 500) return false;
-        }
-        return failureCount < 3;
+function renderApp() {
+  // 设置dayjs中文语言
+  dayjs.locale('zh-cn')
+
+  // 开发环境下自动设置 Mock Token（方便测试）
+  if (import.meta.env.DEV && !localStorage.getItem('access_token')) {
+    console.log('🔧 开发模式：自动设置 Mock Token')
+    localStorage.setItem('access_token', 'mock-token-for-testing')
+    localStorage.setItem('refresh_token', 'mock-refresh-token')
+  }
+
+  // 创建React Query客户端
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 5 * 60 * 1000, // 5分钟内数据认为新鲜
+        gcTime: 10 * 60 * 1000, // 10分钟缓存时间
+        retry: (failureCount, error) => {
+          // 对于4xx错误不重试
+          if (error && typeof error === 'object' && 'status' in error) {
+            const status = error.status as number;
+            if (status >= 400 && status < 500) return false;
+          }
+          return failureCount < 3;
+        },
+        refetchOnWindowFocus: false,
       },
-      refetchOnWindowFocus: false,
+      mutations: {
+        retry: 1,
+      },
     },
-    mutations: {
-      retry: 1,
-    },
-  },
-})
+  })
 
-// 导入自定义主题配置
-import { antdTheme } from './theme'
+  // 导入自定义主题配置
+  import('./theme').then(({ antdTheme }) => {
+    createRoot(document.getElementById('root')!).render(
+      <StrictMode>
+        <ErrorBoundary>
+          <QueryClientProvider client={queryClient}>
+            <ConfigProvider
+              locale={zhCN}
+              theme={antdTheme}
+            >
+              <RouterProvider router={router} />
+            </ConfigProvider>
+            {import.meta.env.DEV && <ReactQueryDevtools />}
+          </QueryClientProvider>
+        </ErrorBoundary>
+      </StrictMode>,
+    )
+  })
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ConfigProvider
-          locale={zhCN}
-          theme={antdTheme}
-        >
-          <RouterProvider router={router} />
-        </ConfigProvider>
-        {import.meta.env.DEV && <ReactQueryDevtools />}
-      </QueryClientProvider>
-    </ErrorBoundary>
-  </StrictMode>,
-)
+// 启动应用
+initApp()

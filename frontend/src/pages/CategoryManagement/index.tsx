@@ -24,7 +24,7 @@ interface CategoryManagementProps {}
 
 const CategoryManagementPage: React.FC<CategoryManagementProps> = () => {
   const navigate = useNavigate()
-  const { setSelectedCategoryId, reset, setEditing } = useCategoryStore()
+  const { selectedCategoryId, setSelectedCategoryId, reset, setEditing } = useCategoryStore()
   const queryClient = useQueryClient()
   
   // 创建类目相关状态
@@ -127,30 +127,46 @@ const CategoryManagementPage: React.FC<CategoryManagementProps> = () => {
             </div>
           </div>
 
-          <Space>
+          <Space size="small">
             <Button
               icon={<PlusOutlined />}
               type="primary"
+              size="small"
               onClick={() => handleAddCategory()}
             >
-              新增一级类目
+              新增类目
             </Button>
             <Button
               icon={<ReloadOutlined />}
+              size="small"
               onClick={handleRefresh}
             >
               刷新
             </Button>
-            <Button onClick={handleBack}>
+            <Button 
+              size="small"
+              onClick={handleBack}
+            >
               返回
             </Button>
           </Space>
         </div>
 
-        {/* 主要内容区域 - 左右分栏布局 */}
-        <Row gutter={16} style={{ minHeight: 'calc(100vh - 200px)' }}>
+        {/* 主要内容区域 - 左右分栏布局（响应式） */}
+        <Row gutter={[16, 16]} style={{ minHeight: 'calc(100vh - 200px)' }}>
           {/* 左侧：类目树 */}
-          <Col xs={24} sm={24} md={10} lg={8} xl={8}>
+          <Col 
+            xs={24} 
+            sm={24} 
+            md={10} 
+            lg={8} 
+            xl={8}
+            style={{ 
+              minHeight: '400px',
+              // 移动端：全宽显示，固定高度
+              // 桌面端：侧边栏显示，自适应高度
+            }}
+          >
             <CategoryTree
               mode="manage"
               onCategorySelect={(category) => {
@@ -166,8 +182,23 @@ const CategoryManagementPage: React.FC<CategoryManagementProps> = () => {
           </Col>
 
           {/* 右侧：类目详情和属性模板 */}
-          <Col xs={24} sm={24} md={14} lg={16} xl={16}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, height: '100%' }}>
+          <Col 
+            xs={24} 
+            sm={24} 
+            md={14} 
+            lg={16} 
+            xl={16}
+            style={{
+              // 移动端：全宽显示，堆叠布局
+              // 桌面端：侧边栏显示，自适应高度
+            }}
+          >
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: 16, 
+              height: '100%'
+            }}>
               {/* 类目详情 */}
               <CategoryDetail
                 onEdit={handleEditCategory}
@@ -184,12 +215,12 @@ const CategoryManagementPage: React.FC<CategoryManagementProps> = () => {
 
         {/* 创建类目弹窗 */}
         <Modal
-          title={parentCategory ? '新增子类目' : '新增一级类目'}
+          title={parentCategory ? '新增子类目' : '新增类目'}
           open={createModalVisible}
           onCancel={handleCreateCancel}
           footer={null}
           width={600}
-          destroyOnClose
+          destroyOnHidden
         >
           <CategoryForm
             mode="create"

@@ -86,6 +86,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: 'SPU 管理',
         },
         {
+          key: '/category',
+          label: '类目管理',
+        },
+        {
           key: '/products/sku',
           label: 'SKU 管理',
         },

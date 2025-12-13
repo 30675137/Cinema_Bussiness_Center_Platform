@@ -26,17 +26,33 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export const categoryHandlers = [
   // 获取类目树
   http.get('/api/categories/tree', async ({ request }) => {
-    await delay(300);
-    const url = new URL(request.url);
-    const lazy = url.searchParams.get('lazy') !== 'false';
-    const tree = generateCategoryTree(lazy);
+    try {
+      await delay(300);
+      const url = new URL(request.url);
+      const lazy = url.searchParams.get('lazy') !== 'false';
+      
+      console.log('[MSW] Getting category tree, lazy:', lazy);
+      const tree = generateCategoryTree(lazy);
+      console.log('[MSW] Generated tree:', tree);
 
-    return HttpResponse.json({
-      success: true,
-      data: tree,
-      message: '获取成功',
-      code: 200,
-    });
+      return HttpResponse.json({
+        success: true,
+        data: tree,
+        message: '获取成功',
+        code: 200,
+      });
+    } catch (error) {
+      console.error('[MSW] Error generating category tree:', error);
+      return HttpResponse.json(
+        {
+          success: false,
+          data: [],
+          message: error instanceof Error ? error.message : '获取类目树失败',
+          code: 500,
+        },
+        { status: 500 }
+      );
+    }
   }),
 
   // 获取类目列表

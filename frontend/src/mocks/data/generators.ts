@@ -1,4 +1,4 @@
-import { SPUItem, SPUStatus, SPUAttribute, AttributeType, ProductImage } from '@/types/spu'
+import { SPUItem, SPUStatus, SPUAttribute, ProductImage } from '@/types/spu'
 import { CategoryItem, CategoryStatus, CategoryLevel } from '@/types/category'
 import { BrandItem, BrandStatus } from '@/types/brand'
 

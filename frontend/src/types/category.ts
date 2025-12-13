@@ -4,6 +4,51 @@ export type CategoryStatus = 'active' | 'inactive'
 // 分类层级
 export type CategoryLevel = 1 | 2 | 3
 
+// 属性类型（基于 data-model.md 规范）- 提前定义，避免循环依赖
+export type AttributeType = 'text' | 'number' | 'single-select' | 'multi-select'
+
+// 属性验证规则 - 提前定义
+export interface AttributeValidation {
+  min?: number
+  max?: number
+  pattern?: string
+  options?: string[]
+  required?: boolean
+}
+
+// 类目属性定义（基于 data-model.md 规范）- 提前定义
+export interface CategoryAttribute {
+  // 基础标识
+  id: string                    // 属性唯一标识
+  name: string                  // 属性名称（必填）
+  displayName: string           // 显示名称（用于UI展示）
+  
+  // 属性配置
+  type: AttributeType           // 属性类型
+  required: boolean            // 是否必填
+  optionalValues?: string[]     // 可选值列表（用于 select 类型）
+  sortOrder: number            // 排序序号
+  
+  // 元数据
+  description?: string          // 属性描述
+  createdAt: string            // 创建时间
+  updatedAt: string            // 更新时间
+}
+
+// 属性模板（基于 data-model.md 规范）- 提前定义
+export interface AttributeTemplate {
+  // 基础标识
+  id: string                    // 模板唯一标识
+  categoryId: string           // 关联的类目ID
+  
+  // 属性列表
+  attributes: CategoryAttribute[]  // 属性定义列表
+  
+  // 元数据
+  createdAt: string            // 创建时间
+  updatedAt: string            // 更新时间
+}
+
 // 类目实体（基于 data-model.md 规范）
 export interface Category {
   // 基础标识
@@ -72,71 +117,9 @@ export interface CategoryTreeNode extends CategoryTree {
   title: string;
   value: string;
   children?: CategoryTreeNode[];
-  isLeaf?: boolean;
+  isLeaf: boolean; // 必须与 CategoryTree 保持一致
   checkable?: boolean;
   selectable?: boolean;
-}
-
-// 属性模板
-export interface AttributeTemplate {
-  id: string
-  categoryId: string
-  name: string
-  description?: string
-  attributes: TemplateAttribute[]
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
-}
-
-// 模板属性
-export interface TemplateAttribute {
-  id: string
-  name: string
-  displayName: string
-  type: AttributeType
-  required: boolean
-  defaultValue?: any
-  options?: string[]
-  validation?: AttributeValidation
-  description?: string
-  sortOrder: number
-}
-
-// 属性类型（基于 data-model.md 规范）
-export type AttributeType = 'text' | 'number' | 'single-select' | 'multi-select'
-
-// 类目属性定义（基于 data-model.md 规范）
-export interface CategoryAttribute {
-  // 基础标识
-  id: string                    // 属性唯一标识
-  name: string                  // 属性名称（必填）
-  displayName: string           // 显示名称（用于UI展示）
-  
-  // 属性配置
-  type: AttributeType           // 属性类型
-  required: boolean            // 是否必填
-  optionalValues?: string[]     // 可选值列表（用于 select 类型）
-  sortOrder: number            // 排序序号
-  
-  // 元数据
-  description?: string          // 属性描述
-  createdAt: string            // 创建时间
-  updatedAt: string            // 更新时间
-}
-
-// 属性模板（基于 data-model.md 规范）
-export interface AttributeTemplate {
-  // 基础标识
-  id: string                    // 模板唯一标识
-  categoryId: string           // 关联的类目ID
-  
-  // 属性列表
-  attributes: CategoryAttribute[]  // 属性定义列表
-  
-  // 元数据
-  createdAt: string            // 创建时间
-  updatedAt: string            // 更新时间
 }
 
 // 兼容旧接口的模板属性（保留向后兼容）
@@ -151,15 +134,6 @@ export interface TemplateAttribute {
   validation?: AttributeValidation
   description?: string
   sortOrder: number
-}
-
-// 属性验证规则
-export interface AttributeValidation {
-  min?: number
-  max?: number
-  pattern?: string
-  options?: string[]
-  required?: boolean
 }
 
 // 类目创建请求参数
@@ -178,4 +152,11 @@ export interface UpdateCategoryRequest {
   description?: string         // 可选
   sortOrder?: number          // 可选
   status?: CategoryStatus     // 可选
+}
+
+// 确保所有类型都被正确导出
+export type {
+  CategoryStatus,
+  CategoryLevel,
+  AttributeType
 }

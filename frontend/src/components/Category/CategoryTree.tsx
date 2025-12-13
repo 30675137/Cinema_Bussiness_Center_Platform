@@ -66,8 +66,17 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
 
   // TanStack Query - 数据获取
   const queryClient = useQueryClient()
-  const { data: treeData, isLoading: treeLoading, refetch: refetchTree } = useCategoryTreeQuery(true)
+  const { data: treeData, isLoading: treeLoading, error: treeError, refetch: refetchTree } = useCategoryTreeQuery(true)
   const deleteMutation = useDeleteCategoryMutation()
+  
+  // 调试日志
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('CategoryTree - treeData:', treeData)
+      console.log('CategoryTree - isLoading:', treeLoading)
+      console.log('CategoryTree - error:', treeError)
+    }
+  }, [treeData, treeLoading, treeError])
   
   // 搜索查询（仅在有关键词时启用）
   const { data: searchResults, isLoading: searchLoading } = useCategorySearchQuery(
@@ -436,14 +445,25 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
   const isLoading = treeLoading || searchLoading
 
   return (
-    <Card size="small" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card 
+      size="small" 
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      role="region"
+      aria-label="类目树导航"
+    >
       {/* 标题和操作栏 */}
-      <div style={{
-        marginBottom: 16,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <div 
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8
+        }}
+        role="toolbar"
+        aria-label="类目树操作工具栏"
+      >
         <div>
           <Title level={5} style={{ margin: 0 }}>
             <FolderOutlined /> 类目树
@@ -459,12 +479,15 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
           </div>
         </div>
 
-        <Space>
+        <Space size="small">
           {showSearch && (
             <Search
-              placeholder="搜索类目名称或编码"
-              style={{ width: 200 }}
+              placeholder="搜索类目..."
+              size="small"
+              style={{ width: 180, minWidth: 120 }}
               allowClear
+              aria-label="搜索类目"
+              role="searchbox"
               value={searchKeyword}
               onChange={e => handleSearch(e.target.value)}
               prefix={<SearchOutlined />}
@@ -472,6 +495,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
           )}
           <Button
             icon={<ReloadOutlined />}
+            size="small"
             onClick={handleRefresh}
             loading={isLoading}
           >
@@ -481,9 +505,10 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
             <Button
               type="primary"
               icon={<PlusOutlined />}
+              size="small"
               onClick={() => onCategoryAdd?.()}
             >
-              新增一级类目
+              新增类目
             </Button>
           )}
         </Space>
@@ -519,6 +544,9 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
             onSelect={handleSelect}
             loadData={loadData}
             treeData={finalTreeData}
+            role="tree"
+            aria-label="类目树"
+            aria-multiselectable="false"
             icon={({ expanded }) =>
               expanded ? <FolderOpenOutlined style={{ color: '#1890ff' }} /> :
               <FolderOutlined style={{ color: '#1890ff' }} />
@@ -542,10 +570,11 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
+                size="small"
                 onClick={() => onCategoryAdd?.()}
                 style={{ marginTop: 16 }}
               >
-                添加第一个类目
+                新增类目
               </Button>
             )}
           </div>

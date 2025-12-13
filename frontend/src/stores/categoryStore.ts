@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { CategoryItem } from '../types/category';
 
 interface CategoryStore {
   // 服务器状态（由 TanStack Query 管理，这里不存储）

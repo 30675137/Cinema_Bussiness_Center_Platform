@@ -1,6 +1,11 @@
 import { http, HttpResponse } from 'msw'
-import { generateMockSPUList, generateMockCategories, generateMockBrands } from '../data/generators'
 import { categoryHandlers } from './categoryHandlers'
+
+// 动态导入 generators（延迟加载），避免在 MSW 启动时立即加载所有依赖
+const getGenerators = async () => {
+  const { generateMockSPUList, generateMockCategories, generateMockBrands } = await import('../data/generators')
+  return { generateMockSPUList, generateMockCategories, generateMockBrands }
+}
 
 // 基础API延迟模拟
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -56,6 +61,7 @@ export const spuHandlers = [
     await delay(300)
 
     const spuId = params.id as string
+    const { generateMockSPUList } = await getGenerators()
     const allSPU = generateMockSPUList(100)
     const spu = allSPU.find(item => item.id === spuId)
 
@@ -152,6 +158,7 @@ export const spuHandlers = [
 export const legacyCategoryHandlers = [
   http.get('/api/category/list', async () => {
     await delay(300)
+    const { generateMockCategories } = await getGenerators()
     const categories = generateMockCategories()
 
     return HttpResponse.json({
@@ -165,6 +172,7 @@ export const legacyCategoryHandlers = [
 export const brandHandlers = [
   http.get('/api/brand/list', async () => {
     await delay(300)
+    const { generateMockBrands } = await getGenerators()
     const brands = generateMockBrands()
 
     return HttpResponse.json({

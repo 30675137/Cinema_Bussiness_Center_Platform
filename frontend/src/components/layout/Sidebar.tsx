@@ -145,11 +145,17 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
   const getOpenKeys = () => {
     const { pathname } = location
 
-    if (pathname.startsWith('/product')) return ['product']
-    if (pathname.startsWith('/inventory')) return ['inventory']
-    if (pathname.startsWith('/pricing')) return ['pricing']
-    if (pathname.startsWith('/procurement')) return ['procurement']
-    if (pathname.startsWith('/analytics')) return ['analytics']
+    // 商品管理菜单：包含 /product, /spu, /category, /brand 等路径
+    if (pathname.startsWith('/product') || 
+        pathname.startsWith('/spu') || 
+        pathname.startsWith('/category') || 
+        pathname.startsWith('/brand')) {
+      return ['/product']
+    }
+    if (pathname.startsWith('/inventory')) return ['/inventory']
+    if (pathname.startsWith('/pricing') || pathname.startsWith('/price')) return ['/pricing']
+    if (pathname.startsWith('/procurement')) return ['/procurement']
+    if (pathname.startsWith('/analytics')) return ['/analytics']
 
     return []
   }

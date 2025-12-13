@@ -11,6 +11,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - N/A (前端文件系统重构，不涉及数据存储) (006-frontend-structure-refactor)
 - TypeScript 5.9.3 + React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4, React Router 7.10.1 (007-category-management)
 - Mock data (in-memory state + MSW handlers + localStorage for persistence) (007-category-management)
+- Python 3.8+ (001-claude-cleanup-script)
 
 - (003-inventory-management)
 
@@ -31,9 +32,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 001-claude-cleanup-script: Added Python 3.8+
+- 001-claude-cleanup-script: Added Python 3.8+
 - 007-category-management: Added TypeScript 5.9.3 + React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4, React Router 7.10.1
-- 006-frontend-structure-refactor: Added TypeScript 5.0.4, React 18.2.0 + Vite 6.0.7, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13
-- 005-sku-management: Added TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13
 
 
 <!-- MANUAL ADDITIONS START -->
