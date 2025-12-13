@@ -433,3 +433,4 @@ interface CategoryStorage {
 
 所有类型定义导出在 `frontend/src/types/category.ts` 文件中，供整个应用使用。
 
+

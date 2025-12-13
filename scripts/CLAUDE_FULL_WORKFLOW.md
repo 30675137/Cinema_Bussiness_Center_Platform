@@ -286,3 +286,4 @@ python scripts/claude_manager.py set-config \
 | 设置 API Key | `python scripts/claude_manager.py set-api-key` |
 | 检查版本 | `claude --version` |
 
+

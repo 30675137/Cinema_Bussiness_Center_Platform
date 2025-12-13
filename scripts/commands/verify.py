@@ -98,3 +98,4 @@ def verify(ctx, output_format):
         log_warning(f"仍有 {fail_count} 项检查失败，请检查上述报告")
         ctx.exit(1)
 
+
