@@ -8,13 +8,15 @@
       "Bash(git pull:*)",
       "Bash(git add:*)",
       "Bash(git fetch:*)",
+      "Bash(git merge:*)",
       "Bash(ls:*)",
       "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
       "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
       "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
       "Bash(git rev-parse:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
