@@ -1,6 +1,6 @@
 # Feature Specification: 类目管理
 
-**Feature Branch**: `007-category-management`  
+**Feature Branch**: `007-category-management-by-claude`  
 **Created**: 2025-01-27  
 **Status**: Draft  
 **Input**: User description: "@2.1_类目管理_UI设计文档.md (1-178)"
@@ -102,7 +102,7 @@
 - 当类目树数据量很大（超过 1000 个节点）时，系统如何保证树结构的加载和渲染性能？**Frontend Implementation**: Uses Ant Design Tree with virtual scrolling and lazy loading to optimize rendering performance. Only visible nodes are rendered, and child nodes are loaded on-demand when parent nodes are expanded.
 - 当用户同时编辑多个类目时，系统如何处理并发修改冲突？**Clarification**: 采用"最后保存者获胜"（Last Write Wins）策略，后保存的修改会覆盖先保存的修改，无需复杂的冲突检测机制。这符合纯前端 Mock 数据场景，实现简单且满足开发测试需求。
 - 当类目被删除后，历史 SPU 数据中的类目引用如何处理？**Clarification**: 保留引用但标记为已删除。SPU 中的 categoryId 字段保留不变，但在 SPU 显示时标记"类目已删除"，确保历史数据完整性。这符合纯前端 Mock 数据场景，实现简单且满足数据追溯需求。
-- 当属性模板中的可选值列表很长（超过 100 项）时，系统如何优化展示和选择体验？
+- 当属性模板中的可选值列表很长（超过 100 项）时，系统如何优化展示和选择体验？**Clarification**: 使用搜索式选择器（AutoComplete）- 提供搜索输入框，用户输入关键词快速筛选匹配选项，优化用户体验。
 - 当用户搜索类目时，如果匹配结果分布在多个分支中，系统如何高效地展开所有相关路径？
 - 当类目编码规则发生变化时，系统如何处理已有类目的编码兼容性？**Clarification**: 保持现有编码不变。已有类目的编码保持不变，新创建的类目使用新的编码规则。这符合纯前端 Mock 数据场景，避免数据迁移复杂度，保持历史数据一致性。
 - 当属性模板配置错误导致 SPU 创建失败时，系统如何提供清晰的错误提示和修复建议？**Clarification**: 表单验证 + 错误消息。在属性模板配置时进行验证，错误时显示 Ant Design Message，提示具体错误字段（如"属性名称不能为空"、"单选类型必须提供可选值"等）。这符合项目技术栈，实现简单且错误信息清晰。
@@ -171,6 +171,9 @@
 
 ### Session 2025-01-27
 
+- Q: 功能分支名称更新 → A: 将分支名从 `007-category-management` 更改为 `007-category-management-by-claude`
+- Q: 功能文件夹路径更新 → A: 将specs文件夹从 `007-category-management` 重命名为 `007-category-management-by-claude`
+
 - Q: 数据持久化策略（纯前端实现） → A: localStorage + 内存（刷新后保留，适合开发测试）
 - Q: 用户角色/权限信息来源（纯前端实现） → A: 前端Mock用户角色（固定角色或可切换，用于演示）
 - Q: SPU使用检查的实现方式（纯前端实现） → A: 前端Mock SPU数据，检查SPU的categoryId引用
@@ -181,6 +184,7 @@
 - Q: 属性可选值输入格式 → A: 多行文本输入 - 使用 TextArea，每行输入一个可选值，按换行符分割
 - Q: 类目编码规则变化时的兼容性处理 → A: 保持现有编码不变 - 已有类目编码保持不变，新创建的类目使用新规则
 - Q: 属性模板配置错误时的错误提示 → A: 表单验证 + 错误消息 - 在属性模板配置时进行验证，错误时显示 Ant Design Message，提示具体错误字段
+- Q: 长可选值列表的优化处理策略（超过100项时） → A: 搜索式选择器（AutoComplete）- 提供搜索输入框，用户输入关键词快速筛选匹配选项
 
 ## Assumptions
 

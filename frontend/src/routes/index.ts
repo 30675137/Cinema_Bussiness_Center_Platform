@@ -20,7 +20,7 @@ const SPUCreate = React.lazy(() => import('@/pages/SPUCreate'))
 const SPUDetail = React.lazy(() => import('@/pages/SPUDetail'))
 
 // Category Pages
-const CategoryManagement = React.lazy(() => import('@/pages/CategoryManagement'))
+const CategoryManagement = React.lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'))
 
 // Brand Pages
 const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'))
@@ -102,7 +102,11 @@ export const router = createBrowserRouter([
     element: withLayout(SPUDetail),
   },
   {
-    path: '/category',
+    path: '/mdm-pim/category',
+    element: withLayout(CategoryManagement),
+  },
+  {
+    path: '/mdm-pim/category/:id',
     element: withLayout(CategoryManagement),
   },
   {

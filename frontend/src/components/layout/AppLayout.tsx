@@ -82,6 +82,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '商品管理 (MDM/PIM)',
       children: [
         {
+          key: '/mdm-pim/category',
+          label: '类目管理',
+        },
+        {
           key: '/products/spu',
           label: 'SPU 管理',
         },

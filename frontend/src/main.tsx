@@ -17,6 +17,15 @@ import './index.css'
 import './monitoring/PerformanceInterceptor'
 import './monitoring/WebVitalsMonitor'
 
+// 在开发环境下启动MSW Mock Service Worker
+if (import.meta.env.DEV) {
+  import('./mocks/browser').then(({ startMSW }) => {
+    startMSW().catch(error => {
+      console.error('Failed to start MSW:', error)
+    })
+  })
+}
+
 // 设置dayjs中文语言
 dayjs.locale('zh-cn')
 

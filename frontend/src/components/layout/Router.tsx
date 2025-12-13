@@ -38,6 +38,9 @@ const ReceivingDetail = lazy(() => import('@/pages/procurement/ReceivingDetail')
 const SupplierList = lazy(() => import('@/pages/procurement/SupplierList'));
 const SupplierDetail = lazy(() => import('@/pages/procurement/SupplierDetail'));
 
+// MDM/PIM 模块 - 类目管理
+const CategoryManagement = lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'));
+
 // 暂时使用现有组件替代
 const Profile = lazy(() => import('@/pages/product/ProductList'));
 const Settings = lazy(() => import('@/pages/product/ProductList'));
@@ -147,6 +150,35 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <SPUListPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // MDM/PIM - 类目管理路由
+  {
+    path: '/mdm-pim/category',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <CategoryManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/mdm-pim/category/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <CategoryManagement />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

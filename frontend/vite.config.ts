@@ -41,7 +41,9 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    proxy: {
+    // 当使用 MSW 时，禁用 API 代理以避免冲突
+    // 设置 VITE_USE_MSW=true 来启用 MSW 模式
+    proxy: process.env.VITE_USE_MSW === 'true' ? {} : {
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,

@@ -1,6 +1,12 @@
-import { SPUItem, SPUStatus, SPUAttribute, AttributeType, ProductImage } from '@/types/spu'
-import { CategoryItem, CategoryStatus, CategoryLevel } from '@/types/category'
-import { BrandItem, BrandStatus } from '@/types/brand'
+// 暂时移除所有导入以避免模块解析问题，专注解决 MSW 启动问题
+// import { SPUItem, SPUStatus, SPUAttribute, ProductImage } from '@/types/spu'
+// import { CategoryItem, CategoryStatus, CategoryLevel } from '@/types/category'
+// import { BrandItem, BrandStatus } from '@/types/brand'
+
+// 本地定义所需类型以避免导入问题
+type AttributeType = 'text' | 'number' | 'boolean' | 'select' | 'multiselect' | 'date' | 'url' | 'image' | 'file'
+type CategoryStatus = 'active' | 'inactive'
+type CategoryLevel = 1 | 2 | 3
 
 // 影院商品相关数据
 const cinemaProducts = {
