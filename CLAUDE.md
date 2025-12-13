@@ -35,7 +35,6 @@ tests/
 ## Recent Changes
 - 001-claude-cleanup-script: Added Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致）
 - 001-claude-cleanup-script: Added Python 3.8+
-- 001-claude-cleanup-script: Added Python 3.8+
 
 
 <!-- MANUAL ADDITIONS START -->
