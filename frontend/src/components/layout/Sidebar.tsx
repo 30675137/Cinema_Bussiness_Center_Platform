@@ -42,9 +42,9 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
           label: 'SPU管理',
         },
         {
-          key: '/category',
+          key: '/mdm-pim/category',
           icon: <AppstoreOutlined />,
-          label: '分类管理',
+          label: '类目管理',
         },
         {
           key: '/brand',

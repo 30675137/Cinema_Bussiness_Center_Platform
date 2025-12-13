@@ -45,7 +45,7 @@ const SPUListTest = lazy(() => import('./pages/SPUList/test'));
 const SPUDetailPage = lazy(() => import('./pages/SPUDetail'));
 
 // 基础数据管理页面
-const CategoryManagementPage = lazy(() => import('./pages/CategoryManagement'));
+const CategoryManagementPage = lazy(() => import('./pages/mdm-pim/category/CategoryManagement'));
 const BrandManagementPage = lazy(() => import('./pages/BrandManagement'));
 
 // 属性模板管理页面
@@ -185,7 +185,7 @@ const App: React.FC = () => {
                 <Route path="/spu/:id/edit" element={<SPUDetailPage />} />
 
                 {/* 基础数据管理 */}
-                <Route path="/categories" element={<CategoryManagementPage />} />
+                <Route path="/mdm-pim/category" element={<CategoryManagementPage />} />
                 <Route path="/brands" element={<BrandManagementPage />} />
 
                 {/* 属性模板管理 */}

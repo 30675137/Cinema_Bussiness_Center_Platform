@@ -2,6 +2,10 @@ import React from 'react';
 import { Card, Table, Button, Space, Input, Select, Tag } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 
+// 导入面包屑组件
+import Breadcrumb from '../../components/common/Breadcrumb';
+import { HomeOutlined } from '@ant-design/icons';
+
 const { Search } = Input;
 const { Option } = Select;
 
@@ -112,6 +116,29 @@ const ProductList: React.FC = React.memo(() => {
 
   return (
     <div style={{ padding: '24px' }}>
+      {/* 面包屑导航 */}
+      <Breadcrumb
+        items={[
+          {
+            title: '首页',
+            path: '/',
+            icon: <HomeOutlined />
+          },
+          {
+            title: '基础设置与主数据',
+            path: '/mdm-pim'
+          },
+          {
+            title: '商品管理 (MDM/PIM)',
+            path: '/mdm-pim/spu'
+          },
+          {
+            title: 'SPU 管理'
+          }
+        ]}
+        style={{ marginBottom: '16px' }}
+      />
+
       <Card
         title="商品管理"
         extra={
