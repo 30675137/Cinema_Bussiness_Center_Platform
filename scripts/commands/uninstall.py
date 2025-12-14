@@ -70,12 +70,14 @@ def execute_cleanup_step(step_name: str, step_func, *args, **kwargs) -> CleanupS
 
 
 @click.command()
-@click.option('--backup', is_flag=True, help='在卸载前备份配置文件')
+@click.option('--backup', is_flag=True, default=True, help='在卸载前备份配置文件（默认启用）')
+@click.option('--no-backup', is_flag=True, help='跳过备份步骤')
 @click.option('--backup-dir', type=click.Path(), help='备份目录路径（默认: ~/.claude-cleanup-backup/）')
 @click.option('--methods', help='要清理的安装方式，逗号分隔（npm,homebrew,native），默认: 自动检测所有方式')
 @click.option('--skip-verify', is_flag=True, help='卸载后不执行验证')
+@click.option('--force', is_flag=True, help='即使备份失败也强制继续（不推荐）')
 @click.pass_context
-def uninstall(ctx, backup, backup_dir, methods, skip_verify):
+def uninstall(ctx, backup, no_backup, backup_dir, methods, skip_verify, force):
     """
     卸载 Claude Code CLI 和 Claude Code Router，清理所有相关配置和残留
     """
@@ -86,23 +88,44 @@ def uninstall(ctx, backup, backup_dir, methods, skip_verify):
     if loaded_config:
         log_info("从配置文件加载环境变量设置")
     
+    # 处理备份选项：默认启用，除非明确指定 --no-backup
+    should_backup = backup and not no_backup
+    
     config = UninstallConfig(
-        backup=backup,
+        backup=should_backup,
         backup_dir=backup_dir,
         methods=methods.split(',') if methods else None
     )
     
     steps: List[CleanupStep] = []
     
-    # 步骤 1: 备份（如果启用）
+    # 步骤 1: 备份（默认启用，除非 --no-backup）
+    backup_location = None
     if config.backup:
-        step = execute_cleanup_step(
-            "备份配置文件",
-            backup_configs,
-            config.backup_dir
-        )
+        backup_result = backup_configs(config.backup_dir)
+        if backup_result:
+            backup_location = backup_result
+            step = CleanupStep(
+                name="备份配置文件",
+                status=StepStatus.SUCCESS,
+                message=f"备份位置: {backup_location}"
+            )
+            log_info(f"✓ 备份已创建: {backup_location}")
+        else:
+            step = CleanupStep(
+                name="备份配置文件",
+                status=StepStatus.FAILED,
+                message="备份失败"
+            )
+            # 如果备份失败且未使用 --force，中止清理操作
+            if not force:
+                log_error("✗ 无法创建备份，清理操作已中止。使用 --force 强制继续（不推荐）")
+                ctx.exit(1)
+            else:
+                log_warning("⚠ 备份失败，但使用 --force 继续执行清理")
         steps.append(step)
-        # 即使备份失败也继续执行清理
+    elif no_backup:
+        log_warning("⚠ 跳过备份步骤（使用 --no-backup）")
     
     # 步骤 2: 停止进程
     processes = find_claude_processes()

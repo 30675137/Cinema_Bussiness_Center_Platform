@@ -77,12 +77,30 @@ python scripts/claude_manager.py install --dry-run --verbose
 
 ### 2. 卸载 Claude 组件
 
+**推荐方式：使用 Shell 入口脚本**
+
 ```bash
-# 基本卸载（自动检测所有安装方式）
+# 基本卸载（默认自动备份）
+scripts/claude-uninstall.sh
+
+# 跳过备份（高级用户）
+scripts/claude-uninstall.sh --no-backup
+
+# 跳过验证步骤
+scripts/claude-uninstall.sh --skip-verify
+
+# 查看帮助
+scripts/claude-uninstall.sh --help
+```
+
+**或使用 Python 入口（向后兼容）**
+
+```bash
+# 基本卸载（默认自动备份）
 python scripts/claude_manager.py uninstall
 
-# 卸载前备份配置文件
-python scripts/claude_manager.py uninstall --backup
+# 跳过备份
+python scripts/claude_manager.py uninstall --no-backup
 
 # 跳过验证步骤
 python scripts/claude_manager.py uninstall --skip-verification
@@ -92,15 +110,22 @@ python scripts/claude_manager.py uninstall --dry-run --verbose
 ```
 
 **卸载流程**:
-1. （可选）备份配置文件到 ~/claude-backup-YYYYMMDD-HHMMSS/
+1. **自动备份**（默认启用）: 备份配置文件到 ~/claude-backup-YYYYMMDD-HHMMSS/
+   - 备份 ~/.zshrc 和 ~/.zshenv（如果存在）
+   - 备份 ~/.claude 等用户配置文件
+   - 使用 `--no-backup` 可跳过备份
 2. 检测所有安装方式（npm、Homebrew、Native、NVM）
 3. 停止运行中的 Router 进程
 4. 卸载 npm 全局包
 5. 卸载 Homebrew 包（如果存在）
 6. 清理 Native 安装（如果存在）
-7. 清理用户配置（~/.claude、~/.claude.json 等）
-8. 清理环境变量（ANTHROPIC_*、SILICONFLOW_*）
-9. 清理 alias（cc、c、claude-dev）
+7. **增强的环境变量清理**:
+   - 删除 `export ANTHROPIC_*` 语句
+   - 删除函数内部的 ANTHROPIC 变量
+   - 删除 alias 中的 ANTHROPIC 变量
+   - 显示详细的清理日志（变量名、行号、类型）
+8. 清理用户配置（~/.claude、~/.claude.json 等）
+9. 清理会话环境变量（当前 Python 进程）
 10. （可选）验证清理结果
 
 **支持的安装方式**:

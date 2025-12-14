@@ -4,6 +4,53 @@
 
 ---
 
+## 0. 推荐方式：使用自动化脚本（快速卸载）
+
+**推荐优先使用自动化卸载脚本**，它会自动处理大部分清理工作：
+
+### 方式 1: Shell 入口脚本（推荐）
+
+```bash
+# 基本卸载（默认自动备份）
+scripts/claude-uninstall.sh
+
+# 跳过备份（高级用户）
+scripts/claude-uninstall.sh --no-backup
+
+# 跳过验证步骤
+scripts/claude-uninstall.sh --skip-verify
+
+# 查看帮助
+scripts/claude-uninstall.sh --help
+```
+
+### 方式 2: Python 入口（向后兼容）
+
+```bash
+# 基本卸载（默认自动备份）
+python scripts/claude_manager.py uninstall
+
+# 跳过备份
+python scripts/claude_manager.py uninstall --no-backup
+
+# 跳过验证步骤
+python scripts/claude_manager.py uninstall --skip-verification
+```
+
+**自动化脚本会处理：**
+- ✅ 自动备份配置文件（默认启用）
+- ✅ 检测并卸载所有安装方式（npm、Homebrew、Native、NVM）
+- ✅ 停止运行中的进程
+- ✅ 清理用户配置和项目残留
+- ✅ **增强的环境变量清理**（export、函数内部、alias 中的 ANTHROPIC 变量）
+- ✅ 自动验证清理结果
+
+**备份位置：** `~/claude-backup-{timestamp}/`
+
+如果自动化脚本无法完全清理，或你需要手动验证，请继续阅读下面的手动清理步骤。
+
+---
+
 ## 1. 目标与范围
 
 本卸载文档覆盖以下内容：
@@ -13,7 +60,7 @@
 - 清理用户级配置文件（如 `~/.claude*`、`~/.claude-code-router`）
 - 清理项目级残留（`.claude/`、`.mcp.json`）
 - 清理 shell 环境变量与 alias（`ANTHROPIC_*`、`SILICONFLOW_*` 等）
-- 提供最终核查清单，确保“确实清干净”
+- 提供最终核查清单，确保"确实清干净"
 
 ---
 
@@ -125,7 +172,14 @@ rm -f  <项目路径>/.mcp.json
 
 ---
 
-## 9. 清理环境变量与 alias（避免新开终端“复活”）
+## 9. 清理环境变量与 alias（避免新开终端"复活"）
+
+> 💡 **提示**: 如果使用了自动化脚本（第 0 节），这一步已经自动完成。自动化脚本会清理：
+> - `export ANTHROPIC_*` 语句
+> - 函数内部的 ANTHROPIC 变量
+> - alias 中的 ANTHROPIC 变量
+> 
+> 如果自动化脚本未完全清理，或你需要手动验证，请继续阅读。
 
 ### 9.1 立即清理当前终端（临时生效）
 ```bash
@@ -145,13 +199,33 @@ grep -nE "ANTHROPIC_|SILICONFLOW_|api\.siliconflow\.cn|moonshotai|Kimi-K2|ccr ac
 ```
 
 #### 9.2.2 编辑删除/注释以下类型行
+
+**Export 语句：**
 - `export ANTHROPIC_BASE_URL=...`
 - `export ANTHROPIC_API_KEY=...`
 - `export ANTHROPIC_AUTH_TOKEN=...`
 - `export ANTHROPIC_MODEL=...`
 - `export SILICONFLOW_API_KEY=...`
+
+**函数内部的变量：**
+- 函数体内定义的 `ANTHROPIC_*` 变量，例如：
+  ```bash
+  cc_glm() {
+    ANTHROPIC_AUTH_TOKEN=sk-xxx
+    export ANTHROPIC_BASE_URL=https://api.example.com
+  }
+  ```
+  需要删除函数中的这些变量行，或删除整个函数（如果函数只包含这些变量）
+
+**Alias 中的变量：**
+- 任何把 ANTHROPIC 变量写进 alias 的命令，例如：
+  ```bash
+  alias cc-glm="ANTHROPIC_AUTH_TOKEN=sk-xxx ANTHROPIC_BASE_URL=https://api.example.com claude"
+  ```
+  需要从 alias 值中删除这些变量，或删除整个 alias（如果 alias 只包含这些变量）
+
+**其他：**
 - `eval "$(ccr activate)"`（若存在）
-- 任何把上面变量写进 alias 的命令（如 `alias cc-kimi="ANTHROPIC_BASE_URL=... ... claude"`）
 
 编辑完成后加载配置并刷新命令缓存：
 
@@ -161,9 +235,16 @@ source ~/.zshenv 2>/dev/null || true
 hash -r
 ```
 
+> 💡 **提示**: 自动化脚本的增强清理功能可以自动处理上述所有情况，包括函数内部和 alias 中的变量。
+
 ---
 
 ## 10. 最终核查清单（必须通过）
+
+> 💡 **快速验证**: 如果使用了自动化脚本，可以运行以下命令进行自动验证：
+> ```bash
+> python scripts/claude_manager.py verify
+> ```
 
 ### 10.1 命令不可用
 ```bash
@@ -193,13 +274,26 @@ ls -ld ~/.claude ~/.claude.json ~/.claude-code-router ~/.claude-code 2>/dev/null
 ```
 **期望：** 输出 `config cleaned`
 
-### 10.5 环境变量无残留
+### 10.5 环境变量无残留（当前会话）
 ```bash
 env | grep -E 'ANTHROPIC_|SILICONFLOW_' || echo "env cleaned"
 ```
 **期望：** 输出 `env cleaned`
 
-### 10.6 Router 进程/端口无残留
+### 10.6 配置文件中的环境变量无残留
+```bash
+grep -nE "ANTHROPIC_|SILICONFLOW_" ~/.zshrc ~/.zshenv ~/.bashrc ~/.bash_profile ~/.profile 2>/dev/null || echo "config files cleaned"
+```
+**期望：** 输出 `config files cleaned`
+
+> 💡 **注意**: 自动化脚本的增强清理功能会检查并清理：
+> - export 语句中的 ANTHROPIC 变量
+> - 函数内部的 ANTHROPIC 变量
+> - alias 中的 ANTHROPIC 变量
+> 
+> 如果手动清理，请确保检查所有这些位置。
+
+### 10.7 Router 进程/端口无残留
 ```bash
 ps aux | grep -E "claude-code-router|ccr" | grep -v grep || echo "no router process"
 lsof -nP -iTCP -sTCP:LISTEN | grep -E "3456|ccr|claude" || echo "no related listening ports"
@@ -226,18 +320,34 @@ ls -l "$(which claude)"
 ### 11.2 新开终端环境变量又出现
 原因是仍写在 `~/.zshrc` 或 `~/.zshenv` 之类文件里。
 
+**可能的位置：**
+1. **Export 语句**（最常见）
+2. **函数内部的变量**（如 `cc_glm()` 函数中定义的变量）
+3. **Alias 中的变量**（如 `alias cc-glm="ANTHROPIC_* claude"`）
+
 快速定位：
 
 ```bash
+# 查找所有 ANTHROPIC 相关配置
 grep -nE "ANTHROPIC_|SILICONFLOW_|api\.siliconflow\.cn|moonshotai|Kimi-K2" \
   ~/.zshrc ~/.zshenv ~/.bashrc ~/.bash_profile ~/.profile 2>/dev/null
+
+# 查找函数中的变量
+grep -A 10 -B 2 "ANTHROPIC_" ~/.zshrc ~/.zshenv 2>/dev/null | grep -E "^\w+\(\)|ANTHROPIC_"
+
+# 查找 alias 中的变量
+grep -E "alias.*ANTHROPIC_" ~/.zshrc ~/.zshenv 2>/dev/null
 ```
+
+**解决方案：**
+- 使用自动化脚本重新清理：`scripts/claude-uninstall.sh`
+- 或手动编辑配置文件，删除上述所有位置的 ANTHROPIC 变量
 
 ---
 
 ## 12. 建议：清理 shell 历史中的泄露 Key（可选但推荐）
 
-> 下面是“查找历史里是否出现过 key”的方法（不会自动删除）
+> 下面是"查找历史里是否出现过 key"的方法（不会自动删除）
 
 ```bash
 grep -nE "ANTHROPIC_API_KEY=|SILICONFLOW_API_KEY=|sk-[A-Za-z0-9]+" ~/.zsh_history 2>/dev/null | head
@@ -248,3 +358,22 @@ grep -nE "ANTHROPIC_API_KEY=|SILICONFLOW_API_KEY=|sk-[A-Za-z0-9]+" ~/.zsh_histor
 ```bash
 fc -R
 ```
+
+---
+
+## 13. 使用自动化脚本的优势
+
+相比手动清理，使用自动化脚本（`scripts/claude-uninstall.sh` 或 `python scripts/claude_manager.py uninstall`）有以下优势：
+
+1. **自动备份**: 清理前自动创建备份，防止数据丢失
+2. **全面检测**: 自动检测所有安装方式（npm、Homebrew、Native、NVM）
+3. **增强清理**: 自动清理 export、函数内部、alias 中的 ANTHROPIC 变量
+4. **详细日志**: 显示删除的每个变量的详细信息（变量名、行号、类型）
+5. **自动验证**: 清理后自动验证结果
+6. **安全处理**: 备份失败时默认中止操作，避免数据丢失
+
+**推荐工作流程：**
+1. 首先尝试使用自动化脚本：`scripts/claude-uninstall.sh`
+2. 运行验证命令：`python scripts/claude_manager.py verify`
+3. 如果验证失败，参考本文档的手动清理步骤进行补充清理
+4. 如果自动化脚本无法运行，使用本文档的手动清理步骤

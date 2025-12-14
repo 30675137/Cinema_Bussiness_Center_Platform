@@ -18,14 +18,16 @@ def create_backup_dir(backup_dir: Optional[str] = None) -> Path:
         创建的备份目录路径
     """
     if backup_dir is None:
-        backup_base = Path.home() / ".claude-cleanup-backup"
+        # 使用与 claude_manager.py 一致的备份目录格式
+        backup_base = Path.home() / "claude-backup"
     else:
         backup_base = Path(backup_dir)
     
     ensure_dir(backup_base)
     
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    backup_path = backup_base / timestamp
+    # 使用与 claude_manager.py 一致的时间戳格式: YYYYMMDD-HHMMSS
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    backup_path = backup_base / f"claude-backup-{timestamp}"
     ensure_dir(backup_path)
     
     log_info(f"创建备份目录: {backup_path}")
@@ -56,13 +58,9 @@ def backup_configs(backup_dir: Optional[str] = None) -> bool:
     
     for config_file in shell_configs:
         if config_file.exists():
-            # 检查是否包含 Claude 相关配置
-            try:
-                content = config_file.read_text(encoding="utf-8")
-                if "ANTHROPIC" in content or "SILICONFLOW" in content or "claude" in content.lower():
-                    config_files_to_backup.append(config_file)
-            except Exception:
-                pass
+            # 默认备份所有 shell 配置文件（即使不包含 Claude 相关配置）
+            # 这样可以确保在清理前有完整备份
+            config_files_to_backup.append(config_file)
     
     # 用户配置文件
     user_configs = [

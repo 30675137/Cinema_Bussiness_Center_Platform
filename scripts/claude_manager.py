@@ -472,14 +472,21 @@ def cmd_uninstall(args):
     steps = []
     start_time = time.time()
 
-    # 1. 备份（可选）
+    # 1. 备份（默认启用，除非明确指定 --no-backup）
     backup_location = None
-    if args.backup:
+    # args.backup 现在默认为 True（通过 default=True），--no-backup 会将其设为 False
+    should_backup = getattr(args, 'backup', True)
+    
+    if should_backup:
         try:
             backup_location = create_backup()
             logging.info(f"✓ Backup created at {backup_location}")
         except Exception as e:
             logging.error(f"✗ Backup failed: {e}")
+            # 备份失败时，询问是否继续（如果没有 --force 参数）
+            if not hasattr(args, 'force') or not args.force:
+                logging.error("✗ 无法创建备份，清理操作已中止。使用 --force 强制继续（不推荐）")
+                return 1
 
     # 2. 检测安装
     logging.info("\n检测 Claude 安装...")
@@ -524,7 +531,9 @@ def cmd_uninstall(args):
 
     # 7. 清理配置
     cleanup_user_configs()
-    cleanup_env_vars()
+    # 使用增强的环境变量清理函数（支持函数内部和 alias 中的变量）
+    from core.env_manager import cleanup_env_vars_from_files
+    cleanup_env_vars_from_files()
     cleanup_aliases()
 
     # 8. 验证（可选）
