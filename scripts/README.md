@@ -77,12 +77,30 @@ python scripts/claude_manager.py install --dry-run --verbose
 
 ### 2. 卸载 Claude 组件
 
+**推荐方式：使用 Shell 入口脚本**
+
 ```bash
-# 基本卸载（自动检测所有安装方式）
+# 基本卸载（默认自动备份）
+scripts/claude-uninstall.sh
+
+# 跳过备份（高级用户）
+scripts/claude-uninstall.sh --no-backup
+
+# 跳过验证步骤
+scripts/claude-uninstall.sh --skip-verify
+
+# 查看帮助
+scripts/claude-uninstall.sh --help
+```
+
+**或使用 Python 入口（向后兼容）**
+
+```bash
+# 基本卸载（默认自动备份）
 python scripts/claude_manager.py uninstall
 
-# 卸载前备份配置文件
-python scripts/claude_manager.py uninstall --backup
+# 跳过备份
+python scripts/claude_manager.py uninstall --no-backup
 
 # 跳过验证步骤
 python scripts/claude_manager.py uninstall --skip-verification
@@ -92,15 +110,22 @@ python scripts/claude_manager.py uninstall --dry-run --verbose
 ```
 
 **卸载流程**:
-1. （可选）备份配置文件到 ~/claude-backup-YYYYMMDD-HHMMSS/
+1. **自动备份**（默认启用）: 备份配置文件到 ~/claude-backup-YYYYMMDD-HHMMSS/
+   - 备份 ~/.zshrc 和 ~/.zshenv（如果存在）
+   - 备份 ~/.claude 等用户配置文件
+   - 使用 `--no-backup` 可跳过备份
 2. 检测所有安装方式（npm、Homebrew、Native、NVM）
 3. 停止运行中的 Router 进程
 4. 卸载 npm 全局包
 5. 卸载 Homebrew 包（如果存在）
 6. 清理 Native 安装（如果存在）
-7. 清理用户配置（~/.claude、~/.claude.json 等）
-8. 清理环境变量（ANTHROPIC_*、SILICONFLOW_*）
-9. 清理 alias（cc、c、claude-dev）
+7. **增强的环境变量清理**:
+   - 删除 `export ANTHROPIC_*` 语句
+   - 删除函数内部的 ANTHROPIC 变量
+   - 删除 alias 中的 ANTHROPIC 变量
+   - 显示详细的清理日志（变量名、行号、类型）
+8. 清理用户配置（~/.claude、~/.claude.json 等）
+9. 清理会话环境变量（当前 Python 进程）
 10. （可选）验证清理结果
 
 **支持的安装方式**:
@@ -166,9 +191,52 @@ python scripts/claude_manager.py set-config \
   --permission dangerously_skip_permissions=false \
   --alias cc='claude --dangerously-skip-permissions' \
   --alias c='claude'
+
+# 从 JSON 文件读取配置
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json
+
+# 从 JSON 文件读取并同步到 shell 配置文件
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --to-shell
+
+# 命令行参数覆盖 JSON 文件中的配置（优先级：命令行 > JSON > 现有配置）
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --env ANTHROPIC_AUTH_TOKEN=sk-new-token
+
+# 指定自定义 shell 配置文件路径
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --to-shell \
+  --shell-config ~/.custom_zshrc
 ```
 
-配置将保存到 `~/.claude/settings.json`。
+**配置优先级**（从高到低）:
+1. 命令行参数 (`--env`, `--permission`, `--alias`)
+2. JSON 文件 (`--json-file`)
+3. 现有配置文件 (`~/.claude/settings.json`)
+4. 默认值
+
+**JSON 文件格式**:
+```json
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxx",
+    "ANTHROPIC_BASE_URL": "https://api.example.com"
+  },
+  "permissions": {
+    "allow": ["read", "write"],
+    "deny": []
+  },
+  "aliases": {
+    "cc": "claude --dangerously-skip-permissions"
+  }
+}
+```
+
+配置将保存到 `~/.claude/settings.json`。如果使用 `--to-shell`，环境变量也会写入 shell 配置文件（`~/.zshrc` 或 `~/.zshenv`）。
 
 ## ⚙️ 全局选项
 
