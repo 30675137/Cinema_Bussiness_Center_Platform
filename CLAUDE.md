@@ -13,6 +13,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - Mock data (in-memory state + MSW handlers + localStorage for persistence) (007-category-management)
 - Python 3.8+ (001-claude-cleanup-script)
 - Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致） (001-claude-cleanup-script)
+- TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4 (001-brand-management)
 
 - (003-inventory-management)
 
@@ -33,9 +34,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 001-brand-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
 - 001-claude-cleanup-script: Added Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致）
 - 001-claude-cleanup-script: Added Python 3.8+
-- 007-category-management: Added TypeScript 5.9.3 + React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4, React Router 7.10.1
 
 
 <!-- MANUAL ADDITIONS START -->

@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { categoryHandlers } from './categoryHandlers'
+import { brandHandlers } from './brandHandlers'
 
 // 动态导入 generators（延迟加载），避免在 MSW 启动时立即加载所有依赖
 const getGenerators = async () => {
@@ -168,26 +169,13 @@ export const legacyCategoryHandlers = [
   })
 ]
 
-// 品牌相关API处理器
-export const brandHandlers = [
-  http.get('/api/brand/list', async () => {
-    await delay(300)
-    const { generateMockBrands } = await getGenerators()
-    const brands = generateMockBrands()
-
-    return HttpResponse.json({
-      success: true,
-      data: brands
-    })
-  })
-]
 
 // 导出所有处理器
 export const handlers = [
   ...spuHandlers,
   ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
   ...legacyCategoryHandlers, // 旧版兼容处理器
-  ...brandHandlers
+  ...brandHandlers // 使用新的brandHandlers
 ]
 
 // 默认导出所有处理器

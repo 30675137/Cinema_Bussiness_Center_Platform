@@ -56,3 +56,19 @@ export const useCategoryStore = create<CategoryStore>()(
     }
   )
 );
+
+// CategoryActions Hook - 提供常用的类别操作
+export const useCategoryActions = () => {
+  const setEditing = useCategoryStore((state) => state.setEditing);
+  const isEditing = useCategoryStore((state) => state.isEditing);
+
+  const startEditing = () => setEditing(true);
+  const cancelEditing = () => setEditing(false);
+
+  return {
+    startEditing,
+    cancelEditing,
+    isEditing,
+    setEditing
+  };
+};

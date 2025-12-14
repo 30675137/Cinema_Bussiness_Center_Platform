@@ -86,13 +86,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '类目管理',
         },
         {
+          key: '/mdm-pim/brands',
+          label: '品牌管理',
+        },
+        {
           key: '/products/spu',
           label: 'SPU 管理',
         },
-        {
-          key: '/category',
-          label: '类目管理',
-        },
+        
         {
           key: '/products/sku',
           label: 'SKU 管理',

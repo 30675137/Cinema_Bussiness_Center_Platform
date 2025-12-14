@@ -17,7 +17,19 @@
       "Bash(git rev-parse:*)",
       "Bash(chmod:*)",
       "Bash(git stash:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run test:e2e:*)",
+      "Bash(npm install:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(bash:*)",
+      "Bash(npm run test:unit:*)",
+      "Bash(npm run dev)",
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node:*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }
