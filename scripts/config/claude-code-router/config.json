@@ -8,12 +8,9 @@
     {
       "name": "openrouter",
       "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
-      "api_key": "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",
+      "api_key": "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",
       "models": [
-        "anthropic/claude-sonnet-4.5",
-        "anthropic/claude-3.5-sonnet",
-        "anthropic/claude-3.7-sonnet",
-        "moonshotai/kimi-k2-thinking"
+        "anthropic/claude-sonnet-4.5"
       ],
       "transformer": {
         "use": ["openrouter"]
