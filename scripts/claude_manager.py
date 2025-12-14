@@ -537,6 +537,67 @@ def cmd_install(args):
     else:
         logging.info("未找到环境变量配置，跳过同步")
 
+    # 8. 同步 Router 配置文件到 ~/.claude-code-router/config.json
+    router_template_path = Path("scripts/config/claude-code-router/config.json")
+    router_user_config_path = Path.home() / ".claude-code-router" / "config.json"
+    
+    if router_template_path.exists():
+        logging.info("\n同步 Router 配置...")
+        try:
+            # 读取模板配置
+            with open(router_template_path, 'r', encoding='utf-8') as f:
+                router_config_data = json.load(f)
+            logging.info(f"从项目模板配置文件读取: {router_template_path}")
+            
+            # 确保目标目录存在
+            router_user_config_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # 如果用户配置文件不存在，或者需要更新，则同步
+            should_sync = False
+            if not router_user_config_path.exists():
+                should_sync = True
+                logging.info("用户 Router 配置文件不存在，将创建新配置")
+            else:
+                # 检查用户配置文件是否为空或只有默认值
+                try:
+                    with open(router_user_config_path, 'r', encoding='utf-8') as f:
+                        existing_config = json.load(f)
+                    # 如果 Providers 为空或 Router 为空，则同步
+                    if not existing_config.get("Providers") or not existing_config.get("Router"):
+                        should_sync = True
+                        logging.info("用户 Router 配置文件不完整，将更新配置")
+                except Exception:
+                    should_sync = True
+                    logging.info("用户 Router 配置文件格式错误，将更新配置")
+            
+            if should_sync and not DRY_RUN:
+                # 写入用户配置文件
+                with open(router_user_config_path, 'w', encoding='utf-8') as f:
+                    json.dump(router_config_data, f, indent=2, ensure_ascii=False)
+                logging.info(f"✓ Router 配置已同步到: {router_user_config_path}")
+                
+                # 显示配置摘要
+                if "Providers" in router_config_data:
+                    providers = router_config_data["Providers"]
+                    logging.info(f"已配置 {len(providers)} 个 Provider:")
+                    for provider in providers:
+                        provider_name = provider.get("name", "unknown")
+                        models = provider.get("models", [])
+                        logging.info(f"  ✓ {provider_name} ({len(models)} 个模型)")
+                
+                if "Router" in router_config_data:
+                    router_rules = router_config_data["Router"]
+                    if "default" in router_rules:
+                        logging.info(f"默认路由: {router_rules['default']}")
+            elif should_sync:
+                logging.info(f"[DRY-RUN] 将同步 Router 配置到: {router_user_config_path}")
+            else:
+                logging.info("用户 Router 配置文件已存在且完整，跳过同步")
+        except Exception as e:
+            logging.warning(f"同步 Router 配置失败: {e}")
+    else:
+        logging.info("未找到 Router 配置模板文件，跳过同步")
+
     logging.info("\n✅ 安装完成！")
     logging.info("⚠️  请执行以下命令使环境变量生效:")
     logging.info("   source ~/.zshrc")

@@ -1,0 +1,28 @@
+{
+  "PORT": 3456,
+  "HOST": "127.0.0.1",
+  "LOG": true,
+  "API_TIMEOUT_MS": 600000,
+  "NON_INTERACTIVE_MODE": false,
+  "Providers": [
+    {
+      "name": "openrouter",
+      "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
+      "api_key": "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",
+      "models": [
+        "anthropic/claude-sonnet-4.5",
+        "anthropic/claude-3.5-sonnet",
+        "anthropic/claude-3.7-sonnet",
+        "moonshotai/kimi-k2-thinking"
+      ],
+      "transformer": {
+        "use": ["openrouter"]
+      }
+    }
+  ],
+  "Router": {
+    "default": "openrouter,anthropic/claude-sonnet-4.5",
+    "longContextThreshold": 60000
+  }
+}
+
