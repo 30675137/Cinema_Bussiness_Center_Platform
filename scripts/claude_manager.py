@@ -20,6 +20,20 @@ import time
 import shutil
 import re
 
+# Add scripts directory to path for core module imports
+_SCRIPT_DIR = Path(__file__).parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+
+# Import core modules
+from core.config_manager import (
+    set_claude_config,
+    set_env_vars_to_shell_config,
+    load_claude_config,
+    save_claude_config,
+)
+from core.env_manager import detect_config_file
+
 # ============================================================================
 # 数据结构
 # ============================================================================
@@ -598,40 +612,166 @@ def cmd_set_api_key(args):
 
 def cmd_set_config(args):
     """设置配置子命令"""
-    config_path = Path.home() / '.claude' / 'settings.json'
-    settings = ClaudeSettings.load(config_path)
-
+    # 初始化配置字典
+    env_vars = {}
+    permissions = {"allow": [], "deny": []}
+    aliases = {}
+    
+    # T010-T014: 从 JSON 文件读取配置（如果提供）
+    if args.json_file:
+        json_path = args.json_file.resolve()  # 解析为绝对路径
+        logging.info(f"从文件加载配置: {json_path}")
+        
+        try:
+            # 检查文件是否存在
+            if not json_path.exists():
+                logging.error(f"JSON 文件不存在: {json_path}")
+                return 1
+            
+            # 读取并解析 JSON
+            with open(json_path, 'r', encoding='utf-8') as f:
+                json_data = json.load(f)
+            
+            # T011: 提取 env 和 permissions，处理缺失字段
+            if "env" in json_data:
+                env_vars.update(json_data["env"])
+                logging.info(f"从 JSON 文件读取环境变量: {list(json_data['env'].keys())}")
+            
+            if "permissions" in json_data:
+                json_perms = json_data["permissions"]
+                if "allow" in json_perms:
+                    permissions["allow"] = json_perms["allow"]
+                if "deny" in json_perms:
+                    permissions["deny"] = json_perms["deny"]
+                logging.info("从 JSON 文件读取权限配置")
+            
+            if "aliases" in json_data:
+                aliases.update(json_data["aliases"])
+                logging.info(f"从 JSON 文件读取别名: {list(json_data['aliases'].keys())}")
+            
+            logging.info("JSON 文件加载成功")
+            
+        except FileNotFoundError:
+            logging.error(f"JSON 文件不存在: {json_path}")
+            return 1
+        except json.JSONDecodeError as e:
+            logging.error(f"JSON 文件格式错误: {json_path}, 错误: {e}")
+            return 1
+        except Exception as e:
+            logging.error(f"读取 JSON 文件失败: {json_path}, 错误: {e}")
+            return 1
+    
+    # T022-T024: 处理命令行参数（优先级高于 JSON 文件）
     # 更新环境变量
     if args.env:
         for env_pair in args.env:
-            key, value = env_pair.split('=', 1)
-            settings.env_vars[key] = value
-            logging.info(f"✓ Set env var: {key}")
-
+            try:
+                if '=' not in env_pair:
+                    logging.error(f"环境变量格式错误: {env_pair} (应为 KEY=VALUE)")
+                    return 2
+                key, value = env_pair.split('=', 1)
+                env_vars[key] = value
+                logging.info(f"✓ Set env var: {key}")
+            except ValueError:
+                logging.error(f"环境变量格式错误: {env_pair}")
+                return 2
+    
     # 更新权限
     if args.permission:
         for perm_pair in args.permission:
-            key, value = perm_pair.split('=', 1)
-            settings.permissions[key] = value.lower() == 'true'
-            logging.info(f"✓ Set permission: {key} = {value}")
-
+            try:
+                if '=' not in perm_pair:
+                    logging.error(f"权限格式错误: {perm_pair} (应为 KEY=VALUE)")
+                    return 2
+                key, value = perm_pair.split('=', 1)
+                # 权限处理：根据值设置 allow 或 deny
+                if value.lower() == 'true':
+                    if key not in permissions["allow"]:
+                        permissions["allow"].append(key)
+                elif value.lower() == 'false':
+                    if key not in permissions["deny"]:
+                        permissions["deny"].append(key)
+                logging.info(f"✓ Set permission: {key} = {value}")
+            except ValueError:
+                logging.error(f"权限格式错误: {perm_pair}")
+                return 2
+    
     # 更新 alias
     if args.alias:
         for alias_pair in args.alias:
-            name, cmd = alias_pair.split('=', 1)
-            settings.aliases[name] = cmd
-            logging.info(f"✓ Set alias: {name} = {cmd}")
-
-    # 保存配置
+            try:
+                if '=' not in alias_pair:
+                    logging.error(f"别名格式错误: {alias_pair} (应为 NAME=COMMAND)")
+                    return 2
+                name, cmd = alias_pair.split('=', 1)
+                aliases[name] = cmd
+                logging.info(f"✓ Set alias: {name} = {cmd}")
+            except ValueError:
+                logging.error(f"别名格式错误: {alias_pair}")
+                return 2
+    
+    # T012: 合并配置到现有配置
     try:
         if not DRY_RUN:
-            settings.save(config_path)
-        logging.info(f"✓ Configuration saved to {config_path}")
-        logging.info("✅ 完成！")
-        return 0
+            # 使用 set_claude_config 进行合并
+            success = set_claude_config(
+                env_vars=env_vars if env_vars else None,
+                permissions=permissions if permissions.get("allow") or permissions.get("deny") else None,
+                merge=True
+            )
+            
+            if not success:
+                logging.error("保存配置失败")
+                return 1
+            
+            # 处理别名（如果 core/config_manager.py 不支持，需要单独处理）
+            if aliases:
+                config = load_claude_config()
+                if "aliases" not in config:
+                    config["aliases"] = {}
+                config["aliases"].update(aliases)
+                save_claude_config(config)
+            
+            logging.info("✓ 配置已保存到 ~/.claude/settings.json")
+        else:
+            logging.info("[DRY-RUN] 配置将被保存到 ~/.claude/settings.json")
     except Exception as e:
-        logging.error(f"✗ Failed to save configuration: {e}")
+        logging.error(f"✗ 保存配置失败: {e}")
         return 1
+    
+    # T017-T021: 处理 --to-shell 参数
+    if args.to_shell:
+        # T017: 检测 shell 配置文件
+        if args.shell_config:
+            shell_config_path = args.shell_config.resolve()
+        else:
+            shell_config_path = detect_config_file()
+        
+        # T018: 检查文件是否存在
+        if not shell_config_path or not shell_config_path.exists():
+            if args.shell_config:
+                logging.error(f"Shell 配置文件不存在: {shell_config_path}")
+            else:
+                logging.error("未找到 shell 配置文件（~/.zshrc 或 ~/.zshenv）")
+            return 1
+        
+        # T019: 写入环境变量到 shell 配置文件
+        if env_vars:
+            success = set_env_vars_to_shell_config(env_vars, shell_config_path)
+            
+            if success:
+                # T020: 成功消息
+                logging.info(f"✓ 环境变量已设置到: {shell_config_path}")
+                logging.info("请运行 'source ~/.zshrc' 或重新打开终端使环境变量生效")
+            else:
+                # T021: 错误处理
+                logging.error("设置 shell 环境变量失败")
+                return 1
+        else:
+            logging.warning("没有环境变量需要写入 shell 配置文件")
+    
+    logging.info("✅ 完成！")
+    return 0
 
 def cmd_verify(args):
     """验证子命令"""
@@ -691,6 +831,9 @@ def main():
     config_parser.add_argument('--env', action='append', help='环境变量 KEY=VALUE')
     config_parser.add_argument('--permission', action='append', help='权限 KEY=VALUE')
     config_parser.add_argument('--alias', action='append', help='Alias NAME=COMMAND')
+    config_parser.add_argument('--json-file', type=Path, help='从 JSON 文件读取配置')
+    config_parser.add_argument('--to-shell', action='store_true', help='同时设置到 shell 配置文件（~/.zshrc）')
+    config_parser.add_argument('--shell-config', type=Path, help='Shell 配置文件路径（默认: 自动检测）')
 
     # verify 子命令
     verify_parser = subparsers.add_parser('verify', help='验证清理结果')

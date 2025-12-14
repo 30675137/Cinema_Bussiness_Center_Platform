@@ -166,9 +166,52 @@ python scripts/claude_manager.py set-config \
   --permission dangerously_skip_permissions=false \
   --alias cc='claude --dangerously-skip-permissions' \
   --alias c='claude'
+
+# 从 JSON 文件读取配置
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json
+
+# 从 JSON 文件读取并同步到 shell 配置文件
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --to-shell
+
+# 命令行参数覆盖 JSON 文件中的配置（优先级：命令行 > JSON > 现有配置）
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --env ANTHROPIC_AUTH_TOKEN=sk-new-token
+
+# 指定自定义 shell 配置文件路径
+python scripts/claude_manager.py set-config \
+  --json-file scripts/config/claude/settings.json \
+  --to-shell \
+  --shell-config ~/.custom_zshrc
 ```
 
-配置将保存到 `~/.claude/settings.json`。
+**配置优先级**（从高到低）:
+1. 命令行参数 (`--env`, `--permission`, `--alias`)
+2. JSON 文件 (`--json-file`)
+3. 现有配置文件 (`~/.claude/settings.json`)
+4. 默认值
+
+**JSON 文件格式**:
+```json
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxx",
+    "ANTHROPIC_BASE_URL": "https://api.example.com"
+  },
+  "permissions": {
+    "allow": ["read", "write"],
+    "deny": []
+  },
+  "aliases": {
+    "cc": "claude --dangerously-skip-permissions"
+  }
+}
+```
+
+配置将保存到 `~/.claude/settings.json`。如果使用 `--to-shell`，环境变量也会写入 shell 配置文件（`~/.zshrc` 或 `~/.zshenv`）。
 
 ## ⚙️ 全局选项
 

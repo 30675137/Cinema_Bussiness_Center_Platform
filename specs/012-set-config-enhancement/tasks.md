@@ -25,9 +25,9 @@
 
 **Purpose**: Verify prerequisites and prepare for implementation
 
-- [ ] T001 Verify existing modules are available: `scripts/core/config_manager.py` and `scripts/core/env_manager.py`
-- [ ] T002 [P] Review `scripts/commands/set_config.py` as reference implementation for `--json-file` and `--to-shell` behavior
-- [ ] T003 [P] Review current `cmd_set_config` implementation in `scripts/claude_manager.py` to understand existing parameter handling
+- [X] T001 Verify existing modules are available: `scripts/core/config_manager.py` and `scripts/core/env_manager.py`
+- [X] T002 [P] Review `scripts/commands/set_config.py` as reference implementation for `--json-file` and `--to-shell` behavior
+- [X] T003 [P] Review current `cmd_set_config` implementation in `scripts/claude_manager.py` to understand existing parameter handling
 
 ---
 
@@ -37,11 +37,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Verify `core/config_manager.py` has `set_claude_config(merge=True)` function for configuration merging
-- [ ] T005 Verify `core/config_manager.py` has `set_env_vars_to_shell_config()` function for shell config writing
-- [ ] T006 Verify `core/env_manager.py` has `detect_config_file()` function for shell config detection
-- [ ] T007 [P] Import required modules in `scripts/claude_manager.py`: `from core.config_manager import set_claude_config, set_env_vars_to_shell_config, load_claude_config` and `from core.env_manager import detect_config_file`
-- [ ] T008 [P] Import `Path` from `pathlib` and `json` module in `scripts/claude_manager.py` if not already imported
+- [X] T004 Verify `core/config_manager.py` has `set_claude_config(merge=True)` function for configuration merging
+- [X] T005 Verify `core/config_manager.py` has `set_env_vars_to_shell_config()` function for shell config writing
+- [X] T006 Verify `core/env_manager.py` has `detect_config_file()` function for shell config detection
+- [X] T007 [P] Import required modules in `scripts/claude_manager.py`: `from core.config_manager import set_claude_config, set_env_vars_to_shell_config, load_claude_config` and `from core.env_manager import detect_config_file`
+- [X] T008 [P] Import `Path` from `pathlib` and `json` module in `scripts/claude_manager.py` if not already imported
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -55,12 +55,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Add `--json-file` argument to `set-config` subparser in `scripts/claude_manager.py` using `type=Path` and help text "从 JSON 文件读取配置"
-- [ ] T010 [US1] Implement JSON file reading logic in `cmd_set_config()` function in `scripts/claude_manager.py`: resolve relative path to absolute (using `Path.resolve()`), check file exists, read and parse JSON
-- [ ] T011 [US1] Extract `env` and `permissions` from JSON data in `cmd_set_config()` function in `scripts/claude_manager.py`, handle missing fields gracefully (use `.get()` with empty dict/list defaults)
-- [ ] T012 [US1] Implement configuration merging in `cmd_set_config()` function in `scripts/claude_manager.py`: call `set_claude_config(env_vars=json_env_vars, permissions=json_permissions, merge=True)` when `--json-file` is provided
-- [ ] T013 [US1] Add error handling for JSON file operations in `cmd_set_config()` function in `scripts/claude_manager.py`: handle `FileNotFoundError` (file doesn't exist), `json.JSONDecodeError` (invalid JSON), display clear error messages, return exit code 1 on error
-- [ ] T014 [US1] Add logging for JSON file operations in `cmd_set_config()` function in `scripts/claude_manager.py`: log when JSON file is loaded, log which fields were extracted, log merge operation
+- [X] T009 [US1] Add `--json-file` argument to `set-config` subparser in `scripts/claude_manager.py` using `type=Path` and help text "从 JSON 文件读取配置"
+- [X] T010 [US1] Implement JSON file reading logic in `cmd_set_config()` function in `scripts/claude_manager.py`: resolve relative path to absolute (using `Path.resolve()`), check file exists, read and parse JSON
+- [X] T011 [US1] Extract `env` and `permissions` from JSON data in `cmd_set_config()` function in `scripts/claude_manager.py`, handle missing fields gracefully (use `.get()` with empty dict/list defaults)
+- [X] T012 [US1] Implement configuration merging in `cmd_set_config()` function in `scripts/claude_manager.py`: call `set_claude_config(env_vars=json_env_vars, permissions=json_permissions, merge=True)` when `--json-file` is provided
+- [X] T013 [US1] Add error handling for JSON file operations in `cmd_set_config()` function in `scripts/claude_manager.py`: handle `FileNotFoundError` (file doesn't exist), `json.JSONDecodeError` (invalid JSON), display clear error messages, return exit code 1 on error
+- [X] T014 [US1] Add logging for JSON file operations in `cmd_set_config()` function in `scripts/claude_manager.py`: log when JSON file is loaded, log which fields were extracted, log merge operation
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Test with `python scripts/claude_manager.py set-config --json-file scripts/config/claude/settings.json`
 
@@ -74,13 +74,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Add `--to-shell` argument to `set-config` subparser in `scripts/claude_manager.py` using `action='store_true'` and help text "同时设置到 shell 配置文件（~/.zshrc）"
-- [ ] T016 [US2] Add `--shell-config` argument to `set-config` subparser in `scripts/claude_manager.py` using `type=Path` and help text "Shell 配置文件路径（默认: 自动检测）"
-- [ ] T017 [US2] Implement shell config file detection logic in `cmd_set_config()` function in `scripts/claude_manager.py`: if `--shell-config` provided, use it (resolve to absolute path), else call `detect_config_file()` to auto-detect
-- [ ] T018 [US2] Add shell config file existence check in `cmd_set_config()` function in `scripts/claude_manager.py`: if file doesn't exist, log error message "未找到 shell 配置文件（~/.zshrc 或 ~/.zshenv）" or "Shell 配置文件不存在: {path}", return exit code 1 (do NOT create file)
-- [ ] T019 [US2] Implement shell config writing logic in `cmd_set_config()` function in `scripts/claude_manager.py`: when `--to-shell` is provided, collect all `env_vars` from JSON file and/or command line args, call `set_env_vars_to_shell_config(env_vars, shell_config_path)`
-- [ ] T020 [US2] Add success message after shell config write in `cmd_set_config()` function in `scripts/claude_manager.py`: log "✓ 环境变量已设置到: {path}", log "请运行 'source ~/.zshrc' 或重新打开终端使环境变量生效"
-- [ ] T021 [US2] Add error handling for shell config write failures in `cmd_set_config()` function in `scripts/claude_manager.py`: if `set_env_vars_to_shell_config()` returns False, log error "设置 shell 环境变量失败", return exit code 1
+- [X] T015 [US2] Add `--to-shell` argument to `set-config` subparser in `scripts/claude_manager.py` using `action='store_true'` and help text "同时设置到 shell 配置文件（~/.zshrc）"
+- [X] T016 [US2] Add `--shell-config` argument to `set-config` subparser in `scripts/claude_manager.py` using `type=Path` and help text "Shell 配置文件路径（默认: 自动检测）"
+- [X] T017 [US2] Implement shell config file detection logic in `cmd_set_config()` function in `scripts/claude_manager.py`: if `--shell-config` provided, use it (resolve to absolute path), else call `detect_config_file()` to auto-detect
+- [X] T018 [US2] Add shell config file existence check in `cmd_set_config()` function in `scripts/claude_manager.py`: if file doesn't exist, log error message "未找到 shell 配置文件（~/.zshrc 或 ~/.zshenv）" or "Shell 配置文件不存在: {path}", return exit code 1 (do NOT create file)
+- [X] T019 [US2] Implement shell config writing logic in `cmd_set_config()` function in `scripts/claude_manager.py`: when `--to-shell` is provided, collect all `env_vars` from JSON file and/or command line args, call `set_env_vars_to_shell_config(env_vars, shell_config_path)`
+- [X] T020 [US2] Add success message after shell config write in `cmd_set_config()` function in `scripts/claude_manager.py`: log "✓ 环境变量已设置到: {path}", log "请运行 'source ~/.zshrc' 或重新打开终端使环境变量生效"
+- [X] T021 [US2] Add error handling for shell config write failures in `cmd_set_config()` function in `scripts/claude_manager.py`: if `set_env_vars_to_shell_config()` returns False, log error "设置 shell 环境变量失败", return exit code 1
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Test with `python scripts/claude_manager.py set-config --json-file scripts/config/claude/settings.json --to-shell`
 
@@ -94,11 +94,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] Implement configuration priority logic in `cmd_set_config()` function in `scripts/claude_manager.py`: initialize empty `env_vars` and `permissions` dicts, if `--json-file` provided, read JSON and update dicts, then if `--env`/`--permission`/`--alias` provided, update dicts (command line args override JSON values)
-- [ ] T023 [US3] Ensure backward compatibility in `cmd_set_config()` function in `scripts/claude_manager.py`: existing `--env`, `--permission`, `--alias` logic continues to work when `--json-file` is NOT provided, existing behavior unchanged
-- [ ] T024 [US3] Update `cmd_set_config()` function in `scripts/claude_manager.py` to handle combined usage: when both `--json-file` and `--env`/`--permission`/`--alias` are provided, command line args should override JSON values (implement priority: CLI args > JSON > existing config)
-- [ ] T025 [US3] Add validation for parameter format in `cmd_set_config()` function in `scripts/claude_manager.py`: validate `--env`, `--permission`, `--alias` format is `KEY=VALUE`, display error message if format invalid, return exit code 2 for parameter errors
-- [ ] T026 [US3] Add comprehensive logging in `cmd_set_config()` function in `scripts/claude_manager.py`: log configuration source (JSON file, command line, existing config), log merge operations, log final configuration being saved
+- [X] T022 [US3] Implement configuration priority logic in `cmd_set_config()` function in `scripts/claude_manager.py`: initialize empty `env_vars` and `permissions` dicts, if `--json-file` provided, read JSON and update dicts, then if `--env`/`--permission`/`--alias` provided, update dicts (command line args override JSON values)
+- [X] T023 [US3] Ensure backward compatibility in `cmd_set_config()` function in `scripts/claude_manager.py`: existing `--env`, `--permission`, `--alias` logic continues to work when `--json-file` is NOT provided, existing behavior unchanged
+- [X] T024 [US3] Update `cmd_set_config()` function in `scripts/claude_manager.py` to handle combined usage: when both `--json-file` and `--env`/`--permission`/`--alias` are provided, command line args should override JSON values (implement priority: CLI args > JSON > existing config)
+- [X] T025 [US3] Add validation for parameter format in `cmd_set_config()` function in `scripts/claude_manager.py`: validate `--env`, `--permission`, `--alias` format is `KEY=VALUE`, display error message if format invalid, return exit code 2 for parameter errors
+- [X] T026 [US3] Add comprehensive logging in `cmd_set_config()` function in `scripts/claude_manager.py`: log configuration source (JSON file, command line, existing config), log merge operations, log final configuration being saved
 
 **Checkpoint**: All user stories should now be independently functional. Test with various combinations: `--json-file` only, `--to-shell` only, `--env` only, `--json-file --env`, `--json-file --to-shell`, etc.
 
@@ -108,8 +108,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T027 [P] Update `scripts/README.md` to document new `--json-file` and `--to-shell` parameters for `set-config` command
-- [ ] T028 [P] Add usage examples to `scripts/README.md` showing how to use `--json-file` and `--to-shell` parameters
+- [X] T027 [P] Update `scripts/README.md` to document new `--json-file` and `--to-shell` parameters for `set-config` command
+- [X] T028 [P] Add usage examples to `scripts/README.md` showing how to use `--json-file` and `--to-shell` parameters
 - [ ] T029 [P] Run manual tests from `quickstart.md` to validate all acceptance scenarios
 - [ ] T030 [P] Test edge cases: JSON file with partial config (only `env`, only `permissions`), JSON file with invalid format, shell config file doesn't exist, environment variable values with special characters
 - [ ] T031 [P] Verify backward compatibility: test existing `--env`, `--permission`, `--alias` parameters still work as before
