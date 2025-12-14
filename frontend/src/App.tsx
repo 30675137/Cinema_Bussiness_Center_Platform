@@ -47,6 +47,7 @@ const SPUDetailPage = lazy(() => import('./pages/SPUDetail'));
 // 基础数据管理页面
 const CategoryManagementPage = lazy(() => import('./pages/mdm-pim/category/CategoryManagement'));
 const BrandManagementPage = lazy(() => import('./pages/BrandManagement'));
+const BrandListPage = lazy(() => import('./pages/mdm-pim/brand/BrandManagement'));
 
 // 属性模板管理页面
 const AttributeTemplatePage = lazy(() => import('./pages/AttributeTemplate'));
@@ -187,6 +188,7 @@ const App: React.FC = () => {
                 {/* 基础数据管理 */}
                 <Route path="/mdm-pim/category" element={<CategoryManagementPage />} />
                 <Route path="/brands" element={<BrandManagementPage />} />
+                <Route path="/mdm-pim/brands" element={<BrandListPage />} />
 
                 {/* 属性模板管理 */}
                 <Route path="/attribute-templates" element={<AttributeTemplatePage />} />
