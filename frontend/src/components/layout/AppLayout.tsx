@@ -90,6 +90,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '品牌管理',
         },
         {
+          key: '/mdm-pim/attribute',
+          label: '属性字典管理',
+        },
+        {
           key: '/products/spu',
           label: 'SPU 管理',
         },

@@ -15,6 +15,10 @@ export type {
   AttributeType
 } from './category/types/category.types';
 
+// 属性字典管理
+export { default as AttributeManagement } from './attribute';
+export * from './attribute/types/attribute.types';
+
 // 预留其他模块的导出位置
 // - 商品管理
 // export { default as ProductManagement } from './product/ProductManagement';

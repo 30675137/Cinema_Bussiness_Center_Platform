@@ -22,6 +22,8 @@ const SkuListPage = lazy(() => import('@/pages/product/sku/SkuListPage'));
 // 类目和品牌管理页面
 const CategoryManagement = lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'));
 const BrandManagement = lazy(() => import('@/pages/mdm-pim/brand/BrandManagement'));
+// 属性字典管理页面
+const AttributeManagement = lazy(() => import('@/pages/mdm-pim/attribute'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -196,6 +198,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <BrandManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // MDM/PIM - 属性字典管理路由
+  {
+    path: '/mdm-pim/attribute',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AttributeManagement />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

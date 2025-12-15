@@ -22,6 +22,9 @@ const SPUDetail = React.lazy(() => import('@/pages/SPUDetail'))
 // Category Pages
 const CategoryManagement = React.lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'))
 
+// Attribute Dictionary Pages
+const AttributeManagement = React.lazy(() => import('@/pages/mdm-pim/attribute'))
+
 // Brand Pages
 const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'))
 
@@ -108,6 +111,10 @@ export const router = createBrowserRouter([
   {
     path: '/mdm-pim/category/:id',
     element: withLayout(CategoryManagement),
+  },
+  {
+    path: '/mdm-pim/attribute',
+    element: withLayout(AttributeManagement),
   },
   {
     path: '/brand',
