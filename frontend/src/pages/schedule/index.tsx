@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Spin, Alert, Space, Button, Tag } from 'antd';
 import dayjs from 'dayjs';
 import { useScheduleListQuery, useHallsListQuery } from './hooks/useScheduleQueries';
@@ -9,6 +10,8 @@ import EventForm from './components/molecules/EventForm';
 import EventDetailDrawer from './components/organisms/EventDetailDrawer';
 
 const ScheduleManagement: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { selectedDate, setSelectedDate, selectedEvent, setSelectedEvent } = useScheduleStore();
   const [formOpen, setFormOpen] = React.useState(false);
   const [formMode, setFormMode] = React.useState<'create' | 'edit'>('create');
@@ -19,6 +22,14 @@ const ScheduleManagement: React.FC = () => {
 
   const isLoading = schedulesQuery.isLoading || hallsQuery.isLoading;
   const isError = schedulesQuery.isError || hallsQuery.isError;
+
+React.useEffect(() => {
+    if (location.pathname.startsWith('/schedule/create') && !formOpen) {
+      setFormMode('create');
+      setPrefill({});
+      setFormOpen(true);
+    }
+  }, [location.pathname, formOpen]);
 
   const handlePrevDay = () => {
     const prev = dayjs(selectedDate).subtract(1, 'day').format('YYYY-MM-DD');
@@ -66,6 +77,9 @@ const ScheduleManagement: React.FC = () => {
     setFormOpen(false);
     setFormMode('create');
     setPrefill({});
+    if (location.pathname.startsWith('/schedule/create')) {
+      navigate('/schedule/gantt', { replace: true });
+    }
   };
 
   return (
