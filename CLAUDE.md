@@ -17,6 +17,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - Python 3.8+ (标准库 + pathlib, re, shutil) + 无外部依赖，仅使用 Python 标准库 (011-uninstall-env-cleanup)
 - 文件系统操作（读取/写入 ~/.zshrc 等配置文件） (011-uninstall-env-cleanup)
 - Python 3.8+ (标准库 + argparse) (012-set-config-enhancement)
+- TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19 (013-schedule-management)
 
 - (003-inventory-management)
 
@@ -37,12 +38,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 013-schedule-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19
 - 010-attribute-dict-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
 - 001-brand-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
-- 012-set-config-enhancement: Added Python 3.8+ (标准库 + argparse)
-- 011-uninstall-env-cleanup: Added 文件系统操作（读取/写入 ~/.zshrc 等配置文件）
-- 011-uninstall-env-cleanup: Added Python 3.8+ (标准库 + pathlib, re, shutil) + 无外部依赖，仅使用 Python 标准库
-- 001-claude-cleanup-script: Added Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致）
 
 
 <!-- MANUAL ADDITIONS START -->

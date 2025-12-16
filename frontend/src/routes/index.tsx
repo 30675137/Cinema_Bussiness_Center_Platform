@@ -31,6 +31,8 @@ const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'))
 // Attribute Template Pages
 const AttributeTemplate = React.lazy(() => import('@/pages/AttributeTemplate'))
 
+// Schedule Management Pages
+const ScheduleManagement = React.lazy(() => import('@/pages/schedule'))
 // Legacy product pages
 const ProductList = React.lazy(() => import('@/pages/product/ProductList'))
 const ProductForm = React.lazy(() => import('@/pages/product/ProductForm'))
@@ -123,6 +125,10 @@ export const router = createBrowserRouter([
   {
     path: '/attribute-template',
     element: withLayout(AttributeTemplate),
+  },
+  {
+    path: '/schedule/gantt',
+    element: withLayout(ScheduleManagement),
   },
   {
     path: '/product',

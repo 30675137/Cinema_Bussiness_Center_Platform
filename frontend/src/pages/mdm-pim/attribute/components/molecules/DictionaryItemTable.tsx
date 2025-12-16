@@ -245,3 +245,4 @@ const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({
 
 export default DictionaryItemTable;
 
+

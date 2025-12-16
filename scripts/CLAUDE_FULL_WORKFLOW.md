@@ -287,3 +287,4 @@ python scripts/claude_manager.py set-config \
 | 检查版本 | `claude --version` |
 
 
+

@@ -24,6 +24,8 @@ const CategoryManagement = lazy(() => import('@/pages/mdm-pim/category/CategoryM
 const BrandManagement = lazy(() => import('@/pages/mdm-pim/brand/BrandManagement'));
 // 属性字典管理页面
 const AttributeManagement = lazy(() => import('@/pages/mdm-pim/attribute'));
+// 排期管理页面
+const ScheduleManagement = lazy(() => import('@/pages/schedule'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -213,6 +215,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <AttributeManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 排期管理 - 甘特图视图路由
+  {
+    path: '/schedule/gantt',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ScheduleManagement />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

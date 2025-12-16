@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { categoryHandlers } from './categoryHandlers'
 import { brandHandlers } from './brandHandlers'
 import { attributeHandlers_ } from './attributeHandlers'
+import { scheduleHandlers } from './scheduleHandlers'
 
 // 动态导入 generators（延迟加载），避免在 MSW 启动时立即加载所有依赖
 const getGenerators = async () => {
@@ -177,7 +178,8 @@ export const handlers = [
   ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
   ...legacyCategoryHandlers, // 旧版兼容处理器
   ...brandHandlers, // 使用新的brandHandlers
-  ...attributeHandlers_ // 属性字典管理处理器
+  ...attributeHandlers_, // 属性字典管理处理器
+  ...scheduleHandlers, // 排期管理处理器
 ]
 
 // 默认导出所有处理器

@@ -152,6 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
         pathname.startsWith('/brand')) {
       return ['/product']
     }
+    if (pathname.startsWith('/schedule')) return ['/schedule']
     if (pathname.startsWith('/inventory')) return ['/inventory']
     if (pathname.startsWith('/pricing') || pathname.startsWith('/price')) return ['/pricing']
     if (pathname.startsWith('/procurement')) return ['/procurement']
