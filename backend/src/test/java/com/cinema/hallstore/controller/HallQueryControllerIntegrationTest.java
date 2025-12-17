@@ -195,7 +195,7 @@ class HallQueryControllerIntegrationTest {
                     .andExpect(jsonPath("$.data", hasSize(4)))
                     .andExpect(jsonPath("$.total", is(4)))
                     // 验证不同类型
-                    .andExpect(jsonPath("$.data[*].type", containsInAnyOrder("VIP", "CP", "PARTY", "PUBLIC")))
+                    .andExpect(jsonPath("$.data[*].type", containsInAnyOrder("VIP", "CP", "Party", "Public")))
                     // 验证不同状态
                     .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("active", "inactive", "maintenance", "active")));
         }
