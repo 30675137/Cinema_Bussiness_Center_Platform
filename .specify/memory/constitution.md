@@ -1,15 +1,15 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 0.0.0 → 1.0.0 -->
-<!-- Modified principles: All 5 core principles defined based on project analysis -->
-<!-- Added sections: Feature Binding Governance, Development Workflow, Quality Standards -->
+<!-- Version change: 1.0.0 → 1.1.0 -->
+<!-- Modified principles: None (clarified scope only) -->
+<!-- Added sections: Backend Architecture & Tech Stack -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/templates/spec-template.md (already aligned)
-  ✅ .specify/templates/plan-template.md (requires constitution check update)
-  ✅ .specify/templates/tasks-template.md (already aligned)
-  ⚠ .specify/templates/commands/*.md (needs verification for agent-specific references)
+  ✅ .specify/templates/spec-template.md (no changes required; still aligned)
+  ✅ .specify/templates/plan-template.md (updated technical context + constitution check for backend)
+  ✅ .specify/templates/tasks-template.md (already generic enough for backend tasks)
+  ⚠ .specify/templates/commands/*.md (directory not present in repo; no action taken)
 -->
-<!-- Follow-up TODOs: None - all placeholders filled with concrete values -->
+<!-- Follow-up TODOs: None -->
 
 # 影院商品管理中台宪法
 
@@ -41,9 +41,36 @@
 
 ### 五、代码质量与工程化 (Code Quality & Engineering Excellence)
 
-遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保类型安全，ESLint + Prettier 确保代码风格一致性，Husky + lint-staged 确保提交质量。所有代码必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范（Conventional Commits），使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、性能考虑、测试覆盖和安全考虑。
+遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保前端类型安全，
+ESLint + Prettier 确保代码风格一致性，Husky + lint-staged 确保提交质量。
+后端必须使用现代 Java 版本与 Spring Boot 框架，并遵循一致的编码规范、
+日志规范和异常处理规范。所有 Java 代码在关键领域类、公共方法以及复杂业
+务分支处必须编写**清晰、准确且有意义的注释**，说明领域含义、边界条件以及
+与 Supabase 或外部系统交互的意图，禁止堆砌无信息量的“废话注释”。所有代码
+必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范（Conventional
+Commits），使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、
+性能考虑、测试覆盖、安全考虑以及关键 Java 代码是否具备足够的注释可读性。
 
-**基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期可维护性，通过自动化工具和规范流程减少人为错误，提升开发效率。
+**基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期
+可维护性，通过自动化工具和规范流程减少人为错误，提升开发效率。
+
+## 后端架构与技术栈
+
+### Spring Boot + Supabase 统一后端栈
+
+后端服务必须使用 **Spring Boot** 作为主要应用框架，通过 **Supabase**
+提供客户端 SDK 访问数据和后端能力（PostgreSQL 数据库、认证、
+存储等）。禁止在同一服务中引入额外的数据库访问层（例如直接连接其他
+数据库实例）绕过 Supabase，除非在规格和架构评审中获得明确批准并记录
+在相关 feature 的 `data-model.md` 中。
+
+所有持久化数据模型和权限规则应以 Supabase 为单一事实来源，Spring Boot
+负责业务编排、领域逻辑和 API 暴露。对 Supabase 的调用必须有清晰的错误
+处理、超时控制和重试/降级策略，并通过集成测试覆盖关键路径。
+
+**基本原理**: 统一的后端技术栈（Spring Boot + Supabase）可以显著降低
+架构复杂度和运维成本，避免多种数据源和框架并存导致的耦合和不一致，
+同时利用 Supabase 托管能力加速开发，Spring Boot 聚焦业务逻辑和接口层。
 
 ## 开发工作流
 
@@ -75,8 +102,12 @@
 
 ## 治理规则
 
-本宪法作为项目开发的最高指导原则，所有开发活动和代码审查都必须验证其合规性。任何对宪法的修改都必须通过团队讨论和批准，并更新版本号。版本控制遵循语义化版本规则：主版本号（重大变更或不兼容的修改）、次版本号（新功能添加）、修订号（错误修复和澄清）。
+本宪法作为项目开发的最高指导原则，所有开发活动和代码审查都必须验证其
+合规性。任何对宪法的修改都必须通过团队讨论和批准，并更新版本号。版本
+控制遵循语义化版本规则：主版本号（重大变更或不兼容的修改）、次版本号
+（新功能添加）、修订号（错误修复和澄清）。
 
-当开发实践与宪法原则发生冲突时，应以宪法原则为准，必要时通过正式流程修订宪法。团队成员都有责任和维护宪法的执行，确保项目的长期健康发展。
+当开发实践与宪法原则发生冲突时，应以宪法原则为准，必要时通过正式流程
+修订宪法。团队成员都有责任维护宪法的执行，确保项目的长期健康发展。
 
-**版本**: 1.0.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-14
+**版本**: 1.2.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-16

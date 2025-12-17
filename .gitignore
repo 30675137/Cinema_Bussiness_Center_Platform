@@ -99,3 +99,20 @@ build/
 .coverage
 htmlcov/
 *.log
+
+# Java / Maven / Spring Boot
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+*.iml
+.idea/
+*.log
+hs_err_pid*
+replay_pid*
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar

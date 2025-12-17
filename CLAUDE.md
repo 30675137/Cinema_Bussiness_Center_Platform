@@ -18,6 +18,8 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - 文件系统操作（读取/写入 ~/.zshrc 等配置文件） (011-uninstall-env-cleanup)
 - Python 3.8+ (标准库 + argparse) (012-set-config-enhancement)
 - TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19 (013-schedule-management)
+- TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien (014-hall-store-backend)
+- Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage）进行开发模拟 (014-hall-store-backend)
 
 - (003-inventory-management)
 
@@ -38,9 +40,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 014-hall-store-backend: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien
 - 013-schedule-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19
 - 010-attribute-dict-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
-- 001-brand-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
 
 
 <!-- MANUAL ADDITIONS START -->

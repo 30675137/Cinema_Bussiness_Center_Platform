@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: cinema-hall-store-backend
+
+server:
+  port: 8080
+
+supabase:
+  # Supabase 项目基础配置，通过环境变量注入，避免泄露密钥
+  url: ${SUPABASE_URL:https://your-project.supabase.co}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:your-service-role-key}
+  api-timeout: 60000 # 毫秒，默认 60s
+
+
