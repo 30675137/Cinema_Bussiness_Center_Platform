@@ -72,7 +72,7 @@ class HallQueryControllerIntegrationTest {
                     .andExpect(jsonPath("$.data[0].name", is("VIP影厅A")))
                     .andExpect(jsonPath("$.data[0].capacity", is(120)))
                     .andExpect(jsonPath("$.data[0].type", is("VIP")))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")))
+                    .andExpect(jsonPath("$.data[0].status", is("active")))
                     .andExpect(jsonPath("$.data[0].tags", hasSize(1)))
                     .andExpect(jsonPath("$.data[0].createdAt", notNullValue()))
                     .andExpect(jsonPath("$.data[0].updatedAt", notNullValue()));
@@ -106,7 +106,7 @@ class HallQueryControllerIntegrationTest {
                             .param("status", "ACTIVE"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")));
+                    .andExpect(jsonPath("$.data[0].status", is("active")));
         }
 
         @Test
@@ -144,7 +144,7 @@ class HallQueryControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
                     .andExpect(jsonPath("$.data[0].type", is("VIP")))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")));
+                    .andExpect(jsonPath("$.data[0].status", is("active")));
         }
 
         @Test
@@ -173,7 +173,7 @@ class HallQueryControllerIntegrationTest {
                     .andExpect(jsonPath("$.data[0].name", is("测试影厅")))
                     .andExpect(jsonPath("$.data[0].capacity", is(60)))
                     .andExpect(jsonPath("$.data[0].type", is("CP")))
-                    .andExpect(jsonPath("$.data[0].status", is("MAINTENANCE")))
+                    .andExpect(jsonPath("$.data[0].status", is("maintenance")))
                     .andExpect(jsonPath("$.data[0].tags", hasSize(2)));
         }
 
@@ -197,7 +197,7 @@ class HallQueryControllerIntegrationTest {
                     // 验证不同类型
                     .andExpect(jsonPath("$.data[*].type", containsInAnyOrder("VIP", "CP", "PARTY", "PUBLIC")))
                     // 验证不同状态
-                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("ACTIVE", "INACTIVE", "MAINTENANCE", "ACTIVE")));
+                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("active", "inactive", "maintenance", "active")));
         }
     }
 

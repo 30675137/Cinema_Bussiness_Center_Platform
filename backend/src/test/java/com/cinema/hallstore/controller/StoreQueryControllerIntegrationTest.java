@@ -65,7 +65,7 @@ class StoreQueryControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(2)))
                     .andExpect(jsonPath("$.total", is(2)))
-                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("ACTIVE", "DISABLED")));
+                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("active", "disabled")));
         }
 
         @Test
@@ -82,7 +82,7 @@ class StoreQueryControllerIntegrationTest {
                             .param("status", "ACTIVE"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")));
+                    .andExpect(jsonPath("$.data[0].status", is("active")));
         }
 
         @Test
@@ -99,7 +99,7 @@ class StoreQueryControllerIntegrationTest {
                             .param("status", "DISABLED"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].status", is("DISABLED")));
+                    .andExpect(jsonPath("$.data[0].status", is("disabled")));
         }
 
         @Test
@@ -129,7 +129,7 @@ class StoreQueryControllerIntegrationTest {
                     .andExpect(jsonPath("$.data[0].code", is("STORE-XYZ")))
                     .andExpect(jsonPath("$.data[0].name", is("测试门店")))
                     .andExpect(jsonPath("$.data[0].region", is("深圳")))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")))
+                    .andExpect(jsonPath("$.data[0].status", is("active")))
                     .andExpect(jsonPath("$.data[0].createdAt", notNullValue()))
                     .andExpect(jsonPath("$.data[0].updatedAt", notNullValue()));
         }
@@ -153,7 +153,7 @@ class StoreQueryControllerIntegrationTest {
                     .andExpect(jsonPath("$.data.code", is("STORE-A")))
                     .andExpect(jsonPath("$.data.name", is("测试门店")))
                     .andExpect(jsonPath("$.data.region", is("上海")))
-                    .andExpect(jsonPath("$.data.status", is("ACTIVE")));
+                    .andExpect(jsonPath("$.data.status", is("active")));
         }
 
         @Test
@@ -178,7 +178,7 @@ class StoreQueryControllerIntegrationTest {
             // When & Then
             mockMvc.perform(get("/api/stores/{storeId}", testStoreId))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.data.status", is("DISABLED")))
+                    .andExpect(jsonPath("$.data.status", is("disabled")))
                     .andExpect(jsonPath("$.data.name", is("已关闭门店")));
         }
     }

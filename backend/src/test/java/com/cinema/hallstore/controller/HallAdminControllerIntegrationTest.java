@@ -80,7 +80,7 @@ class HallAdminControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.name", is("VIP影厅A")))
                 .andExpect(jsonPath("$.data.type", is("VIP")))
                 .andExpect(jsonPath("$.data.capacity", is(120)))
-                .andExpect(jsonPath("$.data.status", is("ACTIVE")))
+                .andExpect(jsonPath("$.data.status", is("active")))
                 .andExpect(jsonPath("$.data.tags", hasSize(1)));
     }
 
@@ -195,7 +195,7 @@ class HallAdminControllerIntegrationTest {
         // When & Then
         mockMvc.perform(post("/api/admin/halls/{hallId}/deactivate", testHallId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.status", is("INACTIVE")));
+                .andExpect(jsonPath("$.data.status", is("inactive")));
     }
 
     @Test
@@ -211,7 +211,7 @@ class HallAdminControllerIntegrationTest {
         // When & Then
         mockMvc.perform(post("/api/admin/halls/{hallId}/activate", testHallId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.status", is("ACTIVE")));
+                .andExpect(jsonPath("$.data.status", is("active")));
     }
 
     // ========== Helper Methods ==========

@@ -70,7 +70,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        // 这里先返回通用错误，后续可以接入日志与错误追踪系统
+        // 打印详细错误信息用于调试
+        ex.printStackTrace();
+        
         ErrorResponse body = new ErrorResponse(
             "INTERNAL_ERROR",
             "服务器内部错误，请稍后重试",

@@ -7,8 +7,18 @@ server:
 
 supabase:
   # Supabase 项目基础配置，通过环境变量注入，避免泄露密钥
-  url: ${SUPABASE_URL:https://your-project.supabase.co}
-  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:your-service-role-key}
+  url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:sb_secret_FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
   api-timeout: 60000 # 毫秒，默认 60s
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.cinema.hallstore: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.reactive.function.client: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 

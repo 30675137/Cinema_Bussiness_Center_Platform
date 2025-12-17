@@ -64,10 +64,6 @@ public class SupabaseConfig {
             .defaultHeader("Content-Type", "application/json")
             .defaultHeader("Prefer", "return=representation")
             .exchangeStrategies(strategies)
-            .build()
-            .mutate()
-            .build()
-            .mutate()
             .build();
     }
 

@@ -125,7 +125,7 @@ class StoreHallRelationContractTest {
             mockMvc.perform(get("/api/stores/{storeId}/halls", storeAId))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(3)))
-                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("ACTIVE", "INACTIVE", "MAINTENANCE")));
+                    .andExpect(jsonPath("$.data[*].status", containsInAnyOrder("active", "inactive", "maintenance")));
         }
 
         @Test
@@ -142,7 +142,7 @@ class StoreHallRelationContractTest {
                             .param("status", "ACTIVE"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.data", hasSize(1)))
-                    .andExpect(jsonPath("$.data[0].status", is("ACTIVE")));
+                    .andExpect(jsonPath("$.data[0].status", is("active")));
         }
     }
 
