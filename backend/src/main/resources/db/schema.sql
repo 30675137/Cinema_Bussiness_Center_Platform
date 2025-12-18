@@ -95,6 +95,43 @@ ALTER TABLE store_reservation_settings ENABLE ROW LEVEL SECURITY;
 -- 13. 创建 store_reservation_settings 表的 RLS 策略
 CREATE POLICY "Enable all access for store_reservation_settings" ON store_reservation_settings FOR ALL USING (true);
 
+-- 14. 创建 activity_types 表（活动类型）
+CREATE TABLE IF NOT EXISTS activity_types (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(500),
+  status VARCHAR(20) NOT NULL DEFAULT 'ENABLED' CHECK (status IN ('ENABLED', 'DISABLED', 'DELETED')),
+  sort INTEGER NOT NULL DEFAULT 0,
+  business_category VARCHAR(100),
+  background_image_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ,
+  created_by VARCHAR(255),
+  updated_by VARCHAR(255)
+);
+
+-- 15. 为 activity_types 表创建索引
+CREATE INDEX IF NOT EXISTS idx_activity_types_status ON activity_types(status);
+CREATE INDEX IF NOT EXISTS idx_activity_types_sort ON activity_types(sort);
+CREATE INDEX IF NOT EXISTS idx_activity_types_name ON activity_types(name);
+
+-- 16. 创建 activity_types 表的唯一约束（名称，排除已删除状态）
+CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_types_name_unique ON activity_types(name) WHERE status != 'DELETED';
+
+-- 17. 为 activity_types 表添加触发器
+DROP TRIGGER IF EXISTS trigger_update_activity_types_updated_at ON activity_types;
+CREATE TRIGGER trigger_update_activity_types_updated_at
+  BEFORE UPDATE ON activity_types
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 18. 为 activity_types 表启用 RLS
+ALTER TABLE activity_types ENABLE ROW LEVEL SECURITY;
+
+-- 19. 创建 activity_types 表的 RLS 策略
+CREATE POLICY "Enable all access for activity_types" ON activity_types FOR ALL USING (true);
+
 -- ============================================================================
 -- 注释
 -- ============================================================================
@@ -118,3 +155,74 @@ COMMENT ON COLUMN store_reservation_settings.store_id IS '门店ID，与stores�
 COMMENT ON COLUMN store_reservation_settings.is_reservation_enabled IS '是否开放预约';
 COMMENT ON COLUMN store_reservation_settings.max_reservation_days IS '可预约天数（未来N天），范围0-365';
 COMMENT ON COLUMN store_reservation_settings.updated_by IS '最后更新人（如果支持用户追踪）';
+
+COMMENT ON TABLE activity_types IS '活动类型表，存储预约活动类型配置（如企业团建、订婚、生日Party等）';
+COMMENT ON COLUMN activity_types.name IS '活动类型名称，必填，唯一（在非已删除状态下）';
+COMMENT ON COLUMN activity_types.description IS '活动类型描述，可选';
+COMMENT ON COLUMN activity_types.status IS '状态：ENABLED=启用, DISABLED=停用, DELETED=已删除（软删除）';
+COMMENT ON COLUMN activity_types.sort IS '排序号，用于控制显示顺序';
+COMMENT ON COLUMN activity_types.business_category IS '业务分类（如：私人订制、商务团建、派对策划），用于分组和筛选';
+COMMENT ON COLUMN activity_types.background_image_url IS '场景背景图 URL，用于后台与小程序端场景卡片展示';
+COMMENT ON COLUMN activity_types.deleted_at IS '删除时间（软删除时记录）';
+COMMENT ON COLUMN activity_types.created_by IS '创建人（如果支持用户追踪）';
+COMMENT ON COLUMN activity_types.updated_by IS '更新人（如果支持用户追踪）';
+
+-- activity_type_packages 表：活动类型下的套餐配置
+CREATE TABLE IF NOT EXISTS activity_type_packages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  activity_type_id UUID NOT NULL REFERENCES activity_types(id) ON DELETE CASCADE,
+  name VARCHAR(200) NOT NULL,
+  current_price NUMERIC(10, 2) NOT NULL,
+  original_price NUMERIC(10, 2),
+  sort INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_type_packages_activity_type_id ON activity_type_packages(activity_type_id);
+CREATE INDEX IF NOT EXISTS idx_activity_type_packages_sort ON activity_type_packages(sort);
+
+DROP TRIGGER IF EXISTS trigger_update_activity_type_packages_updated_at ON activity_type_packages;
+CREATE TRIGGER trigger_update_activity_type_packages_updated_at
+  BEFORE UPDATE ON activity_type_packages
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE activity_type_packages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for activity_type_packages" ON activity_type_packages FOR ALL USING (true);
+
+COMMENT ON TABLE activity_type_packages IS '活动类型套餐表，用于配置每种活动类型下的具体套餐及价格信息';
+COMMENT ON COLUMN activity_type_packages.activity_type_id IS '所属活动类型ID';
+COMMENT ON COLUMN activity_type_packages.name IS '套餐名称，如基础套餐、豪华套餐';
+COMMENT ON COLUMN activity_type_packages.current_price IS '当前售价，单位与业务约定一致';
+COMMENT ON COLUMN activity_type_packages.original_price IS '原价（如有优惠时用于展示对比）';
+COMMENT ON COLUMN activity_type_packages.sort IS '排序号，用于控制同一活动类型下套餐显示顺序';
+
+-- activity_type_halls 表：活动类型与门店/影厅的资源关联
+CREATE TABLE IF NOT EXISTS activity_type_halls (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  activity_type_id UUID NOT NULL REFERENCES activity_types(id) ON DELETE CASCADE,
+  store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+  hall_id UUID NOT NULL REFERENCES halls(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (activity_type_id, hall_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_activity_type_halls_activity_type_id ON activity_type_halls(activity_type_id);
+CREATE INDEX IF NOT EXISTS idx_activity_type_halls_store_id ON activity_type_halls(store_id);
+CREATE INDEX IF NOT EXISTS idx_activity_type_halls_hall_id ON activity_type_halls(hall_id);
+
+DROP TRIGGER IF EXISTS trigger_update_activity_type_halls_updated_at ON activity_type_halls;
+CREATE TRIGGER trigger_update_activity_type_halls_updated_at
+  BEFORE UPDATE ON activity_type_halls
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE activity_type_halls ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for activity_type_halls" ON activity_type_halls FOR ALL USING (true);
+
+COMMENT ON TABLE activity_type_halls IS '活动类型与门店/影厅资源关联表，用于限定某活动类型适用的物理场地';
+COMMENT ON COLUMN activity_type_halls.activity_type_id IS '活动类型ID';
+COMMENT ON COLUMN activity_type_halls.store_id IS '门店ID';
+COMMENT ON COLUMN activity_type_halls.hall_id IS '影厅ID';

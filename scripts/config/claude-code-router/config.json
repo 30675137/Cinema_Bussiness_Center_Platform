@@ -10,7 +10,8 @@
       "api_base_url": "https://openrouter.ai/api/v1/chat/completions",
       "api_key": "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",
       "models": [
-        "anthropic/claude-sonnet-4.5"
+        "anthropic/claude-sonnet-4.5",
+        "openai/gpt-5.2"
       ],
       "transformer": {
         "use": ["openrouter"]
@@ -18,7 +19,7 @@
     }
   ],
   "Router": {
-    "default": "openrouter,anthropic/claude-sonnet-4.5",
+    "default": "openrouter,openai/gpt-5.2",
     "longContextThreshold": 60000
   }
 }

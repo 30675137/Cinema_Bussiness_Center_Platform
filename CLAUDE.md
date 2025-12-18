@@ -20,6 +20,11 @@ Auto-generated from all feature plans. Last updated: 2025-12-11
 - TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19 (013-schedule-management)
 - TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien (014-hall-store-backend)
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage）进行开发模拟 (014-hall-store-backend)
+- TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.3.5 (backend) (014-hall-store-backend)
+- Supabase PostgreSQL 作为主要数据源，包含 `stores` 和 `halls` 两张主数据表；前端开发时可使用 MSW 模拟 API (014-hall-store-backend)
+- Supabase PostgreSQL 作为主要数据源，新增 `store_reservation_settings` 表与 `stores` 表建立一对一关系；前端开发时可使用 MSW 模拟 API (015-store-reservation-settings)
+- TypeScript 5.9.3 + React 19.2.0 (frontend), Java 17 + Spring Boot 3.3.5 (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Spring WebFlux, Supabase Java/HTTP client (WebClient) (016-activity-type)
+- Supabase (PostgreSQL) 作为主要后端数据源，前端使用 MSW handlers + localStorage 进行开发模拟 (016-activity-type)
 
 - (003-inventory-management)
 
@@ -40,9 +45,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
-- 014-hall-store-backend: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien
-- 013-schedule-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19
-- 010-attribute-dict-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
+- 016-activity-type: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 17 + Spring Boot 3.3.5 (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Spring WebFlux, Supabase Java/HTTP client (WebClient)
+- 015-store-reservation-settings: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.3.5 (backend)
+- 014-hall-store-backend: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.3.5 (backend)
 
 
 <!-- MANUAL ADDITIONS START -->

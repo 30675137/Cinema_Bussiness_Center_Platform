@@ -1,37 +1,56 @@
-# Implementation Plan: 影厅资源后端建模（Store-Hall 一致性）
+# Implementation Plan: 影厅资源后端建模（Store-Hall 一致性）+ 门店管理前端页面
 
-**Branch**: `014-hall-store-backend` | **Date**: 2025-12-16 | **Spec**: `specs/014-hall-store-backend/spec.md`
+**Branch**: `014-hall-store-backend` | **Date**: 2025-12-18 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/014-hall-store-backend/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-本特性在现有“影厅资源管理”和“档期甘特图”前端基础上，为后端构建统一的
-Store（门店）与 Hall（影厅）数据模型和门店-影厅关系建模，并提供与前端类
-型一致的查询 API。通过 Spring Boot + Supabase 建立影厅主数据表和门店主数据
-表，确保按门店查询影厅、按门店选择影厅等场景在所有前端页面中使用统一实体
-与标识，避免字段不一致导致的重复映射和数据错误。
+本功能实现影厅资源与门店的后端数据建模及前端展示能力，包括：
+1. **后端建模**：基于 Spring Boot + Supabase 构建 Store（门店）与 Hall（影厅）主数据表，建立清晰的一对多关系
+2. **API 一致性**：提供统一的 REST API（GET /api/stores, GET /api/stores/{storeId}/halls, GET /api/halls）供前端使用，确保返回结构与前端 TypeScript 类型完全一致
+3. **前端门店管理页面**：创建独立的门店管理页面（只读列表），支持名称搜索、状态筛选和前端分页，作为影厅资源管理的参考数据入口
+4. **影厅资源页面增强**：在影厅资源管理页面添加门店筛选器，支持按门店查看影厅或查看全部影厅
+
+技术方案采用 Spring Boot WebClient 调用 Supabase REST API 实现数据访问，前端使用 TanStack Query 管理 API 调用和缓存，确保前后端数据模型的强类型一致性。
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.3.5 (backend)
 
-**Language/Version**: TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend)
-**Primary Dependencies**: Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP client
-**Storage**: Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage）进行开发模拟
-**Testing**: Vitest (unit tests) + Playwright (e2e tests) + Testing Library
-**Target Platform**: Web browser (Chrome, Firefox, Safari, Edge) + Spring Boot backend API
+**Primary Dependencies**:
+- Frontend: Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13
+- Backend: Spring Boot Web 3.3.5, Spring WebFlux WebClient, Jackson, Supabase REST API client
+
+**Storage**: Supabase PostgreSQL 作为主要数据源，包含 `stores` 和 `halls` 两张主数据表；前端开发时可使用 MSW 模拟 API
+
+**Testing**:
+- Backend: JUnit 5 + Spring Boot Test + MockWebServer（模拟 Supabase）
+- Frontend: Vitest (unit tests) + Playwright (e2e tests) + Testing Library
+
+**Target Platform**: Web browser (Chrome, Firefox, Safari, Edge) + Spring Boot backend API (port 8080)
+
 **Project Type**: Full-stack web application (Spring Boot backend + React frontend)
-**Performance Goals**: <3s app startup, <500ms page transitions, support 1000+ list items with virtual scrolling
-**Constraints**: Must comply with Feature Branch Binding (specId alignment), Test-Driven Development, Component-Based Architecture, and Backend Architecture (Spring Boot + Supabase as unified backend stack)
-**Scale/Scope**: 影院商品/资源管理中台的子域（影厅资源与排期），后端本次变更
-范围限定在门店/影厅主数据与相关只读查询 API；暂不涉及多租户、跨门店共享和
-复杂报表。
+
+**Performance Goals**:
+- 门店列表加载 <3秒
+- 名称搜索/状态筛选响应 <1秒
+- 影厅列表加载 <2秒
+- 页面切换 <500ms
+
+**Constraints**:
+- 必须遵循 Feature Branch Binding（specId: 014-hall-store-backend）
+- 测试驱动开发（TDD），先写测试再实现
+- 后端必须使用 Spring Boot + Supabase，不得直接连接其他数据库
+- 前端组件必须遵循原子设计理念
+- 前后端数据结构必须完全一致（字段名、类型、枚举值）
+
+**Scale/Scope**:
+- 预期门店数量：10-50家
+- 预期影厅数量：100-500个
+- 单个门店影厅数：2-20个
+- 并发用户：10-100人
 
 ## Constitution Check
 
@@ -39,98 +58,225 @@ Store（门店）与 Hall（影厅）数据模型和门店-影厅关系建模，
 
 ### 必须满足的宪法原则检查：
 
-- [x] **功能分支绑定**: 当前分支名中的specId必须等于active_spec指向路径中的specId
-  - ✅ 分支名 `014-hall-store-backend` 与 spec 路径 `specs/014-hall-store-backend/spec.md` 一致
-- [x] **测试驱动开发**: 关键业务流程必须先编写测试，确保测试覆盖率100%
-  - ✅ 计划中包含 Repository、Service、Controller 层的单元测试和集成测试
-- [x] **组件化架构**: 必须遵循原子设计理念，组件必须清晰分层和可复用
-  - ✅ 本特性为后端特性，前端复用现有组件，不涉及新组件开发
-- [x] **数据驱动状态管理**: 必须使用Zustand + TanStack Query，状态变更可预测
-  - ✅ 前端继续使用现有状态管理方案，后端通过 Supabase 提供数据源
-- [x] **代码质量工程化**: 必须通过TypeScript/Java类型检查、ESLint/后端静态检查、所有质量门禁
-  - ✅ 后端使用 Java 21 + Spring Boot 3.x，遵循标准编码规范
-- [x] **后端技术栈约束**: 后端必须使用Spring Boot集成Supabase，Supabase为主要数据源与认证/存储提供方
-  - ✅ 设计采用 Spring Boot + Supabase REST API 集成，符合宪法要求
+- [x] **功能分支绑定**: 当前分支名 `014-hall-store-backend` 中的specId与active_spec路径一致
+- [x] **测试驱动开发**: 已规划测试策略（JUnit + Spring Boot Test + Vitest + Playwright）
+- [x] **组件化架构**: 前端门店管理页面将遵循原子设计（Table组件、SearchInput、StatusFilter等）
+- [x] **数据驱动状态管理**: 使用 TanStack Query 管理服务器状态，Zustand 管理客户端状态
+- [x] **代码质量工程化**: TypeScript类型检查、ESLint、Java静态检查、单元测试和集成测试
+- [x] **后端技术栈约束**: 使用 Spring Boot 3.3.5 + Supabase REST API，Supabase为唯一数据源
 
 ### 性能与标准检查：
-- [x] **性能标准**: 应用启动<3秒，页面切换<500ms，大数据列表使用虚拟滚动
-  - ✅ 后端 API 设计支持分页和筛选，前端已有虚拟滚动支持
-- [x] **安全标准**: 使用Zod数据验证，防止XSS，适当的认证授权机制
-  - ✅ 后端使用 Spring Boot Validation，前端继续使用 Zod，Supabase 提供认证
-- [x] **可访问性标准**: 遵循WCAG 2.1 AA级别，支持键盘导航和屏幕阅读器
-  - ✅ 前端复用现有可访问性实现，后端 API 遵循 RESTful 标准
-
-**检查结果**: ✅ **所有宪法要求均已满足**，设计阶段完成，可以进入实现阶段。
+- [x] **性能标准**: 门店列表<3秒，搜索/筛选<1秒，分页支持（前端分页）
+- [x] **安全标准**: 使用 Zod 进行前端数据验证，后端使用 Bean Validation，API 认证通过 Supabase Auth
+- [x] **可访问性标准**: 使用 Ant Design 组件自带的可访问性支持，遵循 WCAG 2.1 AA
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
+specs/014-hall-store-backend/
+├── spec.md              # Feature specification
 ├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
+├── research.md          # Phase 0 output (技术决策记录)
+├── data-model.md        # Phase 1 output (Store/Hall 实体设计)
+├── quickstart.md        # Phase 1 output (开发快速启动指南)
+├── contracts/           # Phase 1 output (API 契约定义)
+│   ├── store-api.yaml  # 门店查询 API OpenAPI spec
+│   └── hall-api.yaml   # 影厅查询 API OpenAPI spec
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
 
 ```text
+backend/
+├── src/main/java/com/cinema/hallstore/
+│   ├── controller/              # REST API 控制器
+│   │   ├── StoreQueryController.java      # GET /api/stores
+│   │   ├── HallQueryController.java       # GET /api/stores/{storeId}/halls
+│   │   └── HallListController.java        # GET /api/halls
+│   ├── service/                 # 业务逻辑层
+│   │   ├── StoreService.java
+│   │   └── HallService.java
+│   ├── repository/              # 数据访问层（Supabase REST API）
+│   │   ├── StoreRepository.java
+│   │   └── HallRepository.java
+│   ├── domain/                  # 领域模型
+│   │   ├── Store.java
+│   │   ├── Hall.java
+│   │   └── enums/
+│   │       ├── StoreStatus.java
+│   │       ├── HallStatus.java
+│   │       └── HallType.java
+│   ├── dto/                     # 数据传输对象
+│   │   ├── StoreDTO.java
+│   │   ├── HallDTO.java
+│   │   └── ApiResponse.java
+│   ├── mapper/                  # 实体与 DTO 映射
+│   │   ├── StoreMapper.java
+│   │   └── HallMapper.java
+│   ├── config/                  # 配置类
+│   │   ├── SupabaseConfig.java
+│   │   └── WebConfig.java
+│   └── exception/               # 异常处理
+│       ├── ResourceNotFoundException.java
+│       └── GlobalExceptionHandler.java
+├── src/test/java/               # 测试
+│   ├── controller/              # 控制器集成测试
+│   ├── service/                 # 服务单元测试
+│   └── repository/              # 仓储层测试
+└── pom.xml
+
 frontend/
 ├── src/
-│   ├── components/          # Reusable UI components (Atomic Design)
-│   │   ├── atoms/          # Basic UI elements (Button, Input, etc.)
-│   │   ├── molecules/      # Component combinations (SearchForm, etc.)
-│   │   ├── organisms/      # Complex components (ProductList, etc.)
-│   │   └── templates/      # Layout templates (MainLayout, etc.)
-│   ├── features/           # Feature-specific modules
-│   │   ├── product-management/
-│   │   │   ├── components/ # Feature-specific components
-│   │   │   ├── hooks/      # Custom hooks
-│   │   │   ├── services/   # API services
-│   │   │   ├── types/      # TypeScript types
-│   │   │   └── utils/      # Utility functions
-│   │   └── [other-features]/
-│   ├── pages/              # Page components (route-level)
-│   ├── hooks/              # Global custom hooks
-│   ├── services/           # Global API services
-│   ├── stores/             # Zustand stores
-│   ├── types/              # Global TypeScript types
-│   ├── utils/              # Global utility functions
-│   ├── constants/          # Application constants
-│   └── assets/             # Static assets
-├── public/                 # Public assets and MSW worker
-├── tests/                  # Test files
-│   ├── __mocks__/         # Mock files
-│   ├── fixtures/          # Test data
-│   └── utils/             # Test utilities
-└── docs/                  # Feature documentation
-
-specs/                      # Feature specifications
-├── [###-feature-name]/
-│   ├── spec.md           # Feature specification
-│   ├── plan.md           # Implementation plan (this file)
-│   ├── research.md       # Research findings
-│   ├── data-model.md     # Data model design
-│   ├── quickstart.md     # Development quickstart
-│   └── tasks.md          # Development tasks
-└── [other-features]/
+│   ├── pages/
+│   │   ├── stores/                      # 门店管理页面（新增）
+│   │   │   ├── index.tsx               # 门店列表页面
+│   │   │   ├── components/             # 页面专用组件
+│   │   │   │   ├── StoreTable.tsx      # 门店列表表格
+│   │   │   │   ├── StoreSearch.tsx     # 搜索框
+│   │   │   │   └── StatusFilter.tsx    # 状态筛选器
+│   │   │   ├── hooks/                  # 自定义 hooks
+│   │   │   │   └── useStoresQuery.ts   # TanStack Query hook
+│   │   │   ├── services/               # API 服务
+│   │   │   │   └── storeService.ts     # 门店 API 调用
+│   │   │   └── types/                  # TypeScript 类型
+│   │   │       └── store.types.ts      # Store 接口定义
+│   │   └── schedule/                    # 排期管理（已有）
+│   │       ├── HallResources.tsx        # 影厅资源管理（需修改）
+│   │       └── components/
+│   │           └── StoreSelector.tsx    # 门店选择器（新增）
+│   ├── components/layout/
+│   │   ├── Router.tsx                   # 路由配置（需添加 /stores 路由）
+│   │   └── AppLayout.tsx                # 应用布局（需添加菜单项）
+│   └── services/
+│       └── api.tsx                      # 通用 API 客户端
+└── tests/
+    ├── pages/stores/                    # 门店页面测试
+    └── e2e/                             # E2E 测试
 ```
 
-**Structure Decision**: 全局仍采用“前端 React + 后端 Spring Boot”的特性化模块
-架构。本特性新增的 Store/Hall 相关代码集中在后端的领域/数据访问层与 API 控
-制器中，并通过 Supabase 作为统一数据源；前端继续复用现有排期与影厅资源管
-理页面，仅适配新的标准化 API。测试将覆盖后端领域逻辑与 API 契约，以及前端
-对新 API 的基本集成验证。
+**Structure Decision**:
+- 后端采用分层架构（Controller → Service → Repository），Repository 层通过 WebClient 调用 Supabase REST API
+- 前端采用 feature-based 模块化架构，门店管理为独立的 page module
+- 前后端数据模型完全对齐，使用相同的字段命名和类型定义
 
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+无宪法原则违反。本功能完全遵循项目宪法的所有要求。
+
+## Phase 0: Research & Decisions
+
+*Output: `research.md`*
+
+### Research Tasks
+
+本阶段需要研究和决策以下技术点：
+
+1. **Spring Boot 与 Supabase REST API 集成模式**
+   - 研究 WebClient vs RestTemplate 的选择
+   - 研究 Supabase REST API 的过滤、排序语法
+   - 研究超时、重试、错误处理策略
+
+2. **前后端枚举值一致性策略**
+   - 研究 Java Enum 与 TypeScript 枚举的映射方案
+   - 研究 Jackson @JsonValue/@JsonCreator 用于枚举序列化
+   - 研究前端枚举值大小写一致性（active vs ACTIVE）
+
+3. **前端门店列表前端分页方案**
+   - 研究 Ant Design Table 前端分页最佳实践
+   - 研究一次性加载 vs 分批加载的性能权衡
+   - 研究搜索筛选与分页的交互方式
+
+4. **API 响应结构标准化**
+   - 研究统一响应格式（{ success, data, message, code }）
+   - 研究分页响应结构（{ data, total }）
+   - 研究错误响应结构
+
+5. **测试策略**
+   - 研究 Spring Boot Test 与 MockWebServer 模拟 Supabase
+   - 研究前端 MSW 模拟后端 API
+   - 研究集成测试覆盖关键路径
+
+## Phase 1: Design & Contracts
+
+*Output: `data-model.md`, `contracts/*.yaml`, `quickstart.md`*
+
+### Data Model Design
+
+将在 `data-model.md` 中详细定义：
+
+1. **Store（门店）实体**
+   - 数据库表：`stores`
+   - 后端 Domain 模型：`Store.java`
+   - 后端 DTO：`StoreDTO.java`
+   - 前端类型：`Store` interface
+   - 字段：id, code, name, region, status, createdAt, updatedAt
+
+2. **Hall（影厅）实体**
+   - 数据库表：`halls`
+   - 后端 Domain 模型：`Hall.java`
+   - 后端 DTO：`HallDTO.java`
+   - 前端类型：`Hall` interface
+   - 字段：id, storeId, code, name, type, capacity, tags, status, createdAt, updatedAt
+
+3. **Store-Hall 关系**
+   - 关系类型：一对多（一个 Store 拥有多个 Hall）
+   - 实现方式：Hall 表中的 storeId 外键
+   - 查询模式：通过 storeId 过滤 halls
+
+### API Contracts
+
+将在 `contracts/` 目录生成 OpenAPI 规范：
+
+1. **GET /api/stores** - 查询门店列表
+   - Query参数：status（可选）
+   - 响应：`{ success: boolean, data: Store[], total: number, message: string, code: number }`
+
+2. **GET /api/stores/{storeId}/halls** - 按门店查询影厅列表
+   - Path参数：storeId（UUID）
+   - Query参数：status（可选）, type（可选）
+   - 响应：`{ data: Hall[], total: number }`
+
+3. **GET /api/halls** - 查询所有影厅
+   - Query参数：status（可选）, type（可选）
+   - 响应：`{ success: boolean, data: Hall[], total: number, message: string, code: number }`
+
+### Quickstart Guide
+
+将在 `quickstart.md` 中提供：
+- 后端启动步骤（配置 Supabase 连接、运行 Spring Boot）
+- 前端启动步骤（安装依赖、启动开发服务器）
+- 数据初始化（创建测试门店和影厅）
+- 关键 API 测试命令
+
+## Phase 2: Task Breakdown
+
+*Output: Generated by `/speckit.tasks` command (not by `/speckit.plan`)*
+
+任务分解将在执行 `/speckit.tasks` 命令时完成，预期包括：
+
+1. **后端任务**
+   - 创建 Supabase 数据表
+   - 实现 Domain 模型和 DTO
+   - 实现 Repository 层（Supabase REST API 调用）
+   - 实现 Service 层
+   - 实现 Controller 层
+   - 编写单元测试和集成测试
+
+2. **前端任务**
+   - 创建门店管理页面
+   - 实现门店列表组件（Table、Search、Filter）
+   - 实现 TanStack Query hooks
+   - 在影厅资源页面添加门店筛选器
+   - 更新路由和菜单
+   - 编写单元测试和 E2E 测试
+
+3. **集成任务**
+   - 前后端联调
+   - 端到端测试
+   - 性能测试
+   - 文档更新

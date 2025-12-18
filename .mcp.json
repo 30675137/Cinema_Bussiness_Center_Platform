@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp"
+    },
+    "mcp-server-commands": {
+      "command": "npx",
+      "args": ["mcp-server-commands"]
+    }
+  }
+}

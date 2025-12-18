@@ -113,7 +113,7 @@ export function useScheduleDetailQuery(
 // ============================================================================
 
 /**
- * Hook to fetch list of halls
+ * Hook to fetch list of halls (legacy - uses old getHallList method)
  */
 export function useHallsListQuery(
   params?: HallQueryParams,
@@ -128,6 +128,34 @@ export function useHallsListQuery(
       const response = await scheduleService.getHallList(params);
       if (!response.success) {
         throw new Error(response.message || 'Failed to fetch halls list');
+      }
+      return response.data;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes (halls change infrequently)
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    retry: 2,
+    refetchOnWindowFocus: false,
+    ...options,
+  });
+}
+
+/**
+ * Hook to fetch all halls (new API - uses getAllHalls method)
+ * Recommended for new code - uses backend /api/halls endpoint
+ */
+export function useAllHallsQuery(
+  params?: HallQueryParams,
+  options?: Omit<
+    UseQueryOptions<Hall[], Error>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return useQuery<Hall[], Error>({
+    queryKey: scheduleKeys.hallsList(params),
+    queryFn: async () => {
+      const response = await scheduleService.getAllHalls(params);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch all halls');
       }
       return response.data;
     },

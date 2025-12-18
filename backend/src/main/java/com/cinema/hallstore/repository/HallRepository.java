@@ -60,6 +60,31 @@ public class HallRepository {
     }
 
     /**
+     * 获取所有影厅列表，支持状态和类型筛选
+     */
+    public List<Hall> findAll(HallStatus status, HallType type) {
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString("/halls")
+                .queryParam("order", "created_at.desc");
+
+        if (status != null) {
+            builder.queryParam("status", "eq." + status.name().toLowerCase());
+        }
+        if (type != null) {
+            builder.queryParam("type", "eq." + type.name());
+        }
+
+        List<SupabaseHallRow> rows = webClient.get()
+                .uri(builder.build().toUriString())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<SupabaseHallRow>>() {})
+                .block(supabaseConfig.getTimeoutDuration());
+
+        return rows == null ? List.of() : rows.stream().map(this::toDomain).toList();
+    }
+
+    /**
      * 根据影厅 ID 查询单个影厅
      */
     public Optional<Hall> findById(UUID hallId) {

@@ -136,10 +136,22 @@ def execute_command(cmd: List[str], description: str, timeout: int = 30) -> bool
     else:
         logging.info(f"Executing: {description}")
         try:
-            result = subprocess.run(cmd, capture_output=True, timeout=timeout)
-            return result.returncode == 0
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+            if result.returncode == 0:
+                return True
+            else:
+                # 输出详细错误信息
+                if result.stderr:
+                    logging.error(f"Error output: {result.stderr.strip()}")
+                if result.stdout:
+                    logging.debug(f"Standard output: {result.stdout.strip()}")
+                return False
         except subprocess.TimeoutExpired:
             logging.error(f"Command timeout: {description}")
+            return False
+        except FileNotFoundError as e:
+            logging.error(f"Command not found: {cmd[0]}")
+            logging.error(f"Details: {e}")
             return False
 
 def detect_zsh_config() -> Path:
@@ -434,7 +446,8 @@ def cmd_install(args):
 
     for comp in components:
         pkg = packages[comp]
-        if execute_command(['npm', 'install', '-g', pkg], f"Install {pkg}"):
+        # npm install 可能需要较长时间，使用 120s 超时
+        if execute_command(['npm', 'install', '-g', pkg], f"Install {pkg}", timeout=120):
             logging.info(f"✓ Successfully installed {pkg}")
         else:
             logging.error(f"✗ Failed to install {pkg}")

@@ -17,6 +17,8 @@ export type HallStatus = 'active' | 'inactive' | 'maintenance';
  */
 export interface Hall {
   id: string;
+  storeId: string;             // 所属门店ID (UUID as string)
+  code: string | null;         // 影厅编码（可选）
   name: string;
   capacity: number;
   type: HallType;

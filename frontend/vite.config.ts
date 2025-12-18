@@ -41,15 +41,26 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    // 在开发环境中，MSW 会拦截 /api 请求，所以不需要 proxy
-    // 如果需要连接真实后端，可以取消注释下面的 proxy 配置
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:8080',
-    //     changeOrigin: true,
-    //     secure: false,
-    //   },
-    // },
+    // 代理配置：将前端 /api 请求代理到后端 Spring Boot 服务
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+        // 可选：打印代理日志便于调试
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('❌ Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('→ Sending Request:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('← Received Response:', proxyRes.statusCode, req.url);
+          });
+        },
+      },
+    },
   },
   // Vitest configuration
   define: {

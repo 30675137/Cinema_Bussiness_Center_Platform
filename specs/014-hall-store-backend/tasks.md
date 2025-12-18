@@ -1,112 +1,154 @@
 # Tasks: 影厅资源后端建模（Store-Hall 一致性）
 
 **Input**: Design documents from `/specs/014-hall-store-backend/`
-**Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/api.yaml`, `quickstart.md`
+**Prerequisites**: plan.md, spec.md, data-model.md, contracts/store-api.yaml, contracts/hall-api.yaml
 
-> 任务列表按用户故事分组，支持独立实现与测试；同时标记可并行执行的任务。
+**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+
+## Format: `[ID] [P?] [Story] Description`
+
+- **[P]**: Can run in parallel (different files, no dependencies)
+- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3, US4)
+- Include exact file paths in descriptions
+
+## Path Conventions
+
+- Backend: `backend/src/main/java/com/cinema/hallstore/`
+- Frontend: `frontend/src/`
+- Tests: `backend/src/test/java/` and `frontend/tests/`
 
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: 为后端 Spring Boot + Supabase 集成准备基础工程与配置骨架。
+**Purpose**: Project initialization and basic structure for backend Spring Boot application
 
-- [x] T001 初始化后端模块骨架（如 `backend/` 目录、Maven 项目）并在 `backend/pom.xml` 中添加 Spring Boot 3.x 与 JUnit5 基本依赖
-- [x] T002 在 `backend/src/main/resources/application.yml` 中增加 Supabase 相关配置占位（`supabase.url`、`supabase.service-role-key` 等），并通过环境变量读取
-- [x] T003 [P] 在 `backend/src/main/java/com/cinema/hallstore/config/SupabaseConfig.java` 中定义 `WebClient supabaseWebClient` Bean，统一设置 baseUrl、认证 Header 与超时
-- [x] T004 [P] 在 `backend/src/main/java/com/cinema/hallstore/config/GlobalExceptionHandler.java` 中创建全局异常处理器，将验证/业务异常映射为 `ErrorResponse` 结构
+- [x] T001 Create Supabase tables `stores` and `halls` with fields per data-model.md
+- [x] T002 Add Spring Boot WebFlux dependency to backend/pom.xml for WebClient support
+- [x] T003 [P] Configure Supabase connection in backend/src/main/java/com/cinema/hallstore/config/SupabaseConfig.java
+- [x] T004 [P] Configure CORS and web settings in backend/src/main/java/com/cinema/hallstore/config/WebConfig.java
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: 所有用户故事共用的基础能力（领域模型、DTO、统一响应封装、日志等）。  
-**⚠️ CRITICAL**: 本阶段未完成前，不开始任何 US1/US2/US3 实现。
+**Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [x] T005 在 `backend/src/main/java/com/cinema/hallstore/domain/Store.java` 中实现 Store 领域模型（字段与状态枚举对齐 `data-model.md`）
-- [x] T006 在 `backend/src/main/java/com/cinema/hallstore/domain/Hall.java` 中实现 Hall 领域模型（字段、状态与类型枚举对齐 `data-model.md`）
-- [x] T007 [P] 在 `backend/src/main/java/com/cinema/hallstore/domain/enums/StoreStatus.java` 与 `HallStatus.java`、`HallType.java` 中定义状态与类型枚举（含注释说明）
-- [x] T008 [P] 在 `backend/src/main/java/com/cinema/hallstore/dto/StoreDTO.java` 与 `HallDTO.java` 中定义对外 DTO，字段命名对齐前端 `Hall`/`Store` 类型与 `contracts/api.yaml`
-- [x] T009 在 `backend/src/main/java/com/cinema/hallstore/dto/ApiResponse.java` 中实现统一响应包装结构（包含 `data`、`error`、`message` 字段）
-- [x] T010 [P] 在 `backend/src/main/java/com/cinema/hallstore/mapper/StoreMapper.java` 与 `HallMapper.java` 中实现 Domain ↔ DTO 映射工具类
-- [x] T011 在 `backend/src/test/java/com/cinema/hallstore/domain/` 下为 Store/Hall 领域模型补充基本单元测试（校验枚举与必填字段约束）
+**CRITICAL**: No user story work can begin until this phase is complete
+
+- [x] T005 [P] Create StoreStatus enum in backend/src/main/java/com/cinema/hallstore/domain/enums/StoreStatus.java (active, disabled)
+- [x] T006 [P] Create HallStatus enum in backend/src/main/java/com/cinema/hallstore/domain/enums/HallStatus.java (active, inactive, maintenance)
+- [x] T007 [P] Create HallType enum in backend/src/main/java/com/cinema/hallstore/domain/enums/HallType.java (VIP, Public, CP, Party)
+- [x] T008 [P] Create Store domain model in backend/src/main/java/com/cinema/hallstore/domain/Store.java
+- [x] T009 [P] Create Hall domain model in backend/src/main/java/com/cinema/hallstore/domain/Hall.java
+- [x] T010 [P] Create StoreDTO in backend/src/main/java/com/cinema/hallstore/dto/StoreDTO.java matching store-api.yaml
+- [x] T011 [P] Create HallDTO in backend/src/main/java/com/cinema/hallstore/dto/HallDTO.java matching hall-api.yaml
+- [x] T012 [P] Create ApiResponse wrapper in backend/src/main/java/com/cinema/hallstore/dto/ApiResponse.java
+- [x] T013 [P] Create StoreMapper in backend/src/main/java/com/cinema/hallstore/mapper/StoreMapper.java (domain <-> DTO)
+- [x] T014 [P] Create HallMapper in backend/src/main/java/com/cinema/hallstore/mapper/HallMapper.java (domain <-> DTO)
+- [x] T015 [P] Create ResourceNotFoundException in backend/src/main/java/com/cinema/hallstore/exception/ResourceNotFoundException.java
+- [x] T016 [P] Create GlobalExceptionHandler in backend/src/main/java/com/cinema/hallstore/exception/GlobalExceptionHandler.java
+
+**Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
 ---
 
-## Phase 3: User Story 1 - 运营配置影厅主数据 (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - 运营配置影厅主数据 (Priority: P1)
 
-**Goal**: 支持运营通过后端 API 维护影厅主数据（创建/编辑/查看/停用），并让前端“影厅资源管理”页按门店拉取统一结构的影厅列表。  
-**Independent Test**: 在仅实现 US1 时，可为指定门店创建/编辑/停用影厅；前端调用“按门店查询影厅列表”API 能看到最新影厅数据且字段完全对齐模型。
+**Goal**: 实现后端 Hall CRUD API，支持按门店查询影厅列表，前端可获取和展示影厅数据
 
-### Tests for User Story 1
+**Independent Test**: 运营可通过 POST /api/halls 创建影厅（管理后台），前端通过 GET /api/stores/{storeId}/halls 拉取门店影厅列表并展示
 
-- [x] T012 [P] [US1] 在 `backend/src/test/java/com/cinema/hallstore/contracts/HallAdminContractTest.java` 中为 `/api/admin/halls` 创建/更新接口编写契约测试（基于 `contracts/api.yaml`）
-- [x] T013 [P] [US1] 在 `backend/src/test/java/com/cinema/hallstore/contracts/HallQueryContractTest.java` 中为 `GET /api/stores/{storeId}/halls` 编写契约测试，校验返回字段结构
+### Backend Implementation for User Story 1
 
-### Implementation for User Story 1
+- [x] T017 [P] [US1] Create HallRepository in backend/src/main/java/com/cinema/hallstore/repository/HallRepository.java (Supabase REST API calls: findAll, findByStoreId, findById, save, update, delete)
+- [x] T018 [US1] Create HallService in backend/src/main/java/com/cinema/hallstore/service/HallService.java (business logic: validation, status filtering, type filtering)
+- [x] T019 [US1] Create HallListController in backend/src/main/java/com/cinema/hallstore/controller/HallListController.java (GET /api/halls endpoint per hall-api.yaml)
+- [x] T020 [US1] Create HallQueryController in backend/src/main/java/com/cinema/hallstore/controller/HallQueryController.java (GET /api/stores/{storeId}/halls endpoint per hall-api.yaml)
+- [x] T021 [US1] Create HallAdminController in backend/src/main/java/com/cinema/hallstore/controller/HallAdminController.java (POST/PUT/DELETE /api/halls endpoints for admin operations)
 
-- [x] T014 [P] [US1] 在 `backend/src/main/java/com/cinema/hallstore/repository/HallRepository.java` 中通过 Supabase WebClient 实现按条件查询/创建/更新 Hall 的底层访问方法
-- [x] T015 [US1] 在 `backend/src/main/java/com/cinema/hallstore/service/HallService.java` 中实现影厅主数据业务逻辑（含创建、编辑、状态变更与基本校验）
-- [x] T016 [US1] 在 `backend/src/main/java/com/cinema/hallstore/controller/HallAdminController.java` 中实现 `/api/admin/halls` POST/PUT/GET 接口（使用 DTO + Service + Mapper）
-- [x] T017 [US1] 在 `backend/src/main/java/com/cinema/hallstore/controller/HallQueryController.java` 中实现 `GET /api/stores/{storeId}/halls`，支持按状态与类型筛选
-- [x] T018 [US1] 在 `backend/src/test/java/com/cinema/hallstore/service/HallServiceTest.java` 中为创建/编辑/停用影厅编写单元测试，覆盖容量>0、类型枚举、状态流转等规则
-- [x] T019 [US1] 在 `backend/src/test/java/com/cinema/hallstore/controller/HallAdminControllerIntegrationTest.java` 中编写集成测试，验证通过 HTTP 调用完成影厅创建与状态更新
-- [x] T020 [US1] 在 `backend/src/test/java/com/cinema/hallstore/controller/HallQueryControllerIntegrationTest.java` 中验证按门店查询影厅列表时返回数据与 DTO/前端类型一致
-
-**Checkpoint**: US1 实现后，可独立完成影厅主数据维护与按门店查询，并通过契约/集成测试验证。
+**Checkpoint**: At this point, Hall CRUD APIs should be fully functional and testable independently via Postman/curl
 
 ---
 
 ## Phase 4: User Story 2 - 建模门店-影厅关系 (Priority: P1)
 
-**Goal**: 在数据模型和 API 层面清晰表达 Store 与 Hall 的 1:N 关系，保证按门店维度查询影厅时关系准确，并能支持门店停用时的历史保留策略。  
-**Independent Test**: 仅实现 US2 时，可在数据库中配置多个门店与影厅，并通过按门店查询接口准确返回各自影厅集合；门店被停用后关系仍可用于历史查询。
+**Goal**: 实现后端 Store API，支持查询门店列表，建立清晰的 Store-Hall 关系
 
-### Tests for User Story 2
+**Independent Test**: 可通过 GET /api/stores 查询所有门店，通过 GET /api/stores/{storeId}/halls 准确查询某门店下的所有影厅
 
-- [x] T021 [P] [US2] 在 `backend/src/test/java/com/cinema/hallstore/contracts/StoreHallRelationContractTest.java` 中为 `GET /api/stores/{storeId}/halls` 设计多门店多影厅场景契约测试
+### Backend Implementation for User Story 2
 
-### Implementation for User Story 2
+- [x] T022 [P] [US2] Create StoreRepository in backend/src/main/java/com/cinema/hallstore/repository/StoreRepository.java (Supabase REST API calls: findAll, findById, findByStatus, save, update, delete)
+- [x] T023 [US2] Create StoreService in backend/src/main/java/com/cinema/hallstore/service/StoreService.java (business logic: validation, status filtering, store-hall relationship queries)
+- [x] T024 [US2] Create StoreQueryController in backend/src/main/java/com/cinema/hallstore/controller/StoreQueryController.java (GET /api/stores endpoint per store-api.yaml)
+- [x] T025 [US2] Update HallService to validate storeId existence before creating/updating halls (integrate with StoreService)
+- [x] T026 [US2] Add cascade handling in HallService for when store status changes to disabled (filter out disabled stores' halls in new schedule creation)
 
-- [x] T022 [P] [US2] 在 `backend/src/main/java/com/cinema/hallstore/repository/StoreRepository.java` 中实现基于 Supabase 的 Store 基础查询（按状态过滤）
-- [x] T023 [US2] 在 `backend/src/main/java/com/cinema/hallstore/service/StoreService.java` 中实现门店列表与门店详情查询逻辑（含 active/disabled 状态处理）
-- [x] T024 [US2] 在 `backend/src/main/java/com/cinema/hallstore/controller/StoreQueryController.java` 中实现 `GET /api/stores` 与 `GET /api/stores/{storeId}` 接口
-- [x] T025 [US2] 在 `backend/src/test/java/com/cinema/hallstore/service/StoreServiceTest.java` 中验证多门店、多影厅组合下按门店查询影厅的正确性（含门店停用场景）
-- [x] T026 [US2] 在 `backend/src/test/java/com/cinema/hallstore/controller/StoreQueryControllerIntegrationTest.java` 中为门店查询接口编写集成测试，覆盖 active/disabled 状态
-
-**Checkpoint**: US2 完成后，门店与影厅关系可在数据层与 API 层完整表达，并支持历史查询语义。
+**Checkpoint**: At this point, Store APIs and Store-Hall relationship queries should be fully functional
 
 ---
 
 ## Phase 5: User Story 3 - 前后端 API 与模型一致性 (Priority: P2)
 
-**Goal**: 确保“影厅资源管理”和“排期甘特图”前端使用的 Hall/Store 类型与后端 API 完全一致，前后端不再需要额外字段映射或重复维护。  
-**Independent Test**: 仅实现 US3 时，前端两处页面均可直接消费新的 `/api/stores` 与 `/api/stores/{storeId}/halls` 接口，字段名和含义保持一致，无需前端转换。
+**Goal**: 确保后端 DTOs 与前端 TypeScript 类型完全一致，统一字段命名和枚举值
 
-### Tests for User Story 3
+**Independent Test**: 前端 Hall 和 Store 类型可直接映射后端 API 响应，无需额外字段转换
 
-- [x] T027 [P] [US3] 在 `frontend/src/pages/schedule/__tests__/hallApi.integration.test.ts` 中编写前端集成测试，验证调用新后端 API 时 Hall 类型字段与期望一致
+### Frontend Type Definitions for User Story 3
 
-### Implementation for User Story 3
+- [x] T027 [P] [US3] Create Store interface in frontend/src/pages/stores/types/store.types.ts (id, code, name, region, status, createdAt, updatedAt)
+- [x] T028 [P] [US3] Create StoreStatus type in frontend/src/pages/stores/types/store.types.ts (active | disabled)
+- [x] T029 [P] [US3] Update Hall interface in frontend/src/pages/schedule/types/schedule.types.ts to add storeId and code fields if missing
+- [x] T030 [P] [US3] Verify HallType and HallStatus enums in frontend/src/pages/schedule/types/schedule.types.ts match backend (VIP/Public/CP/Party, active/inactive/maintenance)
 
-- [x] T028 [P] [US3] 在 `frontend/src/pages/schedule/services/scheduleService.ts` 中新增/调整获取门店与影厅的 API 调用，使之对接 `/api/stores` 与 `/api/stores/{storeId}/halls`
-- [x] T029 [US3] 在 `frontend/src/pages/schedule/hooks/useScheduleQueries.ts` 与 `frontend/src/pages/schedule/HallResources.tsx` 中适配新的 Hall/Store 字段（若有命名差异）
-- [x] T030 [US3] 在 `frontend/src/pages/schedule/__tests__/hallResources.integration.test.tsx` 中增加对"影厅资源管理"页面的端到端验证（使用 MSW 模拟新后端响应结构）
-- [x] T031 [US3] 在 `frontend/src/pages/schedule/__tests__/ganttChart.integration.test.tsx` 中补充针对新 Hall/Store API 的场景，确保排期甘特图页使用统一实体字段
+### Frontend API Services for User Story 3
 
-**Checkpoint**: US3 完成后，前后端在 Hall/Store 字段层面完全一致，任何一侧变更需同步更新规范与契约。
+- [x] T031 [P] [US3] Create storeService.ts in frontend/src/pages/stores/services/storeService.ts (getStores API call)
+- [x] T032 [P] [US3] Update scheduleService.ts in frontend/src/pages/schedule/services/scheduleService.ts to add getHallsByStore and getAllHalls calls
+- [x] T033 [US3] Create useStoresQuery hook in frontend/src/pages/stores/hooks/useStoresQuery.ts (TanStack Query for stores data)
+- [x] T034 [US3] Update useScheduleQueries hook in frontend/src/pages/schedule/hooks/useScheduleQueries.ts to add useHallsByStoreQuery and useAllHallsQuery
+
+**Checkpoint**: Frontend types and API services should match backend contracts exactly, enabling type-safe API calls
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: User Story 4 - 前端门店管理页面 (Priority: P2)
 
-**Purpose**: 提升整体可维护性、可观测性与性能，覆盖多用户故事的横切关注点。
+**Goal**: 创建独立的门店管理页面，支持门店列表展示、名称搜索、状态筛选和前端分页
 
-- [x] T032 [P] 在 `specs/014-hall-store-backend/` 下补充/更新文档（特别是 `quickstart.md` 与 `data-model.md` 中的最终字段与 API 示例）
-- [x] T033 在 `backend/src/main/java/com/cinema/hallstore/` 范围内进行代码清理与重构（消除重复、提升命名、补充注释）
-- [x] T034 [P] 在 `backend/src/test/` 中增加缺失的单元/集成测试用例，确保关键路径覆盖率达标
-- [x] T035 [P] 根据实际 Supabase 性能表现，检查并优化常用查询（例如添加或调整 Supabase 端索引）
-- [x] T036 在 `docs/` 或 `specs/014-hall-store-backend/` 中记录已实现的审计与日志策略，以支持 SC-004
+**Independent Test**: 用户可访问 /stores 路由，查看所有门店列表，使用搜索和筛选功能，并进行前端分页导航
+
+### Frontend Store Management Page for User Story 4
+
+- [x] T035 [P] [US4] Create StoreTable component in frontend/src/pages/stores/components/StoreTable.tsx (Ant Design Table with columns: name, region, status)
+- [x] T036 [P] [US4] Create StoreSearch component in frontend/src/pages/stores/components/StoreSearch.tsx (search input for name filtering)
+- [x] T037 [P] [US4] Create StatusFilter component in frontend/src/pages/stores/components/StatusFilter.tsx (dropdown for status filtering: all/active/disabled)
+- [x] T038 [US4] Create stores page index in frontend/src/pages/stores/index.tsx (integrate StoreTable, StoreSearch, StatusFilter with useStoresQuery)
+- [x] T039 [US4] Add /stores route to frontend/src/components/layout/Router.tsx
+- [x] T040 [US4] Add "门店管理" menu item to frontend/src/components/layout/AppLayout.tsx
+
+### Frontend Hall Resources Page Enhancement for User Story 4
+
+- [x] T041 [P] [US4] Create StoreSelector component in frontend/src/pages/schedule/components/StoreSelector.tsx (dropdown for store selection: all stores + individual stores)
+- [x] T042 [US4] Update HallResources page in frontend/src/pages/schedule/HallResources.tsx to integrate StoreSelector and filter halls by selected store
+
+**Checkpoint**: At this point, Store management page should be accessible, functional, and independently testable; Hall resources page should support store-based filtering
+
+---
+
+## Phase 7: Polish & Cross-Cutting Concerns
+
+**Purpose**: Improvements that affect multiple user stories and overall quality
+
+- [x] T043 [P] Add comprehensive error messages and validation in backend controllers (400/404/500 responses per contracts)
+- [x] T044 [P] Add request/response logging in backend using Spring Boot logging (info level for API calls)
+- [x] T045 [P] Add loading states and error handling in frontend components (using TanStack Query isLoading, isError states)
+- [x] T046 [P] Add empty state handling in StoreTable and HallResources when no data returned
+- [x] T047 [P] Verify CORS configuration allows frontend origin in backend WebConfig
+- [x] T048 Update CLAUDE.md to add backend/frontend technologies for 014-hall-store-backend
+- [x] T049 Update quickstart.md with backend/frontend startup instructions and API testing examples
+- [ ] T050 Run manual E2E test: create store → create halls → view in store management page → filter halls by store in hall resources page
 
 ---
 
@@ -114,58 +156,85 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: 无依赖，可立即开始
-- **Foundational (Phase 2)**: 依赖 Phase 1 完成，阻塞所有用户故事
-- **User Stories (Phase 3–5)**: 依赖 Phase 2 完成
-  - US1 与 US2（均为 P1）可在基础层完成后并行推进
-  - US3（P2）依赖 US1/US2 提供稳定 API 与数据模型
-- **Polish (Phase 6)**: 依赖所有计划内用户故事完成
+- **Setup (Phase 1)**: No dependencies - can start immediately
+- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+- **User Story 1 (Phase 3)**: Depends on Foundational (Phase 2)
+- **User Story 2 (Phase 4)**: Depends on Foundational (Phase 2) - Can run in parallel with US1
+- **User Story 3 (Phase 5)**: Depends on US1 and US2 completion (needs backend APIs)
+- **User Story 4 (Phase 6)**: Depends on US2 and US3 completion (needs Store API and types)
+- **Polish (Phase 7)**: Depends on all user stories being complete
 
 ### User Story Dependencies
 
-- **User Story 1 (P1)**: 基于基础领域模型与 Supabase 集成，无其他故事依赖
-- **User Story 2 (P1)**: 依赖已存在的 Store/Hall 领域模型，可与 US1 并行，但在语义上强化关系建模
-- **User Story 3 (P2)**: 依赖 US1/US2 暴露的稳定 API 与字段结构，用于前后端一致性校验
+- **User Story 1 (P1)**: Can start after Foundational (Phase 2) - No dependencies on other stories
+- **User Story 2 (P1)**: Can start after Foundational (Phase 2) - Can run in parallel with US1
+- **User Story 3 (P2)**: Must start after US1 and US2 (needs backend APIs to define types)
+- **User Story 4 (P2)**: Must start after US2 and US3 (needs Store API and frontend types)
 
 ### Within Each User Story
 
-- 测试（契约/集成）优先编写，并在实现前确保失败
-- 先 Repository，再 Service，最后 Controller 与前端适配
-- 保证每个用户故事在本阶段内即可独立验证与回归
+- Models/Enums before Repositories
+- Repositories before Services
+- Services before Controllers
+- Backend APIs before Frontend types/services
+- Frontend services before Frontend components
+- Frontend components before Page integration
 
----
+### Parallel Opportunities
 
-## Parallel Opportunities
-
-- Phase 1 中标记为 [P] 的配置类与异常处理可并行开发
-- Phase 2 中 DTO、枚举和 Mapper 相关任务可在不同文件上并行推进
-- US1 中 Repository 与契约测试、Service 单测可在依赖清晰时并行
-- US2 的 Store 相关 Repository/Service 与 US1 的 Hall 逻辑可并行，后续在集成测试中汇合
-- US3 的前端适配与测试可在后端 API 稳定后，与 Phase 6 中文档与性能优化并行进行
+- All Setup tasks (T001-T004) can run in parallel
+- All Foundational enum tasks (T005-T007) can run in parallel
+- All Foundational domain models (T008-T009) can run in parallel
+- All Foundational DTOs (T010-T012) can run in parallel
+- All Foundational mappers/exceptions (T013-T016) can run in parallel
+- US1 and US2 can be developed in parallel (different entities, no blocking dependencies)
+- Within US3: Frontend types (T027-T030) can run in parallel, Frontend services (T031-T032) can run in parallel
+- Within US4: Components (T035-T037, T041) can run in parallel
+- All Polish tasks (T043-T047) can run in parallel
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### MVP First (User Stories 1 & 2 Only - P1)
 
-1. 完成 Phase 1 + Phase 2，打好后端基础骨架与领域模型
-2. 实现 Phase 3（US1），使运营可维护影厅主数据并通过 API 查询
-3. 使用契约与集成测试验证 US1 独立可用，满足基础主数据需求
+1. Complete Phase 1: Setup
+2. Complete Phase 2: Foundational (CRITICAL - blocks all stories)
+3. Complete Phase 3 & 4 in parallel: User Story 1 + User Story 2
+4. **STOP and VALIDATE**: Test both Hall and Store APIs independently via Postman
+5. Deploy backend and validate Store-Hall relationship queries
 
 ### Incremental Delivery
 
-1. 在 MVP（US1）稳定后，补充 US2 的门店-影厅关系建模与门店查询接口
-2. 随后实现 US3，使前后端类型与 API 完全一致，减少前端适配成本
-3. 最后执行 Phase 6 的性能优化、文档补全与横切关注点完善
+1. Complete Setup + Foundational → Foundation ready
+2. Add User Story 1 + 2 (P1) → Test independently → Deploy/Demo (MVP - backend APIs ready)
+3. Add User Story 3 (P2) → Test independently → Frontend types aligned
+4. Add User Story 4 (P2) → Test independently → Deploy/Demo (Full feature complete)
+5. Polish phase → Final quality improvements
 
 ### Parallel Team Strategy
 
-1. 小团队可先串行完成 Phase 1–3，确保 MVP 可用，再扩展 US2/US3
-2. 多人团队可在完成 Phase 1–2 后：
-   - 开发者 A 负责 US1（影厅主数据与管理接口）
-   - 开发者 B 负责 US2（门店与关系查询）
-   - 开发者 C 负责 US3（前端适配与一致性验证）
-3. 所有成员在 Phase 6 联合完成重构、性能优化与文档收尾。
+With multiple developers:
 
+1. Team completes Setup + Foundational together
+2. Once Foundational is done:
+   - Developer A: User Story 1 (Hall APIs)
+   - Developer B: User Story 2 (Store APIs)
+3. After US1 + US2 complete:
+   - Developer A: User Story 3 (Frontend types and services)
+   - Developer B: User Story 4 (Frontend pages and components)
+4. Team completes Polish together
 
+---
+
+## Notes
+
+- [P] tasks = different files, no dependencies within same phase
+- [Story] label maps task to specific user story for traceability
+- Each user story should be independently completable and testable
+- Commit after each task or logical group
+- Stop at any checkpoint to validate story independently
+- Backend follows layered architecture: Domain → Repository → Service → Controller
+- Frontend follows feature-based architecture: Types → Services → Hooks → Components → Pages
+- All backend DTOs use camelCase to match frontend TypeScript conventions
+- All enums must match exactly between backend and frontend (case-sensitive)

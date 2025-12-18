@@ -25,9 +25,11 @@ import java.util.UUID;
 public class HallService {
 
     private final HallRepository hallRepository;
+    private final StoreService storeService;
 
-    public HallService(HallRepository hallRepository) {
+    public HallService(HallRepository hallRepository, StoreService storeService) {
         this.hallRepository = hallRepository;
+        this.storeService = storeService;
     }
 
     /**
@@ -36,6 +38,42 @@ public class HallService {
     public List<HallDTO> getHallsByStore(UUID storeId, HallStatus status, HallType type) {
         List<Hall> halls = hallRepository.findByStoreId(storeId, status, type);
         return halls.stream()
+                .map(HallMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * 获取所有影厅列表（跨门店）
+     * 供排期甘特图等需要全局视图的页面使用
+     */
+    public List<HallDTO> getAllHalls(HallStatus status, HallType type) {
+        List<Hall> halls = hallRepository.findAll(status, type);
+        return halls.stream()
+                .map(HallMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * 获取所有来自启用门店的影厅列表（用于新建排期场景）
+     * 过滤掉已停用门店的影厅，确保新排期只使用活跃门店的影厅
+     *
+     * @param status 影厅状态筛选（可选）
+     * @param type 影厅类型筛选（可选）
+     * @return 来自启用门店的影厅列表
+     */
+    public List<HallDTO> getHallsFromActiveStores(HallStatus status, HallType type) {
+        // 获取所有影厅
+        List<Hall> allHalls = hallRepository.findAll(status, type);
+
+        // 获取所有启用的门店ID列表
+        List<UUID> activeStoreIds = storeService.getActiveStores()
+                .stream()
+                .map(storeDto -> UUID.fromString(storeDto.getId()))
+                .toList();
+
+        // 过滤出属于启用门店的影厅
+        return allHalls.stream()
+                .filter(hall -> activeStoreIds.contains(hall.getStoreId()))
                 .map(HallMapper::toDto)
                 .toList();
     }

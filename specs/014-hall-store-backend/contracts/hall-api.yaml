@@ -1,0 +1,427 @@
+openapi: 3.0.3
+info:
+  title: Hall Management API
+  description: |
+    影厅管理 API - 提供影厅主数据查询能力
+
+    功能特性：
+    - 按门店查询影厅列表（GET /api/stores/{storeId}/halls）
+    - 查询所有影厅列表（GET /api/halls）
+    - 支持按状态和类型筛选
+    - 与前端 Hall 类型完全一致
+
+    技术栈：
+    - Backend: Spring Boot 3.3.5 + Supabase REST API
+    - Frontend: React 19.2.0 + TypeScript 5.9.3 + TanStack Query
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  - url: https://api.cinema-platform.example.com/api
+    description: Production server
+
+tags:
+  - name: halls
+    description: 影厅查询接口
+
+paths:
+  /stores/{storeId}/halls:
+    get:
+      tags:
+        - halls
+      summary: 按门店查询影厅列表
+      description: |
+        获取指定门店下的所有影厅，支持按状态和类型筛选。
+
+        **使用场景**：
+        - 影厅资源管理页面：按门店查看影厅列表
+        - 排期管理页面：选择门店后查看可用影厅
+
+        **响应格式**：
+        - 简化格式（与现有接口兼容）：{ data: Hall[], total: number }
+        - 不包含 success, message, code 字段
+
+        **性能目标**：
+        - 响应时间 < 2 秒
+        - 单个门店影厅数：2-20 个
+      operationId: listHallsByStore
+      parameters:
+        - name: storeId
+          in: path
+          description: 门店 ID（UUID）
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - name: status
+          in: query
+          description: 影厅状态筛选（可选）
+          required: false
+          schema:
+            $ref: '#/components/schemas/HallStatus'
+          example: active
+        - name: type
+          in: query
+          description: 影厅类型筛选（可选）
+          required: false
+          schema:
+            $ref: '#/components/schemas/HallType'
+          example: VIP
+      responses:
+        '200':
+          description: 成功返回影厅列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HallsByStoreResponse'
+              examples:
+                allHalls:
+                  summary: 查询门店下所有影厅
+                  value:
+                    data:
+                      - id: "660e8400-e29b-41d4-a716-446655440000"
+                        storeId: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "VIP-01"
+                        name: "VIP影厅1号"
+                        type: "VIP"
+                        capacity: 20
+                        tags: ["杜比音效", "真皮沙发"]
+                        status: "active"
+                        createdAt: "2025-01-03T10:00:00.000Z"
+                        updatedAt: "2025-01-03T10:00:00.000Z"
+                      - id: "660e8400-e29b-41d4-a716-446655440001"
+                        storeId: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "PUB-01"
+                        name: "普通影厅1号"
+                        type: "Public"
+                        capacity: 120
+                        tags: ["IMAX", "3D"]
+                        status: "active"
+                        createdAt: "2025-01-03T11:00:00.000Z"
+                        updatedAt: "2025-01-03T11:00:00.000Z"
+                    total: 2
+                vipHallsOnly:
+                  summary: 只查询 VIP 影厅
+                  value:
+                    data:
+                      - id: "660e8400-e29b-41d4-a716-446655440000"
+                        storeId: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "VIP-01"
+                        name: "VIP影厅1号"
+                        type: "VIP"
+                        capacity: 20
+                        tags: ["杜比音效", "真皮沙发"]
+                        status: "active"
+                        createdAt: "2025-01-03T10:00:00.000Z"
+                        updatedAt: "2025-01-03T10:00:00.000Z"
+                    total: 1
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "无效的门店 ID 格式"
+                code: 400
+                error: "VALIDATION_ERROR"
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "门店不存在"
+                code: 404
+                error: "RESOURCE_NOT_FOUND"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "服务器内部错误"
+                code: 500
+                error: "INTERNAL_SERVER_ERROR"
+
+  /halls:
+    get:
+      tags:
+        - halls
+      summary: 查询所有影厅列表
+      description: |
+        获取所有影厅的列表（跨门店），支持按状态和类型筛选。
+
+        **使用场景**：
+        - 排期甘特图页面：需要全局视图的影厅列表
+        - 影厅资源管理页面：选择"所有门店"时查看全部影厅
+
+        **响应格式**：
+        - 标准格式：{ success: boolean, data: Hall[], total: number, message: string, code: number }
+
+        **性能目标**：
+        - 响应时间 < 3 秒
+        - 预期影厅总数：100-500 个
+      operationId: listAllHalls
+      parameters:
+        - name: status
+          in: query
+          description: 影厅状态筛选（可选）
+          required: false
+          schema:
+            $ref: '#/components/schemas/HallStatus'
+          example: active
+        - name: type
+          in: query
+          description: 影厅类型筛选（可选）
+          required: false
+          schema:
+            $ref: '#/components/schemas/HallType'
+          example: VIP
+      responses:
+        '200':
+          description: 成功返回影厅列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HallListResponse'
+              examples:
+                allHalls:
+                  summary: 查询所有影厅
+                  value:
+                    success: true
+                    data:
+                      - id: "660e8400-e29b-41d4-a716-446655440000"
+                        storeId: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "VIP-01"
+                        name: "VIP影厅1号"
+                        type: "VIP"
+                        capacity: 20
+                        tags: ["杜比音效", "真皮沙发"]
+                        status: "active"
+                        createdAt: "2025-01-03T10:00:00.000Z"
+                        updatedAt: "2025-01-03T10:00:00.000Z"
+                      - id: "660e8400-e29b-41d4-a716-446655440001"
+                        storeId: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "PUB-01"
+                        name: "普通影厅1号"
+                        type: "Public"
+                        capacity: 120
+                        tags: ["IMAX", "3D"]
+                        status: "active"
+                        createdAt: "2025-01-03T11:00:00.000Z"
+                        updatedAt: "2025-01-03T11:00:00.000Z"
+                    total: 2
+                    message: "获取影厅列表成功"
+                    code: 200
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "无效的影厅状态参数"
+                code: 400
+                error: "VALIDATION_ERROR"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "服务器内部错误"
+                code: 500
+                error: "INTERNAL_SERVER_ERROR"
+
+components:
+  schemas:
+    Hall:
+      type: object
+      description: 影厅实体
+      required:
+        - id
+        - storeId
+        - name
+        - type
+        - capacity
+        - tags
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 影厅唯一标识（UUID）
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        storeId:
+          type: string
+          format: uuid
+          description: 所属门店 ID（UUID）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          nullable: true
+          maxLength: 50
+          description: 影厅编码（门店内唯一，可选）
+          example: "VIP-01"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: 影厅名称
+          example: "VIP影厅1号"
+        type:
+          $ref: '#/components/schemas/HallType'
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 可容纳人数
+          example: 20
+        tags:
+          type: array
+          description: 标签列表（如设施、特点）
+          items:
+            type: string
+          example: ["杜比音效", "真皮沙发"]
+        status:
+          $ref: '#/components/schemas/HallStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601 格式）
+          example: "2025-01-03T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 最后更新时间（ISO 8601 格式）
+          example: "2025-01-03T10:00:00.000Z"
+
+    HallType:
+      type: string
+      description: |
+        影厅类型枚举（保持原始大小写）
+        - VIP: VIP 影厅
+        - Public: 普通公众影厅
+        - CP: CP 主题影厅
+        - Party: 派对影厅
+      enum:
+        - VIP
+        - Public
+        - CP
+        - Party
+      example: VIP
+
+    HallStatus:
+      type: string
+      description: |
+        影厅状态枚举（小写）
+        - active: 启用状态，可用于新建排期/预约
+        - inactive: 停用状态，不可用于新建排期
+        - maintenance: 维护中，暂时不可用
+      enum:
+        - active
+        - inactive
+        - maintenance
+      example: active
+
+    HallsByStoreResponse:
+      type: object
+      description: 按门店查询影厅列表响应（简化格式）
+      required:
+        - data
+        - total
+      properties:
+        data:
+          type: array
+          description: 影厅列表数据
+          items:
+            $ref: '#/components/schemas/Hall'
+        total:
+          type: integer
+          description: 影厅总数
+          example: 5
+
+    HallListResponse:
+      type: object
+      description: 影厅列表响应（标准格式）
+      required:
+        - success
+        - data
+        - total
+        - message
+        - code
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: array
+          description: 影厅列表数据
+          items:
+            $ref: '#/components/schemas/Hall'
+        total:
+          type: integer
+          description: 影厅总数
+          example: 100
+        message:
+          type: string
+          description: 响应消息
+          example: "获取影厅列表成功"
+        code:
+          type: integer
+          description: 业务状态码
+          example: 200
+
+    ErrorResponse:
+      type: object
+      description: 错误响应
+      required:
+        - success
+        - message
+        - code
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功（错误时为 false）
+          example: false
+        message:
+          type: string
+          description: 错误消息
+          example: "无效的影厅状态参数"
+        code:
+          type: integer
+          description: HTTP 状态码
+          example: 400
+        error:
+          type: string
+          description: 错误类型代码
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          description: 详细错误信息（可选）
+          additionalProperties: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth JWT token
+
+security:
+  - BearerAuth: []

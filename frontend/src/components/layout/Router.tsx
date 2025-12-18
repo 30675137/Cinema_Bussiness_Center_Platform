@@ -32,6 +32,8 @@ const HallResources = lazy(() => import('@/pages/schedule/HallResources'));
 const StoresPage = lazy(() => import('@/pages/stores'));
 // 门店预约设置页面
 const StoreReservationSettingsPage = lazy(() => import('@/pages/store-reservation-settings'));
+// 活动类型管理页面
+const ActivityTypePage = lazy(() => import('@/pages/activity-types'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -296,6 +298,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <StoreReservationSettingsPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 活动类型管理路由
+  {
+    path: '/activity-types',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ActivityTypePage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

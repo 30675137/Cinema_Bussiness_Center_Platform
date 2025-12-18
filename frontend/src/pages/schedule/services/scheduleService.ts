@@ -380,6 +380,47 @@ class ScheduleService {
       throw error;
     }
   }
+
+  /**
+   * 获取所有影厅列表（新 API，对接后端 /api/halls）
+   * @param params 查询参数（可选状态、类型过滤）
+   * @returns 所有影厅列表
+   */
+  async getAllHalls(params: HallQueryParams = {}): Promise<ApiResponse<Hall[]>> {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (params.status) {
+        queryParams.append('status', params.status.toUpperCase());
+      }
+      if (params.type) {
+        queryParams.append('type', params.type);
+      }
+
+      const url = queryParams.toString()
+        ? `${this.hallsUrl}?${queryParams.toString()}`
+        : this.hallsUrl;
+
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || '获取影厅列表失败');
+      }
+
+      // 后端返回 { data: [...], total: n }，转换为标准 ApiResponse 格式
+      return {
+        success: true,
+        data: result.data || [],
+        message: '获取成功',
+        code: 200,
+        timestamp: Date.now(),
+      };
+    } catch (error) {
+      console.error('Get all halls error:', error);
+      throw error;
+    }
+  }
 }
 
 // Export service instance

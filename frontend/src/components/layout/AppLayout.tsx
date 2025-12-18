@@ -293,6 +293,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '门店预约设置',
         },
         {
+          key: '/activity-types',
+          label: '活动类型管理',
+        },
+        {
           key: '/schedule/hall-resources',
           label: '影厅资源管理',
         },
