@@ -28,6 +28,10 @@ const AttributeManagement = lazy(() => import('@/pages/mdm-pim/attribute'));
 const ScheduleManagement = lazy(() => import('@/pages/schedule'));
 // 影厅资源管理页面
 const HallResources = lazy(() => import('@/pages/schedule/HallResources'));
+// 门店管理页面
+const StoresPage = lazy(() => import('@/pages/stores'));
+// 门店预约设置页面
+const StoreReservationSettingsPage = lazy(() => import('@/pages/store-reservation-settings'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -262,6 +266,36 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <ScheduleManagement />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 门店管理路由
+  {
+    path: '/stores',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <StoresPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 门店预约设置路由
+  {
+    path: '/store-reservation-settings',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <StoreReservationSettingsPage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

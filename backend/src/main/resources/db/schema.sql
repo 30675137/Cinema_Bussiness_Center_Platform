@@ -67,6 +67,34 @@ ALTER TABLE halls ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Enable all access for stores" ON stores FOR ALL USING (true);
 CREATE POLICY "Enable all access for halls" ON halls FOR ALL USING (true);
 
+-- 9. 创建 store_reservation_settings 表（门店预约设置）
+CREATE TABLE IF NOT EXISTS store_reservation_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID NOT NULL UNIQUE REFERENCES stores(id) ON DELETE CASCADE,
+  is_reservation_enabled BOOLEAN NOT NULL DEFAULT false,
+  max_reservation_days INTEGER NOT NULL DEFAULT 0 CHECK (max_reservation_days >= 0 AND max_reservation_days <= 365),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_by VARCHAR(255) -- 如果支持用户追踪，记录最后更新人
+);
+
+-- 10. 为 store_reservation_settings 表创建索引
+CREATE INDEX IF NOT EXISTS idx_store_reservation_settings_store_id ON store_reservation_settings(store_id);
+CREATE INDEX IF NOT EXISTS idx_store_reservation_settings_enabled ON store_reservation_settings(is_reservation_enabled);
+
+-- 11. 为 store_reservation_settings 表添加触发器
+DROP TRIGGER IF EXISTS trigger_update_store_reservation_settings_updated_at ON store_reservation_settings;
+CREATE TRIGGER trigger_update_store_reservation_settings_updated_at
+  BEFORE UPDATE ON store_reservation_settings
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- 12. 为 store_reservation_settings 表启用 RLS
+ALTER TABLE store_reservation_settings ENABLE ROW LEVEL SECURITY;
+
+-- 13. 创建 store_reservation_settings 表的 RLS 策略
+CREATE POLICY "Enable all access for store_reservation_settings" ON store_reservation_settings FOR ALL USING (true);
+
 -- ============================================================================
 -- 注释
 -- ============================================================================
@@ -84,3 +112,9 @@ COMMENT ON COLUMN halls.type IS '影厅类型：VIP=VIP厅, PUBLIC=普通厅, CP
 COMMENT ON COLUMN halls.capacity IS '可容纳人数（1-1000）';
 COMMENT ON COLUMN halls.tags IS '影厅特性标签数组';
 COMMENT ON COLUMN halls.status IS '影厅状态：active=可用, inactive=停用, maintenance=维护中';
+
+COMMENT ON TABLE store_reservation_settings IS '门店预约设置表，存储每个门店的预约配置（是否开放预约、可预约天数）';
+COMMENT ON COLUMN store_reservation_settings.store_id IS '门店ID，与stores表一对一关系';
+COMMENT ON COLUMN store_reservation_settings.is_reservation_enabled IS '是否开放预约';
+COMMENT ON COLUMN store_reservation_settings.max_reservation_days IS '可预约天数（未来N天），范围0-365';
+COMMENT ON COLUMN store_reservation_settings.updated_by IS '最后更新人（如果支持用户追踪）';

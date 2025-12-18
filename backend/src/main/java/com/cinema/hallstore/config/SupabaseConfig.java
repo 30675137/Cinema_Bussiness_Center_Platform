@@ -2,15 +2,21 @@ package com.cinema.hallstore.config;
 
 import java.time.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @ConfigurationProperties(prefix = "supabase")
 public class SupabaseConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(SupabaseConfig.class);
 
     /**
      * Supabase 项目 URL，例如 https://your-project.supabase.co
@@ -51,20 +57,49 @@ public class SupabaseConfig {
         this.apiTimeout = apiTimeout;
     }
 
+    @PostConstruct
+    public void validateConfiguration() {
+        if (!StringUtils.hasText(this.url)) {
+            logger.warn("Supabase URL is not configured. Please set 'supabase.url' in application.yml");
+        }
+        if (!StringUtils.hasText(this.serviceRoleKey)) {
+            logger.error("Supabase Service Role Key is not configured! Please set 'supabase.service-role-key' in application.yml or SUPABASE_SERVICE_ROLE_KEY environment variable");
+        } else {
+            logger.info("Supabase configuration loaded - URL: {}, Service Role Key: {}***", 
+                this.url, 
+                this.serviceRoleKey.length() > 4 ? this.serviceRoleKey.substring(0, 4) : "****");
+        }
+    }
+
     @Bean
     public WebClient supabaseWebClient() {
+        // 验证配置
+        if (!StringUtils.hasText(this.url)) {
+            throw new IllegalStateException("Supabase URL is not configured. Please set 'supabase.url' in application.yml");
+        }
+        if (!StringUtils.hasText(this.serviceRoleKey)) {
+            throw new IllegalStateException("Supabase Service Role Key is not configured. Please set 'supabase.service-role-key' in application.yml or SUPABASE_SERVICE_ROLE_KEY environment variable");
+        }
+
+        logger.info("Initializing Supabase WebClient with URL: {}", this.url);
+        logger.debug("Supabase Service Role Key configured: {}", 
+            this.serviceRoleKey != null && this.serviceRoleKey.length() > 0 ? "***" + this.serviceRoleKey.substring(Math.max(0, this.serviceRoleKey.length() - 4)) : "NOT SET");
+
         ExchangeStrategies strategies = ExchangeStrategies.builder()
             .codecs(cfg -> cfg.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
             .build();
 
-        return WebClient.builder()
+        WebClient.Builder builder = WebClient.builder()
             .baseUrl(this.url + "/rest/v1")
             .defaultHeader("apikey", this.serviceRoleKey)
             .defaultHeader("Authorization", "Bearer " + this.serviceRoleKey)
             .defaultHeader("Content-Type", "application/json")
             .defaultHeader("Prefer", "return=representation")
-            .exchangeStrategies(strategies)
-            .build();
+            .exchangeStrategies(strategies);
+
+        WebClient webClient = builder.build();
+        logger.info("Supabase WebClient initialized successfully");
+        return webClient;
     }
 
     /**
