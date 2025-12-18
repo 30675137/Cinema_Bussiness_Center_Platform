@@ -360,11 +360,72 @@ curl -X GET "http://localhost:8080/api/stores?status=active" \
   -H "Content-Type: application/json"
 ```
 
+**响应格式**（列表查询）:
+```json
+{
+  "total": 3,
+  "data": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "code": "STORE-001",
+      "name": "北京朝阳店",
+      "region": null,
+      "status": "active",
+      "createdAt": "2025-12-17T13:15:36.583437Z",
+      "updatedAt": "2025-12-17T13:15:36.583437Z"
+    }
+  ]
+}
+```
+
 ### 按门店查询影厅列表
 
 ```bash
 curl -X GET "http://localhost:8080/api/stores/{storeId}/halls?status=active&type=VIP" \
   -H "Content-Type: application/json"
+```
+
+**响应格式**（列表查询）:
+```json
+{
+  "total": 2,
+  "data": [
+    {
+      "id": "uuid",
+      "storeId": "uuid",
+      "name": "VIP影厅A",
+      "type": "VIP",
+      "capacity": 120,
+      "tags": ["真皮沙发"],
+      "status": "active",
+      "createdAt": "2025-12-17T13:15:36.583437Z",
+      "updatedAt": "2025-12-17T13:15:36.583437Z"
+    }
+  ]
+}
+```
+
+### 查询门店详情
+
+```bash
+curl -X GET "http://localhost:8080/api/stores/{storeId}" \
+  -H "Content-Type: application/json"
+```
+
+**响应格式**（单个资源）:
+```json
+{
+  "data": {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "code": "STORE-001",
+    "name": "北京朝阳店",
+    "region": null,
+    "status": "active",
+    "createdAt": "2025-12-17T13:15:36.583437Z",
+    "updatedAt": "2025-12-17T13:15:36.583437Z"
+  },
+  "timestamp": "2025-12-17T13:15:36.583437Z"
+}
 ```
 
 ### 创建影厅（管理接口）
@@ -380,6 +441,40 @@ curl -X POST "http://localhost:8080/api/admin/halls" \
     "tags": ["真皮沙发", "KTV设备"]
   }'
 ```
+
+**响应格式**（单个资源）:
+```json
+{
+  "data": {
+    "id": "uuid",
+    "storeId": "uuid",
+    "name": "VIP影厅A",
+    "type": "VIP",
+    "capacity": 120,
+    "tags": ["真皮沙发", "KTV设备"],
+    "status": "active",
+    "createdAt": "2025-12-17T13:15:36.583437Z",
+    "updatedAt": "2025-12-17T13:15:36.583437Z"
+  },
+  "timestamp": "2025-12-17T13:15:36.583437Z"
+}
+```
+
+### ⚠️ API 响应格式说明
+
+**重要**：根据项目宪章要求（见 `.specify/memory/constitution.md`），所有 API 必须遵循统一的响应格式：
+
+1. **列表查询接口**（如 `GET /api/stores`、`GET /api/stores/{id}/halls`）：
+   - 当前实现：`{ "total": number, "data": T[] }`
+   - **注意**：前端代码已兼容此格式，但未来应统一为包含 `success` 字段的标准格式
+
+2. **单个资源接口**（如 `GET /api/stores/{id}`、`POST /api/admin/halls`）：
+   - 使用 `ApiResponse<T>` 包装：`{ "data": T, "timestamp": string }`
+
+3. **错误响应**：
+   - 使用 `ErrorResponse` 或 `ApiResponse.failure()`：`{ "success": false, "error": string, "message": string, "details": object }`
+
+**参考**：`docs/问题总结/014-API响应格式不一致问题.md`
 
 ## 与前端集成
 
@@ -404,22 +499,43 @@ export interface Hall {
 ### 更新前端 Service
 
 ```typescript
-// frontend/src/pages/schedule/services/scheduleService.ts
-export class ScheduleService {
-  async getHallsByStore(storeId: string, params?: HallQueryParams): Promise<Hall[]> {
-    const queryParams = new URLSearchParams();
-    if (params?.status) queryParams.append('status', params.status);
-    if (params?.type) queryParams.append('type', params.type);
-    
-    const response = await fetch(
-      `${this.baseUrl}/stores/${storeId}/halls?${queryParams}`,
-      { headers: this.getHeaders() }
-    );
-    const result = await response.json();
-    return result.data;
+// frontend/src/pages/stores/services/storeService.ts
+export async function getStores(params?: StoreQueryParams): Promise<Store[]> {
+  const url = new URL(`${API_BASE_URL}/api/stores`);
+  
+  // Add query parameters
+  if (params?.status) {
+    url.searchParams.append('status', params.status);
   }
+  
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to fetch stores: ${response.statusText}`);
+  }
+  
+  // Backend returns format: { data, total }
+  // 兼容两种格式：{ data, total } 或 { success, data, total, message, code }
+  const result = await response.json();
+  
+  if (result.success === false) {
+    throw new Error(result.message || 'Failed to fetch stores');
+  }
+  
+  // Return data array (compatible with both formats)
+  return result.data || [];
 }
 ```
+
+**重要提示**：
+- 后端列表查询接口当前返回 `{ data, total }` 格式（无 `success` 字段）
+- 前端代码已兼容此格式，但应确保类型定义准确反映实际返回结构
+- 未来应统一为包含 `success` 字段的标准格式（见项目宪章要求）
 
 ## 部署
 
@@ -433,12 +549,33 @@ export SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### 构建和运行
 
 ```bash
-# 构建
+# 后端启动
+cd backend
 mvn clean package
-
-# 运行
 java -jar target/cinema-hall-store-backend-1.0.0.jar
+
+# 或使用 Maven 直接运行
+mvn spring-boot:run
 ```
+
+### 前端启动
+
+```bash
+# 安装依赖（首次运行）
+cd frontend
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 前端将运行在 http://localhost:5173
+```
+
+### 访问门店管理页面
+
+启动后访问以下页面:
+- 门店管理: http://localhost:5173/stores
+- 影厅资源管理: http://localhost:5173/schedule/hall-resources
 
 ## 注意事项
 
@@ -447,20 +584,27 @@ java -jar target/cinema-hall-store-backend-1.0.0.jar
 3. **数据验证**: 在 Service 层和 Controller 层都进行数据验证，确保数据完整性。
 4. **性能优化**: 对于频繁查询的接口，考虑在 Supabase 中添加适当的索引。
 5. **日志记录**: 记录关键操作和错误，便于问题排查和审计。
+6. **API 响应格式标准化** ⚠️：
+   - 所有 API 接口必须遵循项目宪章中定义的统一响应格式（见 `.specify/memory/constitution.md`）
+   - 列表查询接口应统一使用包含 `success` 字段的标准格式
+   - 前后端开发前必须对齐 API 契约，确保类型定义与实际返回格式一致
+   - 参考：`docs/问题总结/014-API响应格式不一致问题.md`
 
 ## 实现状态
 
 ### 已完成
 
 - ✅ Phase 1: Setup (T001-T004) - 后端模块骨架、Supabase 配置、全局异常处理
-- ✅ Phase 2: Foundational (T005-T011) - 领域模型、DTO、Mapper、枚举定义
-- ✅ Phase 3: US1 影厅主数据 (T012-T020) - HallRepository、HallService、HallAdminController、HallQueryController
-- ✅ Phase 4: US2 门店关系 (T021-T026) - StoreRepository、StoreService、StoreQueryController
-- ✅ Phase 5: US3 前后端一致性 (T027-T031) - 前端 API 适配、集成测试
+- ✅ Phase 2: Foundational (T005-T016) - 领域模型、DTO、Mapper、枚举定义、异常处理
+- ✅ Phase 3: US1 影厅主数据 (T017-T021) - HallRepository、HallService、HallListController、HallQueryController、HallAdminController
+- ✅ Phase 4: US2 门店关系 (T022-T026) - StoreRepository、StoreService、StoreQueryController
+- ✅ Phase 5: US3 前后端一致性 (T027-T034) - 前端类型定义、API 服务、TanStack Query hooks
+- ✅ Phase 6: US4 门店管理页面 (T035-T042) - StoreTable、StoreSearch、StatusFilter、门店管理页面、路由配置
+- ✅ Phase 7: Polish (T043-T049) - 错误处理、CORS配置、加载状态、空状态处理
 
 ### 待完成
 
-- 🔲 Phase 6: Polish (T032-T036) - 文档完善、代码清理、性能优化
+- 🔲 Phase 7: E2E 测试 (T050) - 端到端测试验证
 
 ## 已实现的 API 端点
 
@@ -535,9 +679,73 @@ const halls = await scheduleService.getHallsByStore(storeId, {
 });
 ```
 
+## 常见问题排查
+
+### 问题 1: 前端无法获取门店信息（`http://localhost:3000/stores` 无数据）
+
+**症状**：页面加载但显示空列表，浏览器控制台无错误。
+
+**可能原因**：
+1. 后端 API 响应格式与前端期望不一致
+2. 前端类型定义与实际返回格式不匹配
+3. CORS 配置问题
+
+**排查步骤**：
+
+1. **检查后端 API 是否正常**：
+   ```bash
+   curl http://localhost:8080/api/stores
+   ```
+   应该返回 `{ "total": number, "data": [...] }` 格式
+
+2. **检查浏览器 Network 标签**：
+   - 查看 `/api/stores` 请求是否成功（状态码 200）
+   - 查看响应体格式是否正确
+
+3. **检查前端 Service 代码**：
+   - 确认 `storeService.ts` 正确处理响应格式
+   - 确认类型定义 `StoreListResponse` 与实际返回一致
+
+4. **检查 CORS 配置**：
+   ```bash
+   curl -X OPTIONS http://localhost:8080/api/stores \
+     -H "Origin: http://localhost:3000" \
+     -H "Access-Control-Request-Method: GET" -v
+   ```
+   应该返回 `Access-Control-Allow-Origin: http://localhost:3000`
+
+**解决方案**：
+- 如果后端返回格式为 `{ data, total }`，确保前端代码兼容此格式（见 `frontend/src/pages/stores/services/storeService.ts`）
+- 如果类型定义不匹配，更新 `frontend/src/pages/stores/types/store.types.ts`（如 `region: string | null`）
+
+**参考文档**：`docs/问题总结/014-API响应格式不一致问题.md`
+
+---
+
+### 问题 2: 后端返回 404 或 500 错误
+
+**排查步骤**：
+1. 确认后端服务已启动：`curl http://localhost:8080/actuator/health`
+2. 检查 Supabase 配置是否正确（`application.yml` 中的 `supabase.url` 和 `supabase.service-role-key`）
+3. 检查 Supabase 表结构是否已创建（见"环境设置"部分）
+4. 查看后端日志中的错误信息
+
+---
+
+### 问题 3: 前端类型错误（TypeScript 编译错误）
+
+**排查步骤**：
+1. 确认后端 DTO 字段与前端类型定义完全一致（字段名、类型、可选性）
+2. 特别注意 `null` 值处理：后端可能返回 `null`，前端类型应定义为 `string | null`
+3. 运行类型检查：`cd frontend && npm run type-check`
+
+---
+
 ## 下一步
 
 - 完成 Phase 6 收尾工作（文档、代码清理、性能优化）
+- 统一后端 API 响应格式，确保所有列表查询接口包含 `success` 字段
 - 与真实 Supabase 环境集成测试
 - 添加审计日志记录
+- 更新 API 契约文档（`contracts/api.yaml`），确保前后端类型定义一致
 

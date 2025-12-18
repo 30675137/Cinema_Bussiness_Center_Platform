@@ -1,8 +1,9 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.0.0 → 1.1.0 -->
-<!-- Modified principles: None (clarified scope only) -->
-<!-- Added sections: Backend Architecture & Tech Stack -->
+<!-- Version change: 1.2.0 → 1.3.0 -->
+<!-- Modified principles: None -->
+<!-- Added sections: API 响应格式标准化 (under 后端架构与技术栈) -->
 <!-- Removed sections: None -->
+<!-- Issue reference: docs/问题总结/014-API响应格式不一致问题.md -->
 <!-- Templates requiring updates:
   ✅ .specify/templates/spec-template.md (no changes required; still aligned)
   ✅ .specify/templates/plan-template.md (updated technical context + constitution check for backend)
@@ -72,6 +73,40 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 架构复杂度和运维成本，避免多种数据源和框架并存导致的耦合和不一致，
 同时利用 Supabase 托管能力加速开发，Spring Boot 聚焦业务逻辑和接口层。
 
+### API 响应格式标准化
+
+所有后端 REST API 接口必须遵循统一的响应格式规范，确保前后端集成的一致性和可维护性。
+
+**统一响应格式要求**：
+
+1. **成功响应格式**：
+   - 单个资源：使用 `ApiResponse<T>` 包装，格式为 `{ data: T, timestamp: string }`
+   - 列表查询：使用统一的列表响应格式，必须包含 `{ success: boolean, data: T[], total: number, message?: string, code?: number }`
+   - 所有成功响应必须包含明确的 `success: true` 字段（或通过 HTTP 状态码 2xx 表示成功）
+
+2. **错误响应格式**：
+   - 使用 `ApiResponse` 的 `failure()` 方法或 `ErrorResponse` 结构
+   - 必须包含 `{ success: false, error: string, message: string, details?: object }`
+   - HTTP 状态码必须正确反映错误类型（400/404/409/500 等）
+
+3. **格式一致性要求**：
+   - 同一功能域内的所有接口必须使用相同的响应格式
+   - 列表查询接口（如 `GET /api/stores`、`GET /api/stores/{id}/halls`）必须统一格式
+   - 禁止在同一 Controller 中混用不同的响应格式（如 `Map.of()` 和 `ApiResponse`）
+
+4. **前后端契约对齐**：
+   - 所有 API 接口必须在 `contracts/api.yaml` 中明确定义响应格式
+   - 前端类型定义（TypeScript interfaces）必须与后端实际返回格式完全一致
+   - 前后端开发前必须对齐 API 契约，禁止"先实现后适配"
+
+5. **类型安全**：
+   - 后端 DTO 中的可选字段（如 `region: string | null`）必须在类型定义中明确标注
+   - 前端类型定义必须准确反映后端实际返回的数据结构（包括 null 值处理）
+
+**基本原理**: 统一的 API 响应格式可以显著降低前后端集成成本，避免因格式不一致导致的解析错误和重复适配工作。明确的格式规范有助于提高代码可维护性、减少调试时间，并确保前后端类型定义的一致性。
+
+**参考问题**: 见 `docs/问题总结/014-API响应格式不一致问题.md`
+
 ## 开发工作流
 
 ### 规格驱动开发 (Specification-Driven Development)
@@ -110,4 +145,4 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 当开发实践与宪法原则发生冲突时，应以宪法原则为准，必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行，确保项目的长期健康发展。
 
-**版本**: 1.2.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-16
+**版本**: 1.3.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-17
