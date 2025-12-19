@@ -32,6 +32,11 @@ const HallResources = lazy(() => import('@/pages/schedule/HallResources'));
 const StoresPage = lazy(() => import('@/pages/stores'));
 // 门店预约设置页面
 const StoreReservationSettingsPage = lazy(() => import('@/pages/store-reservation-settings'));
+// 场景包管理页面
+const ScenarioPackageList = lazy(() => import('@/pages/scenario-packages/list'));
+const ScenarioPackageCreate = lazy(() => import('@/pages/scenario-packages/create'));
+const ScenarioPackageEdit = lazy(() => import('@/pages/scenario-packages/edit'));
+const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/preview'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -296,6 +301,63 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <StoreReservationSettingsPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 场景包管理路由
+  {
+    path: '/scenario-packages',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ScenarioPackageList />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/scenario-packages/create',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ScenarioPackageCreate />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/scenario-packages/:id/edit',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ScenarioPackageEdit />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/scenario-packages/:id/preview',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ScenarioPackagePreview />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

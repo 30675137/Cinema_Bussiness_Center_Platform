@@ -3,6 +3,7 @@ import { categoryHandlers } from './categoryHandlers'
 import { brandHandlers } from './brandHandlers'
 import { attributeHandlers_ } from './attributeHandlers'
 import { scheduleHandlers } from './scheduleHandlers'
+import { scenarioPackageHandlers } from './scenarioPackageHandlers'
 
 // 动态导入 generators（延迟加载），避免在 MSW 启动时立即加载所有依赖
 const getGenerators = async () => {
@@ -180,6 +181,7 @@ export const handlers = [
   ...brandHandlers, // 使用新的brandHandlers
   ...attributeHandlers_, // 属性字典管理处理器
   ...scheduleHandlers, // 排期管理处理器
+  ...scenarioPackageHandlers, // 场景包管理处理器
 ]
 
 // 默认导出所有处理器
