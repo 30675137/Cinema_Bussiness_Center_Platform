@@ -30,22 +30,17 @@
       "Bash(npx tsc:*)",
       "Bash(node:*)",
       "Bash(xargs grep:*)",
-      "Bash(mvn clean:*)",
-      "Bash(mvn test:*)",
-      "mcp__supabase__list_projects",
-      "mcp__supabase__apply_migration",
-      "mcp__supabase__list_tables",
-      "mcp__supabase__execute_sql",
-      "Bash(mkdir:*)",
-      "Bash(mvn compile:*)",
+      "Bash(cat:*)",
       "Bash(mvn spring-boot:run:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(grep:*)"
+      "Bash(jps:*)",
+      "Bash(pgrep:*)",
+      "Bash(timeout 5 npx chrome-devtools-mcp@latest:*)",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__take_snapshot",
+      "Bash(mvn clean compile)",
+      "Skill(speckit.analyze)"
     ]
-  },
-  "enabledMcpjsonServers": [
-    "supabase",
-    "mcp-server-commands"
-  ]
+  }
 }

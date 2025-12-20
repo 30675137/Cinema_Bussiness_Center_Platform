@@ -2,6 +2,31 @@ spring:
   application:
     name: cinema-hall-store-backend
 
+  # 数据源配置（Supabase PostgreSQL - Pooler 模式）
+  datasource:
+    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres
+    username: postgres.fxhgyxceqrmnpezluaht
+    password: ppkZ8sGUEHB0qjFs
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none # 暂时禁用，避免启动失败
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
 server:
   port: 8080
 
@@ -10,6 +35,10 @@ supabase:
   url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}
   service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:sb_secret_FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
   api-timeout: 60000 # 毫秒，默认 60s
+
+  storage:
+    bucket: scenario-packages # 场景包背景图片存储桶
+    base-url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}/storage/v1
 
 # 日志配置
 logging:
@@ -20,5 +49,6 @@ logging:
     org.springframework.web.reactive.function.client: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
 
 

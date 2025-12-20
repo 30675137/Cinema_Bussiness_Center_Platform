@@ -161,6 +161,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '场景包/套餐管理',
       children: [
         {
+          key: '/scenario-packages',
+          label: '17-场景包模板管理',
+        },
+        {
           key: '/scenario-package/template',
           label: '场景包模板管理',
         },
