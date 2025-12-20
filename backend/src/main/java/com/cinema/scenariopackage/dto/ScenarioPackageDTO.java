@@ -28,6 +28,9 @@ public class ScenarioPackageDTO {
     private Boolean isLatest;
     private PackageRuleDTO rule;
     private List<HallTypeDTO> hallTypes;
+    private List<PackageBenefitDTO> benefits;
+    private List<PackageItemDTO> items;
+    private List<PackageServiceDTO> services;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -82,6 +85,168 @@ public class ScenarioPackageDTO {
 
         public void setName(String name) {
             this.name = name;
+        }
+    }
+
+    public static class PackageBenefitDTO {
+        private UUID id;
+        private String benefitType;
+        private BigDecimal discountRate;
+        private Integer freeCount;
+        private String description;
+        private Integer sortOrder;
+
+        public UUID getId() {
+            return id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public String getBenefitType() {
+            return benefitType;
+        }
+
+        public void setBenefitType(String benefitType) {
+            this.benefitType = benefitType;
+        }
+
+        public BigDecimal getDiscountRate() {
+            return discountRate;
+        }
+
+        public void setDiscountRate(BigDecimal discountRate) {
+            this.discountRate = discountRate;
+        }
+
+        public Integer getFreeCount() {
+            return freeCount;
+        }
+
+        public void setFreeCount(Integer freeCount) {
+            this.freeCount = freeCount;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public Integer getSortOrder() {
+            return sortOrder;
+        }
+
+        public void setSortOrder(Integer sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public static class PackageItemDTO {
+        private UUID id;
+        private UUID itemId;
+        private Integer quantity;
+        private String itemName;
+        private BigDecimal itemPrice;
+        private Integer sortOrder;
+
+        public UUID getId() {
+            return id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public UUID getItemId() {
+            return itemId;
+        }
+
+        public void setItemId(UUID itemId) {
+            this.itemId = itemId;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(Integer quantity) {
+            this.quantity = quantity;
+        }
+
+        public String getItemName() {
+            return itemName;
+        }
+
+        public void setItemName(String itemName) {
+            this.itemName = itemName;
+        }
+
+        public BigDecimal getItemPrice() {
+            return itemPrice;
+        }
+
+        public void setItemPrice(BigDecimal itemPrice) {
+            this.itemPrice = itemPrice;
+        }
+
+        public Integer getSortOrder() {
+            return sortOrder;
+        }
+
+        public void setSortOrder(Integer sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public static class PackageServiceDTO {
+        private UUID id;
+        private UUID serviceId;
+        private String serviceName;
+        private BigDecimal servicePrice;
+        private Integer sortOrder;
+
+        public UUID getId() {
+            return id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public UUID getServiceId() {
+            return serviceId;
+        }
+
+        public void setServiceId(UUID serviceId) {
+            this.serviceId = serviceId;
+        }
+
+        public String getServiceName() {
+            return serviceName;
+        }
+
+        public void setServiceName(String serviceName) {
+            this.serviceName = serviceName;
+        }
+
+        public BigDecimal getServicePrice() {
+            return servicePrice;
+        }
+
+        public void setServicePrice(BigDecimal servicePrice) {
+            this.servicePrice = servicePrice;
+        }
+
+        public Integer getSortOrder() {
+            return sortOrder;
+        }
+
+        public void setSortOrder(Integer sortOrder) {
+            this.sortOrder = sortOrder;
         }
     }
 
@@ -173,6 +338,30 @@ public class ScenarioPackageDTO {
 
     public void setHallTypes(List<HallTypeDTO> hallTypes) {
         this.hallTypes = hallTypes;
+    }
+
+    public List<PackageBenefitDTO> getBenefits() {
+        return benefits;
+    }
+
+    public void setBenefits(List<PackageBenefitDTO> benefits) {
+        this.benefits = benefits;
+    }
+
+    public List<PackageItemDTO> getItems() {
+        return items;
+    }
+
+    public void setItems(List<PackageItemDTO> items) {
+        this.items = items;
+    }
+
+    public List<PackageServiceDTO> getServices() {
+        return services;
+    }
+
+    public void setServices(List<PackageServiceDTO> services) {
+        this.services = services;
     }
 
     public Instant getCreatedAt() {

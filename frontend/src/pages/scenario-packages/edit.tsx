@@ -9,7 +9,7 @@
  * @since 2025-12-19
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Form,
   Input,
@@ -23,7 +23,6 @@ import {
   Descriptions,
   Row,
   Col,
-  Upload,
   message,
 } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -39,7 +38,16 @@ import {
 } from '@ant-design/icons';
 import { usePackageDetail } from '../../features/scenario-package-management/hooks/usePackageDetail';
 import { useUpdatePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
-import type { UpdatePackageRequest } from '../../features/scenario-package-management/types';
+import { ContentConfigurator } from '../../features/scenario-package-management/components';
+import { ImageUpload } from '../../features/scenario-package-management/components/atoms';
+import type {
+  UpdatePackageRequest,
+  PackageRule,
+  PackageBenefit,
+  PackageItem,
+  PackageService,
+  PackageContent,
+} from '../../features/scenario-package-management/types';
 
 const { TextArea } = Input;
 
@@ -59,6 +67,14 @@ const ScenarioPackageEditPage: React.FC = () => {
   // 选中的影厅类型
   const [selectedHallTypes, setSelectedHallTypes] = useState<string[]>([]);
 
+  // US2: 规则和内容状态
+  const [rule, setRule] = useState<Partial<PackageRule>>({});
+  const [content, setContent] = useState<Partial<PackageContent>>({
+    benefits: [],
+    items: [],
+    services: [],
+  });
+
   const { data, isLoading, isError, error, refetch } = usePackageDetail(id);
   const updateMutation = useUpdatePackage();
 
@@ -73,12 +89,43 @@ const ScenarioPackageEditPage: React.FC = () => {
         durationHours: pkg.rule?.durationHours,
         minPeople: pkg.rule?.minPeople,
         maxPeople: pkg.rule?.maxPeople,
-        packagePrice: pkg.pricing?.packagePrice,
+        packagePrice: (pkg as any).pricing?.packagePrice,
       });
       // 设置已选中的影厅类型
       if (pkg.hallTypes?.length) {
         setSelectedHallTypes(pkg.hallTypes.map((h) => h.id));
       }
+      // US2: 设置规则和内容
+      if (pkg.rule) {
+        setRule(pkg.rule);
+      }
+      // 映射后端返回的 benefits/items/services
+      const pkgAny = pkg as any;
+      setContent({
+        benefits: (pkgAny.benefits || []).map((b: any) => ({
+          id: b.id,
+          benefitType: b.benefitType,
+          discountRate: b.discountRate,
+          freeCount: b.freeCount,
+          description: b.description,
+          sortOrder: b.sortOrder,
+        })),
+        items: (pkgAny.items || []).map((i: any) => ({
+          id: i.id,
+          itemId: i.itemId,
+          quantity: i.quantity,
+          itemNameSnapshot: i.itemName || i.itemNameSnapshot,
+          itemPriceSnapshot: i.itemPrice || i.itemPriceSnapshot,
+          sortOrder: i.sortOrder,
+        })),
+        services: (pkgAny.services || []).map((s: any) => ({
+          id: s.id,
+          serviceId: s.serviceId,
+          serviceNameSnapshot: s.serviceName || s.serviceNameSnapshot,
+          servicePriceSnapshot: s.servicePrice || s.servicePriceSnapshot,
+          sortOrder: s.sortOrder,
+        })),
+      });
     }
   }, [data, form]);
 
@@ -92,6 +139,23 @@ const ScenarioPackageEditPage: React.FC = () => {
         : [...prev, hallId]
     );
   };
+
+  // US2: 内容变更回调
+  const handleRuleChange = useCallback((newRule: Partial<PackageRule>) => {
+    setRule(newRule);
+  }, []);
+
+  const handleBenefitsChange = useCallback((benefits: PackageBenefit[]) => {
+    setContent((prev) => ({ ...prev, benefits }));
+  }, []);
+
+  const handleItemsChange = useCallback((items: PackageItem[]) => {
+    setContent((prev) => ({ ...prev, items }));
+  }, []);
+
+  const handleServicesChange = useCallback((services: PackageService[]) => {
+    setContent((prev) => ({ ...prev, services }));
+  }, []);
 
   /**
    * 处理表单提交
@@ -363,6 +427,27 @@ const ScenarioPackageEditPage: React.FC = () => {
               </Row>
             </Card>
 
+            {/* US2: 内容配置区域 */}
+            <Card
+              title={
+                <Space>
+                  <SettingOutlined style={{ color: '#52c41a' }} />
+                  内容组合配置
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+            >
+              <ContentConfigurator
+                rule={rule}
+                content={content}
+                packagePrice={form.getFieldValue('packagePrice')}
+                onRuleChange={handleRuleChange}
+                onBenefitsChange={handleBenefitsChange}
+                onItemsChange={handleItemsChange}
+                onServicesChange={handleServicesChange}
+              />
+            </Card>
+
             {/* 乐观锁提示 */}
             <Alert
               message="并发编辑提示"
@@ -385,69 +470,11 @@ const ScenarioPackageEditPage: React.FC = () => {
               }
               style={{ marginBottom: 24 }}
             >
-              <Form.Item name="backgroundImageUrl" noStyle>
-                {pkg.backgroundImageUrl ? (
-                  <div style={{ position: 'relative' }}>
-                    <img
-                      src={pkg.backgroundImageUrl}
-                      alt="背景图片"
-                      style={{
-                        width: '100%',
-                        maxHeight: 200,
-                        objectFit: 'cover',
-                        borderRadius: 8,
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                    <Button
-                      size="small"
-                      style={{ position: 'absolute', top: 8, right: 8 }}
-                      onClick={() => form.setFieldValue('backgroundImageUrl', '')}
-                    >
-                      更换
-                    </Button>
-                  </div>
-                ) : (
-                  <Upload.Dragger
-                    name="file"
-                    accept="image/jpeg,image/png"
-                    maxCount={1}
-                    showUploadList={false}
-                    beforeUpload={(file) => {
-                      const isValidType =
-                        file.type === 'image/jpeg' || file.type === 'image/png';
-                      const isLt5M = file.size / 1024 / 1024 < 5;
-
-                      if (!isValidType) {
-                        message.error('只支持 JPG/PNG 格式!');
-                        return false;
-                      }
-                      if (!isLt5M) {
-                        message.error('图片大小不能超过 5MB!');
-                        return false;
-                      }
-                      // TODO: 实现图片上传逻辑
-                      message.info('图片上传功能待实现');
-                      return false;
-                    }}
-                    style={{
-                      background: '#fafafa',
-                      border: '2px dashed #d9d9d9',
-                      borderRadius: 8,
-                    }}
-                  >
-                    <p className="ant-upload-drag-icon">
-                      <PictureOutlined style={{ fontSize: 48, color: '#bfbfbf' }} />
-                    </p>
-                    <p style={{ color: '#8c8c8c' }}>点击上传背景图</p>
-                    <p style={{ color: '#bfbfbf', fontSize: 12 }}>
-                      支持 JPG/PNG，不超过 5MB
-                    </p>
-                  </Upload.Dragger>
-                )}
-              </Form.Item>
+              <ImageUpload
+                packageId={id}
+                value={form.getFieldValue('backgroundImageUrl') || pkg.backgroundImageUrl}
+                onChange={(url) => form.setFieldValue('backgroundImageUrl', url)}
+              />
             </Card>
 
             {/* 定价策略 Card */}

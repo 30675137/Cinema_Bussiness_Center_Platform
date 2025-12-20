@@ -14,8 +14,8 @@ import {
   InputNumber,
   Card,
   Select,
-  FormInstance,
 } from 'antd';
+import type { FormInstance } from 'antd/es/form';
 import ImageUpload from '../atoms/ImageUpload';
 import type { CreatePackageRequest, HallType } from '../../types';
 

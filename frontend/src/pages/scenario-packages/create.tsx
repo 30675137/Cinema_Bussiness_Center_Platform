@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from 'react';
-import { Form, Input, InputNumber, Button, Card, Space, Row, Col, Tag, Upload, message } from 'antd';
+import { Form, Input, InputNumber, Button, Card, Space, Row, Col, Tag, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeftOutlined,
@@ -21,11 +21,13 @@ import {
   ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useCreatePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
+import { ImageUpload } from '../../features/scenario-package-management/components/atoms';
 import type { CreatePackageRequest } from '../../features/scenario-package-management/types';
 
 const { TextArea } = Input;
 
 // 预设的影厅类型选项（后续可从 API 获取）
+// 注意：开发阶段使用字符串 ID，后续有真实影厅数据后改为 UUID
 const HALL_TYPE_OPTIONS = [
   { id: 'vip', name: 'VIP 厅' },
   { id: 'party', name: 'Party 厅' },
@@ -242,42 +244,9 @@ const ScenarioPackageCreatePage: React.FC = () => {
               style={{ marginBottom: 24 }}
             >
               <Form.Item name="backgroundImageUrl" noStyle>
-                <Upload.Dragger
-                  name="file"
-                  accept="image/jpeg,image/png"
-                  maxCount={1}
-                  showUploadList={false}
-                  beforeUpload={(file) => {
-                    const isValidType =
-                      file.type === 'image/jpeg' || file.type === 'image/png';
-                    const isLt5M = file.size / 1024 / 1024 < 5;
-
-                    if (!isValidType) {
-                      message.error('只支持 JPG/PNG 格式!');
-                      return false;
-                    }
-                    if (!isLt5M) {
-                      message.error('图片大小不能超过 5MB!');
-                      return false;
-                    }
-                    // TODO: 实现图片上传逻辑
-                    message.info('图片上传功能待实现');
-                    return false;
-                  }}
-                  style={{
-                    background: '#fafafa',
-                    border: '2px dashed #d9d9d9',
-                    borderRadius: 8,
-                  }}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <PictureOutlined style={{ fontSize: 48, color: '#bfbfbf' }} />
-                  </p>
-                  <p style={{ color: '#8c8c8c' }}>点击上传背景图</p>
-                  <p style={{ color: '#bfbfbf', fontSize: 12 }}>
-                    支持 JPG/PNG，不超过 5MB
-                  </p>
-                </Upload.Dragger>
+                <ImageUpload
+                  onChange={(url) => form.setFieldValue('backgroundImageUrl', url)}
+                />
               </Form.Item>
             </Card>
 

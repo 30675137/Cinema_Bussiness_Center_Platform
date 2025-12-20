@@ -137,10 +137,17 @@ backend/src/main/java/com/cinema/scenariopackage/
 │   ├── PackageRule.java
 │   └── ...
 ├── dto/
-│   ├── CreatePackageRequest.java           # 请求 DTO
-│   ├── UpdatePackageRequest.java
-│   ├── ScenarioPackageDTO.java             # 响应 DTO
-│   └── ...
+│   ├── CreatePackageRequest.java           # 创建场景包请求
+│   ├── UpdatePackageRequest.java           # 更新场景包请求
+│   ├── ScenarioPackageDTO.java             # 场景包详情响应
+│   ├── ScenarioPackageSummary.java         # 场景包列表摘要
+│   ├── AddBenefitRequest.java              # 添加硬权益请求 (US2)
+│   ├── AddItemRequest.java                 # 添加单品请求 (US2)
+│   ├── AddServiceRequest.java              # 添加服务请求 (US2)
+│   ├── ConfigureRulesRequest.java          # 配置规则请求 (US2)
+│   ├── ImageUploadRequest.java             # 图片上传请求
+│   ├── ImageUploadResponse.java            # 预签名 URL 响应
+│   └── ImageConfirmRequest.java            # 图片上传确认
 └── exception/
     ├── PackageNotFoundException.java       # 自定义异常
     └── ConcurrentModificationException.java
@@ -317,6 +324,167 @@ public class PricingService {
 }
 ```
 
+#### 3.2.5 US2 内容管理方法
+
+```java
+@Service
+public class ScenarioPackageService {
+    
+    // US2: 配置规则
+    @Transactional
+    public ScenarioPackageDTO configureRules(UUID id, ConfigureRulesRequest request) {
+        ScenarioPackage pkg = repository.findById(id)
+            .orElseThrow(() -> new PackageNotFoundException(id));
+        
+        // 乐观锁检查
+        if (request.getVersionLock() != null && 
+            !request.getVersionLock().equals(pkg.getVersionLock())) {
+            throw new ConcurrentModificationException("该场景包已被他人修改");
+        }
+        
+        // 业务规则：minPeople <= maxPeople
+        if (request.getMinPeople() != null && request.getMaxPeople() != null &&
+            request.getMinPeople() > request.getMaxPeople()) {
+            throw new ValidationException("最少人数不能大于最多人数");
+        }
+        
+        PackageRule rule = ruleRepository.findByPackageId(id)
+            .orElseGet(() -> new PackageRule(id));
+        rule.setDurationHours(request.getDurationHours());
+        rule.setMinPeople(request.getMinPeople());
+        rule.setMaxPeople(request.getMaxPeople());
+        ruleRepository.save(rule);
+        
+        return toDTO(pkg);
+    }
+    
+    // US2: 添加硬权益
+    @Transactional
+    public ScenarioPackageDTO addBenefit(UUID id, AddBenefitRequest request) {
+        ScenarioPackage pkg = repository.findById(id)
+            .orElseThrow(() -> new PackageNotFoundException(id));
+        
+        PackageBenefit benefit = new PackageBenefit();
+        benefit.setPackageId(id);
+        benefit.setBenefitType(request.getBenefitType());
+        benefit.setDiscountRate(request.getDiscountRate());
+        benefit.setFreeCount(request.getFreeCount());
+        benefit.setDescription(request.getDescription());
+        benefitRepository.save(benefit);
+        
+        return toDTO(pkg);
+    }
+    
+    // US2: 添加单品（带快照）
+    @Transactional
+    public ScenarioPackageDTO addItem(UUID id, AddItemRequest request) {
+        ScenarioPackage pkg = repository.findById(id)
+            .orElseThrow(() -> new PackageNotFoundException(id));
+        
+        PackageItem item = new PackageItem();
+        item.setPackageId(id);
+        item.setItemId(request.getItemId());
+        item.setQuantity(request.getQuantity());
+        item.setItemNameSnapshot(request.getItemNameSnapshot());   // 快照
+        item.setItemPriceSnapshot(request.getItemPriceSnapshot()); // 快照
+        itemRepository.save(item);
+        
+        return toDTO(pkg);
+    }
+    
+    // US2: 添加服务（带快照）
+    @Transactional
+    public ScenarioPackageDTO addService(UUID id, AddServiceRequest request) {
+        ScenarioPackage pkg = repository.findById(id)
+            .orElseThrow(() -> new PackageNotFoundException(id));
+        
+        PackageServiceItem service = new PackageServiceItem();
+        service.setPackageId(id);
+        service.setServiceId(request.getServiceId());
+        service.setServiceNameSnapshot(request.getServiceNameSnapshot());
+        service.setServicePriceSnapshot(request.getServicePriceSnapshot());
+        serviceRepository.save(service);
+        
+        return toDTO(pkg);
+    }
+}
+```
+
+#### 3.2.6 US2 API 端点
+
+```java
+@RestController
+@RequestMapping("/api/scenario-packages")
+public class ScenarioPackageController {
+    
+    // US2: 配置规则
+    @PutMapping("/{id}/rules")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> configureRules(
+            @PathVariable UUID id,
+            @Valid @RequestBody ConfigureRulesRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(service.configureRules(id, request)));
+    }
+    
+    // US2: 添加硬权益
+    @PostMapping("/{id}/benefits")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> addBenefit(
+            @PathVariable UUID id,
+            @Valid @RequestBody AddBenefitRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(service.addBenefit(id, request)));
+    }
+    
+    // US2: 删除硬权益
+    @DeleteMapping("/{id}/benefits/{benefitId}")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> removeBenefit(
+            @PathVariable UUID id,
+            @PathVariable UUID benefitId) {
+        return ResponseEntity.ok(ApiResponse.success(service.removeBenefit(id, benefitId)));
+    }
+    
+    // US2: 添加单品
+    @PostMapping("/{id}/items")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> addItem(
+            @PathVariable UUID id,
+            @Valid @RequestBody AddItemRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(service.addItem(id, request)));
+    }
+    
+    // US2: 更新单品数量
+    @PutMapping("/{id}/items/{itemId}/quantity")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> updateItemQuantity(
+            @PathVariable UUID id,
+            @PathVariable UUID itemId,
+            @RequestParam @Min(1) Integer quantity) {
+        return ResponseEntity.ok(ApiResponse.success(
+            service.updateItemQuantity(id, itemId, quantity)));
+    }
+    
+    // US2: 删除单品
+    @DeleteMapping("/{id}/items/{itemId}")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> removeItem(
+            @PathVariable UUID id,
+            @PathVariable UUID itemId) {
+        return ResponseEntity.ok(ApiResponse.success(service.removeItem(id, itemId)));
+    }
+    
+    // US2: 添加服务
+    @PostMapping("/{id}/services")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> addService(
+            @PathVariable UUID id,
+            @Valid @RequestBody AddServiceRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(service.addService(id, request)));
+    }
+    
+    // US2: 删除服务
+    @DeleteMapping("/{id}/services/{serviceId}")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> removeService(
+            @PathVariable UUID id,
+            @PathVariable UUID serviceId) {
+        return ResponseEntity.ok(ApiResponse.success(service.removeService(id, serviceId)));
+    }
+}
+```
+
 ### 3.3 API 响应格式标准化
 
 **成功响应**（单个资源）:
@@ -394,15 +562,19 @@ public record ErrorResponse(
 frontend/src/features/scenario-package-management/
 ├── components/
 │   ├── atoms/
-│   │   ├── ImageUpload.tsx                # 图片上传组件
+│   │   ├── ImageUpload.tsx                # 图片上传组件 (Supabase 集成)
 │   │   └── StatusBadge.tsx                # 状态标签
 │   ├── molecules/
-│   │   ├── PackageForm.tsx                # 场景包表单
-│   │   ├── PricingCalculator.tsx          # 定价计算器
-│   │   └── ContentSelector.tsx            # 内容选择器
+│   │   ├── PackageForm.tsx                # 场景包基本信息表单
+│   │   ├── PackageListFilters.tsx         # 列表筛选器
+│   │   ├── RuleConfigurator.tsx           # 规则配置器 (US2)
+│   │   ├── BenefitSelector.tsx            # 硬权益选择器 (US2)
+│   │   ├── ItemSelector.tsx               # 单品选择器 (US2)
+│   │   └── ServiceSelector.tsx            # 服务选择器 (US2)
 │   └── organisms/
 │       ├── PackageList.tsx                # 场景包列表
-│       └── PackageEditor.tsx              # 场景包编辑器
+│       ├── PackageEditor.tsx              # 场景包编辑器
+│       └── ContentConfigurator.tsx        # 内容配置器 (US2)
 ├── hooks/
 │   ├── usePackageList.ts                  # 列表查询 hook
 │   ├── usePackageMutation.ts              # 增删改 hook
@@ -605,7 +777,207 @@ export const PricingCalculator = ({ packageId }: Props) => {
 };
 ```
 
-#### 4.2.4 乐观锁冲突处理
+#### 4.2.4 US2 内容配置组件
+
+```typescript
+// components/molecules/RuleConfigurator.tsx
+import { Form, InputNumber, Card, Row, Col } from 'antd';
+
+export interface RuleConfiguratorProps {
+  value?: Partial<PackageRule>;
+  onChange?: (value: Partial<PackageRule>) => void;
+  disabled?: boolean;
+}
+
+export const RuleConfigurator: React.FC<RuleConfiguratorProps> = ({
+  value = {},
+  onChange,
+  disabled = false,
+}) => {
+  return (
+    <Card title="包场规则配置" size="small">
+      <Row gutter={16}>
+        <Col span={8}>
+          <Form.Item label="包场时长">
+            <InputNumber
+              min={1}
+              max={24}
+              value={value.durationHours}
+              onChange={(v) => onChange?.({ ...value, durationHours: v ?? undefined })}
+              addonAfter="小时"
+              disabled={disabled}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item label="最少人数">
+            <InputNumber
+              min={1}
+              value={value.minPeople}
+              onChange={(v) => onChange?.({ ...value, minPeople: v ?? undefined })}
+              addonAfter="人"
+              disabled={disabled}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item label="最多人数">
+            <InputNumber
+              min={value.minPeople || 1}
+              value={value.maxPeople}
+              onChange={(v) => onChange?.({ ...value, maxPeople: v ?? undefined })}
+              addonAfter="人"
+              disabled={disabled}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+    </Card>
+  );
+};
+```
+
+```typescript
+// components/molecules/ItemSelector.tsx
+import { Table, Button, InputNumber, Modal } from 'antd';
+
+export interface ItemSelectorProps {
+  value?: PackageItem[];
+  onChange?: (items: PackageItem[]) => void;
+  disabled?: boolean;
+}
+
+export const ItemSelector: React.FC<ItemSelectorProps> = ({
+  value = [],
+  onChange,
+  disabled = false,
+}) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // 计算小计和合计
+  const calculateSubtotal = (item: PackageItem) => 
+    (item.itemPriceSnapshot || 0) * item.quantity;
+  
+  const total = value.reduce((sum, item) => sum + calculateSubtotal(item), 0);
+
+  const columns = [
+    { title: '单品名称', dataIndex: 'itemNameSnapshot' },
+    { title: '单价', dataIndex: 'itemPriceSnapshot', render: (v) => `¥${v?.toFixed(2)}` },
+    {
+      title: '数量',
+      dataIndex: 'quantity',
+      render: (_, record, index) => (
+        <InputNumber
+          min={1}
+          value={record.quantity}
+          onChange={(v) => {
+            const newItems = [...value];
+            newItems[index] = { ...record, quantity: v || 1 };
+            onChange?.(newItems);
+          }}
+          disabled={disabled}
+        />
+      ),
+    },
+    { title: '小计', render: (_, record) => `¥${calculateSubtotal(record).toFixed(2)}` },
+    {
+      title: '操作',
+      render: (_, record, index) => (
+        <Button danger onClick={() => {
+          const newItems = value.filter((_, i) => i !== index);
+          onChange?.(newItems);
+        }} disabled={disabled}>
+          删除
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <Card title="单品列表" extra={<span>合计: ¥{total.toFixed(2)}</span>}>
+      <Table dataSource={value} columns={columns} pagination={false} />
+      <Button onClick={() => setModalVisible(true)} disabled={disabled}>
+        添加单品
+      </Button>
+      {/* 单品选择 Modal */}
+    </Card>
+  );
+};
+```
+
+```typescript
+// components/organisms/ContentConfigurator.tsx
+import { RuleConfigurator, BenefitSelector, ItemSelector, ServiceSelector } from '../molecules';
+
+export interface ContentConfiguratorProps {
+  rule?: Partial<PackageRule>;
+  content?: Partial<PackageContent>;
+  packagePrice?: number;
+  onRuleChange?: (rule: Partial<PackageRule>) => void;
+  onBenefitsChange?: (benefits: PackageBenefit[]) => void;
+  onItemsChange?: (items: PackageItem[]) => void;
+  onServicesChange?: (services: PackageService[]) => void;
+  disabled?: boolean;
+}
+
+export const ContentConfigurator: React.FC<ContentConfiguratorProps> = ({
+  rule,
+  content,
+  onRuleChange,
+  onBenefitsChange,
+  onItemsChange,
+  onServicesChange,
+  disabled = false,
+}) => {
+  // 计算参考总价
+  const itemsTotal = content?.items?.reduce(
+    (sum, item) => sum + (item.itemPriceSnapshot || 0) * item.quantity, 0
+  ) || 0;
+  const servicesTotal = content?.services?.reduce(
+    (sum, svc) => sum + (svc.servicePriceSnapshot || 0), 0
+  ) || 0;
+  const referencePrice = itemsTotal + servicesTotal;
+
+  return (
+    <Space direction="vertical" style={{ width: '100%' }}>
+      {/* 规则配置 */}
+      <RuleConfigurator value={rule} onChange={onRuleChange} disabled={disabled} />
+      
+      {/* 硬权益 */}
+      <BenefitSelector
+        value={content?.benefits}
+        onChange={onBenefitsChange}
+        disabled={disabled}
+      />
+      
+      {/* 单品 */}
+      <ItemSelector
+        value={content?.items}
+        onChange={onItemsChange}
+        disabled={disabled}
+      />
+      
+      {/* 服务 */}
+      <ServiceSelector
+        value={content?.services}
+        onChange={onServicesChange}
+        disabled={disabled}
+      />
+      
+      {/* 价格汇总 */}
+      <Card size="small">
+        <Row gutter={16}>
+          <Col span={8}>单品总价: ¥{itemsTotal.toFixed(2)}</Col>
+          <Col span={8}>服务总价: ¥{servicesTotal.toFixed(2)}</Col>
+          <Col span={8}><strong>参考总价: ¥{referencePrice.toFixed(2)}</strong></Col>
+        </Row>
+      </Card>
+    </Space>
+  );
+};
+```
+
+#### 4.2.5 乐观锁冲突处理
 
 ```typescript
 // hooks/usePackageMutation.ts
@@ -1000,12 +1372,22 @@ public ScenarioPackageDTO createVersion(UUID oldPackageId) {
 
 1. ✅ 开发环境配置完成
 2. ✅ 数据库初始化完成
-3. 🔄 开始实现后端 API（参考 `contracts/api.yaml`）
-4. 🔄 开始实现前端组件（参考组件结构）
-5. ⏳ 编写单元测试和集成测试
-6. ⏳ 执行 E2E 测试
-7. ⏳ 性能测试和优化
-8. ⏳ 提交代码审查
+3. ✅ 后端 API 实现完成
+   - US1: 创建/编辑场景包基本信息
+   - US2: 配置场景包规则和内容组合
+   - 图片上传（Supabase Storage 预签名 URL）
+4. ✅ 前端组件实现完成
+   - Atoms: ImageUpload, StatusBadge
+   - Molecules: RuleConfigurator, BenefitSelector, ItemSelector, ServiceSelector
+   - Organisms: PackageList, PackageEditor, ContentConfigurator
+5. ✅ 页面集成完成
+   - 列表页 (list.tsx)
+   - 创建页 (create.tsx) - 包含图片上传
+   - 编辑页 (edit.tsx) - 包含图片上传和内容配置
+6. 🔄 TDD 测试用例已编写，待验证
+7. ⏳ 执行 E2E 测试
+8. ⏳ 性能测试和优化
+9. ⏳ 提交代码审查
 
 **参考文档**:
 - [spec.md](./spec.md) - 功能规格说明

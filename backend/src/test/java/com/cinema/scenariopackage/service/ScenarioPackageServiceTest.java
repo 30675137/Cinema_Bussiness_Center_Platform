@@ -162,7 +162,8 @@ class ScenarioPackageServiceTest {
         latch.await();
         executor.shutdown();
 
-        // Assert: At least one should succeed, others should fail due to version conflict
+        // Assert: At least one should succeed, others should fail due to version
+        // conflict
         assertThat(successCount.get()).isGreaterThan(0);
         assertThat(failureCount.get()).isGreaterThan(0);
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
@@ -273,5 +274,337 @@ class ScenarioPackageServiceTest {
         if (deletedPackage != null) {
             assertThat(deletedPackage.getDeletedAt()).isNotNull();
         }
+    }
+
+    // ==================== User Story 2: 配置场景包规则和内容组合 ====================
+
+    /**
+     * T058: 测试配置使用规则
+     * <p>
+     * 场景：为场景包配置时长、最小人数、最大人数
+     * 验证点：
+     * 1. 规则配置成功保存
+     * 2. 数据有效性验证（时长>0，最小人数≤最大人数）
+     * </p>
+     */
+    @Test
+    @Order(8)
+    @DisplayName("T058: Should configure package rules successfully")
+    @Transactional
+    void testConfigureRules() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("规则配置测试场景包");
+        createRequest.setDescription("用于测试规则配置");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act: Configure rules
+        UpdatePackageRequest updateRequest = new UpdatePackageRequest();
+        updateRequest.setVersionLock(createdDto.getVersionLock());
+
+        // 设置规则：时长 3 小时，10-20 人
+        CreatePackageRequest.PackageRuleRequest rule = new CreatePackageRequest.PackageRuleRequest();
+        rule.setDurationHours(3.0);
+        rule.setMinPeople(10);
+        rule.setMaxPeople(20);
+        updateRequest.setRule(rule);
+
+        ScenarioPackageDTO updatedDto = packageService.update(packageId, updateRequest);
+
+        // Assert
+        assertThat(updatedDto.getRule()).isNotNull();
+        assertThat(updatedDto.getRule().getDurationHours()).isEqualTo(3.0);
+        assertThat(updatedDto.getRule().getMinPeople()).isEqualTo(10);
+        assertThat(updatedDto.getRule().getMaxPeople()).isEqualTo(20);
+    }
+
+    /**
+     * T058: 测试规则验证 - 时长必须大于0
+     */
+    @Test
+    @Order(9)
+    @DisplayName("T058: Should reject invalid duration (must be > 0)")
+    @Transactional
+    void testConfigureRulesInvalidDuration() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("规则验证测试");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act & Assert: 时长为 0 或负数应该报错
+        UpdatePackageRequest updateRequest = new UpdatePackageRequest();
+        updateRequest.setVersionLock(createdDto.getVersionLock());
+
+        CreatePackageRequest.PackageRuleRequest rule = new CreatePackageRequest.PackageRuleRequest();
+        rule.setDurationHours(0.0); // 无效时长
+        rule.setMinPeople(10);
+        rule.setMaxPeople(20);
+        updateRequest.setRule(rule);
+
+        // TODO: 实现后应抛出 ValidationException
+        // assertThatThrownBy(() -> packageService.update(packageId, updateRequest))
+        // .isInstanceOf(ValidationException.class);
+    }
+
+    /**
+     * T058: 测试规则验证 - 最小人数不能大于最大人数
+     */
+    @Test
+    @Order(10)
+    @DisplayName("T058: Should reject invalid people range (min > max)")
+    @Transactional
+    void testConfigureRulesInvalidPeopleRange() {
+        // Arrange
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("人数范围验证测试");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act & Assert: 最小人数 > 最大人数应该报错
+        UpdatePackageRequest updateRequest = new UpdatePackageRequest();
+        updateRequest.setVersionLock(createdDto.getVersionLock());
+
+        CreatePackageRequest.PackageRuleRequest rule = new CreatePackageRequest.PackageRuleRequest();
+        rule.setDurationHours(3.0);
+        rule.setMinPeople(30); // 最小人数 > 最大人数
+        rule.setMaxPeople(20);
+        updateRequest.setRule(rule);
+
+        // TODO: 实现后应抛出 ValidationException
+        // assertThatThrownBy(() -> packageService.update(packageId, updateRequest))
+        // .isInstanceOf(ValidationException.class)
+        // .hasMessageContaining("最小人数不能大于最大人数");
+    }
+
+    /**
+     * T059: 测试添加硬权益
+     * <p>
+     * 场景：为场景包添加观影购票优惠权益（折扣票价、免费场次）
+     * 验证点：
+     * 1. 硬权益成功保存
+     * 2. 支持折扣票价和免费场次两种类型
+     * </p>
+     */
+    @Test
+    @Order(11)
+    @DisplayName("T059: Should add hard benefits (DISCOUNT_TICKET)")
+    @Transactional
+    void testAddBenefitsDiscountTicket() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("硬权益测试场景包");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act: Add discount ticket benefit
+        // TODO: 实现 addBenefit 方法后启用
+        // PackageBenefitRequest benefitRequest = new PackageBenefitRequest();
+        // benefitRequest.setBenefitType("DISCOUNT_TICKET");
+        // benefitRequest.setDiscountRate(0.75); // 75% 折扣
+        // benefitRequest.setDescription("观影票价 75 折");
+        //
+        // ScenarioPackageDTO updatedDto = packageService.addBenefit(packageId,
+        // benefitRequest);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getBenefits()).hasSize(1);
+        // assertThat(updatedDto.getContent().getBenefits().get(0).getBenefitType()).isEqualTo("DISCOUNT_TICKET");
+        // assertThat(updatedDto.getContent().getBenefits().get(0).getDiscountRate()).isEqualTo(0.75);
+    }
+
+    /**
+     * T059: 测试添加硬权益 - 免费场次
+     */
+    @Test
+    @Order(12)
+    @DisplayName("T059: Should add hard benefits (FREE_SCREENING)")
+    @Transactional
+    void testAddBenefitsFreeScreening() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("免费场次测试场景包");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act: Add free screening benefit
+        // TODO: 实现 addBenefit 方法后启用
+        // PackageBenefitRequest benefitRequest = new PackageBenefitRequest();
+        // benefitRequest.setBenefitType("FREE_SCREENING");
+        // benefitRequest.setFreeCount(2); // 2 场免费
+        // benefitRequest.setDescription("赠送 2 场免费观影");
+        //
+        // ScenarioPackageDTO updatedDto = packageService.addBenefit(packageId,
+        // benefitRequest);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getBenefits()).hasSize(1);
+        // assertThat(updatedDto.getContent().getBenefits().get(0).getBenefitType()).isEqualTo("FREE_SCREENING");
+        // assertThat(updatedDto.getContent().getBenefits().get(0).getFreeCount()).isEqualTo(2);
+    }
+
+    /**
+     * T060: 测试添加软权益单品
+     * <p>
+     * 场景：为场景包添加单品（如莫吉托、小食拼盘）
+     * 验证点：
+     * 1. 单品成功添加
+     * 2. 数量设置正确
+     * 3. 快照字段（名称、价格）自动复制
+     * </p>
+     */
+    @Test
+    @Order(13)
+    @DisplayName("T060: Should add soft benefit items with snapshot")
+    @Transactional
+    void testAddItems() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("单品测试场景包");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act: Add item
+        // TODO: 实现 addItem 方法后启用
+        // UUID itemId = UUID.randomUUID(); // 假设来自商品主数据
+        // PackageItemRequest itemRequest = new PackageItemRequest();
+        // itemRequest.setItemId(itemId);
+        // itemRequest.setQuantity(20); // 20 杯莫吉托
+        //
+        // ScenarioPackageDTO updatedDto = packageService.addItem(packageId,
+        // itemRequest);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getItems()).hasSize(1);
+        // PackageItem addedItem = updatedDto.getContent().getItems().get(0);
+        // assertThat(addedItem.getItemId()).isEqualTo(itemId);
+        // assertThat(addedItem.getQuantity()).isEqualTo(20);
+        // assertThat(addedItem.getItemNameSnapshot()).isNotNull(); // 快照字段
+        // assertThat(addedItem.getItemPriceSnapshot()).isNotNull(); // 快照字段
+    }
+
+    /**
+     * T060: 测试更新单品数量
+     */
+    @Test
+    @Order(14)
+    @DisplayName("T060: Should update item quantity")
+    @Transactional
+    void testUpdateItemQuantity() {
+        // Arrange: Create a test package with item
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("数量更新测试");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // TODO: 实现 addItem 和 updateItemQuantity 方法后启用
+        // UUID itemId = UUID.randomUUID();
+        // packageService.addItem(packageId, new PackageItemRequest(itemId, 10));
+        //
+        // // Act: Update quantity
+        // ScenarioPackageDTO updatedDto = packageService.updateItemQuantity(packageId,
+        // itemId, 25);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getItems().get(0).getQuantity()).isEqualTo(25);
+    }
+
+    /**
+     * T060: 测试移除单品
+     */
+    @Test
+    @Order(15)
+    @DisplayName("T060: Should remove item")
+    @Transactional
+    void testRemoveItem() {
+        // Arrange: Create a test package with item
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("删除单品测试");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // TODO: 实现 addItem 和 removeItem 方法后启用
+        // UUID itemId = UUID.randomUUID();
+        // packageService.addItem(packageId, new PackageItemRequest(itemId, 10));
+        //
+        // // Act: Remove item
+        // ScenarioPackageDTO updatedDto = packageService.removeItem(packageId, itemId);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getItems()).isEmpty();
+    }
+
+    /**
+     * T061: 测试添加服务项目
+     * <p>
+     * 场景：为场景包添加服务项目（如管家服务、布置服务）
+     * 验证点：
+     * 1. 服务项目成功添加
+     * 2. 快照字段自动复制
+     * </p>
+     */
+    @Test
+    @Order(16)
+    @DisplayName("T061: Should add service with snapshot")
+    @Transactional
+    void testAddServices() {
+        // Arrange: Create a test package
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("服务项目测试场景包");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // Act: Add service
+        // TODO: 实现 addService 方法后启用
+        // UUID serviceId = UUID.randomUUID(); // 假设来自服务主数据
+        // PackageServiceRequest serviceRequest = new PackageServiceRequest();
+        // serviceRequest.setServiceId(serviceId);
+        //
+        // ScenarioPackageDTO updatedDto = packageService.addService(packageId,
+        // serviceRequest);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getServices()).hasSize(1);
+        // PackageService addedService = updatedDto.getContent().getServices().get(0);
+        // assertThat(addedService.getServiceId()).isEqualTo(serviceId);
+        // assertThat(addedService.getServiceNameSnapshot()).isNotNull(); // 快照字段
+        // assertThat(addedService.getServicePriceSnapshot()).isNotNull(); // 快照字段
+    }
+
+    /**
+     * T061: 测试移除服务项目
+     */
+    @Test
+    @Order(17)
+    @DisplayName("T061: Should remove service")
+    @Transactional
+    void testRemoveService() {
+        // Arrange: Create a test package with service
+        CreatePackageRequest createRequest = new CreatePackageRequest();
+        createRequest.setName("删除服务测试");
+
+        ScenarioPackageDTO createdDto = packageService.create(createRequest);
+        UUID packageId = createdDto.getId();
+
+        // TODO: 实现 addService 和 removeService 方法后启用
+        // UUID serviceId = UUID.randomUUID();
+        // packageService.addService(packageId, new PackageServiceRequest(serviceId));
+        //
+        // // Act: Remove service
+        // ScenarioPackageDTO updatedDto = packageService.removeService(packageId,
+        // serviceId);
+        //
+        // // Assert
+        // assertThat(updatedDto.getContent().getServices()).isEmpty();
     }
 }

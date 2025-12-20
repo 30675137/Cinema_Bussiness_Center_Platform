@@ -3,3 +3,4 @@
  */
 export { PackageList } from './PackageList';
 export { PackageEditor } from './PackageEditor';
+export { ContentConfigurator } from './ContentConfigurator';

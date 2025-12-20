@@ -2,7 +2,6 @@ package com.cinema.scenariopackage.dto;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 更新场景包请求 DTO
@@ -19,7 +18,8 @@ public class UpdatePackageRequest {
     private String description;
     private String backgroundImageUrl;
     private CreatePackageRequest.RuleRequest rule;
-    private List<UUID> hallTypeIds;
+    // 开发阶段使用字符串类型，后续改为 List<UUID>
+    private List<String> hallTypeIds;
 
     // Getters and Setters
 
@@ -63,11 +63,11 @@ public class UpdatePackageRequest {
         this.rule = rule;
     }
 
-    public List<UUID> getHallTypeIds() {
+    public List<String> getHallTypeIds() {
         return hallTypeIds;
     }
 
-    public void setHallTypeIds(List<UUID> hallTypeIds) {
+    public void setHallTypeIds(List<String> hallTypeIds) {
         this.hallTypeIds = hallTypeIds;
     }
 }

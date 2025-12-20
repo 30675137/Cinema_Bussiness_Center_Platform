@@ -3,7 +3,6 @@ package com.cinema.scenariopackage.dto;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 创建场景包请求 DTO
@@ -24,8 +23,9 @@ public class CreatePackageRequest {
     @NotNull(message = "使用规则不能为空")
     private RuleRequest rule;
 
-    @NotEmpty(message = "至少需要选择一个影厅类型")
-    private List<UUID> hallTypeIds;
+    // 开发阶段暂时可选，使用字符串类型以支持开发测试
+    // 后续有真实影厅数据后改为 List<UUID> 并添加 @NotEmpty 验证
+    private List<String> hallTypeIds;
 
     // Nested DTO
     public static class RuleRequest {
@@ -98,11 +98,11 @@ public class CreatePackageRequest {
         this.rule = rule;
     }
 
-    public List<UUID> getHallTypeIds() {
+    public List<String> getHallTypeIds() {
         return hallTypeIds;
     }
 
-    public void setHallTypeIds(List<UUID> hallTypeIds) {
+    public void setHallTypeIds(List<String> hallTypeIds) {
         this.hallTypeIds = hallTypeIds;
     }
 }

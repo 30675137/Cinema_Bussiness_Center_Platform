@@ -157,10 +157,11 @@
 - [X] T056c [US1] 创建页基础信息 Card 添加图标标题 frontend/src/pages/scenario-packages/create.tsx
 - [X] T056d [US1] 创建页适用影厅类型改为标签选择器样式 (Tag.CheckableTag) frontend/src/pages/scenario-packages/create.tsx
 - [X] T056e [US1] 创建页使用规则三字段横向排列，标签改为"建议时长" frontend/src/pages/scenario-packages/create.tsx
-- [X] T056f [US1] 创建页右侧添加封面图上传 Card (Upload.Dragger) frontend/src/pages/scenario-packages/create.tsx
+- [X] T056f [US1] 创建页右侧添加封面图上传 Card (集成 ImageUpload 组件) frontend/src/pages/scenario-packages/create.tsx
 - [X] T056g [US1] 创建页右侧添加定价策略 Card（单品总价、服务总价、参考总价、打包一口价） frontend/src/pages/scenario-packages/create.tsx
 - [X] T057a [US1] 编辑页布局重构：同步创建页的左右两栏设计 frontend/src/pages/scenario-packages/edit.tsx
 - [X] T057b [US1] 编辑页 UI 优化：按设计图调整头部、基础信息、使用规则、侧边栏样式 frontend/src/pages/scenario-packages/edit.tsx
+- [X] T057c [US1] 编辑页集成 ImageUpload 组件实现 Supabase 图片上传 frontend/src/pages/scenario-packages/edit.tsx
 
 **Checkpoint**: User Story 1 应该完全可用且可独立测试（创建、查看、编辑基础场景包）
 
@@ -174,53 +175,53 @@
 
 ### 测试 for User Story 2 (TDD - 先写测试) ⚠️
 
-- [ ] T058 [P] [US2] 后端集成测试：配置使用规则 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testConfigureRules)
-- [ ] T059 [P] [US2] 后端集成测试：添加硬权益 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddBenefits)
-- [ ] T060 [P] [US2] 后端集成测试：添加软权益单品 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddItems)
-- [ ] T061 [P] [US2] 后端集成测试：添加服务项目 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddServices)
-- [ ] T062 [P] [US2] 前端组件测试：ContentSelector 内容选择器 frontend/src/features/scenario-package-management/__tests__/ContentSelector.test.tsx
-- [ ] T063 [P] [US2] E2E 测试：完整内容配置流程 frontend/tests/e2e/scenario-package-configure-content.spec.ts
+- [X] T058 [P] [US2] 后端集成测试：配置使用规则 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testConfigureRules)
+- [X] T059 [P] [US2] 后端集成测试：添加硬权益 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddBenefits)
+- [X] T060 [P] [US2] 后端集成测试：添加软权益单品 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddItems)
+- [X] T061 [P] [US2] 后端集成测试：添加服务项目 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testAddServices)
+- [X] T062 [P] [US2] 前端组件测试：ContentSelector 内容选择器 frontend/src/features/scenario-package-management/__tests__/ContentSelector.test.tsx
+- [X] T063 [P] [US2] E2E 测试：完整内容配置流程 frontend/tests/e2e/scenario-package-configure-content.spec.ts
 
 ### 后端实现 for User Story 2
 
 #### 数据模型层
 
-- [ ] T064 [P] [US2] 创建 PackageBenefit 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageBenefit.java (硬权益)
-- [ ] T065 [P] [US2] 创建 PackageItem 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageItem.java (软权益单品，包含快照字段)
-- [ ] T066 [P] [US2] 创建 PackageService 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageService.java (服务项目，包含快照字段)
+- [X] T064 [P] [US2] 创建 PackageBenefit 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageBenefit.java (硬权益)
+- [X] T065 [P] [US2] 创建 PackageItem 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageItem.java (软权益单品，包含快照字段)
+- [X] T066 [P] [US2] 创建 PackageService 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageServiceItem.java (服务项目，包含快照字段)
 
 #### Repository 层
 
-- [ ] T067 [P] [US2] 创建 PackageBenefitRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageBenefitRepository.java
-- [ ] T068 [P] [US2] 创建 PackageItemRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageItemRepository.java
-- [ ] T069 [P] [US2] 创建 PackageServiceRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageServiceRepository.java
+- [X] T067 [P] [US2] 创建 PackageBenefitRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageBenefitRepository.java
+- [X] T068 [P] [US2] 创建 PackageItemRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageItemRepository.java
+- [X] T069 [P] [US2] 创建 PackageServiceRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageServiceItemRepository.java
 
 #### Service 层
 
-- [ ] T070 [US2] 扩展 ScenarioPackageService：添加规则配置方法 (configureRule)
-- [ ] T071 [US2] 扩展 ScenarioPackageService：添加内容管理方法 (addBenefit, removeBenefit, addItem, removeItem, updateItemQuantity, addService, removeService)
-- [ ] T072 [US2] 实现快照逻辑：在添加 Item/Service 时自动从主数据复制名称和价格到快照字段
+- [X] T070 [US2] 扩展 ScenarioPackageService：添加规则配置方法 (configureRules)
+- [X] T071 [US2] 扩展 ScenarioPackageService：添加内容管理方法 (addBenefit, removeBenefit, addItem, removeItem, updateItemQuantity, addService, removeService)
+- [X] T072 [US2] 实现快照逻辑：在添加 Item/Service 时自动从主数据复制名称和价格到快照字段
 
 #### Controller 层
 
-- [ ] T073 [US2] 扩展 ScenarioPackageController：添加内容配置端点 (PUT /api/scenario-packages/{id}/content)
+- [X] T073 [US2] 扩展 ScenarioPackageController：添加内容配置端点 (PUT /{id}/rules, POST /{id}/benefits, DELETE /{id}/benefits/{benefitId}, POST /{id}/items, etc.)
 
 ### 前端实现 for User Story 2
 
 #### 组件 - Molecules
 
-- [ ] T074 [P] [US2] 创建 RuleConfigurator 组件 frontend/src/features/scenario-package-management/components/molecules/RuleConfigurator.tsx (时长、人数范围)
-- [ ] T075 [P] [US2] 创建 BenefitSelector 组件 frontend/src/features/scenario-package-management/components/molecules/BenefitSelector.tsx (硬权益选择，结构化表单)
-- [ ] T076 [P] [US2] 创建 ItemSelector 组件 frontend/src/features/scenario-package-management/components/molecules/ItemSelector.tsx (软权益单品选择，下拉菜单 + 数量调整)
-- [ ] T077 [P] [US2] 创建 ServiceSelector 组件 frontend/src/features/scenario-package-management/components/molecules/ServiceSelector.tsx (服务项目选择，与 ItemSelector 交互一致)
+- [X] T074 [P] [US2] 创建 RuleConfigurator 组件 frontend/src/features/scenario-package-management/components/molecules/RuleConfigurator.tsx (时长、人数范围)
+- [X] T075 [P] [US2] 创建 BenefitSelector 组件 frontend/src/features/scenario-package-management/components/molecules/BenefitSelector.tsx (硬权益选择，结构化表单)
+- [X] T076 [P] [US2] 创建 ItemSelector 组件 frontend/src/features/scenario-package-management/components/molecules/ItemSelector.tsx (软权益单品选择，下拉菜单 + 数量调整)
+- [X] T077 [P] [US2] 创建 ServiceSelector 组件 frontend/src/features/scenario-package-management/components/molecules/ServiceSelector.tsx (服务项目选择，与 ItemSelector 交互一致)
 
 #### 组件 - Organisms
 
-- [ ] T078 [US2] 创建 ContentConfigurator 组件 frontend/src/features/scenario-package-management/components/organisms/ContentConfigurator.tsx (整合规则、硬权益、软权益、服务项目配置)
+- [X] T078 [US2] 创建 ContentConfigurator 组件 frontend/src/features/scenario-package-management/components/organisms/ContentConfigurator.tsx (整合规则、硬权益、软权益、服务项目配置)
 
 #### 页面更新
 
-- [ ] T079 [US2] 更新编辑页面，集成 ContentConfigurator frontend/src/pages/scenario-packages/edit.tsx
+- [X] T079 [US2] 更新编辑页面，集成 ContentConfigurator frontend/src/pages/scenario-packages/edit.tsx
 
 **Checkpoint**: User Stories 1 AND 2 应该都能独立工作（可以创建基础包，也可以配置内容）
 
