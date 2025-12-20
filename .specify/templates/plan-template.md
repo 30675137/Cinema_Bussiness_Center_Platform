@@ -17,15 +17,37 @@
   the iteration process.
 -->
 
-**Language/Version**: TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend)
-**Primary Dependencies**: Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP client
-**Storage**: Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage）进行开发模拟
-**Testing**: Vitest (unit tests) + Playwright (e2e tests) + Testing Library
-**Target Platform**: Web browser (Chrome, Firefox, Safari, Edge) + Spring Boot backend API
-**Project Type**: Full-stack web application (Spring Boot backend + React frontend)
-**Performance Goals**: <3s app startup, <500ms page transitions, support 1000+ list items with virtual scrolling
-**Constraints**: Must comply with Feature Branch Binding (specId alignment), Test-Driven Development, Component-Based Architecture, and Backend Architecture (Spring Boot + Supabase as unified backend stack)
-**Scale/Scope**: Enterprise admin interface, 50+ screens, complex data management workflows
+**Language/Version**:
+- B端（管理后台）: TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend)
+- C端（客户端/小程序）: TypeScript 5.9.3 + Taro 3.x + React (multi-platform mini-program/H5)
+
+**Primary Dependencies**:
+- B端: Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP client
+- C端: Taro 3.x, Taro UI / NutUI, Zustand / Redux, Taro.request wrapper, Supabase client SDK
+
+**Storage**: Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
+
+**Testing**:
+- B端: Vitest (unit tests) + Playwright (e2e tests) + Testing Library
+- C端: Taro 官方测试工具 + 微信开发者工具 / H5 浏览器测试
+
+**Target Platform**:
+- B端: Web browser (Chrome, Firefox, Safari, Edge) + Spring Boot backend API
+- C端: 微信小程序 + 支付宝小程序 + H5 + React Native (Taro 支持的多端平台)
+
+**Project Type**:
+- Full-stack web application (Spring Boot backend + React frontend for B端 admin interface)
+- Multi-platform client application (Taro framework for C端 user-facing apps)
+
+**Performance Goals**:
+- B端: <3s app startup, <500ms page transitions, support 1000+ list items with virtual scrolling
+- C端: <1.5s first screen render, <2MB main package size, FPS ≥ 50 for list scrolling
+
+**Constraints**: Must comply with Feature Branch Binding (specId alignment), Test-Driven Development, Component-Based Architecture, Frontend Tech Stack Layering (B端 vs C端 separation), and Backend Architecture (Spring Boot + Supabase as unified backend stack)
+
+**Scale/Scope**:
+- B端: Enterprise admin interface, 50+ screens, complex data management workflows
+- C端: User-facing mini-program/H5, booking flows, product browsing, user profile management
 
 ## Constitution Check
 
@@ -36,6 +58,7 @@
 - [ ] **功能分支绑定**: 当前分支名中的specId必须等于active_spec指向路径中的specId
 - [ ] **测试驱动开发**: 关键业务流程必须先编写测试，确保测试覆盖率100%
 - [ ] **组件化架构**: 必须遵循原子设计理念，组件必须清晰分层和可复用
+- [ ] **前端技术栈分层**: B端必须使用React+Ant Design，C端必须使用Taro框架，不得混用
 - [ ] **数据驱动状态管理**: 必须使用Zustand + TanStack Query，状态变更可预测
 - [ ] **代码质量工程化**: 必须通过TypeScript/Java类型检查、ESLint/后端静态检查、所有质量门禁
 - [ ] **后端技术栈约束**: 后端必须使用Spring Boot集成Supabase，Supabase为主要数据源与认证/存储提供方
