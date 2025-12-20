@@ -31,6 +31,16 @@ public class HallService {
     }
 
     /**
+     * 获取所有影厅列表（跨门店）
+     */
+    public List<HallDTO> getAllHalls(HallStatus status, HallType type) {
+        List<Hall> halls = hallRepository.findAll(status, type);
+        return halls.stream()
+                .map(HallMapper::toDto)
+                .toList();
+    }
+
+    /**
      * 按门店查询影厅列表
      */
     public List<HallDTO> getHallsByStore(UUID storeId, HallStatus status, HallType type) {

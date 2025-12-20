@@ -26,6 +26,7 @@ public class HallListController {
     }
 
     /**
+     *
      * 获取所有影厅列表
      * GET /api/halls
      *
