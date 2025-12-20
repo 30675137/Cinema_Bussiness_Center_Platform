@@ -1,16 +1,22 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.2.0 → 1.3.0 -->
-<!-- Modified principles: None -->
-<!-- Added sections: API 响应格式标准化 (under 后端架构与技术栈) -->
+<!-- Version change: 1.3.0 → 1.4.0 -->
+<!-- Modified principles:
+  - 组件化架构 (Component-Based Architecture): Extended to clarify distinction between B端 and C端 development frameworks
+-->
+<!-- Added sections:
+  - 前端技术栈分层 (Frontend Tech Stack Layering) - new principle section
+  - C端开发技术栈 (Client-Side Development Tech Stack) - new subsection under 后端架构与技术栈
+-->
 <!-- Removed sections: None -->
-<!-- Issue reference: docs/问题总结/014-API响应格式不一致问题.md -->
 <!-- Templates requiring updates:
-  ✅ .specify/templates/spec-template.md (no changes required; still aligned)
-  ✅ .specify/templates/plan-template.md (updated technical context + constitution check for backend)
-  ✅ .specify/templates/tasks-template.md (already generic enough for backend tasks)
+  ✅ .specify/templates/spec-template.md (no changes required; technology-agnostic by design)
+  ✅ .specify/templates/plan-template.md (updated Technical Context section to include Taro framework and B端/C端 distinction)
+  ✅ .specify/templates/tasks-template.md (already generic enough; no changes needed)
   ⚠ .specify/templates/commands/*.md (directory not present in repo; no action taken)
 -->
-<!-- Follow-up TODOs: None -->
+<!-- Follow-up TODOs:
+  - Consider migrating HallReserveH5/ to Taro framework in future refactoring (current implementation uses plain React + Vite, not Taro-compliant)
+-->
 
 # 影院商品管理中台宪法
 
@@ -24,7 +30,7 @@
 
 ### 二、测试驱动开发 (Test-Driven Development)
 
-测试先行的开发策略是强制性的。所有功能必须先编写测试用例，确保测试失败后再实现功能代码。严格遵循 Red-Green-Refactor 循环：先写测试（Red），实现最小可行代码使测试通过（Green），然后重构优化（Refactor）。使用 Playwright 进行端到端测试，Vitest 进行单元测试，确保关键业务流程的测试覆盖率达到 100%。
+测试先行的开发策略是强制性的。所有功能必须先编写测试用例,确保测试失败后再实现功能代码。严格遵循 Red-Green-Refactor 循环：先写测试（Red），实现最小可行代码使测试通过（Green），然后重构优化（Refactor）。使用 Playwright 进行端到端测试，Vitest 进行单元测试，确保关键业务流程的测试覆盖率达到 100%。
 
 **基本原理**: 测试先行保证功能需求的明确性和代码设计的正确性，通过自动化测试确保代码质量和回归预防，提高代码的可维护性和系统的稳定性。
 
@@ -32,22 +38,55 @@
 
 系统采用原子设计理念的分层组件架构：原子组件（Atoms）、分子组件（Molecules）、有机体（Organisms）、模板（Templates）和页面（Pages）。所有组件必须遵循单一职责原则，具有清晰的 Props 接口定义和 TypeScript 类型注解。使用 React.memo、useMemo、useCallback 进行性能优化，避免不必要的重渲染。
 
-**基本原理**: 组件化架构确保代码的可复用性、可维护性和可测试性，通过清晰的组件层次和性能优化策略，构建高效的用户界面系统。
+**B端（管理后台）** 使用 React + Ant Design 技术栈进行开发，侧重于复杂数据展示和管理操作。
 
-### 四、数据驱动与状态管理 (Data-Driven & State Management)
+**C端（客户端/小程序）** 使用 Taro 框架进行开发，确保多端统一（微信小程序、H5、App等），侧重于用户体验和跨平台兼容性。
 
-使用 Zustand 管理客户端状态，TanStack Query 管理服务器状态，实现数据与 UI 的分离。所有 API 数据获取必须通过 TanStack Query 进行，利用其缓存、重试、后台刷新等特性。本地数据持久化使用 localStorage，Mock 数据使用 MSW（Mock Service Worker）进行模拟。状态变更必须是可预测和可追踪的。
+**基本原理**: 组件化架构确保代码的可复用性、可维护性和可测试性，通过清晰的组件层次和性能优化策略，构建高效的用户界面系统。针对不同端的特性选择合适的技术栈，B端注重功能完整性和数据处理能力，C端注重多端兼容和用户体验。
+
+### 四、前端技术栈分层 (Frontend Tech Stack Layering)
+
+项目前端开发必须明确区分B端（管理后台）和C端（客户端/用户端）的技术栈选择，不得混用：
+
+**B端管理后台技术栈**：
+- 框架：React 19.2.0 + TypeScript 5.9.3
+- UI 组件库：Ant Design 6.1.0
+- 状态管理：Zustand 5.0.9（客户端状态）+ TanStack Query 5.90.12（服务器状态）
+- 路由：React Router 7.10.1
+- Mock 数据：MSW 2.12.4
+- 表单处理：React Hook Form 7.68.0 + Zod 4.1.13（数据验证）
+- 构建工具：Vite 6.0.7
+- 适用场景：复杂数据管理、多表格操作、权限控制、后台管理系统
+
+**C端客户端技术栈**：
+- 框架：**Taro 框架**（多端统一开发框架）
+- UI 组件库：Taro UI 或其他 Taro 兼容的 UI 组件库
+- 状态管理：根据 Taro 最佳实践选择（Redux、Zustand 等）
+- 目标平台：微信小程序、支付宝小程序、H5、React Native 等多端
+- 适用场景：用户预订、商品浏览、个人中心、移动端体验优化
+
+**技术栈选择原则**：
+- 所有新开发的 C端 功能（小程序、H5、移动应用）**必须**使用 Taro 框架
+- 禁止在 C端 项目中使用 B端 技术栈（如直接使用 Ant Design 而非 Taro 兼容组件）
+- 现有非 Taro 实现的 C端 项目应逐步迁移至 Taro 框架
+- B端 和 C端 可共享业务逻辑层（TypeScript 工具函数、数据模型定义、API 接口类型）
+
+**基本原理**: 明确的技术栈分层避免技术选型混乱和跨端兼容性问题。B端技术栈专注于企业级管理能力和复杂交互，C端技术栈通过 Taro 框架实现"一次编写，多端运行"，降低维护成本，提高开发效率，确保用户端体验的一致性。
+
+### 五、数据驱动与状态管理 (Data-Driven & State Management)
+
+使用 Zustand 管理客户端状态，TanStack Query 管理服务器状态，实现数据与 UI 的分离。所有 API 数据获取必须通过 TanStack Query 进行，利用其缓存、重试、后台刷新等特性。本地数据持久化使用 localStorage（B端）或平台特定存储 API（C端 Taro 项目中使用 Taro.setStorage/getStorage）。Mock 数据使用 MSW（Mock Service Worker）进行模拟。状态变更必须是可预测和可追踪的。
 
 **基本原理**: 数据驱动的方法确保应用状态的一致性和可预测性，通过专业的状态管理工具和缓存策略，提供流畅的用户体验和可靠的数据处理能力。
 
-### 五、代码质量与工程化 (Code Quality & Engineering Excellence)
+### 六、代码质量与工程化 (Code Quality & Engineering Excellence)
 
 遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保前端类型安全，
 ESLint + Prettier 确保代码风格一致性，Husky + lint-staged 确保提交质量。
 后端必须使用现代 Java 版本与 Spring Boot 框架，并遵循一致的编码规范、
 日志规范和异常处理规范。所有 Java 代码在关键领域类、公共方法以及复杂业
 务分支处必须编写**清晰、准确且有意义的注释**，说明领域含义、边界条件以及
-与 Supabase 或外部系统交互的意图，禁止堆砌无信息量的“废话注释”。所有代码
+与 Supabase 或外部系统交互的意图，禁止堆砌无信息量的"废话注释"。所有代码
 必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范（Conventional
 Commits），使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、
 性能考虑、测试覆盖、安全考虑以及关键 Java 代码是否具备足够的注释可读性。
@@ -72,6 +111,35 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 **基本原理**: 统一的后端技术栈（Spring Boot + Supabase）可以显著降低
 架构复杂度和运维成本，避免多种数据源和框架并存导致的耦合和不一致，
 同时利用 Supabase 托管能力加速开发，Spring Boot 聚焦业务逻辑和接口层。
+
+### C端开发技术栈 (Client-Side Development Tech Stack)
+
+所有面向最终用户的 C端 应用（小程序、H5、移动应用）必须使用 **Taro 框架** 进行开发。
+
+**技术要求**：
+- 使用 Taro 3.x 或更高版本（保持与官方稳定版本同步）
+- 遵循 Taro 官方文档的最佳实践和开发规范
+- 组件库选择必须兼容 Taro 多端编译能力（推荐 Taro UI、NutUI 等）
+- 状态管理优先选择 Zustand 或 Redux（确保与 Taro 兼容）
+- API 请求统一使用 Taro.request 封装，支持 Token 管理和错误处理
+- 样式编写遵循 Taro 样式规范（支持 rpx/px 单位，避免使用不兼容的 CSS 特性）
+
+**多端适配要求**：
+- 新功能必须至少支持**微信小程序**和 **H5** 两端
+- 使用 Taro 条件编译处理平台差异（process.env.TARO_ENV）
+- 不得使用仅在单一平台可用的 API，必须使用 Taro 统一 API 或做兼容处理
+
+**项目结构要求**：
+- C端 项目代码应独立存放于 `client/` 或 `miniprogram/` 目录
+- 与 B端 管理后台（`frontend/`）和后端（`backend/`）清晰分离
+- 可与后端共享 TypeScript 类型定义（通过 workspace 或 package 引用）
+
+**禁止行为**：
+- 禁止在 C端 项目中直接引入 Ant Design、Element UI 等非 Taro 兼容的 UI 库
+- 禁止使用浏览器专属 API（如 window、document）而不进行平台判断和兼容处理
+- 禁止绕过 Taro 框架直接编写原生小程序代码（除非经架构评审批准并记录）
+
+**基本原理**: Taro 框架提供了成熟的多端统一开发方案，显著降低跨平台开发和维护成本。通过统一的技术栈和开发规范，确保 C端 应用在不同平台上的体验一致性、代码可维护性和团队协作效率。强制使用 Taro 避免技术碎片化和平台迁移困难。
 
 ### API 响应格式标准化
 
@@ -127,9 +195,19 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 
 应用启动时间不超过 3 秒，页面切换响应时间不超过 500 毫秒，数据列表加载支持虚拟滚动优化。必须进行性能监控，使用 Web Vitals 指标评估用户体验。大型数据列表必须使用虚拟滚动或分页加载，避免页面卡顿。
 
+对于 C端 Taro 项目，还需额外关注：
+- 小程序包体积优化（主包 < 2MB，分包合理拆分）
+- 首屏渲染时间 < 1.5 秒
+- 列表滚动流畅度（FPS ≥ 50）
+
 ### 安全标准 (Security Standards)
 
 前端必须有完善的输入验证和数据清理机制，使用 Zod 进行数据验证。防止 XSS 攻击，避免在前端存储敏感信息。API 请求必须包含适当的认证和授权机制，处理 Token 过期和刷新逻辑。
+
+C端 项目还需注意：
+- 敏感数据不得存储在本地存储（使用加密或服务端存储）
+- 小程序中避免明文传输用户隐私信息
+- 遵守平台安全规范（微信小程序、支付宝小程序等）
 
 ### 可访问性标准 (Accessibility Standards)
 
@@ -145,4 +223,4 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 当开发实践与宪法原则发生冲突时，应以宪法原则为准，必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行，确保项目的长期健康发展。
 
-**版本**: 1.3.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-17
+**版本**: 1.4.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-20
