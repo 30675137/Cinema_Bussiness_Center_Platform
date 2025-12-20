@@ -749,3 +749,4 @@ const halls = await scheduleService.getHallsByStore(storeId, {
 - 添加审计日志记录
 - 更新 API 契约文档（`contracts/api.yaml`），确保前后端类型定义一致
 
+

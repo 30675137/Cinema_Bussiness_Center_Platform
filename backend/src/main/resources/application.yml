@@ -2,11 +2,11 @@ spring:
   application:
     name: cinema-hall-store-backend
 
-  # 数据源配置（Supabase PostgreSQL - 使用直连模式）
+  # 数据源配置（Supabase PostgreSQL - Pooler 模式）
   datasource:
-    url: jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres
     username: postgres.fxhgyxceqrmnpezluaht
-    password: Linyk12345678
+    password: ppkZ8sGUEHB0qjFs
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -49,5 +49,6 @@ logging:
     org.springframework.web.reactive.function.client: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
 
 

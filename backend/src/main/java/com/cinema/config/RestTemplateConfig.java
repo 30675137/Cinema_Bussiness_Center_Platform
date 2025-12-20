@@ -1,5 +1,6 @@
 package com.cinema.config;
 
+import com.cinema.hallstore.config.SupabaseConfig;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

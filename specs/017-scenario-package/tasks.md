@@ -27,12 +27,12 @@
 **Purpose**: 项目初始化和基础结构搭建
 
 - [X] T001 执行数据库迁移脚本 backend/src/main/resources/db/migration/V1__create_scenario_packages.sql
-- [ ] T002 配置 Supabase Storage bucket (scenario-packages)，设置为 public-read，限制 5MB
+- [X] T002 配置 Supabase Storage bucket (scenario-packages)，设置为 public-read，限制 5MB
 - [X] T003 [P] 创建后端项目结构 backend/src/main/java/com/cinema/scenariopackage/{controller,service,repository,model,dto,exception}/
 - [X] T004 [P] 创建前端项目结构 frontend/src/features/scenario-package-management/{components/{atoms,molecules,organisms},hooks,services,types,stores,utils}/
 - [X] T005 [P] 创建前端页面结构 frontend/src/pages/scenario-packages/{list,create,edit,preview}.tsx
 - [X] T006 [P] 配置后端环境变量 (Supabase URL, API Key, Storage Bucket) 在 backend/src/main/resources/application.yml
-- [ ] T007 [P] 配置前端环境变量 (API Base URL, Supabase URL) 在 frontend/.env.local
+- [X] T007 [P] 配置前端环境变量 (API Base URL, Supabase URL) 在 frontend/.env.local
 
 ---
 
@@ -73,82 +73,94 @@
 
 > **NOTE: 先编写这些测试，确保它们 FAIL 之后再开始实现**
 
-- [ ] T019 [P] [US1] 后端集成测试：创建场景包 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testCreatePackage)
-- [ ] T020 [P] [US1] 后端集成测试：查询场景包列表 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testListPackages)
-- [ ] T021 [P] [US1] 后端集成测试：查询单个场景包详情 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testGetPackageById)
-- [ ] T022 [P] [US1] 后端集成测试：更新场景包基本信息 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testUpdatePackage)
-- [ ] T023 [P] [US1] 后端集成测试：乐观锁并发冲突 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testOptimisticLockConflict)
-- [ ] T024 [P] [US1] 前端组件测试：PackageList 列表渲染 frontend/src/features/scenario-package-management/__tests__/PackageList.test.tsx
-- [ ] T025 [P] [US1] 前端组件测试：PackageForm 表单验证 frontend/src/features/scenario-package-management/__tests__/PackageForm.test.tsx
-- [ ] T026 [P] [US1] E2E 测试：完整创建流程 frontend/tests/e2e/scenario-package-create.spec.ts
+- [X] T019 [P] [US1] 后端集成测试：创建场景包 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testCreatePackage)
+- [X] T020 [P] [US1] 后端集成测试：查询场景包列表 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testListPackages)
+- [X] T021 [P] [US1] 后端集成测试：查询单个场景包详情 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testGetPackageById)
+- [X] T022 [P] [US1] 后端集成测试：更新场景包基本信息 backend/src/test/java/com/cinema/scenariopackage/controller/ScenarioPackageControllerTest.java (testUpdatePackage)
+- [X] T023 [P] [US1] 后端集成测试：乐观锁并发冲突 backend/src/test/java/com/cinema/scenariopackage/service/ScenarioPackageServiceTest.java (testOptimisticLockConflict)
+- [X] T024 [P] [US1] 前端组件测试：PackageList 列表渲染 frontend/src/features/scenario-package-management/__tests__/PackageList.test.tsx
+- [X] T025 [P] [US1] 前端组件测试：PackageForm 表单验证 frontend/src/features/scenario-package-management/__tests__/PackageForm.test.tsx
+- [X] T026 [P] [US1] E2E 测试：完整创建流程 frontend/tests/e2e/scenario-package-create.spec.ts
 
 ### 后端实现 for User Story 1
 
 #### 数据模型层
 
-- [ ] T027 [P] [US1] 创建 ScenarioPackage 实体 backend/src/main/java/com/cinema/scenariopackage/model/ScenarioPackage.java (包含 @Version 乐观锁)
-- [ ] T028 [P] [US1] 创建 PackageRule 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageRule.java
-- [ ] T029 [P] [US1] 创建 PackageHallAssociation 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageHallAssociation.java
+- [X] T027 [P] [US1] 创建 ScenarioPackage 实体 backend/src/main/java/com/cinema/scenariopackage/model/ScenarioPackage.java (包含 @Version 乐观锁)
+- [X] T028 [P] [US1] 创建 PackageRule 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageRule.java
+- [X] T029 [P] [US1] 创建 PackageHallAssociation 实体 backend/src/main/java/com/cinema/scenariopackage/model/PackageHallAssociation.java
 
 #### Repository 层
 
-- [ ] T030 [P] [US1] 创建 ScenarioPackageRepository backend/src/main/java/com/cinema/scenariopackage/repository/ScenarioPackageRepository.java (JPA Repository)
-- [ ] T031 [P] [US1] 创建 PackageRuleRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageRuleRepository.java
-- [ ] T032 [P] [US1] 创建 PackageHallAssociationRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageHallAssociationRepository.java
+- [X] T030 [P] [US1] 创建 ScenarioPackageRepository backend/src/main/java/com/cinema/scenariopackage/repository/ScenarioPackageRepository.java (JPA Repository)
+- [X] T031 [P] [US1] 创建 PackageRuleRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageRuleRepository.java
+- [X] T032 [P] [US1] 创建 PackageHallAssociationRepository backend/src/main/java/com/cinema/scenariopackage/repository/PackageHallAssociationRepository.java
 
 #### DTO 层
 
-- [ ] T033 [P] [US1] 创建 ScenarioPackageDTO backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageDTO.java (响应 DTO)
-- [ ] T034 [P] [US1] 创建 ScenarioPackageSummary DTO backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageSummary.java (列表摘要)
-- [ ] T035 [P] [US1] 创建 CreatePackageRequest DTO backend/src/main/java/com/cinema/scenariopackage/dto/CreatePackageRequest.java (创建请求)
-- [ ] T036 [P] [US1] 创建 UpdatePackageRequest DTO backend/src/main/java/com/cinema/scenariopackage/dto/UpdatePackageRequest.java (更新请求，包含 versionLock)
+- [X] T033 [P] [US1] 创建 ScenarioPackageDTO backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageDTO.java (响应 DTO)
+- [X] T034 [P] [US1] 创建 ScenarioPackageSummary DTO backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageSummary.java (列表摘要)
+- [X] T035 [P] [US1] 创建 CreatePackageRequest DTO backend/src/main/java/com/cinema/scenariopackage/dto/CreatePackageRequest.java (创建请求)
+- [X] T036 [P] [US1] 创建 UpdatePackageRequest DTO backend/src/main/java/com/cinema/scenariopackage/dto/UpdatePackageRequest.java (更新请求，包含 versionLock)
 
 #### Service 层
 
-- [ ] T037 [US1] 实现 ImageUploadService backend/src/main/java/com/cinema/scenariopackage/service/ImageUploadService.java (预签名 URL 生成，文件验证)
-- [ ] T038 [US1] 实现 ScenarioPackageService 基础方法 backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java (create, findById, findAll, update, delete)
-- [ ] T039 [US1] 在 ScenarioPackageService 中实现乐观锁冲突检测和版本创建逻辑
+- [X] T037 [US1] 实现 ImageUploadService backend/src/main/java/com/cinema/scenariopackage/service/ImageUploadService.java (预签名 URL 生成，文件验证)
+- [X] T038 [US1] 实现 ScenarioPackageService 基础方法 backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java (create, findById, findAll, update, delete)
+- [X] T039 [US1] 在 ScenarioPackageService 中实现乐观锁冲突检测和版本创建逻辑
 
 #### Controller 层
 
-- [ ] T040 [US1] 实现 ScenarioPackageController backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java (POST /api/scenario-packages, GET /api/scenario-packages, GET /api/scenario-packages/{id}, PUT /api/scenario-packages/{id}, DELETE /api/scenario-packages/{id})
-- [ ] T041 [US1] 实现图片上传端点 ScenarioPackageController (POST /api/scenario-packages/{id}/image 生成预签名 URL, PATCH /api/scenario-packages/{id}/image 确认上传)
+- [X] T040 [US1] 实现 ScenarioPackageController backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java (POST /api/scenario-packages, GET /api/scenario-packages, GET /api/scenario-packages/{id}, PUT /api/scenario-packages/{id}, DELETE /api/scenario-packages/{id})
+- [X] T041 [US1] 实现图片上传端点 ScenarioPackageController (POST /api/scenario-packages/{id}/image 生成预签名 URL, PATCH /api/scenario-packages/{id}/image 确认上传)
 
 ### 前端实现 for User Story 1
 
 #### 类型定义和 API 服务
 
-- [ ] T042 [P] [US1] 完善 TypeScript 类型定义 frontend/src/features/scenario-package-management/types/index.ts (ScenarioPackageDetail, CreatePackageRequest, UpdatePackageRequest)
-- [ ] T043 [US1] 创建 packageService API 封装 frontend/src/features/scenario-package-management/services/packageService.ts (list, getById, create, update, delete, generateImageUploadUrl, confirmImageUpload)
+- [X] T042 [P] [US1] 完善 TypeScript 类型定义 frontend/src/features/scenario-package-management/types/index.ts (ScenarioPackageDetail, CreatePackageRequest, UpdatePackageRequest)
+- [X] T043 [US1] 创建 packageService API 封装 frontend/src/features/scenario-package-management/services/packageService.ts (list, getById, create, update, delete, generateImageUploadUrl, confirmImageUpload)
 
 #### Hooks (TanStack Query)
 
-- [ ] T044 [P] [US1] 创建 usePackageList hook frontend/src/features/scenario-package-management/hooks/usePackageList.ts
-- [ ] T045 [P] [US1] 创建 usePackageDetail hook frontend/src/features/scenario-package-management/hooks/usePackageDetail.ts
-- [ ] T046 [P] [US1] 创建 useCreatePackage mutation hook frontend/src/features/scenario-package-management/hooks/useCreatePackage.ts
-- [ ] T047 [P] [US1] 创建 useUpdatePackage mutation hook frontend/src/features/scenario-package-management/hooks/useUpdatePackage.ts (包含乐观锁错误处理)
-- [ ] T048 [P] [US1] 创建 useDeletePackage mutation hook frontend/src/features/scenario-package-management/hooks/useDeletePackage.ts
+- [X] T044 [P] [US1] 创建 usePackageList hook frontend/src/features/scenario-package-management/hooks/usePackageList.ts
+- [X] T045 [P] [US1] 创建 usePackageDetail hook frontend/src/features/scenario-package-management/hooks/usePackageDetail.ts
+- [X] T046 [P] [US1] 创建 useCreatePackage mutation hook frontend/src/features/scenario-package-management/hooks/useCreatePackage.ts
+- [X] T047 [P] [US1] 创建 useUpdatePackage mutation hook frontend/src/features/scenario-package-management/hooks/useUpdatePackage.ts (包含乐观锁错误处理)
+- [X] T048 [P] [US1] 创建 useDeletePackage mutation hook frontend/src/features/scenario-package-management/hooks/useDeletePackage.ts
 
 #### 组件 - Atoms
 
-- [ ] T049 [P] [US1] 创建 ImageUpload 组件 frontend/src/features/scenario-package-management/components/atoms/ImageUpload.tsx (支持预签名 URL 上传，文件验证)
-- [ ] T050 [P] [US1] 创建 StatusBadge 组件 frontend/src/features/scenario-package-management/components/atoms/StatusBadge.tsx (DRAFT/PUBLISHED/UNPUBLISHED)
+- [X] T049 [P] [US1] 创建 ImageUpload 组件 frontend/src/features/scenario-package-management/components/atoms/ImageUpload.tsx (支持预签名 URL 上传，文件验证)
+- [X] T050 [P] [US1] 创建 StatusBadge 组件 frontend/src/features/scenario-package-management/components/atoms/StatusBadge.tsx (DRAFT/PUBLISHED/UNPUBLISHED)
 
 #### 组件 - Molecules
 
-- [ ] T051 [US1] 创建 PackageForm 组件 frontend/src/features/scenario-package-management/components/molecules/PackageForm.tsx (名称、描述、影厅类型选择、图片上传)
-- [ ] T052 [US1] 创建 PackageListFilters 组件 frontend/src/features/scenario-package-management/components/molecules/PackageListFilters.tsx (状态筛选、搜索框)
+- [X] T051 [US1] 创建 PackageForm 组件 frontend/src/features/scenario-package-management/components/molecules/PackageForm.tsx (名称、描述、影厅类型选择、图片上传)
+- [X] T052 [US1] 创建 PackageListFilters 组件 frontend/src/features/scenario-package-management/components/molecules/PackageListFilters.tsx (状态筛选、搜索框)
 
 #### 组件 - Organisms
 
-- [ ] T053 [US1] 创建 PackageList 组件 frontend/src/features/scenario-package-management/components/organisms/PackageList.tsx (表格展示，操作按钮)
-- [ ] T054 [US1] 创建 PackageEditor 组件 frontend/src/features/scenario-package-management/components/organisms/PackageEditor.tsx (编辑表单容器)
+- [X] T053 [US1] 创建 PackageList 组件 frontend/src/features/scenario-package-management/components/organisms/PackageList.tsx (表格展示，操作按钮)
+- [X] T054 [US1] 创建 PackageEditor 组件 frontend/src/features/scenario-package-management/components/organisms/PackageEditor.tsx (编辑表单容器)
 
 #### 页面
 
-- [ ] T055 [US1] 实现场景包列表页 frontend/src/pages/scenario-packages/list.tsx
-- [ ] T056 [US1] 实现场景包创建页 frontend/src/pages/scenario-packages/create.tsx
-- [ ] T057 [US1] 实现场景包编辑页 frontend/src/pages/scenario-packages/edit.tsx
+- [X] T055 [US1] 实现场景包列表页 frontend/src/pages/scenario-packages/list.tsx
+- [X] T056 [US1] 实现场景包创建页 frontend/src/pages/scenario-packages/create.tsx
+- [X] T057 [US1] 实现场景包编辑页 frontend/src/pages/scenario-packages/edit.tsx
+
+#### UI 优化（按设计图调整）
+
+- [X] T056a [US1] 创建页布局重构：单列布局 → 左右两栏布局（Row/Col 16:8） frontend/src/pages/scenario-packages/create.tsx
+- [X] T056b [US1] 创建页头部优化：按钮移至右上角，标题添加下划线强调 frontend/src/pages/scenario-packages/create.tsx
+- [X] T056c [US1] 创建页基础信息 Card 添加图标标题 frontend/src/pages/scenario-packages/create.tsx
+- [X] T056d [US1] 创建页适用影厅类型改为标签选择器样式 (Tag.CheckableTag) frontend/src/pages/scenario-packages/create.tsx
+- [X] T056e [US1] 创建页使用规则三字段横向排列，标签改为"建议时长" frontend/src/pages/scenario-packages/create.tsx
+- [X] T056f [US1] 创建页右侧添加封面图上传 Card (Upload.Dragger) frontend/src/pages/scenario-packages/create.tsx
+- [X] T056g [US1] 创建页右侧添加定价策略 Card（单品总价、服务总价、参考总价、打包一口价） frontend/src/pages/scenario-packages/create.tsx
+- [X] T057a [US1] 编辑页布局重构：同步创建页的左右两栏设计 frontend/src/pages/scenario-packages/edit.tsx
+- [X] T057b [US1] 编辑页 UI 优化：按设计图调整头部、基础信息、使用规则、侧边栏样式 frontend/src/pages/scenario-packages/edit.tsx
 
 **Checkpoint**: User Story 1 应该完全可用且可独立测试（创建、查看、编辑基础场景包）
 
@@ -458,10 +470,10 @@ Developer D:
 
 ## Task Summary
 
-**Total Tasks**: 120
+**Total Tasks**: 129
 - **Phase 1 (Setup)**: 7 tasks
 - **Phase 2 (Foundational)**: 11 tasks
-- **Phase 3 (US1 - 创建基础场景包)**: 39 tasks (8 tests + 31 implementation)
+- **Phase 3 (US1 - 创建基础场景包)**: 48 tasks (8 tests + 31 implementation + 9 UI 优化)
 - **Phase 4 (US2 - 配置内容组合)**: 22 tasks (6 tests + 16 implementation)
 - **Phase 5 (US3 - 设置定价策略)**: 15 tasks (5 tests + 10 implementation)
 - **Phase 6 (US4 - 发布和状态管理)**: 16 tasks (6 tests + 10 implementation)

@@ -24,19 +24,27 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // 允许的源
-        config.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5173"
-        ));
+        // 允许的源（明确指定，不使用通配符）
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173"));
 
         // 允许的HTTP方法
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
         // 允许的请求头
-        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowedHeaders(Arrays.asList(
+                "Content-Type",
+                "Authorization",
+                "X-Requested-With",
+                "X-Request-ID",
+                "X-Timestamp",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"));
 
         // 允许携带凭证（cookies, authorization headers）
         config.setAllowCredentials(true);
@@ -46,14 +54,13 @@ public class CorsConfig {
 
         // 暴露的响应头
         config.setExposedHeaders(Arrays.asList(
-            "Authorization",
-            "Content-Type",
-            "X-Request-ID",
-            "X-Total-Count"
-        ));
+                "Authorization",
+                "Content-Type",
+                "X-Request-ID",
+                "X-Total-Count"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
     }

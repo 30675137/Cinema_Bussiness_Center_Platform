@@ -2,10 +2,8 @@ package com.cinema.scenariopackage.controller;
 
 import com.cinema.common.dto.ApiResponse;
 import com.cinema.common.dto.ListResponse;
-import com.cinema.scenariopackage.dto.CreatePackageRequest;
-import com.cinema.scenariopackage.dto.ScenarioPackageDTO;
-import com.cinema.scenariopackage.dto.ScenarioPackageSummary;
-import com.cinema.scenariopackage.dto.UpdatePackageRequest;
+import com.cinema.scenariopackage.dto.*;
+import com.cinema.scenariopackage.service.ImageUploadService;
 import com.cinema.scenariopackage.service.ScenarioPackageService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -28,15 +26,16 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/api/scenario-packages")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class ScenarioPackageController {
 
     private static final Logger logger = LoggerFactory.getLogger(ScenarioPackageController.class);
 
     private final ScenarioPackageService packageService;
+    private final ImageUploadService imageUploadService;
 
-    public ScenarioPackageController(ScenarioPackageService packageService) {
+    public ScenarioPackageController(ScenarioPackageService packageService, ImageUploadService imageUploadService) {
         this.packageService = packageService;
+        this.imageUploadService = imageUploadService;
     }
 
     /**
@@ -126,5 +125,50 @@ public class ScenarioPackageController {
 
         packageService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ==================== 图片上传相关端点 ====================
+
+    /**
+     * 生成背景图片上传预签名 URL
+     * <p>
+     * 前端使用该 URL 直接上传图片到 Supabase Storage，上传成功后调用 PATCH 接口确认
+     * </p>
+     *
+     * @param id      场景包 ID
+     * @param request 上传请求（文件名、大小、MIME类型）
+     * @return 预签名上传 URL 和公开访问 URL
+     */
+    @PostMapping("/{id}/image")
+    public ResponseEntity<ApiResponse<ImageUploadResponse>> generateImageUploadUrl(
+            @PathVariable UUID id,
+            @Valid @RequestBody ImageUploadRequest request) {
+        logger.info("POST /api/scenario-packages/{}/image - Generate upload URL for: {}", id, request.getFileName());
+
+        // 验证场景包是否存在
+        packageService.findById(id);
+
+        ImageUploadResponse response = imageUploadService.generateUploadUrl(id, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 确认图片上传成功
+     * <p>
+     * 前端上传图片到 Supabase Storage 成功后，调用此接口更新数据库中的 background_image_url 字段
+     * </p>
+     *
+     * @param id      场景包 ID
+     * @param request 确认请求（公开访问 URL）
+     * @return 更新后的场景包详情
+     */
+    @PatchMapping("/{id}/image")
+    public ResponseEntity<ApiResponse<ScenarioPackageDTO>> confirmImageUpload(
+            @PathVariable UUID id,
+            @Valid @RequestBody ImageConfirmRequest request) {
+        logger.info("PATCH /api/scenario-packages/{}/image - Confirm upload: {}", id, request.getPublicUrl());
+
+        ScenarioPackageDTO dto = packageService.updateBackgroundImage(id, request.getPublicUrl());
+        return ResponseEntity.ok(ApiResponse.success(dto));
     }
 }

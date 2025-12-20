@@ -26,15 +26,4 @@ public class HealthController {
         response.put("message", "Backend is running");
         return response;
     }
-
-    @GetMapping("/scenario-packages")
-    public Map<String, Object> mockScenarioPackages() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("data", new Object[]{});
-        response.put("total", 0);
-        response.put("timestamp", Instant.now().toString());
-        response.put("message", "数据库未配置，返回Mock数据。请先执行数据库迁移脚本。");
-        return response;
-    }
 }

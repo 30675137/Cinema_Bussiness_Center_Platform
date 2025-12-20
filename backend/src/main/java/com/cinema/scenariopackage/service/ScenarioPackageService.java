@@ -181,6 +181,30 @@ public class ScenarioPackageService {
         logger.info("Scenario package deleted successfully: {}", id);
     }
 
+    /**
+     * 更新场景包背景图片
+     * <p>
+     * 用于图片上传成功后更新数据库中的 background_image_url 字段
+     * </p>
+     *
+     * @param id       场景包 ID
+     * @param imageUrl 图片公开访问 URL
+     * @return 更新后的场景包详情
+     */
+    @Transactional
+    public ScenarioPackageDTO updateBackgroundImage(UUID id, String imageUrl) {
+        logger.info("Updating background image for package: {}", id);
+
+        ScenarioPackage pkg = packageRepository.findByIdAndNotDeleted(id)
+                .orElseThrow(() -> new PackageNotFoundException(id));
+
+        pkg.setBackgroundImageUrl(imageUrl);
+        pkg = packageRepository.save(pkg);
+
+        logger.info("Background image updated successfully for package: {}", id);
+        return toDTO(pkg);
+    }
+
     // ========== DTO 转换方法 ==========
 
     private ScenarioPackageDTO toDTO(ScenarioPackage pkg) {

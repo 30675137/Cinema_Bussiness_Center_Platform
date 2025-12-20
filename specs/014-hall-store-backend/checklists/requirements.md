@@ -50,3 +50,4 @@
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
 
 
+

@@ -29,7 +29,18 @@
       "Bash(npm run dev:*)",
       "Bash(npx tsc:*)",
       "Bash(node:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(cat:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(jps:*)",
+      "Bash(pgrep:*)",
+      "Bash(timeout 5 npx chrome-devtools-mcp@latest:*)",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__take_snapshot",
+      "Bash(mvn clean compile)",
+      "Skill(speckit.analyze)"
     ]
   }
 }
