@@ -42,6 +42,16 @@ def install_cli_npm() -> bool:
             log_info(f"成功安装: {CLAUDE_CLI_PACKAGE}")
             return True
         else:
+            # 检查是否是权限问题
+            if "EACCES" in result.stderr or "permission denied" in result.stderr:
+                log_warning("检测到权限问题，尝试修复...")
+                if fix_npm_permissions():
+                    # 重试安装
+                    result = run_command(["npm", "install", "-g", CLAUDE_CLI_PACKAGE], check=False)
+                    if result.returncode == 0:
+                        log_info(f"成功安装: {CLAUDE_CLI_PACKAGE}")
+                        return True
+            
             log_error(f"安装失败: {CLAUDE_CLI_PACKAGE}")
             if result.stderr:
                 log_error(f"错误信息: {result.stderr}")
@@ -69,6 +79,16 @@ def install_router_npm() -> bool:
             log_info(f"成功安装: {CLAUDE_ROUTER_PACKAGE}")
             return True
         else:
+            # 棄查是否是权限问题
+            if "EACCES" in result.stderr or "permission denied" in result.stderr:
+                log_warning("检测到权限问题，尝试修复...")
+                if fix_npm_permissions():
+                    # 重试安装
+                    result = run_command(["npm", "install", "-g", CLAUDE_ROUTER_PACKAGE], check=False)
+                    if result.returncode == 0:
+                        log_info(f"成功安装: {CLAUDE_ROUTER_PACKAGE}")
+                        return True
+            
             log_error(f"安装失败: {CLAUDE_ROUTER_PACKAGE}")
             if result.stderr:
                 log_error(f"错误信息: {result.stderr}")
@@ -380,4 +400,76 @@ def cleanup_nvm_packages() -> bool:
         all_success = False
     
     return all_success
+
+
+def fix_npm_permissions() -> bool:
+    """
+    修复 npm 目录权限问题
+    
+    Returns:
+        如果修复成功返回 True，否则返回 False
+    """
+    import os
+    import subprocess
+    
+    try:
+        # 获取当前用户 ID 和组 ID
+        uid = os.getuid()
+        gid = os.getgid()
+        
+        # 获取 npm 全局目录
+        result = run_command(["npm", "root", "-g"], check=False)
+        if result.returncode != 0:
+            log_error("无法获取 npm 全局目录")
+            return False
+        
+        npm_global_root = Path(result.stdout.strip())
+        log_info(f"npm 全局目录: {npm_global_root}")
+        
+        # 检查 @anthropic-ai 和 @musistudio 目录
+        dirs_to_fix = []
+        for org_dir in ["@anthropic-ai", "@musistudio"]:
+            org_path = npm_global_root / org_dir
+            if org_path.exists():
+                # 检查所有者
+                stat_info = org_path.stat()
+                if stat_info.st_uid == 0:  # root 所有
+                    dirs_to_fix.append(org_path)
+        
+        if not dirs_to_fix:
+            # 检查 npm 缓存目录
+            npm_cache = Path.home() / ".npm"
+            if npm_cache.exists():
+                cache_stat = npm_cache.stat()
+                if cache_stat.st_uid == 0:
+                    dirs_to_fix.append(npm_cache)
+        
+        if not dirs_to_fix:
+            log_info("未检测到权限问题")
+            return True
+        
+        # 修复权限
+        log_warning(f"检测到 {len(dirs_to_fix)} 个目录需要修复权限")
+        log_warning("请输入密码以修复权限...")
+        
+        for dir_path in dirs_to_fix:
+            log_info(f"修复: {dir_path}")
+            # 使用 sudo chown 修复权限
+            result = subprocess.run(
+                ["sudo", "chown", "-R", f"{uid}:{gid}", str(dir_path)],
+                check=False,
+                capture_output=True
+            )
+            if result.returncode == 0:
+                log_info(f"✓ 成功修复: {dir_path}")
+            else:
+                log_error(f"✗ 修复失败: {dir_path}")
+                return False
+        
+        log_info("✓ 权限修复完成")
+        return True
+        
+    except Exception as e:
+        log_error(f"修复 npm 权限时出错: {e}")
+        return False
 

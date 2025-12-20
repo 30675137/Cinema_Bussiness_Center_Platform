@@ -479,63 +479,65 @@ def cmd_install(args):
         set_api_key(args.api_key, None)
 
     # 7. 同步配置文件中的环境变量到 shell 配置文件
-    config_data = None
-    env_vars = None
+    logging.info("\n同步配置...")
     
     # 优先读取项目模板配置文件
     template_config_path = Path("scripts/config/claude/settings.json")
     if template_config_path.exists():
         try:
+            logging.info("\n📋 从项目模板配置文件读取配置...")
+            logging.info(f"模板路径: {template_config_path}")
+            
             with open(template_config_path, 'r', encoding='utf-8') as f:
                 config_data = json.load(f)
-                logging.info(f"从项目模板配置文件读取: {template_config_path}")
+            
+            env_vars = config_data.get("env", {})
+            
+            if env_vars:
+                logging.info(f"找到 {len(env_vars)} 个环境变量")
+                
+                # 保存到 ~/.claude/settings.json
+                if save_claude_config(config_data):
+                    logging.info("✓ 配置已保存到 ~/.claude/settings.json")
+                else:
+                    logging.warning("保存配置到 ~/.claude/settings.json 失败")
+                
+                # 同步到 shell 配置文件
+                shell_config = detect_config_file()
+                if shell_config:
+                    logging.info(f"同步环境变量到: {shell_config}")
+                    
+                    if not DRY_RUN:
+                        if set_env_vars_to_shell_config(env_vars, shell_config):
+                            logging.info(f"✓ 环境变量已设置到: {shell_config}")
+                            logging.info("\n已同步以下环境变量:")
+                            for key in sorted(env_vars.keys()):
+                                # 隐藏敏感信息
+                                if "TOKEN" in key or "KEY" in key:
+                                    value = env_vars[key]
+                                    if len(value) > 8:
+                                        masked_value = value[:4] + "*" * (len(value) - 8) + value[-4:]
+                                    else:
+                                        masked_value = "*" * len(value)
+                                    logging.info(f"  ✓ {key} = {masked_value}")
+                                else:
+                                    logging.info(f"  ✓ {key} = {env_vars[key]}")
+                        else:
+                            logging.error("同步配置到 shell 配置文件失败")
+                            logging.warning("请手动运行: python scripts/claude_manager.py sync-config")
+                    else:
+                        logging.info(f"[DRY-RUN] 将同步 {len(env_vars)} 个环境变量到 {shell_config}")
+                else:
+                    logging.warning("未找到 shell 配置文件，跳过同步")
+            else:
+                logging.info("配置文件中没有环境变量")
+                
         except Exception as e:
             logging.warning(f"读取项目模板配置文件失败: {e}")
-    
-    # 如果模板配置文件不存在，尝试读取用户配置文件
-    if not config_data:
-        config_data = load_claude_config()
-        if config_data:
-            logging.info("从用户配置文件读取: ~/.claude/settings.json")
-    
-    # 提取环境变量
-    if config_data and "env" in config_data:
-        env_vars = config_data["env"]
-    
-    # 如果找到环境变量，同步到 shell 配置文件
-    if env_vars:
-        logging.info("\n同步配置到 shell 配置文件...")
-        shell_config = detect_config_file()
-        if shell_config:
-            logging.info(f"检测到 shell 配置文件: {shell_config}")
-            logging.info(f"准备同步 {len(env_vars)} 个环境变量")
-            
-            # 特别关注关键环境变量
-            important_vars = ["ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL", "ANTHROPIC_MODEL"]
-            found_important = [key for key in important_vars if key in env_vars]
-            if found_important:
-                logging.info(f"关键环境变量: {', '.join(found_important)}")
-            
-            if not DRY_RUN:
-                if set_env_vars_to_shell_config(env_vars, shell_config):
-                    logging.info(f"✓ 配置已同步到: {shell_config}")
-                    logging.info("已同步以下环境变量:")
-                    for key in sorted(env_vars.keys()):
-                        logging.info(f"  ✓ {key}")
-                    
-                    # 如果是从模板配置文件读取的，也保存到用户配置文件
-                    if template_config_path.exists() and not Path.home().joinpath(".claude/settings.json").exists():
-                        if save_claude_config(config_data):
-                            logging.info("配置已保存到用户配置文件: ~/.claude/settings.json")
-                else:
-                    logging.error("同步配置到 shell 配置文件失败")
-                    logging.warning("请手动运行: python scripts/claude_manager.py set-config --to-shell")
-            else:
-                logging.info(f"[DRY-RUN] 将同步 {len(env_vars)} 个环境变量到 {shell_config}")
-        else:
-            logging.warning("未找到 shell 配置文件，跳过同步")
+            logging.warning("跳过配置同步")
     else:
-        logging.info("未找到环境变量配置，跳过同步")
+        logging.info(f"项目模板配置文件不存在: {template_config_path}")
+        logging.info("跳过配置同步")
 
     # 8. 同步 Router 配置文件到 ~/.claude-code-router/config.json
     router_template_path = Path("scripts/config/claude-code-router/config.json")
@@ -649,6 +651,43 @@ def cmd_uninstall(args):
         else:
             logging.error(f"✗ Failed to uninstall {pkg}")
 
+    # 4.5. 清理 NVM bin 目录中的孤立符号链接
+    try:
+        nvm_dir = os.environ.get('NVM_DIR', os.path.expanduser('~/.nvm'))
+        current_node_version = os.environ.get('NVM_BIN', '')
+        if current_node_version:
+            bin_dir = Path(current_node_version)
+        else:
+            # 尝试获取当前 node 版本
+            result = subprocess.run(['node', '--version'], capture_output=True, text=True)
+            if result.returncode == 0:
+                version = result.stdout.strip()
+                bin_dir = Path(nvm_dir) / 'versions' / 'node' / version / 'bin'
+            else:
+                bin_dir = None
+        
+        if bin_dir and bin_dir.exists():
+            # 检查并删除 claude 和 ccr 命令
+            for cmd_name in ['claude', 'ccr']:
+                cmd_path = bin_dir / cmd_name
+                if cmd_path.exists():
+                    # 检查是否是孤立符号链接（指向不存在的目标）
+                    if cmd_path.is_symlink():
+                        target = cmd_path.resolve()
+                        if not target.exists():
+                            cmd_path.unlink()
+                            logging.info(f"✓ 删除孤立符号链接: {cmd_path}")
+                        else:
+                            # 如果目标仍存在，也删除（因为 npm 包已卸载）
+                            cmd_path.unlink()
+                            logging.info(f"✓ 删除命令符号链接: {cmd_path}")
+                    elif cmd_path.is_file():
+                        # 如果是文件，也删除
+                        cmd_path.unlink()
+                        logging.info(f"✓ 删除命令文件: {cmd_path}")
+    except Exception as e:
+        logging.warning(f"清理 NVM bin 目录时出错: {e}")
+
     # 5. 卸载 Homebrew
     if installations['homebrew']:
         if execute_command(['brew', 'uninstall', 'claude-code'], "Uninstall Homebrew package"):
@@ -672,6 +711,15 @@ def cmd_uninstall(args):
     from core.env_manager import cleanup_env_vars_from_files
     cleanup_env_vars_from_files()
     cleanup_aliases()
+    
+    # 7.5. 刷新 shell 命令缓存
+    try:
+        logging.info("刷新 shell 命令缓存...")
+        # hash -r 是 shell 内置命令，需要通过 shell 执行
+        subprocess.run(['zsh', '-c', 'hash -r'], check=False, capture_output=True)
+        logging.info("✓ 已刷新 shell 命令缓存")
+    except Exception as e:
+        logging.debug(f"刷新命令缓存时出错（可忽略）: {e}")
 
     # 8. 验证（可选）
     if not args.skip_verification:
@@ -695,6 +743,9 @@ def cmd_uninstall(args):
         logging.info(f"备份位置: {backup_location}")
 
     logging.info("\n✅ 卸载完成！")
+    logging.info("\n⚠️  请重新打开终端或执行以下命令使更改生效:")
+    logging.info("   source ~/.zshrc")
+    logging.info("   hash -r")
     return 0
 
 def set_api_key(api_key: str, config_file: Optional[Path]):
@@ -921,6 +972,112 @@ def cmd_verify(args):
 
     return 0 if fail_count == 0 else 2
 
+def cmd_sync_config(args):
+    """同步配置子命令 - 将配置模板同步到 shell 和 ~/.claude"""
+    logging.info("🔄 开始同步配置...")
+    
+    # 1. 确定源配置文件
+    if args.from_template:
+        template_path = args.from_template.resolve()
+    else:
+        # 默认使用项目模板配置
+        template_path = Path("scripts/config/claude/settings.json")
+    
+    if not template_path.exists():
+        logging.error(f"配置模板文件不存在: {template_path}")
+        return 1
+    
+    # 2. 读取配置文件
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        logging.info(f"✓ 读取配置模板: {template_path}")
+    except Exception as e:
+        logging.error(f"读取配置模板失败: {e}")
+        return 1
+    
+    # 3. 提取环境变量
+    env_vars = config_data.get("env", {})
+    if not env_vars:
+        logging.warning("配置模板中没有环境变量")
+    else:
+        logging.info(f"找到 {len(env_vars)} 个环境变量: {', '.join(env_vars.keys())}")
+    
+    # 4. 同步到 ~/.claude/settings.json
+    if args.to_claude:
+        claude_config_path = Path.home() / ".claude" / "settings.json"
+        
+        # 检查是否已存在
+        if claude_config_path.exists() and not args.force:
+            logging.warning(f"~/.claude/settings.json 已存在，使用 --force 强制覆盖")
+            
+            # 合并配置
+            try:
+                existing_config = load_claude_config()
+                if "env" not in existing_config:
+                    existing_config["env"] = {}
+                existing_config["env"].update(env_vars)
+                
+                if "permissions" in config_data:
+                    existing_config["permissions"] = config_data["permissions"]
+                
+                if save_claude_config(existing_config):
+                    logging.info("✓ 已合并环境变量到 ~/.claude/settings.json")
+                else:
+                    logging.error("合并配置失败")
+                    return 1
+            except Exception as e:
+                logging.error(f"合并配置失败: {e}")
+                return 1
+        else:
+            # 直接保存
+            if not DRY_RUN:
+                if save_claude_config(config_data):
+                    logging.info(f"✓ 配置已保存到: {claude_config_path}")
+                else:
+                    logging.error("保存配置失败")
+                    return 1
+            else:
+                logging.info(f"[DRY-RUN] 将保存配置到: {claude_config_path}")
+    
+    # 5. 同步到 shell 配置文件
+    if args.to_shell and env_vars:
+        shell_config = detect_config_file()
+        if not shell_config:
+            logging.error("未找到 shell 配置文件（~/.zshrc 或 ~/.zshenv）")
+            return 1
+        
+        logging.info(f"同步环境变量到: {shell_config}")
+        
+        if not DRY_RUN:
+            if set_env_vars_to_shell_config(env_vars, shell_config):
+                logging.info(f"✓ 环境变量已设置到: {shell_config}")
+                logging.info("\n已同步以下环境变量:")
+                for key, value in sorted(env_vars.items()):
+                    # 隐藏token的部分内容
+                    if "TOKEN" in key or "KEY" in key:
+                        if len(value) > 8:
+                            masked_value = value[:4] + "*" * (len(value) - 8) + value[-4:]
+                        else:
+                            masked_value = "*" * len(value)
+                        logging.info(f"  ✓ {key} = {masked_value}")
+                    else:
+                        logging.info(f"  ✓ {key} = {value}")
+            else:
+                logging.error("设置环境变量失败")
+                return 1
+        else:
+            logging.info(f"[DRY-RUN] 将同步 {len(env_vars)} 个环境变量到 {shell_config}")
+    
+    # 6. 显示使用提示
+    logging.info("\n✅ 配置同步完成！")
+    if args.to_shell:
+        logging.info("\n⚠️  请执行以下命令使环境变量生效:")
+        logging.info(f"   source {shell_config if shell_config else '~/.zshrc'}")
+        logging.info("或重新打开终端")
+    
+    return 0
+
 
 # ============================================================================
 # 主函数
@@ -967,6 +1124,13 @@ def main():
     config_parser.add_argument('--to-shell', action='store_true', help='同时设置到 shell 配置文件（~/.zshrc）')
     config_parser.add_argument('--shell-config', type=Path, help='Shell 配置文件路径（默认: 自动检测）')
 
+    # sync-config 子命令（新增）
+    sync_parser = subparsers.add_parser('sync-config', help='同步配置文件到 shell 和 ~/.claude')
+    sync_parser.add_argument('--from-template', type=Path, help='从指定模板文件读取配置')
+    sync_parser.add_argument('--to-shell', action='store_true', default=True, help='同步到 shell 配置文件（默认启用）')
+    sync_parser.add_argument('--to-claude', action='store_true', default=True, help='同步到 ~/.claude/settings.json（默认启用）')
+    sync_parser.add_argument('--force', action='store_true', help='强制覆盖现有配置')
+
     # verify 子命令
     verify_parser = subparsers.add_parser('verify', help='验证清理结果')
 
@@ -985,6 +1149,7 @@ def main():
         'uninstall': cmd_uninstall,
         'set-api-key': cmd_set_api_key,
         'set-config': cmd_set_config,
+        'sync-config': cmd_sync_config,
         'verify': cmd_verify,
     }
 
