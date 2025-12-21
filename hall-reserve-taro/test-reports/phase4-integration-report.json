@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-12-21T07:08:14.929Z",
+  "summary": {
+    "total": 11,
+    "passed": 5,
+    "failed": 6,
+    "passRate": "45.5%"
+  },
+  "results": [
+    {
+      "testId": "T036-01",
+      "passed": true,
+      "message": "页面加载成功 (HTTP 200)",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-02",
+      "passed": false,
+      "message": "组件 \"ErrorState\" 未找到",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-02",
+      "passed": false,
+      "message": "组件 \"EmptyState\" 未找到",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-02",
+      "passed": false,
+      "message": "组件 \"error-state\" 未找到",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-02",
+      "passed": false,
+      "message": "组件 \"empty-state\" 未找到",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-02",
+      "passed": false,
+      "message": "组件 \"home-page\" 未找到",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T036-03",
+      "passed": false,
+      "message": "测试工具未找到（可能被 tree-shaking 移除）",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T037-01",
+      "passed": true,
+      "message": "重试功能测试指南已生成（需手动验证）",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T038-01",
+      "passed": true,
+      "message": "空状态测试指南已生成（需手动验证）",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T039-01",
+      "passed": true,
+      "message": "慢速网络测试指南已生成（需手动验证）",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    },
+    {
+      "testId": "T040-01",
+      "passed": true,
+      "message": "自定义错误消息测试指南已生成（需手动验证）",
+      "timestamp": "2025-12-21T07:08:14.929Z"
+    }
+  ]
+}

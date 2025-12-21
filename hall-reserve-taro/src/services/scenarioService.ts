@@ -32,6 +32,12 @@ export async function fetchScenarioPackages(): Promise<ScenarioPackageListItem[]
  * 返回与旧 Scenario 类型兼容的数据结构
  */
 export async function fetchScenarioPackagesMock(): Promise<any[]> {
+  // 检查是否启用测试模式
+  if (typeof window !== 'undefined' && (window as any).getTestMode) {
+    const { fetchScenarioPackagesMockWithTest } = await import('./scenarioServiceTest')
+    return fetchScenarioPackagesMockWithTest()
+  }
+
   // 模拟网络延迟
   await new Promise((resolve) => setTimeout(resolve, 500))
 
