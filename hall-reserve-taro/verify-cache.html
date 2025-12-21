@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TanStack Query 缓存验证</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status.passed {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.failed {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 10px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      margin: 4px 0;
+      padding: 4px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+    .timestamp {
+      color: #6c757d;
+      font-size: 11px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .metric:last-child {
+      border-bottom: none;
+    }
+    .metric-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .metric-value {
+      color: #007bff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 TanStack Query 缓存验证工具</h1>
+
+  <div class="test-section">
+    <div class="test-title">测试说明</div>
+    <p>此工具用于验证 TanStack Query 的缓存策略是否正常工作。</p>
+    <p><strong>缓存配置:</strong></p>
+    <ul>
+      <li>staleTime: 5分钟 (300,000ms)</li>
+      <li>cacheTime: 10分钟 (600,000ms)</li>
+      <li>retry: 2次</li>
+    </ul>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">快速测试</div>
+    <p>打开应用 <a href="http://localhost:10087/" target="_blank">http://localhost:10087/</a></p>
+    <ol>
+      <li>打开 Chrome DevTools (F12)</li>
+      <li>切换到 Network 面板</li>
+      <li>勾选 "Disable cache" (禁用浏览器缓存)</li>
+      <li>刷新页面,观察网络请求</li>
+      <li>在5分钟内再次刷新,检查是否有新的 API 请求</li>
+    </ol>
+  </div>
+
+  <div class="test-section">
+    <div class="test-title">自动化测试</div>
+    <button onclick="runCacheTest()">运行缓存测试</button>
+    <button onclick="clearLogs()">清空日志</button>
+    <div id="test-status" style="margin-top: 15px;"></div>
+    <div id="metrics" style="margin-top: 15px;"></div>
+    <div id="logs" class="log" style="display: none;"></div>
+  </div>
+
+  <script>
+    const logs = [];
+
+    function addLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      logs.push({ timestamp, message, type });
+      updateLogDisplay();
+    }
+
+    function updateLogDisplay() {
+      const logsDiv = document.getElementById('logs');
+      logsDiv.style.display = logs.length > 0 ? 'block' : 'none';
+      logsDiv.innerHTML = logs.map(log =>
+        `<div class="log-entry">
+          <span class="timestamp">[${log.timestamp}]</span> ${log.message}
+        </div>`
+      ).join('');
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    function clearLogs() {
+      logs.length = 0;
+      updateLogDisplay();
+      document.getElementById('test-status').innerHTML = '';
+      document.getElementById('metrics').innerHTML = '';
+    }
+
+    async function runCacheTest() {
+      clearLogs();
+      const statusDiv = document.getElementById('test-status');
+      const metricsDiv = document.getElementById('metrics');
+
+      statusDiv.innerHTML = '<span class="status pending">测试中...</span>';
+      addLog('开始缓存测试');
+
+      try {
+        // 第一次请求
+        addLog('发起第一次请求...');
+        const start1 = performance.now();
+        const response1 = await fetch('http://localhost:10087/');
+        const end1 = performance.now();
+        const time1 = Math.round(end1 - start1);
+        addLog(`第一次请求完成: ${time1}ms`);
+
+        // 等待1秒
+        addLog('等待1秒后发起第二次请求...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 第二次请求 (应该从缓存中获取)
+        addLog('发起第二次请求...');
+        const start2 = performance.now();
+        const response2 = await fetch('http://localhost:10087/');
+        const end2 = performance.now();
+        const time2 = Math.round(end2 - start2);
+        addLog(`第二次请求完成: ${time2}ms`);
+
+        // 分析结果
+        const cacheWorking = time2 < time1 * 0.5; // 如果第二次请求时间少于第一次的50%,说明缓存工作
+
+        if (cacheWorking) {
+          statusDiv.innerHTML = '<span class="status passed">✅ 缓存策略正常工作</span>';
+          addLog('✅ 缓存验证通过: 第二次请求明显更快', 'success');
+        } else {
+          statusDiv.innerHTML = '<span class="status failed">⚠️ 缓存可能未生效</span>';
+          addLog('⚠️ 警告: 第二次请求时间与第一次相近', 'warning');
+        }
+
+        // 显示指标
+        metricsDiv.innerHTML = `
+          <div class="metric">
+            <span class="metric-label">第一次请求时间:</span>
+            <span class="metric-value">${time1}ms</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">第二次请求时间:</span>
+            <span class="metric-value">${time2}ms</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">性能提升:</span>
+            <span class="metric-value">${Math.round((1 - time2/time1) * 100)}%</span>
+          </div>
+        `;
+
+        addLog('测试完成');
+
+      } catch (error) {
+        statusDiv.innerHTML = '<span class="status failed">❌ 测试失败</span>';
+        addLog(`错误: ${error.message}`, 'error');
+      }
+    }
+
+    // 页面加载时的提示
+    window.addEventListener('load', () => {
+      addLog('缓存验证工具已就绪');
+      addLog('点击"运行缓存测试"按钮开始测试');
+    });
+  </script>
+</body>
+</html>

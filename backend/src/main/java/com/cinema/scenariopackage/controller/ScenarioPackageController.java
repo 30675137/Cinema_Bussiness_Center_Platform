@@ -39,10 +39,18 @@ public class ScenarioPackageController {
     }
 
     /**
-     * 创建场景包
+     * 创建场景包（T035）
+     * <p>
+     * 数据验证处理：
+     * - @Valid 注解触发 Bean Validation 验证
+     * - 验证失败时抛出 MethodArgumentNotValidException
+     * - GlobalExceptionHandler 捕获并返回 400 错误，包含详细的字段错误信息
+     * - 错误格式：{ code: "VALIDATION_ERROR", message: "请求参数验证失败", details: {...} }
+     * </p>
      *
-     * @param request 创建请求
-     * @return 创建的场景包详情
+     * @param request 创建请求（必须通过 @Valid 验证）
+     * @return 创建的场景包详情（201 Created）
+     * @throws MethodArgumentNotValidException 当请求参数验证失败时（由 GlobalExceptionHandler 处理）
      */
     @PostMapping
     public ResponseEntity<ApiResponse<ScenarioPackageDTO>> createPackage(

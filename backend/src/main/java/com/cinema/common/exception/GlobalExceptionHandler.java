@@ -6,6 +6,8 @@ import com.cinema.scenariopackage.exception.PackageNotFoundException;
 import com.cinema.scenariopackage.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import java.net.SocketTimeoutException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,6 +117,62 @@ public class GlobalExceptionHandler {
         logger.warn("Illegal argument: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.of("INVALID_ARGUMENT", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * 处理网络超时异常（T034）
+     * <p>
+     * 统一处理网络请求超时异常，包括 Socket 超时、查询超时等
+     * </p>
+     *
+     * @param ex      超时异常对象
+     * @param request Web 请求
+     * @return 504 Gateway Timeout 响应
+     */
+    @ExceptionHandler({SocketTimeoutException.class, QueryTimeoutException.class})
+    public ResponseEntity<ErrorResponse> handleTimeout(
+            Exception ex, WebRequest request) {
+        logger.error("Request timeout: {}", ex.getMessage(), ex);
+        ErrorResponse error = ErrorResponse.of(
+                "TIMEOUT",
+                "请求超时，请稍后重试"
+        );
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(error);
+    }
+
+    /**
+     * 处理数据库访问异常（T034）
+     * <p>
+     * 统一处理数据库连接错误、SQL 执行错误等数据访问异常
+     * 不向客户端暴露数据库错误的具体细节，保护系统安全
+     * </p>
+     *
+     * @param ex      数据访问异常对象
+     * @param request Web 请求
+     * @return 500 Internal Server Error 响应
+     */
+    @ExceptionHandler({DataAccessException.class, SQLException.class})
+    public ResponseEntity<ErrorResponse> handleDatabaseException(
+            Exception ex, WebRequest request) {
+        logger.error("Database error occurred: {}", ex.getMessage(), ex);
+
+        // 判断是否为超时相关的数据库错误
+        if (ex.getCause() instanceof SocketTimeoutException ||
+            ex instanceof QueryTimeoutException ||
+            (ex.getMessage() != null && ex.getMessage().toLowerCase().contains("timeout"))) {
+            ErrorResponse error = ErrorResponse.of(
+                    "DATABASE_TIMEOUT",
+                    "数据库查询超时，请稍后重试"
+            );
+            return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(error);
+        }
+
+        // 其他数据库错误返回通用错误信息
+        ErrorResponse error = ErrorResponse.of(
+                "DATABASE_ERROR",
+                "数据访问失败，请稍后重试"
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
     /**
