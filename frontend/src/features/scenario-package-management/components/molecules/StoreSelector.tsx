@@ -65,9 +65,11 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
   // 加载状态
   if (isLoading) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Spin tip="加载门店列表..." />
-      </div>
+      <Spin tip="加载门店列表..." spinning={true}>
+        <div style={{ padding: '24px', textAlign: 'center', minHeight: '60px' }}>
+          {/* Spin 需要嵌套内容才能显示 tip */}
+        </div>
+      </Spin>
     );
   }
 
@@ -114,6 +116,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
               key={store.id}
               checked={value.includes(store.id)}
               onChange={() => handleToggle(store.id)}
+              aria-label={`选择门店: ${store.name}`}
               style={{
                 padding: '4px 12px',
                 border: '1px solid #d9d9d9',
@@ -152,11 +155,9 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
       )}
 
       {/* 已选数量提示 */}
-      {value.length > 0 && (
-        <div style={{ color: '#8c8c8c', marginTop: 8, fontSize: 12 }}>
-          已选择 {value.length} 个门店
-        </div>
-      )}
+      <div style={{ color: '#8c8c8c', marginTop: 8, fontSize: 12 }}>
+        已选择 {value.length} 个门店
+      </div>
     </div>
   );
 };
