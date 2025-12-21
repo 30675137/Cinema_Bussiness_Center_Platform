@@ -1,22 +1,16 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.3.0 → 1.4.0 -->
-<!-- Modified principles:
-  - 组件化架构 (Component-Based Architecture): Extended to clarify distinction between B端 and C端 development frameworks
--->
+<!-- Version change: 1.4.0 → 1.5.0 -->
+<!-- Modified principles: None -->
 <!-- Added sections:
-  - 前端技术栈分层 (Frontend Tech Stack Layering) - new principle section
-  - C端开发技术栈 (Client-Side Development Tech Stack) - new subsection under 后端架构与技术栈
+  - API 测试规范 (API Testing Standards) - 新增 Postman 测试脚本规范
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/templates/spec-template.md (no changes required; technology-agnostic by design)
-  ✅ .specify/templates/plan-template.md (updated Technical Context section to include Taro framework and B端/C端 distinction)
-  ✅ .specify/templates/tasks-template.md (already generic enough; no changes needed)
-  ⚠ .specify/templates/commands/*.md (directory not present in repo; no action taken)
+  ✅ .specify/templates/spec-template.md (no changes required)
+  ✅ .specify/templates/plan-template.md (no changes required)
+  ✅ .specify/templates/tasks-template.md (no changes required)
 -->
-<!-- Follow-up TODOs:
-  - Consider migrating HallReserveH5/ to Taro framework in future refactoring (current implementation uses plain React + Vite, not Taro-compliant)
--->
+<!-- Follow-up TODOs: None -->
 
 # 影院商品管理中台宪法
 
@@ -175,6 +169,37 @@ Commits），使用语义化版本控制。代码审查必须检查功能实现�
 
 **参考问题**: 见 `docs/问题总结/014-API响应格式不一致问题.md`
 
+### API 测试规范 (API Testing Standards)
+
+涉及 API 开发的功能必须提供 Postman 测试脚本，确保 API 契约的完整性验证和团队协作效率。
+
+**Postman 测试脚本规范**：
+
+1. **文件存放位置**：
+   - Postman Collection 文件必须存放在对应的 spec 文件夹下
+   - 路径格式：`specs/<specId>-<slug>/postman/`
+   - 示例：`specs/019-store-association/postman/`
+
+2. **文件命名规范**：
+   - Collection 文件名必须包含 spec 标识符
+   - 格式：`<specId>-<feature-name>.postman_collection.json`
+   - 示例：`019-store-association.postman_collection.json`
+   - Environment 文件格式：`<specId>-<env>.postman_environment.json`
+   - 示例：`019-local.postman_environment.json`
+
+3. **测试覆盖要求**：
+   - 必须覆盖功能涉及的所有 API 端点（CRUD 操作）
+   - 每个请求必须包含描述说明和预期行为
+   - 必须包含 Tests 脚本验证响应状态码和关键字段
+   - 应包含 Pre-request Scripts 实现测试数据准备（如适用）
+
+4. **环境变量要求**：
+   - 必须提供至少本地开发环境配置
+   - 使用环境变量引用（`{{baseUrl}}`、`{{token}}` 等）
+   - 禁止在 Collection 中硬编码敏感信息
+
+**基本原理**: Postman 测试脚本作为 API 契约的可执行验证工具，与 spec 文件统一管理可确保文档和测试的一致性，便于团队成员快速理解和验证 API 行为，支持 CI/CD 集成和开发联调。
+
 ## 开发工作流
 
 ### 规格驱动开发 (Specification-Driven Development)
@@ -223,4 +248,4 @@ C端 项目还需注意：
 当开发实践与宪法原则发生冲突时，应以宪法原则为准，必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行，确保项目的长期健康发展。
 
-**版本**: 1.4.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-20
+**版本**: 1.5.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-21

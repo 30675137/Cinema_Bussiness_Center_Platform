@@ -1,7 +1,9 @@
 package com.cinema.scenariopackage.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 更新场景包请求 DTO
@@ -20,6 +22,10 @@ public class UpdatePackageRequest {
     private CreatePackageRequest.RuleRequest rule;
     // 开发阶段使用字符串类型，后续改为 List<UUID>
     private List<String> hallTypeIds;
+
+    // 019-store-association: 门店关联
+    @Size(min = 1, message = "请至少选择一个关联门店")
+    private List<UUID> storeIds;
 
     // Getters and Setters
 
@@ -69,5 +75,14 @@ public class UpdatePackageRequest {
 
     public void setHallTypeIds(List<String> hallTypeIds) {
         this.hallTypeIds = hallTypeIds;
+    }
+
+    // 019-store-association
+    public List<UUID> getStoreIds() {
+        return storeIds;
+    }
+
+    public void setStoreIds(List<UUID> storeIds) {
+        this.storeIds = storeIds;
     }
 }

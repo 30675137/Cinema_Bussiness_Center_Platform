@@ -326,3 +326,105 @@ export interface ErrorResponse {
   details?: any;
   timestamp: string;
 }
+
+// ============================================================
+// 门店关联相关类型
+// Feature: 019-store-association
+// ============================================================
+
+/**
+ * 门店摘要信息（用于关联选择展示）
+ */
+export interface StoreSummary {
+  /** 门店唯一标识 */
+  id: string;
+  /** 门店编码 */
+  code: string | null;
+  /** 门店名称 */
+  name: string;
+  /** 所属区域（可选） */
+  region: string | null;
+  /** 门店状态 */
+  status: 'active' | 'disabled';
+}
+
+/**
+ * 场景包门店关联记录
+ */
+export interface ScenarioPackageStoreAssociation {
+  /** 关联记录ID */
+  id: string;
+  /** 场景包ID */
+  packageId: string;
+  /** 门店ID */
+  storeId: string;
+  /** 门店信息（查询时关联） */
+  store?: StoreSummary;
+  /** 创建时间 */
+  createdAt: string;
+  /** 创建人 */
+  createdBy?: string;
+}
+
+/**
+ * 场景包详情（扩展门店关联）
+ * 扩展现有 ScenarioPackageDetail 类型
+ */
+export interface ScenarioPackageDetailWithStores extends ScenarioPackageDetail {
+  /** 关联的门店列表 */
+  stores: StoreSummary[];
+  /** 关联的门店ID列表（用于表单提交） */
+  storeIds: string[];
+}
+
+/**
+ * 门店选择器组件 Props
+ */
+export interface StoreSelectorProps {
+  /** 已选中的门店ID列表 */
+  value: string[];
+  /** 选中状态变化回调 */
+  onChange: (storeIds: string[]) => void;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 是否必填（至少选择一个） */
+  required?: boolean;
+}
+
+// ============================================================
+// Zod Schemas for Store Association (Runtime Validation)
+// Feature: 019-store-association
+// ============================================================
+
+import { z } from 'zod';
+
+/**
+ * 门店摘要 Schema
+ */
+export const StoreSummarySchema = z.object({
+  id: z.string().uuid(),
+  code: z.string().nullable(),
+  name: z.string().min(1),
+  region: z.string().nullable(),
+  status: z.enum(['active', 'disabled']),
+});
+
+/**
+ * 场景包门店关联请求 Schema
+ */
+export const StoreAssociationRequestSchema = z.object({
+  storeIds: z.array(z.string().uuid()).min(1, '请至少选择一个门店'),
+});
+
+/**
+ * 场景包创建/更新请求（扩展门店关联）
+ */
+export interface CreatePackageRequestWithStores extends CreatePackageRequest {
+  /** 关联的门店ID列表 */
+  storeIds: string[];
+}
+
+export interface UpdatePackageRequestWithStores extends UpdatePackageRequest {
+  /** 关联的门店ID列表 */
+  storeIds: string[];
+}

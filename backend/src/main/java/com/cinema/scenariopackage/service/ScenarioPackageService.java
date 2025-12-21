@@ -5,6 +5,7 @@ import com.cinema.scenariopackage.exception.ConcurrentModificationException;
 import com.cinema.scenariopackage.exception.PackageNotFoundException;
 import com.cinema.scenariopackage.model.*;
 import com.cinema.scenariopackage.repository.*;
+import com.cinema.hallstore.service.StoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,10 @@ public class ScenarioPackageService {
     private final PackageItemRepository itemRepository;
     private final PackageServiceItemRepository serviceRepository;
     private final PackagePricingRepository pricingRepository;
+    // 019-store-association: Store association repository
+    private final StoreAssociationRepository storeAssociationRepository;
+    // 019-store-association: Store service for validation
+    private final StoreService storeService;
 
     public ScenarioPackageService(
             ScenarioPackageRepository packageRepository,
@@ -49,7 +54,9 @@ public class ScenarioPackageService {
             PackageBenefitRepository benefitRepository,
             PackageItemRepository itemRepository,
             PackageServiceItemRepository serviceRepository,
-            PackagePricingRepository pricingRepository) {
+            PackagePricingRepository pricingRepository,
+            StoreAssociationRepository storeAssociationRepository,
+            StoreService storeService) {
         this.packageRepository = packageRepository;
         this.ruleRepository = ruleRepository;
         this.hallAssociationRepository = hallAssociationRepository;
@@ -57,6 +64,8 @@ public class ScenarioPackageService {
         this.itemRepository = itemRepository;
         this.serviceRepository = serviceRepository;
         this.pricingRepository = pricingRepository;
+        this.storeAssociationRepository = storeAssociationRepository;
+        this.storeService = storeService;
     }
 
     /**
@@ -171,6 +180,11 @@ public class ScenarioPackageService {
         //         hallAssociationRepository.save(association);
         //     }
         // }
+
+        // 019-store-association: 更新门店关联
+        if (request.getStoreIds() != null && !request.getStoreIds().isEmpty()) {
+            updateStoreAssociations(id, request.getStoreIds(), null);
+        }
 
         logger.info("Scenario package updated successfully: {}", id);
         return toDTO(pkg);
@@ -424,6 +438,74 @@ public class ScenarioPackageService {
 
     // ========== DTO 转换方法 ==========
 
+    // ========== 019-store-association: Store Association Methods ==========
+
+    /**
+     * 更新场景包的门店关联
+     * <p>
+     * 全量更新：删除原有关联，插入新关联
+     * </p>
+     *
+     * @param packageId 场景包ID
+     * @param storeIds 门店ID列表
+     * @param createdBy 创建人
+     */
+    @Transactional
+    public void updateStoreAssociations(UUID packageId, List<UUID> storeIds, String createdBy) {
+        logger.info("Updating store associations for package: {}, stores: {}", packageId, storeIds.size());
+
+        // 验证场景包存在
+        packageRepository.findByIdAndNotDeleted(packageId)
+                .orElseThrow(() -> new PackageNotFoundException(packageId));
+
+        // 019-store-association T041-T042: 验证所有门店存在且处于激活状态
+        List<UUID> inactiveStores = new ArrayList<>();
+        for (UUID storeId : storeIds) {
+            if (!storeService.isStoreActive(storeId)) {
+                inactiveStores.add(storeId);
+            }
+        }
+        if (!inactiveStores.isEmpty()) {
+            throw new IllegalArgumentException(
+                    String.format("以下门店不存在或已停用: %s", inactiveStores));
+        }
+
+        // 删除原有关联
+        storeAssociationRepository.deleteByPackageId(packageId);
+
+        // 创建新关联
+        for (UUID storeId : storeIds) {
+            ScenarioPackageStoreAssociation association = new ScenarioPackageStoreAssociation(packageId, storeId, createdBy);
+            storeAssociationRepository.save(association);
+        }
+
+        logger.info("Store associations updated successfully for package: {}", packageId);
+    }
+
+    /**
+     * 获取场景包关联的门店ID列表
+     *
+     * @param packageId 场景包ID
+     * @return 门店ID列表
+     */
+    @Transactional(readOnly = true)
+    public List<UUID> getStoreIdsByPackageId(UUID packageId) {
+        return storeAssociationRepository.findStoreIdsByPackageId(packageId);
+    }
+
+    /**
+     * 检查门店是否被任何场景包关联
+     *
+     * @param storeId 门店ID
+     * @return 是否被关联
+     */
+    @Transactional(readOnly = true)
+    public boolean isStoreAssociated(UUID storeId) {
+        return storeAssociationRepository.countByStoreId(storeId) > 0;
+    }
+
+    // ========== End 019-store-association ==========
+
     private ScenarioPackageDTO toDTO(ScenarioPackage pkg) {
         ScenarioPackageDTO dto = new ScenarioPackageDTO();
         dto.setId(pkg.getId());
@@ -506,6 +588,12 @@ public class ScenarioPackageService {
                 })
                 .collect(Collectors.toList());
         dto.setServices(serviceDTOs);
+
+        // 019-store-association: 加载门店关联
+        List<UUID> storeIds = storeAssociationRepository.findStoreIdsByPackageId(pkg.getId());
+        dto.setStoreIds(storeIds);
+        // 注意: stores 详细信息需要通过 stores API 单独查询
+        // 前端将使用 storeIds 并结合 stores API 获取详细信息
 
         return dto;
     }
