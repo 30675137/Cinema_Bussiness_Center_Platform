@@ -33,10 +33,10 @@
 
 **Purpose**: 项目初始化和基础结构搭建
 
-- [ ] T001 验证 Taro 小程序项目 `hall-reserve-taro/` 是否已存在并初始化
-- [ ] T002 安装前端依赖 `@tanstack/react-query` 和 `zod` 到 `hall-reserve-taro/package.json`
-- [ ] T003 [P] 验证后端 Spring Boot 项目 `backend/` 是否已存在并配置 Supabase
-- [ ] T004 [P] 配置 Supabase 连接信息到 `backend/src/main/resources/application.yml`
+- [X] T001 验证 Taro 小程序项目 `hall-reserve-taro/` 是否已存在并初始化
+- [X] T002 安装前端依赖 `@tanstack/react-query` 和 `zod` 到 `hall-reserve-taro/package.json`
+- [X] T003 [P] 验证后端 Spring Boot 项目 `backend/` 是否已存在并配置 Supabase
+- [X] T004 [P] 配置 Supabase 连接信息到 `backend/src/main/resources/application.yml`
 
 ---
 
@@ -48,21 +48,21 @@
 
 ### 数据库基础（后端）
 
-- [ ] T005 在 Supabase PostgreSQL 中创建或验证 `scenario_packages` 表结构（根据 data-model.md 中的 SQL 定义）
-- [ ] T006 在 `scenario_packages` 表中插入测试数据（至少 3 条已发布状态的场景包，用于前端测试）
-- [ ] T007 验证数据库索引：`idx_scenario_packages_status` 和 `idx_scenario_packages_category`
+- [X] T005 在 Supabase PostgreSQL 中创建或验证 `scenario_packages` 表结构（根据 data-model.md 中的 SQL 定义）
+- [X] T006 在 `scenario_packages` 表中插入测试数据（至少 3 条已发布状态的场景包，用于前端测试）
+- [X] T007 验证数据库索引：`idx_scenario_packages_status` 和 `idx_scenario_packages_category`
 
 ### 前端基础设施（Taro 小程序）
 
-- [ ] T008 [P] 创建网络请求封装 `hall-reserve-taro/src/utils/request.ts`（基于 research.md 中的 Taro.request 封装策略）
-- [ ] T009 [P] 配置 TanStack Query 在 `hall-reserve-taro/src/app.tsx`（设置 5 分钟缓存和重试策略）
-- [ ] T010 [P] 创建场景包类型定义和 Zod Schema `hall-reserve-taro/src/types/scenario.ts`（基于 data-model.md）
+- [X] T008 [P] 创建网络请求封装 `hall-reserve-taro/src/utils/request.ts`（基于 research.md 中的 Taro.request 封装策略）
+- [X] T009 [P] 配置 TanStack Query 在 `hall-reserve-taro/src/app.tsx`（设置 5 分钟缓存和重试策略）
+- [X] T010 [P] 创建场景包类型定义和 Zod Schema `hall-reserve-taro/src/types/scenario.ts`（基于 data-model.md）
 
 ### 后端基础设施（Spring Boot）
 
-- [ ] T011 [P] 创建 Supabase 配置类 `backend/src/main/java/com/cinema/config/SupabaseConfig.java`
-- [ ] T012 [P] 创建统一 API 响应格式 `backend/src/main/java/com/cinema/dto/ApiResponse.java`（基于 data-model.md）
-- [ ] T013 [P] 创建场景包列表 DTO `backend/src/main/java/com/cinema/dto/ScenarioPackageListItemDTO.java`（基于 contracts/api.yaml）
+- [X] T011 [P] 创建 Supabase 配置类 `backend/src/main/java/com/cinema/config/SupabaseConfig.java`
+- [X] T012 [P] 创建统一 API 响应格式 `backend/src/main/java/com/cinema/dto/ApiResponse.java`（基于 data-model.md）
+- [X] T013 [P] 创建场景包列表 DTO `backend/src/main/java/com/cinema/dto/ScenarioPackageListItemDTO.java`（基于 contracts/api.yaml）
 
 **Checkpoint**: 基础设施就绪 - 用户故事实现可以开始并行进行
 
@@ -76,20 +76,20 @@
 
 ### 后端实现（Spring Boot API）
 
-- [ ] T014 [P] [US1] 创建 Repository `backend/src/main/java/com/cinema/repository/ScenarioPackageRepository.java`（实现 Supabase 查询，WHERE status = 'PUBLISHED'）
-- [ ] T015 [US1] 创建 Service `backend/src/main/java/com/cinema/service/ScenarioPackageService.java`（调用 Repository 获取已发布场景包列表）
-- [ ] T016 [US1] 创建 Controller `backend/src/main/java/com/cinema/controller/ScenarioPackageController.java`（实现 GET /api/scenario-packages 端点）
-- [ ] T017 [US1] 在 Controller 中添加 Cache-Control 响应头（max-age=300，5 分钟缓存）
-- [ ] T018 [US1] 添加全局异常处理器 `backend/src/main/java/com/cinema/exception/GlobalExceptionHandler.java`（捕获数据库错误返回 500）
+- [X] T014 [P] [US1] 创建 Repository `backend/src/main/java/com/cinema/repository/ScenarioPackageRepository.java`（实现 Supabase 查询，WHERE status = 'PUBLISHED'）
+- [X] T015 [US1] 创建 Service `backend/src/main/java/com/cinema/service/ScenarioPackageService.java`（调用 Repository 获取已发布场景包列表）
+- [X] T016 [US1] 创建 Controller `backend/src/main/java/com/cinema/controller/ScenarioPackageController.java`（实现 GET /api/scenario-packages/published 端点）
+- [X] T017 [US1] 在 Controller 中添加 Cache-Control 响应头（max-age=300，5 分钟缓存）
+- [X] T018 [US1] 添加全局异常处理器 `backend/src/main/java/com/cinema/exception/GlobalExceptionHandler.java`（捕获数据库错误返回 500）
 
 ### 前端实现（Taro 小程序）
 
-- [ ] T019 [P] [US1] 创建场景包 API 服务 `hall-reserve-taro/src/services/scenarioService.ts`（实现 fetchScenarioPackages，包含 Zod 验证）
-- [ ] T020 [US1] 修改首页组件 `hall-reserve-taro/src/pages/index/index.tsx`（使用 useQuery Hook 调用 scenarioService）
-- [ ] T021 [US1] 实现首页加载状态 UI（"加载中..." 提示）
-- [ ] T022 [US1] 实现场景包列表渲染逻辑（遍历 scenarios 数组，展示卡片）
-- [ ] T023 [US1] 为场景包卡片添加图片懒加载和占位图处理（onError 事件）
-- [ ] T024 [US1] 实现评分显示逻辑（rating 为 null 时不显示）
+- [X] T019 [P] [US1] 创建场景包 API 服务 `hall-reserve-taro/src/services/scenarioService.ts`（实现 fetchScenarioPackages，包含 Zod 验证）
+- [X] T020 [US1] 修改首页组件 `hall-reserve-taro/src/pages/home/index.tsx`（使用 useQuery Hook 调用 scenarioService）
+- [X] T021 [US1] 实现首页加载状态 UI（"加载中..." 提示）
+- [X] T022 [US1] 实现场景包列表渲染逻辑（遍历 scenarios 数组，展示卡片）
+- [X] T023 [US1] 为场景包卡片添加图片懒加载和占位图处理（onError 事件）
+- [X] T024 [US1] 实现评分显示逻辑（rating 为 null 时不显示）
 
 ### 集成测试（手动验证）
 
@@ -111,10 +111,10 @@
 
 ### 前端实现（错误处理 UI）
 
-- [ ] T030 [P] [US2] 在首页组件 `hall-reserve-taro/src/pages/index/index.tsx` 中添加错误状态处理（检查 error 对象）
-- [ ] T031 [P] [US2] 创建错误提示 UI 组件（显示 "网络连接失败，请检查网络设置" + 重试按钮）
-- [ ] T032 [US2] 实现重试按钮逻辑（调用 refetch 方法清除错误状态并重新加载）
-- [ ] T033 [US2] 实现空状态 UI（当 API 返回空数组时显示 "暂无可用场景包，敬请期待"）
+- [X] T030 [P] [US2] 在首页组件 `hall-reserve-taro/src/pages/home/index.tsx` 中添加错误状态处理（检查 error 对象）
+- [X] T031 [P] [US2] 创建错误提示 UI 组件（显示 "网络连接失败，请检查网络设置" + 重试按钮）
+- [X] T032 [US2] 实现重试按钮逻辑（调用 refetch 方法清除错误状态并重新加载）
+- [X] T033 [US2] 实现空状态 UI（当 API 返回空数组时显示 "暂无可用场景包，敬请期待"）
 
 ### 后端实现（错误响应）
 
