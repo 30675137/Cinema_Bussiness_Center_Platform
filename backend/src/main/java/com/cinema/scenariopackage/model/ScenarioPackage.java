@@ -47,10 +47,11 @@ public class ScenarioPackage {
     private String description;
 
     /**
-     * 背景图片 URL（Supabase Storage 公开链接）
+     * 图片 URL（Supabase Storage 公开链接）
+     * 字段已从 background_image_url 重命名为 image，兼容 C 端前端
      */
-    @Column(name = "background_image_url", columnDefinition = "TEXT")
-    private String backgroundImageUrl;
+    @Column(name = "image", columnDefinition = "TEXT")
+    private String image;
 
     /**
      * 状态：DRAFT（草稿）, PUBLISHED（已发布）, UNPUBLISHED（已下架）
@@ -95,6 +96,26 @@ public class ScenarioPackage {
      */
     @Column(name = "created_by", length = 100)
     private String createdBy;
+
+    /**
+     * 分类（用于C端小程序首页分组）
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private PackageCategory category;
+
+    /**
+     * 固定评分（0-5分，运营配置）
+     */
+    @Column(precision = 3, scale = 2)
+    private java.math.BigDecimal rating;
+
+    /**
+     * 业务标签（JSONB存储）
+     */
+    @Column(columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    private java.util.List<String> tags;
 
     // Lifecycle callbacks
 
@@ -151,12 +172,12 @@ public class ScenarioPackage {
         this.description = description;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public PackageStatus getStatus() {
@@ -215,6 +236,30 @@ public class ScenarioPackage {
         this.createdBy = createdBy;
     }
 
+    public PackageCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(PackageCategory category) {
+        this.category = category;
+    }
+
+    public java.math.BigDecimal getRating() {
+        return rating;
+    }
+
+    public void setRating(java.math.BigDecimal rating) {
+        this.rating = rating;
+    }
+
+    public java.util.List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(java.util.List<String> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public String toString() {
         return "ScenarioPackage{" +
@@ -237,5 +282,17 @@ public class ScenarioPackage {
         PUBLISHED,
         /** 已下架 */
         UNPUBLISHED
+    }
+
+    /**
+     * 场景包分类枚举（用于C端小程序首页分组）
+     */
+    public enum PackageCategory {
+        /** 私人订制（观影类） */
+        MOVIE,
+        /** 商务团建 */
+        TEAM,
+        /** 派对策划 */
+        PARTY
     }
 }

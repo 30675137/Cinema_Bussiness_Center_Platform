@@ -56,7 +56,27 @@ public class ScenarioPackageController {
     }
 
     /**
-     * 查询场景包列表（分页）
+     * 查询已发布的场景包列表（用于C端小程序首页）
+     * <p>
+     * 符合 018-hall-reserve-homepage API 契约
+     * 仅返回状态为 PUBLISHED 的场景包
+     * </p>
+     *
+     * @return 已发布场景包列表
+     */
+    @GetMapping("/published")
+    public ResponseEntity<ApiResponse<java.util.List<ScenarioPackageListItemDTO>>> listPublishedPackages() {
+        logger.info("GET /api/scenario-packages/published - List published packages for Taro frontend");
+
+        java.util.List<ScenarioPackageListItemDTO> packages = packageService.findPublishedPackagesForTaro();
+
+        return ResponseEntity.ok()
+                .cacheControl(org.springframework.http.CacheControl.maxAge(5, java.util.concurrent.TimeUnit.MINUTES))
+                .body(ApiResponse.success(packages));
+    }
+
+    /**
+     * 查询场景包列表（分页，B端后台使用）
      *
      * @param page      页码（从0开始）
      * @param size      每页大小

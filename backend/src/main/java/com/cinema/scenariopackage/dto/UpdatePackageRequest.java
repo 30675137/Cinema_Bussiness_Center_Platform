@@ -16,7 +16,7 @@ public class UpdatePackageRequest {
 
     private String name;
     private String description;
-    private String backgroundImageUrl;
+    private String image;
     private CreatePackageRequest.RuleRequest rule;
     // 开发阶段使用字符串类型，后续改为 List<UUID>
     private List<String> hallTypeIds;
@@ -47,12 +47,12 @@ public class UpdatePackageRequest {
         this.description = description;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public CreatePackageRequest.RuleRequest getRule() {

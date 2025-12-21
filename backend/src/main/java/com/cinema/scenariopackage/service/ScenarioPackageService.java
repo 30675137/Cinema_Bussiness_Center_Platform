@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class ScenarioPackageService {
     private final PackageBenefitRepository benefitRepository;
     private final PackageItemRepository itemRepository;
     private final PackageServiceItemRepository serviceRepository;
+    private final PackagePricingRepository pricingRepository;
 
     public ScenarioPackageService(
             ScenarioPackageRepository packageRepository,
@@ -46,13 +48,15 @@ public class ScenarioPackageService {
             PackageHallAssociationRepository hallAssociationRepository,
             PackageBenefitRepository benefitRepository,
             PackageItemRepository itemRepository,
-            PackageServiceItemRepository serviceRepository) {
+            PackageServiceItemRepository serviceRepository,
+            PackagePricingRepository pricingRepository) {
         this.packageRepository = packageRepository;
         this.ruleRepository = ruleRepository;
         this.hallAssociationRepository = hallAssociationRepository;
         this.benefitRepository = benefitRepository;
         this.itemRepository = itemRepository;
         this.serviceRepository = serviceRepository;
+        this.pricingRepository = pricingRepository;
     }
 
     /**
@@ -66,7 +70,7 @@ public class ScenarioPackageService {
         ScenarioPackage pkg = new ScenarioPackage();
         pkg.setName(request.getName());
         pkg.setDescription(request.getDescription());
-        pkg.setBackgroundImageUrl(request.getBackgroundImageUrl());
+        pkg.setImage(request.getImage());
         pkg.setStatus(ScenarioPackage.PackageStatus.DRAFT);
         pkg = packageRepository.save(pkg);
 
@@ -140,8 +144,8 @@ public class ScenarioPackageService {
         if (request.getDescription() != null) {
             pkg.setDescription(request.getDescription());
         }
-        if (request.getBackgroundImageUrl() != null) {
-            pkg.setBackgroundImageUrl(request.getBackgroundImageUrl());
+        if (request.getImage() != null) {
+            pkg.setImage(request.getImage());
         }
 
         pkg = packageRepository.save(pkg);
@@ -205,7 +209,7 @@ public class ScenarioPackageService {
         ScenarioPackage pkg = packageRepository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new PackageNotFoundException(id));
 
-        pkg.setBackgroundImageUrl(imageUrl);
+        pkg.setImage(imageUrl);
         pkg = packageRepository.save(pkg);
 
         logger.info("Background image updated successfully for package: {}", id);
@@ -428,7 +432,7 @@ public class ScenarioPackageService {
         dto.setVersionLock(pkg.getVersionLock());
         dto.setName(pkg.getName());
         dto.setDescription(pkg.getDescription());
-        dto.setBackgroundImageUrl(pkg.getBackgroundImageUrl());
+        dto.setImage(pkg.getImage());
         dto.setStatus(pkg.getStatus());
         dto.setIsLatest(pkg.getIsLatest());
         dto.setCreatedAt(pkg.getCreatedAt());
@@ -511,7 +515,7 @@ public class ScenarioPackageService {
         summary.setId(pkg.getId());
         summary.setName(pkg.getName());
         summary.setDescription(pkg.getDescription());
-        summary.setBackgroundImageUrl(pkg.getBackgroundImageUrl());
+        summary.setImage(pkg.getImage());
         summary.setStatus(pkg.getStatus());
         summary.setVersion(pkg.getVersion());
         summary.setIsLatest(pkg.getIsLatest());
@@ -537,5 +541,74 @@ public class ScenarioPackageService {
         summary.setHallCount(hallCount);
 
         return summary;
+    }
+
+    /**
+     * 查询已发布的场景包列表（用于C端小程序首页）
+     * <p>
+     * 符合 018-hall-reserve-homepage API 契约
+     * </p>
+     *
+     * @return 已发布场景包列表（简化 DTO）
+     */
+    @Transactional(readOnly = true)
+    public List<ScenarioPackageListItemDTO> findPublishedPackagesForTaro() {
+        logger.info("Fetching published scenario packages for Taro frontend");
+
+        List<ScenarioPackage> packages = packageRepository.findPublishedPackages();
+
+        return packages.stream()
+                .map(this::toListItemDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 将 ScenarioPackage 实体转换为 ScenarioPackageListItemDTO
+     *
+     * @param pkg 场景包实体
+     * @return 列表项 DTO
+     */
+    private ScenarioPackageListItemDTO toListItemDTO(ScenarioPackage pkg) {
+        ScenarioPackageListItemDTO dto = new ScenarioPackageListItemDTO();
+        dto.setId(pkg.getId());
+        dto.setTitle(pkg.getName()); // 前端字段为 title，后端字段为 name
+        dto.setCategory(pkg.getCategory());
+        dto.setImage(pkg.getImage());
+        dto.setRating(pkg.getRating());
+        dto.setTags(pkg.getTags() != null ? pkg.getTags() : List.of());
+
+        // 获取定价信息（从 package_pricing 表）
+        BigDecimal packagePrice = getPackagePrice(pkg.getId());
+        dto.setPackagePrice(packagePrice);
+
+        // 填充 location（场馆位置）- 暂用默认值，后续从关联表获取
+        dto.setLocation("北京·精选场馆");
+
+        // 填充 packages（套餐列表）
+        ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
+        summary.setId(pkg.getId().toString());
+        summary.setName("基础套餐");
+        summary.setPrice(packagePrice);
+        summary.setOriginalPrice(packagePrice != null ? packagePrice.multiply(new BigDecimal("1.2")) : null); // 原价暂用 1.2 倍
+        summary.setDesc(pkg.getDescription() != null ? pkg.getDescription() : "");
+        summary.setTags(List.of("推荐"));
+        dto.setPackages(List.of(summary));
+
+        return dto;
+    }
+
+    /**
+     * 获取场景包定价
+     * <p>
+     * 从 package_pricing 表查询定价信息
+     * </p>
+     *
+     * @param packageId 场景包 ID
+     * @return 打包一口价（如果没有定价信息则返回 0.00）
+     */
+    private BigDecimal getPackagePrice(UUID packageId) {
+        return pricingRepository.findByPackageId(packageId)
+                .map(PackagePricing::getPackagePrice)
+                .orElse(BigDecimal.ZERO);
     }
 }

@@ -4,10 +4,12 @@ import { useScenarios } from '@/services/scenarioService'
 import { useAppStore } from '@/stores/appStore'
 import { THEME_CONFIG } from '@/constants'
 import type { Scenario } from '@/types'
+import ErrorState from '@/components/ErrorState'
+import EmptyState from '@/components/EmptyState'
 import './index.less'
 
 export default function Home() {
-  const { data: scenarios, isLoading } = useScenarios()
+  const { data: scenarios, isLoading, error, refetch } = useScenarios()
   const setActiveScenario = useAppStore((s) => s.setActiveScenario)
 
   const handleSelectScenario = (scenario: Scenario) => {
@@ -19,10 +21,58 @@ export default function Home() {
     Taro.navigateTo({ url: '/pages/admin/index' })
   }
 
+  const handleRetry = () => {
+    refetch()
+  }
+
+  // 加载状态
   if (isLoading) {
     return (
       <View className="loading-container">
         <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <View className="home-page">
+        <View className="header">
+          <View className="location">
+            <Text className="icon-location">📍</Text>
+            <Text className="city">北京</Text>
+            <Text className="dot">·</Text>
+            <Text className="sub">严选场馆</Text>
+          </View>
+          <View className="settings" onClick={handleOpenAdmin}>
+            <Text>⚙️</Text>
+          </View>
+        </View>
+        <ErrorState
+          message={error instanceof Error ? error.message : '服务暂时不可用，请稍后重试'}
+          onRetry={handleRetry}
+        />
+      </View>
+    )
+  }
+
+  // 空状态
+  if (!scenarios || scenarios.length === 0) {
+    return (
+      <View className="home-page">
+        <View className="header">
+          <View className="location">
+            <Text className="icon-location">📍</Text>
+            <Text className="city">北京</Text>
+            <Text className="dot">·</Text>
+            <Text className="sub">严选场馆</Text>
+          </View>
+          <View className="settings" onClick={handleOpenAdmin}>
+            <Text>⚙️</Text>
+          </View>
+        </View>
+        <EmptyState />
       </View>
     )
   }
@@ -66,12 +116,19 @@ export default function Home() {
                   src={scenario.image}
                   mode="aspectFill"
                   className="image"
+                  lazyLoad
+                  onError={(e) => {
+                    console.warn('Image load failed:', scenario.image, e)
+                    // Fallback to placeholder handled by CSS
+                  }}
                 />
                 {/* Rating Badge */}
-                <View className="rating-badge">
-                  <Text>⭐</Text>
-                  <Text className="rating-text">{scenario.rating}</Text>
-                </View>
+                {scenario.rating != null && (
+                  <View className="rating-badge">
+                    <Text>⭐</Text>
+                    <Text className="rating-text">{scenario.rating}</Text>
+                  </View>
+                )}
                 {/* Category Badge */}
                 <View className={`category-badge ${theme.badgeStyle}`}>
                   <Text className="category-text">{theme.label}</Text>
@@ -115,6 +172,10 @@ export default function Home() {
           <Image
             src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=100&q=80"
             className="rebook-image"
+            lazyLoad
+            onError={(e) => {
+              console.warn('Rebook image load failed', e)
+            }}
           />
           <View className="rebook-info">
             <Text className="rebook-title">电竞对战团建包</Text>
