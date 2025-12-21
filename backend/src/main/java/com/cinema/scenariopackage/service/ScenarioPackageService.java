@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public class ScenarioPackageService {
     private final PackageBenefitRepository benefitRepository;
     private final PackageItemRepository itemRepository;
     private final PackageServiceItemRepository serviceRepository;
+    private final PackagePricingRepository pricingRepository;
 
     public ScenarioPackageService(
             ScenarioPackageRepository packageRepository,
@@ -46,13 +48,15 @@ public class ScenarioPackageService {
             PackageHallAssociationRepository hallAssociationRepository,
             PackageBenefitRepository benefitRepository,
             PackageItemRepository itemRepository,
-            PackageServiceItemRepository serviceRepository) {
+            PackageServiceItemRepository serviceRepository,
+            PackagePricingRepository pricingRepository) {
         this.packageRepository = packageRepository;
         this.ruleRepository = ruleRepository;
         this.hallAssociationRepository = hallAssociationRepository;
         this.benefitRepository = benefitRepository;
         this.itemRepository = itemRepository;
         this.serviceRepository = serviceRepository;
+        this.pricingRepository = pricingRepository;
     }
 
     /**
@@ -537,5 +541,63 @@ public class ScenarioPackageService {
         summary.setHallCount(hallCount);
 
         return summary;
+    }
+
+    /**
+     * 查询已发布的场景包列表（用于C端小程序首页）
+     * <p>
+     * 符合 018-hall-reserve-homepage API 契约
+     * </p>
+     *
+     * @return 已发布场景包列表（简化 DTO）
+     */
+    @Transactional(readOnly = true)
+    public List<ScenarioPackageListItemDTO> findPublishedPackagesForTaro() {
+        logger.info("Fetching published scenario packages for Taro frontend");
+
+        List<ScenarioPackage> packages = packageRepository.findPublishedPackages();
+
+        return packages.stream()
+                .map(this::toListItemDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 将 ScenarioPackage 实体转换为 ScenarioPackageListItemDTO
+     *
+     * @param pkg 场景包实体
+     * @return 列表项 DTO
+     */
+    private ScenarioPackageListItemDTO toListItemDTO(ScenarioPackage pkg) {
+        ScenarioPackageListItemDTO dto = new ScenarioPackageListItemDTO();
+        dto.setId(pkg.getId());
+        dto.setTitle(pkg.getName()); // 前端字段为 title，后端字段为 name
+        dto.setCategory(pkg.getCategory());
+        dto.setBackgroundImageUrl(pkg.getBackgroundImageUrl());
+        dto.setRating(pkg.getRating());
+        dto.setTags(pkg.getTags() != null ? pkg.getTags() : List.of());
+
+        // 获取定价信息（从 package_pricing 表）
+        // 注意：当前实现假设 packagePrice 已加入主表，如果使用独立表需要查询 package_pricing
+        // 临时处理：如果主表没有，查询 package_pricing 表
+        BigDecimal packagePrice = getPackagePrice(pkg.getId());
+        dto.setPackagePrice(packagePrice);
+
+        return dto;
+    }
+
+    /**
+     * 获取场景包定价
+     * <p>
+     * 从 package_pricing 表查询定价信息
+     * </p>
+     *
+     * @param packageId 场景包 ID
+     * @return 打包一口价（如果没有定价信息则返回 0.00）
+     */
+    private BigDecimal getPackagePrice(UUID packageId) {
+        return pricingRepository.findByPackageId(packageId)
+                .map(PackagePricing::getPackagePrice)
+                .orElse(BigDecimal.ZERO);
     }
 }

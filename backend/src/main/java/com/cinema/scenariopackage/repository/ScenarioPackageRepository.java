@@ -85,4 +85,19 @@ public interface ScenarioPackageRepository extends JpaRepository<ScenarioPackage
      */
     @Query("SELECT sp FROM ScenarioPackage sp WHERE (sp.basePackageId = :basePackageId OR sp.id = :basePackageId) AND sp.isLatest = true AND sp.deletedAt IS NULL")
     Optional<ScenarioPackage> findLatestVersion(@Param("basePackageId") UUID basePackageId);
+
+    /**
+     * 查询已发布的场景包列表（用于C端小程序首页）
+     * <p>
+     * 规则：
+     * - 仅返回 status = PUBLISHED 的场景包
+     * - 仅返回最新版本（is_latest = true）
+     * - 排除软删除（deleted_at IS NULL）
+     * - 按创建时间倒序排列
+     * </p>
+     *
+     * @return 已发布场景包列表
+     */
+    @Query("SELECT sp FROM ScenarioPackage sp WHERE sp.isLatest = true AND sp.status = 'PUBLISHED' AND sp.deletedAt IS NULL ORDER BY sp.createdAt DESC")
+    List<ScenarioPackage> findPublishedPackages();
 }
