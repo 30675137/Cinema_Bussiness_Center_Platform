@@ -66,12 +66,19 @@ export default function Home() {
                   src={scenario.image}
                   mode="aspectFill"
                   className="image"
+                  lazyLoad
+                  onError={(e) => {
+                    console.warn('Image load failed:', scenario.image, e)
+                    // Fallback to placeholder handled by CSS
+                  }}
                 />
                 {/* Rating Badge */}
-                <View className="rating-badge">
-                  <Text>⭐</Text>
-                  <Text className="rating-text">{scenario.rating}</Text>
-                </View>
+                {scenario.rating != null && (
+                  <View className="rating-badge">
+                    <Text>⭐</Text>
+                    <Text className="rating-text">{scenario.rating}</Text>
+                  </View>
+                )}
                 {/* Category Badge */}
                 <View className={`category-badge ${theme.badgeStyle}`}>
                   <Text className="category-text">{theme.label}</Text>

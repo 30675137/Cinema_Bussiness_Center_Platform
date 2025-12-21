@@ -5,10 +5,11 @@ import './app.less'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
-      retry: 1
-    }
-  }
+      staleTime: 5 * 60 * 1000,    // 5 分钟缓存
+      cacheTime: 10 * 60 * 1000,   // 10 分钟内存保留
+      retry: 2,                     // 失败重试 2 次
+    },
+  },
 })
 
 function App({ children }: PropsWithChildren) {
