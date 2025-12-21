@@ -39,10 +39,10 @@ public class ScenarioPackageListItemDTO {
     private PackageCategory category;
 
     /**
-     * 背景图片 URL
+     * 图片 URL（已从 backgroundImageUrl 重命名，兼容 C 端前端）
      */
     @NotBlank
-    private String backgroundImageUrl;
+    private String image;
 
     /**
      * 打包一口价（起价），单位：元
@@ -64,6 +64,16 @@ public class ScenarioPackageListItemDTO {
     @NotNull
     private List<String> tags;
 
+    /**
+     * 场馆位置（如 "耀莱成龙影城（五棵松店）"）
+     */
+    private String location;
+
+    /**
+     * 套餐列表（包含价格信息）
+     */
+    private List<PackageSummary> packages;
+
     // Constructors
 
     public ScenarioPackageListItemDTO() {
@@ -73,14 +83,14 @@ public class ScenarioPackageListItemDTO {
             UUID id,
             String title,
             PackageCategory category,
-            String backgroundImageUrl,
+            String image,
             BigDecimal packagePrice,
             BigDecimal rating,
             List<String> tags) {
         this.id = id;
         this.title = title;
         this.category = category;
-        this.backgroundImageUrl = backgroundImageUrl;
+        this.image = image;
         this.packagePrice = packagePrice;
         this.rating = rating;
         this.tags = tags;
@@ -112,12 +122,12 @@ public class ScenarioPackageListItemDTO {
         this.category = category;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public BigDecimal getPackagePrice() {
@@ -144,6 +154,22 @@ public class ScenarioPackageListItemDTO {
         this.tags = tags;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public List<PackageSummary> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(List<PackageSummary> packages) {
+        this.packages = packages;
+    }
+
     @Override
     public String toString() {
         return "ScenarioPackageListItemDTO{" +
@@ -152,7 +178,81 @@ public class ScenarioPackageListItemDTO {
                 ", category=" + category +
                 ", packagePrice=" + packagePrice +
                 ", rating=" + rating +
+                ", location='" + location + '\'' +
                 ", tagsCount=" + (tags != null ? tags.size() : 0) +
+                ", packagesCount=" + (packages != null ? packages.size() : 0) +
                 '}';
+    }
+
+    /**
+     * 套餐摘要（列表展示用）
+     */
+    public static class PackageSummary {
+        private String id;
+        private String name;
+        private BigDecimal price;
+        private BigDecimal originalPrice;
+        private String desc;
+        private List<String> tags;
+
+        public PackageSummary() {
+        }
+
+        public PackageSummary(String id, String name, BigDecimal price, BigDecimal originalPrice, String desc, List<String> tags) {
+            this.id = id;
+            this.name = name;
+            this.price = price;
+            this.originalPrice = originalPrice;
+            this.desc = desc;
+            this.tags = tags;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public BigDecimal getPrice() {
+            return price;
+        }
+
+        public void setPrice(BigDecimal price) {
+            this.price = price;
+        }
+
+        public BigDecimal getOriginalPrice() {
+            return originalPrice;
+        }
+
+        public void setOriginalPrice(BigDecimal originalPrice) {
+            this.originalPrice = originalPrice;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags;
+        }
     }
 }

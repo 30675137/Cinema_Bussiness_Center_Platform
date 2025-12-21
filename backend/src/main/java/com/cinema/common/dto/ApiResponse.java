@@ -64,7 +64,7 @@ public class ApiResponse<T> {
      * @return ApiResponse 实例
      */
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, data, null);
+        return new ApiResponse<>(true, data, "");
     }
 
     /**

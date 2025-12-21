@@ -47,10 +47,11 @@ public class ScenarioPackage {
     private String description;
 
     /**
-     * 背景图片 URL（Supabase Storage 公开链接）
+     * 图片 URL（Supabase Storage 公开链接）
+     * 字段已从 background_image_url 重命名为 image，兼容 C 端前端
      */
-    @Column(name = "background_image_url", columnDefinition = "TEXT")
-    private String backgroundImageUrl;
+    @Column(name = "image", columnDefinition = "TEXT")
+    private String image;
 
     /**
      * 状态：DRAFT（草稿）, PUBLISHED（已发布）, UNPUBLISHED（已下架）
@@ -171,12 +172,12 @@ public class ScenarioPackage {
         this.description = description;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public PackageStatus getStatus() {

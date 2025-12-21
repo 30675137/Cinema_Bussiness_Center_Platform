@@ -23,7 +23,7 @@ public class ScenarioPackageDTO {
     private Integer versionLock;
     private String name;
     private String description;
-    private String backgroundImageUrl;
+    private String image;
     private PackageStatus status;
     private Boolean isLatest;
     private PackageRuleDTO rule;
@@ -300,12 +300,12 @@ public class ScenarioPackageDTO {
         this.description = description;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public PackageStatus getStatus() {

@@ -18,7 +18,7 @@ public class CreatePackageRequest {
 
     private String description;
 
-    private String backgroundImageUrl;
+    private String image;
 
     @NotNull(message = "使用规则不能为空")
     private RuleRequest rule;
@@ -82,12 +82,12 @@ public class CreatePackageRequest {
         this.description = description;
     }
 
-    public String getBackgroundImageUrl() {
-        return backgroundImageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public RuleRequest getRule() {

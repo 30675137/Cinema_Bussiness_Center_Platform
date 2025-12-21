@@ -29,7 +29,9 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://127.0.0.1:3000",
-                "http://127.0.0.1:5173"));
+                "http://127.0.0.1:5173",
+                "http://localhost:10086",    // C端 Taro H5
+                "http://127.0.0.1:10086"));  // C端 Taro H5
 
         // 允许的HTTP方法
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
