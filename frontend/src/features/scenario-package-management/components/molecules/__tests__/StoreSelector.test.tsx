@@ -111,9 +111,10 @@ describe('StoreSelector Component', () => {
     it('应该显示门店区域信息', () => {
       render(<StoreSelector {...defaultProps} />, { wrapper: createWrapper() });
 
-      expect(screen.getByText(/北京/)).toBeInTheDocument();
-      expect(screen.getByText(/上海/)).toBeInTheDocument();
-      expect(screen.getByText(/广州/)).toBeInTheDocument();
+      // 区域信息显示在括号中，使用 getAllByText 因为可能匹配多个
+      expect(screen.getAllByText(/\(北京\)/).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/\(上海\)/).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/\(广州\)/).length).toBeGreaterThan(0);
     });
 
     it('应该显示搜索框', () => {
@@ -246,7 +247,7 @@ describe('StoreSelector Component', () => {
       const searchInput = screen.getByPlaceholderText(/搜索门店/i);
       await user.type(searchInput, '不存在的门店');
 
-      expect(screen.getByText(/未找到匹配的门店/i)).toBeInTheDocument();
+      expect(screen.getByText(/未找到.*不存在的门店.*的门店/i)).toBeInTheDocument();
     });
 
     it('应该能清空搜索', async () => {
