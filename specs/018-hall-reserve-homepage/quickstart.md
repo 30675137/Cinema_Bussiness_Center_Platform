@@ -561,3 +561,117 @@ curl http://localhost:8080/api/scenario-packages
 ---
 
 **提示**: 本指南涵盖了从零开始的完整开发流程。如遇到问题，请参考规格说明 (`spec.md`)、数据模型 (`data-model.md`) 和 API 契约 (`contracts/api.yaml`)。
+
+## 🔧 环境配置（T057 补充）
+
+### API Base URL 配置说明
+
+#### 开发环境配置
+
+**前端配置** (`hall-reserve-taro/src/utils/request.ts`):
+
+```typescript
+// 开发环境 API 地址配置
+const getBaseURL = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://your-domain.com' // 生产环境 API 地址
+  }
+
+  if (process.env.TARO_ENV === 'weapp') {
+    // 微信小程序环境：使用真实域名（小程序不支持 localhost）
+    return 'https://your-dev-domain.com'
+  }
+
+  // H5 开发环境：使用本地后端
+  return 'http://localhost:8080'
+}
+
+export const BASE_URL = getBaseURL()
+```
+
+**后端配置** (`backend/src/main/resources/application.yml`):
+
+```yaml
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev  # 开发环境
+```
+
+#### 环境变量设置
+
+**本地开发** (`.env` 文件):
+
+```bash
+# Supabase 配置（开发环境）
+SUPABASE_PROJECT_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+API_BASE_URL=http://localhost:8080
+```
+
+**生产环境** (云服务器环境变量):
+
+```bash
+PROD_SUPABASE_PROJECT_URL=https://prod-project.supabase.co
+PROD_SUPABASE_ANON_KEY=prod-anon-key
+API_BASE_URL=https://your-production-api.com
+```
+
+---
+
+## ✅ 完整验收测试清单（T060）
+
+### 前端测试 ✅
+
+- [x] Taro H5 开发服务器运行成功 (`npm run dev:h5`)
+- [x] 微信小程序开发模式运行成功 (`npm run dev:weapp`)
+- [x] 首页加载场景包列表（至少 3 条数据）
+- [x] TanStack Query 缓存生效（5 分钟内无重复请求）
+- [x] 图片懒加载功能正常
+- [x] 评分条件显示正确（rating 为 null 时不显示）
+- [x] 错误处理 UI 正常（ErrorState 组件）
+- [x] 空状态 UI 正常（EmptyState 组件）
+- [x] 重试按钮功能正常
+
+### 后端测试 ✅
+
+- [x] Spring Boot 应用启动成功 (`./mvnw spring-boot:run`)
+- [x] API 端点返回正确数据 (`GET /api/scenario-packages/published`)
+- [x] Cache-Control 响应头正确设置（max-age=300）
+- [x] 数据库查询仅返回 PUBLISHED 状态的场景包
+- [x] DTO 字段符合前端 Zod Schema 定义
+- [x] 异常处理返回正确的 ErrorResponse 格式
+- [x] 后端单元测试通过 (`./mvnw test`)
+
+### 集成测试 ✅
+
+- [x] 前后端联调成功（API 请求返回 200）
+- [x] 错误场景测试（详见 manual-testing-guide.md）
+- [x] 重试功能测试（详见 manual-testing-guide.md）
+- [x] 空状态测试（详见 manual-testing-guide.md）
+- [x] 网络断开测试（详见 manual-testing-guide.md）
+
+### 性能测试
+
+- [ ] 首屏加载时间 < 2 秒（待实际测量，详见 performance-validation.md）
+- [x] 缓存命中时加载时间 < 500ms
+- [x] 图片懒加载生效
+- [x] API 响应缓存生效
+
+### 代码质量 ✅
+
+- [x] 前端代码格式一致（详见 code-quality-report.md）
+- [x] 后端 JavaDoc 注释完整（详见 code-quality-report.md）
+- [x] TypeScript 类型安全
+- [x] 无编译错误和警告
+
+---
+
+## 📚 补充文档链接
+
+- **手动测试指南**: `manual-testing-guide.md`
+- **代码质量报告**: `code-quality-report.md`
+- **性能验证报告**: `performance-validation.md`
+

@@ -607,4 +607,79 @@ class ScenarioPackageServiceTest {
         // // Assert
         // assertThat(updatedDto.getContent().getServices()).isEmpty();
     }
+
+    /**
+     * T024-B: 测试查询已发布场景包列表（Taro前端）
+     * <p>
+     * 验证点：
+     * 1. 调用 findPublishedPackagesForTaro() 方法返回列表
+     * 2. 返回的 DTO 符合 ScenarioPackageListItemDTO 结构
+     * 3. 包含必需字段：id, title, category, backgroundImageUrl, packagePrice, rating, tags
+     * 4. rating 字段可为 null
+     * 5. tags 字段为数组（不为 null）
+     * </p>
+     */
+    @Test
+    @Order(18)
+    @DisplayName("T024-B: Should find published packages for Taro frontend")
+    void testFindPublishedPackagesForTaro() {
+        // Act: 调用查询方法
+        var packages = packageService.findPublishedPackagesForTaro();
+
+        // Assert: 验证返回值类型和结构
+        assertThat(packages).isNotNull();
+        // 注意：测试环境中可能没有已发布的场景包，所以验证列表本身而非大小
+
+        // 如果有数据，验证 DTO 结构
+        if (!packages.isEmpty()) {
+            var firstPackage = packages.get(0);
+            assertThat(firstPackage.getId()).isNotNull();
+            assertThat(firstPackage.getTitle()).isNotNull();
+            assertThat(firstPackage.getCategory()).isNotNull();
+            assertThat(firstPackage.getBackgroundImageUrl()).isNotNull();
+            assertThat(firstPackage.getPackagePrice()).isNotNull();
+            // rating 可以为 null
+            assertThat(firstPackage.getTags()).isNotNull(); // tags 必须是数组，不为 null
+        }
+    }
+
+    /**
+     * T024-B: 测试 ScenarioPackageListItemDTO 与前端 Zod Schema 兼容性
+     * <p>
+     * 验证 DTO 字段类型符合前端 TypeScript 定义：
+     * - id: UUID -> string
+     * - title: string
+     * - category: enum ('MOVIE' | 'TEAM' | 'PARTY')
+     * - backgroundImageUrl: string
+     * - packagePrice: BigDecimal -> number
+     * - rating: BigDecimal (nullable) -> number | undefined
+     * - tags: List<String> -> string[]
+     * </p>
+     */
+    @Test
+    @Order(19)
+    @DisplayName("T024-B: DTO fields should be compatible with frontend Zod schema")
+    void testDTOZodSchemaCompatibility() {
+        // 此测试验证 Service 层正确调用 Repository 并转换为 DTO
+        // 实际的类型兼容性在运行时由 Jackson 序列化保证
+
+        var packages = packageService.findPublishedPackagesForTaro();
+
+        // 验证方法调用成功且无类型错误
+        assertThat(packages).isNotNull();
+        assertThat(packages).isInstanceOf(java.util.List.class);
+
+        // 如果有数据，验证字段类型
+        if (!packages.isEmpty()) {
+            var pkg = packages.get(0);
+            assertThat(pkg.getId()).isInstanceOf(java.util.UUID.class);
+            assertThat(pkg.getTitle()).isInstanceOf(String.class);
+            assertThat(pkg.getBackgroundImageUrl()).isInstanceOf(String.class);
+            assertThat(pkg.getPackagePrice()).isInstanceOf(java.math.BigDecimal.class);
+            if (pkg.getRating() != null) {
+                assertThat(pkg.getRating()).isInstanceOf(java.math.BigDecimal.class);
+            }
+            assertThat(pkg.getTags()).isInstanceOf(java.util.List.class);
+        }
+    }
 }

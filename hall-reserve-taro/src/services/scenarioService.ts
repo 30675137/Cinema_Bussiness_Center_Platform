@@ -14,7 +14,7 @@ import { ApiResponseSchema, type ScenarioPackageListItem } from '../types/scenar
  */
 export async function fetchScenarioPackages(): Promise<ScenarioPackageListItem[]> {
   // 发起 API 请求
-  const response = await request('/api/scenario-packages')
+  const response = await request('/api/scenario-packages/published')
 
   // 使用 Zod 验证响应数据格式
   const validated = ApiResponseSchema.parse(response)
@@ -111,6 +111,6 @@ import { useQuery } from '@tanstack/react-query'
 export function useScenarios() {
   return useQuery({
     queryKey: ['scenarioPackages'],
-    queryFn: fetchScenarioPackagesMock, // 使用 Mock 数据，后端准备好后改为 fetchScenarioPackages
+    queryFn: fetchScenarioPackages, // 使用真实 API
   })
 }

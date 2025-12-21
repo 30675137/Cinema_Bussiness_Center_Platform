@@ -1,6 +1,22 @@
 # Cinema_Bussiness_Center_Platform Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-12-11
+Auto-generated from all feature plans. Last updated: 2025-12-21
+
+## Project Rules (宪章规则)
+
+项目遵循 `.specify/memory/constitution.md` 宪章规范，详细规则见 `.claude/rules/` 目录：
+
+| 规则 | 说明 |
+|------|------|
+| 01-branch-spec-binding | 功能分支与规格绑定 |
+| 02-test-driven-development | 测试驱动开发 |
+| 03-frontend-b-tech-stack | B端技术栈（React+AntD） |
+| 04-frontend-c-tech-stack | C端技术栈（Taro 多端） |
+| 05-state-management | 状态管理（Zustand+TanStack Query） |
+| 06-code-quality | 代码质量与工程化 |
+| 07-backend-architecture | 后端架构（Spring Boot+Supabase） |
+| 08-api-standards | API 响应格式标准 |
+| 09-quality-standards | 质量标准（性能/安全/可访问性） |
 
 ## Active Technologies
 - TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand, TanStack Query, React Router 6 (005-sku-management)
@@ -42,7 +58,6 @@ tests/
 ## Recent Changes
 - 014-hall-store-backend: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien
 - 013-schedule-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19
-- 010-attribute-dict-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
 
 
 <!-- MANUAL ADDITIONS START -->

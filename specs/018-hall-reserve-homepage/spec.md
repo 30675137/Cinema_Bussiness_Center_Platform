@@ -13,7 +13,7 @@
 - Q: 小程序首页 API 应该返回哪些字段？（选项 A：仅列表摘要字段 vs 选项 B：完整数据 vs 选项 C：部分字段混合方案） → A: 仅返回列表摘要字段（id、title、category、backgroundImageUrl、起价、评分、标签），详细信息在详情页加载
 - Q: API 应该如何处理场景包状态过滤？（选项 A：服务端过滤 vs 选项 B：客户端过滤 vs 选项 C：查询参数控制） → A: 服务端过滤 - API 仅返回 status = PUBLISHED 的场景包
 - Q: 评分（rating）字段的数据来源是什么？（选项 A：运营配置固定评分 vs 选项 B：默认占位评分 vs 选项 C：暂不支持） → A: 使用运营人员手动配置的固定评分 - 在 017 场景包管理中新增评分配置字段
-- Q: 小程序首页应该调用哪个 API 端点？（选项 A：GET /api/scenario-packages vs 选项 B：带版本号 vs 选项 C：按客户端分组） → A: GET /api/scenario-packages（符合 RESTful 规范）
+- Q: 小程序首页应该调用哪个 API 端点？（选项 A：GET /api/scenario-packages/published vs 选项 B：带版本号 vs 选项 C：按客户端分组） → A: GET /api/scenario-packages/published（符合 RESTful 子资源规范，语义明确表示仅返回已发布状态的场景包）
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -93,7 +93,7 @@
 - **FR-004**: 系统 MUST 支持 API 请求失败时的错误处理，向用户展示友好的错误提示信息，并提供重试机制
 - **FR-005**: 系统 MUST 使用 TanStack Query 实现数据缓存策略，缓存时间为 5 分钟，避免频繁请求后端
 - **FR-006**: 系统 MUST 使用 Zod 对 API 返回的数据进行运行时验证，确保数据结构符合前端类型定义，不符合则抛出错误并记录日志
-- **FR-007**: 前端 MUST 将 API 请求逻辑封装在 `scenarioService.ts` 中，调用 `GET /api/scenario-packages` 端点，使用 `Taro.request` 进行网络请求，支持 H5 和微信小程序双端
+- **FR-007**: 前端 MUST 将 API 请求逻辑封装在 `scenarioService.ts` 中，调用 `GET /api/scenario-packages/published` 端点，使用 `Taro.request` 进行网络请求，支持 H5 和微信小程序双端
 - **FR-008**: API 响应格式 MUST 遵循统一的响应格式规范（如 `{ success: boolean, data: ScenarioPackageListItem[], message?: string }`），确保前后端契约一致
 - **FR-009**: 系统 MUST 在请求超时（超过 10 秒）时自动终止请求并提示用户
 - **FR-010**: 系统 MUST 支持用户手动触发页面刷新（下拉刷新），强制清除缓存并重新加载最新数据
@@ -125,7 +125,7 @@
 
 ## Assumptions
 
-1. **后端 API 已存在或将同步开发**: 后端提供符合 RESTful 规范的场景包列表接口 `GET /api/scenario-packages`，返回 JSON 格式数据
+1. **后端 API 已存在或将同步开发**: 后端提供符合 RESTful 规范的场景包列表接口 `GET /api/scenario-packages/published`，返回 JSON 格式数据
 2. **数据格式为列表摘要**: API 返回的是场景包列表摘要数据（ScenarioPackageListItem），仅包含首页展示所需字段，不包含完整的 017 后端数据模型中的所有嵌套对象（pricing、rules、benefits、items、services 等详细信息在详情页 API 中获取）
 3. **使用 Supabase 作为后端数据源**: 基于项目宪法要求，假设后端使用 Spring Boot + Supabase 架构，场景包数据存储在 Supabase PostgreSQL 数据库中。后端通过 SQL 查询条件 `WHERE status = 'PUBLISHED'` 在服务端过滤场景包状态
 4. **网络环境**: 假设目标用户群体网络环境以 4G/5G 和 WiFi 为主，但需兼容 3G 弱网场景

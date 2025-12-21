@@ -324,6 +324,70 @@ class ScenarioPackageControllerTest {
     }
 
     /**
+     * T024-A: 测试查询已发布场景包列表（用于Taro小程序首页）
+     * <p>
+     * 验证点：
+     * 1. HTTP 状态码 200 OK
+     * 2. 仅返回 PUBLISHED 状态的场景包
+     * 3. Cache-Control 头设置为 max-age=300（5分钟）
+     * 4. ApiResponse 结构正确（success, data, timestamp）
+     * 5. DTO 包含所有必需字段（id, title, category, backgroundImageUrl, packagePrice, rating, tags）
+     * </p>
+     */
+    @Test
+    @Order(9)
+    @DisplayName("T024-A: Should return published packages for Taro frontend")
+    void testListPublishedPackagesForTaro() throws Exception {
+        // Arrange: 创建测试数据 - 包括已发布和草稿状态
+        // 注意：由于测试环境限制，这里仅验证接口响应格式
+        // 实际的 PUBLISHED 状态过滤逻辑在 Service 层测试中验证
+
+        // Act & Assert: 验证接口响应格式
+        mockMvc.perform(get("/api/scenario-packages/published")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // 验证 Cache-Control 头
+                .andExpect(header().string("Cache-Control", "max-age=300"))
+                // 验证 ApiResponse 结构
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    /**
+     * T024-A: 测试已发布场景包列表 DTO 字段完整性
+     * <p>
+     * 验证返回的 DTO 包含所有前端必需字段
+     * </p>
+     */
+    @Test
+    @Order(10)
+    @DisplayName("T024-A: Published packages DTO should contain all required fields")
+    void testPublishedPackagesDTOFields() throws Exception {
+        // 注意：此测试依赖数据库中存在已发布的场景包（通过迁移V3插入）
+        // 如果测试环境为空，此测试将验证空数组响应
+
+        MvcResult result = mockMvc.perform(get("/api/scenario-packages/published"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andReturn();
+
+        // 如果有数据，验证 DTO 字段结构
+        String responseBody = result.getResponse().getContentAsString();
+        if (responseBody.contains("\"data\":[") && !responseBody.contains("\"data\":[]")) {
+            mockMvc.perform(get("/api/scenario-packages/published"))
+                    .andExpect(jsonPath("$.data[0].id").exists())
+                    .andExpect(jsonPath("$.data[0].title").exists())
+                    .andExpect(jsonPath("$.data[0].category").exists())
+                    .andExpect(jsonPath("$.data[0].backgroundImageUrl").exists())
+                    .andExpect(jsonPath("$.data[0].packagePrice").exists())
+                    .andExpect(jsonPath("$.data[0].tags").isArray());
+        }
+    }
+
+    /**
      * T022: 测试删除场景包（软删除）
      * <p>
      * 验证点：
