@@ -357,7 +357,7 @@ export const InventoryTransactionSchema = z.object({
   operatorId: z.string(),
   transactionTime: z.string(),
   remarks: z.string().max(500).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -390,7 +390,7 @@ export const CurrentInventorySchema = z.object({
   reservedQty: z.number(),
   inTransitQty: z.number(),
   damagedQty: z.number(),
-  expiredQty: number(),
+  expiredQty: z.number(),
   lastTransactionTime: z.string().optional(),
   lastTransactionType: z.nativeEnum(TransactionType).optional(),
   totalValue: z.number().optional(),

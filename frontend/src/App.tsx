@@ -9,6 +9,7 @@ import { bundleAnalyzer } from './monitoring/BundleAnalyzer';
 import { PERFORMANCE_CONFIG } from './monitoring/config';
 import { LazyLoadWrapper } from './optimization/LazyLoadWrapper';
 import LoadingSpinner from './components/LoadingSpinner';
+import AppLayout from './components/layout/AppLayout';
 
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -29,8 +30,27 @@ const ReviewPanel = lazy(() => import('./pages/review/ReviewPanel'));
 // 库存追溯页面
 const InventoryTrace = lazy(() => import('./pages/inventory/InventoryTrace'));
 
+// 库存台账页面
+const InventoryLedger = lazy(() => import('./pages/inventory/InventoryLedger'));
+
+// 库存流水页面
+const InventoryMovements = lazy(() => import('./pages/inventory/InventoryMovements'));
+
 // 登录页面
 const LoginPage = lazy(() => import('./pages/auth/Login'));
+
+// SPU管理页面
+const SPUListPage = lazy(() => import('./pages/SPUList'));
+const SPUListTest = lazy(() => import('./pages/SPUList/test'));
+const SPUDetailPage = lazy(() => import('./pages/SPUDetail'));
+
+// 基础数据管理页面
+const CategoryManagementPage = lazy(() => import('./pages/mdm-pim/category/CategoryManagement'));
+const BrandManagementPage = lazy(() => import('./pages/BrandManagement'));
+const BrandListPage = lazy(() => import('./pages/mdm-pim/brand/BrandManagement'));
+
+// 属性模板管理页面
+const AttributeTemplatePage = lazy(() => import('./pages/AttributeTemplate'));
 
 // 初始化性能监控
 const initializePerformanceMonitoring = () => {
@@ -143,6 +163,12 @@ const App: React.FC = () => {
                 <Route path="/inventory" element={<InventoryTrace />} />
                 <Route path="/inventory-trace" element={<InventoryTrace />} />
 
+                {/* 库存台账 */}
+                <Route path="/inventory/ledger" element={<InventoryLedger />} />
+
+                {/* 库存流水 */}
+                <Route path="/inventory/movements" element={<InventoryMovements />} />
+
                 {/* 性能监控 */}
                 <Route
                   path="/performance"
@@ -152,6 +178,20 @@ const App: React.FC = () => {
                     />
                   }
                 />
+
+                {/* SPU管理 */}
+                <Route path="/spu" element={<SPUListPage />} />
+                <Route path="/spu/test" element={<SPUListTest />} />
+                <Route path="/spu/:id" element={<SPUDetailPage />} />
+                <Route path="/spu/:id/edit" element={<SPUDetailPage />} />
+
+                {/* 基础数据管理 */}
+                <Route path="/mdm-pim/category" element={<CategoryManagementPage />} />
+                <Route path="/brands" element={<BrandManagementPage />} />
+                <Route path="/mdm-pim/brands" element={<BrandListPage />} />
+
+                {/* 属性模板管理 */}
+                <Route path="/attribute-templates" element={<AttributeTemplatePage />} />
 
                 {/* 其他页面 */}
                 <Route path="/about" element={<AboutPage />} />

@@ -2,6 +2,9 @@ import { z } from 'zod';
 import type { BaseEntity } from './index';
 import { MaterialType, ProductStatus } from './index';
 
+// 重新导出常用的枚举类型，方便其他文件直接从 product.ts 导入
+export { MaterialType, ProductStatus };
+
 // 商品接口定义
 export interface Product extends BaseEntity {
   id: string;
@@ -280,9 +283,13 @@ export const ProductBasicInfoSchema = z.object({
   categoryId: z.string()
     .min(1, '请选择商品类目'),
 
-  materialType: z.nativeEnum(MaterialType, {
-    message: '请选择物料类型'
-  }),
+  materialType: MaterialType && typeof MaterialType === 'object' 
+    ? z.nativeEnum(MaterialType, {
+        message: '请选择物料类型'
+      })
+    : z.enum(['raw_material', 'semi_finished', 'finished_good'], {
+        message: '请选择物料类型'
+      }),
 
   basePrice: z.number()
     .min(0, '价格必须大于等于0')
@@ -320,9 +327,13 @@ export const ProductBasicInfoSchema = z.object({
     .max(200, '储存条件不能超过200个字符')
     .optional(),
 
-  status: z.nativeEnum(ProductStatus, {
-    message: '请选择商品状态'
-  })
+  status: ProductStatus && typeof ProductStatus === 'object'
+    ? z.nativeEnum(ProductStatus, {
+        message: '请选择商品状态'
+      })
+    : z.enum(['draft', 'pending_review', 'approved', 'published', 'disabled', 'archived'], {
+        message: '请选择商品状态'
+      })
 });
 
 export const ProductContentSchema = z.object({
@@ -408,8 +419,6 @@ export const ProductFormSchema = z.object({
       path: ['bom']
     });
   }
-
-  return data;
 });
 
 // 导出类型推导
@@ -452,5 +461,6 @@ export const createEmptyProductForm = (): ProductFormData => ({
     productId: '',
     title: '',
     images: []
-  }
+  },
+  status: ProductStatus.DRAFT
 });

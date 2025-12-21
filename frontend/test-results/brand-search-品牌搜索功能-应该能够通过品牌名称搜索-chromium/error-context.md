@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "appstore" [ref=e7]:
+            - img [ref=e8]
+          - generic [ref=e10]: 影院业务中台
+        - menu [ref=e11]:
+          - menuitem "home 工作台" [ref=e12] [cursor=pointer]:
+            - img "home" [ref=e13]:
+              - img [ref=e14]
+            - generic [ref=e16]: 工作台
+          - menuitem "control 基础设置与主数据" [ref=e17] [cursor=pointer]:
+            - img "control" [ref=e18]:
+              - img [ref=e19]
+            - generic [ref=e21]: 基础设置与主数据
+          - menuitem "shopping 商品管理 (MDM/PIM)" [ref=e22] [cursor=pointer]:
+            - img "shopping" [ref=e23]:
+              - img [ref=e24]
+            - generic [ref=e26]: 商品管理 (MDM/PIM)
+          - menuitem "reconciliation BOM/配方 & 成本管理" [ref=e27] [cursor=pointer]:
+            - img "reconciliation" [ref=e28]:
+              - img [ref=e29]
+            - generic [ref=e31]: BOM/配方 & 成本管理
+          - menuitem "gold 场景包/套餐管理" [ref=e32] [cursor=pointer]:
+            - img "gold" [ref=e33]:
+              - img [ref=e34]
+            - generic [ref=e36]: 场景包/套餐管理
+          - menuitem "dollar 价格体系管理" [ref=e37] [cursor=pointer]:
+            - img "dollar" [ref=e38]:
+              - img [ref=e39]
+            - generic [ref=e41]: 价格体系管理
+          - menuitem "shopping-cart 采购与入库管理" [ref=e42] [cursor=pointer]:
+            - img "shopping-cart" [ref=e43]:
+              - img [ref=e44]
+            - generic [ref=e46]: 采购与入库管理
+          - menuitem "database 库存 & 仓店库存管理" [ref=e47] [cursor=pointer]:
+            - img "database" [ref=e48]:
+              - img [ref=e49]
+            - generic [ref=e51]: 库存 & 仓店库存管理
+          - menuitem "calendar 档期/排期/资源预约" [ref=e52] [cursor=pointer]:
+            - img "calendar" [ref=e53]:
+              - img [ref=e54]
+            - generic [ref=e56]: 档期/排期/资源预约
+          - menuitem "file-text 订单与履约管理" [ref=e57] [cursor=pointer]:
+            - img "file-text" [ref=e58]:
+              - img [ref=e59]
+            - generic [ref=e61]: 订单与履约管理
+          - menuitem "bar-chart 运营 & 报表/指标看板" [ref=e62] [cursor=pointer]:
+            - img "bar-chart" [ref=e63]:
+              - img [ref=e64]
+            - generic [ref=e66]: 运营 & 报表/指标看板
+          - menuitem "setting 系统管理/设置/权限" [ref=e67] [cursor=pointer]:
+            - img "setting" [ref=e68]:
+              - img [ref=e69]
+            - generic [ref=e71]: 系统管理/设置/权限
+    - generic [ref=e72]:
+      - banner [ref=e73]:
+        - button "menu-fold" [ref=e76] [cursor=pointer]:
+          - img "menu-fold" [ref=e78]:
+            - img [ref=e79]
+        - generic [ref=e81]:
+          - button "bell" [ref=e84] [cursor=pointer]:
+            - img "bell" [ref=e86]:
+              - img [ref=e87]
+          - generic [ref=e90] [cursor=pointer]:
+            - img "user" [ref=e93]:
+              - img [ref=e94]
+            - generic [ref=e96]: 用户
+      - main [ref=e97]:
+        - generic [ref=e99]:
+          - img "close-circle" [ref=e101]:
+            - img [ref=e102]
+          - generic [ref=e104]: 应用程序遇到错误
+          - generic [ref=e106]:
+            - paragraph [ref=e107]: "错误信息: The requested module '/src/features/brand-management/types/brand.types.ts' does not provide an export named 'Brand'"
+            - group [ref=e108]:
+              - generic "查看详细错误信息" [ref=e109]
+          - generic [ref=e110]:
+            - button "重 试" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: 重 试
+            - button "刷新页面" [ref=e113] [cursor=pointer]:
+              - generic [ref=e114]: 刷新页面
+  - generic [ref=e115]:
+    - img [ref=e117]
+    - button "Open Tanstack query devtools" [ref=e165] [cursor=pointer]:
+      - img [ref=e166]
+```

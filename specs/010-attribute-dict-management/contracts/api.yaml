@@ -1,0 +1,1181 @@
+openapi: 3.0.3
+info:
+  title: 属性模板与数据字典管理 API
+  description: API for managing attribute templates and data dictionaries
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+  license:
+    name: Internal Use Only
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: Dictionary Types
+    description: 字典类型管理
+  - name: Dictionary Items
+    description: 字典项管理
+  - name: Attribute Templates
+    description: 属性模板管理
+  - name: Attributes
+    description: 属性管理
+  - name: SPU Attributes
+    description: SPU属性值管理
+  - name: SKU Attributes
+    description: SKU属性值管理
+
+paths:
+  # Dictionary Types APIs
+  /dictionary-types:
+    get:
+      tags:
+        - Dictionary Types
+      summary: 获取字典类型列表
+      description: 获取所有字典类型的列表，支持分页和筛选
+      operationId: listDictionaryTypes
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从1开始
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: search
+          in: query
+          description: 搜索关键词（名称或编码）
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回字典类型列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DictionaryType'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Dictionary Types
+      summary: 创建字典类型
+      description: 创建新的字典类型
+      operationId: createDictionaryType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - name
+              properties:
+                code:
+                  type: string
+                  description: 字典类型编码
+                  example: capacity_unit
+                name:
+                  type: string
+                  description: 字典类型名称
+                  example: 容量单位
+                description:
+                  type: string
+                  description: 描述
+                  example: 商品容量单位标准
+                category:
+                  type: string
+                  enum: [basic, business, custom]
+                  default: custom
+                  description: 类型分类
+                sort:
+                  type: integer
+                  default: 0
+                  description: 显示顺序
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryType'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: 编码或名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /dictionary-types/{typeId}:
+    get:
+      tags:
+        - Dictionary Types
+      summary: 获取字典类型详情
+      description: 根据ID获取字典类型的详细信息
+      operationId: getDictionaryType
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          description: 字典类型ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回字典类型详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryType'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Dictionary Types
+      summary: 更新字典类型
+      description: 更新字典类型的信息
+      operationId: updateDictionaryType
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          description: 字典类型ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 字典类型名称
+                description:
+                  type: string
+                  description: 描述
+                sort:
+                  type: integer
+                  description: 显示顺序
+                status:
+                  type: string
+                  enum: [active, inactive]
+                  description: 状态
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryType'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Dictionary Types
+      summary: 删除字典类型
+      description: 删除字典类型（如果有关联数据则不允许删除）
+      operationId: deleteDictionaryType
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          description: 字典类型ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 存在关联数据，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Dictionary Items APIs
+  /dictionary-types/{typeId}/items:
+    get:
+      tags:
+        - Dictionary Items
+      summary: 获取字典项列表
+      description: 获取指定字典类型的所有字典项
+      operationId: listDictionaryItems
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          description: 字典类型ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: search
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回字典项列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DictionaryItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Dictionary Items
+      summary: 创建字典项
+      description: 在指定字典类型下创建新的字典项
+      operationId: createDictionaryItem
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          description: 字典类型ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - name
+              properties:
+                code:
+                  type: string
+                  description: 字典项编码
+                  example: 500ml
+                name:
+                  type: string
+                  description: 字典项名称
+                  example: 500毫升
+                value:
+                  description: 实际存储值
+                  example: 500
+                parentId:
+                  type: string
+                  format: uuid
+                  description: 父级ID（用于层级结构）
+                level:
+                  type: integer
+                  default: 0
+                  description: 层级
+                sort:
+                  type: integer
+                  default: 0
+                  description: 显示顺序
+                remark:
+                  type: string
+                  description: 备注
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 编码或名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /dictionary-items/{itemId}:
+    get:
+      tags:
+        - Dictionary Items
+      summary: 获取字典项详情
+      operationId: getDictionaryItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          description: 字典项ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回字典项详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Dictionary Items
+      summary: 更新字典项
+      operationId: updateDictionaryItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          description: 字典项ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 字典项名称
+                value:
+                  description: 实际存储值
+                sort:
+                  type: integer
+                  description: 显示顺序
+                status:
+                  type: string
+                  enum: [active, inactive]
+                  description: 状态
+                remark:
+                  type: string
+                  description: 备注
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DictionaryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Dictionary Items
+      summary: 删除字典项
+      description: 删除字典项（如果被使用则不允许删除）
+      operationId: deleteDictionaryItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          description: 字典项ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 字典项被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dictionary-items/batch-update-sort:
+    post:
+      tags:
+        - Dictionary Items
+      summary: 批量更新字典项排序
+      description: 批量更新多个字典项的排序值
+      operationId: batchUpdateItemSort
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updates:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - id
+                      - sort
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: 字典项ID
+                      sort:
+                        type: integer
+                        description: 新的排序值
+      responses:
+        '200':
+          description: 批量更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: integer
+                    description: 更新的数量
+
+  # Attribute Templates APIs
+  /attribute-templates:
+    get:
+      tags:
+        - Attribute Templates
+      summary: 获取属性模板列表
+      description: 获取属性模板列表，可按类目筛选
+      operationId: listAttributeTemplates
+      parameters:
+        - name: categoryId
+          in: query
+          description: 类目ID
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: isActive
+          in: query
+          description: 是否激活状态
+          required: false
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 成功返回属性模板列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AttributeTemplate'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags:
+        - Attribute Templates
+      summary: 创建属性模板
+      description: 为指定类目创建属性模板
+      operationId: createAttributeTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - categoryId
+                - name
+              properties:
+                categoryId:
+                  type: string
+                  format: uuid
+                  description: 类目ID（必须是三级类目）
+                name:
+                  type: string
+                  description: 模板名称
+                attributes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AttributeCreate'
+                  description: 属性列表
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplate'
+
+  /attribute-templates/{templateId}:
+    get:
+      tags:
+        - Attribute Templates
+      summary: 获取属性模板详情
+      operationId: getAttributeTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回属性模板详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateWithAttributes'
+
+    put:
+      tags:
+        - Attribute Templates
+      summary: 更新属性模板
+      operationId: updateAttributeTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 模板名称
+                isActive:
+                  type: boolean
+                  description: 是否激活
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplate'
+
+    delete:
+      tags:
+        - Attribute Templates
+      summary: 删除属性模板
+      operationId: deleteAttributeTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 模板被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /attribute-templates/copy:
+    post:
+      tags:
+        - Attribute Templates
+      summary: 复制属性模板
+      description: 从一个类目复制属性模板到另一个类目
+      operationId: copyAttributeTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fromCategoryId
+                - toCategoryId
+              properties:
+                fromCategoryId:
+                  type: string
+                  format: uuid
+                  description: 源类目ID
+                toCategoryId:
+                  type: string
+                  format: uuid
+                  description: 目标类目ID
+      responses:
+        '201':
+          description: 复制成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplate'
+
+  # Attributes APIs
+  /attributes:
+    post:
+      tags:
+        - Attributes
+      summary: 创建属性
+      description: 在属性模板中创建新属性
+      operationId: createAttribute
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttributeCreate'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+
+  /attributes/{attributeId}:
+    get:
+      tags:
+        - Attributes
+      summary: 获取属性详情
+      operationId: getAttribute
+      parameters:
+        - name: attributeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回属性详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+
+    put:
+      tags:
+        - Attributes
+      summary: 更新属性
+      operationId: updateAttribute
+      parameters:
+        - name: attributeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 属性名称
+                required:
+                  type: boolean
+                  description: 是否必填
+                dictionaryTypeId:
+                  type: string
+                  format: uuid
+                  description: 关联字典类型ID
+                customValues:
+                  type: array
+                  items:
+                    type: string
+                  description: 自定义可选值
+                defaultValue:
+                  description: 默认值
+                sort:
+                  type: integer
+                  description: 显示顺序
+                validation:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ValidationRule'
+                  description: 验证规则
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attribute'
+
+    delete:
+      tags:
+        - Attributes
+      summary: 删除属性
+      operationId: deleteAttribute
+      parameters:
+        - name: attributeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 属性被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    # Common Schemas
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误代码
+        message:
+          type: string
+          description: 错误信息
+        details:
+          type: object
+          description: 错误详情
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: 当前页码
+        pageSize:
+          type: integer
+          description: 每页数量
+        total:
+          type: integer
+          description: 总记录数
+        totalPages:
+          type: integer
+          description: 总页数
+
+    # Entity Schemas
+    DictionaryType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 字典类型ID
+        code:
+          type: string
+          description: 字典类型编码
+        name:
+          type: string
+          description: 字典类型名称
+        description:
+          type: string
+          description: 描述
+        isSystem:
+          type: boolean
+          description: 是否系统内置
+        category:
+          type: string
+          enum: [basic, business, custom]
+          description: 类型分类
+        sort:
+          type: integer
+          description: 显示顺序
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 状态
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        createdBy:
+          type: string
+          description: 创建者ID
+        updatedBy:
+          type: string
+          description: 更新者ID
+        itemCount:
+          type: integer
+          description: 字典项数量
+          readOnly: true
+
+    DictionaryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 字典项ID
+        typeId:
+          type: string
+          format: uuid
+          description: 字典类型ID
+        code:
+          type: string
+          description: 字典项编码
+        name:
+          type: string
+          description: 字典项名称
+        value:
+          description: 实际存储值
+        parentId:
+          type: string
+          format: uuid
+          description: 父级ID
+        level:
+          type: integer
+          description: 层级
+        sort:
+          type: integer
+          description: 显示顺序
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 状态
+        remark:
+          type: string
+          description: 备注
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        createdBy:
+          type: string
+          description: 创建者ID
+        updatedBy:
+          type: string
+          description: 更新者ID
+        typeName:
+          type: string
+          description: 字典类型名称
+          readOnly: true
+
+    AttributeTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 属性模板ID
+        categoryId:
+          type: string
+          format: uuid
+          description: 类目ID
+        name:
+          type: string
+          description: 模板名称
+        version:
+          type: integer
+          description: 版本号
+        isActive:
+          type: boolean
+          description: 是否激活
+        appliedAt:
+          type: string
+          format: date-time
+          description: 应用时间
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        createdBy:
+          type: string
+          description: 创建者ID
+        updatedBy:
+          type: string
+          description: 更新者ID
+        categoryName:
+          type: string
+          description: 类目名称
+          readOnly: true
+        attributeCount:
+          type: integer
+          description: 属性数量
+          readOnly: true
+
+    AttributeTemplateWithAttributes:
+      allOf:
+        - $ref: '#/components/schemas/AttributeTemplate'
+        - type: object
+          properties:
+            attributes:
+              type: array
+              items:
+                $ref: '#/components/schemas/Attribute'
+              description: 属性列表
+
+    Attribute:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 属性ID
+        templateId:
+          type: string
+          format: uuid
+          description: 模板ID
+        name:
+          type: string
+          description: 属性名称
+        code:
+          type: string
+          description: 属性编码
+        type:
+          type: string
+          enum: [text, number, single-select, multi-select, boolean, date]
+          description: 属性类型
+        required:
+          type: boolean
+          description: 是否必填
+        description:
+          type: string
+          description: 描述
+        dictionaryTypeId:
+          type: string
+          format: uuid
+          description: 关联字典类型ID
+        customValues:
+          type: array
+          items:
+            type: string
+          description: 自定义可选值
+        defaultValue:
+          description: 默认值
+        sort:
+          type: integer
+          description: 显示顺序
+        group:
+          type: string
+          description: 分组名称
+        level:
+          type: string
+          enum: [SPU, SKU, both]
+          description: 适用层级
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRule'
+          description: 验证规则
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        createdBy:
+          type: string
+          description: 创建者ID
+        updatedBy:
+          type: string
+          description: 更新者ID
+        templateName:
+          type: string
+          description: 模板名称
+          readOnly: true
+        dictionaryTypeName:
+          type: string
+          description: 字典类型名称
+          readOnly: true
+
+    AttributeCreate:
+      type: object
+      required:
+        - templateId
+        - name
+        - code
+        - type
+        - required
+      properties:
+        templateId:
+          type: string
+          format: uuid
+          description: 模板ID
+        name:
+          type: string
+          description: 属性名称
+        code:
+          type: string
+          description: 属性编码
+        type:
+          type: string
+          enum: [text, number, single-select, multi-select, boolean, date]
+          description: 属性类型
+        required:
+          type: boolean
+          description: 是否必填
+        description:
+          type: string
+          description: 描述
+        dictionaryTypeId:
+          type: string
+          format: uuid
+          description: 关联字典类型ID
+        customValues:
+          type: array
+          items:
+            type: string
+          description: 自定义可选值
+        defaultValue:
+          description: 默认值
+        sort:
+          type: integer
+          description: 显示顺序
+        group:
+          type: string
+          description: 分组名称
+        level:
+          type: string
+          enum: [SPU, SKU, both]
+          default: SPU
+          description: 适用层级
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRule'
+          description: 验证规则
+
+    ValidationRule:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          enum: [required, min, max, pattern, custom]
+          description: 验证类型
+        value:
+          description: 验证值
+        message:
+          type: string
+          description: 错误信息
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: 未授权
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: 禁止访问
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

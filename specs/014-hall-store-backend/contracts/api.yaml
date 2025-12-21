@@ -1,0 +1,566 @@
+openapi: 3.0.0
+info:
+  title: 影厅资源后端 API
+  version: 1.0.0
+  description: 门店（Store）与影厅（Hall）主数据管理 API，支持按门店查询影厅、门店列表查询等功能
+
+servers:
+  - url: /api
+    description: 本地开发服务器
+
+paths:
+  /stores:
+    get:
+      summary: 查询门店列表
+      description: 获取所有门店列表，用于前端选择门店和按门店筛选影厅
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, disabled]
+          description: 筛选门店状态（可选，默认返回所有状态）
+      responses:
+        '200':
+          description: 成功返回门店列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Store'
+                  total:
+                    type: integer
+                    example: 5
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /stores/{storeId}:
+    get:
+      summary: 获取门店详情
+      description: 根据门店ID获取单个门店的详细信息
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 门店ID
+      responses:
+        '200':
+          description: 成功返回门店详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Store'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /stores/{storeId}/halls:
+    get:
+      summary: 按门店查询影厅列表
+      description: 查询指定门店下的所有影厅，支持按状态和类型筛选
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 门店ID
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive, maintenance]
+          description: 筛选影厅状态（可选）
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [VIP, CP, Party, Public]
+          description: 筛选影厅类型（可选）
+      responses:
+        '200':
+          description: 成功返回影厅列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Hall'
+                  total:
+                    type: integer
+                    example: 10
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/stores:
+    post:
+      summary: 创建门店（管理接口）
+      description: 运营后台创建新门店
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStoreRequest'
+      responses:
+        '201':
+          description: 成功创建门店
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Store'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: 门店编码已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/stores/{storeId}:
+    put:
+      summary: 更新门店（管理接口）
+      description: 更新门店信息，包括状态变更
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 门店ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoreRequest'
+      responses:
+        '200':
+          description: 成功更新门店
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Store'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/halls:
+    post:
+      summary: 创建影厅（管理接口）
+      description: 运营后台为指定门店创建新影厅
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHallRequest'
+      responses:
+        '201':
+          description: 成功创建影厅
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Hall'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/halls/{hallId}:
+    get:
+      summary: 获取影厅详情（管理接口）
+      description: 根据影厅ID获取详细信息
+      parameters:
+        - name: hallId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 影厅ID
+      responses:
+        '200':
+          description: 成功返回影厅详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Hall'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: 更新影厅（管理接口）
+      description: 更新影厅信息，包括状态变更
+      parameters:
+        - name: hallId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 影厅ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateHallRequest'
+      responses:
+        '200':
+          description: 成功更新影厅
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Hall'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Store:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 门店主键
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          description: 门店编码（全局唯一）
+          example: "STORE-001"
+        name:
+          type: string
+          description: 门店名称
+          example: "北京朝阳店"
+        region:
+          type: string
+          nullable: true
+          description: 所属区域/城市
+          example: "北京市朝阳区"
+        status:
+          type: string
+          enum: [active, disabled]
+          description: 门店状态
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-15T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-01-15T10:00:00Z"
+
+    Hall:
+      type: object
+      required:
+        - id
+        - storeId
+        - name
+        - type
+        - capacity
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 影厅主键
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        storeId:
+          type: string
+          format: uuid
+          description: 所属门店ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          nullable: true
+          description: 影厅编码（门店内唯一）
+          example: "HALL-001"
+        name:
+          type: string
+          description: 影厅名称
+          example: "VIP影厅A"
+        type:
+          type: string
+          enum: [VIP, CP, Party, Public]
+          description: 影厅类型
+          example: "VIP"
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 可容纳人数
+          example: 120
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: 标签列表
+          example: ["真皮沙发", "KTV设备"]
+        status:
+          type: string
+          enum: [active, inactive, maintenance]
+          description: 影厅状态
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-15T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-01-15T10:00:00Z"
+
+    CreateStoreRequest:
+      type: object
+      required:
+        - code
+        - name
+      properties:
+        code:
+          type: string
+          description: 门店编码（全局唯一）
+          example: "STORE-001"
+        name:
+          type: string
+          description: 门店名称
+          example: "北京朝阳店"
+        region:
+          type: string
+          nullable: true
+          description: 所属区域/城市
+          example: "北京市朝阳区"
+        status:
+          type: string
+          enum: [active, disabled]
+          default: active
+          description: 门店状态
+          example: "active"
+
+    UpdateStoreRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 门店编码（全局唯一）
+          example: "STORE-001"
+        name:
+          type: string
+          description: 门店名称
+          example: "北京朝阳店"
+        region:
+          type: string
+          nullable: true
+          description: 所属区域/城市
+          example: "北京市朝阳区"
+        status:
+          type: string
+          enum: [active, disabled]
+          description: 门店状态
+          example: "active"
+
+    CreateHallRequest:
+      type: object
+      required:
+        - storeId
+        - name
+        - type
+        - capacity
+      properties:
+        storeId:
+          type: string
+          format: uuid
+          description: 所属门店ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          nullable: true
+          description: 影厅编码（门店内唯一）
+          example: "HALL-001"
+        name:
+          type: string
+          description: 影厅名称
+          example: "VIP影厅A"
+        type:
+          type: string
+          enum: [VIP, CP, Party, Public]
+          description: 影厅类型
+          example: "VIP"
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 可容纳人数
+          example: 120
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: 标签列表
+          example: ["真皮沙发", "KTV设备"]
+        status:
+          type: string
+          enum: [active, inactive, maintenance]
+          default: active
+          description: 影厅状态
+          example: "active"
+
+    UpdateHallRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+          description: 影厅编码（门店内唯一）
+          example: "HALL-001"
+        name:
+          type: string
+          description: 影厅名称
+          example: "VIP影厅A"
+        type:
+          type: string
+          enum: [VIP, CP, Party, Public]
+          description: 影厅类型
+          example: "VIP"
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          description: 可容纳人数
+          example: 120
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: 标签列表
+          example: ["真皮沙发", "KTV设备"]
+        status:
+          type: string
+          enum: [active, inactive, maintenance]
+          description: 影厅状态
+          example: "active"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: 错误类型
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: 错误消息
+          example: "门店编码已存在"
+        details:
+          type: object
+          nullable: true
+          description: 错误详情（可选）
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "VALIDATION_ERROR"
+            message: "容量必须为正整数"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "NOT_FOUND"
+            message: "门店不存在"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "INTERNAL_ERROR"
+            message: "服务器内部错误，请稍后重试"
+
+

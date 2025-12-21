@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: 门店预约设置 API
+  description: 门店维度的预约设置管理接口
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api.example.com
+    description: 生产环境
+
+tags:
+  - name: Store Reservation Settings
+    description: 门店预约设置管理
+
+paths:
+  /api/stores/{storeId}/reservation-settings:
+    get:
+      tags:
+        - Store Reservation Settings
+      summary: 获取门店预约设置
+      description: 根据门店ID获取该门店的预约设置信息
+      operationId: getStoreReservationSettings
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 门店ID
+      responses:
+        '200':
+          description: 成功返回预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseStoreReservationSettings'
+        '404':
+          description: 门店不存在或预约设置不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Store Reservation Settings
+      summary: 更新门店预约设置
+      description: 更新指定门店的预约设置（是否开放预约、可预约天数）
+      operationId: updateStoreReservationSettings
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 门店ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoreReservationSettingsRequest'
+      responses:
+        '200':
+          description: 成功更新预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseStoreReservationSettings'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stores/reservation-settings/batch:
+    put:
+      tags:
+        - Store Reservation Settings
+      summary: 批量更新门店预约设置
+      description: 批量更新多个门店的预约设置，支持部分成功策略
+      operationId: batchUpdateStoreReservationSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpdateStoreReservationSettingsRequest'
+      responses:
+        '200':
+          description: 批量更新完成（可能部分成功）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseBatchUpdateResult'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    StoreReservationSettings:
+      type: object
+      description: 门店预约设置
+      required:
+        - id
+        - storeId
+        - isReservationEnabled
+        - maxReservationDays
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 预约设置ID
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        isReservationEnabled:
+          type: boolean
+          description: 是否开放预约
+        maxReservationDays:
+          type: integer
+          minimum: 0
+          maximum: 365
+          description: 可预约天数（未来N天）
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601格式）
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间（ISO 8601格式）
+        updatedBy:
+          type: string
+          nullable: true
+          description: 最后更新人（可选）
+
+    UpdateStoreReservationSettingsRequest:
+      type: object
+      description: 更新预约设置请求
+      required:
+        - isReservationEnabled
+      properties:
+        isReservationEnabled:
+          type: boolean
+          description: 是否开放预约
+        maxReservationDays:
+          type: integer
+          minimum: 1
+          maximum: 365
+          description: 可预约天数（当isReservationEnabled=true时必填且>0）
+
+    BatchUpdateStoreReservationSettingsRequest:
+      type: object
+      description: 批量更新预约设置请求
+      required:
+        - storeIds
+        - settings
+      properties:
+        storeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          description: 门店ID列表（至少1个）
+        settings:
+          $ref: '#/components/schemas/UpdateStoreReservationSettingsRequest'
+
+    BatchUpdateResult:
+      type: object
+      description: 批量更新结果
+      required:
+        - successCount
+        - failureCount
+        - failures
+      properties:
+        successCount:
+          type: integer
+          minimum: 0
+          description: 成功更新的门店数量
+        failureCount:
+          type: integer
+          minimum: 0
+          description: 失败的门店数量
+        failures:
+          type: array
+          items:
+            $ref: '#/components/schemas/FailureDetail'
+          description: 失败详情列表
+
+    FailureDetail:
+      type: object
+      description: 批量更新失败详情
+      required:
+        - storeId
+        - error
+        - message
+      properties:
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        error:
+          type: string
+          description: 错误类型（如 VALIDATION_ERROR, NOT_FOUND）
+        message:
+          type: string
+          description: 错误消息
+
+    ApiResponseStoreReservationSettings:
+      type: object
+      description: 单个预约设置响应（遵循统一API响应格式）
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          $ref: '#/components/schemas/StoreReservationSettings'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ApiResponseBatchUpdateResult:
+      type: object
+      description: 批量更新结果响应（遵循统一API响应格式）
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          $ref: '#/components/schemas/BatchUpdateResult'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ErrorResponse:
+      type: object
+      description: 错误响应（遵循统一API响应格式）
+      required:
+        - success
+        - error
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误类型
+        message:
+          type: string
+          description: 错误消息
+        details:
+          type: object
+          nullable: true
+          description: 错误详情（可选）
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误时间戳
+
