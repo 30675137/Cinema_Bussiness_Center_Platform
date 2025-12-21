@@ -7,3 +7,5 @@ export { RuleConfigurator } from './RuleConfigurator';
 export { BenefitSelector } from './BenefitSelector';
 export { ItemSelector } from './ItemSelector';
 export { ServiceSelector } from './ServiceSelector';
+// 019-store-association: Store selector component
+export { StoreSelector } from './StoreSelector';

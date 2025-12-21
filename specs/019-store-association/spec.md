@@ -14,6 +14,8 @@
 - Q: 在本功能的语境中，"场馆"具体指的是什么？ → A: Store（门店）- 场景包关联到整个门店，该门店下符合类型的影厅均可使用
 - Q: 这个新的场馆关联功能在数据模型层面应该如何实现？ → A: 新增独立的关联表（scenario_package_store_associations）- 标准多对多关系
 - Q: 这个新的场馆关联配置功能在前端应该如何组织实现？ → A: 在现有的场景包编辑页面中新增"场馆关联"配置区域（扩展 scenario-packages/edit 组件）
+- Q: Postman 测试脚本应覆盖哪些 API 端点？ → A: 覆盖所有 API 端点（CRUD + 门店列表查询）
+- Q: Postman 测试脚本应包含哪些环境配置？ → A: 仅本地开发环境（localhost）
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -87,6 +89,22 @@ B端运营人员在创建或编辑场景包时，需要选择该场景包可在�
 - **FR-009**: 系统 MUST 在关联的场馆被停用或删除时，在编辑页面显示警告标识，但保留关联记录（支持历史数据追溯）
 - **FR-010**: 系统 SHOULD 支持批量配置场馆关联（非 MVP 必须功能，可后续迭代实现）
 - **FR-011**: 系统 MUST 调用现有的门店查询 API（来自 014-hall-store-backend）获取门店列表数据，确保与门店管理功能的数据一致性
+
+### API Testing Requirements
+
+- **TR-001**: 项目 MUST 提供 Postman Collection 文件（`specs/019-store-association/postman/store-association.postman_collection.json`），覆盖所有 API 端点
+- **TR-002**: Postman Collection MUST 包含以下 API 测试用例：
+  - `GET /api/stores` - 获取门店列表
+  - `GET /api/scenario-packages/{id}` - 获取场景包详情（含门店关联）
+  - `POST /api/scenario-packages` - 创建场景包（含门店关联）
+  - `PUT /api/scenario-packages/{id}` - 更新场景包（含门店关联）
+  - `DELETE /api/scenario-packages/{id}` - 删除场景包
+- **TR-003**: 每个 Postman 请求 MUST 包含：
+  - 请求描述和预期行为说明
+  - 环境变量引用（`{{baseUrl}}`、`{{packageId}}`）
+  - Tests 脚本验证响应状态码和关键字段
+- **TR-004**: Postman Collection SHOULD 包含 Pre-request Scripts 实现测试数据准备和清理
+- **TR-005**: 项目 MUST 提供本地开发环境配置文件（`specs/019-store-association/postman/local.postman_environment.json`），包含 `baseUrl=http://localhost:8080` 等变量
 
 ### Feature Dependencies
 

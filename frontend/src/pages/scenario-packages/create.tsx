@@ -19,9 +19,12 @@ import {
   ClockCircleOutlined,
   PictureOutlined,
   ThunderboltOutlined,
+  ShopOutlined,
 } from '@ant-design/icons';
 import { useCreatePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
 import { ImageUpload } from '../../features/scenario-package-management/components/atoms';
+// 019-store-association: Import StoreSelector component
+import { StoreSelector } from '../../features/scenario-package-management/components/molecules';
 import type { CreatePackageRequest } from '../../features/scenario-package-management/types';
 
 const { TextArea } = Input;
@@ -43,6 +46,9 @@ const ScenarioPackageCreatePage: React.FC = () => {
   // 选中的影厅类型
   const [selectedHallTypes, setSelectedHallTypes] = useState<string[]>([]);
 
+  // 019-store-association: 选中的门店ID列表
+  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([]);
+
   /**
    * 切换影厅类型选择状态
    */
@@ -58,6 +64,12 @@ const ScenarioPackageCreatePage: React.FC = () => {
    * 处理表单提交
    */
   const handleSubmit = async (values: any) => {
+    // 019-store-association: 验证至少选择一个门店
+    if (selectedStoreIds.length === 0) {
+      message.error('请至少选择一个关联门店');
+      return;
+    }
+
     try {
       const request: CreatePackageRequest = {
         name: values.name,
@@ -71,7 +83,9 @@ const ScenarioPackageCreatePage: React.FC = () => {
         hallTypeIds: selectedHallTypes,
         // 新增：打包一口价
         packagePrice: values.packagePrice,
-      };
+        // 019-store-association: 包含门店关联
+        storeIds: selectedStoreIds,
+      } as any;
 
       await createMutation.mutateAsync(request);
       navigate('/scenario-packages');
@@ -190,6 +204,28 @@ const ScenarioPackageCreatePage: React.FC = () => {
                   ))}
                 </Space>
               </Form.Item>
+            </Card>
+
+            {/* 019-store-association: 关联门店 Card */}
+            <Card
+              title={
+                <Space>
+                  <ShopOutlined style={{ color: '#1890ff' }} />
+                  关联门店
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+              extra={
+                <span style={{ color: '#8c8c8c', fontSize: 12 }}>
+                  必填，至少选择一个门店
+                </span>
+              }
+            >
+              <StoreSelector
+                value={selectedStoreIds}
+                onChange={setSelectedStoreIds}
+                required
+              />
             </Card>
 
             {/* 使用规则 Card - 三列横向排列 */}

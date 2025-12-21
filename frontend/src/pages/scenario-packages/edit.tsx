@@ -35,11 +35,14 @@ import {
   PictureOutlined,
   ThunderboltOutlined,
   InfoCircleOutlined,
+  ShopOutlined,
 } from '@ant-design/icons';
 import { usePackageDetail } from '../../features/scenario-package-management/hooks/usePackageDetail';
 import { useUpdatePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
 import { ContentConfigurator } from '../../features/scenario-package-management/components';
 import { ImageUpload } from '../../features/scenario-package-management/components/atoms';
+// 019-store-association: Import StoreSelector component
+import { StoreSelector } from '../../features/scenario-package-management/components/molecules';
 import type {
   UpdatePackageRequest,
   PackageRule,
@@ -66,6 +69,9 @@ const ScenarioPackageEditPage: React.FC = () => {
 
   // 选中的影厅类型
   const [selectedHallTypes, setSelectedHallTypes] = useState<string[]>([]);
+
+  // 019-store-association: 选中的门店ID列表
+  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([]);
 
   // US2: 规则和内容状态
   const [rule, setRule] = useState<Partial<PackageRule>>({});
@@ -94,6 +100,11 @@ const ScenarioPackageEditPage: React.FC = () => {
       // 设置已选中的影厅类型
       if (pkg.hallTypes?.length) {
         setSelectedHallTypes(pkg.hallTypes.map((h) => h.id));
+      }
+      // 019-store-association: 回显已关联的门店
+      const pkgWithStores = pkg as any;
+      if (pkgWithStores.storeIds?.length) {
+        setSelectedStoreIds(pkgWithStores.storeIds);
       }
       // US2: 设置规则和内容
       if (pkg.rule) {
@@ -163,6 +174,12 @@ const ScenarioPackageEditPage: React.FC = () => {
   const handleSubmit = async (values: any) => {
     if (!data?.data) return;
 
+    // 019-store-association: 验证至少选择一个门店
+    if (selectedStoreIds.length === 0) {
+      message.error('请至少选择一个关联门店');
+      return;
+    }
+
     try {
       const request: UpdatePackageRequest = {
         versionLock: data.data.versionLock, // 关键：传递乐观锁版本号
@@ -176,15 +193,26 @@ const ScenarioPackageEditPage: React.FC = () => {
         },
         hallTypeIds: selectedHallTypes,
         packagePrice: values.packagePrice,
-      };
+        // 019-store-association: 包含门店关联
+        storeIds: selectedStoreIds,
+      } as any;
 
       await updateMutation.mutateAsync({ id: id!, request });
       navigate('/scenario-packages');
-    } catch (error) {
-      // 错误已由 mutation onError 处理
-      console.error('Update failed:', error);
-      // 如果是乐观锁冲突，重新加载数据
-      refetch();
+    } catch (error: any) {
+      // 019-store-association: 增强 409 冲突处理
+      const statusCode = error?.response?.status || error?.status;
+      if (statusCode === 409) {
+        message.error({
+          content: '保存失败：数据已被其他用户修改，页面将自动刷新获取最新数据',
+          duration: 5,
+        });
+        // 重新加载数据
+        refetch();
+      } else {
+        // 其他错误由 mutation onError 处理
+        console.error('Update failed:', error);
+      }
     }
   };
 
@@ -386,6 +414,28 @@ const ScenarioPackageEditPage: React.FC = () => {
                   ))}
                 </Space>
               </Form.Item>
+            </Card>
+
+            {/* 019-store-association: 关联门店 Card */}
+            <Card
+              title={
+                <Space>
+                  <ShopOutlined style={{ color: '#1890ff' }} />
+                  关联门店
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+              extra={
+                <span style={{ color: '#8c8c8c', fontSize: 12 }}>
+                  必填，至少选择一个门店
+                </span>
+              }
+            >
+              <StoreSelector
+                value={selectedStoreIds}
+                onChange={setSelectedStoreIds}
+                required
+              />
             </Card>
 
             {/* 使用规则 Card - 三列横向排列 */}

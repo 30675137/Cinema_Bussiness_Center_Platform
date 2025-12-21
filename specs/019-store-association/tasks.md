@@ -25,11 +25,11 @@
 
 **Purpose**: Project initialization, database migration, type definitions
 
-- [ ] T001 Create database migration script `backend/src/main/resources/db/migration/V5__add_store_associations.sql`
-- [ ] T002 [P] Add StoreSummary and StoreAssociation types in `frontend/src/features/scenario-package-management/types/index.ts`
-- [ ] T003 [P] Add Zod validation schemas for store association in `frontend/src/features/scenario-package-management/types/index.ts`
-- [ ] T004 [P] Create ScenarioPackageStoreAssociation entity in `backend/src/main/java/com/cinema/scenariopackage/model/ScenarioPackageStoreAssociation.java`
-- [ ] T005 [P] Extend ScenarioPackageDTO with stores and storeIds fields in `backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageDTO.java`
+- [x] T001 Create database migration script `backend/src/main/resources/db/migration/V5__add_store_associations.sql`
+- [x] T002 [P] Add StoreSummary and StoreAssociation types in `frontend/src/features/scenario-package-management/types/index.ts`
+- [x] T003 [P] Add Zod validation schemas for store association in `frontend/src/features/scenario-package-management/types/index.ts`
+- [x] T004 [P] Create ScenarioPackageStoreAssociation entity in `backend/src/main/java/com/cinema/scenariopackage/model/ScenarioPackageStoreAssociation.java`
+- [x] T005 [P] Extend ScenarioPackageDTO with stores and storeIds fields in `backend/src/main/java/com/cinema/scenariopackage/dto/ScenarioPackageDTO.java`
 
 ---
 
@@ -39,11 +39,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Create StoreAssociationRepository interface in `backend/src/main/java/com/cinema/scenariopackage/repository/StoreAssociationRepository.java`
-- [ ] T007 Implement StoreAssociationRepository with Supabase client in `backend/src/main/java/com/cinema/scenariopackage/repository/StoreAssociationRepositoryImpl.java`
-- [ ] T008 Add store association methods to ScenarioPackageService in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
-- [ ] T009 Extend ScenarioPackageController to include stores in response in `backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java`
-- [ ] T010 Verify storeService.getStores() works correctly by calling GET /api/stores (manual verification or existing test)
+- [x] T006 Create StoreAssociationRepository interface in `backend/src/main/java/com/cinema/scenariopackage/repository/StoreAssociationRepository.java`
+- [x] T007 Implement StoreAssociationRepository with Supabase client in `backend/src/main/java/com/cinema/scenariopackage/repository/StoreAssociationRepositoryImpl.java`
+- [x] T008 Add store association methods to ScenarioPackageService in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- [x] T009 Extend ScenarioPackageController to include stores in response in `backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java`
+- [x] T010 Verify storeService.getStores() works correctly by calling GET /api/stores (manual verification or existing test)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -59,23 +59,23 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T011 [P] [US1] Create unit test for StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/__tests__/StoreSelector.test.tsx`
-- [ ] T012 [P] [US1] Create E2E test for store selection in edit page in `frontend/tests/e2e/scenario-packages/store-association.spec.ts`
-- [ ] T013 [P] [US1] Create backend integration test for store association CRUD in `backend/src/test/java/com/cinema/scenariopackage/StoreAssociationIntegrationTest.java`
+- [x] T011 [P] [US1] Create unit test for StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/__tests__/StoreSelector.test.tsx`
+- [x] T012 [P] [US1] Create E2E test for store selection in edit page in `frontend/tests/e2e/scenario-packages/store-association.spec.ts`
+- [x] T013 [P] [US1] Create backend integration test for store association CRUD in `backend/src/test/java/com/cinema/scenariopackage/StoreAssociationIntegrationTest.java`
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] Create StoreSelector molecule component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T015 [US1] Add useStores hook using TanStack Query in `frontend/src/features/scenario-package-management/hooks/useStores.ts`
-- [ ] T016 [US1] Integrate StoreSelector into edit.tsx page in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T017 [US1] Integrate StoreSelector into create.tsx page in `frontend/src/pages/scenario-packages/create.tsx`
-- [ ] T018 [US1] Add storeIds to form submission payload in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T019 [US1] Implement store association save logic in backend service `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
-- [ ] T020 [US1] Implement store association retrieval for package detail in backend `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
-- [ ] T021 [US1] Add validation for minimum one store required in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T022 [US1] Add validation for minimum one store required in backend `backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java`
-- [ ] T023 [US1] Implement store association data echo-back (回显) when loading edit page in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T024 [US1] Handle inactive store warning display in StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T014 [US1] Create StoreSelector molecule component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T015 [US1] Add useStores hook using TanStack Query in `frontend/src/features/scenario-package-management/hooks/useStores.ts`
+- [x] T016 [US1] Integrate StoreSelector into edit.tsx page in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T017 [US1] Integrate StoreSelector into create.tsx page in `frontend/src/pages/scenario-packages/create.tsx`
+- [x] T018 [US1] Add storeIds to form submission payload in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T019 [US1] Implement store association save logic in backend service `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- [x] T020 [US1] Implement store association retrieval for package detail in backend `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- [x] T021 [US1] Add validation for minimum one store required in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T022 [US1] Add validation for minimum one store required in backend `backend/src/main/java/com/cinema/scenariopackage/controller/ScenarioPackageController.java`
+- [x] T023 [US1] Implement store association data echo-back (回显) when loading edit page in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T024 [US1] Handle inactive store warning display in StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -89,15 +89,15 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T025 [P] [US2] Create unit test for search filtering logic in `frontend/src/features/scenario-package-management/components/molecules/__tests__/StoreSelector.test.tsx`
+- [x] T025 [P] [US2] Create unit test for search filtering logic in `frontend/src/features/scenario-package-management/components/molecules/__tests__/StoreSelector.test.tsx`
 - [ ] T026 [P] [US2] Create E2E test for store search functionality in `frontend/tests/e2e/scenario-packages/store-search.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Add search input to StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T028 [US2] Implement frontend filtering by name and region in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T029 [US2] Add empty search result state display in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T030 [US2] Add clear search button functionality in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T027 [US2] Add search input to StoreSelector component in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T028 [US2] Implement frontend filtering by name and region in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T029 [US2] Add empty search result state display in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T030 [US2] Add clear search button functionality in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -131,12 +131,12 @@
 
 **Purpose**: Handle edge cases defined in spec.md
 
-- [ ] T037 Display warning for inactive/deleted stores in StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T038 Implement optimistic lock conflict handling (409 response) in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T039 Add version conflict error message and refresh prompt in `frontend/src/pages/scenario-packages/edit.tsx`
-- [ ] T040 Handle empty store list scenario with proper message in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T041 Add backend validation for store existence before association in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
-- [ ] T042 Add backend validation for store active status before association in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- [x] T037 Display warning for inactive/deleted stores in StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T038 Implement optimistic lock conflict handling (409 response) in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T039 Add version conflict error message and refresh prompt in `frontend/src/pages/scenario-packages/edit.tsx`
+- [x] T040 Handle empty store list scenario with proper message in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T041 Add backend validation for store existence before association in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- [x] T042 Add backend validation for store active status before association in `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
 
 ---
 
@@ -144,14 +144,31 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T043 [P] Add loading states for store list in StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T044 [P] Add error states for store list loading failure in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
-- [ ] T045 [P] Add accessibility attributes (aria-labels) to StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T043 [P] Add loading states for store list in StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T044 [P] Add error states for store list loading failure in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
+- [x] T045 [P] Add accessibility attributes (aria-labels) to StoreSelector in `frontend/src/features/scenario-package-management/components/molecules/StoreSelector.tsx`
 - [ ] T046 Verify all E2E tests pass with `npm run test:e2e`
 - [ ] T047 Verify all unit tests pass with `npm run test`
 - [ ] T048 Verify backend tests pass with `./mvnw test`
 - [ ] T049 Run quickstart.md manual verification checklist
 - [ ] T050 Update scenario-package-management feature documentation if needed
+
+---
+
+## Phase 8: API Testing (Postman)
+
+**Purpose**: Provide Postman Collection for API contract verification per constitution v1.5.0
+
+- [x] T051 [P] Create Postman directory structure at `specs/019-store-association/postman/`
+- [x] T052 [P] Create Postman Collection file `019-store-association.postman_collection.json` with all API endpoints
+- [x] T053 [P] Create local environment file `019-local.postman_environment.json` with baseUrl=http://localhost:8080
+- [x] T054 Add GET /api/stores request with Tests script (verify 200 status, data array)
+- [x] T055 Add GET /api/scenario-packages/{id} request with Tests script (verify storeIds field)
+- [x] T056 Add POST /api/scenario-packages request with storeIds in body and Tests script
+- [x] T057 Add PUT /api/scenario-packages/{id} request with storeIds update and Tests script
+- [x] T058 Add Pre-request Script for test data setup (create test package)
+- [x] T059 Add cleanup request to delete test package after tests
+- [x] T060 Verify Postman Collection runs successfully with Newman or Postman CLI (7/7 requests executed, findings documented)
 
 ---
 
@@ -245,10 +262,11 @@ Task: "Create backend integration test for store association CRUD"
 | Phase 5 | User Story 3 (P3) | 6 | Optional |
 | Phase 6 | Edge Cases | 6 | Required |
 | Phase 7 | Polish | 8 | Required |
-| **Total** | | **50** | |
+| Phase 8 | API Testing (Postman) | 10 | Required |
+| **Total** | | **60** | |
 
-**MVP Scope (不含 P3)**: 44 tasks
-**Full Scope**: 50 tasks
+**MVP Scope (不含 P3)**: 54 tasks
+**Full Scope**: 60 tasks
 
 ---
 

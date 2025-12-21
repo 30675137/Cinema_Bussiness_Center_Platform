@@ -31,6 +31,9 @@ public class ScenarioPackageDTO {
     private List<PackageBenefitDTO> benefits;
     private List<PackageItemDTO> items;
     private List<PackageServiceDTO> services;
+    // 019-store-association: 门店关联
+    private List<StoreDTO> stores;
+    private List<UUID> storeIds;
     private Instant createdAt;
     private Instant updatedAt;
     private String createdBy;
@@ -250,6 +253,58 @@ public class ScenarioPackageDTO {
         }
     }
 
+    /**
+     * 门店摘要 DTO
+     * Feature: 019-store-association
+     */
+    public static class StoreDTO {
+        private UUID id;
+        private String code;
+        private String name;
+        private String region;
+        private String status;
+
+        public UUID getId() {
+            return id;
+        }
+
+        public void setId(UUID id) {
+            this.id = id;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getRegion() {
+            return region;
+        }
+
+        public void setRegion(String region) {
+            this.region = region;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+    }
+
     // Getters and Setters
 
     public UUID getId() {
@@ -362,6 +417,23 @@ public class ScenarioPackageDTO {
 
     public void setServices(List<PackageServiceDTO> services) {
         this.services = services;
+    }
+
+    // 019-store-association: Stores getters and setters
+    public List<StoreDTO> getStores() {
+        return stores;
+    }
+
+    public void setStores(List<StoreDTO> stores) {
+        this.stores = stores;
+    }
+
+    public List<UUID> getStoreIds() {
+        return storeIds;
+    }
+
+    public void setStoreIds(List<UUID> storeIds) {
+        this.storeIds = storeIds;
     }
 
     public Instant getCreatedAt() {
