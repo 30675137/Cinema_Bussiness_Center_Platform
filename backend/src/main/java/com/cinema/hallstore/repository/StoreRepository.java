@@ -100,6 +100,7 @@ public class StoreRepository {
 
     /**
      * Supabase 表行结构（snake_case）
+     * @updated 020-store-address 添加地址字段
      */
     private static class SupabaseStoreRow {
         @JsonProperty("id")
@@ -122,6 +123,22 @@ public class StoreRepository {
 
         @JsonProperty("updated_at")
         public Instant updatedAt;
+
+        // 020-store-address 新增字段
+        @JsonProperty("province")
+        public String province;
+
+        @JsonProperty("city")
+        public String city;
+
+        @JsonProperty("district")
+        public String district;
+
+        @JsonProperty("address")
+        public String address;
+
+        @JsonProperty("phone")
+        public String phone;
     }
 
     // ========== Mapping Methods ==========
@@ -135,6 +152,12 @@ public class StoreRepository {
         store.setStatus(parseStoreStatus(row.status));
         store.setCreatedAt(row.createdAt);
         store.setUpdatedAt(row.updatedAt);
+        // 020-store-address 地址字段映射
+        store.setProvince(row.province);
+        store.setCity(row.city);
+        store.setDistrict(row.district);
+        store.setAddress(row.address);
+        store.setPhone(row.phone);
         return store;
     }
 

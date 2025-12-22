@@ -6,6 +6,7 @@ import com.cinema.hallstore.dto.StoreDTO;
 /**
  * Store ↔ StoreDTO 映射：
  * - 隔离领域模型与对外传输结构，便于后续演进
+ * @updated 020-store-address 添加地址字段映射
  */
 public final class StoreMapper {
 
@@ -24,6 +25,12 @@ public final class StoreMapper {
         dto.setStatus(store.getStatus());
         dto.setCreatedAt(store.getCreatedAt());
         dto.setUpdatedAt(store.getUpdatedAt());
+        // 020-store-address 地址字段映射
+        dto.setProvince(store.getProvince());
+        dto.setCity(store.getCity());
+        dto.setDistrict(store.getDistrict());
+        dto.setAddress(store.getAddress());
+        dto.setPhone(store.getPhone());
         return dto;
     }
 }

@@ -13,6 +13,7 @@ export type StoreStatus = 'active' | 'disabled';
 /**
  * Store entity interface
  * Matches backend StoreDTO fields exactly (camelCase, lowercase enum values)
+ * @updated 020-store-address 添加地址字段
  */
 export interface Store {
   id: string;                    // UUID as string
@@ -22,6 +23,13 @@ export interface Store {
   status: StoreStatus;           // Store status (active | disabled)
   createdAt: string;             // ISO 8601 timestamp
   updatedAt: string;             // ISO 8601 timestamp
+  // 020-store-address 新增字段
+  province?: string | null;      // 省份
+  city?: string | null;          // 城市
+  district?: string | null;      // 区县
+  address?: string | null;       // 详细地址
+  phone?: string | null;         // 联系电话
+  addressSummary?: string | null; // 地址摘要（派生字段）
 }
 
 /**
