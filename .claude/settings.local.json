@@ -51,7 +51,8 @@
       "Bash(done)",
       "Bash(python3:*)",
       "Skill(speckit.implement)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Skill(speckit.specify)"
     ]
   }
 }
