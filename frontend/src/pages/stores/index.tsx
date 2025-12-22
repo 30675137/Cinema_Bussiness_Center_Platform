@@ -6,16 +6,19 @@
  * - Search by name
  * - Filter by status
  * - Frontend pagination
+ * - Create new store (022-store-crud)
  * - Store address editing (020-store-address)
  * - Reservation settings configuration (016-store-reservation-settings)
  */
 
 import React, { useState, useMemo } from 'react';
-import { Card, Typography, Space, message } from 'antd';
-import { ShopOutlined } from '@ant-design/icons';
+import { Card, Typography, Space, Button, message } from 'antd';
+import { ShopOutlined, PlusOutlined } from '@ant-design/icons';
 import { useStoresQuery } from './hooks/useStoresQuery';
 import StoreTable from './components/StoreTable';
 import StoreEditModal from './components/StoreEditModal';
+import CreateStoreModal from './components/CreateStoreModal';
+import EditStoreModal from './components/EditStoreModal';
 import StoreSearch from './components/StoreSearch';
 import StatusFilter from './components/StatusFilter';
 // 016-store-reservation-settings: 导入预约设置相关组件
@@ -32,16 +35,23 @@ const { Title } = Typography;
 
 /**
  * Stores Page Component
- * Integrates StoreTable, StoreSearch, StatusFilter, and ReservationSettingsModal
+ * Integrates StoreTable, StoreSearch, StatusFilter, CreateStoreModal, and ReservationSettingsModal
  */
 const StoresPage: React.FC = () => {
   // State for filters
   const [searchName, setSearchName] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 
-  // 020-store-address: State for edit modal
+  // 022-store-crud: State for create modal
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // 020-store-address: State for address edit modal
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
+
+  // 022-store-crud: State for full edit modal
+  const [fullEditModalOpen, setFullEditModalOpen] = useState(false);
+  const [fullEditingStore, setFullEditingStore] = useState<Store | null>(null);
 
   // 016-store-reservation-settings: State for reservation settings modal
   const [reservationModalOpen, setReservationModalOpen] = useState(false);
@@ -106,6 +116,16 @@ const StoresPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // 022-store-crud: Handle open create modal
+  const handleOpenCreateModal = () => {
+    setCreateModalOpen(true);
+  };
+
+  // 022-store-crud: Handle close create modal
+  const handleCloseCreateModal = () => {
+    setCreateModalOpen(false);
+  };
+
   // Handle status filter change
   const handleStatusChange = (value: string | undefined) => {
     setStatusFilter(value);
@@ -121,7 +141,7 @@ const StoresPage: React.FC = () => {
     }
   };
 
-  // 020-store-address: Handle edit store
+  // 020-store-address: Handle edit store address
   const handleEditStore = (store: Store) => {
     setEditingStore(store);
     setEditModalOpen(true);
@@ -131,6 +151,18 @@ const StoresPage: React.FC = () => {
   const handleCloseEditModal = () => {
     setEditModalOpen(false);
     setEditingStore(null);
+  };
+
+  // 022-store-crud: Handle full edit store
+  const handleFullEditStore = (store: Store) => {
+    setFullEditingStore(store);
+    setFullEditModalOpen(true);
+  };
+
+  // 022-store-crud: Handle close full edit modal
+  const handleCloseFullEditModal = () => {
+    setFullEditModalOpen(false);
+    setFullEditingStore(null);
   };
 
   // 016-store-reservation-settings: Handle open reservation settings modal
@@ -160,13 +192,21 @@ const StoresPage: React.FC = () => {
   return (
     <div className="stores-page-container">
       {/* Page Header */}
-      <div className="stores-page-header" style={{ marginBottom: 16 }}>
-        <Title level={2}>
+      <div className="stores-page-header" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Title level={2} style={{ margin: 0 }}>
           <Space>
             <ShopOutlined />
             门店管理
           </Space>
         </Title>
+        {/* 022-store-crud: 新建门店按钮 */}
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleOpenCreateModal}
+        >
+          新建门店
+        </Button>
       </div>
 
       {/* Search and Filter Section */}
@@ -197,15 +237,29 @@ const StoresPage: React.FC = () => {
             onChange: handlePaginationChange,
           }}
           onEdit={handleEditStore}
+          onEditStore={handleFullEditStore}
           onReservationSettings={handleOpenReservationSettings}
         />
       </Card>
+
+      {/* 022-store-crud: Create Modal */}
+      <CreateStoreModal
+        open={createModalOpen}
+        onClose={handleCloseCreateModal}
+      />
 
       {/* 020-store-address: Edit Modal */}
       <StoreEditModal
         open={editModalOpen}
         store={editingStore}
         onClose={handleCloseEditModal}
+      />
+
+      {/* 022-store-crud: Full Edit Modal */}
+      <EditStoreModal
+        open={fullEditModalOpen}
+        store={fullEditingStore}
+        onClose={handleCloseFullEditModal}
       />
 
       {/* 016-store-reservation-settings: Reservation Settings Modal */}

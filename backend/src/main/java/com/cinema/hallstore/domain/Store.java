@@ -11,6 +11,7 @@ import java.util.UUID;
  * 
  * @since 014-hall-store-backend
  * @updated 020-store-address 添加地址字段
+ * @updated 022-store-crud 添加version字段和createdBy/updatedBy
  */
 public class Store {
 
@@ -19,8 +20,11 @@ public class Store {
     private String name;
     private String region;
     private StoreStatus status;
+    private Long version;  // 022-store-crud: 乐观锁版本号
     private Instant createdAt;
     private Instant updatedAt;
+    private UUID createdBy;   // 022-store-crud: 创建人ID
+    private UUID updatedBy;   // 022-store-crud: 最后修改人ID
 
     // 020-store-address 新增字段
     private String province;   // 省份，如 "北京市"
@@ -83,6 +87,31 @@ public class Store {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // 022-store-crud: version/createdBy/updatedBy getter/setter
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public UUID getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(UUID updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
     // 020-store-address 地址字段 getter/setter

@@ -31,6 +31,8 @@ public final class StoreMapper {
         dto.setDistrict(store.getDistrict());
         dto.setAddress(store.getAddress());
         dto.setPhone(store.getPhone());
+        // 022-store-crud 版本号字段映射
+        dto.setVersion(store.getVersion());
         return dto;
     }
 }

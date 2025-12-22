@@ -68,6 +68,9 @@ public class StoreDTO {
     /** 联系电话 - 支持手机号、座机、400热线 */
     private String phone;
 
+    /** 版本号 - 用于乐观锁 @since 022-store-crud */
+    private Long version;
+
     public String getId() {
         return id;
     }
@@ -163,6 +166,15 @@ public class StoreDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    // 022-store-crud 新增 version getter/setter
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     /**

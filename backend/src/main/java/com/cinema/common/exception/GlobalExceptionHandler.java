@@ -1,6 +1,10 @@
 package com.cinema.common.exception;
 
 import com.cinema.common.dto.ErrorResponse;
+import com.cinema.hallstore.exception.OptimisticLockException;
+import com.cinema.hallstore.exception.StoreHasDependenciesException;
+import com.cinema.hallstore.exception.StoreNameConflictException;
+import com.cinema.hallstore.exception.StoreNotFoundException;
 import com.cinema.scenariopackage.exception.ConcurrentModificationException;
 import com.cinema.scenariopackage.exception.PackageNotFoundException;
 import com.cinema.scenariopackage.exception.ValidationException;
@@ -47,6 +51,70 @@ public class GlobalExceptionHandler {
         logger.warn("Resource not found: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.of("NOT_FOUND", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    // ==================== Store CRUD Exceptions (022-store-crud) ====================
+
+    /**
+     * 处理门店未找到异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 404 响应
+     */
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleStoreNotFound(
+            StoreNotFoundException ex, WebRequest request) {
+        logger.warn("Store not found: {}", ex.getStoreId());
+        ErrorResponse error = ErrorResponse.of("STORE_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * 处理门店名称冲突异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 409 响应
+     */
+    @ExceptionHandler(StoreNameConflictException.class)
+    public ResponseEntity<ErrorResponse> handleStoreNameConflict(
+            StoreNameConflictException ex, WebRequest request) {
+        logger.warn("Store name conflict: {}", ex.getStoreName());
+        ErrorResponse error = ErrorResponse.of("STORE_NAME_CONFLICT", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * 处理门店存在依赖关系异常（无法删除）
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 409 响应
+     */
+    @ExceptionHandler(StoreHasDependenciesException.class)
+    public ResponseEntity<ErrorResponse> handleStoreHasDependencies(
+            StoreHasDependenciesException ex, WebRequest request) {
+        logger.warn("Store has dependencies, cannot delete: storeId={}, dependencyType={}",
+                ex.getStoreId(), ex.getDependencyType());
+        ErrorResponse error = ErrorResponse.of("STORE_HAS_DEPENDENCIES", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * 处理乐观锁冲突异常（门店版本不匹配）
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 409 响应
+     */
+    @ExceptionHandler(OptimisticLockException.class)
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(
+            OptimisticLockException ex, WebRequest request) {
+        logger.warn("Optimistic lock conflict: storeId={}, expectedVersion={}, actualVersion={}",
+                ex.getStoreId(), ex.getExpectedVersion(), ex.getActualVersion());
+        ErrorResponse error = ErrorResponse.of("OPTIMISTIC_LOCK_CONFLICT", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     /**

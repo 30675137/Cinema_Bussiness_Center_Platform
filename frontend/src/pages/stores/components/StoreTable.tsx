@@ -6,11 +6,13 @@
  */
 
 import React from 'react';
-import { Table, Tag, Empty, Button, Space, Tooltip, Badge } from 'antd';
-import { EnvironmentOutlined, SettingOutlined } from '@ant-design/icons';
+import { Table, Tag, Empty, Button, Space, Tooltip, Badge, Popconfirm, Modal, message } from 'antd';
+import { EnvironmentOutlined, SettingOutlined, EditOutlined, DeleteOutlined, StopOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { Store } from '../types/store.types';
+import type { Store, StoreStatusEnum } from '../types/store.types';
 import type { StoreReservationSettings } from '../../store-reservation-settings/types/reservation-settings.types';
+import { useToggleStoreStatus } from '../hooks/useToggleStoreStatus';
+import { useDeleteStore } from '../hooks/useDeleteStore';
 
 // 门店与预约设置结合类型
 interface StoreWithSettings extends Store {
@@ -30,6 +32,8 @@ interface StoreTableProps {
   };
   /** 编辑门店地址回调 @since 020-store-address */
   onEdit?: (store: Store) => void;
+  /** 编辑门店信息回调 @since 022-store-crud */
+  onEditStore?: (store: Store) => void;
   /** 预约设置回调 @since 016-store-reservation-settings */
   onReservationSettings?: (store: Store) => void;
 }
@@ -44,8 +48,13 @@ const StoreTable: React.FC<StoreTableProps> = ({
   loading = false,
   pagination,
   onEdit,
+  onEditStore,
   onReservationSettings,
 }) => {
+  // 022-store-crud: Toggle status hook
+  const toggleStatusMutation = useToggleStoreStatus();
+  // 022-store-crud: Delete store hook
+  const deleteStoreMutation = useDeleteStore();
   // 将预约设置合并到门店数据
   const storesWithSettings: StoreWithSettings[] = React.useMemo(() => {
     const settingsMap = new Map(
@@ -80,10 +89,56 @@ const StoreTable: React.FC<StoreTableProps> = ({
       case 'active':
         return '启用';
       case 'disabled':
+      case 'inactive':
         return '停用';
       default:
         return status;
     }
+  };
+
+  // 022-store-crud: Handle toggle status
+  const handleToggleStatus = (store: Store) => {
+    const newStatus = store.status === 'active' ? 'inactive' : 'active';
+    const actionText = newStatus === 'active' ? '启用' : '停用';
+
+    Modal.confirm({
+      title: `确认${actionText}门店`,
+      content: `确定要${actionText}门店「${store.name}」吗？`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await toggleStatusMutation.mutateAsync({
+            storeId: store.id,
+            data: { status: newStatus as unknown as StoreStatusEnum },
+          });
+          message.success(`门店已${actionText}`);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : `${actionText}失败`;
+          message.error(errorMessage);
+        }
+      },
+    });
+  };
+
+  // 022-store-crud: Handle delete store
+  const handleDeleteStore = (store: Store) => {
+    Modal.confirm({
+      title: '确认删除门店',
+      content: `删除后无法恢复，确定要删除门店「${store.name}」吗？`,
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await deleteStoreMutation.mutateAsync(store.id);
+          message.success('门店删除成功');
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : '删除失败';
+          message.error(errorMessage);
+        }
+      },
+    });
   };
 
   // 016-store-reservation-settings: 获取预约状态显示
@@ -244,14 +299,25 @@ const StoreTable: React.FC<StoreTableProps> = ({
         );
       },
     },
-    // 020-store-address + 016-store-reservation-settings: 操作列
+    // 020-store-address + 016-store-reservation-settings + 022-store-crud: 操作列
     {
       title: '操作',
       key: 'action',
-      width: 140,
+      width: 260,
       fixed: 'right' as const,
       render: (_: unknown, record: StoreWithSettings) => (
-        <Space size="small">
+        <Space size="small" wrap>
+          {/* 022-store-crud: 编辑按钮 */}
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => onEditStore?.(record)}
+            aria-label={`编辑${record.name}`}
+          >
+            编辑
+          </Button>
+          {/* 020-store-address: 地址按钮 */}
           <Button
             type="link"
             size="small"
@@ -261,6 +327,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
           >
             地址
           </Button>
+          {/* 016-store-reservation-settings: 预约设置 */}
           <Button
             type="link"
             size="small"
@@ -268,7 +335,31 @@ const StoreTable: React.FC<StoreTableProps> = ({
             onClick={() => onReservationSettings?.(record)}
             aria-label={`设置${record.name}的预约配置`}
           >
-            预约设置
+            预约
+          </Button>
+          {/* 022-store-crud: 状态切换 */}
+          <Tooltip title={record.status === 'active' ? '停用门店' : '启用门店'}>
+            <Button
+              type="link"
+              size="small"
+              icon={record.status === 'active' ? <StopOutlined /> : <CheckCircleOutlined />}
+              onClick={() => handleToggleStatus(record)}
+              danger={record.status === 'active'}
+              aria-label={record.status === 'active' ? `停用${record.name}` : `启用${record.name}`}
+            >
+              {record.status === 'active' ? '停用' : '启用'}
+            </Button>
+          </Tooltip>
+          {/* 022-store-crud: 删除按钮 */}
+          <Button
+            type="link"
+            size="small"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDeleteStore(record)}
+            aria-label={`删除${record.name}`}
+          >
+            删除
           </Button>
         </Space>
       ),
