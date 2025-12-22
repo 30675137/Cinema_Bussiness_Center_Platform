@@ -13,6 +13,7 @@ import { Card, Typography, Space } from 'antd';
 import { ShopOutlined } from '@ant-design/icons';
 import { useStoresQuery } from './hooks/useStoresQuery';
 import StoreTable from './components/StoreTable';
+import StoreEditModal from './components/StoreEditModal';
 import StoreSearch from './components/StoreSearch';
 import StatusFilter from './components/StatusFilter';
 import type { Store } from './types/store.types';
@@ -27,6 +28,10 @@ const StoresPage: React.FC = () => {
   // State for filters
   const [searchName, setSearchName] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+
+  // 020-store-address: State for edit modal
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingStore, setEditingStore] = useState<Store | null>(null);
 
   // State for pagination (frontend pagination)
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +88,18 @@ const StoresPage: React.FC = () => {
     }
   };
 
+  // 020-store-address: Handle edit store
+  const handleEditStore = (store: Store) => {
+    setEditingStore(store);
+    setEditModalOpen(true);
+  };
+
+  // 020-store-address: Handle close edit modal
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setEditingStore(null);
+  };
+
   return (
     <div className="stores-page-container">
       {/* Page Header */}
@@ -121,8 +138,16 @@ const StoresPage: React.FC = () => {
             total: filteredStores.length,
             onChange: handlePaginationChange,
           }}
+          onEdit={handleEditStore}
         />
       </Card>
+
+      {/* 020-store-address: Edit Modal */}
+      <StoreEditModal
+        open={editModalOpen}
+        store={editingStore}
+        onClose={handleCloseEditModal}
+      />
     </div>
   );
 };

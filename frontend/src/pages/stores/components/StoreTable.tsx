@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { Table, Tag, Empty } from 'antd';
+import { Table, Tag, Empty, Button, Space, Tooltip } from 'antd';
+import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { Store } from '../types/store.types';
 
@@ -19,6 +20,8 @@ interface StoreTableProps {
     total: number;
     onChange: (page: number, pageSize: number) => void;
   };
+  /** 编辑门店回调 @since 020-store-address */
+  onEdit?: (store: Store) => void;
 }
 
 /**
@@ -29,6 +32,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
   stores,
   loading = false,
   pagination,
+  onEdit,
 }) => {
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -84,12 +88,16 @@ const StoreTable: React.FC<StoreTableProps> = ({
       dataIndex: 'region',
       key: 'region',
       width: 150,
-      render: (text: string) => (
-        <span className="region-text">
-          {text || '-'}
-        </span>
-      ),
-      sorter: (a, b) => (a.region || '').localeCompare(b.region || ''),
+      render: (_: string, record: Store) => {
+        // 优先显示 region，否则显示城市
+        const displayRegion = record.region || record.city || '-';
+        return (
+          <span className="region-text">
+            {displayRegion}
+          </span>
+        );
+      },
+      sorter: (a, b) => (a.region || a.city || '').localeCompare(b.region || b.city || ''),
     },
     {
       title: '状态',
@@ -118,6 +126,62 @@ const StoreTable: React.FC<StoreTableProps> = ({
         </span>
       ),
       sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    },
+    // 020-store-address: 添加地址摘要列
+    {
+      title: '地址',
+      dataIndex: 'addressSummary',
+      key: 'addressSummary',
+      width: 200,
+      ellipsis: true,
+      render: (_: string, record: Store) => {
+        // 构建完整地址
+        const fullAddress = [
+          record.province,
+          record.city,
+          record.district,
+          record.address
+        ].filter(Boolean).join('');
+        
+        // 简短显示：城市+区县+详细地址
+        const shortAddress = [
+          record.city,
+          record.district,
+          record.address
+        ].filter(Boolean).join(' ');
+        
+        if (!shortAddress) {
+          return <span style={{ color: '#999' }}>未配置</span>;
+        }
+        
+        return (
+          <Tooltip title={fullAddress || shortAddress}>
+            <span className="address-summary-text">
+              {shortAddress}
+            </span>
+          </Tooltip>
+        );
+      },
+    },
+    // 020-store-address: 添加操作列
+    {
+      title: '操作',
+      key: 'action',
+      width: 100,
+      fixed: 'right' as const,
+      render: (_: unknown, record: Store) => (
+        <Space size="small">
+          <Button
+            type="link"
+            size="small"
+            icon={<EnvironmentOutlined />}
+            onClick={() => onEdit?.(record)}
+            aria-label={`编辑${record.name}的地址`}
+          >
+            地址
+          </Button>
+        </Space>
+      ),
     },
   ];
 

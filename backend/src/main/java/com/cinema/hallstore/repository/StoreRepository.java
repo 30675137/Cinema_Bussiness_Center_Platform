@@ -12,7 +12,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -100,6 +102,7 @@ public class StoreRepository {
 
     /**
      * Supabase 表行结构（snake_case）
+     * @updated 020-store-address 添加地址字段
      */
     private static class SupabaseStoreRow {
         @JsonProperty("id")
@@ -122,6 +125,22 @@ public class StoreRepository {
 
         @JsonProperty("updated_at")
         public Instant updatedAt;
+
+        // 020-store-address 新增字段
+        @JsonProperty("province")
+        public String province;
+
+        @JsonProperty("city")
+        public String city;
+
+        @JsonProperty("district")
+        public String district;
+
+        @JsonProperty("address")
+        public String address;
+
+        @JsonProperty("phone")
+        public String phone;
     }
 
     // ========== Mapping Methods ==========
@@ -135,6 +154,12 @@ public class StoreRepository {
         store.setStatus(parseStoreStatus(row.status));
         store.setCreatedAt(row.createdAt);
         store.setUpdatedAt(row.updatedAt);
+        // 020-store-address 地址字段映射
+        store.setProvince(row.province);
+        store.setCity(row.city);
+        store.setDistrict(row.district);
+        store.setAddress(row.address);
+        store.setPhone(row.phone);
         return store;
     }
 
@@ -144,6 +169,48 @@ public class StoreRepository {
             return StoreStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
             return StoreStatus.ACTIVE;
+        }
+    }
+
+    /**
+     * 更新门店地址信息
+     *
+     * @param storeId  门店ID
+     * @param province 省份
+     * @param city     城市
+     * @param district 区县
+     * @param address  详细地址
+     * @param phone    联系电话
+     * @return 更新后的门店信息，如果门店不存在返回 Optional.empty()
+     * @since 020-store-address
+     */
+    public Optional<Store> updateAddress(UUID storeId, String province, String city,
+                                         String district, String address, String phone) {
+        // 构建更新请求体
+        Map<String, Object> updateBody = new HashMap<>();
+        updateBody.put("province", province);
+        updateBody.put("city", city);
+        updateBody.put("district", district);
+        updateBody.put("address", address);
+        updateBody.put("phone", phone);
+
+        try {
+            // 使用 Supabase PATCH 请求更新，需要返回更新后的数据
+            List<SupabaseStoreRow> rows = webClient.patch()
+                    .uri("/stores?id=eq." + storeId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Prefer", "return=representation")
+                    .bodyValue(updateBody)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<SupabaseStoreRow>>() {})
+                    .block(supabaseConfig.getTimeoutDuration());
+
+            if (rows == null || rows.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(toDomain(rows.get(0)));
+        } catch (WebClientResponseException.NotFound e) {
+            return Optional.empty();
         }
     }
 }

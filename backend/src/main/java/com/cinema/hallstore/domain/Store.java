@@ -8,6 +8,9 @@ import java.util.UUID;
 
 /**
  * Store 领域模型，对应 Supabase 中的 stores 表。
+ * 
+ * @since 014-hall-store-backend
+ * @updated 020-store-address 添加地址字段
  */
 public class Store {
 
@@ -18,6 +21,13 @@ public class Store {
     private StoreStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+
+    // 020-store-address 新增字段
+    private String province;   // 省份，如 "北京市"
+    private String city;       // 城市，如 "北京市"
+    private String district;   // 区县，如 "朝阳区"
+    private String address;    // 详细地址
+    private String phone;      // 联系电话
 
     public UUID getId() {
         return id;
@@ -73,6 +83,47 @@ public class Store {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // 020-store-address 地址字段 getter/setter
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override

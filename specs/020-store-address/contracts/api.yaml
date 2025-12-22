@@ -1,0 +1,280 @@
+openapi: 3.0.3
+info:
+  title: Store Address API
+  description: |
+    门店地址信息管理 API - 扩展 014-hall-store-backend
+
+    本规格定义门店地址相关字段的 API 契约，包括：
+    - 门店列表查询（含地址摘要）
+    - 门店详情查询（含完整地址）
+    - 门店地址信息更新
+  version: 1.0.0
+  contact:
+    name: Cinema Platform Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+tags:
+  - name: Stores
+    description: 门店管理（扩展地址字段）
+
+paths:
+  /stores:
+    get:
+      tags:
+        - Stores
+      summary: 获取门店列表
+      description: 获取所有门店列表，返回包含地址摘要的门店信息
+      operationId: getStores
+      parameters:
+        - name: status
+          in: query
+          description: 按状态过滤
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive]
+        - name: province
+          in: query
+          description: 按省份过滤
+          required: false
+          schema:
+            type: string
+        - name: city
+          in: query
+          description: 按城市过滤
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回门店列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreListResponse'
+
+  /stores/{storeId}:
+    get:
+      tags:
+        - Stores
+      summary: 获取门店详情
+      description: 获取单个门店的完整信息，包括详细地址
+      operationId: getStoreById
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          description: 门店ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回门店详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreDetailResponse'
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Stores
+      summary: 更新门店信息
+      description: 更新门店信息，包括地址字段
+      operationId: updateStore
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoreRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreDetailResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Store:
+      type: object
+      description: 门店信息（扩展地址字段）
+      required:
+        - id
+        - code
+        - name
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 门店ID
+          example: "11111111-1111-1111-1111-111111111111"
+        code:
+          type: string
+          description: 门店编码
+          example: "STORE-001"
+        name:
+          type: string
+          description: 门店名称
+          example: "北京朝阳店"
+        region:
+          type: string
+          nullable: true
+          description: 所属区域（保留字段，向后兼容）
+          example: "北京"
+        province:
+          type: string
+          nullable: true
+          description: 省份
+          example: "北京市"
+        city:
+          type: string
+          nullable: true
+          description: 城市
+          example: "北京市"
+        district:
+          type: string
+          nullable: true
+          description: 区县
+          example: "朝阳区"
+        address:
+          type: string
+          nullable: true
+          description: 详细地址
+          example: "建国路88号SOHO现代城"
+        phone:
+          type: string
+          nullable: true
+          description: 联系电话
+          example: "010-12345678"
+        addressSummary:
+          type: string
+          nullable: true
+          description: 地址摘要（派生字段，格式为"城市 区县"）
+          example: "北京市 朝阳区"
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 门店状态
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    UpdateStoreRequest:
+      type: object
+      description: 更新门店请求
+      properties:
+        name:
+          type: string
+          description: 门店名称
+        province:
+          type: string
+          description: 省份（必填）
+          example: "北京市"
+        city:
+          type: string
+          description: 城市（必填）
+          example: "北京市"
+        district:
+          type: string
+          description: 区县（必填）
+          example: "朝阳区"
+        address:
+          type: string
+          description: 详细地址
+          example: "建国路88号SOHO现代城"
+        phone:
+          type: string
+          description: 联系电话（需符合格式：手机号/座机/400热线）
+          pattern: '^(1[3-9]\d{9})|(0\d{2,3}-?\d{7,8})|(400-?\d{3}-?\d{4})$'
+          example: "010-12345678"
+
+    StoreListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+        total:
+          type: integer
+          description: 总数量
+          example: 10
+
+    StoreDetailResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Store'
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误码
+          example: "STORE_NOT_FOUND"
+        message:
+          type: string
+          description: 错误信息
+          example: "门店不存在"
+        details:
+          type: object
+          description: 错误详情

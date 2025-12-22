@@ -52,6 +52,22 @@ public class StoreDTO {
     /** 更新时间 - 序列化为 ISO 8601 格式 */
     private Instant updatedAt;
 
+    // 020-store-address 新增字段
+    /** 省份 - 如 "北京市" */
+    private String province;
+
+    /** 城市 - 如 "北京市" */
+    private String city;
+
+    /** 区县 - 如 "朝阳区" */
+    private String district;
+
+    /** 详细地址 - 如 "xx路xx号xx大厦" */
+    private String address;
+
+    /** 联系电话 - 支持手机号、座机、400热线 */
+    private String phone;
+
     public String getId() {
         return id;
     }
@@ -106,6 +122,66 @@ public class StoreDTO {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    // 020-store-address 地址字段 getter/setter
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    /**
+     * 获取地址摘要（派生字段）
+     * 格式："城市 区县"，如 "北京市 朝阳区"
+     * 
+     * @return 地址摘要字符串，如果城市和区县都为空则返回 null
+     */
+    public String getAddressSummary() {
+        if (city == null && district == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (city != null) sb.append(city);
+        if (district != null) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(district);
+        }
+        return sb.toString();
     }
 }
 

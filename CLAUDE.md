@@ -36,6 +36,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-21
 - TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19 (013-schedule-management)
 - TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien (014-hall-store-backend)
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage）进行开发模拟 (014-hall-store-backend)
+- Supabase (PostgreSQL) - 扩展 stores 表添加 province, city, district, address, phone 字段 (020-store-address)
 
 - (003-inventory-management)
 
@@ -56,6 +57,7 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- 020-store-address: Added Supabase (PostgreSQL) - 扩展 stores 表添加 province, city, district, address, phone 字段
 - 014-hall-store-backend: Added TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend) + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP clien
 - 013-schedule-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, React Hook Form 7.68.0, Zod 4.1.13, dayjs 1.11.19
 
