@@ -3,15 +3,19 @@
  *
  * Modal component for batch updating reservation settings for multiple stores.
  * Uses React Hook Form with Zod validation.
+ * 
+ * @feature 016-store-reservation-settings
+ * @updated 添加时长单位、押金配置支持
  */
 
 import React, { useEffect } from 'react';
-import { Modal, Form, Switch, InputNumber, Button, Space, message, Alert, List, Typography } from 'antd';
+import { Modal, Form, Switch, InputNumber, Button, Space, message, Alert, List, Typography, Divider, Radio } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reservationSettingsSchema } from '../types/reservation-settings.schema';
 import type { ReservationSettingsFormData } from '../types/reservation-settings.schema';
 import type { BatchUpdateResult } from '../types/reservation-settings.types';
+import { generateDefaultTimeSlots } from '../types/reservation-settings.types';
 
 const { Text } = Typography;
 
@@ -50,11 +54,19 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
     defaultValues: {
       isReservationEnabled: false,
       maxReservationDays: 0,
+      timeSlots: generateDefaultTimeSlots(),
+      minAdvanceHours: 1,
+      durationUnit: 1,
+      depositRequired: false,
+      depositAmount: undefined,
+      depositPercentage: undefined,
+      isActive: true,
     },
   });
 
-  // Watch isReservationEnabled to conditionally enable/disable maxReservationDays
+  // Watch fields
   const isReservationEnabled = watch('isReservationEnabled');
+  const depositRequired = watch('depositRequired');
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -62,6 +74,13 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
       reset({
         isReservationEnabled: false,
         maxReservationDays: 0,
+        timeSlots: generateDefaultTimeSlots(),
+        minAdvanceHours: 1,
+        durationUnit: 1,
+        depositRequired: false,
+        depositAmount: undefined,
+        depositPercentage: undefined,
+        isActive: true,
       });
     }
   }, [visible, reset]);
@@ -201,6 +220,108 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
             )}
           />
         </Form.Item>
+
+        {/* 时长单位 - US3 */}
+        {isReservationEnabled && (
+          <Form.Item
+            label="预约时长单位"
+            help={errors.durationUnit?.message || '设置预约的基本时长单位'}
+            validateStatus={errors.durationUnit ? 'error' : ''}
+          >
+            <Controller
+              name="durationUnit"
+              control={control}
+              render={({ field }) => (
+                <Radio.Group
+                  {...field}
+                  disabled={!isReservationEnabled}
+                  optionType="button"
+                  buttonStyle="solid"
+                >
+                  <Radio.Button value={1}>1 小时</Radio.Button>
+                  <Radio.Button value={2}>2 小时</Radio.Button>
+                  <Radio.Button value={4}>4 小时</Radio.Button>
+                </Radio.Group>
+              )}
+            />
+          </Form.Item>
+        )}
+
+        {/* 押金设置 - US4 */}
+        {isReservationEnabled && (
+          <>
+            <Divider orientation="left" style={{ margin: '16px 0 8px' }}>押金设置</Divider>
+            <Form.Item
+              label="是否需要押金"
+              help={errors.depositRequired?.message}
+              validateStatus={errors.depositRequired ? 'error' : ''}
+            >
+              <Controller
+                name="depositRequired"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onChange={field.onChange}
+                    disabled={!isReservationEnabled}
+                    checkedChildren="需要"
+                    unCheckedChildren="不需要"
+                  />
+                )}
+              />
+            </Form.Item>
+
+            {depositRequired && (
+              <>
+                <Form.Item
+                  label="押金金额"
+                  help={errors.depositAmount?.message || '固定押金金额（元）'}
+                  validateStatus={errors.depositAmount ? 'error' : ''}
+                >
+                  <Controller
+                    name="depositAmount"
+                    control={control}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        max={100000}
+                        precision={2}
+                        disabled={!isReservationEnabled || !depositRequired}
+                        style={{ width: '100%' }}
+                        addonBefore="¥"
+                        placeholder="输入固定押金金额"
+                      />
+                    )}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label="押金比例"
+                  help={errors.depositPercentage?.message || '按订单金额的百分比收取押金'}
+                  validateStatus={errors.depositPercentage ? 'error' : ''}
+                >
+                  <Controller
+                    name="depositPercentage"
+                    control={control}
+                    render={({ field }) => (
+                      <InputNumber
+                        {...field}
+                        min={0}
+                        max={100}
+                        precision={0}
+                        disabled={!isReservationEnabled || !depositRequired}
+                        style={{ width: '100%' }}
+                        addonAfter="%"
+                        placeholder="输入押金比例"
+                      />
+                    )}
+                  />
+                </Form.Item>
+              </>
+            )}
+          </>
+        )}
 
         <Form.Item>
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>

@@ -292,10 +292,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           key: '/stores',
           label: '门店管理',
         },
-        {
-          key: '/store-reservation-settings',
-          label: '门店预约设置',
-        },
+        // 016-store-reservation-settings: 已整合到门店管理页面，移除独立菜单项
+        // {
+        //   key: '/store-reservation-settings',
+        //   label: '门店预约设置',
+        // },
         {
           key: '/activity-types',
           label: '活动类型管理',

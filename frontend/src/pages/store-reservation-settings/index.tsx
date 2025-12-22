@@ -9,12 +9,12 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Card, Typography, Space, Modal, message } from 'antd';
+import { Card, Typography, Space, message } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import { useStoresQuery } from '../stores/hooks/useStoresQuery';
 import { useAllStoresReservationSettings, useUpdateStoreReservationSettings, useBatchUpdateStoreReservationSettings } from './hooks/useReservationSettingsQuery';
 import ReservationSettingsTable from './components/ReservationSettingsTable';
-import ReservationSettingsForm from './components/ReservationSettingsForm';
+import ReservationSettingsModal from './components/ReservationSettingsModal';
 import BatchReservationSettingsModal from './components/BatchReservationSettingsModal';
 import StoreSearch from '../stores/components/StoreSearch';
 import StatusFilter from '../stores/components/StatusFilter';
@@ -263,26 +263,18 @@ const StoreReservationSettingsPage: React.FC = () => {
         />
       </Card>
 
-      {/* Edit Modal */}
-      <Modal
-        title={`预约设置 - ${editingStore?.name || ''}`}
-        open={editModalVisible}
-        onCancel={handleModalCancel}
-        footer={null}
-        width={600}
-        destroyOnClose
-      >
-        {editingStore && (
-          <ReservationSettingsForm
-            storeId={editingStore.id}
-            storeName={editingStore.name}
-            initialData={editingSettings}
-            onSubmit={handleFormSubmit}
-            onCancel={handleModalCancel}
-            loading={updateMutation.isPending}
-          />
-        )}
-      </Modal>
+      {/* Edit Modal - 使用新的 ReservationSettingsModal 组件 */}
+      {editingStore && (
+        <ReservationSettingsModal
+          visible={editModalVisible}
+          storeId={editingStore.id}
+          storeName={editingStore.name}
+          initialData={editingSettings}
+          onSubmit={handleFormSubmit}
+          onCancel={handleModalCancel}
+          loading={updateMutation.isPending}
+        />
+      )}
 
       {/* Batch Edit Modal */}
       <BatchReservationSettingsModal

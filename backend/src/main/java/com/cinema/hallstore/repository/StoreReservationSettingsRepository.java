@@ -12,15 +12,20 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * StoreReservationSettingsRepository:
  * - 通过 Supabase REST API 实现门店预约设置数据的查询和更新操作
  * - 使用 WebClient 进行 HTTP 调用
+ * 
+ * @since 015-store-reservation-settings
+ * @updated 016-store-reservation-settings 添加时间段、提前量、时长单位、押金字段
  */
 @Repository
 public class StoreReservationSettingsRepository {
@@ -84,12 +89,7 @@ public class StoreReservationSettingsRepository {
     public StoreReservationSettings save(StoreReservationSettings settings) {
         if (settings.getId() == null) {
             // 插入新记录 - 只发送必需字段，让数据库自动生成 id, created_at, updated_at
-            SupabaseRow row = new SupabaseRow();
-            row.storeId = settings.getStoreId();
-            row.isReservationEnabled = settings.getIsReservationEnabled();
-            row.maxReservationDays = settings.getMaxReservationDays();
-            row.updatedBy = settings.getUpdatedBy();
-            // 不设置 id, createdAt, updatedAt - 由数据库自动生成
+            SupabaseRow row = toSupabaseRowForInsert(settings);
             
             try {
                 SupabaseRow created = webClient.post()
@@ -112,12 +112,7 @@ public class StoreReservationSettingsRepository {
             }
         } else {
             // 更新现有记录 - 只发送可更新的字段
-            // 不发送：id（通过 URI 参数指定）、store_id（外键不可修改）、created_at（不应更新）、updated_at（由触发器自动更新）
-            SupabaseRow row = new SupabaseRow();
-            row.isReservationEnabled = settings.getIsReservationEnabled();
-            row.maxReservationDays = settings.getMaxReservationDays();
-            row.updatedBy = settings.getUpdatedBy();
-            // 不设置 id, storeId, createdAt, updatedAt
+            SupabaseRow row = toSupabaseRowForUpdate(settings);
             
             try {
                 List<SupabaseRow> updatedList = webClient.patch()
@@ -173,6 +168,43 @@ public class StoreReservationSettingsRepository {
 
         @JsonProperty("updated_by")
         public String updatedBy;
+
+        // 016-store-reservation-settings 新增字段
+        @JsonProperty("time_slots")
+        public List<TimeSlotRow> timeSlots;
+
+        @JsonProperty("min_advance_hours")
+        public Integer minAdvanceHours;
+
+        @JsonProperty("duration_unit")
+        public Integer durationUnit;
+
+        @JsonProperty("deposit_required")
+        public Boolean depositRequired;
+
+        @JsonProperty("deposit_amount")
+        public BigDecimal depositAmount;
+
+        @JsonProperty("deposit_percentage")
+        public Integer depositPercentage;
+
+        @JsonProperty("is_active")
+        public Boolean isActive;
+    }
+
+    /**
+     * 时间段 Supabase 结构
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private static class TimeSlotRow {
+        @JsonProperty("dayOfWeek")
+        public Integer dayOfWeek;
+
+        @JsonProperty("startTime")
+        public String startTime;
+
+        @JsonProperty("endTime")
+        public String endTime;
     }
 
     // ========== Mapping Methods ==========
@@ -186,19 +218,78 @@ public class StoreReservationSettingsRepository {
         settings.setCreatedAt(row.createdAt);
         settings.setUpdatedAt(row.updatedAt);
         settings.setUpdatedBy(row.updatedBy);
+
+        // 016-store-reservation-settings 新增字段
+        if (row.timeSlots != null) {
+            settings.setTimeSlots(row.timeSlots.stream()
+                    .map(ts -> new StoreReservationSettings.TimeSlot(
+                            ts.dayOfWeek, ts.startTime, ts.endTime))
+                    .collect(Collectors.toList()));
+        }
+        settings.setMinAdvanceHours(row.minAdvanceHours);
+        settings.setDurationUnit(row.durationUnit);
+        settings.setDepositRequired(row.depositRequired);
+        settings.setDepositAmount(row.depositAmount);
+        settings.setDepositPercentage(row.depositPercentage);
+        settings.setIsActive(row.isActive);
+
         return settings;
     }
 
-    private SupabaseRow toSupabaseRow(StoreReservationSettings settings) {
+    private SupabaseRow toSupabaseRowForInsert(StoreReservationSettings settings) {
         SupabaseRow row = new SupabaseRow();
-        row.id = settings.getId();
         row.storeId = settings.getStoreId();
         row.isReservationEnabled = settings.getIsReservationEnabled();
         row.maxReservationDays = settings.getMaxReservationDays();
-        row.createdAt = settings.getCreatedAt();
-        row.updatedAt = settings.getUpdatedAt();
         row.updatedBy = settings.getUpdatedBy();
+
+        // 016-store-reservation-settings 新增字段
+        if (settings.getTimeSlots() != null) {
+            row.timeSlots = settings.getTimeSlots().stream()
+                    .map(ts -> {
+                        TimeSlotRow tsr = new TimeSlotRow();
+                        tsr.dayOfWeek = ts.getDayOfWeek();
+                        tsr.startTime = ts.getStartTime();
+                        tsr.endTime = ts.getEndTime();
+                        return tsr;
+                    })
+                    .collect(Collectors.toList());
+        }
+        row.minAdvanceHours = settings.getMinAdvanceHours();
+        row.durationUnit = settings.getDurationUnit();
+        row.depositRequired = settings.getDepositRequired();
+        row.depositAmount = settings.getDepositAmount();
+        row.depositPercentage = settings.getDepositPercentage();
+        row.isActive = settings.getIsActive();
+
+        return row;
+    }
+
+    private SupabaseRow toSupabaseRowForUpdate(StoreReservationSettings settings) {
+        SupabaseRow row = new SupabaseRow();
+        row.isReservationEnabled = settings.getIsReservationEnabled();
+        row.maxReservationDays = settings.getMaxReservationDays();
+        row.updatedBy = settings.getUpdatedBy();
+
+        // 016-store-reservation-settings 新增字段
+        if (settings.getTimeSlots() != null) {
+            row.timeSlots = settings.getTimeSlots().stream()
+                    .map(ts -> {
+                        TimeSlotRow tsr = new TimeSlotRow();
+                        tsr.dayOfWeek = ts.getDayOfWeek();
+                        tsr.startTime = ts.getStartTime();
+                        tsr.endTime = ts.getEndTime();
+                        return tsr;
+                    })
+                    .collect(Collectors.toList());
+        }
+        row.minAdvanceHours = settings.getMinAdvanceHours();
+        row.durationUnit = settings.getDurationUnit();
+        row.depositRequired = settings.getDepositRequired();
+        row.depositAmount = settings.getDepositAmount();
+        row.depositPercentage = settings.getDepositPercentage();
+        row.isActive = settings.getIsActive();
+
         return row;
     }
 }
-

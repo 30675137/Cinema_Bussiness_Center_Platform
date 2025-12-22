@@ -1,18 +1,26 @@
 /**
  * StoreTable Component
  *
- * Displays list of stores with columns: name, region, status
+ * Displays list of stores with columns: name, region, status, reservation info
  * Follows Ant Design Table patterns from BrandTable
  */
 
 import React from 'react';
-import { Table, Tag, Empty, Button, Space, Tooltip } from 'antd';
-import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Table, Tag, Empty, Button, Space, Tooltip, Badge } from 'antd';
+import { EnvironmentOutlined, SettingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { Store } from '../types/store.types';
+import type { StoreReservationSettings } from '../../store-reservation-settings/types/reservation-settings.types';
+
+// 门店与预约设置结合类型
+interface StoreWithSettings extends Store {
+  reservationSettings?: StoreReservationSettings;
+}
 
 interface StoreTableProps {
   stores: Store[];
+  /** 预约设置数据 @since 016-store-reservation-settings */
+  reservationSettings?: StoreReservationSettings[];
   loading?: boolean;
   pagination?: {
     current: number;
@@ -20,8 +28,10 @@ interface StoreTableProps {
     total: number;
     onChange: (page: number, pageSize: number) => void;
   };
-  /** 编辑门店回调 @since 020-store-address */
+  /** 编辑门店地址回调 @since 020-store-address */
   onEdit?: (store: Store) => void;
+  /** 预约设置回调 @since 016-store-reservation-settings */
+  onReservationSettings?: (store: Store) => void;
 }
 
 /**
@@ -30,10 +40,23 @@ interface StoreTableProps {
  */
 const StoreTable: React.FC<StoreTableProps> = ({
   stores,
+  reservationSettings = [],
   loading = false,
   pagination,
   onEdit,
+  onReservationSettings,
 }) => {
+  // 将预约设置合并到门店数据
+  const storesWithSettings: StoreWithSettings[] = React.useMemo(() => {
+    const settingsMap = new Map(
+      reservationSettings.map(s => [s.storeId, s])
+    );
+    return stores.map(store => ({
+      ...store,
+      reservationSettings: settingsMap.get(store.id),
+    }));
+  }, [stores, reservationSettings]);
+
   // Format date for display
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-CN');
@@ -63,13 +86,22 @@ const StoreTable: React.FC<StoreTableProps> = ({
     }
   };
 
-  const columns: ColumnsType<Store> = [
+  // 016-store-reservation-settings: 获取预约状态显示
+  const getReservationStatusColor = (enabled: boolean) => {
+    return enabled ? 'green' : 'default';
+  };
+
+  const getReservationStatusText = (enabled: boolean) => {
+    return enabled ? '已开放' : '未开放';
+  };
+
+  const columns: ColumnsType<StoreWithSettings> = [
     {
       title: '门店名称',
       dataIndex: 'name',
       key: 'name',
-      width: 200,
-      render: (text: string, record: Store) => (
+      width: 180,
+      render: (text: string, record: StoreWithSettings) => (
         <div className="store-name-cell">
           <div>
             <span className="store-name-text" title={text}>
@@ -103,7 +135,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 100,
+      width: 80,
       render: (status: string) => (
         <Tag color={getStatusColor(status)}>
           {getStatusText(status)}
@@ -114,6 +146,55 @@ const StoreTable: React.FC<StoreTableProps> = ({
         { text: '停用', value: 'disabled' },
       ],
       onFilter: (value, record) => record.status.toLowerCase() === value,
+    },
+    // 016-store-reservation-settings: 预约状态列
+    {
+      title: '预约状态',
+      key: 'reservationEnabled',
+      width: 100,
+      render: (_, record: StoreWithSettings) => {
+        const enabled = record.reservationSettings?.isReservationEnabled ?? false;
+        return (
+          <Tag color={getReservationStatusColor(enabled)}>
+            {getReservationStatusText(enabled)}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: '已开放', value: true },
+        { text: '未开放', value: false },
+      ],
+      onFilter: (value, record) => {
+        const enabled = record.reservationSettings?.isReservationEnabled ?? false;
+        return enabled === value;
+      },
+    },
+    // 016-store-reservation-settings: 可预约天数列
+    {
+      title: '可预约天数',
+      key: 'maxReservationDays',
+      width: 110,
+      render: (_, record: StoreWithSettings) => {
+        const days = record.reservationSettings?.maxReservationDays ?? 0;
+        const enabled = record.reservationSettings?.isReservationEnabled ?? false;
+        
+        if (!enabled) {
+          return <span style={{ color: '#999' }}>-</span>;
+        }
+        
+        return (
+          <Badge
+            count={`${days}天`}
+            showZero
+            style={{ backgroundColor: days > 0 ? '#52c41a' : '#999' }}
+          />
+        );
+      },
+      sorter: (a, b) => {
+        const daysA = a.reservationSettings?.maxReservationDays ?? 0;
+        const daysB = b.reservationSettings?.maxReservationDays ?? 0;
+        return daysA - daysB;
+      },
     },
     {
       title: '创建时间',
@@ -132,9 +213,9 @@ const StoreTable: React.FC<StoreTableProps> = ({
       title: '地址',
       dataIndex: 'addressSummary',
       key: 'addressSummary',
-      width: 200,
+      width: 180,
       ellipsis: true,
-      render: (_: string, record: Store) => {
+      render: (_: string, record: StoreWithSettings) => {
         // 构建完整地址
         const fullAddress = [
           record.province,
@@ -163,13 +244,13 @@ const StoreTable: React.FC<StoreTableProps> = ({
         );
       },
     },
-    // 020-store-address: 添加操作列
+    // 020-store-address + 016-store-reservation-settings: 操作列
     {
       title: '操作',
       key: 'action',
-      width: 100,
+      width: 140,
       fixed: 'right' as const,
-      render: (_: unknown, record: Store) => (
+      render: (_: unknown, record: StoreWithSettings) => (
         <Space size="small">
           <Button
             type="link"
@@ -179,6 +260,15 @@ const StoreTable: React.FC<StoreTableProps> = ({
             aria-label={`编辑${record.name}的地址`}
           >
             地址
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            icon={<SettingOutlined />}
+            onClick={() => onReservationSettings?.(record)}
+            aria-label={`设置${record.name}的预约配置`}
+          >
+            预约设置
           </Button>
         </Space>
       ),
@@ -201,7 +291,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
     <div className="store-table-wrapper">
       <Table
         columns={columns}
-        dataSource={stores}
+        dataSource={storesWithSettings}
         rowKey="id"
         loading={loading}
         pagination={pagination ? {

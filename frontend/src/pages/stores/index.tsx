@@ -6,23 +6,33 @@
  * - Search by name
  * - Filter by status
  * - Frontend pagination
+ * - Store address editing (020-store-address)
+ * - Reservation settings configuration (016-store-reservation-settings)
  */
 
 import React, { useState, useMemo } from 'react';
-import { Card, Typography, Space } from 'antd';
+import { Card, Typography, Space, message } from 'antd';
 import { ShopOutlined } from '@ant-design/icons';
 import { useStoresQuery } from './hooks/useStoresQuery';
 import StoreTable from './components/StoreTable';
 import StoreEditModal from './components/StoreEditModal';
 import StoreSearch from './components/StoreSearch';
 import StatusFilter from './components/StatusFilter';
+// 016-store-reservation-settings: 导入预约设置相关组件
+import ReservationSettingsModal from '../store-reservation-settings/components/ReservationSettingsModal';
+import {
+  useStoreReservationSettings,
+  useAllStoresReservationSettings,
+  useUpdateStoreReservationSettings,
+} from '../store-reservation-settings/hooks/useReservationSettingsQuery';
 import type { Store } from './types/store.types';
+import type { ReservationSettingsFormData } from '../store-reservation-settings/types/reservation-settings.schema';
 
 const { Title } = Typography;
 
 /**
  * Stores Page Component
- * Integrates StoreTable, StoreSearch, and StatusFilter
+ * Integrates StoreTable, StoreSearch, StatusFilter, and ReservationSettingsModal
  */
 const StoresPage: React.FC = () => {
   // State for filters
@@ -33,13 +43,36 @@ const StoresPage: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
 
+  // 016-store-reservation-settings: State for reservation settings modal
+  const [reservationModalOpen, setReservationModalOpen] = useState(false);
+  const [selectedStoreForReservation, setSelectedStoreForReservation] = useState<Store | null>(null);
+
   // State for pagination (frontend pagination)
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
   // Fetch stores data with status filter
-  const { data: stores = [], isLoading } = useStoresQuery(
+  const { data: stores = [], isLoading: storesLoading } = useStoresQuery(
     statusFilter ? { status: statusFilter } : undefined
+  );
+
+  // 016-store-reservation-settings: 提取所有门店ID用于获取预约设置
+  const storeIds = useMemo(() => stores.map((store) => store.id), [stores]);
+
+  // 016-store-reservation-settings: 获取所有门店的预约设置
+  const { data: allReservationSettings = [], isLoading: settingsLoading } = useAllStoresReservationSettings(storeIds);
+
+  // 综合加载状态
+  const isLoading = storesLoading || settingsLoading;
+
+  // 016-store-reservation-settings: Fetch reservation settings for selected store
+  const { data: currentReservationSettings } = useStoreReservationSettings(
+    selectedStoreForReservation?.id
+  );
+
+  // 016-store-reservation-settings: Mutation for updating reservation settings
+  const updateReservationMutation = useUpdateStoreReservationSettings(
+    selectedStoreForReservation?.id || ''
   );
 
   // Apply frontend filtering by name
@@ -100,6 +133,30 @@ const StoresPage: React.FC = () => {
     setEditingStore(null);
   };
 
+  // 016-store-reservation-settings: Handle open reservation settings modal
+  const handleOpenReservationSettings = (store: Store) => {
+    setSelectedStoreForReservation(store);
+    setReservationModalOpen(true);
+  };
+
+  // 016-store-reservation-settings: Handle reservation form submit
+  const handleReservationSubmit = async (data: ReservationSettingsFormData) => {
+    try {
+      await updateReservationMutation.mutateAsync(data);
+      message.success('预约设置保存成功');
+      setReservationModalOpen(false);
+      setSelectedStoreForReservation(null);
+    } catch (error) {
+      message.error('保存失败，请重试');
+    }
+  };
+
+  // 016-store-reservation-settings: Handle reservation modal cancel
+  const handleReservationCancel = () => {
+    setReservationModalOpen(false);
+    setSelectedStoreForReservation(null);
+  };
+
   return (
     <div className="stores-page-container">
       {/* Page Header */}
@@ -131,6 +188,7 @@ const StoresPage: React.FC = () => {
       <Card>
         <StoreTable
           stores={paginatedStores}
+          reservationSettings={allReservationSettings}
           loading={isLoading}
           pagination={{
             current: currentPage,
@@ -139,6 +197,7 @@ const StoresPage: React.FC = () => {
             onChange: handlePaginationChange,
           }}
           onEdit={handleEditStore}
+          onReservationSettings={handleOpenReservationSettings}
         />
       </Card>
 
@@ -148,6 +207,19 @@ const StoresPage: React.FC = () => {
         store={editingStore}
         onClose={handleCloseEditModal}
       />
+
+      {/* 016-store-reservation-settings: Reservation Settings Modal */}
+      {selectedStoreForReservation && (
+        <ReservationSettingsModal
+          visible={reservationModalOpen}
+          storeId={selectedStoreForReservation.id}
+          storeName={selectedStoreForReservation.name}
+          initialData={currentReservationSettings}
+          onSubmit={handleReservationSubmit}
+          onCancel={handleReservationCancel}
+          loading={updateReservationMutation.isPending}
+        />
+      )}
     </div>
   );
 };

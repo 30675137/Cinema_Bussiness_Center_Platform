@@ -3,6 +3,7 @@ import { categoryHandlers } from './categoryHandlers'
 import { brandHandlers } from './brandHandlers'
 import { attributeHandlers_ } from './attributeHandlers'
 import { scheduleHandlers } from './scheduleHandlers'
+import { reservationSettingsHandlers } from './reservationSettingsHandlers'
 // 场景包使用真实后端 API，不再使用 mock
 // import { scenarioPackageHandlers } from './scenarioPackageHandlers'
 
@@ -182,6 +183,7 @@ export const handlers = [
   ...brandHandlers, // 使用新的brandHandlers
   ...attributeHandlers_, // 属性字典管理处理器
   ...scheduleHandlers, // 排期管理处理器
+  ...reservationSettingsHandlers, // 门店预约设置处理器
   // 场景包使用真实后端 API，已禁用 mock
   // ...scenarioPackageHandlers,
 ]

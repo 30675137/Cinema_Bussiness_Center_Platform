@@ -50,7 +50,8 @@
       "Skill(skill-doc-generator)",
       "Bash(done)",
       "Bash(python3:*)",
-      "Skill(speckit.implement)"
+      "Skill(speckit.implement)",
+      "Bash(find:*)"
     ]
   }
 }

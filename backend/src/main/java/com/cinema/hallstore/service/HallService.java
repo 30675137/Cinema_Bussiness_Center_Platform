@@ -53,17 +53,6 @@ public class HallService {
     }
 
     /**
-     * 获取所有影厅列表（跨门店）
-     * 供排期甘特图等需要全局视图的页面使用
-     */
-    public List<HallDTO> getAllHalls(HallStatus status, HallType type) {
-        List<Hall> halls = hallRepository.findAll(status, type);
-        return halls.stream()
-                .map(HallMapper::toDto)
-                .toList();
-    }
-
-    /**
      * 获取所有来自启用门店的影厅列表（用于新建排期场景）
      * 过滤掉已停用门店的影厅，确保新排期只使用活跃门店的影厅
      *

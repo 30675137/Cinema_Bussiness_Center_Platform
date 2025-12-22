@@ -292,7 +292,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // 门店预约设置路由
+  // 016-store-reservation-settings: 已整合到门店管理页面，保留路由但重定向到门店管理
   {
     path: '/store-reservation-settings',
     element: (
@@ -300,6 +300,7 @@ export const router = createBrowserRouter([
         <AppLayout>
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
+              {/* 重定向到门店管理页面，预约设置已整合其中 */}
               <StoreReservationSettingsPage />
             </Suspense>
           </ErrorBoundary>

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,25 +34,43 @@ public class StoreReservationSettingsService {
 
     /**
      * 根据门店ID获取预约设置
+     * 如果设置不存在，返回默认设置
      *
      * @param storeId 门店ID
      * @return 预约设置DTO
-     * @throws ResourceNotFoundException 如果预约设置不存在
      */
     public StoreReservationSettingsDTO getSettings(UUID storeId) {
         logger.debug("Getting reservation settings for store: {}", storeId);
         try {
-            StoreReservationSettings settings = repository.findByStoreId(storeId)
-                    .orElseThrow(() -> new ResourceNotFoundException("门店预约设置", storeId.toString()));
-            logger.info("Successfully retrieved reservation settings for store: {}", storeId);
-            return StoreReservationSettingsMapper.toDto(settings);
-        } catch (ResourceNotFoundException e) {
-            logger.warn("Reservation settings not found for store: {}", storeId);
-            throw e;
+            Optional<StoreReservationSettings> settingsOpt = repository.findByStoreId(storeId);
+            if (settingsOpt.isPresent()) {
+                logger.info("Successfully retrieved reservation settings for store: {}", storeId);
+                return StoreReservationSettingsMapper.toDto(settingsOpt.get());
+            } else {
+                // 返回默认设置
+                logger.info("Reservation settings not found for store: {}, returning defaults", storeId);
+                return createDefaultSettingsDto(storeId);
+            }
         } catch (Exception e) {
             logger.error("Error getting reservation settings for store: {}", storeId, e);
             throw e;
         }
+    }
+
+    /**
+     * 创建默认预约设置 DTO
+     */
+    private StoreReservationSettingsDTO createDefaultSettingsDto(UUID storeId) {
+        StoreReservationSettingsDTO dto = new StoreReservationSettingsDTO();
+        dto.setStoreId(storeId.toString());
+        dto.setIsReservationEnabled(false);
+        dto.setMaxReservationDays(0);
+        dto.setMinAdvanceHours(1);
+        dto.setDurationUnit(1);
+        dto.setDepositRequired(false);
+        dto.setIsActive(true);
+        dto.setTimeSlots(java.util.Collections.emptyList());
+        return dto;
     }
 
     /**
@@ -76,10 +95,34 @@ public class StoreReservationSettingsService {
                         return newSettings;
                     });
 
-            // 更新字段
+            // 更新基础字段
             settings.setIsReservationEnabled(request.getIsReservationEnabled());
             settings.setMaxReservationDays(request.getMaxReservationDays());
             settings.setUpdatedAt(Instant.now());
+
+            // 016-store-reservation-settings 更新新增字段
+            if (request.getTimeSlots() != null) {
+                settings.setTimeSlots(StoreReservationSettingsMapper.toTimeSlotDomains(request.getTimeSlots()));
+            }
+            if (request.getMinAdvanceHours() != null) {
+                settings.setMinAdvanceHours(request.getMinAdvanceHours());
+            }
+            if (request.getDurationUnit() != null) {
+                settings.setDurationUnit(request.getDurationUnit());
+            }
+            if (request.getDepositRequired() != null) {
+                settings.setDepositRequired(request.getDepositRequired());
+            }
+            if (request.getDepositAmount() != null) {
+                settings.setDepositAmount(request.getDepositAmount());
+            }
+            if (request.getDepositPercentage() != null) {
+                settings.setDepositPercentage(request.getDepositPercentage());
+            }
+            if (request.getIsActive() != null) {
+                settings.setIsActive(request.getIsActive());
+            }
+
             // Note: updatedBy 字段可以在后续添加用户认证后设置
 
             // 保存更新（如果 id 为 null，repository.save 会自动创建新记录）
