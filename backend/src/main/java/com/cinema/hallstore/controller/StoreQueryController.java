@@ -3,7 +3,9 @@ package com.cinema.hallstore.controller;
 import com.cinema.hallstore.domain.enums.StoreStatus;
 import com.cinema.hallstore.dto.ApiResponse;
 import com.cinema.hallstore.dto.StoreDTO;
+import com.cinema.hallstore.dto.UpdateStoreAddressRequest;
 import com.cinema.hallstore.service.StoreService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import java.util.UUID;
  * StoreQueryController:
  * - 提供门店查询接口
  * - 供前端选择门店和按门店筛选影厅使用
+ * - 020-store-address: 添加门店地址更新接口
  */
 @RestController
 @RequestMapping("/api/stores")
@@ -57,5 +60,21 @@ public class StoreQueryController {
     public ResponseEntity<ApiResponse<StoreDTO>> getStore(@PathVariable UUID storeId) {
         StoreDTO store = storeService.getStoreById(storeId);
         return ResponseEntity.ok(ApiResponse.success(store));
+    }
+
+    /**
+     * 更新门店地址信息
+     * PUT /api/stores/{storeId}
+     *
+     * @param storeId 门店ID
+     * @param request 更新请求
+     * @since 020-store-address
+     */
+    @PutMapping("/{storeId}")
+    public ResponseEntity<ApiResponse<StoreDTO>> updateStore(
+            @PathVariable UUID storeId,
+            @Valid @RequestBody UpdateStoreAddressRequest request) {
+        StoreDTO updatedStore = storeService.updateStoreAddress(storeId, request);
+        return ResponseEntity.ok(ApiResponse.success(updatedStore));
     }
 }

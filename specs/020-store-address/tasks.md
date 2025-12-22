@@ -66,14 +66,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement updateStoreAddress() method in StoreService `backend/src/main/java/com/cinema/hallstore/service/StoreService.java`
-- [ ] T016 [US1] Add PUT /api/stores/{id} endpoint for address update in `backend/src/main/java/com/cinema/hallstore/controller/StoreController.java`
-- [ ] T017 [US1] Add address validation (province/city/district required, phone format) in `backend/src/main/java/com/cinema/hallstore/service/StoreService.java`
-- [ ] T018 [US1] Create AddressForm component in `frontend/src/features/store-management/components/AddressForm.tsx`
-- [ ] T019 [US1] Create useUpdateStore hook with TanStack Query in `frontend/src/features/store-management/hooks/useUpdateStore.ts`
-- [ ] T020 [US1] Integrate AddressForm into store edit page in `frontend/src/pages/stores/edit.tsx`
-- [ ] T021 [US1] Add Zod schema for phone validation in `frontend/src/features/store-management/types/validation.ts`
-- [ ] T022 [US1] Add form validation error display in AddressForm component `frontend/src/features/store-management/components/AddressForm.tsx`
+- [x] T015 [US1] Implement updateStoreAddress() method in StoreService `backend/src/main/java/com/cinema/hallstore/service/StoreService.java`
+- [x] T016 [US1] Add PUT /api/stores/{id} endpoint for address update in `backend/src/main/java/com/cinema/hallstore/controller/StoreQueryController.java`
+- [x] T017 [US1] Add address validation (province/city/district required, phone format) - 已在 UpdateStoreAddressRequest 通过 Jakarta Validation 实现
+- [x] T018 [US1] Create AddressForm component in `frontend/src/features/store-management/components/AddressForm.tsx`
+- [x] T019 [US1] Create useUpdateStore hook with TanStack Query in `frontend/src/features/store-management/hooks/useUpdateStore.ts`
+- [x] T020 [US1] Integrate AddressForm into store list page via StoreEditModal `frontend/src/pages/stores/components/StoreEditModal.tsx`
+- [x] T021 [US1] Add phone validation - 已在 AddressForm 通过 Ant Design Form rules 实现
+- [x] T022 [US1] Add form validation error display - 已在 AddressForm 和 StoreEditModal 中实现
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 

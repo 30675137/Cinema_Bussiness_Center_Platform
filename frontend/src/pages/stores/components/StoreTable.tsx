@@ -6,7 +6,8 @@
  */
 
 import React from 'react';
-import { Table, Tag, Empty } from 'antd';
+import { Table, Tag, Empty, Button, Space } from 'antd';
+import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { Store } from '../types/store.types';
 
@@ -19,6 +20,8 @@ interface StoreTableProps {
     total: number;
     onChange: (page: number, pageSize: number) => void;
   };
+  /** 编辑门店回调 @since 020-store-address */
+  onEdit?: (store: Store) => void;
 }
 
 /**
@@ -29,6 +32,7 @@ const StoreTable: React.FC<StoreTableProps> = ({
   stores,
   loading = false,
   pagination,
+  onEdit,
 }) => {
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -118,6 +122,40 @@ const StoreTable: React.FC<StoreTableProps> = ({
         </span>
       ),
       sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    },
+    // 020-store-address: 添加地址摘要列
+    {
+      title: '地址',
+      dataIndex: 'addressSummary',
+      key: 'addressSummary',
+      width: 150,
+      render: (text: string, record: Store) => (
+        <span className="address-summary-text">
+          {text || record.city && record.district
+            ? `${record.city || ''} ${record.district || ''}`.trim()
+            : <span style={{ color: '#999' }}>未配置</span>}
+        </span>
+      ),
+    },
+    // 020-store-address: 添加操作列
+    {
+      title: '操作',
+      key: 'action',
+      width: 100,
+      fixed: 'right' as const,
+      render: (_: unknown, record: Store) => (
+        <Space size="small">
+          <Button
+            type="link"
+            size="small"
+            icon={<EnvironmentOutlined />}
+            onClick={() => onEdit?.(record)}
+            aria-label={`编辑${record.name}的地址`}
+          >
+            地址
+          </Button>
+        </Space>
+      ),
     },
   ];
 

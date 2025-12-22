@@ -3,6 +3,7 @@ package com.cinema.hallstore.service;
 import com.cinema.hallstore.domain.Store;
 import com.cinema.hallstore.domain.enums.StoreStatus;
 import com.cinema.hallstore.dto.StoreDTO;
+import com.cinema.hallstore.dto.UpdateStoreAddressRequest;
 import com.cinema.hallstore.exception.ResourceNotFoundException;
 import com.cinema.hallstore.mapper.StoreMapper;
 import com.cinema.hallstore.repository.StoreRepository;
@@ -83,5 +84,34 @@ public class StoreService {
         return storeRepository.findById(storeId)
                 .map(store -> store.getStatus() == StoreStatus.ACTIVE)
                 .orElse(false);
+    }
+
+    /**
+     * 更新门店地址信息
+     *
+     * @param storeId 门店ID
+     * @param request 更新请求
+     * @return 更新后的门店信息
+     * @throws ResourceNotFoundException 如果门店不存在
+     * @since 020-store-address
+     */
+    public StoreDTO updateStoreAddress(UUID storeId, UpdateStoreAddressRequest request) {
+        // 1. 验证门店存在
+        if (storeRepository.findById(storeId).isEmpty()) {
+            throw new ResourceNotFoundException("门店", storeId.toString());
+        }
+
+        // 2. 调用 repository 更新地址信息
+        Store updatedStore = storeRepository.updateAddress(
+                storeId,
+                request.getProvince(),
+                request.getCity(),
+                request.getDistrict(),
+                request.getAddress(),
+                request.getPhone()
+        ).orElseThrow(() -> new ResourceNotFoundException("门店", storeId.toString()));
+
+        // 3. 返回更新后的 DTO
+        return StoreMapper.toDto(updatedStore);
     }
 }
