@@ -12,7 +12,7 @@ test.describe('Store Reservation Settings Page', () => {
     await page.goto('/store-reservation-settings');
     
     // Wait for the page to load
-    await page.waitForSelector('[data-testid="store-reservation-settings-page"]', { timeout: 10000 }).catch(() => {
+    await page.waitForSelector('[data-testid="store-reservation-settings-page"]', { timeout: 10000 }).catch(async () => {
       // If testid doesn't exist, wait for the title instead
       await page.waitForSelector('h2:has-text("门店预约设置")', { timeout: 10000 });
     });

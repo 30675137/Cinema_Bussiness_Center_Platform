@@ -156,7 +156,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
     // Then 系统更新显示对应时间段内的库存变动情况
 
     // 切换到交易历史标签
-    await page.click('[data-testid="tab-transactions']');
+    await page.click('[data-testid="tab-transactions"]');
 
     // 测试日期范围筛选
     const dateFilter = page.locator('[data-testid="date-range-filter"]');

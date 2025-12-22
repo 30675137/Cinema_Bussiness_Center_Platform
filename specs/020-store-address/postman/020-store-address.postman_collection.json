@@ -1,0 +1,261 @@
+{
+	"info": {
+		"_postman_id": "020-store-address-collection",
+		"name": "020-Store-Address-Management",
+		"description": "门店地址信息管理 API 测试集合\n\n## 功能说明\n- 获取门店列表（含 addressSummary）\n- 获取门店详情（含完整地址字段）\n- 更新门店地址信息\n- 电话格式验证\n\n## 使用方法\n1. 导入 Collection 和 Environment\n2. 选择 020-local 环境\n3. 运行测试",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "获取门店列表",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('响应状态码为 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('响应包含 data 数组', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"});",
+							"",
+							"pm.test('响应包含 total 字段', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('total');",
+							"});",
+							"",
+							"pm.test('每个门店包含 addressSummary 字段', function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.data && jsonData.data.length > 0) {",
+							"        jsonData.data.forEach(function(store) {",
+							"            pm.expect(store).to.have.property('addressSummary');",
+							"        });",
+							"        // 保存第一个门店 ID 供后续测试使用",
+							"        pm.environment.set('storeId', jsonData.data[0].id);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/stores",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "stores"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "获取门店详情",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('响应状态码为 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('响应包含 data 字段', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"});",
+							"",
+							"pm.test('门店数据包含地址字段', function () {",
+							"    var jsonData = pm.response.json();",
+							"    var store = jsonData.data;",
+							"    pm.expect(store).to.have.property('id');",
+							"    pm.expect(store).to.have.property('name');",
+							"    pm.expect(store).to.have.property('province');",
+							"    pm.expect(store).to.have.property('city');",
+							"    pm.expect(store).to.have.property('district');",
+							"    pm.expect(store).to.have.property('address');",
+							"    pm.expect(store).to.have.property('phone');",
+							"    pm.expect(store).to.have.property('addressSummary');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/stores/{{storeId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "stores", "{{storeId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "更新门店地址",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('响应状态码为 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('响应包含 data 字段', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"});",
+							"",
+							"pm.test('更新后的门店包含新地址信息', function () {",
+							"    var jsonData = pm.response.json();",
+							"    var store = jsonData.data;",
+							"    pm.expect(store.province).to.equal('北京市');",
+							"    pm.expect(store.city).to.equal('北京市');",
+							"    pm.expect(store.district).to.equal('朝阳区');",
+							"    pm.expect(store.address).to.equal('建国路88号');",
+							"    pm.expect(store.phone).to.equal('13800138000');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"province\": \"北京市\",\n    \"city\": \"北京市\",\n    \"district\": \"朝阳区\",\n    \"address\": \"建国路88号\",\n    \"phone\": \"13800138000\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/stores/{{storeId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "stores", "{{storeId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "更新门店地址 - 无效电话格式",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('响应状态码为 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('响应包含错误信息', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"    pm.expect(jsonData.message).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"province\": \"北京市\",\n    \"city\": \"北京市\",\n    \"district\": \"朝阳区\",\n    \"address\": \"建国路88号\",\n    \"phone\": \"invalid-phone\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/stores/{{storeId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "stores", "{{storeId}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "更新门店地址 - 缺少必填字段",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('响应状态码为 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('响应包含验证错误信息', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.be.false;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"province\": \"北京市\",\n    \"address\": \"建国路88号\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/stores/{{storeId}}",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "stores", "{{storeId}}"]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		}
+	]
+}

@@ -27,11 +27,15 @@ public class CorsConfig {
         // 允许的源（明确指定，不使用通配符）
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
+                "http://localhost:3001",
                 "http://localhost:5173",
                 "http://127.0.0.1:3000",
+                "http://127.0.0.1:3001",
                 "http://127.0.0.1:5173",
                 "http://localhost:10086",    // C端 Taro H5
-                "http://127.0.0.1:10086"));  // C端 Taro H5
+                "http://localhost:10087",    // C端 Taro H5 (备用端口)
+                "http://127.0.0.1:10086",    // C端 Taro H5
+                "http://127.0.0.1:10087"));  // C端 Taro H5 (备用端口)
 
         // 允许的HTTP方法
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
