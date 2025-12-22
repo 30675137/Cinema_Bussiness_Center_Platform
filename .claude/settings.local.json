@@ -40,7 +40,17 @@
       "mcp__chrome-devtools__new_page",
       "mcp__chrome-devtools__take_snapshot",
       "Bash(mvn clean compile)",
-      "Skill(speckit.analyze)"
+      "Skill(speckit.analyze)",
+      "Skill(speckit.clarify)",
+      "Bash(test:*)",
+      "Bash(if [ -d \"/Users/lining/qoder/Cinema_Bussiness_Center_Platform/specs/001-skill-doc-generator/checklists\" ])",
+      "Bash(then:*)",
+      "Bash(else echo \"no_checklists_dir\")",
+      "Bash(fi)",
+      "Skill(skill-doc-generator)",
+      "Bash(done)",
+      "Bash(python3:*)",
+      "Skill(speckit.implement)"
     ]
   }
 }
