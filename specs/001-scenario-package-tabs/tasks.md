@@ -65,15 +65,15 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 **Goal**: Prepare development environment and project structure
 
-- [ ] T001 [P] Install frontend dependencies: `npm install react@19.2.0 antd@6.1.0 react-hook-form@7.68.0 zod@4.1.13 @tanstack/react-query@5.90.12 zustand@5.0.9 @hookform/resolvers dayjs@1.11.19 axios` in `frontend/`
-- [ ] T002 [P] Install dev dependencies: `npm install -D @types/react @types/node vitest @testing-library/react @testing-library/user-event playwright msw@2.12.4` in `frontend/`
-- [ ] T003 [P] Create feature folder structure in `frontend/src/features/scenario-package-editor/`
-- [ ] T004 [P] Create TypeScript type definitions from data-model.md in `frontend/src/features/scenario-package-editor/types/index.ts`
-- [ ] T005 [P] Set up Zustand store for editor state in `frontend/src/features/scenario-package-editor/stores/useScenarioPackageStore.ts`
-- [ ] T006 [P] Set up TanStack Query hooks for API calls in `frontend/src/features/scenario-package-editor/hooks/useScenarioPackageQueries.ts`
-- [ ] T007 [P] Create Zod validation schemas from data-model.md in `frontend/src/features/scenario-package-editor/schemas/validationSchemas.ts`
-- [ ] T008 [P] Set up Axios API client with base configuration in `frontend/src/features/scenario-package-editor/services/apiClient.ts`
-- [ ] T009 Create MSW mock handlers for scenario package APIs in `frontend/src/mocks/handlers/scenarioPackageHandlers.ts`
+- [x] T001 [P] Install frontend dependencies: `npm install react@19.2.0 antd@6.1.0 react-hook-form@7.68.0 zod@4.1.13 @tanstack/react-query@5.90.12 zustand@5.0.9 @hookform/resolvers dayjs@1.11.19 axios` in `frontend/`
+- [x] T002 [P] Install dev dependencies: `npm install -D @types/react @types/node vitest @testing-library/react @testing-library/user-event playwright msw@2.12.4` in `frontend/`
+- [x] T003 [P] Create feature folder structure in `frontend/src/features/scenario-package-editor/`
+- [x] T004 [P] Create TypeScript type definitions from data-model.md in `frontend/src/features/scenario-package-editor/types/index.ts`
+- [x] T005 [P] Set up Zustand store for editor state in `frontend/src/features/scenario-package-editor/stores/useScenarioPackageStore.ts`
+- [x] T006 [P] Set up TanStack Query hooks for API calls in `frontend/src/features/scenario-package-editor/hooks/useScenarioPackageQueries.ts`
+- [x] T007 [P] Create Zod validation schemas from data-model.md in `frontend/src/features/scenario-package-editor/schemas/validationSchemas.ts`
+- [x] T008 [P] Set up Axios API client with base configuration in `frontend/src/features/scenario-package-editor/services/apiClient.ts`
+- [x] T009 Create MSW mock handlers for scenario package APIs in `frontend/src/mocks/handlers/scenarioPackageHandlers.ts`
 
 **Parallel Execution**: Tasks T001-T008 can run in parallel (different files, no dependencies)
 
@@ -257,7 +257,7 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 - [ ] T061 [US4] Implement form fields: dayOfWeek (Select), startTime (TimePicker), endTime (TimePicker), capacity (InputNumber), priceAdjustment (nested form) in TimeSlotTemplateForm
 - [ ] T062 [US4] Add validation: startTime < endTime in timeSlotTemplateSchema
 - [ ] T063 [US4] Implement "Add Slot" button per day-of-week column opening TimeSlotTemplateForm
-- [ ] T064 [US4] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/time-slot-templates, PUT, DELETE
+- [x] T064 [US4] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/time-slot-templates, PUT, DELETE (后端已实现)
 - [ ] T065 [US4] Implement "Copy to Other Days" feature allowing batch template duplication
 - [ ] T066 [US4] Create CalendarOverrideView component using Ant Design Calendar in `frontend/src/features/scenario-package-editor/components/time-slots/CalendarOverrideView.tsx`
 - [ ] T067 [US4] Implement custom dateCellRender showing override indicator badges (ADD=green, MODIFY=orange, CANCEL=red)
@@ -341,7 +341,7 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 - [ ] T095 [P] Implement comprehensive error messages for all API failure scenarios
 - [ ] T096 [P] Add audit logging for publish/unpublish actions in backend
 - [ ] T097 [P] Set up Sentry or error tracking for production monitoring
-- [ ] T098 Add end-to-end smoke test using Playwright covering full scenario package creation flow in `tests/e2e/scenario-package-editor.spec.ts`
+- [x] T098 Add end-to-end smoke test using Playwright covering full scenario package creation flow in `tests/e2e/scenario-package-editor.spec.ts`
 - [ ] T099 Perform manual QA testing across all 5 tabs and document results
 - [ ] T100 Update project documentation: README, API docs, user guide
 
@@ -425,6 +425,7 @@ Before marking feature complete, ensure:
 ---
 
 **Generated**: 2025-12-23
+**Updated**: 2025-12-23 (后端时段模板CRUD API完成, Taro详情页API集成完成)
 **Feature Branch**: 001-scenario-package-tabs
 **Total Estimated Tasks**: 100
 **MVP Tasks (US1 only)**: 11 tasks (T017-T027)
