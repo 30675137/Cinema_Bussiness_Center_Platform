@@ -1,0 +1,197 @@
+.my-reservations-page {
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 24px 20px;
+  background: #fff;
+}
+
+.back-btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #333;
+}
+
+.header-title {
+  font-size: 34px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.header-placeholder {
+  width: 60px;
+}
+
+/* Status Tabs */
+.status-tabs {
+  background: #fff;
+  padding: 16px 24px;
+  white-space: nowrap;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tab-item {
+  display: inline-block;
+  padding: 12px 24px;
+  margin-right: 16px;
+  font-size: 28px;
+  color: #666;
+  border-radius: 24px;
+  background: #f5f6fa;
+}
+
+.tab-item.active {
+  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* List Scroll */
+.list-scroll {
+  flex: 1;
+  padding: 24px;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 28px;
+  color: #999;
+}
+
+/* Error */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  font-size: 28px;
+  color: #999;
+}
+
+.retry-btn {
+  margin-top: 20px;
+  padding: 16px 40px;
+  background: #667eea;
+  color: #fff;
+  border-radius: 24px;
+  font-size: 26px;
+}
+
+/* Empty */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.empty-text {
+  font-size: 28px;
+  color: #999;
+}
+
+/* Reservation List */
+.reservation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Reservation Card */
+.reservation-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-number {
+  font-size: 24px;
+  color: #999;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 22px;
+}
+
+.card-content {
+  margin-bottom: 16px;
+}
+
+.package-name {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1a1a2e;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.info-label {
+  font-size: 26px;
+  color: #999;
+  width: 140px;
+}
+
+.info-value {
+  font-size: 26px;
+  color: #333;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.total-amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.view-detail {
+  font-size: 26px;
+  color: #667eea;
+}

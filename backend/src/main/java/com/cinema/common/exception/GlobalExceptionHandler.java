@@ -5,6 +5,9 @@ import com.cinema.hallstore.exception.OptimisticLockException;
 import com.cinema.hallstore.exception.StoreHasDependenciesException;
 import com.cinema.hallstore.exception.StoreNameConflictException;
 import com.cinema.hallstore.exception.StoreNotFoundException;
+import com.cinema.reservation.exception.InsufficientInventoryException;
+import com.cinema.reservation.exception.InvalidStatusTransitionException;
+import com.cinema.reservation.exception.ReservationNotFoundException;
 import com.cinema.scenariopackage.exception.ConcurrentModificationException;
 import com.cinema.scenariopackage.exception.PackageNotFoundException;
 import com.cinema.scenariopackage.exception.ValidationException;
@@ -115,6 +118,68 @@ public class GlobalExceptionHandler {
                 ex.getStoreId(), ex.getExpectedVersion(), ex.getActualVersion());
         ErrorResponse error = ErrorResponse.of("OPTIMISTIC_LOCK_CONFLICT", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    // ==================== Reservation Exceptions (U001-reservation-order-management) ====================
+
+    /**
+     * 处理预约单未找到异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 404 响应
+     */
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleReservationNotFound(
+            ReservationNotFoundException ex, WebRequest request) {
+        logger.warn("Reservation not found: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("RESERVATION_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * 处理库存不足异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 409 响应
+     */
+    @ExceptionHandler(InsufficientInventoryException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientInventory(
+            InsufficientInventoryException ex, WebRequest request) {
+        logger.warn("Insufficient inventory: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("INSUFFICIENT_INVENTORY", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * 处理无效状态转换异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 400 响应
+     */
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStatusTransition(
+            InvalidStatusTransitionException ex, WebRequest request) {
+        logger.warn("Invalid status transition: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("INVALID_STATUS_TRANSITION", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * 处理非法状态异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 400 响应
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(
+            IllegalStateException ex, WebRequest request) {
+        logger.warn("Illegal state: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("ILLEGAL_STATE", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**

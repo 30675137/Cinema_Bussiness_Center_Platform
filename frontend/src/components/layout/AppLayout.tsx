@@ -360,6 +360,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           key: '/orders/exceptions',
           label: '异常订单/审计日志',
         },
+        {
+          key: '/reservation-orders',
+          label: 'U001-预约单管理',
+        },
       ],
     },
     {

@@ -3,6 +3,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useMemo } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { useBookingStore } from '@/stores/bookingStore'
+import { useReservationStore } from '@/stores/reservationStore'
 import { useCreateBooking } from '@/services/bookingService'
 import { useScenarioDetail, usePackageTiers, useAddonItems, useTimeSlotTemplates } from '@/services/scenarioService'
 import { THEME_CONFIG } from '@/constants'
@@ -38,6 +39,9 @@ export default function Detail() {
   } = useBookingStore()
 
   const createBooking = useCreateBooking()
+  
+  // 预约表单store
+  const setScenarioPackage = useReservationStore((s) => s.setScenarioPackage)
 
   // 将后端数据转换为页面需要的格式
   const scenario = useMemo(() => {
@@ -145,30 +149,13 @@ export default function Detail() {
   const handlePayment = () => {
     if (!scenario || !selectedPkg || !selectedTime) return
 
-    createBooking.mutate(
-      {
-        scenario,
-        package: selectedPkg,
-        addons,
-        total: totalPrice,
-        time: selectedTime,
-        date: selectedDate
-      },
-      {
-        onSuccess: () => {
-          setSuccessData({
-            scenario,
-            package: selectedPkg,
-            addons,
-            total: totalPrice,
-            time: selectedTime,
-            date: selectedDate
-          })
-          reset()
-          Taro.redirectTo({ url: '/pages/success/index' })
-        }
-      }
-    )
+    // 设置场景包信息到预约Store
+    setScenarioPackage(scenario.id, scenario.title, scenario.image)
+    
+    // 跳转到预约表单页面
+    Taro.navigateTo({
+      url: `/pages/reservation-form/index?id=${scenario.id}&tierId=${selectedPkg.id}&date=${selectedDate}&time=${selectedTime}`
+    })
   }
 
   if (isLoadingScenario || isLoadingTiers || !scenario) {
@@ -342,11 +329,11 @@ export default function Detail() {
             </Text>
           </View>
           <View
-            className={`pay-btn ${!selectedTime || createBooking.isPending ? 'disabled' : ''}`}
+            className={`pay-btn ${!selectedTime ? 'disabled' : ''}`}
             onClick={handlePayment}
           >
-            <Text>{createBooking.isPending ? '处理中...' : '立即支付'}</Text>
-            <Text>⚡</Text>
+            <Text>立即预约</Text>
+            <Text>📅</Text>
           </View>
         </View>
       </View>

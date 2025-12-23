@@ -53,7 +53,8 @@
       "Skill(speckit.implement)",
       "Bash(find:*)",
       "Skill(speckit.specify)",
-      "Bash(git cherry-pick:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(grep:*)"
     ]
   }
 }

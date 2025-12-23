@@ -38,6 +38,9 @@ const ScenarioPackageCreate = lazy(() => import('@/pages/scenario-packages/creat
 // 新的多标签页编辑器
 const ScenarioPackageEdit = lazy(() => import('@/features/scenario-package-editor/ScenarioPackageEditorPage'));
 const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/preview'));
+// 预约单管理页面
+const ReservationOrderList = lazy(() => import('@/pages/reservation-orders/ReservationOrderList'));
+const ReservationOrderDetail = lazy(() => import('@/pages/reservation-orders/ReservationOrderDetail'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -360,6 +363,35 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <ScenarioPackagePreview />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 预约单管理路由
+  {
+    path: '/reservation-orders',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReservationOrderList />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/reservation-orders/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ReservationOrderDetail />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

@@ -3,6 +3,9 @@ export default defineAppConfig({
     'pages/home/index',
     'pages/detail/index',
     'pages/store-detail/index',
+    'pages/reservation-form/index',
+    'pages/my-reservations/index',
+    'pages/my-reservations/detail/index',
     'pages/success/index',
     'pages/admin/index'
   ],
