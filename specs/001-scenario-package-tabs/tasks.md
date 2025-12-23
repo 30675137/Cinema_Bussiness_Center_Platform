@@ -113,17 +113,17 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 ### Implementation Tasks
 
-- [ ] T017 [US1] Create main ScenarioPackageEditor container component in `frontend/src/features/scenario-package-editor/components/ScenarioPackageEditor.tsx`
-- [ ] T018 [US1] Implement Ant Design Tabs component with 5 tab panels in ScenarioPackageEditor
-- [ ] T019 [US1] Create BasicInfoTab component in `frontend/src/features/scenario-package-editor/components/tabs/BasicInfoTab.tsx`
-- [ ] T020 [US1] Set up React Hook Form with Zod resolver for basic info in BasicInfoTab
-- [ ] T021 [US1] Implement form fields: name (Input), description (TextArea), category (Select) in BasicInfoTab
-- [ ] T022 [US1] Integrate ImageUpload component for mainImage field in BasicInfoTab
-- [ ] T023 [US1] Wire up useUnsavedChanges hook to BasicInfoTab form state
-- [ ] T024 [US1] Implement tab change handler with confirmation modal when isDirty=true in ScenarioPackageEditor
-- [ ] T025 [US1] Connect BasicInfoTab to TanStack Query mutation for PUT /api/scenario-packages/:id
-- [ ] T026 [US1] Add success/error toast notifications for save operation in BasicInfoTab
-- [ ] T027 [US1] Implement page-level beforeunload event listener for unsaved changes warning in ScenarioPackageEditor
+- [x] T017 [US1] Create main ScenarioPackageEditor container component in `frontend/src/features/scenario-package-editor/ScenarioPackageEditorPage.tsx`
+- [x] T018 [US1] Implement Ant Design Tabs component with 5 tab panels in ScenarioPackageEditor
+- [x] T019 [US1] Create BasicInfoTab component in `frontend/src/features/scenario-package-editor/components/tabs/BasicInfoTab.tsx`
+- [x] T020 [US1] Set up React Hook Form with Zod resolver for basic info in BasicInfoTab
+- [x] T021 [US1] Implement form fields: name (Input), description (TextArea), category (Select) in BasicInfoTab
+- [x] T022 [US1] Integrate ImageUpload component for mainImage field in BasicInfoTab
+- [x] T023 [US1] Wire up useUnsavedChanges hook to BasicInfoTab form state
+- [x] T024 [US1] Implement tab change handler with confirmation modal when isDirty=true in ScenarioPackageEditor
+- [x] T025 [US1] Connect BasicInfoTab to TanStack Query mutation for PUT /api/scenario-packages/:id
+- [x] T026 [US1] Add success/error toast notifications for save operation in BasicInfoTab
+- [x] T027 [US1] Implement page-level beforeunload event listener for unsaved changes warning in ScenarioPackageEditor
 
 **Parallel Opportunities**:
 - T019-T022 can be developed in parallel (different form fields)
@@ -154,21 +154,21 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 ### Implementation Tasks
 
-- [ ] T028 [US2] Create PackagesTab component in `frontend/src/features/scenario-package-editor/components/tabs/PackagesTab.tsx`
-- [ ] T029 [US2] Implement package list display using Ant Design Table in PackagesTab
-- [ ] T030 [US2] Create PackageTierForm modal component in `frontend/src/features/scenario-package-editor/components/forms/PackageTierForm.tsx`
-- [ ] T031 [US2] Set up React Hook Form with packageTierSchema validation in PackageTierForm
-- [ ] T032 [US2] Implement form fields: name, price (InputNumber), originalPrice (InputNumber), tags (Select mode="tags") in PackageTierForm
-- [ ] T033 [US2] Add custom validation: originalPrice >= price in PackageTierForm schema
-- [ ] T034 [US2] Implement service description field (TextArea) and sortOrder (hidden, auto-managed) in PackageTierForm
-- [ ] T035 [US2] Create "Add Package" button handler opening PackageTierForm modal in create mode in PackagesTab
-- [ ] T036 [US2] Implement "Edit" action in table row opening PackageTierForm modal in edit mode in PackagesTab
-- [ ] T037 [US2] Implement "Delete" action with confirmation popconfirm in PackagesTab
-- [ ] T038 [US2] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/packages, PUT /api/scenario-packages/:id/packages/:packageId, DELETE /api/scenario-packages/:id/packages/:packageId
-- [ ] T039 [US2] Implement drag-and-drop reordering using @dnd-kit/sortable in PackagesTab table
-- [ ] T040 [US2] Add originalPrice badge showing discount percentage when originalPrice exists in table render
-- [ ] T041 [US2] Display tags as Ant Design Tag components with color variants in table
-- [ ] T042 [US2] Add validation warning in publish settings if packages.length === 0
+- [x] T028 [US2] Create PackagesTab component in `frontend/src/features/scenario-package-editor/components/tabs/PackagesTab.tsx`
+- [x] T029 [US2] Implement package list display using Ant Design Table in PackagesTab
+- [x] T030 [US2] Create PackageTierForm modal component in `frontend/src/features/scenario-package-editor/components/forms/PackageTierForm.tsx`
+- [x] T031 [US2] Set up React Hook Form with packageTierSchema validation in PackageTierForm
+- [x] T032 [US2] Implement form fields: name, price (InputNumber), originalPrice (InputNumber), tags (Select mode="tags") in PackageTierForm
+- [x] T033 [US2] Add custom validation: originalPrice >= price in PackageTierForm schema
+- [x] T034 [US2] Implement service description field (TextArea) and sortOrder (hidden, auto-managed) in PackageTierForm
+- [x] T035 [US2] Create "Add Package" button handler opening PackageTierForm modal in create mode in PackagesTab
+- [x] T036 [US2] Implement "Edit" action in table row opening PackageTierForm modal in edit mode in PackagesTab
+- [x] T037 [US2] Implement "Delete" action with confirmation popconfirm in PackagesTab
+- [x] T038 [US2] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/packages, PUT /api/scenario-packages/:id/packages/:packageId, DELETE /api/scenario-packages/:id/packages/:packageId
+- [x] T039 [US2] Implement drag-and-drop reordering using @dnd-kit/sortable in PackagesTab table
+- [x] T040 [US2] Add originalPrice badge showing discount percentage when originalPrice exists in table render
+- [x] T041 [US2] Display tags as Ant Design Tag components with color variants in table
+- [x] T042 [US2] Add validation warning in publish settings if packages.length === 0
 
 **Parallel Opportunities**:
 - T029-T030 (list display vs form component) can be built in parallel
@@ -202,19 +202,19 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 ### Implementation Tasks
 
-- [ ] T043 [US3] Create AddOnsTab component in `frontend/src/features/scenario-package-editor/components/tabs/AddOnsTab.tsx`
-- [ ] T044 [US3] Set up TanStack Query for fetching global add-on items: GET /api/add-on-items
-- [ ] T045 [US3] Set up TanStack Query for fetching associated add-ons: GET /api/scenario-packages/:id/add-ons
-- [ ] T046 [US3] Implement Ant Design Transfer component with add-on items as dataSource in AddOnsTab
-- [ ] T047 [US3] Transform add-on items to Transfer format: {key, title, description, disabled} based on isActive
-- [ ] T048 [US3] Implement Transfer search/filter by item name
-- [ ] T049 [US3] Add category grouping display in Transfer item render function
-- [ ] T050 [US3] Create associated add-ons table below Transfer showing selected items with sortOrder and isRequired columns
-- [ ] T051 [US3] Implement drag-and-drop reordering for associated items table using @dnd-kit/sortable
-- [ ] T052 [US3] Add "Required" checkbox toggle in associated items table
-- [ ] T053 [US3] Wire up batch update mutation: PUT /api/scenario-packages/:id/add-ons with complete association list
-- [ ] T054 [US3] Implement save button handler transforming Transfer targetKeys + table state into API request format
-- [ ] T055 [US3] Add inventory display (if applicable) and "Sold Out" badge for items with inventory=0
+- [x] T043 [US3] Create AddOnsTab component in `frontend/src/features/scenario-package-editor/components/tabs/AddonsTab.tsx`
+- [x] T044 [US3] Set up TanStack Query for fetching global add-on items: GET /api/add-on-items
+- [x] T045 [US3] Set up TanStack Query for fetching associated add-ons: GET /api/scenario-packages/:id/add-ons
+- [x] T046 [US3] Implement Ant Design Transfer component with add-on items as dataSource in AddOnsTab
+- [x] T047 [US3] Transform add-on items to Transfer format: {key, title, description, disabled} based on isActive
+- [x] T048 [US3] Implement Transfer search/filter by item name
+- [x] T049 [US3] Add category grouping display in Transfer item render function
+- [x] T050 [US3] Create associated add-ons table below Transfer showing selected items with sortOrder and isRequired columns
+- [x] T051 [US3] Implement drag-and-drop reordering for associated items table using @dnd-kit/sortable
+- [x] T052 [US3] Add "Required" checkbox toggle in associated items table
+- [x] T053 [US3] Wire up batch update mutation: PUT /api/scenario-packages/:id/add-ons with complete association list
+- [x] T054 [US3] Implement save button handler transforming Transfer targetKeys + table state into API request format
+- [x] T055 [US3] Add inventory display (if applicable) and "Sold Out" badge for items with inventory=0
 
 **Parallel Opportunities**:
 - T044-T045 (data fetching) can run in parallel
@@ -249,7 +249,7 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 ### Implementation Tasks
 
-- [ ] T056 [US4] Create TimeSlotsTab component with Tab sub-navigation (Week View / Calendar View) in `frontend/src/features/scenario-package-editor/components/tabs/TimeSlotsTab.tsx`
+- [x] T056 [US4] Create TimeSlotsTab component with Tab sub-navigation (Week View / Calendar View) in `frontend/src/features/scenario-package-editor/components/tabs/TimeSlotsTab.tsx`
 - [ ] T057 [US4] Create WeekTemplateView component in `frontend/src/features/scenario-package-editor/components/time-slots/WeekTemplateView.tsx`
 - [ ] T058 [US4] Implement 7-column layout (Sun-Sat) in WeekTemplateView
 - [ ] T059 [US4] Create TimeSlotTemplateItem component displaying startTime-endTime, capacity, priceAdjustment in `frontend/src/features/scenario-package-editor/components/time-slots/TimeSlotTemplateItem.tsx`
@@ -305,20 +305,20 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 ### Implementation Tasks
 
-- [ ] T075 [US5] Create PublishSettingsTab component in `frontend/src/features/scenario-package-editor/components/tabs/PublishSettingsTab.tsx`
-- [ ] T076 [US5] Implement status display badge showing current status (DRAFT/PUBLISHED/ARCHIVED) in PublishSettingsTab
-- [ ] T077 [US5] Create form fields: effectiveStartDate (DatePicker), effectiveEndDate (DatePicker), advanceBookingDays (InputNumber) in PublishSettingsTab
-- [ ] T078 [US5] Add date range validation: effectiveEndDate >= effectiveStartDate using Zod refine
-- [ ] T079 [US5] Implement "Save Settings" button for PUT /api/scenario-packages/:id/publish-settings
-- [ ] T080 [US5] Create PublishValidationChecker component displaying validation results in `frontend/src/features/scenario-package-editor/components/publish/PublishValidationChecker.tsx`
-- [ ] T081 [US5] Implement validation checks: basicInfo complete (name, category, mainImage), packages.length >= 1, hasTimeSlots
-- [ ] T082 [US5] Display validation results as Ant Design Alert components with checklist (✓ passed / ✗ failed)
-- [ ] T083 [US5] Implement "Publish" button with disabled state if validation fails
-- [ ] T084 [US5] Wire up publish mutation: POST /api/scenario-packages/:id/publish
-- [ ] T085 [US5] Handle publish validation error response (400) and display error.details.missingItems
-- [ ] T086 [US5] Implement "Unpublish" button for POST /api/scenario-packages/:id/unpublish
-- [ ] T087 [US5] Add confirmation modal for both publish and unpublish actions
-- [ ] T088 [US5] Implement success redirect to scenario package list page after publish/unpublish
+- [x] T075 [US5] Create PublishSettingsTab component in `frontend/src/features/scenario-package-editor/components/tabs/PublishTab.tsx`
+- [x] T076 [US5] Implement status display badge showing current status (DRAFT/PUBLISHED/ARCHIVED) in PublishSettingsTab
+- [x] T077 [US5] Create form fields: effectiveStartDate (DatePicker), effectiveEndDate (DatePicker), advanceBookingDays (InputNumber) in PublishSettingsTab
+- [x] T078 [US5] Add date range validation: effectiveEndDate >= effectiveStartDate using Zod refine
+- [x] T079 [US5] Implement "Save Settings" button for PUT /api/scenario-packages/:id/publish-settings
+- [x] T080 [US5] Create PublishValidationChecker component displaying validation results in PublishTab
+- [x] T081 [US5] Implement validation checks: basicInfo complete (name, category, mainImage), packages.length >= 1, hasTimeSlots
+- [x] T082 [US5] Display validation results as Ant Design Alert components with checklist (✓ passed / ✗ failed)
+- [x] T083 [US5] Implement "Publish" button with disabled state if validation fails
+- [x] T084 [US5] Wire up publish mutation: POST /api/scenario-packages/:id/publish
+- [x] T085 [US5] Handle publish validation error response (400) and display error.details.missingItems
+- [x] T086 [US5] Implement "Unpublish" button for POST /api/scenario-packages/:id/unpublish
+- [x] T087 [US5] Add confirmation modal for both publish and unpublish actions
+- [x] T088 [US5] Implement success redirect to scenario package list page after publish/unpublish
 
 **Parallel Opportunities**:
 - T075-T079 (settings form) and T080-T082 (validation checker) can be built in parallel
