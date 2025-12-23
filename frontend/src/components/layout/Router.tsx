@@ -35,7 +35,8 @@ const StoreReservationSettingsPage = lazy(() => import('@/pages/store-reservatio
 // 场景包管理页面
 const ScenarioPackageList = lazy(() => import('@/pages/scenario-packages/list'));
 const ScenarioPackageCreate = lazy(() => import('@/pages/scenario-packages/create'));
-const ScenarioPackageEdit = lazy(() => import('@/pages/scenario-packages/edit'));
+// 新的多标签页编辑器
+const ScenarioPackageEdit = lazy(() => import('@/features/scenario-package-editor/ScenarioPackageEditorPage'));
 const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/preview'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));

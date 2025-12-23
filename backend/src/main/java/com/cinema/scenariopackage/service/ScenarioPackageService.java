@@ -46,6 +46,11 @@ public class ScenarioPackageService {
     private final StoreAssociationRepository storeAssociationRepository;
     // 019-store-association: Store service for validation
     private final StoreService storeService;
+    // 001-scenario-package-tabs: New repositories
+    private final PackageTierRepository tierRepository;
+    private final AddonItemRepository addonItemRepository;
+    private final PackageAddonRepository packageAddonRepository;
+    private final TimeSlotTemplateRepository timeSlotTemplateRepository;
 
     public ScenarioPackageService(
             ScenarioPackageRepository packageRepository,
@@ -56,7 +61,11 @@ public class ScenarioPackageService {
             PackageServiceItemRepository serviceRepository,
             PackagePricingRepository pricingRepository,
             StoreAssociationRepository storeAssociationRepository,
-            StoreService storeService) {
+            StoreService storeService,
+            PackageTierRepository tierRepository,
+            AddonItemRepository addonItemRepository,
+            PackageAddonRepository packageAddonRepository,
+            TimeSlotTemplateRepository timeSlotTemplateRepository) {
         this.packageRepository = packageRepository;
         this.ruleRepository = ruleRepository;
         this.hallAssociationRepository = hallAssociationRepository;
@@ -66,6 +75,10 @@ public class ScenarioPackageService {
         this.pricingRepository = pricingRepository;
         this.storeAssociationRepository = storeAssociationRepository;
         this.storeService = storeService;
+        this.tierRepository = tierRepository;
+        this.addonItemRepository = addonItemRepository;
+        this.packageAddonRepository = packageAddonRepository;
+        this.timeSlotTemplateRepository = timeSlotTemplateRepository;
     }
 
     /**
@@ -698,5 +711,127 @@ public class ScenarioPackageService {
         return pricingRepository.findByPackageId(packageId)
                 .map(PackagePricing::getPackagePrice)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    // ==================== 套餐档位、加购项、时段模板相关方法 ====================
+
+    /**
+     * 获取场景包的套餐档位列表
+     */
+    @Transactional(readOnly = true)
+    public List<PackageTier> getPackageTiers(UUID packageId) {
+        logger.info("Getting package tiers for package: {}", packageId);
+        // 验证场景包存在
+        findById(packageId);
+        return tierRepository.findByPackageIdOrderBySortOrder(packageId);
+    }
+
+    /**
+     * 获取所有启用的加购项
+     */
+    @Transactional(readOnly = true)
+    public List<AddonItem> getActiveAddonItems() {
+        logger.info("Getting all active addon items");
+        return addonItemRepository.findAllActive();
+    }
+
+    /**
+     * 获取场景包关联的加购项
+     */
+    @Transactional(readOnly = true)
+    public List<PackageAddon> getPackageAddons(UUID packageId) {
+        logger.info("Getting package addons for package: {}", packageId);
+        // 验证场景包存在
+        findById(packageId);
+        return packageAddonRepository.findByPackageIdOrderBySortOrder(packageId);
+    }
+
+    /**
+     * 获取场景包的时段模板
+     */
+    @Transactional(readOnly = true)
+    public List<TimeSlotTemplate> getTimeSlotTemplates(UUID packageId) {
+        logger.info("Getting time slot templates for package: {}", packageId);
+        // 验证场景包存在
+        findById(packageId);
+        return timeSlotTemplateRepository.findByPackageIdOrderByDayOfWeekAndStartTime(packageId);
+    }
+
+    /**
+     * 创建时段模板
+     */
+    @Transactional
+    public TimeSlotTemplate createTimeSlotTemplate(UUID packageId, CreateTimeSlotTemplateRequest request) {
+        logger.info("Creating time slot template for package: {}, dayOfWeek: {}", packageId, request.getDayOfWeek());
+        // 验证场景包存在
+        findById(packageId);
+
+        TimeSlotTemplate template = new TimeSlotTemplate();
+        template.setPackageId(packageId);
+        template.setDayOfWeek(request.getDayOfWeek());
+        template.setStartTime(java.time.LocalTime.parse(request.getStartTime()));
+        template.setEndTime(java.time.LocalTime.parse(request.getEndTime()));
+        template.setCapacity(request.getCapacity());
+        template.setPriceAdjustment(request.getPriceAdjustment());
+        template.setIsEnabled(request.getIsEnabled() != null ? request.getIsEnabled() : true);
+
+        return timeSlotTemplateRepository.save(template);
+    }
+
+    /**
+     * 更新时段模板
+     */
+    @Transactional
+    public TimeSlotTemplate updateTimeSlotTemplate(UUID packageId, UUID templateId, CreateTimeSlotTemplateRequest request) {
+        logger.info("Updating time slot template: {} for package: {}", templateId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        TimeSlotTemplate template = timeSlotTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("时段模板不存在: " + templateId));
+
+        if (!template.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("时段模板不属于此场景包");
+        }
+
+        if (request.getDayOfWeek() != null) {
+            template.setDayOfWeek(request.getDayOfWeek());
+        }
+        if (request.getStartTime() != null) {
+            template.setStartTime(java.time.LocalTime.parse(request.getStartTime()));
+        }
+        if (request.getEndTime() != null) {
+            template.setEndTime(java.time.LocalTime.parse(request.getEndTime()));
+        }
+        if (request.getCapacity() != null) {
+            template.setCapacity(request.getCapacity());
+        }
+        if (request.getPriceAdjustment() != null) {
+            template.setPriceAdjustment(request.getPriceAdjustment());
+        }
+        if (request.getIsEnabled() != null) {
+            template.setIsEnabled(request.getIsEnabled());
+        }
+
+        return timeSlotTemplateRepository.save(template);
+    }
+
+    /**
+     * 删除时段模板
+     */
+    @Transactional
+    public void deleteTimeSlotTemplate(UUID packageId, UUID templateId) {
+        logger.info("Deleting time slot template: {} for package: {}", templateId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        TimeSlotTemplate template = timeSlotTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new IllegalArgumentException("时段模板不存在: " + templateId));
+
+        if (!template.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("时段模板不属于此场景包");
+        }
+
+        timeSlotTemplateRepository.delete(template);
     }
 }

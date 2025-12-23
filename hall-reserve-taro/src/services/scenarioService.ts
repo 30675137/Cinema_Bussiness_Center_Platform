@@ -114,3 +114,101 @@ export function useScenarios() {
     queryFn: fetchScenarioPackages, // 使用真实 API
   })
 }
+
+/**
+ * 根据 ID 获取场景包详情
+ * 
+ * @param id 场景包 ID
+ * @returns Promise<ScenarioDetail> 场景包详情
+ */
+export async function fetchScenarioById(id: string): Promise<any> {
+  const response = await request(`/api/scenario-packages/${id}`)
+  
+  if (!response.success) {
+    throw new Error(response.message || '获取场景包详情失败')
+  }
+  
+  return response.data
+}
+
+/**
+ * 根据 ID 获取场景包的套餐档位列表
+ */
+export async function fetchPackageTiers(packageId: string): Promise<any[]> {
+  const response = await request(`/api/scenario-packages/${packageId}/tiers`)
+  
+  if (!response.success) {
+    throw new Error(response.message || '获取套餐列表失败')
+  }
+  
+  return response.data
+}
+
+/**
+ * 使用 TanStack Query 的场景包详情 Hook
+ */
+export function useScenarioDetail(id: string | undefined) {
+  return useQuery({
+    queryKey: ['scenarioPackage', id],
+    queryFn: () => fetchScenarioById(id!),
+    enabled: !!id,
+  })
+}
+
+/**
+ * 使用 TanStack Query 的套餐档位 Hook
+ */
+export function usePackageTiers(packageId: string | undefined) {
+  return useQuery({
+    queryKey: ['packageTiers', packageId],
+    queryFn: () => fetchPackageTiers(packageId!),
+    enabled: !!packageId,
+  })
+}
+
+/**
+ * 获取所有启用的加购项
+ */
+export async function fetchAddonItems(): Promise<any[]> {
+  const response = await request('/api/addon-items')
+  
+  if (!response.success) {
+    throw new Error(response.message || '获取加购项列表失败')
+  }
+  
+  return response.data
+}
+
+/**
+ * 使用 TanStack Query 的加购项列表 Hook
+ */
+export function useAddonItems() {
+  return useQuery({
+    queryKey: ['addonItems'],
+    queryFn: fetchAddonItems,
+  })
+}
+
+/**
+ * 获取场景包的时段模板
+ */
+export async function fetchTimeSlotTemplates(packageId: string): Promise<any[]> {
+  const response = await request(`/api/scenario-packages/${packageId}/time-slot-templates`)
+  
+  if (!response.success) {
+    throw new Error(response.message || '获取时段模板失败')
+  }
+  
+  return response.data
+}
+
+/**
+ * 使用 TanStack Query 的时段模板 Hook
+ */
+export function useTimeSlotTemplates(packageId: string | undefined) {
+  return useQuery({
+    queryKey: ['timeSlotTemplates', packageId],
+    queryFn: () => fetchTimeSlotTemplates(packageId!),
+    enabled: !!packageId,
+  })
+}

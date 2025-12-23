@@ -6,12 +6,21 @@
 ## 规则
 
 ### R1.1 分支命名
-- **格式**: `feat/<specId>-<slug>`
-- **示例**: `feat/017-scenario-package`
+- **格式**: `feat/<specId>-<slug>`,其中 specId 为 `X###` (模块字母+三位数字)
+- **示例**: `feat/S017-store-crud`, `feat/A005-scenario-package`
 
 ### R1.2 规格文档位置
 - **路径**: `specs/<specId>-<slug>/spec.md`
-- **示例**: `specs/017-scenario-package/spec.md`
+- **示例**: `specs/S017-store-crud/spec.md`, `specs/A005-scenario-package/spec.md`
+
+### R1.2.1 模块字母映射
+- **S**: 门店/影厅管理 (Store/Hall Management)
+- **P**: 商品/库存管理 (Product/Inventory Management)
+- **B**: 品牌/分类管理 (Brand/Category Management)
+- **A**: 活动/场景包管理 (Activity/Scenario Package Management)
+- **U**: 用户/预订管理 (User/Reservation Management)
+- **T**: 工具/基础设施 (Tool/Infrastructure)
+- **F**: 前端基础 (Frontend Infrastructure)
 
 ### R1.3 激活规格引用
 - 通过 `.specify/active_spec.txt` 维护当前激活规格

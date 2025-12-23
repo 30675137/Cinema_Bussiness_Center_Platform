@@ -303,7 +303,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/schedule/hall-resources',
-          label: '影厅资源管理',
+          label: '14-影厅资源管理',
         },
         {
           key: '/schedule/gantt',

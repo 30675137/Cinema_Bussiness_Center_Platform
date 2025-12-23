@@ -337,4 +337,76 @@ public class ScenarioPackageController {
         ScenarioPackageDTO dto = packageService.removeService(id, serviceId);
         return ResponseEntity.ok(ApiResponse.success(dto));
     }
+
+    // ==================== 套餐档位、加购项、时段模板 API ====================
+
+    /**
+     * 获取场景包的套餐档位列表
+     */
+    @GetMapping("/{id}/tiers")
+    public ResponseEntity<ApiResponse<java.util.List<com.cinema.scenariopackage.model.PackageTier>>> getPackageTiers(
+            @PathVariable UUID id) {
+        logger.info("GET /api/scenario-packages/{}/tiers - Get package tiers", id);
+        java.util.List<com.cinema.scenariopackage.model.PackageTier> tiers = packageService.getPackageTiers(id);
+        return ResponseEntity.ok(ApiResponse.success(tiers));
+    }
+
+    /**
+     * 获取场景包关联的加购项
+     */
+    @GetMapping("/{id}/addons")
+    public ResponseEntity<ApiResponse<java.util.List<com.cinema.scenariopackage.model.PackageAddon>>> getPackageAddons(
+            @PathVariable UUID id) {
+        logger.info("GET /api/scenario-packages/{}/addons - Get package addons", id);
+        java.util.List<com.cinema.scenariopackage.model.PackageAddon> addons = packageService.getPackageAddons(id);
+        return ResponseEntity.ok(ApiResponse.success(addons));
+    }
+
+    /**
+     * 获取场景包的时段模板
+     */
+    @GetMapping("/{id}/time-slot-templates")
+    public ResponseEntity<ApiResponse<java.util.List<com.cinema.scenariopackage.model.TimeSlotTemplate>>> getTimeSlotTemplates(
+            @PathVariable UUID id) {
+        logger.info("GET /api/scenario-packages/{}/time-slot-templates - Get time slot templates", id);
+        java.util.List<com.cinema.scenariopackage.model.TimeSlotTemplate> templates = packageService.getTimeSlotTemplates(id);
+        return ResponseEntity.ok(ApiResponse.success(templates));
+    }
+
+    /**
+     * 创建时段模板
+     */
+    @PostMapping("/{id}/time-slot-templates")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.TimeSlotTemplate>> createTimeSlotTemplate(
+            @PathVariable UUID id,
+            @Valid @RequestBody com.cinema.scenariopackage.dto.CreateTimeSlotTemplateRequest request) {
+        logger.info("POST /api/scenario-packages/{}/time-slot-templates - Create time slot template", id);
+        com.cinema.scenariopackage.model.TimeSlotTemplate template = packageService.createTimeSlotTemplate(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(template));
+    }
+
+    /**
+     * 更新时段模板
+     */
+    @PutMapping("/{id}/time-slot-templates/{templateId}")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.TimeSlotTemplate>> updateTimeSlotTemplate(
+            @PathVariable UUID id,
+            @PathVariable UUID templateId,
+            @Valid @RequestBody com.cinema.scenariopackage.dto.CreateTimeSlotTemplateRequest request) {
+        logger.info("PUT /api/scenario-packages/{}/time-slot-templates/{} - Update time slot template", id, templateId);
+        com.cinema.scenariopackage.model.TimeSlotTemplate template = packageService.updateTimeSlotTemplate(id, templateId, request);
+        return ResponseEntity.ok(ApiResponse.success(template));
+    }
+
+    /**
+     * 删除时段模板
+     */
+    @DeleteMapping("/{id}/time-slot-templates/{templateId}")
+    public ResponseEntity<Void> deleteTimeSlotTemplate(
+            @PathVariable UUID id,
+            @PathVariable UUID templateId) {
+        logger.info("DELETE /api/scenario-packages/{}/time-slot-templates/{} - Delete time slot template", id, templateId);
+        packageService.deleteTimeSlotTemplate(id, templateId);
+        return ResponseEntity.noContent().build();
+    }
 }

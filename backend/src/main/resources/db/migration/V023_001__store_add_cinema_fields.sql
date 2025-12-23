@@ -22,9 +22,15 @@ ALTER TABLE stores ADD COLUMN IF NOT EXISTS seat_count INTEGER;
 COMMENT ON COLUMN stores.seat_count IS '总座位数';
 
 -- 添加约束：面积、影厅数、座位数必须为正数
-ALTER TABLE stores ADD CONSTRAINT IF NOT EXISTS ck_stores_area_positive 
-    CHECK (area IS NULL OR area > 0);
-ALTER TABLE stores ADD CONSTRAINT IF NOT EXISTS ck_stores_hall_count_positive 
-    CHECK (hall_count IS NULL OR hall_count > 0);
-ALTER TABLE stores ADD CONSTRAINT IF NOT EXISTS ck_stores_seat_count_positive 
-    CHECK (seat_count IS NULL OR seat_count > 0);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_stores_area_positive') THEN
+        ALTER TABLE stores ADD CONSTRAINT ck_stores_area_positive CHECK (area IS NULL OR area > 0);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_stores_hall_count_positive') THEN
+        ALTER TABLE stores ADD CONSTRAINT ck_stores_hall_count_positive CHECK (hall_count IS NULL OR hall_count > 0);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_stores_seat_count_positive') THEN
+        ALTER TABLE stores ADD CONSTRAINT ck_stores_seat_count_positive CHECK (seat_count IS NULL OR seat_count > 0);
+    END IF;
+END $$;

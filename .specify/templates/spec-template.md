@@ -1,9 +1,18 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
+**Feature Branch**: `[X###-feature-name]`
+**Created**: [DATE]
+**Status**: Draft
 **Input**: User description: "$ARGUMENTS"
+
+<!--
+  规格编号格式说明 (Spec ID Format):
+  X### 其中:
+  - X: 模块字母 (S=门店/影厅, P=商品/库存, B=品牌/分类, A=活动/场景包, U=用户/预订, T=工具/基础设施, F=前端基础)
+  - ###: 模块内递增的三位数字 (001-999)
+
+  示例: S001-store-crud, P012-inventory-management, A005-scenario-package-tabs
+-->
 
 ## User Scenarios & Testing *(mandatory)*
 

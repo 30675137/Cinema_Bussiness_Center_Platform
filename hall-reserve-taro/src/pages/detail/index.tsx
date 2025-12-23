@@ -4,14 +4,25 @@ import { useEffect, useMemo } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { useBookingStore } from '@/stores/bookingStore'
 import { useCreateBooking } from '@/services/bookingService'
-import { THEME_CONFIG, ADDONS, TIME_SLOTS } from '@/constants'
+import { useScenarioDetail, usePackageTiers, useAddonItems, useTimeSlotTemplates } from '@/services/scenarioService'
+import { THEME_CONFIG } from '@/constants'
 import './index.less'
 
 const DATE_OPTIONS = ['今天', '明天', '周五 24', '周六 25']
 
 export default function Detail() {
   const router = useRouter()
-  const scenario = useAppStore((s) => s.activeScenario)
+  const packageId = router.params.id
+  
+  // 使用 API 获取场景包详情
+  const { data: scenarioData, isLoading: isLoadingScenario } = useScenarioDetail(packageId)
+  // 使用 API 获取套餐档位
+  const { data: tiersData, isLoading: isLoadingTiers } = usePackageTiers(packageId)
+  // 使用 API 获取加购项
+  const { data: addonsData, isLoading: isLoadingAddons } = useAddonItems()
+  // 使用 API 获取时段模板
+  const { data: timeSlotsData, isLoading: isLoadingTimeSlots } = useTimeSlotTemplates(packageId)
+  
   const setSuccessData = useAppStore((s) => s.setSuccessData)
 
   const {
@@ -28,16 +39,85 @@ export default function Detail() {
 
   const createBooking = useCreateBooking()
 
+  // 将后端数据转换为页面需要的格式
+  const scenario = useMemo(() => {
+    if (!scenarioData) return null
+    return {
+      id: scenarioData.id,
+      title: scenarioData.name,
+      category: scenarioData.category || 'MOVIE',
+      image: scenarioData.image || 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800',
+      location: '北京·精选场馆',
+      rating: scenarioData.rating || 5.0,
+      tags: scenarioData.tags || ['浪漫', '惊喜'],
+      packages: (tiersData || []).map(tier => ({
+        id: tier.id,
+        name: tier.name,
+        price: tier.price,
+        originalPrice: tier.originalPrice || tier.price,
+        desc: tier.serviceDescription || '',
+        tags: tier.tags || []
+      }))
+    }
+  }, [scenarioData, tiersData])
+
+  // 根据选中的日期获取对应的时段列表
+  const timeSlots = useMemo(() => {
+    if (!timeSlotsData || timeSlotsData.length === 0) return []
+    
+    // 获取选中日期对应的星期几
+    const today = new Date()
+    let targetDate = today
+    if (selectedDate === '明天') {
+      targetDate = new Date(today.getTime() + 24 * 60 * 60 * 1000)
+    } else if (selectedDate.includes('周')) {
+      // 解析“周五 24”这种格式
+      const dayMatch = selectedDate.match(/(周[\u4e00-\u65e5])/)
+      if (dayMatch) {
+        const dayMap: Record<string, number> = {
+          '周日': 0, '周一': 1, '周二': 2, '周三': 3, 
+          '周四': 4, '周五': 5, '周六': 6
+        }
+        const targetDayOfWeek = dayMap[dayMatch[1]] ?? today.getDay()
+        const todayDayOfWeek = today.getDay()
+        const diff = (targetDayOfWeek - todayDayOfWeek + 7) % 7 || 7
+        targetDate = new Date(today.getTime() + diff * 24 * 60 * 60 * 1000)
+      }
+    }
+    const dayOfWeek = targetDate.getDay()
+    
+    // 过滤当天的时段
+    const todaySlots = timeSlotsData
+      .filter((slot: any) => slot.dayOfWeek === dayOfWeek && slot.isEnabled)
+      .map((slot: any) => ({
+        id: slot.id,
+        time: slot.startTime.substring(0, 5), // "10:00:00" -> "10:00"
+        endTime: slot.endTime.substring(0, 5),
+        status: slot.capacity > 0 ? 'Available' : 'Sold Out',
+        capacity: slot.capacity,
+        priceAdjustment: slot.priceAdjustment
+      }))
+      .sort((a: any, b: any) => a.time.localeCompare(b.time))
+    
+    return todaySlots
+  }, [timeSlotsData, selectedDate])
+
   // 初始化
   useEffect(() => {
-    if (scenario && !selectedPkgId) {
+    if (scenario && scenario.packages.length > 0 && !selectedPkgId) {
       setSelectedPkgId(scenario.packages[0].id)
     }
-    const firstAvailable = TIME_SLOTS.find((t) => t.status === 'Available')
-    if (firstAvailable && !selectedTime) {
-      setSelectedTime(firstAvailable.time)
+  }, [scenario, tiersData])
+
+  // 时段初始化
+  useEffect(() => {
+    if (timeSlots.length > 0) {
+      const firstAvailable = timeSlots.find((t: any) => t.status === 'Available')
+      if (firstAvailable) {
+        setSelectedTime(firstAvailable.time)
+      }
     }
-  }, [scenario])
+  }, [timeSlots])
 
   const theme = scenario ? THEME_CONFIG[scenario.category] : null
 
@@ -51,11 +131,11 @@ export default function Detail() {
 
   const totalPrice = useMemo(() => {
     if (!selectedPkg) return 0
-    const addonsPrice = ADDONS.reduce((sum, item) => {
+    const addonsPrice = (addonsData || []).reduce((sum, item) => {
       return sum + item.price * (addons[item.id] || 0)
     }, 0)
     return selectedPkg.price + addonsPrice
-  }, [selectedPkg, addons])
+  }, [selectedPkg, addons, addonsData])
 
   const handleBack = () => {
     reset()
@@ -91,7 +171,7 @@ export default function Detail() {
     )
   }
 
-  if (!scenario) {
+  if (isLoadingScenario || isLoadingTiers || !scenario) {
     return (
       <View className="loading-container">
         <Text>加载中...</Text>
@@ -155,20 +235,26 @@ export default function Detail() {
 
           {/* Time Grid */}
           <View className="time-grid">
-            {TIME_SLOTS.map((slot) => {
-              const isAvailable = slot.status === 'Available'
-              const isSelected = selectedTime === slot.time
-              return (
-                <View
-                  key={slot.time}
-                  className={`time-item ${!isAvailable ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`}
-                  onClick={() => isAvailable && setSelectedTime(slot.time)}
-                >
-                  <Text className="time-text">{slot.time}</Text>
-                  {!isAvailable && <Text className="sold-out">售罄</Text>}
-                </View>
-              )
-            })}
+            {timeSlots.length === 0 ? (
+              <View className="no-slots">
+                <Text>当日无可用时段</Text>
+              </View>
+            ) : (
+              timeSlots.map((slot: any) => {
+                const isAvailable = slot.status === 'Available'
+                const isSelected = selectedTime === slot.time
+                return (
+                  <View
+                    key={slot.id || slot.time}
+                    className={`time-item ${!isAvailable ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`}
+                    onClick={() => isAvailable && setSelectedTime(slot.time)}
+                  >
+                    <Text className="time-text">{slot.time}</Text>
+                    {!isAvailable && <Text className="sold-out">售罄</Text>}
+                  </View>
+                )
+              })
+            )}
           </View>
         </View>
 
@@ -185,7 +271,7 @@ export default function Detail() {
                 <View className="package-info">
                   <View className="package-header">
                     <Text className="package-name">{pkg.name}</Text>
-                    {pkg.tags.length > 0 && (
+                    {pkg.tags && pkg.tags.length > 0 && (
                       <View className="package-tag">
                         <Text>{pkg.tags[0]}</Text>
                       </View>
@@ -195,7 +281,9 @@ export default function Detail() {
                 </View>
                 <View className="package-price">
                   <Text className="current-price">¥{pkg.price}</Text>
-                  <Text className="original-price">¥{pkg.originalPrice}</Text>
+                  {pkg.originalPrice && pkg.originalPrice > pkg.price && (
+                    <Text className="original-price">¥{pkg.originalPrice}</Text>
+                  )}
                 </View>
               </View>
             ))}
@@ -206,7 +294,7 @@ export default function Detail() {
         <View className="section">
           <Text className="section-title">超值加购</Text>
           <View className="addon-list">
-            {ADDONS.map((item) => (
+            {(addonsData || []).map((item) => (
               <View key={item.id} className="addon-item">
                 <View className="addon-info">
                   <Text className="addon-name">{item.name}</Text>
