@@ -1,6 +1,6 @@
 import { View, Text, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useScenarios } from '@/services/scenarioService'
+import { useState, useEffect } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { THEME_CONFIG } from '@/constants'
 import type { Scenario } from '@/types'
@@ -8,9 +8,71 @@ import ErrorState from '@/components/ErrorState'
 import EmptyState from '@/components/EmptyState'
 import './index.less'
 
+// API Base URL
+const API_BASE = 'http://192.168.10.71:8080'
+
 export default function Home() {
-  const { data: scenarios, isLoading, error, refetch } = useScenarios()
+  const [scenarios, setScenarios] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const setActiveScenario = useAppStore((s) => s.setActiveScenario)
+
+  useEffect(() => {
+    console.log('Home: 开始加载数据...')
+    Taro.request({
+      url: `${API_BASE}/api/scenario-packages/published`,
+      method: 'GET',
+    })
+      .then((res) => {
+        console.log('Home: API 响应', res)
+        if (res.statusCode === 200 && res.data.success) {
+          const data = res.data.data.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            image: item.image,
+            category: item.category,
+            tags: item.tags || [],
+            location: item.location || '北京·精选场馆',
+            rating: item.rating || 0,
+            packages: item.packages || [{
+              id: item.id,
+              name: '基础套餐',
+              price: item.packagePrice || 0,
+              originalPrice: item.packagePrice * 1.2,
+              desc: '',
+              tags: []
+            }]
+          }))
+          console.log('Home: 转换后数据', data)
+          setScenarios(data)
+        } else {
+          setError(new Error(res.data.message || '加载失败'))
+        }
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        console.error('Home: 请求失败', err)
+        setError(err)
+        setIsLoading(false)
+      })
+  }, [])
+
+  const refetch = () => {
+    setIsLoading(true)
+    setError(null)
+    Taro.request({
+      url: `${API_BASE}/api/scenario-packages/published`,
+      method: 'GET',
+    }).then((res) => {
+      if (res.statusCode === 200 && res.data.success) {
+        setScenarios(res.data.data)
+      }
+      setIsLoading(false)
+    }).catch((err) => {
+      setError(err)
+      setIsLoading(false)
+    })
+  }
 
   const handleSelectScenario = (scenario: Scenario) => {
     setActiveScenario(scenario)

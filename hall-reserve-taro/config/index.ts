@@ -16,7 +16,8 @@ export default defineConfig<'vite'>(async (merge) => {
     outputRoot: 'dist',
     plugins: [
           '@tarojs/plugin-framework-react',
-          '@tarojs/plugin-platform-h5'
+          '@tarojs/plugin-platform-h5',
+          '@tarojs/plugin-platform-weapp'
         ],
     defineConstants: {},
     copy: {

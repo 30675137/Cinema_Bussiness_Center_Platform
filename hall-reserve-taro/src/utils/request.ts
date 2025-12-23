@@ -1,9 +1,9 @@
 import Taro from '@tarojs/taro'
 
 // API Base URL 配置
-const BASE_URL = process.env.TARO_ENV === 'weapp'
-  ? 'https://api.production.com'  // 生产环境（小程序）
-  : 'http://localhost:8080'        // 开发环境（H5）
+// 开发环境统一使用本地后端，生产环境再替换为线上地址
+// 小程序中 localhost 指向模拟器本身，需要使用电脑的局域网 IP
+const BASE_URL = 'http://192.168.10.71:8080'
 
 /**
  * 统一网络请求封装

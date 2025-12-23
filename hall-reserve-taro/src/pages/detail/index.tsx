@@ -1,28 +1,57 @@
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro, { useRouter } from '@tarojs/taro'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { useBookingStore } from '@/stores/bookingStore'
 import { useReservationStore } from '@/stores/reservationStore'
-import { useCreateBooking } from '@/services/bookingService'
-import { useScenarioDetail, usePackageTiers, useAddonItems, useTimeSlotTemplates } from '@/services/scenarioService'
 import { THEME_CONFIG } from '@/constants'
 import './index.less'
 
+const API_BASE = 'http://192.168.10.71:8080'
 const DATE_OPTIONS = ['今天', '明天', '周五 24', '周六 25']
 
 export default function Detail() {
   const router = useRouter()
   const packageId = router.params.id
   
-  // 使用 API 获取场景包详情
-  const { data: scenarioData, isLoading: isLoadingScenario } = useScenarioDetail(packageId)
-  // 使用 API 获取套餐档位
-  const { data: tiersData, isLoading: isLoadingTiers } = usePackageTiers(packageId)
-  // 使用 API 获取加购项
-  const { data: addonsData, isLoading: isLoadingAddons } = useAddonItems()
-  // 使用 API 获取时段模板
-  const { data: timeSlotsData, isLoading: isLoadingTimeSlots } = useTimeSlotTemplates(packageId)
+  // 直接使用 useState 管理数据
+  const [scenarioData, setScenarioData] = useState<any>(null)
+  const [tiersData, setTiersData] = useState<any[]>([])
+  const [addonsData, setAddonsData] = useState<any[]>([])
+  const [timeSlotsData, setTimeSlotsData] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  
+  // 加载数据
+  useEffect(() => {
+    if (!packageId) return
+    console.log('Detail: 开始加载, packageId=', packageId)
+    
+    Promise.all([
+      Taro.request({ url: `${API_BASE}/api/scenario-packages/${packageId}` }),
+      Taro.request({ url: `${API_BASE}/api/scenario-packages/${packageId}/tiers` }),
+      Taro.request({ url: `${API_BASE}/api/addon-items` }),
+      Taro.request({ url: `${API_BASE}/api/scenario-packages/${packageId}/time-slot-templates` }),
+    ]).then(([scenarioRes, tiersRes, addonsRes, slotsRes]) => {
+      console.log('Detail: API 响应', { scenarioRes, tiersRes, addonsRes, slotsRes })
+      
+      if (scenarioRes.statusCode === 200 && scenarioRes.data.success) {
+        setScenarioData(scenarioRes.data.data)
+      }
+      if (tiersRes.statusCode === 200 && tiersRes.data.success) {
+        setTiersData(tiersRes.data.data || [])
+      }
+      if (addonsRes.statusCode === 200 && addonsRes.data.success) {
+        setAddonsData(addonsRes.data.data || [])
+      }
+      if (slotsRes.statusCode === 200 && slotsRes.data.success) {
+        setTimeSlotsData(slotsRes.data.data || [])
+      }
+      setIsLoading(false)
+    }).catch((err) => {
+      console.error('Detail: 请求失败', err)
+      setIsLoading(false)
+    })
+  }, [packageId])
   
   const setSuccessData = useAppStore((s) => s.setSuccessData)
 
@@ -38,8 +67,6 @@ export default function Detail() {
     reset
   } = useBookingStore()
 
-  const createBooking = useCreateBooking()
-  
   // 预约表单store
   const setScenarioPackage = useReservationStore((s) => s.setScenarioPackage)
 
@@ -158,7 +185,7 @@ export default function Detail() {
     })
   }
 
-  if (isLoadingScenario || isLoadingTiers || !scenario) {
+  if (isLoading || !scenario) {
     return (
       <View className="loading-container">
         <Text>加载中...</Text>

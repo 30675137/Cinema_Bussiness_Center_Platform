@@ -12,19 +12,38 @@ import { ApiResponseSchema, type ScenarioPackageListItem } from '../types/scenar
  * @returns Promise<ScenarioPackageListItem[]> 场景包列表
  * @throws Error 当 API 请求失败或数据格式验证失败时抛出错误
  */
-export async function fetchScenarioPackages(): Promise<ScenarioPackageListItem[]> {
+export async function fetchScenarioPackages(): Promise<any[]> {
   // 发起 API 请求
-  const response = await request('/api/scenario-packages/published')
+  const response = await request<any>('/api/scenario-packages/published')
 
-  // 使用 Zod 验证响应数据格式
-  const validated = ApiResponseSchema.parse(response)
+  console.log('API Response:', response)
 
   // 检查业务逻辑成功标识
-  if (!validated.success) {
-    throw new Error(validated.message || '获取场景包列表失败')
+  if (!response.success) {
+    throw new Error(response.message || '获取场景包列表失败')
   }
 
-  return validated.data
+  // 转换数据格式以适配前端 Scenario 类型
+  const data = response.data.map((item: any) => ({
+    id: item.id,
+    title: item.title,
+    image: item.image,
+    category: item.category,
+    tags: item.tags || [],
+    location: item.location || '北京·精选场馆',
+    rating: item.rating || 0,
+    packages: item.packages || [{
+      id: item.id,
+      name: '基础套餐',
+      price: item.packagePrice || 0,
+      originalPrice: item.packagePrice * 1.2,
+      desc: '',
+      tags: []
+    }]
+  }))
+
+  console.log('Transformed data:', data)
+  return data
 }
 
 /**
