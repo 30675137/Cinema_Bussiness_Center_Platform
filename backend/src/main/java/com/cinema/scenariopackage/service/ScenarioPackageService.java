@@ -732,6 +732,74 @@ public class ScenarioPackageService {
     }
 
     /**
+     * 创建套餐档位
+     */
+    @Transactional
+    public PackageTier createPackageTier(UUID packageId, CreatePackageTierRequest request) {
+        logger.info("Creating package tier for package: {}, name: {}", packageId, request.getName());
+        // 验证场景包存在
+        findById(packageId);
+
+        PackageTier tier = new PackageTier();
+        tier.setPackageId(packageId);
+        tier.setName(request.getName());
+        tier.setPrice(request.getPrice());
+        tier.setOriginalPrice(request.getOriginalPrice());
+        tier.setTags(request.getTags());
+        tier.setServiceDescription(request.getServiceDescription());
+        tier.setSortOrder(request.getSortOrder() != null ? request.getSortOrder() : 0);
+
+        return tierRepository.save(tier);
+    }
+
+    /**
+     * 更新套餐档位
+     */
+    @Transactional
+    public PackageTier updatePackageTier(UUID packageId, UUID tierId, CreatePackageTierRequest request) {
+        logger.info("Updating package tier: {} for package: {}", tierId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        PackageTier tier = tierRepository.findById(tierId)
+                .orElseThrow(() -> new IllegalArgumentException("套餐档位不存在: " + tierId));
+
+        if (!tier.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("套餐档位不属于此场景包");
+        }
+
+        tier.setName(request.getName());
+        tier.setPrice(request.getPrice());
+        tier.setOriginalPrice(request.getOriginalPrice());
+        tier.setTags(request.getTags());
+        tier.setServiceDescription(request.getServiceDescription());
+        if (request.getSortOrder() != null) {
+            tier.setSortOrder(request.getSortOrder());
+        }
+
+        return tierRepository.save(tier);
+    }
+
+    /**
+     * 删除套餐档位
+     */
+    @Transactional
+    public void deletePackageTier(UUID packageId, UUID tierId) {
+        logger.info("Deleting package tier: {} for package: {}", tierId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        PackageTier tier = tierRepository.findById(tierId)
+                .orElseThrow(() -> new IllegalArgumentException("套餐档位不存在: " + tierId));
+
+        if (!tier.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("套餐档位不属于此场景包");
+        }
+
+        tierRepository.delete(tier);
+    }
+
+    /**
      * 获取所有启用的加购项
      */
     @Transactional(readOnly = true)

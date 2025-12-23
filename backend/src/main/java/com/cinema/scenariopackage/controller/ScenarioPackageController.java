@@ -353,6 +353,43 @@ public class ScenarioPackageController {
     }
 
     /**
+     * 创建套餐档位
+     */
+    @PostMapping("/{id}/tiers")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.PackageTier>> createPackageTier(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreatePackageTierRequest request) {
+        logger.info("POST /api/scenario-packages/{}/tiers - Create package tier: {}", id, request.getName());
+        com.cinema.scenariopackage.model.PackageTier tier = packageService.createPackageTier(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(tier));
+    }
+
+    /**
+     * 更新套餐档位
+     */
+    @PutMapping("/{id}/tiers/{tierId}")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.PackageTier>> updatePackageTier(
+            @PathVariable UUID id,
+            @PathVariable UUID tierId,
+            @Valid @RequestBody CreatePackageTierRequest request) {
+        logger.info("PUT /api/scenario-packages/{}/tiers/{} - Update package tier", id, tierId);
+        com.cinema.scenariopackage.model.PackageTier tier = packageService.updatePackageTier(id, tierId, request);
+        return ResponseEntity.ok(ApiResponse.success(tier));
+    }
+
+    /**
+     * 删除套餐档位
+     */
+    @DeleteMapping("/{id}/tiers/{tierId}")
+    public ResponseEntity<Void> deletePackageTier(
+            @PathVariable UUID id,
+            @PathVariable UUID tierId) {
+        logger.info("DELETE /api/scenario-packages/{}/tiers/{} - Delete package tier", id, tierId);
+        packageService.deletePackageTier(id, tierId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * 获取场景包关联的加购项
      */
     @GetMapping("/{id}/addons")
