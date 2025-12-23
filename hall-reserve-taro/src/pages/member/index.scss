@@ -1,0 +1,30 @@
+.member-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 100px;
+}
+
+.member-header {
+  background-color: #fff;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.member-title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #333;
+}
+
+.member-content {
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.placeholder-text {
+  font-size: 28px;
+  color: #999;
+}
