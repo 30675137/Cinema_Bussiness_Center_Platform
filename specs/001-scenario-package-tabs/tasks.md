@@ -83,13 +83,13 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 **Goal**: Build shared components and utilities required by all user stories
 
-- [ ] T010 [P] Create AppLayout component with sidebar in `frontend/src/components/templates/AppLayout.tsx`
-- [ ] T011 [P] Create React Router configuration with scenario package editor route in `frontend/src/router/index.tsx`
-- [ ] T012 [P] Implement image upload component using Ant Design Upload in `frontend/src/components/molecules/ImageUpload.tsx`
-- [ ] T013 [P] Create form field wrapper component for React Hook Form + Ant Design integration in `frontend/src/components/molecules/FormField.tsx`
-- [ ] T014 [P] Implement unsaved changes detection hook in `frontend/src/features/scenario-package-editor/hooks/useUnsavedChanges.ts`
-- [ ] T015 [P] Create tab change confirmation Modal component in `frontend/src/features/scenario-package-editor/components/TabChangeConfirmModal.tsx`
-- [ ] T016 [P] Set up API service layer for scenario packages CRUD in `frontend/src/features/scenario-package-editor/services/scenarioPackageService.ts`
+- [x] T010 [P] Create AppLayout component with sidebar in `frontend/src/components/layout/AppLayout.tsx`
+- [x] T011 [P] Create React Router configuration with scenario package editor route in `frontend/src/components/layout/Router.tsx`
+- [x] T012 [P] Implement image upload component using Ant Design Upload in `frontend/src/features/scenario-package-editor/components/forms/ImageUploader.tsx`
+- [x] T013 [P] Create form field wrapper component for React Hook Form + Ant Design integration in `frontend/src/components/ui/FormField/`
+- [x] T014 [P] Implement unsaved changes detection hook in `frontend/src/features/scenario-package-editor/hooks/useFormDirtyState.ts`
+- [x] T015 [P] Create tab change confirmation Modal component in `frontend/src/features/scenario-package-editor/components/molecules/UnsavedChangesAlert.tsx`
+- [x] T016 [P] Set up API service layer for scenario packages CRUD in `frontend/src/features/scenario-package-editor/services/apiClient.ts`
 
 **Parallel Execution**: Tasks T010-T016 can run in parallel
 
