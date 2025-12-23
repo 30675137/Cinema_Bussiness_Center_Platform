@@ -4,8 +4,9 @@
 
 /**
  * 影厅类型
+ * 支持后端返回的首字母大写格式和数据库存储的全大写格式
  */
-export type HallType = 'VIP' | 'Public' | 'CP' | 'Party';
+export type HallType = 'VIP' | 'Public' | 'CP' | 'Party' | 'PUBLIC' | 'PARTY';
 
 /**
  * 影厅状态

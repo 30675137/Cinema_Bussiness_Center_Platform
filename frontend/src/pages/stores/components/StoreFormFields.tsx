@@ -7,7 +7,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Form, Input, Select, Row, Col } from 'antd';
+import { Form, Input, Select, Row, Col, DatePicker, InputNumber } from 'antd';
 import { Controller, useWatch } from 'react-hook-form';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { REGIONS, getCitiesByRegion, PROVINCES } from '../../../constants/regions';
@@ -193,6 +193,100 @@ const StoreFormFields: React.FC<StoreFormFieldsProps> = ({
           )}
         />
       </Form.Item>
+
+      {/* 023-store-cinema-fields: 影城信息 */}
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="开业时间"
+            validateStatus={errors?.openingDate ? 'error' : undefined}
+            help={errors?.openingDate?.message}
+          >
+            <Controller
+              name="openingDate"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="YYYY-MM-DD，如2012-01-01"
+                  maxLength={10}
+                  disabled={disabled}
+                  aria-label="开业时间"
+                />
+              )}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="面积(平方米)"
+            validateStatus={errors?.area ? 'error' : undefined}
+            help={errors?.area?.message}
+          >
+            <Controller
+              name="area"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  placeholder="如4147"
+                  min={1}
+                  style={{ width: '100%' }}
+                  disabled={disabled}
+                  aria-label="面积"
+                />
+              )}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            label="影厅数"
+            validateStatus={errors?.hallCount ? 'error' : undefined}
+            help={errors?.hallCount?.message}
+          >
+            <Controller
+              name="hallCount"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  placeholder="如7"
+                  min={1}
+                  style={{ width: '100%' }}
+                  disabled={disabled}
+                  aria-label="影厅数"
+                />
+              )}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            label="座位数"
+            validateStatus={errors?.seatCount ? 'error' : undefined}
+            help={errors?.seatCount?.message}
+          >
+            <Controller
+              name="seatCount"
+              control={control}
+              render={({ field }) => (
+                <InputNumber
+                  {...field}
+                  placeholder="如785"
+                  min={1}
+                  style={{ width: '100%' }}
+                  disabled={disabled}
+                  aria-label="座位数"
+                />
+              )}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
     </>
   );
 };

@@ -49,6 +49,30 @@ export const createStoreSchema = z.object({
     .string()
     .min(1, '电话号码不能为空')
     .regex(PHONE_REGEX, '请输入有效的电话号码(手机号11位或座机号如010-12345678)'),
+  // 023-store-cinema-fields 新增字段
+  openingDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '请输入有效的日期格式 (YYYY-MM-DD)')
+    .optional()
+    .or(z.literal('')),
+  area: z
+    .number()
+    .positive('面积必须为正数')
+    .int('面积必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
+  hallCount: z
+    .number()
+    .positive('影厅数必须为正整数')
+    .int('影厅数必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
+  seatCount: z
+    .number()
+    .positive('座位数必须为正整数')
+    .int('座位数必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
 });
 
 /**
@@ -91,6 +115,30 @@ export const updateStoreSchema = z.object({
     .min(1, '电话号码不能为空')
     .regex(PHONE_REGEX, '请输入有效的电话号码(手机号11位或座机号如010-12345678)')
     .optional(),
+  // 023-store-cinema-fields 新增字段
+  openingDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, '请输入有效的日期格式 (YYYY-MM-DD)')
+    .optional()
+    .or(z.literal('')),
+  area: z
+    .number()
+    .positive('面积必须为正数')
+    .int('面积必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
+  hallCount: z
+    .number()
+    .positive('影厅数必须为正整数')
+    .int('影厅数必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
+  seatCount: z
+    .number()
+    .positive('座位数必须为正整数')
+    .int('座位数必须为整数')
+    .optional()
+    .or(z.literal(undefined)),
   version: z.number({ required_error: 'version字段必填' }),
 });
 

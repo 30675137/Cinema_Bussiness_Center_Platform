@@ -3,6 +3,7 @@ package com.cinema.hallstore.dto;
 import com.cinema.hallstore.domain.enums.StoreStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * StoreDTO - 门店数据传输对象
@@ -70,6 +71,19 @@ public class StoreDTO {
 
     /** 版本号 - 用于乐观锁 @since 022-store-crud */
     private Long version;
+
+    // 023-store-cinema-fields 新增字段
+    /** 开业时间 */
+    private LocalDate openingDate;
+
+    /** 面积(平方米) */
+    private Integer area;
+
+    /** 影厅数 */
+    private Integer hallCount;
+
+    /** 座位数 */
+    private Integer seatCount;
 
     public String getId() {
         return id;
@@ -175,6 +189,39 @@ public class StoreDTO {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    // 023-store-cinema-fields getter/setter
+    public LocalDate getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(LocalDate openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public Integer getArea() {
+        return area;
+    }
+
+    public void setArea(Integer area) {
+        this.area = area;
+    }
+
+    public Integer getHallCount() {
+        return hallCount;
+    }
+
+    public void setHallCount(Integer hallCount) {
+        this.hallCount = hallCount;
+    }
+
+    public Integer getSeatCount() {
+        return seatCount;
+    }
+
+    public void setSeatCount(Integer seatCount) {
+        this.seatCount = seatCount;
     }
 
     /**

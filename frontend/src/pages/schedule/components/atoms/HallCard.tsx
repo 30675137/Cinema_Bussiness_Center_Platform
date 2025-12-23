@@ -9,19 +9,32 @@ interface HallCardProps {
 const typeColorMap: Record<string, string> = {
   VIP: 'gold',
   Public: 'blue',
+  PUBLIC: 'blue',
   CP: 'purple',
   Party: 'magenta',
+  PARTY: 'magenta',
+};
+
+// 类型显示名称映射（统一首字母大写显示）
+const typeDisplayMap: Record<string, string> = {
+  VIP: 'VIP',
+  Public: 'Public',
+  PUBLIC: 'Public',
+  CP: 'CP',
+  Party: 'Party',
+  PARTY: 'Party',
 };
 
 const HallCard: React.FC<HallCardProps> = ({ hall }) => {
   const typeColor = typeColorMap[hall.type] || 'default';
+  const typeDisplay = typeDisplayMap[hall.type] || hall.type;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Text strong>{hall.name}</Typography.Text>
         <Tag color={typeColor} style={{ fontSize: 10 }}>
-          {hall.type}
+          {typeDisplay}
         </Tag>
       </div>
       <Space size={4} direction="horizontal" wrap>

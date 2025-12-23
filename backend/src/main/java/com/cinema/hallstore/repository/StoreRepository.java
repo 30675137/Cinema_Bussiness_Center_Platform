@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,6 +156,19 @@ public class StoreRepository {
 
         @JsonProperty("phone")
         public String phone;
+
+        // 023-store-cinema-fields 新增字段
+        @JsonProperty("opening_date")
+        public LocalDate openingDate;
+
+        @JsonProperty("area")
+        public Integer area;
+
+        @JsonProperty("hall_count")
+        public Integer hallCount;
+
+        @JsonProperty("seat_count")
+        public Integer seatCount;
     }
 
     // ========== Mapping Methods ==========
@@ -177,6 +191,11 @@ public class StoreRepository {
         store.setDistrict(row.district);
         store.setAddress(row.address);
         store.setPhone(row.phone);
+        // 023-store-cinema-fields 影城字段映射
+        store.setOpeningDate(row.openingDate);
+        store.setArea(row.area);
+        store.setHallCount(row.hallCount);
+        store.setSeatCount(row.seatCount);
         return store;
     }
 
@@ -300,6 +319,11 @@ public class StoreRepository {
         putIfNotBlank(body, "district", store.getDistrict());
         putIfNotBlank(body, "address", store.getAddress());
         putIfNotBlank(body, "phone", store.getPhone());
+        // 023-store-cinema-fields 新字段
+        if (store.getOpeningDate() != null) body.put("opening_date", store.getOpeningDate().toString());
+        if (store.getArea() != null) body.put("area", store.getArea());
+        if (store.getHallCount() != null) body.put("hall_count", store.getHallCount());
+        if (store.getSeatCount() != null) body.put("seat_count", store.getSeatCount());
         if (store.getCreatedBy() != null) {
             body.put("created_by", store.getCreatedBy().toString());
         }
@@ -350,6 +374,11 @@ public class StoreRepository {
         if (store.getDistrict() != null) body.put("district", store.getDistrict());
         if (store.getAddress() != null) body.put("address", store.getAddress());
         if (store.getPhone() != null) body.put("phone", store.getPhone());
+        // 023-store-cinema-fields 新字段
+        if (store.getOpeningDate() != null) body.put("opening_date", store.getOpeningDate().toString());
+        if (store.getArea() != null) body.put("area", store.getArea());
+        if (store.getHallCount() != null) body.put("hall_count", store.getHallCount());
+        if (store.getSeatCount() != null) body.put("seat_count", store.getSeatCount());
         if (store.getUpdatedBy() != null) body.put("updated_by", store.getUpdatedBy().toString());
 
         try {

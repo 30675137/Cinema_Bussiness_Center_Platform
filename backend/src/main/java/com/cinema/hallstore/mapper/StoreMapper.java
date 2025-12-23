@@ -33,6 +33,11 @@ public final class StoreMapper {
         dto.setPhone(store.getPhone());
         // 022-store-crud 版本号字段映射
         dto.setVersion(store.getVersion());
+        // 023-store-cinema-fields 影城字段映射
+        dto.setOpeningDate(store.getOpeningDate());
+        dto.setArea(store.getArea());
+        dto.setHallCount(store.getHallCount());
+        dto.setSeatCount(store.getSeatCount());
         return dto;
     }
 }

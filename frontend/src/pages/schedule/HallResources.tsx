@@ -9,24 +9,32 @@ const HallResources: React.FC = () => {
 
   // Fetch stores for the selector
   const storesQuery = useStoresListQuery();
-  const stores = storesQuery.data || [];
 
-  // Fetch halls based on selected store
-  // If no store selected, fetch all halls; otherwise fetch halls by store
+  // Always fetch all halls to compute which stores have halls
+  const allHallsQuery = useAllHallsQuery();
+  const allHalls = allHallsQuery.data || [];
+
+  // Compute store IDs that have halls (for filtering dropdown)
+  const storeIdsWithHalls = React.useMemo(() => {
+    return new Set(allHalls.map(hall => hall.storeId));
+  }, [allHalls]);
+
+  // Filter stores to only show those with halls
+  const storesWithHalls = React.useMemo(() => {
+    return (storesQuery.data || []).filter(store => storeIdsWithHalls.has(store.id));
+  }, [storesQuery.data, storeIdsWithHalls]);
+
+  // Fetch halls by store when a store is selected
   const hallsByStoreQuery = useHallsByStoreQuery(
     selectedStoreId,
     undefined,
     { enabled: !!selectedStoreId }
   );
-  const allHallsQuery = useAllHallsQuery(
-    undefined,
-    { enabled: !selectedStoreId }
-  );
 
   // Use the appropriate query based on selection
   const hallsQuery = selectedStoreId ? hallsByStoreQuery : allHallsQuery;
 
-  const isLoading = hallsQuery.isLoading || storesQuery.isLoading;
+  const isLoading = hallsQuery.isLoading || storesQuery.isLoading || allHallsQuery.isLoading;
   const isError = hallsQuery.isError;
   const halls = hallsQuery.data || [];
 
@@ -41,10 +49,10 @@ const HallResources: React.FC = () => {
       bordered={false}
       extra={
         <StoreSelector
-          stores={stores}
+          stores={storesWithHalls}
           value={selectedStoreId}
           onChange={handleStoreChange}
-          loading={storesQuery.isLoading}
+          loading={storesQuery.isLoading || allHallsQuery.isLoading}
         />
       }
     >

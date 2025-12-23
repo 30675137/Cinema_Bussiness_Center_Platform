@@ -251,6 +251,28 @@ const StoreTable: React.FC<StoreTableProps> = ({
         return daysA - daysB;
       },
     },
+    // 023-store-cinema-fields: 影厅数列
+    {
+      title: '影厅数',
+      dataIndex: 'hallCount',
+      key: 'hallCount',
+      width: 80,
+      render: (val: number | null | undefined) => (
+        val != null ? <span>{val}个</span> : <span style={{ color: '#999' }}>-</span>
+      ),
+      sorter: (a, b) => (a.hallCount ?? 0) - (b.hallCount ?? 0),
+    },
+    // 023-store-cinema-fields: 座位数列
+    {
+      title: '座位数',
+      dataIndex: 'seatCount',
+      key: 'seatCount',
+      width: 90,
+      render: (val: number | null | undefined) => (
+        val != null ? <span>{val}个</span> : <span style={{ color: '#999' }}>-</span>
+      ),
+      sorter: (a, b) => (a.seatCount ?? 0) - (b.seatCount ?? 0),
+    },
     {
       title: '创建时间',
       dataIndex: 'createdAt',

@@ -2,7 +2,10 @@ package com.cinema.hallstore.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 
 /**
  * DTO for creating a new store
@@ -38,6 +41,22 @@ public class CreateStoreDTO {
         message = "请输入有效的电话号码(手机号11位或座机号如010-12345678)"
     )
     private String phone;
+
+    // 023-store-cinema-fields 新增字段
+    /** 开业时间 */
+    private LocalDate openingDate;
+
+    /** 面积(平方米) */
+    @Positive(message = "面积必须为正数")
+    private Integer area;
+
+    /** 影厅数 */
+    @Positive(message = "影厅数必须为正整数")
+    private Integer hallCount;
+
+    /** 座位数 */
+    @Positive(message = "座位数必须为正整数")
+    private Integer seatCount;
 
     // Getters and Setters
     public String getName() {
@@ -94,5 +113,38 @@ public class CreateStoreDTO {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    // 023-store-cinema-fields getter/setter
+    public LocalDate getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(LocalDate openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public Integer getArea() {
+        return area;
+    }
+
+    public void setArea(Integer area) {
+        this.area = area;
+    }
+
+    public Integer getHallCount() {
+        return hallCount;
+    }
+
+    public void setHallCount(Integer hallCount) {
+        this.hallCount = hallCount;
+    }
+
+    public Integer getSeatCount() {
+        return seatCount;
+    }
+
+    public void setSeatCount(Integer seatCount) {
+        this.seatCount = seatCount;
     }
 }

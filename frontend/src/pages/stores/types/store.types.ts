@@ -55,6 +55,11 @@ export interface Store {
   address?: string | null;       // 详细地址
   phone?: string | null;         // 联系电话
   addressSummary?: string | null; // 地址摘要（派生字段）
+  // 023-store-cinema-fields 新增字段
+  openingDate?: string | null;    // 开业时间 (ISO date string)
+  area?: number | null;           // 面积(平方米)
+  hallCount?: number | null;      // 影厅数
+  seatCount?: number | null;      // 座位数
 }
 
 /**
@@ -69,6 +74,11 @@ export interface CreateStoreDTO {
   district?: string;      // 所属区县
   address: string;        // 详细地址
   phone: string;          // 联系电话
+  // 023-store-cinema-fields 新增字段
+  openingDate?: string;   // 开业时间 (YYYY-MM-DD)
+  area?: number;          // 面积(平方米)
+  hallCount?: number;     // 影厅数
+  seatCount?: number;     // 座位数
   // status defaults to ACTIVE on server side
 }
 
@@ -84,6 +94,11 @@ export interface UpdateStoreDTO {
   district?: string;      // 所属区县
   address?: string;       // 详细地址
   phone?: string;         // 联系电话
+  // 023-store-cinema-fields 新增字段
+  openingDate?: string;   // 开业时间 (YYYY-MM-DD)
+  area?: number;          // 面积(平方米)
+  hallCount?: number;     // 影厅数
+  seatCount?: number;     // 座位数
   version: number;        // 必填，用于乐观锁
 }
 

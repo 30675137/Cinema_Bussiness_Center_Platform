@@ -3,6 +3,7 @@ package com.cinema.hallstore.domain;
 import com.cinema.hallstore.domain.enums.StoreStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,6 +33,12 @@ public class Store {
     private String district;   // 区县，如 "朝阳区"
     private String address;    // 详细地址
     private String phone;      // 联系电话
+
+    // 023-store-cinema-fields 新增字段
+    private LocalDate openingDate;  // 开业时间
+    private Integer area;            // 面积(平方米)
+    private Integer hallCount;       // 影厅数
+    private Integer seatCount;       // 座位数
 
     public UUID getId() {
         return id;
@@ -153,6 +160,39 @@ public class Store {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    // 023-store-cinema-fields getter/setter
+    public LocalDate getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(LocalDate openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public Integer getArea() {
+        return area;
+    }
+
+    public void setArea(Integer area) {
+        this.area = area;
+    }
+
+    public Integer getHallCount() {
+        return hallCount;
+    }
+
+    public void setHallCount(Integer hallCount) {
+        this.hallCount = hallCount;
+    }
+
+    public Integer getSeatCount() {
+        return seatCount;
+    }
+
+    public void setSeatCount(Integer seatCount) {
+        this.seatCount = seatCount;
     }
 
     @Override

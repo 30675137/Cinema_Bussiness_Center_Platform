@@ -8,7 +8,7 @@
 import React from 'react';
 import { Select, Space } from 'antd';
 import { ShopOutlined } from '@ant-design/icons';
-import type { Store } from '@/pages/stores/types/store.types';
+import type { Store } from '../services/scheduleService';
 
 interface StoreSelectorProps {
   stores: Store[];

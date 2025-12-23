@@ -162,6 +162,11 @@ public class StoreService {
         store.setDistrict(dto.getDistrict());
         store.setAddress(dto.getAddress());
         store.setPhone(dto.getPhone());
+        // 023-store-cinema-fields 新字段
+        store.setOpeningDate(dto.getOpeningDate());
+        store.setArea(dto.getArea());
+        store.setHallCount(dto.getHallCount());
+        store.setSeatCount(dto.getSeatCount());
         store.setStatus(StoreStatus.ACTIVE);  // 默认状态为启用
         store.setVersion(0L);  // 初始版本号
 
@@ -212,6 +217,11 @@ public class StoreService {
         if (dto.getDistrict() != null) existingStore.setDistrict(dto.getDistrict());
         if (dto.getAddress() != null) existingStore.setAddress(dto.getAddress());
         if (dto.getPhone() != null) existingStore.setPhone(dto.getPhone());
+        // 023-store-cinema-fields 新字段
+        if (dto.getOpeningDate() != null) existingStore.setOpeningDate(dto.getOpeningDate());
+        if (dto.getArea() != null) existingStore.setArea(dto.getArea());
+        if (dto.getHallCount() != null) existingStore.setHallCount(dto.getHallCount());
+        if (dto.getSeatCount() != null) existingStore.setSeatCount(dto.getSeatCount());
 
         // 6. 保存更新
         Store updatedStore = storeRepository.update(existingStore)
@@ -311,6 +321,11 @@ public class StoreService {
         clone.setUpdatedAt(source.getUpdatedAt());
         clone.setCreatedBy(source.getCreatedBy());
         clone.setUpdatedBy(source.getUpdatedBy());
+        // 023-store-cinema-fields 新字段
+        clone.setOpeningDate(source.getOpeningDate());
+        clone.setArea(source.getArea());
+        clone.setHallCount(source.getHallCount());
+        clone.setSeatCount(source.getSeatCount());
         return clone;
     }
 
