@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -407,6 +408,84 @@ public class ScenarioPackageController {
             @PathVariable UUID templateId) {
         logger.info("DELETE /api/scenario-packages/{}/time-slot-templates/{} - Delete time slot template", id, templateId);
         packageService.deleteTimeSlotTemplate(id, templateId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // ==================== T071: 时段覆盖 API ====================
+
+    /**
+     * 获取场景包的时段覆盖列表
+     *
+     * @param id        场景包 ID
+     * @param startDate 开始日期（可选）
+     * @param endDate   结束日期（可选）
+     * @return 时段覆盖列表
+     */
+    @GetMapping("/{id}/time-slot-overrides")
+    public ResponseEntity<ApiResponse<java.util.List<com.cinema.scenariopackage.model.TimeSlotOverride>>> getTimeSlotOverrides(
+            @PathVariable UUID id,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate) {
+        logger.info("GET /api/scenario-packages/{}/time-slot-overrides - Get time slot overrides", id);
+        
+        java.util.List<com.cinema.scenariopackage.model.TimeSlotOverride> overrides;
+        if (startDate != null && endDate != null) {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            overrides = packageService.getTimeSlotOverridesByDateRange(id, start, end);
+        } else {
+            overrides = packageService.getTimeSlotOverrides(id);
+        }
+        return ResponseEntity.ok(ApiResponse.success(overrides));
+    }
+
+    /**
+     * 创建时段覆盖
+     *
+     * @param id      场景包 ID
+     * @param request 创建请求
+     * @return 创建的时段覆盖
+     */
+    @PostMapping("/{id}/time-slot-overrides")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.TimeSlotOverride>> createTimeSlotOverride(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreateTimeSlotOverrideRequest request) {
+        logger.info("POST /api/scenario-packages/{}/time-slot-overrides - Create time slot override for date: {}", id, request.getDate());
+        com.cinema.scenariopackage.model.TimeSlotOverride override = packageService.createTimeSlotOverride(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(override));
+    }
+
+    /**
+     * 更新时段覆盖
+     *
+     * @param id         场景包 ID
+     * @param overrideId 覆盖规则 ID
+     * @param request    更新请求
+     * @return 更新后的时段覆盖
+     */
+    @PutMapping("/{id}/time-slot-overrides/{overrideId}")
+    public ResponseEntity<ApiResponse<com.cinema.scenariopackage.model.TimeSlotOverride>> updateTimeSlotOverride(
+            @PathVariable UUID id,
+            @PathVariable UUID overrideId,
+            @Valid @RequestBody CreateTimeSlotOverrideRequest request) {
+        logger.info("PUT /api/scenario-packages/{}/time-slot-overrides/{} - Update time slot override", id, overrideId);
+        com.cinema.scenariopackage.model.TimeSlotOverride override = packageService.updateTimeSlotOverride(id, overrideId, request);
+        return ResponseEntity.ok(ApiResponse.success(override));
+    }
+
+    /**
+     * 删除时段覆盖
+     *
+     * @param id         场景包 ID
+     * @param overrideId 覆盖规则 ID
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{id}/time-slot-overrides/{overrideId}")
+    public ResponseEntity<Void> deleteTimeSlotOverride(
+            @PathVariable UUID id,
+            @PathVariable UUID overrideId) {
+        logger.info("DELETE /api/scenario-packages/{}/time-slot-overrides/{} - Delete time slot override", id, overrideId);
+        packageService.deleteTimeSlotOverride(id, overrideId);
         return ResponseEntity.noContent().build();
     }
 }

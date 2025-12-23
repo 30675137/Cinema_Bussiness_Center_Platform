@@ -111,11 +111,18 @@ export function useTimeSlotTemplates(packageId: string | null) {
 
 /**
  * 获取时段覆盖
+ * @param packageId 场景包ID
+ * @param startDate 可选开始日期 (YYYY-MM-DD)
+ * @param endDate 可选结束日期 (YYYY-MM-DD)
  */
-export function useTimeSlotOverrides(packageId: string | null) {
+export function useTimeSlotOverrides(
+  packageId: string | null,
+  startDate?: string,
+  endDate?: string
+) {
   return useQuery<TimeSlotOverride[]>({
-    queryKey: scenarioPackageEditorKeys.timeSlotOverrides(packageId || ''),
-    queryFn: () => scenarioPackageApi.getTimeSlotOverrides(packageId!),
+    queryKey: [...scenarioPackageEditorKeys.timeSlotOverrides(packageId || ''), startDate, endDate],
+    queryFn: () => scenarioPackageApi.getTimeSlotOverrides(packageId!, startDate, endDate),
     enabled: !!packageId,
     staleTime: 30 * 1000,
   });
@@ -350,7 +357,32 @@ export function useCreateTimeSlotOverride(packageId: string) {
   return useMutation({
     mutationFn: (data: CreateTimeSlotOverrideRequest) =>
       scenarioPackageApi.createTimeSlotOverride(packageId, data),
+    onError: (error) => {
+      showErrorMessage(error, '创建时段覆盖失败');
+      logError(error, { operation: 'createTimeSlotOverride', packageId });
+    },
     onSuccess: () => {
+      showSuccessMessage('时段覆盖已创建');
+      queryClient.invalidateQueries({ queryKey: scenarioPackageEditorKeys.timeSlotOverrides(packageId) });
+    },
+  });
+}
+
+/**
+ * 更新时段覆盖
+ */
+export function useUpdateTimeSlotOverride(packageId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ overrideId, data }: { overrideId: string; data: Partial<CreateTimeSlotOverrideRequest> }) =>
+      scenarioPackageApi.updateTimeSlotOverride(packageId, overrideId, data),
+    onError: (error) => {
+      showErrorMessage(error, '更新时段覆盖失败');
+      logError(error, { operation: 'updateTimeSlotOverride', packageId });
+    },
+    onSuccess: () => {
+      showSuccessMessage('时段覆盖已更新');
       queryClient.invalidateQueries({ queryKey: scenarioPackageEditorKeys.timeSlotOverrides(packageId) });
     },
   });
@@ -365,7 +397,12 @@ export function useDeleteTimeSlotOverride(packageId: string) {
   return useMutation({
     mutationFn: (overrideId: string) =>
       scenarioPackageApi.deleteTimeSlotOverride(packageId, overrideId),
+    onError: (error) => {
+      showErrorMessage(error, '删除时段覆盖失败');
+      logError(error, { operation: 'deleteTimeSlotOverride', packageId });
+    },
     onSuccess: () => {
+      showSuccessMessage('时段覆盖已删除');
       queryClient.invalidateQueries({ queryKey: scenarioPackageEditorKeys.timeSlotOverrides(packageId) });
     },
   });

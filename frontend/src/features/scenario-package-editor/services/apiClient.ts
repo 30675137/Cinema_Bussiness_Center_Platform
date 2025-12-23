@@ -300,10 +300,22 @@ export const scenarioPackageApi = {
 
   /**
    * 获取时段覆盖列表
+   * @param packageId 场景包ID
+   * @param startDate 可选开始日期 (YYYY-MM-DD)
+   * @param endDate 可选结束日期 (YYYY-MM-DD)
    */
-  async getTimeSlotOverrides(packageId: string): Promise<TimeSlotOverride[]> {
-    const response = await apiClient.get<ListResponse<TimeSlotOverride>>(
-      API_PATHS.timeSlotOverrides(packageId)
+  async getTimeSlotOverrides(
+    packageId: string,
+    startDate?: string,
+    endDate?: string
+  ): Promise<TimeSlotOverride[]> {
+    const params: Record<string, string> = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    
+    const response = await apiClient.get<ApiResponse<TimeSlotOverride[]>>(
+      API_PATHS.timeSlotOverrides(packageId),
+      { params }
     );
     return response.data.data;
   },
@@ -314,6 +326,21 @@ export const scenarioPackageApi = {
   async createTimeSlotOverride(packageId: string, data: CreateTimeSlotOverrideRequest): Promise<TimeSlotOverride> {
     const response = await apiClient.post<ApiResponse<TimeSlotOverride>>(
       API_PATHS.timeSlotOverrides(packageId),
+      data
+    );
+    return response.data.data;
+  },
+
+  /**
+   * 更新时段覆盖
+   */
+  async updateTimeSlotOverride(
+    packageId: string,
+    overrideId: string,
+    data: Partial<CreateTimeSlotOverrideRequest>
+  ): Promise<TimeSlotOverride> {
+    const response = await apiClient.put<ApiResponse<TimeSlotOverride>>(
+      API_PATHS.timeSlotOverride(packageId, overrideId),
       data
     );
     return response.data.data;

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,6 +52,8 @@ public class ScenarioPackageService {
     private final AddonItemRepository addonItemRepository;
     private final PackageAddonRepository packageAddonRepository;
     private final TimeSlotTemplateRepository timeSlotTemplateRepository;
+    // T071: Time slot override repository
+    private final TimeSlotOverrideRepository timeSlotOverrideRepository;
 
     public ScenarioPackageService(
             ScenarioPackageRepository packageRepository,
@@ -65,7 +68,8 @@ public class ScenarioPackageService {
             PackageTierRepository tierRepository,
             AddonItemRepository addonItemRepository,
             PackageAddonRepository packageAddonRepository,
-            TimeSlotTemplateRepository timeSlotTemplateRepository) {
+            TimeSlotTemplateRepository timeSlotTemplateRepository,
+            TimeSlotOverrideRepository timeSlotOverrideRepository) {
         this.packageRepository = packageRepository;
         this.ruleRepository = ruleRepository;
         this.hallAssociationRepository = hallAssociationRepository;
@@ -79,6 +83,7 @@ public class ScenarioPackageService {
         this.addonItemRepository = addonItemRepository;
         this.packageAddonRepository = packageAddonRepository;
         this.timeSlotTemplateRepository = timeSlotTemplateRepository;
+        this.timeSlotOverrideRepository = timeSlotOverrideRepository;
     }
 
     /**
@@ -833,5 +838,131 @@ public class ScenarioPackageService {
         }
 
         timeSlotTemplateRepository.delete(template);
+    }
+
+    // ==================== T071: 时段覆盖相关方法 ====================
+
+    /**
+     * 获取场景包的时段覆盖列表
+     */
+    @Transactional(readOnly = true)
+    public List<TimeSlotOverride> getTimeSlotOverrides(UUID packageId) {
+        logger.info("Getting time slot overrides for package: {}", packageId);
+        // 验证场景包存在
+        findById(packageId);
+        return timeSlotOverrideRepository.findByPackageIdOrderByDateAscStartTimeAsc(packageId);
+    }
+
+    /**
+     * 根据日期范围获取时段覆盖
+     */
+    @Transactional(readOnly = true)
+    public List<TimeSlotOverride> getTimeSlotOverridesByDateRange(UUID packageId, LocalDate startDate, LocalDate endDate) {
+        logger.info("Getting time slot overrides for package: {} from {} to {}", packageId, startDate, endDate);
+        // 验证场景包存在
+        findById(packageId);
+        return timeSlotOverrideRepository.findByPackageIdAndDateRange(packageId, startDate, endDate);
+    }
+
+    /**
+     * 创建时段覆盖
+     */
+    @Transactional
+    public TimeSlotOverride createTimeSlotOverride(UUID packageId, CreateTimeSlotOverrideRequest request) {
+        logger.info("Creating time slot override for package: {}, date: {}, type: {}", 
+                packageId, request.getDate(), request.getOverrideType());
+        // 验证场景包存在
+        findById(packageId);
+
+        // 业务规则验证：ADD/MODIFY 类型必须有时间
+        if (("ADD".equals(request.getOverrideType()) || "MODIFY".equals(request.getOverrideType())) 
+                && (request.getStartTime() == null || request.getEndTime() == null)) {
+            throw new IllegalArgumentException("新增或修改类型的覆盖规则必须指定开始和结束时间");
+        }
+
+        TimeSlotOverride override = new TimeSlotOverride();
+        override.setPackageId(packageId);
+        override.setDate(LocalDate.parse(request.getDate()));
+        override.setOverrideType(request.getOverrideType());
+        
+        if (request.getStartTime() != null) {
+            override.setStartTime(java.time.LocalTime.parse(request.getStartTime()));
+        }
+        if (request.getEndTime() != null) {
+            override.setEndTime(java.time.LocalTime.parse(request.getEndTime()));
+        }
+        override.setCapacity(request.getCapacity());
+        override.setReason(request.getReason());
+
+        return timeSlotOverrideRepository.save(override);
+    }
+
+    /**
+     * 更新时段覆盖
+     */
+    @Transactional
+    public TimeSlotOverride updateTimeSlotOverride(UUID packageId, UUID overrideId, CreateTimeSlotOverrideRequest request) {
+        logger.info("Updating time slot override: {} for package: {}", overrideId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        TimeSlotOverride override = timeSlotOverrideRepository.findById(overrideId)
+                .orElseThrow(() -> new IllegalArgumentException("时段覆盖不存在: " + overrideId));
+
+        if (!override.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("时段覆盖不属于此场景包");
+        }
+
+        // 业务规则验证
+        String newType = request.getOverrideType() != null ? request.getOverrideType() : override.getOverrideType();
+        if (("ADD".equals(newType) || "MODIFY".equals(newType))) {
+            String newStartTime = request.getStartTime() != null ? request.getStartTime() : 
+                    (override.getStartTime() != null ? override.getStartTime().toString() : null);
+            String newEndTime = request.getEndTime() != null ? request.getEndTime() : 
+                    (override.getEndTime() != null ? override.getEndTime().toString() : null);
+            if (newStartTime == null || newEndTime == null) {
+                throw new IllegalArgumentException("新增或修改类型的覆盖规则必须指定开始和结束时间");
+            }
+        }
+
+        if (request.getDate() != null) {
+            override.setDate(LocalDate.parse(request.getDate()));
+        }
+        if (request.getOverrideType() != null) {
+            override.setOverrideType(request.getOverrideType());
+        }
+        if (request.getStartTime() != null) {
+            override.setStartTime(java.time.LocalTime.parse(request.getStartTime()));
+        }
+        if (request.getEndTime() != null) {
+            override.setEndTime(java.time.LocalTime.parse(request.getEndTime()));
+        }
+        if (request.getCapacity() != null) {
+            override.setCapacity(request.getCapacity());
+        }
+        if (request.getReason() != null) {
+            override.setReason(request.getReason());
+        }
+
+        return timeSlotOverrideRepository.save(override);
+    }
+
+    /**
+     * 删除时段覆盖
+     */
+    @Transactional
+    public void deleteTimeSlotOverride(UUID packageId, UUID overrideId) {
+        logger.info("Deleting time slot override: {} for package: {}", overrideId, packageId);
+        // 验证场景包存在
+        findById(packageId);
+
+        TimeSlotOverride override = timeSlotOverrideRepository.findById(overrideId)
+                .orElseThrow(() -> new IllegalArgumentException("时段覆盖不存在: " + overrideId));
+
+        if (!override.getPackageId().equals(packageId)) {
+            throw new IllegalArgumentException("时段覆盖不属于此场景包");
+        }
+
+        timeSlotOverrideRepository.delete(override);
     }
 }
