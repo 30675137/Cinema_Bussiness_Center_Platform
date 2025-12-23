@@ -250,24 +250,24 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 ### Implementation Tasks
 
 - [x] T056 [US4] Create TimeSlotsTab component with Tab sub-navigation (Week View / Calendar View) in `frontend/src/features/scenario-package-editor/components/tabs/TimeSlotsTab.tsx`
-- [ ] T057 [US4] Create WeekTemplateView component in `frontend/src/features/scenario-package-editor/components/time-slots/WeekTemplateView.tsx`
-- [ ] T058 [US4] Implement 7-column layout (Sun-Sat) in WeekTemplateView
-- [ ] T059 [US4] Create TimeSlotTemplateItem component displaying startTime-endTime, capacity, priceAdjustment in `frontend/src/features/scenario-package-editor/components/time-slots/TimeSlotTemplateItem.tsx`
-- [ ] T060 [US4] Create TimeSlotTemplateForm modal for add/edit template in `frontend/src/features/scenario-package-editor/components/forms/TimeSlotTemplateForm.tsx`
-- [ ] T061 [US4] Implement form fields: dayOfWeek (Select), startTime (TimePicker), endTime (TimePicker), capacity (InputNumber), priceAdjustment (nested form) in TimeSlotTemplateForm
-- [ ] T062 [US4] Add validation: startTime < endTime in timeSlotTemplateSchema
-- [ ] T063 [US4] Implement "Add Slot" button per day-of-week column opening TimeSlotTemplateForm
+- [x] T057 [US4] Create WeekTemplateView component in `frontend/src/features/scenario-package-editor/components/time-slots/WeekTemplateView.tsx`
+- [x] T058 [US4] Implement 7-column layout (Sun-Sat) in WeekTemplateView
+- [x] T059 [US4] Create TimeSlotTemplateItem component displaying startTime-endTime, capacity, priceAdjustment in `frontend/src/features/scenario-package-editor/components/time-slots/TimeSlotTemplateItem.tsx`
+- [x] T060 [US4] Create TimeSlotTemplateForm modal for add/edit template in `frontend/src/features/scenario-package-editor/components/forms/TimeSlotTemplateForm.tsx`
+- [x] T061 [US4] Implement form fields: dayOfWeek (Select), startTime (TimePicker), endTime (TimePicker), capacity (InputNumber), priceAdjustment (nested form) in TimeSlotTemplateForm
+- [x] T062 [US4] Add validation: startTime < endTime in timeSlotTemplateSchema
+- [x] T063 [US4] Implement "Add Slot" button per day-of-week column opening TimeSlotTemplateForm
 - [x] T064 [US4] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/time-slot-templates, PUT, DELETE (后端已实现)
-- [ ] T065 [US4] Implement "Copy to Other Days" feature allowing batch template duplication
-- [ ] T066 [US4] Create CalendarOverrideView component using Ant Design Calendar in `frontend/src/features/scenario-package-editor/components/time-slots/CalendarOverrideView.tsx`
-- [ ] T067 [US4] Implement custom dateCellRender showing override indicator badges (ADD=green, MODIFY=orange, CANCEL=red)
-- [ ] T068 [US4] Create DateOverrideForm modal for add/edit date-specific overrides in `frontend/src/features/scenario-package-editor/components/forms/DateOverrideForm.tsx`
-- [ ] T069 [US4] Implement form fields: date (DatePicker), overrideType (Radio), startTime (TimePicker, conditional), endTime (TimePicker, conditional), capacity, reason (TextArea) in DateOverrideForm
-- [ ] T070 [US4] Add conditional validation: if overrideType=ADD/MODIFY, startTime & endTime required
-- [ ] T071 [US4] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/time-slot-overrides, PUT, DELETE
-- [ ] T072 [US4] Implement calendar cell click handler opening DateOverrideForm
-- [ ] T073 [US4] Display existing overrides in DateOverrideForm when editing specific date
-- [ ] T074 [US4] Add validation warning in publish settings if (templates.length + overrides.filter(type!==CANCEL).length) === 0
+- [x] T065 [US4] Implement "Copy to Other Days" feature allowing batch template duplication
+- [x] T066 [US4] Create CalendarOverrideView component using Ant Design Calendar in `frontend/src/features/scenario-package-editor/components/time-slots/CalendarOverrideView.tsx`
+- [x] T067 [US4] Implement custom dateCellRender showing override indicator badges (ADD=green, MODIFY=orange, CANCEL=red)
+- [x] T068 [US4] Create DateOverrideForm modal for add/edit date-specific overrides in `frontend/src/features/scenario-package-editor/components/forms/DateOverrideForm.tsx`
+- [x] T069 [US4] Implement form fields: date (DatePicker), overrideType (Radio), startTime (TimePicker, conditional), endTime (TimePicker, conditional), capacity, reason (TextArea) in DateOverrideForm
+- [x] T070 [US4] Add conditional validation: if overrideType=ADD/MODIFY, startTime & endTime required
+- [ ] T071 [US4] Wire up TanStack Query mutations: POST /api/scenario-packages/:id/time-slot-overrides, PUT, DELETE (待后端实现)
+- [x] T072 [US4] Implement calendar cell click handler opening DateOverrideForm
+- [x] T073 [US4] Display existing overrides in DateOverrideForm when editing specific date
+- [x] T074 [US4] Add validation warning in publish settings if (templates.length + overrides.filter(type!==CANCEL).length) === 0
 
 **Parallel Opportunities**:
 - T057-T065 (Week Template View) and T066-T073 (Calendar Override View) can be built in parallel as they are independent sub-features
@@ -332,13 +332,13 @@ Parallel Branches: US2, US3, US4 can develop in parallel after US1
 
 **Goal**: Refine UI/UX, add error handling, and ensure production readiness
 
-- [ ] T089 [P] Implement global error boundary component in `frontend/src/components/ErrorBoundary.tsx`
-- [ ] T090 [P] Add loading skeletons for all data-fetching components using Ant Design Skeleton
-- [ ] T091 [P] Implement optimistic updates for all mutations using TanStack Query optimistic update pattern
-- [ ] T092 [P] Add keyboard navigation support (Tab key, Enter to submit, Esc to close modals)
-- [ ] T093 [P] Implement accessibility improvements: ARIA labels, focus management, screen reader announcements
-- [ ] T094 [P] Add responsive design breakpoints for tablet and mobile (if applicable to B-end admin)
-- [ ] T095 [P] Implement comprehensive error messages for all API failure scenarios
+- [x] T089 [P] Implement global error boundary component in `frontend/src/components/ErrorBoundary.tsx`
+- [x] T090 [P] Add loading skeletons for all data-fetching components using Ant Design Skeleton
+- [x] T091 [P] Implement optimistic updates for all mutations using TanStack Query optimistic update pattern
+- [x] T092 [P] Add keyboard navigation support (Tab key, Enter to submit, Esc to close modals)
+- [x] T093 [P] Implement accessibility improvements: ARIA labels, focus management, screen reader announcements
+- [x] T094 [P] Add responsive design breakpoints for tablet and mobile (if applicable to B-end admin)
+- [x] T095 [P] Implement comprehensive error messages for all API failure scenarios
 - [ ] T096 [P] Add audit logging for publish/unpublish actions in backend
 - [ ] T097 [P] Set up Sentry or error tracking for production monitoring
 - [x] T098 Add end-to-end smoke test using Playwright covering full scenario package creation flow in `tests/e2e/scenario-package-editor.spec.ts`

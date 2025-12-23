@@ -1,27 +1,19 @@
 /**
  * TimeSlotsTab 组件
- * 时段模板配置标签页
+ * 时段模板配置标签页 - 支持周视图和日历覆盖视图
  * Feature: 001-scenario-package-tabs
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
-  Empty,
-  Button,
-  Skeleton,
+  Tabs,
   message,
-  Table,
-  Switch,
-  Space,
   Modal,
-  Form,
-  TimePicker,
-  Select,
-  InputNumber,
-  Popconfirm,
+  Checkbox,
+  Space,
+  Typography,
 } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { CalendarOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { EditableCard } from '../';
 import { useScenarioPackageStore } from '../../stores/useScenarioPackageStore';
 import {
@@ -30,7 +22,13 @@ import {
   useUpdateTimeSlotTemplate,
   useDeleteTimeSlotTemplate,
 } from '../../hooks/useScenarioPackageQueries';
-import { DAY_OF_WEEK_LABELS, type TimeSlotTemplate, type DayOfWeek } from '../../types';
+import { DAY_OF_WEEK_LABELS, type TimeSlotTemplate, type TimeSlotOverride, type DayOfWeek } from '../../types';
+import { WeekTemplateView } from '../time-slots/WeekTemplateView';
+import { CalendarOverrideView } from '../time-slots/CalendarOverrideView';
+import { TimeSlotTemplateForm, type TimeSlotTemplateFormValues } from '../forms/TimeSlotTemplateForm';
+import { DateOverrideForm, type DateOverrideFormValues } from '../forms/DateOverrideForm';
+
+const { Text } = Typography;
 
 interface TimeSlotsTabProps {
   /** 场景包ID */
@@ -47,180 +45,275 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
   loading: parentLoading = false,
 }) => {
   const isDirty = useScenarioPackageStore((state) => state.dirtyTabs.timeslots);
+  const setTabDirty = useScenarioPackageStore((state) => state.setTabDirty);
 
-  // 模态框状态
-  const [formOpen, setFormOpen] = useState(false);
-  const [form] = Form.useForm();
+  // 子标签页状态
+  const [activeTab, setActiveTab] = useState('week');
+  
+  // 时段模板表单状态
+  const [templateFormVisible, setTemplateFormVisible] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<TimeSlotTemplate | undefined>();
+  const [defaultDayOfWeek, setDefaultDayOfWeek] = useState<DayOfWeek>(1);
+  
+  // 日期覆盖表单状态
+  const [overrideFormVisible, setOverrideFormVisible] = useState(false);
+  const [editingOverride, setEditingOverride] = useState<TimeSlotOverride | undefined>();
+  const [defaultOverrideDate, setDefaultOverrideDate] = useState<string | undefined>();
+  
+  // 复制到其他天 Modal 状态
+  const [copyModalVisible, setCopyModalVisible] = useState(false);
+  const [templateToCopy, setTemplateToCopy] = useState<TimeSlotTemplate | undefined>();
+  const [selectedDays, setSelectedDays] = useState<DayOfWeek[]>([]);
 
-  // 查询数据
-  const { data: templates = [], isLoading } = useTimeSlotTemplates(packageId);
+  // 查询时段模板数据
+  const { data: templates = [], isLoading: templatesLoading } = useTimeSlotTemplates(packageId);
   const createMutation = useCreateTimeSlotTemplate(packageId);
   const updateMutation = useUpdateTimeSlotTemplate(packageId);
   const deleteMutation = useDeleteTimeSlotTemplate(packageId);
 
+  // 日期覆盖数据（暂时使用空数组，后续可接入后端API）
+  const overrides: TimeSlotOverride[] = [];
+
+  const loading = parentLoading || templatesLoading;
+
+  // === 时段模板操作 ===
+  
   // 添加时段
-  const handleAdd = () => {
-    form.resetFields();
-    setFormOpen(true);
-  };
+  const handleAddTemplate = useCallback((dayOfWeek: DayOfWeek) => {
+    setDefaultDayOfWeek(dayOfWeek);
+    setEditingTemplate(undefined);
+    setTemplateFormVisible(true);
+  }, []);
 
-  // 保存时段
-  const handleSave = async () => {
-    try {
-      const values = await form.validateFields();
-      await createMutation.mutateAsync({
-        dayOfWeek: values.dayOfWeek,
-        startTime: values.timeRange[0].format('HH:mm'),
-        endTime: values.timeRange[1].format('HH:mm'),
-        capacity: values.capacity || null,
-        isEnabled: true,
-      });
-      message.success('时段已添加');
-      setFormOpen(false);
-    } catch (error) {
-      if ((error as any).errorFields) return;
-      message.error('添加失败');
-    }
-  };
-
-  // 切换启用状态
-  const handleToggle = async (template: TimeSlotTemplate, enabled: boolean) => {
-    try {
-      await updateMutation.mutateAsync({
-        templateId: template.id,
-        data: { isEnabled: enabled },
-      });
-      message.success(enabled ? '已启用' : '已禁用');
-    } catch (error) {
-      message.error('操作失败');
-    }
-  };
+  // 编辑时段
+  const handleEditTemplate = useCallback((template: TimeSlotTemplate) => {
+    setEditingTemplate(template);
+    setTemplateFormVisible(true);
+  }, []);
 
   // 删除时段
-  const handleDelete = async (templateId: string) => {
+  const handleDeleteTemplate = useCallback(async (id: string) => {
     try {
-      await deleteMutation.mutateAsync(templateId);
+      await deleteMutation.mutateAsync(id);
       message.success('已删除');
+      setTabDirty('timeslots', true);
     } catch (error) {
       message.error('删除失败');
     }
-  };
+  }, [deleteMutation, setTabDirty]);
 
-  const loading = parentLoading || isLoading;
+  // 切换启用状态
+  const handleToggleEnabled = useCallback(async (id: string, enabled: boolean) => {
+    try {
+      await updateMutation.mutateAsync({
+        templateId: id,
+        data: { isEnabled: enabled },
+      });
+      message.success(enabled ? '已启用' : '已禁用');
+      setTabDirty('timeslots', true);
+    } catch (error) {
+      message.error('操作失败');
+    }
+  }, [updateMutation, setTabDirty]);
 
-  const columns = [
-    {
-      title: '星期',
-      dataIndex: 'dayOfWeek',
-      key: 'dayOfWeek',
-      render: (day: DayOfWeek) => DAY_OF_WEEK_LABELS[day],
-    },
-    {
-      title: '时段',
-      key: 'time',
-      render: (_: unknown, record: TimeSlotTemplate) => `${record.startTime} - ${record.endTime}`,
-    },
-    {
-      title: '容量',
-      dataIndex: 'capacity',
-      key: 'capacity',
-      render: (v: number | null) => v ?? '不限',
-    },
-    {
-      title: '状态',
-      dataIndex: 'isEnabled',
-      key: 'isEnabled',
-      render: (enabled: boolean, record: TimeSlotTemplate) => (
-        <Switch
-          checked={enabled}
-          onChange={(checked) => handleToggle(record, checked)}
-          loading={updateMutation.isPending}
-        />
-      ),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_: unknown, record: TimeSlotTemplate) => (
-        <Popconfirm
-          title="确定删除这个时段吗？"
-          onConfirm={() => handleDelete(record.id)}
-        >
-          <Button type="link" danger icon={<DeleteOutlined />} size="small">
-            删除
-          </Button>
-        </Popconfirm>
-      ),
-    },
-  ];
+  // 提交时段模板表单
+  const handleSubmitTemplate = useCallback(async (values: TimeSlotTemplateFormValues) => {
+    try {
+      const priceAdjustment = values.priceAdjustmentType !== 'none' && values.priceAdjustmentValue !== undefined
+        ? { type: values.priceAdjustmentType, value: values.priceAdjustmentValue }
+        : undefined;
+
+      if (editingTemplate) {
+        // 更新
+        await updateMutation.mutateAsync({
+          templateId: editingTemplate.id,
+          data: {
+            startTime: values.startTime,
+            endTime: values.endTime,
+            capacity: values.capacity,
+            priceAdjustment,
+            isEnabled: values.isEnabled,
+          },
+        });
+        message.success('已更新');
+      } else {
+        // 创建
+        await createMutation.mutateAsync({
+          dayOfWeek: values.dayOfWeek,
+          startTime: values.startTime,
+          endTime: values.endTime,
+          capacity: values.capacity,
+          priceAdjustment,
+          isEnabled: values.isEnabled,
+        });
+        message.success('已添加');
+      }
+      setTabDirty('timeslots', true);
+      setTemplateFormVisible(false);
+    } catch (error) {
+      message.error(editingTemplate ? '更新失败' : '添加失败');
+      throw error;
+    }
+  }, [editingTemplate, createMutation, updateMutation, setTabDirty]);
+
+  // 复制到其他天
+  const handleCopyToOtherDays = useCallback((template: TimeSlotTemplate) => {
+    setTemplateToCopy(template);
+    setSelectedDays([]);
+    setCopyModalVisible(true);
+  }, []);
+
+  // 执行复制
+  const handleConfirmCopy = useCallback(async () => {
+    if (!templateToCopy || selectedDays.length === 0) return;
+
+    try {
+      for (const day of selectedDays) {
+        await createMutation.mutateAsync({
+          dayOfWeek: day,
+          startTime: templateToCopy.startTime,
+          endTime: templateToCopy.endTime,
+          capacity: templateToCopy.capacity,
+          priceAdjustment: templateToCopy.priceAdjustment,
+          isEnabled: templateToCopy.isEnabled,
+        });
+      }
+      message.success(`已复制到 ${selectedDays.length} 天`);
+      setTabDirty('timeslots', true);
+      setCopyModalVisible(false);
+    } catch (error) {
+      message.error('复制失败');
+    }
+  }, [templateToCopy, selectedDays, createMutation, setTabDirty]);
+
+  // === 日期覆盖操作 ===
+  
+  const handleAddOverride = useCallback((date: string) => {
+    setDefaultOverrideDate(date);
+    setEditingOverride(undefined);
+    setOverrideFormVisible(true);
+  }, []);
+
+  const handleEditOverride = useCallback((override: TimeSlotOverride) => {
+    setEditingOverride(override);
+    setOverrideFormVisible(true);
+  }, []);
+
+  const handleDeleteOverride = useCallback(async (id: string) => {
+    // TODO: 接入后端 API
+    message.info('日期覆盖功能即将上线');
+  }, []);
+
+  const handleSubmitOverride = useCallback(async (values: DateOverrideFormValues) => {
+    // TODO: 接入后端 API
+    message.info('日期覆盖功能即将上线');
+    setOverrideFormVisible(false);
+  }, []);
+
+  // 可选天列表（排除当前模板所在天）
+  const availableDays = templateToCopy
+    ? ([0, 1, 2, 3, 4, 5, 6] as DayOfWeek[]).filter(d => d !== templateToCopy.dayOfWeek)
+    : [];
 
   return (
     <>
       <EditableCard
-        title="时段模板"
-        description="配置可预订时段规则"
+        title="时段配置"
+        description="配置场景包的可预订时段规则"
         isDirty={isDirty}
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-            添加时段
-          </Button>
-        }
       >
-        {loading ? (
-          <Skeleton active paragraph={{ rows: 4 }} />
-        ) : templates.length === 0 ? (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="暂无时段，请添加第一个时段"
-          >
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-              添加时段
-            </Button>
-          </Empty>
-        ) : (
-          <Table
-            dataSource={templates}
-            columns={columns}
-            rowKey="id"
-            pagination={false}
-            size="small"
-          />
-        )}
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={[
+            {
+              key: 'week',
+              label: (
+                <span>
+                  <ScheduleOutlined />
+                  周模板
+                </span>
+              ),
+              children: (
+                <WeekTemplateView
+                  templates={templates}
+                  loading={loading}
+                  onAdd={handleAddTemplate}
+                  onEdit={handleEditTemplate}
+                  onDelete={handleDeleteTemplate}
+                  onToggleEnabled={handleToggleEnabled}
+                  onCopyToOtherDays={handleCopyToOtherDays}
+                />
+              ),
+            },
+            {
+              key: 'calendar',
+              label: (
+                <span>
+                  <CalendarOutlined />
+                  日期覆盖
+                </span>
+              ),
+              children: (
+                <CalendarOverrideView
+                  overrides={overrides}
+                  loading={loading}
+                  onAddOverride={handleAddOverride}
+                  onEditOverride={handleEditOverride}
+                  onDeleteOverride={handleDeleteOverride}
+                />
+              ),
+            },
+          ]}
+        />
       </EditableCard>
 
-      {/* 添加时段模态框 */}
+      {/* 时段模板表单 */}
+      <TimeSlotTemplateForm
+        visible={templateFormVisible}
+        onClose={() => setTemplateFormVisible(false)}
+        onSubmit={handleSubmitTemplate}
+        initialData={editingTemplate}
+        defaultDayOfWeek={defaultDayOfWeek}
+        loading={createMutation.isPending || updateMutation.isPending}
+      />
+
+      {/* 日期覆盖表单 */}
+      <DateOverrideForm
+        visible={overrideFormVisible}
+        onClose={() => setOverrideFormVisible(false)}
+        onSubmit={handleSubmitOverride}
+        initialData={editingOverride}
+        defaultDate={defaultOverrideDate}
+        loading={false}
+      />
+
+      {/* 复制到其他天 Modal */}
       <Modal
-        title="添加时段"
-        open={formOpen}
-        onCancel={() => setFormOpen(false)}
-        onOk={handleSave}
+        title="复制到其他天"
+        open={copyModalVisible}
+        onCancel={() => setCopyModalVisible(false)}
+        onOk={handleConfirmCopy}
         confirmLoading={createMutation.isPending}
+        okButtonProps={{ disabled: selectedDays.length === 0 }}
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="dayOfWeek"
-            label="星期"
-            rules={[{ required: true, message: '请选择星期' }]}
-          >
-            <Select
-              placeholder="选择星期"
-              options={Object.entries(DAY_OF_WEEK_LABELS).map(([k, v]) => ({
-                value: Number(k),
-                label: v,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item
-            name="timeRange"
-            label="时间范围"
-            rules={[{ required: true, message: '请选择时间' }]}
-          >
-            <TimePicker.RangePicker format="HH:mm" minuteStep={30} />
-          </Form.Item>
-          <Form.Item name="capacity" label="容量限制">
-            <InputNumber min={1} placeholder="留空表示不限制" style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
+        <div style={{ marginBottom: 16 }}>
+          <Text>
+            将时段 <Text strong>{templateToCopy?.startTime?.substring(0, 5)} - {templateToCopy?.endTime?.substring(0, 5)}</Text> 复制到：
+          </Text>
+        </div>
+        <Checkbox.Group
+          value={selectedDays}
+          onChange={(values) => setSelectedDays(values as DayOfWeek[])}
+        >
+          <Space direction="vertical">
+            {availableDays.map((day) => (
+              <Checkbox key={day} value={day}>
+                {DAY_OF_WEEK_LABELS[day]}
+              </Checkbox>
+            ))}
+          </Space>
+        </Checkbox.Group>
       </Modal>
     </>
   );
