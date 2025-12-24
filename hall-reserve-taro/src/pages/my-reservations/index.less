@@ -208,3 +208,152 @@
   display: flex;
   align-items: center;
 }
+
+/* =============================================
+   Phase 6: Responsive Design & Multi-Device Adaptation
+   ============================================= */
+
+/* T042: 小屏幕适配 (iPhone SE 320-375px) */
+@media screen and (max-width: 375px) {
+  .header-title {
+    font-size: 30px;
+  }
+
+  .list-scroll {
+    padding: 16px;
+  }
+
+  .reservation-card {
+    padding: 12px;
+  }
+
+  .package-name {
+    font-size: 26px;
+  }
+
+  .info-label,
+  .info-value {
+    font-size: 22px;
+  }
+
+  .info-label {
+    width: 100px;
+  }
+
+  .total-amount {
+    font-size: 28px;
+  }
+
+  .order-number,
+  .status-badge {
+    font-size: 20px;
+  }
+
+  .tab-item {
+    padding: 10px 20px;
+    font-size: 26px;
+  }
+}
+
+/* T043: 大屏幕适配 (iPad 768px+) */
+@media screen and (min-width: 768px) {
+  .my-reservations-page {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+  }
+
+  .header {
+    padding: 48px 32px 24px;
+  }
+
+  .header-title {
+    font-size: 38px;
+  }
+
+  .status-tabs {
+    padding: 20px 32px;
+  }
+
+  .tab-item {
+    padding: 14px 28px;
+    font-size: 30px;
+    margin-right: 20px;
+  }
+
+  .list-scroll {
+    padding: 32px;
+  }
+
+  .reservation-list {
+    gap: 20px;
+  }
+
+  .reservation-card {
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .order-number {
+    font-size: 24px;
+  }
+
+  .status-badge {
+    font-size: 24px;
+    padding: 6px 16px;
+  }
+
+  .package-name {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .info-row {
+    margin-bottom: 6px;
+  }
+
+  .info-label,
+  .info-value {
+    font-size: 26px;
+  }
+
+  .info-label {
+    width: 120px;
+  }
+
+  .card-footer {
+    padding-top: 14px;
+  }
+
+  .total-amount {
+    font-size: 36px;
+  }
+
+  .view-detail {
+    font-size: 26px;
+    padding: 10px 16px;
+  }
+
+  /* 空状态和加载状态适配 */
+  .empty,
+  .loading,
+  .error {
+    height: 400px;
+    font-size: 32px;
+  }
+
+  .empty-icon {
+    font-size: 100px;
+  }
+
+  .retry-btn {
+    padding: 18px 48px;
+    font-size: 28px;
+  }
+}

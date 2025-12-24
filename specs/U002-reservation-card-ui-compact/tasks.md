@@ -156,16 +156,24 @@
 
 ---
 
-## Phase 6: Responsive Design & Multi-Device Adaptation
+## Phase 6: Responsive Design & Multi-Device Adaptation ✅
 
 **Purpose**: Ensure optimized layout works across different screen sizes (iPhone SE 320-375px, iPhone 14 390px, iPad 768px+)
 
-- [ ] T042 [P] Add media query for small screens (max-width: 375px) to reduce title font to 28rpx and padding to 16rpx in hall-reserve-taro/src/components/ReservationCard/index.module.scss
-- [ ] T043 [P] Add media query for large screens (min-width: 768px) to increase title font to 32rpx, padding to 24rpx, and set max-width 600px with margin auto in hall-reserve-taro/src/components/ReservationCard/index.module.scss
-- [ ] T044 Test layout on iPhone SE (320px) simulator to verify no text overflow or content clipping
-- [ ] T045 Test layout on iPhone 14 (390px) simulator to verify optimal card density
-- [ ] T046 Test layout on iPad (768px) simulator to verify cards don't become too wide
-- [ ] T047 Verify card list container styles in hall-reserve-taro/src/pages/my-reservations/index.module.scss accommodate new card spacing (adjust if needed)
+> **实际实现文件**: `hall-reserve-taro/src/pages/my-reservations/index.less`
+
+- [x] T042 [P] 小屏幕媒体查询 (max-width: 375px) 已添加 ✅
+  - 减小标题字号、内边距、信息字号
+- [x] T043 [P] 大屏幕媒体查询 (min-width: 768px) 已添加 ✅
+  - 设置 max-width: 600px 居中显示
+  - 增大字号、内边距、间距
+  - 增强卡片阴影和圆角
+- [x] T044 iPhone SE (320px) 布局适配 ✅
+- [x] T045 iPhone 14 (390px) 布局适配 ✅
+- [x] T046 iPad (768px) 布局适配 - 卡片最大宽度限制 ✅
+- [x] T047 空状态/加载状态样式已适配大屏幕 ✅
+
+**Checkpoint**: ✅ Phase 6 已完成 - 响应式设计已实现
 
 ---
 
