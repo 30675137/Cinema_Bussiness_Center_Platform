@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/stores/appStore'
 import { useBookingStore } from '@/stores/bookingStore'
 import { useReservationStore } from '@/stores/reservationStore'
+import { useUserStore } from '@/stores/userStore'
+import { silentLogin } from '@/services/authService'
 import { THEME_CONFIG } from '@/constants'
 import './index.less'
 
@@ -171,13 +173,30 @@ export default function Detail() {
     return selectedPkg.price + addonsPrice
   }, [selectedPkg, addons, addonsData])
 
+  // 获取登录状态
+  const isLoggedIn = useUserStore((state) => state.isLoggedIn)
+
   const handleBack = () => {
     reset()
     Taro.navigateBack()
   }
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!scenario || !selectedPkg || !selectedTime) return
+
+    // 检查登录状态,未登录时触发静默登录
+    if (!isLoggedIn) {
+      Taro.showLoading({ title: '登录中...' })
+      try {
+        await silentLogin()
+        Taro.hideLoading()
+        console.log('[Detail] 登录成功,继续预约流程')
+      } catch (error) {
+        Taro.hideLoading()
+        Taro.showToast({ title: '请先登录', icon: 'none' })
+        return
+      }
+    }
 
     // 设置场景包信息到预约Store
     setScenarioPackage(scenario.id, scenario.title, scenario.image)

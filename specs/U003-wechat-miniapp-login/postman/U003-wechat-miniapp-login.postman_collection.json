@@ -1,0 +1,340 @@
+{
+  "info": {
+    "name": "U003 - 微信小程序登录功能",
+    "description": "微信小程序登录相关的 API 测试集合\n\n包含以下接口：\n- POST /api/auth/wechat-login: 微信静默登录\n- POST /api/auth/refresh-token: 刷新访问令牌\n- POST /api/auth/decrypt-phone: 解密微信手机号（待实现）",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. 微信小程序登录",
+      "item": [
+        {
+          "name": "微信静默登录 - 成功",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 验证响应体结构",
+                  "pm.test(\"Response has required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.data).to.have.property('refreshToken');",
+                  "    pm.expect(jsonData.data).to.have.property('expiresIn');",
+                  "    pm.expect(jsonData.data).to.have.property('user');",
+                  "});",
+                  "",
+                  "// 验证用户信息结构",
+                  "pm.test(\"User info has required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var user = jsonData.data.user;",
+                  "    pm.expect(user).to.have.property('id');",
+                  "    pm.expect(user).to.have.property('openid');",
+                  "});",
+                  "",
+                  "// 保存 access_token 和 refresh_token 到环境变量",
+                  "if (pm.response.json().success) {",
+                  "    pm.environment.set('access_token', pm.response.json().data.accessToken);",
+                  "    pm.environment.set('refresh_token', pm.response.json().data.refreshToken);",
+                  "    pm.environment.set('user_id', pm.response.json().data.user.id);",
+                  "    console.log('Tokens saved to environment');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"071abc123def456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/wechat-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "wechat-login"
+              ]
+            },
+            "description": "使用微信小程序登录凭证 code 进行静默登录\n\n注意：实际测试时需要替换 code 为真实的微信登录凭证（通过 wx.login() 获取）"
+          },
+          "response": []
+        },
+        {
+          "name": "微信静默登录 - code 无效",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has error fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', false);",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"invalid_code_12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/wechat-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "wechat-login"
+              ]
+            },
+            "description": "测试使用无效的 code 进行登录"
+          },
+          "response": []
+        },
+        {
+          "name": "微信静默登录 - code 为空",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/wechat-login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "wechat-login"
+              ]
+            },
+            "description": "测试 code 参数为空的情况（应触发 @NotBlank 验证）"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. 令牌刷新",
+      "item": [
+        {
+          "name": "刷新访问令牌 - 成功",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has new tokens\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('accessToken');",
+                  "    pm.expect(jsonData.data).to.have.property('refreshToken');",
+                  "    pm.expect(jsonData.data).to.have.property('expiresIn');",
+                  "});",
+                  "",
+                  "// 更新环境变量中的 token",
+                  "if (pm.response.json().success) {",
+                  "    pm.environment.set('access_token', pm.response.json().data.accessToken);",
+                  "    pm.environment.set('refresh_token', pm.response.json().data.refreshToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh-token"
+              ]
+            },
+            "description": "使用 refresh_token 刷新访问令牌\n\n前置条件：需要先执行\"微信静默登录 - 成功\"以获取 refresh_token"
+          },
+          "response": []
+        },
+        {
+          "name": "刷新访问令牌 - refresh_token 无效",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has error fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', false);",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"invalid_refresh_token_12345\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/refresh-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh-token"
+              ]
+            },
+            "description": "测试使用无效的 refresh_token"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. 手机号解密（待实现 T044）",
+      "item": [
+        {
+          "name": "解密微信手机号",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 注意：此接口将在 T044 中实现",
+                  "pm.test(\"Status code is 501 (Not Implemented)\", function () {",
+                  "    pm.response.to.have.status(501);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encryptedData\": \"CiyLU1Aw2KjvrjMdj8YKliAjtP43uA...\",\n  \"iv\": \"r7BXXKkLb8qrSNn05n0qiA==\",\n  \"sessionKey\": \"tiihtNczf5v6AKRyjwEUhQ==\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/decrypt-phone",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "decrypt-phone"
+              ]
+            },
+            "description": "解密微信返回的加密手机号数据\n\n注意：此接口将在 T044 (User Story 4) 中实现"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

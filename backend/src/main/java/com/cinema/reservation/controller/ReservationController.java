@@ -3,6 +3,7 @@ package com.cinema.reservation.controller;
 import com.cinema.common.dto.ApiResponse;
 import com.cinema.reservation.dto.*;
 import com.cinema.reservation.service.ReservationOrderService;
+import com.cinema.reservation.repository.ReservationOrderRepository;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +34,12 @@ public class ReservationController {
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
     private final ReservationOrderService reservationService;
+    private final ReservationOrderRepository reservationRepository;
 
-    public ReservationController(ReservationOrderService reservationService) {
+    public ReservationController(ReservationOrderService reservationService, 
+                                  ReservationOrderRepository reservationRepository) {
         this.reservationService = reservationService;
+        this.reservationRepository = reservationRepository;
     }
 
     /**
@@ -75,16 +79,15 @@ public class ReservationController {
      * @return 预约单列表
      */
     @GetMapping("/my")
-    public ResponseEntity<Map<String, Object>> getMyReservations(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMyReservations(
             @RequestHeader(value = "X-User-Id", required = false) UUID userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         
         if (userId == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "用户未登录"
-            ));
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.failure("用户未登录")
+            );
         }
         
         logger.debug("Getting reservations for user: {}", userId);
@@ -92,14 +95,19 @@ public class ReservationController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<ReservationListItemDTO> reservations = reservationService.findByUser(userId, pageable);
         
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "data", reservations.getContent(),
-                "total", reservations.getTotalElements(),
+        // 返回符合前端 PageResponse 格式的数据
+        Map<String, Object> pageData = Map.of(
+                "content", reservations.getContent(),
+                "totalElements", reservations.getTotalElements(),
+                "totalPages", reservations.getTotalPages(),
                 "page", page,
                 "size", size,
-                "totalPages", reservations.getTotalPages()
-        ));
+                "first", reservations.isFirst(),
+                "last", reservations.isLast()
+        );
+        logger.debug("Getting reservations for pageData: {}", pageData);
+        
+        return ResponseEntity.ok(ApiResponse.success(pageData));
     }
 
     /**
@@ -136,5 +144,27 @@ public class ReservationController {
         
         ReservationOrderDTO result = reservationService.completePayment(orderNumber, paymentId);
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /**
+     * 获取待处理订单数量 (C端)
+     * GET /api/reservations/pending-count
+     *
+     * @param userId 用户ID
+     * @return 待处理订单数量
+     */
+    @GetMapping("/pending-count")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getPendingCount(
+            @RequestHeader(value = "X-User-Id", required = false) UUID userId) {
+        logger.debug("Getting pending count for user: {}", userId);
+        if (userId == null) {
+            // 未登录用户返回0
+            return ResponseEntity.ok(ApiResponse.success(Map.of("pendingCount", 0L)));
+        }
+        
+        logger.debug("Getting pending count for user: {}", userId);
+        
+        long count = reservationRepository.countPendingByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.success(Map.of("pendingCount", count)));
     }
 }

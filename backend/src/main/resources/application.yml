@@ -42,12 +42,22 @@ server:
 supabase:
   # Supabase 项目基础配置，通过环境变量注入，避免泄露密钥
   url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}
+  anon-key: ${SUPABASE_ANON_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs}
   service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:sb_secret_FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
+  jwt-secret: ${SUPABASE_JWT_SECRET:FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
   api-timeout: 60000 # 毫秒，默认 60s
 
   storage:
     bucket: scenario-packages # 场景包背景图片存储桶
     base-url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}/storage/v1
+
+# 微信小程序配置（用于微信登录功能）
+wechat:
+  miniprogram:
+    # AppID 和 AppSecret 必须通过环境变量注入，禁止硬编码
+    # 从微信公众平台 > 开发 > 开发设置 获取
+    app-id: ${WECHAT_APPID:wx23d19fd65c65af26}
+    app-secret: ${WECHAT_APP_SECRET:e8550f82e70ba2278b0e030786b9653d}
 
 # 日志配置
 logging:

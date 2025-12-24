@@ -7,8 +7,10 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useEffect, useMemo, useState } from 'react'
 import { useReservationStore, useTotalAmount, useIsFormValid } from '@/stores/reservationStore'
 import { useAppStore } from '@/stores/appStore'
+import { useUserStore } from '@/stores/userStore'
 import { useScenarioDetail, usePackageTiers, useAddonItems, useTimeSlotTemplates } from '@/services/scenarioService'
 import { createReservation } from '@/services/reservationService'
+import { silentLogin } from '@/services/authService'
 import TimeSlotPicker from './components/TimeSlotPicker'
 import PackageTierSelector from './components/PackageTierSelector'
 import AddonSelector from './components/AddonSelector'
@@ -42,6 +44,9 @@ export default function ReservationForm() {
 
   const totalAmount = useTotalAmount()
   const isFormValid = useIsFormValid()
+
+  // 获取登录状态
+  const isLoggedIn = useUserStore((state) => state.isLoggedIn)
 
   // API数据获取
   const { data: scenarioData, isLoading: isLoadingScenario } = useScenarioDetail(packageId)
@@ -131,6 +136,20 @@ export default function ReservationForm() {
   // 提交预约
   const handleSubmit = async () => {
     if (!isFormValid || isSubmitting) return
+
+    // 检查登录状态,未登录时触发静默登录
+    if (!isLoggedIn) {
+      Taro.showLoading({ title: '登录中...' })
+      try {
+        await silentLogin()
+        Taro.hideLoading()
+        console.log('[ReservationForm] 登录成功,继续提交预约')
+      } catch (error) {
+        Taro.hideLoading()
+        Taro.showToast({ title: '请先登录', icon: 'none' })
+        return
+      }
+    }
 
     setIsSubmitting(true)
 

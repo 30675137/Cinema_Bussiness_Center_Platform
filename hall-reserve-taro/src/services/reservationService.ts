@@ -2,84 +2,13 @@
  * 预约单API服务
  * 封装C端预约单相关的API调用
  */
-import Taro from '@tarojs/taro'
+import { request } from '../utils/request'
 import type {
-  ApiResponse,
   CreateReservationRequest,
   ReservationOrder,
   ReservationListItem,
   PageResponse,
 } from './types/reservation.types'
-
-// API基础URL - H5环境直接使用默认值
-const API_BASE_URL = 'http://192.168.10.71:8080'
-
-/**
- * 获取JWT Token
- */
-function getToken(): string | null {
-  return Taro.getStorageSync('access_token')
-}
-
-/**
- * 统一请求封装
- */
-async function request<T>(options: {
-  url: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  data?: unknown
-  showError?: boolean
-}): Promise<T> {
-  const { url, method, data, showError = true } = options
-  const token = getToken()
-
-  try {
-    const response = await Taro.request({
-      url: `${API_BASE_URL}${url}`,
-      method,
-      data,
-      header: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    })
-
-    // HTTP状态码检查
-    if (response.statusCode === 401) {
-      // Token过期，跳转登录
-      Taro.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
-      Taro.removeStorageSync('access_token')
-      Taro.navigateTo({ url: '/pages/login/index' })
-      throw new Error('Unauthorized')
-    }
-
-    if (response.statusCode >= 400) {
-      const errorData = response.data as { message?: string; code?: string }
-      const errorMessage = errorData.message || '请求失败'
-      if (showError) {
-        Taro.showToast({ title: errorMessage, icon: 'none' })
-      }
-      throw new Error(errorMessage)
-    }
-
-    // 解析API响应
-    const apiResponse = response.data as ApiResponse<T>
-    if (apiResponse.success === false) {
-      const errorMessage = apiResponse.message || '请求失败'
-      if (showError) {
-        Taro.showToast({ title: errorMessage, icon: 'none' })
-      }
-      throw new Error(errorMessage)
-    }
-
-    return apiResponse.data
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error('网络请求失败')
-  }
-}
 
 /**
  * 创建预约
@@ -93,6 +22,7 @@ export async function createReservation(
     url: '/api/reservations',
     method: 'POST',
     data,
+    requiresAuth: true, // 需要登录
   })
 }
 
@@ -106,6 +36,7 @@ export async function getMyReservations(params?: {
   size?: number
   status?: string
 }): Promise<PageResponse<ReservationListItem>> {
+  console.log('[ReservationService] getMyReservations called with params:', params)
   const queryParams = new URLSearchParams()
   if (params?.page !== undefined) queryParams.set('page', String(params.page))
   if (params?.size !== undefined) queryParams.set('size', String(params.size))
@@ -113,11 +44,15 @@ export async function getMyReservations(params?: {
 
   const queryString = queryParams.toString()
   const url = `/api/reservations/my${queryString ? `?${queryString}` : ''}`
+  console.log('[ReservationService] Request URL:', url)
 
-  return request<PageResponse<ReservationListItem>>({
+  const result = await request<PageResponse<ReservationListItem>>({
     url,
     method: 'GET',
+    requiresAuth: true, // 需要登录
   })
+  console.log('[ReservationService] Response:', result)
+  return result
 }
 
 /**
@@ -129,6 +64,7 @@ export async function getReservationDetail(id: string): Promise<ReservationOrder
   return request<ReservationOrder>({
     url: `/api/reservations/${id}`,
     method: 'GET',
+    requiresAuth: true, // 需要登录
   })
 }
 
@@ -143,6 +79,7 @@ export async function getReservationByOrderNumber(
   return request<ReservationOrder>({
     url: `/api/reservations/order-number/${orderNumber}`,
     method: 'GET',
+    requiresAuth: true, // 需要登录
   })
 }
 
@@ -160,6 +97,7 @@ export async function cancelMyReservation(
     url: `/api/reservations/${id}/cancel`,
     method: 'POST',
     data: { cancelReason: reason },
+    requiresAuth: true, // 需要登录
   })
 }
 
@@ -174,6 +112,7 @@ export async function getPendingCount(): Promise<number> {
       url: '/api/reservations/pending-count',
       method: 'GET',
       showError: false,
+      requiresAuth: true, // 需要登录
     })
     return result.pendingCount || 0
   } catch (error) {

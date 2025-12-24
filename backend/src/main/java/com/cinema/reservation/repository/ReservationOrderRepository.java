@@ -151,4 +151,20 @@ public interface ReservationOrderRepository extends JpaRepository<ReservationOrd
      * @return 是否存在
      */
     boolean existsByOrderNumber(String orderNumber);
+
+    /**
+     * 统计用户的待处理订单数量
+     * <p>
+     * 待处理订单定义：
+     * - PENDING（待确认）
+     * - CONFIRMED 且 requiresPayment=true（已确认待支付）
+     * </p>
+     *
+     * @param userId 用户ID
+     * @return 待处理订单数量
+     */
+    @Query("SELECT COUNT(r) FROM ReservationOrder r WHERE " +
+            "r.userId = :userId AND " +
+            "(r.status = 'PENDING' OR (r.status = 'CONFIRMED' AND r.requiresPayment = true))")
+    long countPendingByUserId(@Param("userId") UUID userId);
 }

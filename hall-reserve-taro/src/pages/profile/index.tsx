@@ -6,6 +6,8 @@ import { View, Text, Image } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
 import { useState, useCallback } from 'react'
 import { getPendingCount } from '@/services/reservationService'
+import { silentLogin } from '@/services/authService'
+import { useUserStore } from '@/stores/userStore'
 import './index.less'
 
 // 默认头像
@@ -21,35 +23,17 @@ interface MenuItem {
 }
 
 export default function Profile() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userInfo, setUserInfo] = useState({
-    nickname: '点击登录',
-    avatar: DEFAULT_AVATAR,
-  })
+  const user = useUserStore((state) => state.user)
+  const isLoggedIn = useUserStore((state) => state.isLoggedIn)
   const [pendingCount, setPendingCount] = useState(0)
+
+  // 调试日志: 检查当前状态
+  console.log('[Profile] Current state - isLoggedIn:', isLoggedIn, 'user:', user)
 
   // 页面显示时检查登录状态和待处理订单数
   useDidShow(() => {
-    checkLoginStatus()
     fetchPendingCount()
   })
-
-  // 检查登录状态
-  const checkLoginStatus = useCallback(() => {
-    const token = Taro.getStorageSync('token')
-    const storedUserInfo = Taro.getStorageSync('userInfo')
-    
-    if (token && storedUserInfo) {
-      setIsLoggedIn(true)
-      setUserInfo(storedUserInfo)
-    } else {
-      setIsLoggedIn(false)
-      setUserInfo({
-        nickname: '点击登录',
-        avatar: DEFAULT_AVATAR,
-      })
-    }
-  }, [])
 
   // 获取待处理订单数量
   const fetchPendingCount = useCallback(async () => {
@@ -63,21 +47,43 @@ export default function Profile() {
   }, [])
 
   // 处理头像区域点击
-  const handleAvatarClick = () => {
+  const handleAvatarClick = async () => {
     if (!isLoggedIn) {
-      // 跳转登录页面
-      Taro.navigateTo({
-        url: '/pages/login/index?redirect=/pages/profile/index',
-      })
+      // 触发静默登录
+      Taro.showLoading({ title: '登录中...' })
+      try {
+        const loginResponse = await silentLogin()
+        console.log('[Profile] Login response:', JSON.stringify(loginResponse))
+        console.log('[Profile] User from response:', JSON.stringify(loginResponse.user))
+        // 更新 userStore 状态
+        useUserStore.getState().setUser(loginResponse.user)
+        console.log('[Profile] After setUser, isLoggedIn:', useUserStore.getState().isLoggedIn)
+        Taro.hideLoading()
+        Taro.showToast({ title: '登录成功', icon: 'success' })
+      } catch (error) {
+        console.error('[Profile] Login error:', error)
+        Taro.hideLoading()
+        Taro.showToast({ title: '登录失败，请重试', icon: 'none' })
+      }
     }
   }
 
   // 处理菜单项点击
-  const handleMenuClick = (item: MenuItem) => {
+  const handleMenuClick = async (item: MenuItem) => {
     if (item.requireLogin && !isLoggedIn) {
-      Taro.navigateTo({
-        url: `/pages/login/index?redirect=${encodeURIComponent(item.path)}`,
-      })
+      // 触发静默登录
+      Taro.showLoading({ title: '登录中...' })
+      try {
+        const loginResponse = await silentLogin()
+        // 更新 userStore 状态
+        useUserStore.getState().setUser(loginResponse.user)
+        Taro.hideLoading()
+        // 登录成功后跳转到目标页面
+        Taro.navigateTo({ url: item.path })
+      } catch (error) {
+        Taro.hideLoading()
+        Taro.showToast({ title: '登录失败，请重试', icon: 'none' })
+      }
       return
     }
     Taro.navigateTo({ url: item.path })
@@ -112,11 +118,13 @@ export default function Profile() {
       <View className="user-section" onClick={handleAvatarClick}>
         <Image
           className="avatar"
-          src={userInfo.avatar}
+          src={user?.avatarUrl || DEFAULT_AVATAR}
           mode="aspectFill"
         />
         <View className="user-info">
-          <Text className="nickname">{userInfo.nickname}</Text>
+          <Text className="nickname">
+            {isLoggedIn ? (user?.nickname || '微信用户') : '点击登录'}
+          </Text>
           {!isLoggedIn && (
             <Text className="login-hint">登录后查看更多信息</Text>
           )}

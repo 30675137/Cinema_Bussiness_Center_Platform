@@ -57,7 +57,15 @@
       "Bash(grep:*)",
       "Bash(pnpm build:weapp:*)",
       "Bash(npm run build:weapp:*)",
-      "Bash(npm run build:h5:*)"
+      "Bash(npm run build:h5:*)",
+      "Skill(speckit.plan)",
+      "Skill(speckit.tasks)",
+      "Bash(if [ -d \"/Users/lining/qoder/Cinema_Bussiness_Center_Platform/specs/U003-wechat-miniapp-login/checklists\" ])",
+      "Bash(npm run test:run:*)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(mvn clean package:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(mvn package:*)"
     ]
   }
 }
