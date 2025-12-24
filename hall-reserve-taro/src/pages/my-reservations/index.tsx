@@ -4,8 +4,7 @@
  */
 import { View, Text, ScrollView } from '@tarojs/components'
 import Taro, { useDidShow } from '@tarojs/taro'
-import { useState, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useCallback, useEffect } from 'react'
 import { getMyReservations } from '@/services/reservationService'
 import { RESERVATION_STATUS_CONFIG } from '@/services/types/reservation.types'
 import type { ReservationListItem, ReservationStatus } from '@/services/types/reservation.types'
@@ -21,35 +20,51 @@ const STATUS_TABS = [
 ]
 
 export default function MyReservations() {
+  console.log('[MyReservations] Component rendered')
   const [activeTab, setActiveTab] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [reservations, setReservations] = useState<ReservationListItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-  // 获取预约列表
-  const {
-    data,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ['myReservations', activeTab],
-    queryFn: () => getMyReservations({
-      page: 0,
-      size: 20,
-      status: activeTab || undefined,
-    }),
-  })
+  // 加载数据函数
+  const loadData = useCallback(async (status?: string) => {
+    console.log('[MyReservations] loadData called, status:', status || 'all')
+    setIsLoading(true)
+    setError(null)
+    try {
+      const result = await getMyReservations({
+        page: 0,
+        size: 20,
+        status: status || undefined,
+      })
+      console.log('[MyReservations] API response:', result)
+      setReservations(result?.content || [])
+    } catch (err) {
+      console.error('[MyReservations] API error:', err)
+      setError(err as Error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // 组件挂载时加载数据
+  useEffect(() => {
+    console.log('[MyReservations] useEffect triggered')
+    loadData(activeTab)
+  }, [activeTab, loadData])
 
   // 页面显示时刷新数据
   useDidShow(() => {
-    refetch()
+    loadData(activeTab)
   })
 
   // 下拉刷新
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
-    await refetch()
+    await loadData(activeTab)
     setIsRefreshing(false)
-  }, [refetch])
+  }, [activeTab, loadData])
 
   // 切换Tab
   const handleTabChange = (key: string) => {
@@ -79,8 +94,6 @@ export default function MyReservations() {
     const date = new Date(dateStr)
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
   }
-
-  const reservations = data?.content || []
 
   return (
     <View className="my-reservations-page">
@@ -121,7 +134,7 @@ export default function MyReservations() {
         ) : error ? (
           <View className="error">
             <Text>加载失败，请重试</Text>
-            <View className="retry-btn" onClick={() => refetch()}>
+            <View className="retry-btn" onClick={() => loadData(activeTab)}>
               <Text>重试</Text>
             </View>
           </View>
