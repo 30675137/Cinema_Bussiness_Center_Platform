@@ -164,6 +164,25 @@ export async function cancelMyReservation(
 }
 
 /**
+ * 获取待处理订单数量
+ * 待处理订单定义为: PENDING(待确认) 或 CONFIRMED且requiresPayment=true(已确认待支付)
+ * @returns 待处理订单数量
+ */
+export async function getPendingCount(): Promise<number> {
+  try {
+    const result = await request<{ pendingCount: number }>({
+      url: '/api/reservations/pending-count',
+      method: 'GET',
+      showError: false,
+    })
+    return result.pendingCount || 0
+  } catch (error) {
+    console.error('获取待处理订单数失败:', error)
+    return 0
+  }
+}
+
+/**
  * 预约服务对象
  */
 export const reservationService = {
@@ -172,6 +191,7 @@ export const reservationService = {
   getReservationDetail,
   getReservationByOrderNumber,
   cancelMyReservation,
+  getPendingCount,
 }
 
 export default reservationService

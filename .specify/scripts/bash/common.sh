@@ -72,9 +72,12 @@ check_feature_branch() {
         return 0
     fi
 
-    if [[ ! "$branch" =~ ^[0-9]{3}- ]]; then
+    # Support both formats:
+    # - Legacy: 001-feature-name (numeric prefix)
+    # - New: X001-feature-name (module letter + numeric prefix)
+    if [[ ! "$branch" =~ ^[0-9]{3}- ]] && [[ ! "$branch" =~ ^[A-Z][0-9]{3}- ]]; then
         echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
-        echo "Feature branches should be named like: 001-feature-name" >&2
+        echo "Feature branches should be named like: 001-feature-name or X001-feature-name" >&2
         return 1
     fi
 
@@ -83,21 +86,29 @@ check_feature_branch() {
 
 get_feature_dir() { echo "$1/specs/$2"; }
 
-# Find feature directory by numeric prefix instead of exact branch match
+# Find feature directory by prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Supports both formats:
+# - Legacy: 001-feature-name (numeric prefix)
+# - New: X001-feature-name (module letter + numeric prefix)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
+    local prefix=""
 
-    # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
-    if [[ ! "$branch_name" =~ ^([0-9]{3})- ]]; then
-        # If branch doesn't have numeric prefix, fall back to exact match
+    # Extract prefix from branch
+    # New format: X001-feature-name (module letter + numeric prefix)
+    if [[ "$branch_name" =~ ^([A-Z][0-9]{3})- ]]; then
+        prefix="${BASH_REMATCH[1]}"
+    # Legacy format: 001-feature-name (numeric prefix only)
+    elif [[ "$branch_name" =~ ^([0-9]{3})- ]]; then
+        prefix="${BASH_REMATCH[1]}"
+    else
+        # If branch doesn't have valid prefix, fall back to exact match
         echo "$specs_dir/$branch_name"
         return
     fi
-
-    local prefix="${BASH_REMATCH[1]}"
 
     # Search for directories in specs/ that start with this prefix
     local matches=()

@@ -54,7 +54,10 @@
       "Bash(find:*)",
       "Skill(speckit.specify)",
       "Bash(git cherry-pick:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(pnpm build:weapp:*)",
+      "Bash(npm run build:weapp:*)",
+      "Bash(npm run build:h5:*)"
     ]
   }
 }
