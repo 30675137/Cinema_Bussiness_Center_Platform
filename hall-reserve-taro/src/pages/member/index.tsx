@@ -1,14 +1,17 @@
+/**
+ * 会员页面 - 占位
+ * 后续开发会员功能
+ */
 import { View, Text } from '@tarojs/components'
-import './index.scss'
+import './index.less'
 
 export default function Member() {
   return (
-    <View className='member-page'>
-      <View className='member-header'>
-        <Text className='member-title'>会员中心</Text>
-      </View>
-      <View className='member-content'>
-        <Text className='placeholder-text'>会员功能开发中...</Text>
+    <View className="member-page">
+      <View className="placeholder">
+        <Text className="icon">👑</Text>
+        <Text className="title">会员中心</Text>
+        <Text className="subtitle">专属权益，敬请期待</Text>
       </View>
     </View>
   )

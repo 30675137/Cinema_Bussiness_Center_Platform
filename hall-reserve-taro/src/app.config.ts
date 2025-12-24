@@ -1,11 +1,11 @@
 export default defineAppConfig({
   pages: [
-    // Tab 页面（必须放在最前面）
+    // TabBar 页面必须放在前面
     'pages/home/index',
     'pages/mall/index',
     'pages/member/index',
     'pages/profile/index',
-    // 其他非 Tab 页面
+    // 普通页面
     'pages/detail/index',
     'pages/store-detail/index',
     'pages/reservation-form/index',
@@ -14,17 +14,23 @@ export default defineAppConfig({
     'pages/success/index',
     'pages/admin/index'
   ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTitleText: '影院多元经营',
+    navigationBarTextStyle: 'black'
+  },
   tabBar: {
     color: '#999999',
-    selectedColor: '#1890ff',
+    selectedColor: '#ff2e4d',
     backgroundColor: '#ffffff',
     borderStyle: 'black',
     list: [
       {
         pagePath: 'pages/home/index',
         text: '场地预约',
-        iconPath: 'assets/tabbar/reserve.png',
-        selectedIconPath: 'assets/tabbar/reserve-active.png'
+        iconPath: 'assets/tabbar/home.png',
+        selectedIconPath: 'assets/tabbar/home-active.png'
       },
       {
         pagePath: 'pages/mall/index',
@@ -45,11 +51,5 @@ export default defineAppConfig({
         selectedIconPath: 'assets/tabbar/profile-active.png'
       }
     ]
-  },
-  window: {
-    backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff',
-    navigationBarTitleText: '影院多元经营',
-    navigationBarTextStyle: 'black'
   }
 })

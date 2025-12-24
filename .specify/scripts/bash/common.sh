@@ -86,53 +86,29 @@ check_feature_branch() {
 
 get_feature_dir() { echo "$1/specs/$2"; }
 
-# Find feature directory by numeric prefix instead of exact branch match
+# Find feature directory by prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
 # Supports both formats:
-# - Legacy: 001-feature-name (numeric prefix only)
+# - Legacy: 001-feature-name (numeric prefix)
 # - New: X001-feature-name (module letter + numeric prefix)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
+    local prefix=""
 
-    # Try new format first: X001-feature-name (module letter + numeric prefix)
+    # Extract prefix from branch
+    # New format: X001-feature-name (module letter + numeric prefix)
     if [[ "$branch_name" =~ ^([A-Z][0-9]{3})- ]]; then
-        local prefix="${BASH_REMATCH[1]}"
-
-        # Search for directories in specs/ that start with this prefix
-        local matches=()
-        if [[ -d "$specs_dir" ]]; then
-            for dir in "$specs_dir"/"$prefix"-*; do
-                if [[ -d "$dir" ]]; then
-                    matches+=("$(basename "$dir")")
-                fi
-            done
-        fi
-
-        # Handle results
-        if [[ ${#matches[@]} -eq 1 ]]; then
-            echo "$specs_dir/${matches[0]}"
-            return
-        elif [[ ${#matches[@]} -gt 1 ]]; then
-            echo "ERROR: Multiple spec directories found with prefix '$prefix': ${matches[*]}" >&2
-            echo "Please ensure only one spec directory exists per prefix." >&2
-            echo "$specs_dir/$branch_name"
-            return
-        fi
-        # No match found with new format, fall through to return branch name path
-        echo "$specs_dir/$branch_name"
-        return
-    fi
-
+        prefix="${BASH_REMATCH[1]}"
     # Legacy format: 001-feature-name (numeric prefix only)
-    if [[ ! "$branch_name" =~ ^([0-9]{3})- ]]; then
-        # If branch doesn't have numeric prefix, fall back to exact match
+    elif [[ "$branch_name" =~ ^([0-9]{3})- ]]; then
+        prefix="${BASH_REMATCH[1]}"
+    else
+        # If branch doesn't have valid prefix, fall back to exact match
         echo "$specs_dir/$branch_name"
         return
     fi
-
-    local prefix="${BASH_REMATCH[1]}"
 
     # Search for directories in specs/ that start with this prefix
     local matches=()
