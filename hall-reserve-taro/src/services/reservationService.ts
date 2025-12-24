@@ -12,7 +12,7 @@ import type {
 } from './types/reservation.types'
 
 // API基础URL - H5环境直接使用默认值
-const API_BASE_URL = 'http://localhost:8080'
+const API_BASE_URL = 'http://192.168.10.71:8080'
 
 /**
  * 获取JWT Token

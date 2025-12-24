@@ -683,22 +683,49 @@ public class ScenarioPackageService {
         dto.setRating(pkg.getRating());
         dto.setTags(pkg.getTags() != null ? pkg.getTags() : List.of());
 
-        // 获取定价信息（从 package_pricing 表）
-        BigDecimal packagePrice = getPackagePrice(pkg.getId());
-        dto.setPackagePrice(packagePrice);
-
         // 填充 location（场馆位置）- 暂用默认值，后续从关联表获取
         dto.setLocation("北京·精选场馆");
 
-        // 填充 packages（套餐列表）
-        ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
-        summary.setId(pkg.getId().toString());
-        summary.setName("基础套餐");
-        summary.setPrice(packagePrice);
-        summary.setOriginalPrice(packagePrice != null ? packagePrice.multiply(new BigDecimal("1.2")) : null); // 原价暂用 1.2 倍
-        summary.setDesc(pkg.getDescription() != null ? pkg.getDescription() : "");
-        summary.setTags(List.of("推荐"));
-        dto.setPackages(List.of(summary));
+        // 从 package_tiers 表获取真实套餐数据
+        List<PackageTier> tiers = tierRepository.findByPackageIdOrderBySortOrder(pkg.getId());
+        
+        if (tiers != null && !tiers.isEmpty()) {
+            // 有套餐档位数据，使用真实数据
+            List<ScenarioPackageListItemDTO.PackageSummary> packages = tiers.stream()
+                .map(tier -> {
+                    ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
+                    summary.setId(tier.getId().toString());
+                    summary.setName(tier.getName());
+                    summary.setPrice(tier.getPrice());
+                    summary.setOriginalPrice(tier.getOriginalPrice());
+                    summary.setDesc(tier.getServiceDescription() != null ? tier.getServiceDescription() : "");
+                    summary.setTags(tier.getTags() != null ? tier.getTags() : List.of());
+                    return summary;
+                })
+                .collect(java.util.stream.Collectors.toList());
+            dto.setPackages(packages);
+            
+            // 取最低价作为起价
+            BigDecimal minPrice = tiers.stream()
+                .map(PackageTier::getPrice)
+                .filter(price -> price != null)
+                .min(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+            dto.setPackagePrice(minPrice);
+        } else {
+            // 没有套餐档位，回退到 package_pricing 表
+            BigDecimal packagePrice = getPackagePrice(pkg.getId());
+            dto.setPackagePrice(packagePrice);
+            
+            ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
+            summary.setId(pkg.getId().toString());
+            summary.setName("基础套餐");
+            summary.setPrice(packagePrice);
+            summary.setOriginalPrice(packagePrice != null ? packagePrice.multiply(new BigDecimal("1.2")) : null);
+            summary.setDesc(pkg.getDescription() != null ? pkg.getDescription() : "");
+            summary.setTags(List.of("推荐"));
+            dto.setPackages(List.of(summary));
+        }
 
         return dto;
     }

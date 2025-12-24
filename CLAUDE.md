@@ -41,6 +41,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-21
 - Supabase PostgreSQL 作为主要数据源，扩展 stores 表添加 status 字段（枚举类型 ACTIVE/INACTIVE），新增 store_operation_logs 表用于审计日志 (022-store-crud)
 - 无需数据存储，纯前端配置 (F001-miniapp-tab-bar)
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟 (U001-reservation-order-management)
+- 无需数据存储(纯UI样式优化) (U002-reservation-card-ui-compact)
 
 - (003-inventory-management)
 
@@ -61,9 +62,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- U002-reservation-card-ui-compact: Added 无需数据存储(纯UI样式优化)
 - U001-reservation-order-management: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 - U001-reservation-order-management: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
-- F001-miniapp-tab-bar: Added 无需数据存储，纯前端配置
 
 
 <!-- MANUAL ADDITIONS START -->

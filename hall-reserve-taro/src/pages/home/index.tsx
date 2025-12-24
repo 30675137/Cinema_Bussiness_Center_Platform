@@ -166,6 +166,10 @@ export default function Home() {
       <View className="scenario-list">
         {scenarios?.map((scenario) => {
           const theme = THEME_CONFIG[scenario.category]
+          // 计算所有套餐中的最低价
+          const minPrice = scenario.packages?.length > 0
+            ? Math.min(...scenario.packages.map((pkg: any) => pkg.price || 0))
+            : 0
           return (
             <View
               key={scenario.id}
@@ -215,7 +219,7 @@ export default function Home() {
                   </View>
                   <View className="price-row">
                     <Text className="price-label">起价 </Text>
-                    <Text className="price">¥{scenario.packages[0].price}</Text>
+                    <Text className="price">¥{minPrice}</Text>
                   </View>
                 </View>
                 <View className="arrow">

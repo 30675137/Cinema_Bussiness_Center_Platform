@@ -27,6 +27,7 @@ export default function ReservationForm() {
     scenarioPackageName,
     scenarioPackageImage,
     selectedDate,
+    reservationDateApi,
     selectedSlot,
     selectedTier,
     selectedAddons,
@@ -58,13 +59,6 @@ export default function ReservationForm() {
       )
     }
   }, [scenarioData, packageId])
-
-  // 初始化日期（从URL参数）
-  useEffect(() => {
-    if (date) {
-      setDate(date)
-    }
-  }, [date])
 
   // 初始化套餐选择（从URL参数）
   useEffect(() => {
@@ -156,7 +150,7 @@ export default function ReservationForm() {
         scenarioPackageId: scenarioPackageId || packageId || '',
         packageTierId: selectedTier?.id || '',
         timeSlotTemplateId: selectedSlot?.id || '',
-        reservationDate: selectedDate,
+        reservationDate: reservationDateApi,
         contactName: contactInfo.name,
         contactPhone: contactInfo.phone,
         remark: remark || undefined,
@@ -237,22 +231,32 @@ export default function ReservationForm() {
       </View>
 
       <ScrollView scrollY className="content-scroll">
-        {/* Section 1: 日期时段选择 */}
+        {/* Section 1: 预约信息摘要（只读展示，从详情页传入） */}
         <View className="section">
-          <Text className="section-title">选择时段</Text>
-          <TimeSlotPicker
-            slots={timeSlots}
-            selectedDate={selectedDate}
-          />
+          <Text className="section-title">预约信息</Text>
+          <View className="summary-card">
+            <View className="summary-row">
+              <Text className="summary-label">预约日期</Text>
+              <Text className="summary-value">{selectedDate || '未选择'}</Text>
+            </View>
+            <View className="summary-row">
+              <Text className="summary-label">预约时段</Text>
+              <Text className="summary-value">{selectedSlot?.name || '未选择'}</Text>
+            </View>
+            <View className="summary-row">
+              <Text className="summary-label">选择套餐</Text>
+              <Text className="summary-value">{selectedTier?.name || '未选择'}</Text>
+            </View>
+            {selectedTier && (
+              <View className="summary-row">
+                <Text className="summary-label">套餐价格</Text>
+                <Text className="summary-value price">¥{selectedTier.price}</Text>
+              </View>
+            )}
+          </View>
         </View>
 
-        {/* Section 2: 套餐选择 */}
-        <View className="section">
-          <Text className="section-title">选择套餐</Text>
-          <PackageTierSelector tiers={packageTiers} />
-        </View>
-
-        {/* Section 3: 加购项选择 */}
+        {/* Section 2: 加购项选择 */}
         {addonItems.length > 0 && (
           <View className="section">
             <Text className="section-title">超值加购</Text>
@@ -260,7 +264,7 @@ export default function ReservationForm() {
           </View>
         )}
 
-        {/* Section 4: 联系人信息 */}
+        {/* Section 3: 联系人信息 */}
         <View className="section">
           <Text className="section-title">联系人信息</Text>
           <ContactForm />
