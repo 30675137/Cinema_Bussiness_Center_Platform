@@ -19,8 +19,11 @@ interface ReservationFormState {
   scenarioPackageName: string
   scenarioPackageImage: string
 
-  // 选择的日期
+  // 选择的日期（显示用，如"12月25日（今天）"）
   selectedDate: string
+  
+  // 选择的日期（API用，如"2024-12-25"）
+  reservationDateApi: string
 
   // 选择的时段
   selectedSlot: TimeSlot | null
@@ -39,7 +42,7 @@ interface ReservationFormState {
 
   // Actions
   setScenarioPackage: (id: string, name: string, image: string) => void
-  setDate: (date: string) => void
+  setDate: (displayDate: string, apiDate: string) => void
   setSlot: (slot: TimeSlot | null) => void
   setTier: (tier: PackageTier | null) => void
   addAddon: (item: AddonItem, quantity?: number) => void
@@ -71,6 +74,7 @@ const initialState = {
   scenarioPackageName: '',
   scenarioPackageImage: '',
   selectedDate: getTodayString(),
+  reservationDateApi: getTodayString(),
   selectedSlot: null,
   selectedTier: null,
   selectedAddons: new Map<string, { item: AddonItem; quantity: number }>(),
@@ -93,9 +97,10 @@ export const useReservationStore = create<ReservationFormState>((set, get) => ({
     }),
 
   // 设置日期
-  setDate: (date) =>
+  setDate: (displayDate, apiDate) =>
     set({
-      selectedDate: date,
+      selectedDate: displayDate,
+      reservationDateApi: apiDate,
       // 切换日期时清空时段选择
       selectedSlot: null,
     }),

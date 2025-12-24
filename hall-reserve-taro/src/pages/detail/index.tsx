@@ -69,6 +69,9 @@ export default function Detail() {
 
   // 预约表单store
   const setScenarioPackage = useReservationStore((s) => s.setScenarioPackage)
+  const setReservationDate = useReservationStore((s) => s.setDate)
+  const setReservationSlot = useReservationStore((s) => s.setSlot)
+  const setReservationTier = useReservationStore((s) => s.setTier)
 
   // 将后端数据转换为页面需要的格式
   const scenario = useMemo(() => {
@@ -179,9 +182,70 @@ export default function Detail() {
     // 设置场景包信息到预约Store
     setScenarioPackage(scenario.id, scenario.title, scenario.image)
     
+    // 计算具体日期
+    const today = new Date()
+    let targetDate = new Date(today)
+    let friendlyName = selectedDate
+    
+    if (selectedDate === '今天') {
+      // 今天
+    } else if (selectedDate === '明天') {
+      targetDate = new Date(today.getTime() + 24 * 60 * 60 * 1000)
+    } else if (selectedDate.includes('周')) {
+      // 解析"周五 24"这种格式
+      const dayMatch = selectedDate.match(/(周[\u4e00-\u65e5])/)
+      if (dayMatch) {
+        const dayMap: Record<string, number> = {
+          '周日': 0, '周一': 1, '周二': 2, '周三': 3, 
+          '周四': 4, '周五': 5, '周六': 6
+        }
+        const targetDayOfWeek = dayMap[dayMatch[1]] ?? today.getDay()
+        const todayDayOfWeek = today.getDay()
+        const diff = (targetDayOfWeek - todayDayOfWeek + 7) % 7 || 7
+        targetDate = new Date(today.getTime() + diff * 24 * 60 * 60 * 1000)
+      }
+    }
+    
+    // 格式化日期: "12月25日（今天）"
+    const month = targetDate.getMonth() + 1
+    const day = targetDate.getDate()
+    const formattedDate = `${month}月${day}日（${friendlyName}）`
+    
+    // API格式日期: "2024-12-25"
+    const year = targetDate.getFullYear()
+    const apiDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    
+    // 设置日期（显示格式和API格式）
+    setReservationDate(formattedDate, apiDate)
+    
+    // 找到对应的时段对象，设置到store
+    const selectedSlotObj = timeSlots.find((s: any) => s.time === selectedTime)
+    if (selectedSlotObj) {
+      setReservationSlot({
+        id: selectedSlotObj.id,
+        name: `${selectedSlotObj.time} - ${selectedSlotObj.endTime}`,
+        startTime: selectedSlotObj.time,
+        endTime: selectedSlotObj.endTime,
+        capacity: selectedSlotObj.capacity,
+        bookedCount: 0,
+        available: true,
+      })
+    }
+    
+    // 设置套餐
+    setReservationTier({
+      id: selectedPkg.id,
+      name: selectedPkg.name,
+      price: selectedPkg.price,
+      originalPrice: selectedPkg.originalPrice,
+      description: selectedPkg.desc || '',
+      includes: [],
+      tags: selectedPkg.tags || [],
+    })
+    
     // 跳转到预约表单页面
     Taro.navigateTo({
-      url: `/pages/reservation-form/index?id=${scenario.id}&tierId=${selectedPkg.id}&date=${selectedDate}&time=${selectedTime}`
+      url: `/pages/reservation-form/index?id=${scenario.id}`
     })
   }
 
