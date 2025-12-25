@@ -6,6 +6,7 @@ import { scheduleHandlers } from './scheduleHandlers'
 import { reservationSettingsHandlers } from './reservationSettingsHandlers'
 import { scenarioPackageEditorHandlers } from './scenarioPackageEditorHandlers'
 import { skuHandlers } from './sku' // P001-sku-master-data
+import { conversionHandlers } from './conversion' // P002-unit-conversion
 // 场景包使用真实后端 API，不再使用 mock
 // import { scenarioPackageHandlers } from './scenarioPackageHandlers'
 
@@ -188,6 +189,7 @@ export const handlers = [
   ...reservationSettingsHandlers, // 门店预约设置处理器
   ...scenarioPackageEditorHandlers, // 场景包编辑器处理器
   ...skuHandlers, // SKU主数据管理处理器 (P001-sku-master-data)
+  ...conversionHandlers, // 单位换算管理处理器 (P002-unit-conversion)
   // 场景包使用真实后端 API，已禁用 mock
   // ...scenarioPackageHandlers,
 ]
