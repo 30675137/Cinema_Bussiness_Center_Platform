@@ -1,12 +1,13 @@
 /**
  * SKU筛选器组件
- * 支持关键字搜索、SPU、品牌、类目、状态、是否管理库存等筛选条件
+ * 支持关键字搜索、SPU、品牌、类目、状态、SKU类型、门店范围、是否管理库存等筛选条件
+ * @since P001-sku-master-data T028 - 增强筛选功能
  */
 import React, { useEffect } from 'react';
-import { Form, Input, Select, Button, Space, Card } from 'antd';
+import { Form, Input, Select, Button, Space, Card, Checkbox, Tag } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { SkuQueryParams } from '@/types/sku';
-import { SkuStatus } from '@/types/sku';
+import { SkuStatus, SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSpusQuery } from '@/hooks/useSku';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -43,6 +44,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
         brand: filters.brand,
         categoryId: filters.categoryId,
         status: filters.status || 'all',
+        skuTypes: filters.skuTypes || [], // T028: SKU类型筛选
+        storeId: filters.storeId, // T028: 门店筛选
         manageInventory: filters.manageInventory,
       });
     }
@@ -55,6 +58,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
       brand: values.brand,
       categoryId: values.categoryId,
       status: values.status === 'all' ? undefined : values.status,
+      skuTypes: values.skuTypes && values.skuTypes.length > 0 ? values.skuTypes : undefined, // T028
+      storeId: values.storeId, // T028
       manageInventory: values.manageInventory,
     };
 
@@ -82,6 +87,25 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
     { label: '全部', value: undefined },
     { label: '是', value: true },
     { label: '否', value: false },
+  ];
+
+  // SKU类型选项 (T028)
+  const skuTypeOptions = Object.entries(SKU_TYPE_CONFIG).map(([value, config]) => ({
+    label: (
+      <Space>
+        <Tag color={config.color}>{config.text}</Tag>
+      </Space>
+    ),
+    value,
+  }));
+
+  // 门店选项 (T028)
+  // TODO: 从门店API获取门店列表
+  const storeOptions = [
+    { label: '北京朝阳影城', value: 'store-1' },
+    { label: '上海浦东影城', value: 'store-2' },
+    { label: '广州天河影城', value: 'store-3' },
+    { label: '深圳福田影城', value: 'store-4' },
   ];
 
   // 从SPU列表中提取唯一的品牌和类目
@@ -185,11 +209,49 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
           </Form.Item>
 
           <Form.Item label="状态" name="status" style={{ marginBottom: 0 }}>
-            <Select 
-              placeholder="选择状态" 
+            <Select
+              placeholder="选择状态"
               options={statusOptions}
               data-testid="sku-filter-status"
             />
+          </Form.Item>
+
+          {/* T028: SKU类型筛选 */}
+          <Form.Item label="SKU类型" name="skuTypes" style={{ marginBottom: 0 }}>
+            <Select
+              mode="multiple"
+              placeholder="选择SKU类型（可多选）"
+              allowClear
+              maxTagCount="responsive"
+              data-testid="sku-filter-types"
+            >
+              {Object.entries(SKU_TYPE_CONFIG).map(([value, config]) => (
+                <Option key={value} value={value}>
+                  <Tag color={config.color}>{config.text}</Tag>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          {/* T028: 门店筛选 */}
+          <Form.Item label="门店" name="storeId" style={{ marginBottom: 0 }}>
+            <Select
+              placeholder="选择门店"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.children as string)
+                  ?.toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              allowClear
+              data-testid="sku-filter-store"
+            >
+              {storeOptions.map((store) => (
+                <Option key={store.value} value={store.value}>
+                  {store.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item

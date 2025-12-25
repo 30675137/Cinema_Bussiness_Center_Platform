@@ -21,6 +21,48 @@ interface ApiResponse<T = any> {
   timestamp: string;
 }
 
+// 后端返回的品牌数据结构（snake_case）
+interface BackendBrand {
+  id: string;
+  brand_code: string;
+  name: string;
+  english_name?: string;
+  brand_type: string;
+  primary_categories?: string[];
+  company?: string;
+  brand_level?: string;
+  tags?: string[];
+  description?: string;
+  logo_url?: string;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+// 转换后端数据为前端格式
+function transformBrand(backend: BackendBrand): Brand {
+  return {
+    id: backend.id,
+    brandCode: backend.brand_code,
+    name: backend.name,
+    englishName: backend.english_name,
+    brandType: backend.brand_type as any,
+    primaryCategories: backend.primary_categories || [],
+    company: backend.company,
+    brandLevel: backend.brand_level,
+    tags: backend.tags || [],
+    description: backend.description,
+    logoUrl: backend.logo_url,
+    status: backend.status as any,
+    createdAt: backend.created_at || new Date().toISOString(),
+    updatedAt: backend.updated_at || new Date().toISOString(),
+    createdBy: backend.created_by || 'system',
+    updatedBy: backend.updated_by || 'system',
+  };
+}
+
 /**
  * 品牌管理API服务
  * 提供品牌相关的所有API调用接口
@@ -67,7 +109,10 @@ class BrandService {
         throw new Error(data.message || '获取品牌列表失败');
       }
 
-      return data;
+      return {
+        ...data,
+        data: Array.isArray(data.data) ? data.data.map(transformBrand) : [],
+      };
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : '网络错误');
     }

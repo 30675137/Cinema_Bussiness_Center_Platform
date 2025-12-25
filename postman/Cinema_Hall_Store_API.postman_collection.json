@@ -213,6 +213,116 @@
 				}
 			],
 			"description": "影厅管理相关 API 接口（需要管理员权限）"
+		},
+		{
+			"name": "SKU APIs",
+			"item": [
+				{
+					"name": "Get SKU List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/skus?page=1&pageSize=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "skus"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "20"
+								}
+							]
+						},
+						"description": "查询SKU列表，支持分页"
+					},
+					"response": []
+				},
+				{
+					"name": "Create SKU",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"SKU-TEST-001\",\n  \"name\": \"测试商品\",\n  \"spuId\": \"{{spu_id}}\",\n  \"skuType\": \"raw_material\",\n  \"mainUnit\": \"份\",\n  \"status\": \"draft\",\n  \"standardCost\": 0\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/skus",
+							"host": ["{{base_url}}"],
+							"path": ["api", "skus"]
+						},
+						"description": "创建SKU\n\n请求字段说明:\n- code: SKU编码 (必填)\n- name: SKU名称 (必填)\n- spuId: 所属SPU ID (必填, UUID格式)\n- skuType: SKU类型 (必填) raw_material/packaging/finished_product/combo\n- mainUnit: 主单位 (必填)\n- status: 状态 draft/enabled/disabled\n- standardCost: 标准成本 (原料/包材类型必填)\n\nSKU类型说明:\n- raw_material: 原料 (需要standardCost)\n- packaging: 包材 (需要standardCost)\n- finished_product: 成品 (需要bomComponents)\n- combo: 套餐 (需要comboItems)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get SKU By ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/skus/{{sku_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "skus", "{{sku_id}}"]
+						},
+						"description": "根据ID查询SKU详情"
+					},
+					"response": []
+				},
+				{
+					"name": "Update SKU",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"更新后的SKU名称\",\n  \"mainUnit\": \"份\",\n  \"status\": \"enabled\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/skus/{{sku_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "skus", "{{sku_id}}"]
+						},
+						"description": "更新SKU信息"
+					},
+					"response": []
+				}
+			],
+			"description": "SKU管理相关 API 接口"
 		}
 	],
 	"variable": [

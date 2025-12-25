@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SKU } from '@/types/sku';
-import { SkuStatus } from '@/types/sku';
+import { SkuStatus, SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
 import {
   getSkuStatusText,
   getSkuStatusColor,
@@ -93,6 +93,27 @@ export const SkuTable: React.FC<SkuTableProps> = ({
           <span>{name}</span>
         </Tooltip>
       ),
+    },
+    {
+      title: 'SKU类型',
+      dataIndex: 'skuType',
+      key: 'skuType',
+      width: 120,
+      filters: [
+        { text: '原料', value: SkuType.RAW_MATERIAL },
+        { text: '包材', value: SkuType.PACKAGING },
+        { text: '成品', value: SkuType.FINISHED_PRODUCT },
+        { text: '套餐', value: SkuType.COMBO },
+      ],
+      onFilter: (value, record) => record.skuType === value,
+      render: (type: SkuType) => {
+        const config = SKU_TYPE_CONFIG[type];
+        return config ? (
+          <Tag color={config.color}>{config.text}</Tag>
+        ) : (
+          <Text type="secondary">-</Text>
+        );
+      },
     },
     {
       title: '品牌',

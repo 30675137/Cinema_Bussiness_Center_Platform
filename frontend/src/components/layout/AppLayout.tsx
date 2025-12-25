@@ -87,7 +87,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/mdm-pim/brands',
-          label: '品牌管理',
+          label: 'P001-品牌管理',
         },
         {
           key: '/mdm-pim/attribute',
@@ -95,12 +95,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/products/spu',
-          label: 'SPU 管理',
+          label: 'P001-SPU 管理',
         },
         
         {
           key: '/products/sku',
-          label: 'SKU 管理',
+          label: 'P001-SKU 管理',
         },
         {
           key: '/products/attributes',

@@ -35,7 +35,8 @@ export const UnitBarcodeTab: React.FC<UnitBarcodeTabProps> = ({
 }) => {
   const { data: units = [] } = useUnitsQuery();
   const inventoryUnits = units.filter((u) => u.type === 'inventory');
-  const salesUnits = units.filter((u) => u.type === 'sales');
+  // 销售单位也使用同一套单位列表（只是用途不同）
+  const salesUnits = units.filter((u) => u.type === 'sales' || u.type === 'inventory');
   const checkBarcodeMutation = useCheckBarcodeMutation();
 
   // 使用 useFieldArray 管理动态字段
