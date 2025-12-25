@@ -315,6 +315,13 @@ export interface SkuFormData {
     isOptional?: boolean;
     sortOrder?: number;
   }>;
+  /** 套餐子项（套餐类型使用） */
+  comboItems?: Array<{
+    subItemId: string;
+    quantity: number;
+    unit: string;
+    sortOrder?: number;
+  }>;
 }
 
 /**

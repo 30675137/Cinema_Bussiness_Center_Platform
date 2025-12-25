@@ -9,7 +9,9 @@ import { PlusOutlined, ArrowLeftOutlined, SaveOutlined, DeleteOutlined, SearchOu
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSpusQuery, useUnitsQuery, useCreateSkuMutation, useUpdateSkuMutation, useSkuQuery, useIngredientsQuery } from '@/hooks/useSku';
+import { useSpusQuery, useUnitsQuery, useCreateSkuMutation, useUpdateSkuMutation, useSkuQuery, useIngredientsQuery, useComboItemsQuery } from '@/hooks/useSku';
+import { useQueryClient } from '@tanstack/react-query';
+import { skuKeys } from '@/services';
 import { skuService } from '@/services/skuService';
 import { SkuStatus, SkuType } from '@/types/sku';
 import type { SPU } from '@/types/sku';
@@ -67,18 +69,10 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   const { data: spus = [] } = useSpusQuery();
   const { data: units = [] } = useUnitsQuery();
   const { data: rawIngredients = [] } = useIngredientsQuery();
+  const { data: rawComboItems = [] } = useComboItemsQuery(); // 套餐子项包含成品
   const createMutation = useCreateSkuMutation();
   const updateMutation = useUpdateSkuMutation();
-  
-  // 转换原料 SKU 为 Ingredient 格式
-  const ingredients: Ingredient[] = useMemo(() => {
-    return rawIngredients.map((sku: any) => ({
-      id: sku.id,
-      name: sku.name,
-      unit: sku.mainUnit || 'g',
-      unitPrice: sku.standardCost || 0,
-    }));
-  }, [rawIngredients]);
+  const queryClient = useQueryClient();
   
   // 编辑模式下加载SKU数据
   const { data: skuData, isLoading: loadingSku } = useSkuQuery(
@@ -129,6 +123,20 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   
   // 是否为原料/包材类型
   const isRawOrPackaging = currentProductType === 'raw_material' || currentProductType === 'packaging';
+  
+  // 是否为套餐类型
+  const isComboType = currentProductType === 'combo';
+  
+  // 根据产品类型选择数据源：套餐可选成品，成品只能选原料/包材
+  const ingredients: Ingredient[] = useMemo(() => {
+    const sourceData = isComboType ? rawComboItems : rawIngredients;
+    return sourceData.map((sku: any) => ({
+      id: sku.id,
+      name: sku.name,
+      unit: sku.mainUnit || 'g',
+      unitPrice: sku.standardCost || 0,
+    }));
+  }, [isComboType, rawComboItems, rawIngredients]);
 
   // 过滤后的原料列表
   const filteredIngredients = useMemo(() => {
@@ -191,9 +199,14 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       // 确保 SPU 存在于列表中
       const spuExists = spus.some((spu: SPU) => spu.id === skuData.spuId);
       
-      // 获取 BOM 数据（如果存在）
-      const skuDataWithBom = skuData as any;
-      const bomData = skuDataWithBom.bomComponents || [];
+      // 根据 SKU 类型获取对应的数据
+      const skuDataWithItems = skuData as any;
+      const isCombo = skuDataWithItems.skuType === 'combo';
+      
+      // 套餐类型读取 comboItems，成品类型读取 bomComponents
+      const itemsData = isCombo 
+        ? (skuDataWithItems.comboItems || []) 
+        : (skuDataWithItems.bomComponents || []);
       
       console.log('[Edit Mode] Setting form values:', {
         spuId: skuData.spuId,
@@ -203,26 +216,36 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
         name: skuData.name,
         status: skuData.status,
         standardCost: skuData.standardCost,
-        bomCount: bomData.length,
-        bomData,
+        skuType: skuDataWithItems.skuType,
+        isCombo,
+        itemsCount: itemsData.length,
+        itemsData,
       });
       
-      // 填充 BOM 配方数据（从 ingredients 列表查找组件名称）
-      if (bomData.length > 0) {
-        const convertedBomItems: BOMItem[] = bomData.map((bom: any) => {
-          const componentId = bom.componentId || bom.component_id || bom.id;
-          // 从 ingredients 列表中查找组件名称
-          const ingredient = ingredients.find((ing: Ingredient) => ing.id === componentId);
+      // 填充 BOM/套餐子项数据（从 ingredients 列表查找组件名称）
+      if (itemsData.length > 0) {
+        const convertedItems: BOMItem[] = itemsData.map((item: any) => {
+          // 套餐类型使用 subItemId，成品类型使用 componentId
+          const itemId = isCombo 
+            ? (item.subItemId || item.sub_item_id || item.id)
+            : (item.componentId || item.component_id || item.id);
+          // 从 ingredients 列表中查找名称
+          const ingredient = ingredients.find((ing: Ingredient) => ing.id === itemId);
+          // 套餐子项名称优先从 subItemName 获取，BOM 从 componentName 获取
+          const itemName = isCombo 
+            ? (item.subItemName || ingredient?.name || '未知商品')
+            : (item.componentName || ingredient?.name || '未知原料');
+          
           return {
-            ingredientId: componentId,
-            name: bom.componentName || ingredient?.name || '未知原料',
-            quantity: Number(bom.quantity) || 0,
-            unit: bom.unit || ingredient?.unit || 'g',
-            cost: Number(bom.unitCost) || (Number(bom.quantity) * (ingredient?.unitPrice || 0)),
+            ingredientId: itemId,
+            name: itemName,
+            quantity: Number(item.quantity) || 0,
+            unit: item.unit || ingredient?.unit || 'g',
+            cost: Number(item.unitCost) || (Number(item.quantity) * (ingredient?.unitPrice || 0)),
           };
         });
-        setBomItems(convertedBomItems);
-        console.log('[Edit Mode] Converted BOM items:', convertedBomItems);
+        setBomItems(convertedItems);
+        console.log('[Edit Mode] Converted items:', convertedItems);
       }
       
       // 延迟设置值，确保 Select 组件已渲染完成
@@ -276,39 +299,69 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           },
         });
         
-        // 更新BOM配方（如果有bomItems）
+        // 更新BOM配方或套餐子项（根据SKU类型）
         if (bomItems.length > 0) {
-          const bomComponents = bomItems.map((item, index) => ({
-            componentId: item.ingredientId,
-            quantity: item.quantity,
-            unit: item.unit,
-            isOptional: false,
-            sortOrder: index,
-          }));
+          const isComboType = skuData?.skuType === 'combo';
           
           try {
-            await skuService.updateBom(skuId, bomComponents, 0);
-            console.log('[Edit Mode] BOM updated successfully');
+            if (isComboType) {
+              // 套餐类型：更新套餐子项
+              const comboItems = bomItems.map((item, index) => ({
+                subItemId: item.ingredientId,
+                quantity: item.quantity,
+                unit: item.unit,
+                sortOrder: index,
+              }));
+              await skuService.updateComboItems(skuId, comboItems);
+              // 关键修复：使 SKU 缓存失效，强制下次获取最新数据（含 comboItems）
+              queryClient.invalidateQueries({ queryKey: skuKeys.sku(skuId) });
+              console.log('[Edit Mode] Combo items updated successfully, cache invalidated');
+            } else {
+              // 成品类型：更新BOM配方
+              const bomComponents = bomItems.map((item, index) => ({
+                componentId: item.ingredientId,
+                quantity: item.quantity,
+                unit: item.unit,
+                isOptional: false,
+                sortOrder: index,
+              }));
+              await skuService.updateBom(skuId, bomComponents, 0);
+              // 关键修复：使 SKU 缓存失效，强制下次获取最新数据（含 bomComponents）
+              queryClient.invalidateQueries({ queryKey: skuKeys.sku(skuId) });
+              console.log('[Edit Mode] BOM updated successfully, cache invalidated');
+            }
           } catch (bomError: any) {
-            console.error('[Edit Mode] BOM update failed:', bomError);
-            message.warning('SKU信息已更新，但BOM配方更新失败: ' + (bomError?.message || '未知错误'));
+            console.error('[Edit Mode] BOM/Combo update failed:', bomError);
+            const updateType = isComboType ? '套餐子项' : 'BOM配方';
+            message.warning(`SKU信息已更新，但${updateType}更新失败: ` + (bomError?.message || '未知错误'));
           }
         }
         
         message.success('SKU更新成功');
       } else {
-        // 创建模式
+              // 创建模式
         const autoCode = `SKU${Date.now()}`;
         // 从SPU继承产品类型
         const spuWithType = selectedSpu as any;
         const inheritedSkuType = spuWithType?.productType as SkuType || SkuType.RAW_MATERIAL;
         
-        // 构建BOM组件数据（成品类型需要）
-        const bomComponents = bomItems.length > 0 ? bomItems.map((item, index) => ({
+        // 根据产品类型构建不同的子项数据
+        const isComboTypeCreate = inheritedSkuType === 'combo';
+        
+        // BOM组件数据（成品类型需要）
+        const bomComponents = (!isComboTypeCreate && bomItems.length > 0) ? bomItems.map((item, index) => ({
           componentId: item.ingredientId,
           quantity: item.quantity,
           unit: item.unit,
           isOptional: false,
+          sortOrder: index,
+        })) : undefined;
+        
+        // 套餐子项数据（套餐类型需要）
+        const comboItems = (isComboTypeCreate && bomItems.length > 0) ? bomItems.map((item, index) => ({
+          subItemId: item.ingredientId,
+          quantity: item.quantity,
+          unit: item.unit,
           sortOrder: index,
         })) : undefined;
         
@@ -320,6 +373,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           skuType: inheritedSkuType, // 从SPU继承类型
           standardCost: values.standardCost, // 标准成本（原料/包材必填）
           bomComponents, // BOM组件（成品类型必填）
+          comboItems, // 套餐子项（套餐类型必填）
+          price: values.price, // 零售价（成品/套餐类型）
           manageInventory: true,
           allowNegativeStock: false,
           salesUnits: [],
@@ -553,18 +608,18 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                 </Col>
               </Row>
               <div style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
-                * 成本基于 BOM 配方各原料单价累加自动计算得出
+                * 成本基于{isComboType ? '套餐子项' : 'BOM 配方各原料'}单价累加自动计算得出
               </div>
             </Card>
           </Col>
 
-          {/* 右侧 - BOM配方管理 */}
+          {/* 右侧 - BOM配方管理/套餐子项管理 */}
           <Col span={14}>
             <Card 
               title={
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 16, color: '#1890ff' }}>◇</span>
-                  BOM 配方管理
+                  {isComboType ? '套餐子项管理' : 'BOM 配方管理'}
                 </span>
               }
               extra={
@@ -577,7 +632,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     setIsIngModalOpen(true);
                   }}
                 >
-                  添加配方原料
+                  {isComboType ? '添加套餐商品' : '添加配方原料'}
                 </Button>
               }
               style={{ minHeight: 400 }}
@@ -592,7 +647,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     size="middle"
                     columns={[
                       {
-                        title: '原料名称',
+                        title: isComboType ? '商品名称' : '原料名称',
                         dataIndex: 'name',
                         key: 'name',
                         render: (name: string) => (
@@ -659,7 +714,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     summary={() => (
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0} colSpan={2}>
-                          <span style={{ color: '#999' }}>共 {bomItems.length} 项原料</span>
+                          <span style={{ color: '#999' }}>共 {bomItems.length} 项{isComboType ? '商品' : '原料'}</span>
                         </Table.Summary.Cell>
                         <Table.Summary.Cell index={1} align="right">
                           <span style={{ fontSize: 16, fontWeight: 600 }}>¥ {totalCost.toFixed(2)}</span>
@@ -674,7 +729,9 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                   description={
                     <span style={{ color: '#999' }}>
-                      尚未配置配方，点击右上角按钮从原料库中选择
+                      {isComboType 
+                        ? '尚未配置套餐，点击右上角按钮从成品库中选择'
+                        : '尚未配置配方，点击右上角按钮从原料库中选择'}
                     </span>
                   }
                   style={{ marginTop: 80 }}
@@ -688,12 +745,16 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           </Col>
         </Row>
 
-        {/* 原料选择弹窗 */}
+        {/* 原料/子项选择弹窗 */}
         <Modal
           title={
             <div style={{ paddingBottom: 4 }}>
-              <div style={{ fontWeight: 700, fontSize: 20, color: '#1a1a2e' }}>🧪 选择原料库</div>
-              <div style={{ fontSize: 14, color: '#666', fontWeight: 'normal', marginTop: 6 }}>点击下方卡片将原料添加至配方</div>
+              <div style={{ fontWeight: 700, fontSize: 20, color: '#1a1a2e' }}>
+                {isComboType ? '🎁 选择套餐子项' : '🧪 选择原料库'}
+              </div>
+              <div style={{ fontSize: 14, color: '#666', fontWeight: 'normal', marginTop: 6 }}>
+                点击下方卡片将{isComboType ? '商品' : '原料'}添加至{isComboType ? '套餐' : '配方'}
+              </div>
             </div>
           }
           open={isIngModalOpen}
@@ -701,7 +762,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           footer={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
               <div style={{ fontSize: 14, color: '#666' }}>
-                已选择 <span style={{ color: '#1890ff', fontWeight: 700, fontSize: 18 }}>{bomItems.length}</span> 种原料
+                已选择 <span style={{ color: '#1890ff', fontWeight: 700, fontSize: 18 }}>{bomItems.length}</span> 种{isComboType ? '商品' : '原料'}
               </div>
               <Button 
                 type="primary"
@@ -746,7 +807,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             borderBottom: '1px solid #eee' 
           }}>
             <Input
-              placeholder="🔍  输入原料名称搜索..."
+              placeholder={isComboType ? '🔍  输入商品名称搜索...' : '🔍  输入原料名称搜索...'}
               value={ingSearchTerm}
               onChange={(e) => setIngSearchTerm(e.target.value)}
               allowClear
