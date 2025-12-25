@@ -206,6 +206,10 @@ export interface SkuQueryParams {
   status?: SkuStatus | 'all';
   /** 是否管理库存 */
   manageInventory?: boolean;
+  /** SKU类型筛选（多选） (US-001 T028) */
+  skuTypes?: SkuType[];
+  /** 门店ID筛选 (US-001 用户故事5) */
+  storeId?: string;
 
   // 分页参数
   /** 当前页码，从1开始 */
@@ -322,6 +326,8 @@ export interface SkuFormData {
     unit: string;
     sortOrder?: number;
   }>;
+  /** 门店范围：空数组表示全门店可用 (US-001 用户故事5) */
+  storeScope?: string[];
 }
 
 /**

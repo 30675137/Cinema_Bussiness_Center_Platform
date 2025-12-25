@@ -10,6 +10,7 @@ import type { SkuQueryParams } from '@/types/sku';
 import { SkuStatus, SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSpusQuery } from '@/hooks/useSku';
+import { useStoresQuery } from '@/pages/stores/hooks/useStoresQuery';
 import { useResponsive } from '@/hooks/useResponsive';
 
 const { Option } = Select;
@@ -34,6 +35,7 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
   const filters = store.filters || { status: 'all' };
   const { setFilters, clearFilters } = store;
   const { data: spus = [] } = useSpusQuery();
+  const { data: storesData = [] } = useStoresQuery(); // 获取真实门店列表
 
   // 同步store中的筛选条件到表单
   useEffect(() => {
@@ -99,14 +101,11 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
     value,
   }));
 
-  // 门店选项 (T028)
-  // TODO: 从门店API获取门店列表
-  const storeOptions = [
-    { label: '北京朝阳影城', value: 'store-1' },
-    { label: '上海浦东影城', value: 'store-2' },
-    { label: '广州天河影城', value: 'store-3' },
-    { label: '深圳福田影城', value: 'store-4' },
-  ];
+  // 门店选项 (US-001 用户故事5 - 使用真实API数据)
+  const storeOptions = storesData.map((s: any) => ({
+    label: s.name,
+    value: s.id,
+  }));
 
   // 从SPU列表中提取唯一的品牌和类目
   const brands = Array.from(new Set(spus.map(spu => spu.brand))).sort();
@@ -153,8 +152,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
               placeholder="选择SPU"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
+                ((option?.children as unknown as string) || '')
+                  .toLowerCase()
                   .includes(input.toLowerCase())
               }
               allowClear
@@ -173,8 +172,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
               placeholder="选择品牌"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
+                ((option?.children as unknown as string) || '')
+                  .toLowerCase()
                   .includes(input.toLowerCase())
               }
               allowClear
@@ -193,8 +192,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
               placeholder="选择类目"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
+                ((option?.children as unknown as string) || '')
+                  .toLowerCase()
                   .includes(input.toLowerCase())
               }
               allowClear
@@ -239,8 +238,8 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
               placeholder="选择门店"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
+                ((option?.children as unknown as string) || '')
+                  .toLowerCase()
                   .includes(input.toLowerCase())
               }
               allowClear
