@@ -60,7 +60,7 @@ public class UnitConversionController {
             return ResponseEntity.ok(ApiResponse.success(conversion));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure("NOT_FOUND", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         }
     }
 
@@ -77,10 +77,10 @@ public class UnitConversionController {
                     .body(ApiResponse.success(created, "创建成功"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.failure("VALIDATION_ERROR", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.failure("DUPLICATE_RULE", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         }
     }
 
@@ -97,13 +97,13 @@ public class UnitConversionController {
             return ResponseEntity.ok(ApiResponse.success(updated, "更新成功"));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure("NOT_FOUND", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.failure("VALIDATION_ERROR", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.failure("DUPLICATE_RULE", e.getMessage()));
+                    .body(ApiResponse.failure(e.getMessage()));
         }
     }
 
