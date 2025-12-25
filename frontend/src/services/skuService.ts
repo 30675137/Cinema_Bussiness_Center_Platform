@@ -415,6 +415,7 @@ class SkuServiceImpl implements ISkuService {
       status: statusValue,
       standardCost: formData.standardCost, // 标准成本（原料/包材类型）
       price: formData.price, // 零售价（成品/套餐类型）
+      storeScope: formData.storeScope, // 门店范围 (US-001 用户故事5)
     });
     const backendResponse = response as unknown as { success: boolean; data: BackendSkuData };
     return transformBackendSku(backendResponse.data);

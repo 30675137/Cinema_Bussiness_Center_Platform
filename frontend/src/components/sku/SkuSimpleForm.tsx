@@ -10,6 +10,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSpusQuery, useUnitsQuery, useCreateSkuMutation, useUpdateSkuMutation, useSkuQuery, useIngredientsQuery, useComboItemsQuery } from '@/hooks/useSku';
+import { useStoresQuery } from '@/pages/stores/hooks/useStoresQuery';
 import { useQueryClient } from '@tanstack/react-query';
 import { skuKeys } from '@/services';
 import { skuService } from '@/services/skuService';
@@ -44,6 +45,7 @@ const simpleFormSchema = z.object({
   price: z.number().min(0, '零售价不能为负'),
   standardCost: z.number().min(0, '标准成本不能为负').optional(),
   status: z.nativeEnum(SkuStatus),
+  storeScope: z.array(z.string()), // 门店范围：空数组表示全门店
 });
 
 type SimpleFormValues = z.infer<typeof simpleFormSchema>;
@@ -70,6 +72,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   const { data: units = [] } = useUnitsQuery();
   const { data: rawIngredients = [] } = useIngredientsQuery();
   const { data: rawComboItems = [] } = useComboItemsQuery(); // 套餐子项包含成品
+  const { data: stores = [] } = useStoresQuery(); // 获取门店列表
   const createMutation = useCreateSkuMutation();
   const updateMutation = useUpdateSkuMutation();
   const queryClient = useQueryClient();
@@ -104,6 +107,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       price: 0,
       standardCost: 0,
       status: SkuStatus.DRAFT,
+      storeScope: [], // 默认全门店
     },
   });
 
@@ -257,6 +261,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
         setValue('price', (skuData as any).price || 0); // 零售价（成品/套餐类型）
         setValue('standardCost', skuData.standardCost || 0);
         setValue('status', skuData.status || SkuStatus.DRAFT, { shouldValidate: true });
+        // 门店范围 (US-001 用户故事5)
+        setValue('storeScope', skuData.storeScope || []);
       }, 100);
     }
   }, [open, isEditMode, skuData, spus, ingredients, setValue]);
@@ -284,6 +290,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             status: values.status,
             standardCost: values.standardCost,
             price: values.price, // 零售价（成品/套餐类型）
+            storeScope: values.storeScope, // 门店范围 (US-001 用户故事5)
             manageInventory: skuData?.manageInventory ?? true,
             allowNegativeStock: skuData?.allowNegativeStock ?? false,
             salesUnits: skuData?.salesUnits?.map(su => ({
@@ -375,6 +382,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           bomComponents, // BOM组件（成品类型必填）
           comboItems, // 套餐子项（套餐类型必填）
           price: values.price, // 零售价（成品/套餐类型）
+          storeScope: values.storeScope, // 门店范围 (US-001 用户故事5)
           manageInventory: true,
           allowNegativeStock: false,
           salesUnits: [],
@@ -576,6 +584,36 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     />
                   </Form.Item>
                 )}
+
+                {/* 门店范围配置 (US-001 用户故事5 - P2) */}
+                <Form.Item
+                  label="门店范围"
+                  extra="空表示全门店可用，选择特定门店则仅在这些门店可用"
+                >
+                  <Controller
+                    name="storeScope"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        mode="multiple"
+                        placeholder="全门店可用（或选择特定门店）"
+                        allowClear
+                        showSearch
+                        filterOption={(input, option) =>
+                          (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                        }
+                        style={{ width: '100%' }}
+                      >
+                        {stores.map((store: any) => (
+                          <Option key={store.id} value={store.id}>
+                            {store.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                </Form.Item>
               </Form>
             </Card>
 
