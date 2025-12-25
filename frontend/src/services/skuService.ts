@@ -75,6 +75,16 @@ export interface ISkuService {
     isOptional?: boolean;
     sortOrder?: number;
   }>, wasteRate?: number): Promise<{ calculatedCost: number }>;
+  
+  /**
+   * 更新套餐子项
+   */
+  updateComboItems(skuId: string, items: Array<{
+    subItemId: string;
+    quantity: number;
+    unit: string;
+    sortOrder?: number;
+  }>): Promise<{ calculatedCost: number }>;
 }
 
 /**
@@ -254,6 +264,21 @@ function transformBackendSku(backendSku: BackendSkuData, spuMap?: Map<string, Ba
     }));
   }
   
+  // 处理套餐子项数据
+  let comboItems: any[] | undefined;
+  const rawComboItems = backendSku.comboItems || backendSku.combo_items;
+  if (rawComboItems && Array.isArray(rawComboItems)) {
+    comboItems = rawComboItems.map((item: any) => ({
+      id: item.id,
+      subItemId: item.subItemId || item.sub_item_id || '',
+      subItemName: item.subItem?.name || item.sub_item?.name || '',
+      quantity: item.quantity,
+      unit: item.unit,
+      unitCost: item.unitCost ?? item.unit_cost ?? 0,
+      sortOrder: item.sortOrder ?? item.sort_order ?? 0,
+    }));
+  }
+  
   return {
     id: backendSku.id,
     code: backendSku.code,
@@ -284,6 +309,7 @@ function transformBackendSku(backendSku: BackendSkuData, spuMap?: Map<string, Ba
     updatedBy: '',
     updatedByName: '',
     bomComponents: bomComponents,
+    comboItems: comboItems,
   };
 }
 
@@ -369,6 +395,11 @@ class SkuServiceImpl implements ISkuService {
       requestBody.bomComponents = formData.bomComponents;
     }
     
+    // 套餐类型需要子项
+    if (formData.comboItems && formData.comboItems.length > 0) {
+      requestBody.comboItems = formData.comboItems;
+    }
+    
     const response = await apiService.post<{ success: boolean; data: BackendSkuData }>('/skus', requestBody);
     const backendResponse = response as unknown as { success: boolean; data: BackendSkuData };
     return transformBackendSku(backendResponse.data);
@@ -416,6 +447,24 @@ class SkuServiceImpl implements ISkuService {
     const response = await apiService.put<{ success: boolean; data: { calculatedCost: number } }>(`/skus/${skuId}/bom`, {
       components,
       wasteRate: wasteRate || 0,
+    });
+    const backendResponse = response as unknown as { success: boolean; data: { calculatedCost: number } };
+    return backendResponse.data;
+  }
+  
+  /**
+   * 更新套餐子项
+   * @param skuId 套餐SKU ID
+   * @param items 套餐子项列表
+   */
+  async updateComboItems(skuId: string, items: Array<{
+    subItemId: string;
+    quantity: number;
+    unit: string;
+    sortOrder?: number;
+  }>): Promise<{ calculatedCost: number }> {
+    const response = await apiService.put<{ success: boolean; data: { calculatedCost: number } }>(`/skus/${skuId}/combo-items`, {
+      items,
     });
     const backendResponse = response as unknown as { success: boolean; data: { calculatedCost: number } };
     return backendResponse.data;

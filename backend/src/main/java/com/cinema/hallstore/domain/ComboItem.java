@@ -1,5 +1,8 @@
 package com.cinema.hallstore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +28,7 @@ import java.util.UUID;
     @UniqueConstraint(name = "uk_combo_sub_item", columnNames = {"combo_id", "sub_item_id"})
 })
 @EntityListeners(AuditingEntityListener.class)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ComboItem {
 
     /**
@@ -81,13 +85,16 @@ public class ComboItem {
 
     /**
      * 可选: 关联到套餐SKU实体 (延迟加载)
+     * 使用 @JsonIgnore 避免序列化时发送给 Supabase
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "combo_id", insertable = false, updatable = false)
     private Sku combo;
 
     /**
      * 可选: 关联到子项SKU实体 (延迟加载)
+     * 用于获取子项名称等信息
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sub_item_id", insertable = false, updatable = false)

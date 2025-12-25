@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -64,14 +66,29 @@ public class ComboItemRepository {
 
     /**
      * 创建套餐子项
+     * 使用 snake_case 字段名以匹配 Supabase/PostgreSQL 列名
+     * Supabase POST 返回数组，需要取第一个元素
      */
     public ComboItem save(ComboItem item) {
-        return webClient.post()
+        // 构建符合数据库列名的请求体 (snake_case)
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("combo_id", item.getComboId());
+        requestBody.put("sub_item_id", item.getSubItemId());
+        requestBody.put("quantity", item.getQuantity());
+        requestBody.put("unit", item.getUnit());
+        requestBody.put("unit_cost", item.getUnitCost());
+        requestBody.put("sort_order", item.getSortOrder());
+        // id 和 created_at 由数据库自动生成，不需要发送
+        
+        // Supabase REST API POST 返回的是数组，需要取第一个元素
+        List<ComboItem> result = webClient.post()
                 .uri("/combo_items")
-                .bodyValue(item)
+                .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(ComboItem.class)
+                .bodyToMono(new ParameterizedTypeReference<List<ComboItem>>() {})
                 .block();
+        
+        return (result != null && !result.isEmpty()) ? result.get(0) : null;
     }
 
     /**
