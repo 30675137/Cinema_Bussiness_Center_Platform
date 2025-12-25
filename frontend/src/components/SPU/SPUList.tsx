@@ -277,14 +277,34 @@ const SPUList: React.FC<SPUListProps> = ({
       dataIndex: 'brand',
       key: 'brand',
       width: 120,
-      render: getBrandTag,
+      render: (_: any, record: SPUItem) => {
+        // 支持brand对象或brandName字符串
+        const brandName = record.brand?.name || record.brandName;
+        if (!brandName) return '-';
+        return (
+          <Tag color="blue" style={{ fontSize: '12px' }}>
+            {brandName}
+          </Tag>
+        );
+      },
     },
     {
       title: '分类',
       dataIndex: 'category',
       key: 'category',
       width: 150,
-      render: getCategoryTag,
+      render: (_: any, record: SPUItem) => {
+        // 支持category对象或categoryName字符串
+        const categoryName = record.category?.name || record.categoryName;
+        if (!categoryName) return '-';
+        return (
+          <Tooltip title={record.category?.path?.join(' / ') || categoryName}>
+            <Tag color="green" style={{ fontSize: '12px', maxWidth: '150px' }}>
+              {categoryName}
+            </Tag>
+          </Tooltip>
+        );
+      },
     },
     {
       title: '状态',

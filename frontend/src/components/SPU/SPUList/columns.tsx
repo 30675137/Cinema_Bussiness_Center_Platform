@@ -93,10 +93,10 @@ export const SPUColumnsGenerator = ({
         </div>
       )
     },
-    // 品牌
+    // 品牌 - 直接使用SPU数据中的brandName字段
     {
       title: '品牌',
-      dataIndex: 'brandId',
+      dataIndex: 'brandName',
       key: 'brandId',
       width: 120,
       filters: brands.map(brand => ({
@@ -104,14 +104,14 @@ export const SPUColumnsGenerator = ({
         value: brand.id,
       })),
       onFilter: (value: string, record: SPUItem) => record.brandId === value,
-      render: (brandId: string) => (
-        <span className="text-sm">{getBrandName(brandId)}</span>
+      render: (brandName: string, record: SPUItem) => (
+        <span className="text-sm">{brandName || record.brandId || '-'}</span>
       )
     },
-    // 分类
+    // 分类 - 直接使用SPU数据中的categoryName字段
     {
       title: '分类',
-      dataIndex: 'categoryId',
+      dataIndex: 'categoryName',
       key: 'categoryId',
       width: 150,
       filters: categories.map(category => ({
@@ -119,13 +119,12 @@ export const SPUColumnsGenerator = ({
         value: category.id,
       })),
       onFilter: (value: string, record: SPUItem) => record.categoryId === value,
-      render: (categoryId: string, record: SPUItem) => {
-        const categoryName = getCategoryName(categoryId);
+      render: (categoryName: string, record: SPUItem) => {
         const categoryPath = record.categoryPath || [];
 
         return (
           <div>
-            <div className="text-sm">{categoryName}</div>
+            <div className="text-sm">{categoryName || record.categoryId || '-'}</div>
             {categoryPath.length > 1 && (
               <div className="text-xs text-gray-500">
                 {categoryPath.slice(0, -1).join(' > ')}

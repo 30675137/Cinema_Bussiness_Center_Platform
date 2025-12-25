@@ -1,5 +1,58 @@
 import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category } from '@/types/spu'
 import { generateSPUCode } from '@/utils/spuHelpers'
+import { apiService } from './api'
+
+/**
+ * 后端SPU数据结构（API返回格式 - snake_case）
+ */
+interface BackendSpu {
+  id: string;
+  code: string;
+  name: string;
+  short_name?: string;
+  description?: string;
+  category_id?: string;
+  category_name?: string;
+  brand_id?: string;
+  brand_name?: string;
+  status: string;
+  unit?: string;
+  tags?: string[];
+  images?: any;
+  specifications?: any;
+  attributes?: any;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+/**
+ * 将后端SPU数据转换为前端格式
+ */
+function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
+  return {
+    id: backendSpu.id,
+    code: backendSpu.code,
+    name: backendSpu.name,
+    shortName: backendSpu.short_name,
+    description: backendSpu.description || '',
+    unit: backendSpu.unit,
+    brandId: backendSpu.brand_id || '',
+    brandName: backendSpu.brand_name,
+    categoryId: backendSpu.category_id || '',
+    categoryName: backendSpu.category_name,
+    status: (backendSpu.status || 'draft') as SPUStatus,
+    tags: backendSpu.tags || [],
+    images: Array.isArray(backendSpu.images) ? backendSpu.images : [],
+    specifications: Array.isArray(backendSpu.specifications) ? backendSpu.specifications : [],
+    attributes: Array.isArray(backendSpu.attributes) ? backendSpu.attributes : [],
+    createdAt: backendSpu.created_at || new Date().toISOString(),
+    updatedAt: backendSpu.updated_at || new Date().toISOString(),
+    createdBy: backendSpu.created_by,
+    updatedBy: backendSpu.updated_by,
+  };
+}
 
 // API 响应类型定义
 export interface ApiResponse<T = any> {
@@ -291,102 +344,55 @@ class SPUService {
    */
   async getSPUList(params: SPUQueryParams): Promise<PaginatedResponse<SPUItem>> {
     try {
-      // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      // 构建查询参数
+      const queryParams = new URLSearchParams();
+      if (params.keyword) queryParams.append('keyword', params.keyword);
+      if (params.status) queryParams.append('status', params.status);
+      if (params.categoryId) queryParams.append('categoryId', params.categoryId);
+      if (params.brandId) queryParams.append('brandId', params.brandId);
+      queryParams.append('page', String(params.page || 1));
+      queryParams.append('pageSize', String(params.pageSize || 20));
 
-      // 生成Mock数据
-      const allSPUData = this.generateMockSPUList(100) // 生成100条测试数据
+      const queryString = queryParams.toString();
+      const url = `/spus${queryString ? `?${queryString}` : ''}`;
 
-      // 应用筛选条件
-      let filteredData = allSPUData.filter(spu => {
-        // 关键词搜索
-        if (params.keyword) {
-          const keyword = params.keyword.toLowerCase()
-          const searchableText = `${spu.code} ${spu.name} ${spu.description} ${spu.tags?.join(' ')}`.toLowerCase()
-          if (!searchableText.includes(keyword)) {
-            return false
-          }
-        }
+      // 调用后端API
+      const response = await apiService.get<{
+        success: boolean;
+        data: BackendSpu[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      }>(url);
 
-        // 品牌筛选
-        if (params.brandId && spu.brandId !== params.brandId) {
-          return false
-        }
+      const backendResponse = response as unknown as {
+        success: boolean;
+        data: BackendSpu[];
+        total: number;
+        page: number;
+        pageSize: number;
+        totalPages: number;
+      };
 
-        // 分类筛选
-        if (params.categoryId && spu.categoryId !== params.categoryId) {
-          return false
-        }
+      // 转换数据格式
+      const list = (backendResponse.data || []).map(transformBackendSpu);
 
-        // 状态筛选
-        if (params.status && spu.status !== params.status) {
-          return false
-        }
-
-        // 标签筛选
-        if (params.tags && params.tags.length > 0) {
-          const hasMatchingTag = params.tags.some(tag =>
-            spu.tags?.includes(tag)
-          )
-          if (!hasMatchingTag) {
-            return false
-          }
-        }
-
-        // 日期范围筛选
-        if (params.dateRange && params.dateRange.length === 2) {
-          const createdDate = new Date(spu.createdAt)
-          const startDate = new Date(params.dateRange[0])
-          const endDate = new Date(params.dateRange[1])
-          endDate.setHours(23, 59, 59, 999) // 设置为当天结束
-
-          if (createdDate < startDate || createdDate > endDate) {
-            return false
-          }
-        }
-
-        return true
-      })
-
-      // 排序
-      if (params.sortBy) {
-        filteredData.sort((a, b) => {
-          let aValue: any = a[params.sortBy as keyof SPUItem]
-          let bValue: any = b[params.sortBy as keyof SPUItem]
-
-          if (params.sortBy === 'createdAt' || params.sortBy === 'updatedAt') {
-            aValue = new Date(aValue).getTime()
-            bValue = new Date(bValue).getTime()
-          }
-
-          if (aValue === bValue) return 0
-          const comparison = aValue > bValue ? 1 : -1
-          return params.sortOrder === 'asc' ? comparison : -comparison
-        })
-      }
-
-      // 分页处理
-      const page = params.page || 1
-      const pageSize = params.pageSize || 20
-      const startIndex = (page - 1) * pageSize
-      const endIndex = startIndex + pageSize
-      const paginatedData = filteredData.slice(startIndex, endIndex)
-
-      // Mock分页响应
       return {
         success: true,
         data: {
-          list: paginatedData,
-          total: filteredData.length,
-          page,
-          pageSize,
-          totalPages: Math.ceil(filteredData.length / pageSize),
+          list,
+          total: backendResponse.total || list.length,
+          page: backendResponse.page || params.page || 1,
+          pageSize: backendResponse.pageSize || params.pageSize || 20,
+          totalPages: backendResponse.totalPages || Math.ceil((backendResponse.total || list.length) / (params.pageSize || 20)),
         },
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
+      console.error('Failed to fetch SPU list from backend:', error);
       return {
         success: false,
         data: {
@@ -399,7 +405,7 @@ class SPUService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -410,25 +416,25 @@ class SPUService {
    */
   async deleteSPU(id: string): Promise<ApiResponse<null>> {
     try {
-      // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800))
+      // 调用后端API删除
+      await apiService.delete(`/spus/${id}`);
 
-      // Mock删除逻辑
       return {
         success: true,
         data: null,
         message: '删除成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
+      console.error('Failed to delete SPU:', error);
       return {
         success: false,
         data: null,
         message: error instanceof Error ? error.message : '删除失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 

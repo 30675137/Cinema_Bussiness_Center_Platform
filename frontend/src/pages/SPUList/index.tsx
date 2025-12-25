@@ -81,23 +81,23 @@ const SPUListPage: React.FC<SPUListProps> = () => {
     }
   }
 
-  // Mock加载品牌数据
+  // 加载品牌数据 - 从真实API获取
   const loadBrands = async (): Promise<Brand[]> => {
-    // 模拟API延迟
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    return [
-      { id: 'brand_001', name: '可口可乐', code: 'COKE', status: 'active' },
-      { id: 'brand_002', name: '百事可乐', code: 'PEPSI', status: 'active' },
-      { id: 'brand_003', name: '农夫山泉', code: 'NONGFU', status: 'active' },
-      { id: 'brand_004', name: '康师傅', code: 'KSF', status: 'active' },
-      { id: 'brand_005', name: '统一', code: 'UNI', status: 'active' },
-      { id: 'brand_006', name: '旺旺', code: 'WW', status: 'active' },
-      { id: 'brand_007', name: '奥利奥', code: 'OREO', status: 'active' },
-      { id: 'brand_008', name: '乐事', code: 'LAYS', status: 'active' },
-      { id: 'brand_009', name: '好丽友', code: 'HYF', status: 'active' },
-      { id: 'brand_010', name: '百醇', code: 'BAO', status: 'active' },
-    ]
+    try {
+      const response = await fetch('/api/v1/brands');
+      const result = await response.json();
+      if (result.success && Array.isArray(result.data)) {
+        return result.data.map((brand: any) => ({
+          id: brand.id,
+          name: brand.name,
+          code: brand.brand_code || brand.brandCode,
+          status: brand.status || 'active',
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load brands:', error);
+    }
+    return [];
   }
 
   // Mock加载分类数据

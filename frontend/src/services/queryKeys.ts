@@ -73,6 +73,17 @@ export const attributeTemplateKeys = new QueryKeyFactory('attributeTemplates') a
   custom: (...args: any[]) => readonly string[];
 } as QueryKeyFactory;
 
+// SKU相关查询键
+export const skuKeys = {
+  skus: () => ['skus'] as const,
+  sku: (id: string) => ['skus', 'detail', id] as const,
+  skusPaginated: (page: number, pageSize: number, filters?: Record<string, any>) => 
+    ['skus', 'paginated', page, pageSize, filters] as const,
+  spus: () => ['skus', 'spus'] as const,
+  units: () => ['skus', 'units'] as const,
+  custom: (...args: any[]) => ['skus', ...args] as const,
+};
+
 // SPU相关查询键（用于检查使用情况）
 export const spuKeys = new QueryKeyFactory('spus') as {
   all: () => readonly string[];

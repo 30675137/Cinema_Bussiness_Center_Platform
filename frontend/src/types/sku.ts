@@ -3,6 +3,17 @@
  */
 
 /**
+ * SKU类型枚举
+ * @since P001-sku-master-data
+ */
+export enum SkuType {
+  RAW_MATERIAL = 'raw_material',        // 原料
+  PACKAGING = 'packaging',              // 包材
+  FINISHED_PRODUCT = 'finished_product', // 成品
+  COMBO = 'combo'                       // 套餐/组合
+}
+
+/**
  * SKU状态枚举
  */
 export enum SkuStatus {
@@ -86,6 +97,16 @@ export interface SKU {
   code: string;
   /** SKU名称，如："可口可乐330ml瓶装" */
   name: string;
+
+  // SKU类型 (P001-sku-master-data)
+  /** SKU类型：原料/包材/成品/套餐 */
+  skuType: SkuType;
+  /** 门店范围：空数组表示全门店，非空数组表示特定门店ID列表 */
+  storeScope: string[];
+  /** 标准成本(元)：原料/包材手动输入，成品/套餐自动计算 */
+  standardCost?: number;
+  /** 损耗率(%)：仅成品类型有效，范围0-100 */
+  wasteRate?: number;
 
   // 关联信息
   /** 所属SPU ID */
@@ -296,5 +317,139 @@ export interface SkuListState {
   };
   /** 选中的SKU ID列表 */
   selectedSkuIds: string[];
+}
+
+/**
+ * BOM组件接口
+ * @since P001-sku-master-data
+ */
+export interface BomComponent {
+  /** 组件ID */
+  id: string;
+  /** 成品SKU ID */
+  finishedProductId: string;
+  /** 组件SKU ID */
+  componentId: string;
+  /** 组件SKU (关联查询) */
+  component?: SKU;
+  /** 数量 */
+  quantity: number;
+  /** 单位 */
+  unit: string;
+  /** 单位成本(快照) */
+  unitCost?: number;
+  /** 总成本 = 数量 × 单位成本 */
+  totalCost?: number;
+  /** 是否可选组件 */
+  isOptional: boolean;
+  /** 排序序号 */
+  sortOrder: number;
+  /** 创建时间 */
+  createdAt: string;
+}
+
+/**
+ * 套餐子项接口
+ * @since P001-sku-master-data
+ */
+export interface ComboItem {
+  /** 子项ID */
+  id: string;
+  /** 套餐SKU ID */
+  comboId: string;
+  /** 子项SKU ID */
+  subItemId: string;
+  /** 子项SKU (关联查询) */
+  subItem?: SKU;
+  /** 数量 */
+  quantity: number;
+  /** 单位 */
+  unit: string;
+  /** 单位成本(快照) */
+  unitCost?: number;
+  /** 总成本 = 数量 × 单位成本 */
+  totalCost?: number;
+  /** 排序序号 */
+  sortOrder: number;
+  /** 创建时间 */
+  createdAt: string;
+}
+
+/**
+ * SKU详情接口（包含BOM和套餐信息）
+ * @since P001-sku-master-data
+ */
+export interface SKUDetail extends SKU {
+  /** BOM组件列表（仅成品类型） */
+  bomComponents?: BomComponent[];
+  /** 套餐子项列表（仅套餐类型） */
+  comboItems?: ComboItem[];
+}
+
+/**
+ * BOM组件输入接口（用于表单）
+ * @since P001-sku-master-data
+ */
+export interface BomComponentInput {
+  /** 组件SKU ID */
+  componentId: string;
+  /** 数量 */
+  quantity: number;
+  /** 单位 */
+  unit: string;
+  /** 是否可选 */
+  isOptional?: boolean;
+  /** 排序序号 */
+  sortOrder?: number;
+}
+
+/**
+ * 套餐子项输入接口（用于表单）
+ * @since P001-sku-master-data
+ */
+export interface ComboItemInput {
+  /** 子项SKU ID */
+  subItemId: string;
+  /** 数量 */
+  quantity: number;
+  /** 单位 */
+  unit: string;
+  /** 排序序号 */
+  sortOrder?: number;
+}
+
+/**
+ * SKU类型配置
+ * @since P001-sku-master-data
+ */
+export const SKU_TYPE_CONFIG: Record<SkuType, { color: string; text: string }> = {
+  [SkuType.RAW_MATERIAL]: { color: 'blue', text: '原料' },
+  [SkuType.PACKAGING]: { color: 'green', text: '包材' },
+  [SkuType.FINISHED_PRODUCT]: { color: 'orange', text: '成品' },
+  [SkuType.COMBO]: { color: 'purple', text: '套餐' }
+};
+
+/**
+ * SKU状态配置
+ */
+export const SKU_STATUS_CONFIG: Record<SkuStatus, { color: string; text: string }> = {
+  [SkuStatus.DRAFT]: { color: 'default', text: '草稿' },
+  [SkuStatus.ENABLED]: { color: 'success', text: '启用' },
+  [SkuStatus.DISABLED]: { color: 'error', text: '停用' }
+};
+
+/**
+ * 成本明细接口
+ * @since P001-sku-master-data
+ */
+export interface CostBreakdown {
+  /** 组件成本合计 */
+  componentCost: number;
+  /** 损耗成本 */
+  wasteCost: number;
+  /** 损耗率 */
+  wasteRate: number;
+  /** 标准成本总计 */
+  standardCost: number;
 }
 

@@ -1,0 +1,837 @@
+openapi: 3.0.3
+info:
+  title: SKU主数据管理 API
+  description: SKU类型扩展、BOM配置和门店范围管理接口
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api.cinema.example.com
+    description: 生产环境
+
+tags:
+  - name: SKU管理
+    description: SKU主数据CRUD操作
+  - name: BOM管理
+    description: 成品BOM配置
+  - name: 套餐管理
+    description: 套餐子项配置
+  - name: 成本计算
+    description: 标准成本计算与刷新
+
+paths:
+  /skus:
+    get:
+      summary: 查询SKU列表
+      tags: [SKU管理]
+      parameters:
+        - name: skuType
+          in: query
+          schema:
+            type: string
+            enum: [raw_material, packaging, finished_product, combo]
+          description: 按SKU类型筛选
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, enabled, disabled]
+          description: 按状态筛选
+        - name: storeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: 按门店可用性筛选(返回该门店可用的SKU)
+        - name: keyword
+          in: query
+          schema:
+            type: string
+          description: 关键词搜索(名称/条码)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SKU'
+                  total:
+                    type: integer
+                    example: 100
+                  page:
+                    type: integer
+                    example: 1
+                  pageSize:
+                    type: integer
+                    example: 20
+                  message:
+                    type: string
+                    example: 查询成功
+
+    post:
+      summary: 创建SKU
+      tags: [SKU管理]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SKUCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKU'
+                  message:
+                    type: string
+                    example: SKU创建成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /skus/{id}:
+    get:
+      summary: 获取SKU详情
+      tags: [SKU管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKUDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: 更新SKU
+      tags: [SKU管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SKUUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKU'
+                  message:
+                    type: string
+                    example: SKU更新成功
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: 删除SKU
+      tags: [SKU管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: SKU删除成功
+        '400':
+          description: 删除失败(存在依赖关系)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: SKU_IN_USE
+                  message:
+                    type: string
+                    example: 该SKU正在被其他成品的BOM使用,无法删除
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /skus/{id}/bom:
+    get:
+      summary: 获取成品SKU的BOM配置
+      tags: [BOM管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 成品SKU ID
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BomComponent'
+        '400':
+          description: SKU类型错误
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                    example: INVALID_SKU_TYPE
+                  message:
+                    type: string
+                    example: 只有成品类型的SKU才有BOM配置
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: 更新成品SKU的BOM配置
+      tags: [BOM管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                components:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BomComponentInput'
+                wasteRate:
+                  type: number
+                  format: float
+                  minimum: 0
+                  maximum: 100
+                  example: 5.0
+                  description: 损耗率(%)
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      components:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BomComponent'
+                      calculatedCost:
+                        type: number
+                        format: decimal
+                        example: 29.93
+                        description: 计算后的标准成本
+                  message:
+                    type: string
+                    example: BOM配置更新成功,标准成本已重新计算
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /skus/{id}/combo-items:
+    get:
+      summary: 获取套餐SKU的子项配置
+      tags: [套餐管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 套餐SKU ID
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComboItem'
+
+    put:
+      summary: 更新套餐SKU的子项配置
+      tags: [套餐管理]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ComboItemInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ComboItem'
+                      calculatedCost:
+                        type: number
+                        format: decimal
+                        example: 91.47
+                  message:
+                    type: string
+                    example: 套餐子项配置更新成功
+
+  /skus/{id}/recalculate-cost:
+    post:
+      summary: 手动重新计算标准成本
+      tags: [成本计算]
+      description: 当组件成本变更后,手动触发成品/套餐成本重新计算
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 计算成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      oldCost:
+                        type: number
+                        format: decimal
+                        example: 28.50
+                      newCost:
+                        type: number
+                        format: decimal
+                        example: 29.93
+                      changedAt:
+                        type: string
+                        format: date-time
+                  message:
+                    type: string
+                    example: 标准成本已更新
+
+  /skus/{id}/validate-store-scope:
+    post:
+      summary: 验证门店范围可用性
+      tags: [SKU管理]
+      description: 在启用成品/套餐前,验证所有组件/子项在目标门店可用
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                storeScope:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: 目标门店范围(空数组=全门店)
+      responses:
+        '200':
+          description: 验证结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      valid:
+                        type: boolean
+                        example: true
+                      errors:
+                        type: array
+                        items:
+                          type: string
+                        example: []
+                      warnings:
+                        type: array
+                        items:
+                          type: string
+                        example: ["组件'威士忌'在部分门店库存不足"]
+
+components:
+  schemas:
+    SKU:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          example: "6901234567890"
+          description: 条码(全局唯一)
+        name:
+          type: string
+          example: "威士忌可乐"
+        spuId:
+          type: string
+          format: uuid
+        skuType:
+          type: string
+          enum: [raw_material, packaging, finished_product, combo]
+          example: finished_product
+        mainUnit:
+          type: string
+          example: "杯"
+        storeScope:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example: []
+          description: 门店范围(空数组=全门店)
+        standardCost:
+          type: number
+          format: decimal
+          nullable: true
+          example: 29.93
+        wasteRate:
+          type: number
+          format: float
+          example: 5.0
+          description: 损耗率(%),仅成品有效
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          example: enabled
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SKUDetail:
+      allOf:
+        - $ref: '#/components/schemas/SKU'
+        - type: object
+          properties:
+            bom:
+              type: array
+              items:
+                $ref: '#/components/schemas/BomComponent'
+              description: BOM组件(仅成品类型)
+            comboItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComboItem'
+              description: 套餐子项(仅套餐类型)
+
+    SKUCreateRequest:
+      type: object
+      required:
+        - code
+        - name
+        - spuId
+        - skuType
+        - mainUnit
+      properties:
+        code:
+          type: string
+          example: "6901234567890"
+        name:
+          type: string
+          example: "威士忌可乐"
+        spuId:
+          type: string
+          format: uuid
+        skuType:
+          type: string
+          enum: [raw_material, packaging, finished_product, combo]
+        mainUnit:
+          type: string
+          example: "杯"
+        storeScope:
+          type: array
+          items:
+            type: string
+            format: uuid
+          default: []
+        standardCost:
+          type: number
+          format: decimal
+          nullable: true
+          description: 原料/包材必填,成品/套餐自动计算
+        wasteRate:
+          type: number
+          format: float
+          default: 0
+          minimum: 0
+          maximum: 100
+        bom:
+          type: object
+          properties:
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/BomComponentInput'
+          description: BOM配置(仅成品类型需要)
+        comboItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboItemInput'
+          description: 套餐子项(仅套餐类型需要)
+
+    SKUUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        mainUnit:
+          type: string
+        storeScope:
+          type: array
+          items:
+            type: string
+            format: uuid
+        standardCost:
+          type: number
+          format: decimal
+          nullable: true
+        wasteRate:
+          type: number
+          format: float
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+
+    BomComponent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        finishedProductId:
+          type: string
+          format: uuid
+        componentId:
+          type: string
+          format: uuid
+        componentName:
+          type: string
+          example: "威士忌"
+        componentType:
+          type: string
+          enum: [raw_material, packaging]
+        quantity:
+          type: number
+          format: decimal
+          example: 50
+        unit:
+          type: string
+          example: "ml"
+        unitCost:
+          type: number
+          format: decimal
+          nullable: true
+          example: 0.50
+        totalCost:
+          type: number
+          format: decimal
+          example: 25.00
+        isOptional:
+          type: boolean
+          default: false
+        sortOrder:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+
+    BomComponentInput:
+      type: object
+      required:
+        - componentId
+        - quantity
+        - unit
+      properties:
+        componentId:
+          type: string
+          format: uuid
+          description: 组件SKU ID(必须是原料或包材)
+        quantity:
+          type: number
+          format: decimal
+          minimum: 0
+          exclusiveMinimum: true
+        unit:
+          type: string
+        isOptional:
+          type: boolean
+          default: false
+        sortOrder:
+          type: integer
+          default: 0
+
+    ComboItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        comboId:
+          type: string
+          format: uuid
+        subItemId:
+          type: string
+          format: uuid
+        subItemName:
+          type: string
+          example: "威士忌可乐"
+        subItemType:
+          type: string
+          enum: [raw_material, packaging, finished_product]
+        quantity:
+          type: number
+          format: decimal
+          example: 2
+        unit:
+          type: string
+          example: "杯"
+        unitCost:
+          type: number
+          format: decimal
+          nullable: true
+          example: 29.93
+        totalCost:
+          type: number
+          format: decimal
+          example: 59.86
+        sortOrder:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+
+    ComboItemInput:
+      type: object
+      required:
+        - subItemId
+        - quantity
+        - unit
+      properties:
+        subItemId:
+          type: string
+          format: uuid
+          description: 子项SKU ID(不能是套餐类型)
+        quantity:
+          type: number
+          format: decimal
+          minimum: 0
+          exclusiveMinimum: true
+        unit:
+          type: string
+        sortOrder:
+          type: integer
+          default: 0
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: VALIDATION_ERROR
+              message:
+                type: string
+                example: 请求参数验证失败
+              details:
+                type: object
+                additionalProperties: true
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: SKU_NOT_FOUND
+              message:
+                type: string
+                example: 未找到指定的SKU
+
+    Conflict:
+      description: 资源冲突
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: string
+                example: CODE_ALREADY_EXISTS
+              message:
+                type: string
+                example: 条码已存在
