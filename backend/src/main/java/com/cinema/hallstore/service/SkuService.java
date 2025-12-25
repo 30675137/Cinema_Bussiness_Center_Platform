@@ -176,7 +176,7 @@ public class SkuService {
      */
     @Transactional
     public Sku update(UUID id, String name, String mainUnit, String[] storeScope,
-                      BigDecimal standardCost, BigDecimal wasteRate, SkuStatus status) {
+                      BigDecimal standardCost, BigDecimal wasteRate, BigDecimal price, SkuStatus status) {
         Sku sku = findById(id);
 
         if (name != null) {
@@ -195,6 +195,10 @@ public class SkuService {
             sku.setWasteRate(wasteRate);
             // 重新计算成本
             recalculateCost(id);
+        }
+        // 零售价（仅成品/套餐类型）
+        if (price != null && (sku.getSkuType() == SkuType.FINISHED_PRODUCT || sku.getSkuType() == SkuType.COMBO)) {
+            sku.setPrice(price);
         }
         if (status != null) {
             sku.setStatus(status);

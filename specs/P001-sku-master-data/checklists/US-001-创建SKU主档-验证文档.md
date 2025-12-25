@@ -1,8 +1,66 @@
 # US-001 创建SKU主档 验证文档
 
-**版本**: 1.0  
+**版本**: 1.2  
 **更新日期**: 2025-12-25  
-**状态**: MVP完成 (93.3%)
+**状态**: MVP完成 + 类型继承重构
+
+---
+
+## 📚 关键概念理解
+
+### SPU vs SKU 区别
+
+| 维度 | SPU (标准产品单元) | SKU (库存单位) |
+|------|-------------------|----------------|
+| **定义** | 一类产品的抽象 | 最小可管理库存单位 |
+| **作用** | 产品归类、品牌分类 | 库存管理、成本核算、BOM组件 |
+| **属性** | 品牌、分类、描述 | 规格、成本、库存、条码 |
+
+### SKU 四种类型说明
+
+| 类型 | 说明 | 成本来源 | 例子 |
+|------|------|---------|------|
+| **原料 (raw_material)** | 生产原材料 | 手动输入 | 威士忌(0.5元/ml)、可乐糖浆(0.02元/ml) |
+| **包材 (packaging)** | 包装耗材 | 手动输入 | 纸杯(0.3元/个)、吸管(0.1元/根)、高脚杯(2元/个) |
+| **成品 (finished_product)** | 可售卖商品 | BOM自动计算 | 冰镇可乐(=糖浆+纸杯+吸管) |
+| **套餐 (combo)** | 商品组合 | 子项自动计算 | 观影套餐(=可乐×2+爆米花×1) |
+
+### 为什么包材是 SKU 而不是 SPU？
+
+包材应该是 **SKU**，原因：
+1. **需要管库存** - 纸杯用完要补货
+2. **有明确成本** - 0.3元/个
+3. **是BOM组件** - 成品配方需要引用它
+4. **可能有多规格** - 大/中/小纸杯
+
+### SKU 类型继承机制（重构后）
+
+**重构前**：SKU 类型由用户手动选择，可能与 SPU 分类不一致
+
+**重构后**：
+- SPU 新增 `product_type` 字段
+- 创建 SKU 时自动继承 SPU 的产品类型
+- SKU 表单中产品类型为只读展示
+
+```
+创建流程：
+1. 创建 SPU「纸杯」(product_type: packaging)
+2. 创建 SKU → 类型自动 = packaging ✅ 继承
+```
+
+### 业务场景举例
+
+**场景：制作一杯「冰镇可乐」**
+
+```
+SPU: 可乐饮品 (分类: 饮料)
+  └── SKU: 冰镇可乐 (类型: 成品)
+        └── BOM配方:
+              ├── 可乐糖浆 200ml × 0.02元 = 4.00元 (原料SKU)
+              ├── 纸杯 1个 × 0.30元 = 0.30元 (包材SKU)
+              └── 吸管 1根 × 0.10元 = 0.10元 (包材SKU)
+        └── 成本合计: 4.40元
+```
 
 ---
 
@@ -10,8 +68,8 @@
 
 | 服务 | 地址 | 说明 |
 |------|------|------|
-| **前端首页** | http://localhost:5173 | 影院业务中台 |
-| **SKU管理页面** | http://localhost:5173/products/sku | SKU列表/新建/编辑/查看 |
+| **前端首页** | http://localhost:3002 | 影院业务中台 |
+| **SKU管理页面** | http://localhost:3002/products/sku | SKU列表/新建/编辑/查看 |
 | **后端API** | http://localhost:8080 | Spring Boot服务 |
 | **SKU API基础路径** | http://localhost:8080/api/skus | RESTful接口 |
 
@@ -23,7 +81,7 @@
 
 ```bash
 cd /Users/lining/qoder/Cinema_Bussiness_Center_Platform/backend
-mvn spring-boot:run
+mvn package -DskipTests -Dmaven.test.skip=true -q && java -jar target/*.jar
 ```
 
 **验证启动成功**:
@@ -50,7 +108,7 @@ npm install  # 首次运行
 npm run dev
 ```
 
-**访问地址**: http://localhost:5173
+**访问地址**: http://localhost:3002
 
 ---
 
@@ -61,7 +119,7 @@ npm run dev
 **对应用户故事**: US-001 用户故事1 - 创建原料SKU (P1)
 
 **页面操作**:
-1. 访问: http://localhost:5173/products/sku
+1. 访问: http://localhost:3002/products/sku
 2. 点击「新建SKU」按钮
 3. 填写基本信息:
    - SKU类型: **原料**
@@ -98,7 +156,7 @@ curl -X POST http://localhost:8080/api/skus \
 **对应用户故事**: US-001 用户故事2 - 创建包材SKU (P1)
 
 **页面操作**:
-1. 访问: http://localhost:5173/products/sku
+1. 访问: http://localhost:3002/products/sku
 2. 点击「新建SKU」按钮
 3. 填写基本信息:
    - SKU类型: **包材**
@@ -136,7 +194,7 @@ curl -X POST http://localhost:8080/api/skus \
 **前置条件**: 已创建原料和包材SKU
 
 **页面操作**:
-1. 访问: http://localhost:5173/products/sku
+1. 访问: http://localhost:3002/products/sku
 2. 点击「新建SKU」
 3. 填写基本信息:
    - SKU类型: **成品**
@@ -190,7 +248,7 @@ curl -X POST http://localhost:8080/api/skus \
 **前置条件**: 已创建成品SKU
 
 **页面操作**:
-1. 访问: http://localhost:5173/products/sku
+1. 访问: http://localhost:3002/products/sku
 2. 点击「新建SKU」
 3. 填写基本信息:
    - SKU类型: **套餐**
@@ -234,7 +292,7 @@ curl -X POST http://localhost:8080/api/skus \
 **对应用户故事**: US-001 用户故事5 - 管理SKU状态和门店范围 (P2)
 
 **页面操作**:
-1. 访问: http://localhost:5173/products/sku
+1. 访问: http://localhost:3002/products/sku
 2. 选择一个草稿状态的SKU
 3. 点击「启用」按钮
 4. 验证状态变为「已启用」

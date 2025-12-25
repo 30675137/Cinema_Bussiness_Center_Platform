@@ -4,15 +4,16 @@
  * 参考设计原型: ProductBOM.tsx
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import { Modal, Form, Input, Select, InputNumber, Row, Col, Card, Button, Empty, message, Spin, Typography, Table, Tooltip } from 'antd';
+import { Modal, Form, Input, Select, InputNumber, Row, Col, Card, Button, Empty, message, Spin, Typography, Table, Tooltip, Tag } from 'antd';
 import { PlusOutlined, ArrowLeftOutlined, SaveOutlined, DeleteOutlined, SearchOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSpusQuery, useUnitsQuery, useCreateSkuMutation, useUpdateSkuMutation, useSkuQuery, useIngredientsQuery } from '@/hooks/useSku';
 import { skuService } from '@/services/skuService';
-import { SkuStatus } from '@/types/sku';
+import { SkuStatus, SkuType } from '@/types/sku';
 import type { SPU } from '@/types/sku';
+import { PRODUCT_TYPE_OPTIONS } from '@/types/spu';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -39,6 +40,7 @@ const simpleFormSchema = z.object({
   spuId: z.string().min(1, '请选择所属SPU'),
   name: z.string().min(1, '请输入商品名称').max(200, '商品名称不能超过200个字符'),
   price: z.number().min(0, '零售价不能为负'),
+  standardCost: z.number().min(0, '标准成本不能为负').optional(),
   status: z.nativeEnum(SkuStatus),
 });
 
@@ -106,6 +108,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       spuId: '',
       name: '',
       price: 0,
+      standardCost: 0,
       status: SkuStatus.DRAFT,
     },
   });
@@ -115,6 +118,17 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   
   // 获取选中的SPU信息
   const selectedSpu = spus.find((spu: SPU) => spu.id === spuId);
+  
+  // 获取当前产品类型（编辑模式优先使用 skuData.skuType，否则使用 selectedSpu.productType）
+  const currentProductType = useMemo(() => {
+    if (isEditMode && skuData?.skuType) {
+      return skuData.skuType;
+    }
+    return (selectedSpu as any)?.productType || '';
+  }, [isEditMode, skuData?.skuType, selectedSpu]);
+  
+  // 是否为原料/包材类型
+  const isRawOrPackaging = currentProductType === 'raw_material' || currentProductType === 'packaging';
 
   // 过滤后的原料列表
   const filteredIngredients = useMemo(() => {
@@ -173,7 +187,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   // 编辑模式下填充表单数据
   // 使用 setValue 而不是 reset，避免 destroyOnClose 导致的时序问题
   useEffect(() => {
-    if (open && isEditMode && skuData && spus.length > 0) {
+    if (open && isEditMode && skuData && spus.length > 0 && ingredients.length > 0) {
       // 确保 SPU 存在于列表中
       const spuExists = spus.some((spu: SPU) => spu.id === skuData.spuId);
       
@@ -185,22 +199,30 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
         spuId: skuData.spuId,
         spuExists,
         spusCount: spus.length,
+        ingredientsCount: ingredients.length,
         name: skuData.name,
         status: skuData.status,
         standardCost: skuData.standardCost,
         bomCount: bomData.length,
+        bomData,
       });
       
-      // 填充 BOM 配方数据
+      // 填充 BOM 配方数据（从 ingredients 列表查找组件名称）
       if (bomData.length > 0) {
-        const convertedBomItems: BOMItem[] = bomData.map((bom: any) => ({
-          ingredientId: bom.componentId || bom.id,
-          name: bom.componentName || '原料',
-          quantity: Number(bom.quantity) || 0,
-          unit: bom.unit || 'g',
-          cost: Number(bom.unitCost) || 0,
-        }));
+        const convertedBomItems: BOMItem[] = bomData.map((bom: any) => {
+          const componentId = bom.componentId || bom.component_id || bom.id;
+          // 从 ingredients 列表中查找组件名称
+          const ingredient = ingredients.find((ing: Ingredient) => ing.id === componentId);
+          return {
+            ingredientId: componentId,
+            name: bom.componentName || ingredient?.name || '未知原料',
+            quantity: Number(bom.quantity) || 0,
+            unit: bom.unit || ingredient?.unit || 'g',
+            cost: Number(bom.unitCost) || (Number(bom.quantity) * (ingredient?.unitPrice || 0)),
+          };
+        });
         setBomItems(convertedBomItems);
+        console.log('[Edit Mode] Converted BOM items:', convertedBomItems);
       }
       
       // 延迟设置值，确保 Select 组件已渲染完成
@@ -209,12 +231,12 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           setValue('spuId', skuData.spuId, { shouldValidate: true });
         }
         setValue('name', skuData.name || '', { shouldValidate: true });
-        // 使用 standardCost 作为零售价（如果没有专门的零售价字段）
-        setValue('price', skuData.standardCost || 0);
+        setValue('price', (skuData as any).price || 0); // 零售价（成品/套餐类型）
+        setValue('standardCost', skuData.standardCost || 0);
         setValue('status', skuData.status || SkuStatus.DRAFT, { shouldValidate: true });
       }, 100);
     }
-  }, [open, isEditMode, skuData, spus, setValue]);
+  }, [open, isEditMode, skuData, spus, ingredients, setValue]);
 
   // 提交表单
   const onSubmit = async (values: SimpleFormValues) => {
@@ -237,6 +259,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             name: values.name,
             mainUnitId: skuData?.mainUnitId || mainUnitId,
             status: values.status,
+            standardCost: values.standardCost,
+            price: values.price, // 零售价（成品/套餐类型）
             manageInventory: skuData?.manageInventory ?? true,
             allowNegativeStock: skuData?.allowNegativeStock ?? false,
             salesUnits: skuData?.salesUnits?.map(su => ({
@@ -275,11 +299,27 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       } else {
         // 创建模式
         const autoCode = `SKU${Date.now()}`;
+        // 从SPU继承产品类型
+        const spuWithType = selectedSpu as any;
+        const inheritedSkuType = spuWithType?.productType as SkuType || SkuType.RAW_MATERIAL;
+        
+        // 构建BOM组件数据（成品类型需要）
+        const bomComponents = bomItems.length > 0 ? bomItems.map((item, index) => ({
+          componentId: item.ingredientId,
+          quantity: item.quantity,
+          unit: item.unit,
+          isOptional: false,
+          sortOrder: index,
+        })) : undefined;
+        
         await createMutation.mutateAsync({
           spuId: values.spuId,
           name: values.name,
           mainUnitId: mainUnitId,
           status: values.status,
+          skuType: inheritedSkuType, // 从SPU继承类型
+          standardCost: values.standardCost, // 标准成本（原料/包材必填）
+          bomComponents, // BOM组件（成品类型必填）
           manageInventory: true,
           allowNegativeStock: false,
           salesUnits: [],
@@ -353,28 +393,45 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   />
                 </Form.Item>
 
-                {/* 品牌和分类（自动继承自SPU） */}
+                {/* 品牌、分类和产品类型（自动继承自SPU） */}
                 {selectedSpu && (
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item label="品牌">
-                        <Input 
-                          value={selectedSpu.brand || '-'} 
-                          disabled 
-                          style={{ background: '#f5f5f5' }}
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={12}>
-                      <Form.Item label="分类">
-                        <Input 
-                          value={selectedSpu.category || '-'} 
-                          disabled 
-                          style={{ background: '#f5f5f5' }}
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                  <>
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="品牌">
+                          <Input 
+                            value={selectedSpu.brand || '-'} 
+                            disabled 
+                            style={{ background: '#f5f5f5' }}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label="分类">
+                          <Input 
+                            value={selectedSpu.category || '-'} 
+                            disabled 
+                            style={{ background: '#f5f5f5' }}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    {/* 产品类型（从SPU继承） */}
+                    <Form.Item label="产品类型">
+                      {(() => {
+                        const spuWithType = selectedSpu as any;
+                        const productType = spuWithType.productType;
+                        const typeConfig = PRODUCT_TYPE_OPTIONS.find(opt => opt.value === productType);
+                        return typeConfig ? (
+                          <Tag color={typeConfig.color} style={{ fontSize: 14, padding: '4px 12px' }}>
+                            {typeConfig.label}
+                          </Tag>
+                        ) : (
+                          <Text type="secondary">未设置（请先在SPU中配置产品类型）</Text>
+                        );
+                      })()}
+                    </Form.Item>
+                  </>
                 )}
 
                 {/* 商品名称 */}
@@ -396,30 +453,33 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   />
                 </Form.Item>
 
-                {/* 零售价 + 状态 */}
+                {/* 状态（所有类型都显示） + 零售价（仅成品/套餐显示） */}
                 <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item
-                      label="零售价 (¥)"
-                      validateStatus={errors.price ? 'error' : undefined}
-                      help={errors.price?.message}
-                    >
-                      <Controller
-                        name="price"
-                        control={control}
-                        render={({ field }) => (
-                          <InputNumber
-                            {...field}
-                            min={0}
-                            precision={2}
-                            style={{ width: '100%' }}
-                            placeholder="0"
-                          />
-                        )}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
+                  {/* 零售价 - 仅成品/套餐显示 */}
+                  {!isRawOrPackaging && (
+                    <Col span={12}>
+                      <Form.Item
+                        label="零售价 (¥)"
+                        validateStatus={errors.price ? 'error' : undefined}
+                        help={errors.price?.message}
+                      >
+                        <Controller
+                          name="price"
+                          control={control}
+                          render={({ field }) => (
+                            <InputNumber
+                              {...field}
+                              min={0}
+                              precision={2}
+                              style={{ width: '100%' }}
+                              placeholder="0"
+                            />
+                          )}
+                        />
+                      </Form.Item>
+                    </Col>
+                  )}
+                  <Col span={isRawOrPackaging ? 24 : 12}>
                     <Form.Item label="当前状态">
                       <Controller
                         name="status"
@@ -435,6 +495,32 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     </Form.Item>
                   </Col>
                 </Row>
+
+                {/* 标准成本（仅原料/包材类型显示） */}
+                {isRawOrPackaging && (
+                  <Form.Item
+                    label="标准成本 (¥)"
+                    required
+                    extra="原料和包材需要设置标准成本，用于BOM成本计算"
+                    validateStatus={errors.standardCost ? 'error' : undefined}
+                    help={errors.standardCost?.message}
+                  >
+                    <Controller
+                      name="standardCost"
+                      control={control}
+                      render={({ field }) => (
+                        <InputNumber
+                          {...field}
+                          min={0}
+                          precision={2}
+                          style={{ width: '100%' }}
+                          placeholder="请输入标准成本"
+                          addonAfter="元"
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                )}
               </Form>
             </Card>
 

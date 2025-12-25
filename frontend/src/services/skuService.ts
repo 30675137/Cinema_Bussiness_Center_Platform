@@ -116,6 +116,7 @@ interface BackendSkuData {
   storeScope?: string[];
   standardCost?: number | null;
   wasteRate?: number | null;
+  price?: number | null; // 零售价
   createdAt?: string;
   updatedAt?: string;
   // snake_case from list API
@@ -125,6 +126,7 @@ interface BackendSkuData {
   store_scope?: string[];
   standard_cost?: number | null;
   waste_rate?: number | null;
+  price_?: number | null; // 零售价 (snake_case 备用)
   created_at?: string;
   updated_at?: string;
   // BOM配方（仅成品类型）
@@ -154,6 +156,7 @@ interface BackendSpu {
   category_name?: string;
   brand_id?: string;
   brand_name?: string;
+  product_type?: string; // 产品类型: raw_material, packaging, finished_product, combo
   status: string;
   unit?: string;
   tags?: string[];
@@ -228,6 +231,7 @@ function transformBackendSku(backendSku: BackendSkuData, spuMap?: Map<string, Ba
   const storeScope = backendSku.storeScope || backendSku.store_scope || [];
   const standardCost = backendSku.standardCost ?? backendSku.standard_cost ?? undefined;
   const wasteRate = backendSku.wasteRate ?? backendSku.waste_rate ?? undefined;
+  const price = backendSku.price ?? undefined;
   const createdAt = backendSku.createdAt || backendSku.created_at || '';
   const updatedAt = backendSku.updatedAt || backendSku.updated_at || '';
   
@@ -258,6 +262,7 @@ function transformBackendSku(backendSku: BackendSkuData, spuMap?: Map<string, Ba
     storeScope: storeScope,
     standardCost: standardCost,
     wasteRate: wasteRate,
+    price: price,
     spuId: spuId,
     spuName: spuInfo?.name || '', // 从SPU获取名称
     brand: spuInfo?.brand || '', // 从SPU获取品牌
@@ -345,17 +350,24 @@ class SkuServiceImpl implements ISkuService {
   async createSku(formData: SkuFormData): Promise<SKU> {
     // 后端枚举使用小写值: draft, enabled, disabled, raw_material, finished_product, combo, packaging
     const statusValue = formData.status?.toLowerCase() || 'draft';
+    // SKU类型从SPU继承，默认为 raw_material
+    const skuTypeValue = formData.skuType || 'raw_material';
     
     // 构建请求体
     const requestBody: Record<string, any> = {
       code: formData.mainBarcode || `SKU${Date.now()}`,
       name: formData.name,
       spuId: formData.spuId,
-      skuType: 'raw_material', // 默认使用原料类型，不需要BOM
+      skuType: skuTypeValue,
       mainUnit: formData.mainUnitId,
       status: statusValue,
-      standardCost: 0, // 原料类型需要标准成本
+      standardCost: formData.standardCost ?? 0, // 原料/包材类型需要标准成本
     };
+    
+    // 成品类型需要BOM组件
+    if (formData.bomComponents && formData.bomComponents.length > 0) {
+      requestBody.bomComponents = formData.bomComponents;
+    }
     
     const response = await apiService.post<{ success: boolean; data: BackendSkuData }>('/skus', requestBody);
     const backendResponse = response as unknown as { success: boolean; data: BackendSkuData };
@@ -370,6 +382,8 @@ class SkuServiceImpl implements ISkuService {
       name: formData.name,
       mainUnit: formData.mainUnitId,
       status: statusValue,
+      standardCost: formData.standardCost, // 标准成本（原料/包材类型）
+      price: formData.price, // 零售价（成品/套餐类型）
     });
     const backendResponse = response as unknown as { success: boolean; data: BackendSkuData };
     return transformBackendSku(backendResponse.data);
@@ -438,6 +452,7 @@ class SkuServiceImpl implements ISkuService {
           brand: item.brand_name || '',
           category: item.category_name || '',
           categoryId: item.category_id || '',
+          productType: item.product_type as 'raw_material' | 'packaging' | 'finished_product' | 'combo' | undefined, // 产品类型，SKU继承用
         }));
       }
     } catch (error) {

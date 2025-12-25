@@ -101,6 +101,14 @@ public class Sku {
     private BigDecimal wasteRate = BigDecimal.ZERO;
 
     /**
+     * 零售价(元)
+     * 仅成品/套餐类型使用
+     */
+    @Column(name = "price", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal price = BigDecimal.ZERO;
+
+    /**
      * SKU状态: DRAFT(草稿), ENABLED(启用), DISABLED(停用)
      */
     @Enumerated(EnumType.STRING)
