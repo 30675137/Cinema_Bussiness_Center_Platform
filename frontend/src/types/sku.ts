@@ -70,6 +70,8 @@ export interface SPU {
   category: string;
   /** 类目ID */
   categoryId: string;
+  /** 产品类型（SKU继承此类型） */
+  productType?: 'raw_material' | 'packaging' | 'finished_product' | 'combo';
 }
 
 /**
@@ -105,9 +107,11 @@ export interface SKU {
   storeScope: string[];
   /** 标准成本(元)：原料/包材手动输入，成品/套餐自动计算 */
   standardCost?: number;
-  /** 损耗率(%)：仅成品类型有效，范围0-100 */
+  /** 损耗率(%):仅成品类型有效,范围0-100 */
   wasteRate?: number;
-
+  /** 零售价(元):仅成品/套餐类型有效 */
+  price?: number;
+  
   // 关联信息
   /** 所属SPU ID */
   spuId: string;
@@ -265,6 +269,8 @@ export interface SkuFormData {
   name: string;
   /** SKU编码（只读，新建时为空） */
   code?: string;
+  /** SKU类型（从SPU继承） */
+  skuType?: SkuType;
 
   // 规格属性
   /** 规格/型号 */
@@ -297,6 +303,18 @@ export interface SkuFormData {
   minSaleQty?: number;
   /** 状态 */
   status: SkuStatus;
+  /** 标准成本（原料/包材类型使用） */
+  standardCost?: number;
+  /** 零售价（成品/套餐类型使用） */
+  price?: number;
+  /** BOM组件（成品类型使用） */
+  bomComponents?: Array<{
+    componentId: string;
+    quantity: number;
+    unit: string;
+    isOptional?: boolean;
+    sortOrder?: number;
+  }>;
 }
 
 /**

@@ -22,6 +22,9 @@ public class SkuUpdateRequest {
     @DecimalMax(value = "100.0", message = "损耗率不能大于100")
     private BigDecimal wasteRate;
 
+    @DecimalMin(value = "0.0", message = "零售价不能小于0")
+    private BigDecimal price;
+
     private SkuStatus status;
 
     // Getters and Setters
@@ -63,6 +66,14 @@ public class SkuUpdateRequest {
 
     public void setWasteRate(BigDecimal wasteRate) {
         this.wasteRate = wasteRate;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public SkuStatus getStatus() {

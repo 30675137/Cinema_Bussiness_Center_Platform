@@ -1,4 +1,4 @@
-import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category } from '@/types/spu'
+import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category, ProductType } from '@/types/spu'
 import { generateSPUCode } from '@/utils/spuHelpers'
 import { apiService } from './api'
 
@@ -16,6 +16,7 @@ interface BackendSpu {
   brand_id?: string;
   brand_name?: string;
   status: string;
+  product_type?: string;  // 产品类型: raw_material, packaging, finished_product, combo
   unit?: string;
   tags?: string[];
   images?: any;
@@ -43,6 +44,7 @@ function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
     categoryId: backendSpu.category_id || '',
     categoryName: backendSpu.category_name,
     status: (backendSpu.status || 'draft') as SPUStatus,
+    productType: backendSpu.product_type as ProductType,  // 产品类型
     tags: backendSpu.tags || [],
     images: Array.isArray(backendSpu.images) ? backendSpu.images : [],
     specifications: Array.isArray(backendSpu.specifications) ? backendSpu.specifications : [],
@@ -80,6 +82,7 @@ export interface CreateSPURequest {
   brandId: string
   categoryId: string
   status: SPUStatus
+  productType: ProductType  // 产品类型（必填）
   tags?: string[]
   images: Array<{
     uid: string
@@ -103,6 +106,7 @@ export interface UpdateSPURequest extends Partial<CreateSPURequest> {
   id: string
   code?: string
   status?: SPUStatus
+  productType?: ProductType  // 产品类型
   tags?: string[]
   images?: Array<{
     uid: string
@@ -149,6 +153,11 @@ class SPUService {
         throw new Error('商品描述不能为空')
       }
 
+      // 验证产品类型
+      if (!data.productType) {
+        throw new Error('请选择产品类型')
+      }
+
       if (!data.images || data.images.length === 0) {
         throw new Error('请至少上传一张商品图片')
       }
@@ -164,6 +173,7 @@ class SPUService {
         brandId: data.brandId,
         categoryId: data.categoryId,
         status: data.status || 'draft',
+        productType: data.productType,  // 产品类型
         tags: data.tags || [],
         images: data.images
           .filter(img => img.status === 'done' && img.url)

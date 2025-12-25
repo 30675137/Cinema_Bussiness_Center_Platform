@@ -2,7 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { Form, Input, Select, Upload, Button, Card, Row, Col, Space, message, Divider, Alert } from 'antd'
 import { PlusOutlined, MinusCircleOutlined, UploadOutlined, SettingOutlined } from '@ant-design/icons'
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface'
-import type { SPUItem, SPUStatus, Brand, Category, AttributeTemplate, AttributeTemplateItem } from '@/types/spu'
+import type { SPUItem, SPUStatus, Brand, Category, AttributeTemplate, AttributeTemplateItem, ProductType } from '@/types/spu'
+import { PRODUCT_TYPE_OPTIONS } from '@/types/spu'
 import { BrandSelect } from './BrandSelect'
 import { CategorySelector } from './CategorySelector'
 import AttributeEditor from '@/components/Attribute/AttributeEditor'
@@ -19,6 +20,7 @@ interface SPUFormData {
   brandId: string
   categoryId: string
   status: SPUStatus
+  productType?: ProductType  // 产品类型，SKU创建时继承
   tags: string[]
   images: UploadFile[]
   specifications: Array<{ name: string; value: string }>
@@ -164,6 +166,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
         brandId: initialValues.brandId || '',
         categoryId: initialValues.categoryId || '',
         status: initialValues.status || 'draft',
+        productType: initialValues.productType,
         tags: initialValues.tags || [],
         specifications: initialValues.specifications || [{ name: '', value: '' }],
         attributeTemplateId: initialValues.attributeTemplateId || '',
@@ -185,6 +188,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
       onValuesChange={onValuesChange}
       initialValues={{
         status: 'draft',
+        productType: undefined,
         specifications: [{ name: '', value: '' }],
         attributeTemplateId: '',
         attributeValues: {},
@@ -241,7 +245,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
         </Row>
 
         <Row gutter={16}>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item
               name="unit"
               label="标准单位"
@@ -249,7 +253,23 @@ const SPUForm: React.FC<SPUFormProps> = ({
               <Input placeholder="如：瓶/包/盒等（可选）" />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={6}>
+            <Form.Item
+              name="productType"
+              label="产品类型"
+              tooltip="产品类型决定了SKU的用途，创建SKU时将继承此类型"
+              rules={[{ required: true, message: '请选择产品类型' }]}
+            >
+              <Select placeholder="请选择产品类型">
+                {PRODUCT_TYPE_OPTIONS.map(opt => (
+                  <Option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={6}>
             <Form.Item
               name="status"
               label="状态"
@@ -262,14 +282,14 @@ const SPUForm: React.FC<SPUFormProps> = ({
               </Select>
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={6}>
             <Form.Item
               name="tags"
               label="标签"
             >
               <Select
                 mode="tags"
-                placeholder="请输入标签，按回车添加"
+                placeholder="请输入标签"
                 style={{ width: '100%' }}
                 maxTagCount={5}
               />

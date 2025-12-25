@@ -95,6 +95,13 @@ public class Spu {
     private String status = "draft";
 
     /**
+     * 产品类型: raw_material-原料, packaging-包材, finished_product-成品, combo-套餐
+     * SKU创建时继承此类型
+     */
+    @Column(name = "product_type", length = 20)
+    private String productType;
+
+    /**
      * 基本单位
      */
     @Column(name = "unit", length = 20)

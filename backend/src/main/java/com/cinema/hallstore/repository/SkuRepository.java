@@ -203,6 +203,10 @@ public class SkuRepository {
         if (sku.getStatus() != null) {
             updateFields.put("status", sku.getStatus().getValue());
         }
+        // P001-sku-master-data: 添加零售价字段更新（仅成品/套餐类型使用）
+        if (sku.getPrice() != null) {
+            updateFields.put("price", sku.getPrice());
+        }
         // 不发送 created_at 和 updated_at，数据库触发器会自动处理
 
         System.out.println("Updating SKU with fields: " + updateFields);

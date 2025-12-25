@@ -27,6 +27,7 @@ public class SkuDetailDTO {
     private String[] storeScope;
     private BigDecimal standardCost;
     private BigDecimal wasteRate;
+    private BigDecimal price; // 零售价
     private SkuStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -49,6 +50,7 @@ public class SkuDetailDTO {
         dto.storeScope = sku.getStoreScope();
         dto.standardCost = sku.getStandardCost();
         dto.wasteRate = sku.getWasteRate();
+        dto.price = sku.getPrice();
         dto.status = sku.getStatus();
         dto.createdAt = sku.getCreatedAt();
         dto.updatedAt = sku.getUpdatedAt();
@@ -126,6 +128,14 @@ public class SkuDetailDTO {
 
     public void setWasteRate(BigDecimal wasteRate) {
         this.wasteRate = wasteRate;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public SkuStatus getStatus() {

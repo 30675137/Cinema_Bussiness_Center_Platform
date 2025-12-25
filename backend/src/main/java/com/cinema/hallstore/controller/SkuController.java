@@ -137,6 +137,7 @@ public class SkuController {
                     request.getStoreScope(),
                     request.getStandardCost(),
                     request.getWasteRate(),
+                    request.getPrice(),
                     request.getStatus()
             );
             return ResponseEntity.ok(ApiResponse.success(updatedSku));
