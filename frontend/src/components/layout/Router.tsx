@@ -41,6 +41,8 @@ const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/prev
 // 预约单管理页面
 const ReservationOrderList = lazy(() => import('@/pages/reservation-orders/ReservationOrderList'));
 const ReservationOrderDetail = lazy(() => import('@/pages/reservation-orders/ReservationOrderDetail'));
+// 单位换算管理页面 (P002-unit-conversion)
+const ConversionPage = lazy(() => import('@/pages/bom/ConversionPage'));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -886,6 +888,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <Stocktaking />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 单位换算管理路由 (P002-unit-conversion)
+  {
+    path: '/bom/conversion',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ConversionPage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

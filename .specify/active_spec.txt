@@ -1,1 +1,1 @@
-specs/U001-reservation-order-management/spec.md
+specs/P002-unit-conversion

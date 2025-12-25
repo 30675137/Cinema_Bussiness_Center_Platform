@@ -64,7 +64,6 @@ tests/
 ## Recent Changes
 - P001-sku-master-data: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 - U002-reservation-card-ui-compact: Added 无需数据存储(纯UI样式优化)
-- U001-reservation-order-management: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 
 
 <!-- MANUAL ADDITIONS START -->
