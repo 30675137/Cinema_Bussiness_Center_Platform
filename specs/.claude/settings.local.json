@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(ls:*)",
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: 创建场景包定价策略规格 \\(018-pricing-strategy\\)\n\n新增场景包定价策略功能规格，包含4个优先级用户故事：\n- P1: 设置场景包打包价格（核心功能）\n- P2: 查看优惠金额和优惠比例（辅助决策）\n- P3: 响应场景包内容变更（数据一致性）\n- P4: 验证定价规则（数据验证）\n\n功能特性：\n- 15条功能需求，覆盖价格显示、计算、验证和数据一致性\n- 7个边界场景（空内容、仅硬权益、并发编辑等）\n- 8个可测量的成功标准（2分钟完成、500ms计算、100%准确率）\n- 12条假设说明和10项范围外项目\n\n规格文件已通过质量检查，可进入下一阶段。\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(.specify/scripts/bash/setup-plan.sh --json)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh claude)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --require-tasks --include-tasks)",
+      "Bash(python -m pytest tests/test_api_client.py -v)",
+      "Bash(python -m unittest tests.test_api_client -v)",
+      "Bash(python tests/test_api_client.py -v)",
+      "Bash(python tests/test_scenario_ops.py -v)",
+      "Bash(python tests/test_store_ops.py -v)",
+      "Bash(python -m unittest discover -s tests -v)",
+      "Skill(ops-expert)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --paths-only)"
+    ]
+  }
+}
