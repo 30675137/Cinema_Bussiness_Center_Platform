@@ -22,7 +22,11 @@
       "Bash(python tests/test_store_ops.py -v)",
       "Bash(python -m unittest discover -s tests -v)",
       "Skill(ops-expert)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --paths-only)"
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --paths-only)",
+      "Bash(/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(cat /Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.claude/skills/doc-writer/SKILL.md)",
+      "Skill(doc-writer)"
     ]
   }
 }

@@ -42,6 +42,9 @@ const PriceManagement = React.lazy(() => import('@/pages/price/PriceManagement')
 const PricingConfig = React.lazy(() => import('@/pages/pricing/PricingConfig'))
 const InventoryTrace = React.lazy(() => import('@/pages/inventory/InventoryTrace'))
 
+// Inventory Adjustment Pages (P004)
+const InventoryApproval = React.lazy(() => import('@/pages/inventory/ApprovalPage'))
+
 // Loading component for lazy loaded pages
 const PageLoader: React.FC = () => (
   <div style={{
@@ -153,6 +156,10 @@ export const router = createBrowserRouter([
   {
     path: '/inventory/trace',
     element: withLayout(InventoryTrace),
+  },
+  {
+    path: '/inventory/approvals',
+    element: withLayout(InventoryApproval),
   },
   {
     path: '*',

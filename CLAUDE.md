@@ -43,6 +43,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-21
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟 (U001-reservation-order-management)
 - 无需数据存储(纯UI样式优化) (U002-reservation-card-ui-compact)
 - Supabase (PostgreSQL) - 使用现有 `inventory` 表，关联 `skus`、`stores`、`categories` 表 (P003-inventory-query)
+- Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表 (P004-inventory-adjustment)
 
 - (003-inventory-management)
 
@@ -63,9 +64,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- P004-inventory-adjustment: Added Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表
 - P003-inventory-query: Added Supabase (PostgreSQL) - 使用现有 `inventory` 表，关联 `skus`、`stores`、`categories` 表
 - P001-sku-master-data: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
-- U002-reservation-card-ui-compact: Added 无需数据存储(纯UI样式优化)
 
 
 <!-- MANUAL ADDITIONS START -->

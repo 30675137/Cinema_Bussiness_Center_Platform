@@ -1,7 +1,8 @@
 /**
  * P003-inventory-query: 库存查询页面
+ * P004-inventory-adjustment: 添加库存调整功能
  * 
- * 提供门店SKU库存列表展示，支持分页。
+ * 提供门店SKU库存列表展示，支持分页和库存调整。
  */
 
 import { useState, useCallback } from 'react';
@@ -12,6 +13,7 @@ import { InventoryTable } from '@/features/inventory/components/InventoryTable';
 import { SearchInput } from '@/features/inventory/components/SearchInput';
 import { InventoryFilterBar } from '@/features/inventory/components/InventoryFilterBar';
 import { InventoryDetailDrawer } from '@/features/inventory/components/InventoryDetailDrawer';
+import { AdjustmentModal } from '@/features/inventory/components/AdjustmentModal';
 import type { InventoryQueryParams, StoreInventoryItem, InventoryStatus } from '@/features/inventory/types';
 
 const { Title } = Typography;
@@ -32,6 +34,10 @@ export function InventoryPage() {
   // 详情抽屉状态
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedInventoryId, setSelectedInventoryId] = useState<string | undefined>(undefined);
+
+  // 调整弹窗状态
+  const [adjustmentModalOpen, setAdjustmentModalOpen] = useState(false);
+  const [selectedInventoryForAdjust, setSelectedInventoryForAdjust] = useState<StoreInventoryItem | null>(null);
 
   // 获取库存列表
   const { data, isLoading, isError, error, refetch } = useInventoryList(queryParams);
@@ -80,6 +86,26 @@ export function InventoryPage() {
     setDrawerOpen(false);
     setSelectedInventoryId(undefined);
   }, []);
+
+  // 调整按钮点击处理
+  const handleAdjustClick = useCallback((record: StoreInventoryItem) => {
+    setSelectedInventoryForAdjust(record);
+    setAdjustmentModalOpen(true);
+  }, []);
+
+  // 关闭调整弹窗
+  const handleAdjustmentModalClose = useCallback(() => {
+    setAdjustmentModalOpen(false);
+    setSelectedInventoryForAdjust(null);
+  }, []);
+
+  // 调整成功回调
+  const handleAdjustmentSuccess = useCallback(() => {
+    setAdjustmentModalOpen(false);
+    setSelectedInventoryForAdjust(null);
+    // 刷新库存列表
+    refetch();
+  }, [refetch]);
 
   // 错误状态
   if (isError) {
@@ -145,6 +171,7 @@ export function InventoryPage() {
             pageSize={queryParams.pageSize}
             onPageChange={handlePageChange}
             onRowClick={handleRowClick}
+            onAdjustClick={handleAdjustClick}
           />
         )}
       </Card>
@@ -154,6 +181,14 @@ export function InventoryPage() {
         inventoryId={selectedInventoryId}
         open={drawerOpen}
         onClose={handleDrawerClose}
+      />
+
+      {/* 库存调整弹窗 */}
+      <AdjustmentModal
+        open={adjustmentModalOpen}
+        inventory={selectedInventoryForAdjust}
+        onClose={handleAdjustmentModalClose}
+        onSuccess={handleAdjustmentSuccess}
       />
     </div>
   );
