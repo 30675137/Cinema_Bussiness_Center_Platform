@@ -1,1 +1,1 @@
-specs/P002-unit-conversion
+specs/P003-inventory-query

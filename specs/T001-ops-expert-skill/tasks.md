@@ -157,15 +157,112 @@
 
 ---
 
-## Phase 7: Polish & Cross-Cutting Concerns
+## Phase 7: User Story 5 - 单位换算专家服务 (Priority: P2) 🆕
+
+**Goal**: 运营人员可以通过对话进行单位换算计算、查询换算规则、配置换算关系
+
+**Independent Test**: 执行 `claude /ops 45ml威士忌等于多少瓶` 返回换算结果和换算路径
+
+**Dependencies**: P002-unit-conversion 后端 API 必须已部署
+
+### API Client Extensions for User Story 5
+
+- [x] T047 [P] [US5] Extend api_client.py with unit conversion methods at `.claude/skills/ops-expert/scripts/api_client.py`
+  - ✅ `list_unit_conversions(category, search)` - 获取换算规则列表
+  - ✅ `get_unit_conversion(id)` - 获取单条规则
+  - ✅ `create_unit_conversion(from_unit, to_unit, rate, category)` - 创建规则
+  - ✅ `update_unit_conversion(id, from_unit, to_unit, rate, category)` - 更新规则
+  - ✅ `delete_unit_conversion(id)` - 删除规则
+  - ✅ `get_unit_conversion_stats()` - 获取统计信息
+
+### Scripts for User Story 5
+
+- [x] T048 [P] [US5] Create query_conversions.py at `.claude/skills/ops-expert/scripts/query_conversions.py`
+  - ✅ 查询所有换算规则 / 按类别筛选 / 按单位搜索
+  - CLI: `python query_conversions.py [--category volume] [--search 瓶]`
+
+- [x] T049 [P] [US5] Create calculate_conversion.py at `.claude/skills/ops-expert/scripts/calculate_conversion.py`
+  - ✅ 执行单位换算计算 / 自动查找换算路径 / 按类别舍入
+  - 舍入规则: volume=1位小数, weight=0位, quantity=向上取整
+  - CLI: `python calculate_conversion.py <数量> <源单位> <目标单位>`
+
+- [x] T050 [P] [US5] Create create_conversion.py at `.claude/skills/ops-expert/scripts/create_conversion.py`
+  - ✅ 解析用户输入 / 验证格式 / 检测循环依赖 / 创建规则
+  - CLI: `python create_conversion.py <源单位> <目标单位> <换算率> <类别>`
+
+- [x] T051 [P] [US5] Create update_conversion.py at `.claude/skills/ops-expert/scripts/update_conversion.py`
+  - ✅ 更新现有规则 / 检测循环依赖 / 检查 BOM 引用
+  - CLI: `python update_conversion.py <规则ID> <源单位> <目标单位> <换算率> <类别>`
+
+- [x] T052 [P] [US5] Create delete_conversion.py at `.claude/skills/ops-expert/scripts/delete_conversion.py`
+  - ✅ 检查 BOM 引用 / 检查路径依赖 / 删除规则
+  - CLI: `python delete_conversion.py <规则ID> [--force]`
+
+- [x] T053 [P] [US5] Create validate_cycle.py at `.claude/skills/ops-expert/scripts/validate_cycle.py`
+  - ✅ 检测循环依赖 / 返回循环路径
+  - CLI: `python validate_cycle.py <源单位> <目标单位>`
+
+### Unit Tests for User Story 5
+
+- [x] T054 [P] [US5] Create test_conversion.py at `.claude/skills/ops-expert/scripts/tests/test_conversion.py`
+  - ✅ 测试直接换算 / 换算链计算 / 各类别舍入
+  - ✅ 测试循环检测 / 路径查找 / 错误处理
+
+### Knowledge Base for User Story 5
+
+- [x] T055 [P] [US5] Create unit-conversion.md at `.claude/skills/ops-expert/references/unit-conversion.md`
+  - ✅ 已完成：包含业务规则、数据库结构、API 参考
+
+- [x] T056 [US5] Update database-schema.md with unit_conversions table at `.claude/skills/ops-expert/references/database-schema.md`
+  - ✅ 已完成：添加 unit_conversions 表结构
+
+### Integration for User Story 5
+
+- [x] T057 [US5] Update SKILL.md with unit conversion capabilities at `.claude/skills/ops-expert/SKILL.md`
+  - ✅ 添加单位换算到核心能力
+  - ✅ 添加换算意图识别模式
+  - ✅ 添加换算错误处理
+
+- [x] T058 [US5] Add unit conversion intent patterns to ops.md at `.claude/commands/ops.md`
+  - ✅ 换算计算: "XX等于多少YY", "换算XX到YY"
+  - ✅ 规则查询: "查看换算规则", "搜索单位"
+  - ✅ 规则配置: "添加换算规则", "删除换算规则"
+  - ✅ 添加完整的单位换算操作章节 (5.1-5.4)
+  - ✅ 添加换算相关错误处理模式
+  - ✅ 更新可用脚本列表和知识库引用
+
+- [x] T059 [US5] Add unit conversion examples to common-queries.md at `.claude/skills/ops-expert/examples/common-queries.md`
+  - ✅ 换算计算示例 / 规则查询示例 / 规则配置示例
+
+**Checkpoint**: User Story 5 complete - `/ops 45ml等于多少瓶` returns calculation with path
+
+---
+
+## Phase 8: Polish & Cross-Cutting Concerns
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T042 [P] Add error handling patterns to SKILL.md for edge cases at `.claude/skills/ops-expert/SKILL.md`
-- [ ] T043 [P] Add context switching guidance to ops.md at `.claude/commands/ops.md`
+- [x] T042 [P] Add error handling patterns to SKILL.md for edge cases at `.claude/skills/ops-expert/SKILL.md`
+  - ✅ 已完成：错误处理模式已在 SKILL.md 中定义（PATH_NOT_FOUND, CYCLE_DETECTED 等）
+- [x] T043 [P] Add context switching guidance to ops.md at `.claude/commands/ops.md`
+  - ✅ 已完成：上下文切换指南章节已存在
 - [ ] T044 Review and optimize all reference documents for consistency
 - [ ] T045 Run integration tests: query, operation, help, batch scenarios
 - [ ] T046 Update quickstart.md with final test commands at `specs/T001-ops-expert-skill/quickstart.md`
+
+### Unit Conversion Integration Tests
+
+- [x] T060 [US5] Verify P002 backend API availability
+  - ✅ Test: `curl http://localhost:8080/api/unit-conversions` → 返回 29 条规则
+  - ✅ 后端 API 正常运行
+
+- [x] T061 [US5] Run unit conversion integration tests
+  - ✅ `python3 calculate_conversion.py 45 ml 瓶` → 0.1瓶 (带舍入)
+  - ✅ `python3 query_conversions.py --category volume` → 7 条体积类规则
+  - ✅ `python3 query_conversions.py --stats` → 统计信息
+  - ✅ `python3 calculate_conversion.py 1 瓶 升` → 0.5升 (换算链: 瓶→ml→升)
+  - ✅ `python3 calculate_conversion.py 15 瓶 箱` → 2箱 (计数类向上取整)
+  - ✅ `python3 calculate_conversion.py 1 瓶 kg` → 错误处理正确
 
 ---
 
@@ -180,20 +277,24 @@ graph TD
     P2 --> P4[Phase 4: US2 Operations]
     P2 --> P5[Phase 5: US3 Help]
     P2 --> P6[Phase 6: US4 Batch]
-    P3 --> P7[Phase 7: Polish]
-    P4 --> P7
-    P5 --> P7
-    P6 --> P7
+    P2 --> P7[Phase 7: US5 Unit Conversion]
+    P3 --> P8[Phase 8: Polish]
+    P4 --> P8
+    P5 --> P8
+    P6 --> P8
+    P7 --> P8
+    EXT[P002 Backend API] --> P7
 ```
 
 - **Setup (Phase 1)**: No dependencies - can start immediately
 - **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-6)**: All depend on Foundational phase completion
+- **User Stories (Phase 3-7)**: All depend on Foundational phase completion
   - US1 (Query) can proceed independently
   - US2 (Operations) can proceed independently
   - US3 (Help) can proceed independently
   - US4 (Batch) can proceed independently
-- **Polish (Phase 7)**: Depends on all user stories being complete
+  - US5 (Unit Conversion) depends on P002 backend API
+- **Polish (Phase 8)**: Depends on all user stories being complete
 
 ### User Story Dependencies
 
@@ -201,14 +302,16 @@ graph TD
 - **User Story 2 (P2)**: May reference US1 knowledge base but independently testable
 - **User Story 3 (P3)**: May reference US1/US2 knowledge base but independently testable
 - **User Story 4 (P4)**: Builds on US2 scripts but independently testable
+- **User Story 5 (P2)**: Depends on P002 backend API, extends api_client.py
 
 ### Parallel Opportunities
 
 - All Setup tasks marked [P] can run in parallel (T002, T003, T004)
 - All Foundational tasks marked [P] can run in parallel (T007, T008, T010)
-- Once Foundational completes, US1-US4 phases can start in parallel
+- Once Foundational completes, US1-US5 phases can start in parallel
 - Within each story, all tasks marked [P] can run in parallel
 - Knowledge base files (references/*.md) can be created in parallel
+- US5 scripts (T048-T053) can all run in parallel since they operate on different files
 
 ---
 
@@ -234,6 +337,21 @@ Task: "T020 [P] [US2] Write unit tests for scenario_ops.py"
 Task: "T021 [P] [US2] Write unit tests for store_ops.py"
 ```
 
+## Parallel Example: User Story 5
+
+```bash
+# Launch all scripts together (after T047 api_client extension):
+Task: "T048 [P] [US5] Create query_conversions.py"
+Task: "T049 [P] [US5] Create calculate_conversion.py"
+Task: "T050 [P] [US5] Create create_conversion.py"
+Task: "T051 [P] [US5] Create update_conversion.py"
+Task: "T052 [P] [US5] Create delete_conversion.py"
+Task: "T053 [P] [US5] Create validate_cycle.py"
+
+# Then create tests:
+Task: "T054 [P] [US5] Create test_conversion.py"
+```
+
 ---
 
 ## Implementation Strategy
@@ -253,7 +371,8 @@ Task: "T021 [P] [US2] Write unit tests for store_ops.py"
 3. Add User Story 2 (Operations) → Operators can execute actions
 4. Add User Story 3 (Help) → Operators get guidance
 5. Add User Story 4 (Batch) → Advanced batch operations
-6. Each story adds value without breaking previous stories
+6. Add User Story 5 (Unit Conversion) → Unit conversion expert service (requires P002 API)
+7. Each story adds value without breaking previous stories
 
 ### Recommended Execution Order
 
@@ -263,13 +382,15 @@ Task: "T021 [P] [US2] Write unit tests for store_ops.py"
 3. T018-T026 (US2 Operations)
 4. T027-T033 (US3 Help)
 5. T034-T041 (US4 Batch)
-6. T042-T046 (Polish)
+6. T047-T059 (US5 Unit Conversion) → Requires P002 backend
+7. T042-T046, T060-T061 (Polish)
 
 **Parallel Team (2 developers)**:
 1. Both: T001-T010 (Setup + Foundational)
 2. Dev A: US1 (T011-T017) | Dev B: US2 scripts (T018-T021)
 3. Dev A: US3 (T027-T033) | Dev B: US2 integration (T022-T026)
-4. Both: US4 + Polish
+4. Dev A: US4 | Dev B: US5 scripts (T047-T054)
+5. Both: US5 integration (T057-T059) + Polish
 
 ---
 
@@ -282,3 +403,20 @@ Task: "T021 [P] [US2] Write unit tests for store_ops.py"
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - Avoid: vague tasks, same file conflicts, cross-story dependencies
+- **US5 特别说明**:
+  - 依赖 P002-unit-conversion 后端 API，实施前需确认 API 可用
+  - 知识库文件 (T055, T056) 已完成
+  - 所有 Python 脚本调用后端 API，不直接操作数据库
+  - 舍入规则: volume=1位小数, weight=0位, quantity=向上取整
+
+## P002 Backend API Reference (for US5)
+
+| 端点 | 方法 | 功能 |
+|------|------|------|
+| `/api/unit-conversions` | GET | 获取规则列表 |
+| `/api/unit-conversions/{id}` | GET | 获取单条规则 |
+| `/api/unit-conversions` | POST | 创建规则 |
+| `/api/unit-conversions/{id}` | PUT | 更新规则 |
+| `/api/unit-conversions/{id}` | DELETE | 删除规则 |
+| `/api/unit-conversions/calculate-path` | POST | 计算换算路径 |
+| `/api/unit-conversions/validate-cycle` | POST | 验证循环依赖 |

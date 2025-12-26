@@ -356,23 +356,329 @@ class OpsApiClient:
             params={"store_id": f"eq.{store_id}"}
         )
 
+    # ============ 单位换算相关方法 (US5) ============
+
+    def list_unit_conversions(
+        self,
+        category: Optional[str] = None,
+        search: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """获取单位换算规则列表
+
+        Args:
+            category: 类别筛选 (volume/weight/quantity)
+            search: 单位名称搜索
+            limit: 返回数量限制
+
+        Returns:
+            换算规则列表
+        """
+        params = {"limit": str(limit), "order": "category,from_unit"}
+        if category:
+            params["category"] = f"eq.{category}"
+        if search:
+            # 搜索源单位或目标单位包含关键词
+            params["or"] = f"(from_unit.ilike.%{search}%,to_unit.ilike.%{search}%)"
+        return self.get("/rest/v1/unit_conversions", params=params)
+
+    def get_unit_conversion(self, conversion_id: str) -> Dict[str, Any]:
+        """获取单条换算规则
+
+        Args:
+            conversion_id: 规则 ID
+
+        Returns:
+            换算规则详情
+        """
+        return self.get(
+            "/rest/v1/unit_conversions",
+            params={"id": f"eq.{conversion_id}"}
+        )
+
+    def create_unit_conversion(
+        self,
+        from_unit: str,
+        to_unit: str,
+        conversion_rate: float,
+        category: str
+    ) -> Dict[str, Any]:
+        """创建换算规则
+
+        Args:
+            from_unit: 源单位
+            to_unit: 目标单位
+            conversion_rate: 换算率 (1 from_unit = ? to_unit)
+            category: 类别 (volume/weight/quantity)
+
+        Returns:
+            创建结果
+        """
+        valid_categories = ["volume", "weight", "quantity"]
+        if category not in valid_categories:
+            return format_response(
+                success=False,
+                message=f"无效的类别: {category}",
+                error=f"类别必须是以下之一: {', '.join(valid_categories)}"
+            )
+
+        if conversion_rate <= 0:
+            return format_response(
+                success=False,
+                message="无效的换算率",
+                error="换算率必须为正数"
+            )
+
+        data = {
+            "from_unit": from_unit,
+            "to_unit": to_unit,
+            "conversion_rate": conversion_rate,
+            "category": category
+        }
+        return self.post("/rest/v1/unit_conversions", data=data)
+
+    def update_unit_conversion(
+        self,
+        conversion_id: str,
+        from_unit: str,
+        to_unit: str,
+        conversion_rate: float,
+        category: str
+    ) -> Dict[str, Any]:
+        """更新换算规则
+
+        Args:
+            conversion_id: 规则 ID
+            from_unit: 源单位
+            to_unit: 目标单位
+            conversion_rate: 换算率
+            category: 类别
+
+        Returns:
+            更新结果
+        """
+        valid_categories = ["volume", "weight", "quantity"]
+        if category not in valid_categories:
+            return format_response(
+                success=False,
+                message=f"无效的类别: {category}",
+                error=f"类别必须是以下之一: {', '.join(valid_categories)}"
+            )
+
+        if conversion_rate <= 0:
+            return format_response(
+                success=False,
+                message="无效的换算率",
+                error="换算率必须为正数"
+            )
+
+        data = {
+            "from_unit": from_unit,
+            "to_unit": to_unit,
+            "conversion_rate": conversion_rate,
+            "category": category
+        }
+        return self.patch(
+            "/rest/v1/unit_conversions",
+            data=data,
+            params={"id": f"eq.{conversion_id}"}
+        )
+
+    def delete_unit_conversion(self, conversion_id: str) -> Dict[str, Any]:
+        """删除换算规则
+
+        Args:
+            conversion_id: 规则 ID
+
+        Returns:
+            删除结果
+        """
+        return self.delete(
+            "/rest/v1/unit_conversions",
+            params={"id": f"eq.{conversion_id}"}
+        )
+
+    def get_unit_conversion_stats(self) -> Dict[str, Any]:
+        """获取换算规则统计
+
+        Returns:
+            各类别规则数量统计
+        """
+        # 通过 Supabase RPC 或直接查询统计
+        result = self.get("/rest/v1/unit_conversions", params={"select": "category"})
+        if not result.get("success"):
+            return result
+
+        # 手动统计各类别数量
+        data = result.get("data", [])
+        stats = {"volume": 0, "weight": 0, "quantity": 0, "total": len(data)}
+        for item in data:
+            category = item.get("category")
+            if category in stats:
+                stats[category] += 1
+
+        return format_response(
+            success=True,
+            message="统计成功",
+            data=stats
+        )
+
+
+class SpringBootClient:
+    """Spring Boot 后端 API 客户端
+
+    用于访问本地后端 API，作为 Supabase 直接访问的备用方案。
+
+    环境变量:
+        BACKEND_URL: 后端 API 基础 URL (默认: http://localhost:8080)
+    """
+
+    def __init__(self, base_url: Optional[str] = None, timeout: int = 30):
+        """初始化 Spring Boot 客户端
+
+        Args:
+            base_url: API 基础 URL
+            timeout: 请求超时时间
+        """
+        self.base_url = base_url or os.environ.get("BACKEND_URL", "http://localhost:8080")
+        self.timeout = timeout
+
+    def _make_request(
+        self,
+        method: str,
+        endpoint: str,
+        params: Optional[Dict[str, str]] = None,
+        data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        """执行 HTTP 请求"""
+        url = f"{self.base_url.rstrip('/')}{endpoint}"
+        if params:
+            url = f"{url}?{urlencode(params)}"
+
+        headers = {"Content-Type": "application/json"}
+        body = json.dumps(data).encode("utf-8") if data else None
+
+        try:
+            request = Request(url, data=body, headers=headers, method=method)
+            with urlopen(request, timeout=self.timeout) as response:
+                response_data = json.loads(response.read().decode("utf-8"))
+                return response_data
+        except HTTPError as e:
+            try:
+                error_body = json.loads(e.read().decode("utf-8"))
+                return error_body
+            except:
+                return {"success": False, "error": str(e)}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def get(self, endpoint: str, params: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+        return self._make_request("GET", endpoint, params=params)
+
+    def post(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        return self._make_request("POST", endpoint, data=data)
+
+    def put(self, endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        return self._make_request("PUT", endpoint, data=data)
+
+    def delete(self, endpoint: str) -> Dict[str, Any]:
+        return self._make_request("DELETE", endpoint)
+
+    # ============ 单位换算相关方法 ============
+
+    def list_unit_conversions(
+        self,
+        category: Optional[str] = None,
+        search: Optional[str] = None,
+        limit: int = 100
+    ) -> Dict[str, Any]:
+        """获取单位换算规则列表"""
+        params = {}
+        if category:
+            params["category"] = category
+        if search:
+            params["search"] = search
+        return self.get("/api/unit-conversions", params if params else None)
+
+    def get_unit_conversion(self, conversion_id: str) -> Dict[str, Any]:
+        """获取单条换算规则"""
+        return self.get(f"/api/unit-conversions/{conversion_id}")
+
+    def create_unit_conversion(
+        self,
+        from_unit: str,
+        to_unit: str,
+        conversion_rate: float,
+        category: str
+    ) -> Dict[str, Any]:
+        """创建换算规则"""
+        data = {
+            "fromUnit": from_unit,
+            "toUnit": to_unit,
+            "conversionRate": conversion_rate,
+            "category": category
+        }
+        return self.post("/api/unit-conversions", data)
+
+    def update_unit_conversion(
+        self,
+        conversion_id: str,
+        from_unit: str,
+        to_unit: str,
+        conversion_rate: float,
+        category: str
+    ) -> Dict[str, Any]:
+        """更新换算规则"""
+        data = {
+            "fromUnit": from_unit,
+            "toUnit": to_unit,
+            "conversionRate": conversion_rate,
+            "category": category
+        }
+        return self.put(f"/api/unit-conversions/{conversion_id}", data)
+
+    def delete_unit_conversion(self, conversion_id: str) -> Dict[str, Any]:
+        """删除换算规则"""
+        return self.delete(f"/api/unit-conversions/{conversion_id}")
+
+    def get_unit_conversion_stats(self) -> Dict[str, Any]:
+        """获取换算规则统计"""
+        result = self.list_unit_conversions()
+        if not result.get("success"):
+            return result
+
+        data = result.get("data", [])
+        stats = {"volume": 0, "weight": 0, "quantity": 0, "total": len(data)}
+        for item in data:
+            category = item.get("category", "").lower()
+            if category in stats:
+                stats[category] += 1
+
+        return {"success": True, "data": stats, "message": "统计成功"}
+
 
 # 创建默认客户端实例（延迟初始化）
-_client: Optional[OpsApiClient] = None
+_client = None
 
 
-def get_client() -> OpsApiClient:
+def get_client():
     """获取默认客户端实例
 
-    Returns:
-        OpsApiClient 实例
+    优先使用 Spring Boot 后端 API (BACKEND_URL)，
+    如果未设置且 Supabase 配置可用，则使用 Supabase 直接访问。
 
-    Raises:
-        ValueError: 环境变量未配置时
+    Returns:
+        API 客户端实例
     """
     global _client
     if _client is None:
-        _client = OpsApiClient()
+        # 优先使用 Spring Boot 后端
+        backend_url = os.environ.get("BACKEND_URL", "")
+        if backend_url or not os.environ.get("SUPABASE_URL"):
+            # 默认使用 Spring Boot 客户端
+            _client = SpringBootClient()
+        else:
+            _client = OpsApiClient()
     return _client
 
 

@@ -1,0 +1,392 @@
+openapi: 3.0.3
+info:
+  title: P003 Inventory Query API
+  description: 门店SKU库存查询 API 契约
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+paths:
+  /inventory:
+    get:
+      summary: 查询库存列表
+      description: |
+        查询门店SKU库存列表，支持分页、搜索和多维筛选。
+        - 支持按SKU名称/编码模糊搜索
+        - 支持按门店、库存状态、商品分类筛选
+        - 筛选条件为交集关系
+      operationId: listInventory
+      tags:
+        - Inventory
+      parameters:
+        - name: storeId
+          in: query
+          description: 门店ID（默认当前用户所属门店）
+          schema:
+            type: string
+            format: uuid
+        - name: keyword
+          in: query
+          description: 搜索关键词（匹配SKU名称或编码）
+          schema:
+            type: string
+            maxLength: 100
+        - name: categoryId
+          in: query
+          description: 商品分类ID
+          schema:
+            type: string
+            format: uuid
+        - name: statuses
+          in: query
+          description: 库存状态筛选（多选，逗号分隔）
+          schema:
+            type: string
+            example: "LOW,OUT_OF_STOCK"
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页条数
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryListResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未认证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问该门店
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inventory/{id}:
+    get:
+      summary: 获取库存详情
+      description: 获取单条库存记录的详细信息
+      operationId: getInventoryDetail
+      tags:
+        - Inventory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 库存记录ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryDetailResponse'
+        '404':
+          description: 库存记录不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /stores/accessible:
+    get:
+      summary: 获取可访问的门店列表
+      description: 获取当前用户有权限访问的门店列表
+      operationId: listAccessibleStores
+      tags:
+        - Store
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreListResponse'
+
+  /categories:
+    get:
+      summary: 获取商品分类列表
+      description: 获取商品分类树形结构
+      operationId: listCategories
+      tags:
+        - Category
+      parameters:
+        - name: status
+          in: query
+          description: 分类状态
+          schema:
+            type: string
+            enum: [ACTIVE, INACTIVE]
+            default: ACTIVE
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+
+components:
+  schemas:
+    InventoryStatus:
+      type: string
+      description: 库存状态
+      enum:
+        - SUFFICIENT      # 充足
+        - NORMAL          # 正常
+        - BELOW_THRESHOLD # 偏低
+        - LOW             # 不足
+        - OUT_OF_STOCK    # 缺货
+
+    StoreInventoryItem:
+      type: object
+      description: 库存列表项
+      required:
+        - id
+        - storeId
+        - skuId
+        - skuCode
+        - skuName
+        - onHandQty
+        - availableQty
+        - reservedQty
+        - mainUnit
+        - inventoryStatus
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 库存记录ID
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        storeName:
+          type: string
+          description: 门店名称
+        skuId:
+          type: string
+          format: uuid
+          description: SKU ID
+        skuCode:
+          type: string
+          description: SKU编码
+        skuName:
+          type: string
+          description: SKU名称
+        onHandQty:
+          type: number
+          format: decimal
+          description: 现存数量
+        availableQty:
+          type: number
+          format: decimal
+          description: 可用数量
+        reservedQty:
+          type: number
+          format: decimal
+          description: 预占数量
+        safetyStock:
+          type: number
+          format: decimal
+          description: 安全库存
+        mainUnit:
+          type: string
+          description: 库存单位
+        categoryId:
+          type: string
+          format: uuid
+          description: 分类ID
+        categoryName:
+          type: string
+          description: 分类名称
+        inventoryStatus:
+          $ref: '#/components/schemas/InventoryStatus'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 最后更新时间
+
+    StoreInventoryDetail:
+      allOf:
+        - $ref: '#/components/schemas/StoreInventoryItem'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: 创建时间
+            storeCode:
+              type: string
+              description: 门店编码
+
+    InventoryListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - page
+        - pageSize
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreInventoryItem'
+        total:
+          type: integer
+          description: 总记录数
+          example: 156
+        page:
+          type: integer
+          description: 当前页码
+          example: 1
+        pageSize:
+          type: integer
+          description: 每页条数
+          example: 20
+        message:
+          type: string
+          description: 提示信息
+
+    InventoryDetailResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/StoreInventoryDetail'
+
+    StoreItem:
+      type: object
+      required:
+        - id
+        - code
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: 门店编码
+        name:
+          type: string
+          description: 门店名称
+        region:
+          type: string
+          description: 区域
+
+    StoreListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoreItem'
+
+    CategoryItem:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - level
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          description: 分类编码
+        name:
+          type: string
+          description: 分类名称
+        parentId:
+          type: string
+          format: uuid
+          description: 父分类ID
+        level:
+          type: integer
+          description: 层级
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryItem'
+
+    CategoryListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryItem'
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误代码
+          example: STORE_NOT_ACCESSIBLE
+        message:
+          type: string
+          description: 错误信息
+          example: 您没有权限访问该门店
+        details:
+          type: object
+          description: 错误详情

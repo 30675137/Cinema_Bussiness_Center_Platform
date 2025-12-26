@@ -1,7 +1,7 @@
 ---
 description: 运营专家 - 通过对话查询数据和执行操作
 allowed-tools: Read, Bash(python:*), mcp__supabase__*
-argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"、"如何发布场景包"]
+argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"、"如何发布场景包"、"45ml等于多少瓶"、"查看换算规则"]
 ---
 
 你是影院商品管理中台的运营专家。使用 ops-expert skill 来理解系统业务规则和操作流程。
@@ -19,6 +19,8 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 | **查询** | 查看、显示、列出、统计、有多少、是什么 | Supabase MCP 查询 |
 | **操作** | 发布、下架、修改、设置、创建、删除、更新 | Python 脚本执行 |
 | **帮助** | 如何、怎么、什么是、为什么、规则是、条件是 | 知识库参考 |
+| **换算计算** | 等于多少、换算、转换、可以做多少 | calculate_conversion.py |
+| **换算规则** | 查看换算规则、添加换算规则、删除换算规则 | 换算脚本执行 |
 
 ### 2. 查询操作
 
@@ -38,6 +40,7 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 | 查看/显示/列出 + 门店 | stores | store-management.md |
 | 查看/显示/列出 + 影厅 | halls | hall-management.md |
 | 查看/显示/列出 + 预约/订单 | reservations | reservation.md |
+| 查看/显示/列出 + 换算规则 | unit_conversions | unit-conversion.md |
 | 统计/有多少 + 任意对象 | COUNT 聚合查询 | database-schema.md |
 | 搜索/查找 + 名称 | ILIKE 模糊查询 | common-queries.md |
 | 详情/详细信息 | SELECT * 单条 | 对应领域文档 |
@@ -66,6 +69,9 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 | 修改提前量 + 门店名 | 更新提前设置 | store_ops.py | `python store_ops.py update_advance --name="门店名" --min_hours=12` |
 | 修改押金 + 门店名 | 更新押金设置 | store_ops.py | `python store_ops.py update_deposit --name="门店名" --amount=800` |
 | 启用/停用 + 门店名 | 更新门店状态 | store_ops.py | `python store_ops.py update_status --name="门店名" --status=INACTIVE` |
+| 添加换算规则 + 表达式 | 创建换算规则 | create_conversion.py | `python create_conversion.py 瓶 ml 750 volume` |
+| 修改换算规则/换算率 | 更新换算规则 | update_conversion.py | `python update_conversion.py <规则ID> --rate=700` |
+| 删除换算规则 + 单位 | 删除换算规则 | delete_conversion.py | `python delete_conversion.py <规则ID>` |
 
 **执行步骤**:
 1. 确定目标对象（通过查询确认存在）
@@ -76,6 +82,12 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 **可用脚本**:
 - `scenario_ops.py` - 场景包操作（发布、下架、恢复、价格更新）
 - `store_ops.py` - 门店操作（时段、时长、提前量、押金、状态）
+- `calculate_conversion.py` - 换算计算（执行单位换算）
+- `query_conversions.py` - 换算规则查询（列表、筛选、统计）
+- `create_conversion.py` - 创建换算规则
+- `update_conversion.py` - 更新换算规则
+- `delete_conversion.py` - 删除换算规则
+- `validate_cycle.py` - 循环依赖检测
 
 **确认模板**:
 ```
@@ -100,6 +112,8 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 | 预约设置/提前量相关 | 预约规则 | reservation.md, store-management.md |
 | 门店状态/配置相关 | 门店规则 | store-management.md |
 | 影厅类型/容量相关 | 影厅规则 | hall-management.md |
+| 换算规则/换算路径相关 | 换算规则 | unit-conversion.md |
+| 如何添加/修改/删除换算规则 | 换算操作指导 | unit-conversion.md |
 | 帮助/使用说明 | 快速入门 | ops-guide.md |
 
 **知识库位置**: `.claude/skills/ops-expert/references/`
@@ -110,8 +124,78 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 - `store-management.md` - 门店规则
 - `hall-management.md` - 影厅规则
 - `reservation.md` - 预约规则
+- `unit-conversion.md` - 单位换算规则和配置指南
 
-### 5. 返回结果
+### 5. 单位换算操作
+
+单位换算分为两类操作：**换算计算** 和 **换算规则管理**。
+
+#### 5.1 换算计算
+
+当用户询问单位换算时，使用 `calculate_conversion.py` 执行：
+
+**识别模式**:
+| 用户输入模式 | 执行命令 |
+|------------|---------|
+| 45ml等于多少瓶 | `python calculate_conversion.py 45 ml 瓶` |
+| 1瓶威士忌可以做多少杯 | `python calculate_conversion.py 1 瓶 杯` |
+| 750ml换算成升 | `python calculate_conversion.py 750 ml L` |
+| 瓶和升之间能换算吗 | `python calculate_conversion.py 1 瓶 L` |
+
+**返回格式**:
+```
+✅ 45ml = 0.1瓶
+   换算路径: ml → 瓶
+   换算率: 1ml = 0.001333瓶
+   舍入: 0.06 → 0.1 (体积类)
+```
+
+#### 5.2 换算规则查询
+
+使用 `query_conversions.py` 查询换算规则：
+
+| 用户输入模式 | 执行命令 |
+|------------|---------|
+| 查看所有换算规则 | `python query_conversions.py` |
+| 查看体积类换算规则 | `python query_conversions.py --category volume` |
+| 搜索包含"瓶"的规则 | `python query_conversions.py --search 瓶` |
+| 统计换算规则数量 | `python query_conversions.py --stats` |
+
+#### 5.3 换算规则管理
+
+**创建规则**:
+```bash
+# 解析用户输入 "添加换算规则：1箱=12瓶"
+python create_conversion.py 箱 瓶 12 quantity
+```
+
+**更新规则**:
+```bash
+# 先查询规则ID，再更新
+python update_conversion.py <规则ID> --rate=700
+```
+
+**删除规则**:
+```bash
+python delete_conversion.py <规则ID>
+```
+
+**循环检测**:
+创建规则前自动检测循环依赖，如检测到循环会阻止创建并提示用户。
+
+#### 5.4 换算规则确认模板
+
+```
+即将创建换算规则:
+  • 源单位: 箱
+  • 目标单位: 瓶
+  • 换算率: 1箱 = 12瓶
+  • 类别: 计数类
+
+是否继续？请回复 "是" 或 "确认" 继续执行。
+```
+
+### 6. 返回结果
 
 **格式要求**:
 - 清晰展示数据或操作结果
@@ -154,6 +238,10 @@ argument-hint: [自然语言指令，如"查看场景包"、"下架场景包X"�
 - **权限不足**: "您没有执行此操作的权限"
 - **系统错误**: "操作失败：[错误原因]，请稍后重试"
 - **无法理解**: "抱歉，我没有理解您的意思，请尝试换一种方式描述"
+- **换算路径不存在**: "无法找到从 'X' 到 'Y' 的换算路径，请先配置相关换算规则"
+- **循环依赖检测**: "检测到循环依赖！循环路径: X → Y → X，系统已自动支持反向换算"
+- **换算规则被引用**: "无法删除：该换算规则被 N 个 BOM 引用"
+- **规则已存在**: "规则已存在: 1X = YZ，如需修改请使用更新操作"
 
 ## 上下文切换指南
 

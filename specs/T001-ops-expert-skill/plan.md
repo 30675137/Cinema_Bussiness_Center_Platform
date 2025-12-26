@@ -1,55 +1,50 @@
-# Implementation Plan: 运营专家技能 (Ops Expert Skill)
+# Implementation Plan: 运营专家技能 - 单位换算专家扩展
 
-**Branch**: `T001-ops-expert-skill` | **Date**: 2025-12-25 | **Spec**: [spec.md](./spec.md)
+**Branch**: `T001-ops-expert-skill` | **Date**: 2025-12-26 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/T001-ops-expert-skill/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-开发一个 Claude Code 运营专家技能，使运营人员能够通过自然语言对话方式查询系统数据、执行日常操作、获取操作指导。技术方案采用 Agent + Skill 组合架构：Agent (`agents/ops-expert.md`) 负责交互执行和意图识别，Skill (`skills/ops-expert/SKILL.md`) 提供业务知识库。查询操作通过 Supabase MCP 直接读取数据库，写操作通过封装的 Python 脚本调用后端 REST API。
+本功能扩展现有的运营专家 Skill (`.claude/skills/ops-expert/`)，新增单位换算专家能力，让运营人员能够通过对话方式进行单位换算计算、查询换算规则、配置换算关系。
+
+**核心技术方案**：
+1. 复用 P002-unit-conversion 模块的后端 API
+2. 新增 6 个 Python 脚本处理单位换算操作
+3. 扩展 SKILL.md 添加单位换算意图识别
+4. 新增 unit-conversion.md 业务知识库
 
 ## Technical Context
 
 **Language/Version**:
-- Claude Code Skill/Agent: Markdown + YAML frontmatter
-- Python 脚本: Python 3.8+ (用于 API 操作封装)
-- 项目虚拟环境: venv/poetry (与 `.specify/scripts/` 共享)
+- Claude Code Skill: Markdown (SKILL.md) + Python 3.8+ (scripts)
+- 后端 API: Java 21 + Spring Boot 3.x (复用 P002)
 
 **Primary Dependencies**:
-- Supabase MCP: 数据库查询
-- Python requests: REST API 调用
-- 现有 specs 目录: 业务知识来源
+- Python: requests, supabase-py (复用现有 api_client.py)
+- 后端: P002 unit-conversion API endpoints
+- 数据库: unit_conversions 表 (V028 迁移已创建)
 
 **Storage**:
-- 查询: Supabase MCP 直接读取数据库
-- 写操作: Python 脚本调用后端 REST API
-- 知识库: 静态 Markdown 文件 (从 specs 生成 + 手动补充)
+- 复用 Supabase `unit_conversions` 表
+- 不需要新建数据库表
 
 **Testing**:
-- 手动测试: 通过 `/ops` 命令触发 Agent，验证意图识别和操作执行
-- 脚本测试: Python 脚本单元测试 (pytest)
+- Python 脚本单元测试 (pytest)
+- 手动集成测试 (通过 /ops 命令验证)
 
 **Target Platform**:
-- Claude Code CLI 环境
-- macOS / Linux 终端
+- Claude Code CLI (通过 /ops 命令触发)
 
 **Project Type**:
-- Claude Code Skill + Agent 开发
-- 不涉及前端 UI 或后端服务开发
+- Claude Code Skill 扩展 (非前端/后端功能)
 
 **Performance Goals**:
-- 查询响应: <30 秒获取数据结果
-- 意图识别: <2 秒提供引导提示
+- 换算计算响应时间 < 2秒
+- 换算路径查找支持最多 5 个中间步骤
 
 **Constraints**:
-- 必须使用 Slash command `/ops` 触发
-- 知识库覆盖全部规划模块，操作能力随模块实现扩展
-- Python 脚本使用项目虚拟环境
-
-**Scale/Scope**:
-- 知识库: 覆盖 ~40 个 specs 目录的业务规则
-- 操作脚本: 覆盖场景包、门店、影厅、预约等核心模块的 CRUD 操作
+- 必须复用 P002 后端 API，不重复实现算法
+- 必须继承现有 Skill 的安全约束
 
 ## Constitution Check
 
@@ -57,18 +52,18 @@
 
 ### 必须满足的宪法原则检查：
 
-- [x] **功能分支绑定**: 当前分支 `T001-ops-expert-skill` 等于 active_spec 指向路径中的 specId ✓
-- [x] **测试驱动开发**: Python 脚本需要编写单元测试；Agent/Skill 通过手动集成测试验证
-- [x] **组件化架构**: Agent 和 Skill 分离，知识库使用 references/ 目录组织
-- [x] **前端技术栈分层**: 本功能不涉及前端 UI 开发，仅 Claude Code 终端交互 ✓
-- [x] **数据驱动状态管理**: 不适用（非前端应用）✓
-- [x] **代码质量工程化**: Python 脚本遵循 PEP8，Markdown 遵循项目规范
-- [x] **后端技术栈约束**: 写操作通过 REST API 调用，保持与 Spring Boot + Supabase 架构一致 ✓
+- [x] **功能分支绑定**: 当前分支 T001-ops-expert-skill = active_spec 路径 T001-ops-expert-skill ✓
+- [x] **测试驱动开发**: Python 脚本有对应的 pytest 测试 (tests/test_*.py)
+- [N/A] **组件化架构**: 本功能为 Skill 扩展，不涉及前端组件
+- [N/A] **前端技术栈分层**: 本功能为 Skill 扩展，不涉及前端
+- [N/A] **数据驱动状态管理**: 本功能为 Skill 扩展，不涉及前端状态
+- [x] **代码质量工程化**: Python 脚本遵循 PEP8，有类型注解
+- [x] **后端技术栈约束**: 复用 P002 的 Spring Boot API，数据存储在 Supabase
 
 ### 性能与标准检查：
-- [x] **性能标准**: 查询 <30s，意图引导 <2s ✓
-- [x] **安全标准**: Python 脚本使用环境变量存储 API Token，不硬编码敏感信息
-- [x] **可访问性标准**: 不适用（CLI 交互）✓
+- [x] **性能标准**: 换算计算 < 2秒，路径查找支持 5 步
+- [x] **安全标准**: 操作确认、循环依赖检测、BOM 引用检查
+- [N/A] **可访问性标准**: 本功能为 CLI 交互，无 UI
 
 ## Project Structure
 
@@ -76,67 +71,116 @@
 
 ```text
 specs/T001-ops-expert-skill/
-├── spec.md              # Feature specification ✓
-├── plan.md              # This file ✓
-├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output (N/A - no database entities)
-├── quickstart.md        # Phase 1 output
-└── contracts/           # Phase 1 output (N/A - no new APIs)
+├── plan.md              # This file
+├── research.md          # 研究文档 (已完成)
+├── spec.md              # 功能规格 (已完成)
+├── quickstart.md        # 开发快速入门
+├── tasks.md             # 开发任务列表
+└── checklists/
+    └── requirements.md  # 需求检查清单 (已完成)
 ```
 
-### Source Code (repository root)
+### Source Code (Skill 目录)
 
 ```text
-.claude/
-├── commands/
-│   └── ops.md                    # Slash command 入口 (调用 Agent)
-├── skills/
-│   └── ops-expert/               # 运营专家知识库
-│       ├── SKILL.md              # Skill 主文件 (触发条件 + 核心能力)
-│       ├── references/           # 业务知识参考
-│       │   ├── scenario-package.md   # 场景包管理规则
-│       │   ├── store-management.md   # 门店管理规则
-│       │   ├── hall-management.md    # 影厅管理规则
-│       │   ├── reservation.md        # 预约管理规则
-│       │   ├── ops-guide.md          # 运营操作指南 (手动维护)
-│       │   └── glossary.md           # 业务术语表
-│       ├── examples/             # 对话示例
-│       │   └── common-queries.md # 常见查询示例
-│       └── scripts/              # Python 操作脚本
-│           ├── __init__.py
-│           ├── api_client.py     # REST API 客户端封装
-│           ├── scenario_ops.py   # 场景包操作
-│           ├── store_ops.py      # 门店操作
-│           └── utils.py          # 工具函数
-└── agents/                       # (可选) Agent 定义
-    └── ops-expert.md             # 运营专家 Agent (如需独立 Agent)
+.claude/skills/ops-expert/
+├── SKILL.md                      # 主技能文件 (需更新)
+├── scripts/
+│   ├── api_client.py            # API 客户端 (已存在，需扩展)
+│   ├── query_stores.py          # 门店查询 (已存在)
+│   ├── query_conversions.py     # 换算规则查询 (新增)
+│   ├── calculate_conversion.py  # 换算计算 (新增)
+│   ├── create_conversion.py     # 创建规则 (新增)
+│   ├── update_conversion.py     # 修改规则 (新增)
+│   ├── delete_conversion.py     # 删除规则 (新增)
+│   ├── validate_cycle.py        # 循环检测 (新增)
+│   └── tests/
+│       ├── test_api_client.py   # 客户端测试 (已存在)
+│       └── test_conversion.py   # 换算脚本测试 (新增)
+├── references/
+│   ├── database-schema.md       # 数据库结构 (需更新)
+│   ├── unit-conversion.md       # 单位换算知识库 (新增)
+│   ├── scenario-package.md      # 场景包规则 (已存在)
+│   └── ...
+└── examples/
+    └── common-queries.md        # 常见查询示例 (需更新)
 ```
 
-**Structure Decision**:
-- 采用 Skill + Command 组合模式（而非独立 Agent）
-- Skill 提供业务知识库，Command (`/ops`) 提供触发入口
-- Python 脚本封装写操作，通过 `Bash()` 工具调用
+### 依赖的外部模块
 
-## Complexity Tracking
+```text
+# P002-unit-conversion 后端 API (复用)
+backend/src/main/java/com/cinema/unitconversion/
+├── controller/UnitConversionController.java   # REST API
+├── service/UnitConversionService.java         # 业务逻辑
+├── service/ConversionPathService.java         # 路径计算
+└── repository/UnitConversionRepository.java   # 数据访问
 
-> **无宪法违规需要记录**
+# P002 前端工具函数 (参考算法实现)
+frontend/src/features/unit-conversion/utils/
+├── pathFinding.ts      # BFS 路径查找
+├── cycleDetection.ts   # DFS 循环检测
+└── rounding.ts         # 舍入规则
+```
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| N/A | N/A | N/A |
+**Structure Decision**: 扩展现有 Claude Code Skill，不新建独立项目。Python 脚本调用 P002 后端 API 实现功能，知识库文档提供业务上下文。
 
 ## Implementation Phases
 
-### Phase 0: Research (已完成澄清)
-- [x] Claude Code Skill 结构研究 (通过 Context7 完成)
-- [x] 技术决策确认 (Supabase MCP + Python 脚本)
-- [x] 触发方式确认 (Slash command `/ops`)
+### Phase 1: 知识库扩展
 
-### Phase 1: Design & Contracts
-- [ ] 生成 SKILL.md 模板
-- [ ] 设计 references/ 目录结构
-- [ ] 设计 Python 脚本接口
-- [ ] 生成 quickstart.md
+1. 创建 `references/unit-conversion.md` 业务知识库
+2. 更新 `references/database-schema.md` 添加 unit_conversions 表
+3. 更新 `examples/common-queries.md` 添加单位换算示例
 
-### Phase 2: Tasks (由 /speckit.tasks 生成)
-- 待 Phase 1 完成后执行
+### Phase 2: Python 脚本开发
+
+1. 扩展 `api_client.py` 添加单位换算 API 方法
+2. 创建 `query_conversions.py` 查询换算规则
+3. 创建 `calculate_conversion.py` 执行换算计算
+4. 创建 `create_conversion.py` 创建换算规则
+5. 创建 `update_conversion.py` 修改换算规则
+6. 创建 `delete_conversion.py` 删除换算规则
+7. 创建 `validate_cycle.py` 循环依赖检测
+
+### Phase 3: SKILL.md 更新
+
+1. 添加单位换算能力描述到核心能力部分
+2. 添加单位换算意图识别到工作流程
+3. 添加单位换算常见指令示例
+4. 添加单位换算错误处理模式
+
+### Phase 4: 测试与验证
+
+1. 创建 `tests/test_conversion.py` 单元测试
+2. 手动验证 /ops 命令的单位换算功能
+3. 验证各种边界情况处理
+
+## Complexity Tracking
+
+> 本功能复杂度较低，无宪法违规需要解释
+
+| 违规项 | 无 | - |
+|--------|---|---|
+
+## API Dependencies (P002)
+
+| 端点 | 方法 | 功能 | 脚本调用 |
+|------|------|------|----------|
+| `/api/unit-conversions` | GET | 获取规则列表 | query_conversions.py |
+| `/api/unit-conversions/{id}` | GET | 获取单条规则 | query_conversions.py |
+| `/api/unit-conversions` | POST | 创建规则 | create_conversion.py |
+| `/api/unit-conversions/{id}` | PUT | 更新规则 | update_conversion.py |
+| `/api/unit-conversions/{id}` | DELETE | 删除规则 | delete_conversion.py |
+| `/api/unit-conversions/stats` | GET | 统计信息 | query_conversions.py |
+| `/api/unit-conversions/validate-cycle` | POST | 循环检测 | validate_cycle.py |
+| `/api/unit-conversions/calculate-path` | POST | 路径计算 | calculate_conversion.py |
+
+## Success Criteria Mapping
+
+| 成功标准 | 实现方式 | 验证方法 |
+|---------|---------|---------|
+| SC-009: 换算准确率 100% | 复用 P002 API | 单元测试 + 手动验证 |
+| SC-010: 路径查找 < 5秒 | 后端 BFS 算法 | 性能测试 |
+| SC-011: 循环检测准确率 100% | 后端 DFS 算法 | 单元测试 |
+| SC-012: 80% 选择对话配置 | 友好的对话交互 | 用户反馈 |

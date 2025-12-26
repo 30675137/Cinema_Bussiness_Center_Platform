@@ -318,3 +318,199 @@ claude /ops 将场景包"测试包"下架
 ## 下一步
 
 完成基础结构后，运行 `/speckit.tasks` 生成详细任务列表。
+
+---
+
+## 单位换算专家扩展 (2025-12-26 新增)
+
+### 新增文件
+
+```bash
+# 新增知识库文件
+.claude/skills/ops-expert/references/unit-conversion.md
+
+# 新增 Python 脚本
+.claude/skills/ops-expert/scripts/query_conversions.py
+.claude/skills/ops-expert/scripts/calculate_conversion.py
+.claude/skills/ops-expert/scripts/create_conversion.py
+.claude/skills/ops-expert/scripts/update_conversion.py
+.claude/skills/ops-expert/scripts/delete_conversion.py
+.claude/skills/ops-expert/scripts/validate_cycle.py
+.claude/skills/ops-expert/scripts/tests/test_conversion.py
+```
+
+### 依赖的后端 API (P002)
+
+确认后端服务已启动并提供以下 API：
+
+```bash
+# 测试后端 API 是否可用
+curl http://localhost:8080/api/unit-conversions
+
+# 预期响应
+{
+  "success": true,
+  "data": [
+    {"id": "...", "fromUnit": "ml", "toUnit": "L", "conversionRate": 0.001, "category": "volume"},
+    ...
+  ]
+}
+```
+
+### 测试单位换算功能
+
+```bash
+# 测试换算计算
+claude /ops 45ml威士忌等于多少瓶
+
+# 测试规则查询
+claude /ops 查看所有体积类换算规则
+
+# 测试规则创建
+claude /ops 添加换算规则：1箱=12瓶
+
+# 测试路径查询
+claude /ops 瓶和升之间能换算吗
+
+# 测试成本计算
+claude /ops 威士忌可乐的成本是多少
+```
+
+### Python 脚本模板 (calculate_conversion.py)
+
+```python
+#!/usr/bin/env python3
+"""
+单位换算计算
+用法: python calculate_conversion.py <数量> <源单位> <目标单位>
+示例: python calculate_conversion.py 45 ml 瓶
+"""
+import sys
+import os
+import math
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from api_client import get_client
+
+# 舍入精度配置
+PRECISION_MAP = {
+    'volume': 1,    # 体积类保留1位小数
+    'weight': 0,    # 重量类取整
+    'quantity': 0   # 计数类取整（向上）
+}
+
+def round_by_category(value: float, category: str) -> float:
+    """按类别应用舍入规则"""
+    precision = PRECISION_MAP.get(category, 2)
+    if category == 'quantity':
+        return math.ceil(value)
+    else:
+        return round(value, precision)
+
+def main():
+    if len(sys.argv) < 4:
+        print("用法: python calculate_conversion.py <数量> <源单位> <目标单位>")
+        print("示例: python calculate_conversion.py 45 ml 瓶")
+        sys.exit(1)
+
+    quantity = float(sys.argv[1])
+    from_unit = sys.argv[2]
+    to_unit = sys.argv[3]
+
+    if quantity <= 0:
+        print("❌ 换算数量必须为正数")
+        sys.exit(1)
+
+    client = get_client()
+
+    # 调用后端 API 计算换算路径
+    result = client.calculate_conversion_path(from_unit, to_unit)
+
+    if result['success'] and result['data'].get('found'):
+        path_data = result['data']
+        total_rate = path_data['total_rate']
+        path = path_data['path']
+        category = path_data.get('category', 'volume')
+
+        # 计算换算结果
+        raw_result = quantity * total_rate
+        final_result = round_by_category(raw_result, category)
+
+        print(f"✅ {quantity}{from_unit} = {final_result}{to_unit}")
+        print(f"   换算路径: {' → '.join(path)}")
+        print(f"   换算率: 1{from_unit} = {total_rate}{to_unit}")
+        if raw_result != final_result:
+            print(f"   舍入: {raw_result} → {final_result} ({category}类)")
+    else:
+        print(f"❌ 无法找到从 '{from_unit}' 到 '{to_unit}' 的换算路径")
+        print("   建议: 请先配置相关换算规则")
+        print("   示例: /ops 添加换算规则：1瓶=750ml")
+
+if __name__ == '__main__':
+    main()
+```
+
+### api_client.py 扩展
+
+需要在现有 api_client.py 中添加以下方法：
+
+```python
+class OpsApiClient:
+    # ... 现有方法 ...
+
+    # 单位换算相关方法
+    def list_conversions(self, category: str = None, search: str = None):
+        """获取换算规则列表"""
+        params = {}
+        if category:
+            params['category'] = category
+        if search:
+            params['search'] = search
+        return self.request('GET', '/unit-conversions', params=params)
+
+    def get_conversion(self, id: str):
+        """获取单条换算规则"""
+        return self.request('GET', f'/unit-conversions/{id}')
+
+    def create_conversion(self, from_unit: str, to_unit: str, rate: float, category: str):
+        """创建换算规则"""
+        data = {
+            'fromUnit': from_unit,
+            'toUnit': to_unit,
+            'conversionRate': rate,
+            'category': category
+        }
+        return self.request('POST', '/unit-conversions', data=data)
+
+    def update_conversion(self, id: str, from_unit: str, to_unit: str, rate: float, category: str):
+        """更新换算规则"""
+        data = {
+            'fromUnit': from_unit,
+            'toUnit': to_unit,
+            'conversionRate': rate,
+            'category': category
+        }
+        return self.request('PUT', f'/unit-conversions/{id}', data=data)
+
+    def delete_conversion(self, id: str):
+        """删除换算规则"""
+        return self.request('DELETE', f'/unit-conversions/{id}')
+
+    def calculate_conversion_path(self, from_unit: str, to_unit: str):
+        """计算换算路径"""
+        data = {'fromUnit': from_unit, 'toUnit': to_unit}
+        return self.request('POST', '/unit-conversions/calculate-path', data=data)
+
+    def validate_cycle(self, from_unit: str, to_unit: str, existing_rules: list = None):
+        """验证循环依赖"""
+        data = {
+            'fromUnit': from_unit,
+            'toUnit': to_unit,
+            'existingRules': existing_rules or []
+        }
+        return self.request('POST', '/unit-conversions/validate-cycle', data=data)
+
+    def get_conversion_stats(self):
+        """获取换算规则统计"""
+        return self.request('GET', '/unit-conversions/stats')
+```

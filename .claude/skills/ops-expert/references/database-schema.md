@@ -13,6 +13,7 @@
 | `store_reservation_settings` | 门店预约设置 | 门店的预约规则配置 |
 | `brands` | 品牌 | 品牌信息 |
 | `categories` | 分类 | 商品分类 |
+| `unit_conversions` | 单位换算 | 单位换算规则配置 |
 
 ---
 
@@ -248,3 +249,48 @@ SELECT COUNT(*) as total,
 FROM reservations
 WHERE reservation_date >= DATE_TRUNC('week', CURRENT_DATE);
 ```
+
+---
+
+## BOM 相关表
+
+### unit_conversions（单位换算）
+
+```sql
+CREATE TABLE unit_conversions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    from_unit VARCHAR(20) NOT NULL,           -- 源单位
+    to_unit VARCHAR(20) NOT NULL,             -- 目标单位
+    conversion_rate DECIMAL(10,6) NOT NULL,   -- 换算率：1 from_unit = ? to_unit
+    category VARCHAR(20) NOT NULL             -- 类别: volume/weight/quantity
+      CHECK (category IN ('volume', 'weight', 'quantity')),
+    CONSTRAINT uk_conversion_from_to UNIQUE (from_unit, to_unit)
+);
+```
+
+**类别说明**:
+- `volume`: 体积类（ml, L, 杯, 瓶等）- 默认保留1位小数
+- `weight`: 重量类（g, kg, 份等）- 默认取整
+- `quantity`: 计数类（个, 打, 箱等）- 默认向上取整
+
+**常用查询**:
+```sql
+-- 查询所有换算规则
+SELECT * FROM unit_conversions ORDER BY category, from_unit;
+
+-- 按类别筛选换算规则
+SELECT * FROM unit_conversions WHERE category = 'volume';
+
+-- 搜索包含特定单位的规则
+SELECT * FROM unit_conversions
+WHERE from_unit ILIKE '%瓶%' OR to_unit ILIKE '%瓶%';
+
+-- 统计各类别规则数量
+SELECT category, COUNT(*) as count FROM unit_conversions GROUP BY category;
+```
+
+**预置数据**:
+系统预置以下基础换算规则：
+- 体积: ml↔L (1000), 瓶↔ml (根据产品规格)
+- 重量: g↔kg (1000)
+- 计数: 个↔打 (12), 瓶↔箱 (12)
