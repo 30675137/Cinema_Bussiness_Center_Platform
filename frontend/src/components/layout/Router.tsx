@@ -48,7 +48,7 @@ const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
 const AuditHistory = lazy(() => import('@/pages/product/ProductList'));
 const InventoryOperations = lazy(() => import('@/pages/inventory/InventoryOperations'));
-const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryMovements'));
+const InventoryQuery = lazy(() => import('@/pages/inventory/InventoryPage'));
 const InventoryTransactions = lazy(() => import('@/pages/inventory/InventoryMovements'));
 const TransferManagement = lazy(() => import('@/pages/inventory/TransferManagement'));
 const ProcurementTransfer = lazy(() => import('@/pages/inventory/TransferManagement'));
@@ -69,7 +69,18 @@ const Profile = lazy(() => import('@/pages/product/ProductList'));
 const Settings = lazy(() => import('@/pages/product/ProductList'));
 
 const Login = lazy(() => import('@/pages/product/ProductList'));
-const NotFound = lazy(() => import('@/pages/product/ProductList'));
+
+// 库存审批页面
+const InventoryApproval = lazy(() => import('@/pages/inventory/ApprovalPage'));
+
+// 404 页面组件
+const NotFound = () => (
+  <div style={{ textAlign: 'center', padding: '50px' }}>
+    <h1>404</h1>
+    <p>页面未找到</p>
+    <a href="/dashboard">返回首页</a>
+  </div>
+);
 
 // 加载组件
 const LoadingSpinner = () => (
@@ -723,6 +734,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <InventoryTransactions />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 库存审批管理路由
+  {
+    path: '/inventory/approvals',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <InventoryApproval />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

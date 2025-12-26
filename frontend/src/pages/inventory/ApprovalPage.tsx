@@ -8,7 +8,8 @@
  */
 
 import React, { useState } from 'react';
-import { Card, Drawer, Descriptions, Divider, Typography, Space, Tag, Timeline } from 'antd';
+import { Card, Drawer, Descriptions, Divider, Typography, Space, Tag, Timeline, Radio } from 'antd';
+import type { RadioChangeEvent } from 'antd';
 import { ApprovalList } from '@/features/inventory/components/ApprovalList';
 import { AdjustmentStatusTag } from '@/features/inventory/components/AdjustmentStatusTag';
 import type { InventoryAdjustment } from '@/features/inventory/types/adjustment';
@@ -16,12 +17,21 @@ import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
+/** 状态筛选选项 */
+const STATUS_OPTIONS = [
+  { label: '待审批', value: 'pending_approval' },
+  { label: '已通过', value: 'approved' },
+  { label: '已拒绝', value: 'rejected' },
+  { label: '全部', value: '' },
+];
+
 /**
  * 审批管理页面
  */
 const ApprovalPage: React.FC = () => {
   const [selectedAdjustment, setSelectedAdjustment] = useState<InventoryAdjustment | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('pending_approval');
 
   // 查看详情
   const handleViewDetail = (adjustment: InventoryAdjustment) => {
@@ -35,6 +45,11 @@ const ApprovalPage: React.FC = () => {
     setSelectedAdjustment(null);
   };
 
+  // 状态筛选变化
+  const handleStatusChange = (e: RadioChangeEvent) => {
+    setStatusFilter(e.target.value);
+  };
+
   return (
     <div style={{ padding: 24 }}>
       {/* 页面标题 */}
@@ -45,8 +60,27 @@ const ApprovalPage: React.FC = () => {
         </Text>
       </div>
 
-      {/* 待审批列表 */}
-      <ApprovalList onViewDetail={handleViewDetail} />
+      {/* 状态筛选器 */}
+      <Card style={{ marginBottom: 16 }}>
+        <Space>
+          <Text strong>状态筛选：</Text>
+          <Radio.Group
+            value={statusFilter}
+            onChange={handleStatusChange}
+            optionType="button"
+            buttonStyle="solid"
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <Radio.Button key={option.value} value={option.value}>
+                {option.label}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        </Space>
+      </Card>
+
+      {/* 审批列表 */}
+      <ApprovalList statusFilter={statusFilter} onViewDetail={handleViewDetail} />
 
       {/* 详情抽屉 */}
       <Drawer

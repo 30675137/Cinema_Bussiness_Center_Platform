@@ -41,31 +41,35 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   const columns: ColumnsType<CurrentInventory> = [
     {
       title: 'SKU编码',
-      dataIndex: ['sku', 'skuCode'],
+      dataIndex: 'skuCode',  // 后端返回扁平结构
       key: 'skuCode',
       width: 120,
       fixed: isMobile ? undefined : 'left',
-      render: (code: string) => <Text strong>{code}</Text>,
+      render: (code: string, record) => <Text strong>{code || record.sku?.skuCode}</Text>,
     },
     {
       title: 'SKU名称',
-      dataIndex: ['sku', 'name'],
+      dataIndex: 'skuName',  // 后端返回扁平结构
       key: 'skuName',
       width: 200,
       ellipsis: {
         showTitle: false,
       },
-      render: (name: string) => (
-        <Tooltip title={name}>
-          <span>{name}</span>
-        </Tooltip>
-      ),
+      render: (name: string, record) => {
+        const displayName = name || record.sku?.name;
+        return (
+          <Tooltip title={displayName}>
+            <span>{displayName}</span>
+          </Tooltip>
+        );
+      },
     },
     {
       title: '门店/仓库',
-      dataIndex: ['store', 'name'],
+      dataIndex: 'storeName',  // 后端返回扁平结构
       key: 'storeName',
       width: 150,
+      render: (name: string, record) => name || record.store?.name,
     },
     {
       title: '现存数量',
@@ -76,7 +80,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       sorter: (a, b) => a.onHandQty - b.onHandQty,
       render: (qty: number, record) => (
         <Text strong style={{ color: qty <= 0 ? '#ff4d4f' : undefined }}>
-          {formatQuantity(qty, record.sku?.unit)}
+          {formatQuantity(qty, (record as any).mainUnit || record.sku?.unit)}
         </Text>
       ),
     },
@@ -87,7 +91,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       width: 110,
       align: 'right',
       sorter: (a, b) => a.availableQty - b.availableQty,
-      render: (qty: number, record) => formatQuantity(qty, record.sku?.unit),
+      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '预占数量',
@@ -95,7 +99,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'reservedQty',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, record.sku?.unit),
+      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '在途数量',
@@ -103,7 +107,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'inTransitQty',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, record.sku?.unit),
+      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '安全库存',
@@ -111,7 +115,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'safetyStock',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, record.sku?.unit),
+      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '库存状态',
@@ -134,11 +138,15 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     },
     {
       title: '最后更新',
-      dataIndex: 'lastUpdated',
+      dataIndex: 'updatedAt',  // 后端返回 updatedAt
       key: 'lastUpdated',
       width: 160,
-      sorter: (a, b) => new Date(a.lastUpdated).getTime() - new Date(b.lastUpdated).getTime(),
-      render: (date: string) => formatDateTime(date),
+      sorter: (a, b) => {
+        const dateA = (a as any).updatedAt || a.lastUpdated;
+        const dateB = (b as any).updatedAt || b.lastUpdated;
+        return new Date(dateA).getTime() - new Date(dateB).getTime();
+      },
+      render: (date: string, record) => formatDateTime(date || record.lastUpdated),
     },
     {
       title: '操作',

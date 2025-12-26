@@ -2,11 +2,16 @@ package com.cinema.inventory.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.cinema.inventory.domain.InventoryAdjustment;
+import com.cinema.inventory.repository.AdjustmentRepository;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -28,6 +33,13 @@ public class ApprovalService {
      */
     private static final BigDecimal APPROVAL_THRESHOLD = new BigDecimal("1000");
 
+    private final AdjustmentRepository adjustmentRepository;
+
+    @Autowired
+    public ApprovalService(AdjustmentRepository adjustmentRepository) {
+        this.adjustmentRepository = adjustmentRepository;
+    }
+
     /**
      * 审批通过
      * 
@@ -46,13 +58,33 @@ public class ApprovalService {
 
         logger.info("审批通过 - adjustmentId={}, approver={}", adjustmentId, approverName);
 
-        // TODO: 实际实现应该：
         // 1. 查询调整记录
+        Optional<InventoryAdjustment> optionalAdjustment = adjustmentRepository.findById(adjustmentId);
+        if (optionalAdjustment.isEmpty()) {
+            logger.warn("审批失败 - 调整记录不存在: {}", adjustmentId);
+            return ApprovalResult.failure(adjustmentId, "调整记录不存在");
+        }
+
+        InventoryAdjustment adjustment = optionalAdjustment.get();
+
         // 2. 验证状态是否为 pending_approval
+        if (!adjustment.canApprove()) {
+            logger.warn("审批失败 - 状态不允许审批: {}, 当前状态: {}", adjustmentId, adjustment.getStatus());
+            return ApprovalResult.failure(adjustmentId, "当前状态不允许审批，当前状态: " + adjustment.getStatus());
+        }
+
         // 3. 更新状态为 approved
-        // 4. 执行库存更新
-        // 5. 记录审批历史
-        // 6. 生成流水记录
+        adjustment.setStatus("approved");
+        adjustment.setApprovedAt(OffsetDateTime.now());
+        adjustment.setApprovedBy(approverId);
+
+        // 4. 保存更新
+        adjustmentRepository.save(adjustment);
+
+        logger.info("审批通过成功 - adjustmentId={}, 新状态=approved", adjustmentId);
+
+        // TODO: 5. 执行库存更新（更新 store_inventory 表）
+        // TODO: 6. 生成流水记录（inventory_transactions 表）
 
         return ApprovalResult.success(
                 adjustmentId,
@@ -80,11 +112,36 @@ public class ApprovalService {
         logger.info("审批拒绝 - adjustmentId={}, approver={}, reason={}", 
                 adjustmentId, approverName, comments);
 
-        // TODO: 实际实现应该：
         // 1. 查询调整记录
+        Optional<InventoryAdjustment> optionalAdjustment = adjustmentRepository.findById(adjustmentId);
+        if (optionalAdjustment.isEmpty()) {
+            logger.warn("拒绝失败 - 调整记录不存在: {}", adjustmentId);
+            return ApprovalResult.failure(adjustmentId, "调整记录不存在");
+        }
+
+        InventoryAdjustment adjustment = optionalAdjustment.get();
+
         // 2. 验证状态是否为 pending_approval
+        if (!adjustment.canApprove()) {
+            logger.warn("拒绝失败 - 状态不允许审批: {}, 当前状态: {}", adjustmentId, adjustment.getStatus());
+            return ApprovalResult.failure(adjustmentId, "当前状态不允许审批，当前状态: " + adjustment.getStatus());
+        }
+
         // 3. 更新状态为 rejected
-        // 4. 记录审批历史
+        adjustment.setStatus("rejected");
+        adjustment.setApprovedAt(OffsetDateTime.now());
+        adjustment.setApprovedBy(approverId);
+        // 如果需要保存拒绝原因，可以添加到 remarks 或者专门的字段
+        if (comments != null && !comments.isEmpty()) {
+            String existingRemarks = adjustment.getRemarks();
+            String rejectReason = "【拒绝原因】" + comments;
+            adjustment.setRemarks(existingRemarks != null ? existingRemarks + " " + rejectReason : rejectReason);
+        }
+
+        // 4. 保存更新
+        adjustmentRepository.save(adjustment);
+
+        logger.info("审批拒绝成功 - adjustmentId={}, 新状态=rejected", adjustmentId);
 
         return ApprovalResult.success(
                 adjustmentId,
@@ -107,12 +164,35 @@ public class ApprovalService {
 
         logger.info("撤回调整 - adjustmentId={}, operator={}", adjustmentId, operatorId);
 
-        // TODO: 实际实现应该：
         // 1. 查询调整记录
+        Optional<InventoryAdjustment> optionalAdjustment = adjustmentRepository.findById(adjustmentId);
+        if (optionalAdjustment.isEmpty()) {
+            logger.warn("撤回失败 - 调整记录不存在: {}", adjustmentId);
+            return ApprovalResult.failure(adjustmentId, "调整记录不存在");
+        }
+
+        InventoryAdjustment adjustment = optionalAdjustment.get();
+
         // 2. 验证操作人是否为申请人
+        if (!adjustment.getOperatorId().equals(operatorId)) {
+            logger.warn("撤回失败 - 操作人不是申请人: adjustmentId={}, operatorId={}, originalOperatorId={}", 
+                    adjustmentId, operatorId, adjustment.getOperatorId());
+            return ApprovalResult.failure(adjustmentId, "只有申请人才能撤回");
+        }
+
         // 3. 验证状态是否为 pending_approval
+        if (!adjustment.canWithdraw()) {
+            logger.warn("撤回失败 - 状态不允许撤回: {}, 当前状态: {}", adjustmentId, adjustment.getStatus());
+            return ApprovalResult.failure(adjustmentId, "当前状态不允许撤回，当前状态: " + adjustment.getStatus());
+        }
+
         // 4. 更新状态为 withdrawn
-        // 5. 记录操作历史
+        adjustment.setStatus("withdrawn");
+
+        // 5. 保存更新
+        adjustmentRepository.save(adjustment);
+
+        logger.info("撤回成功 - adjustmentId={}, 新状态=withdrawn", adjustmentId);
 
         return ApprovalResult.success(
                 adjustmentId,

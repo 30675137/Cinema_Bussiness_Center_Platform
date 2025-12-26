@@ -1,7 +1,7 @@
 /**
- * P004-inventory-adjustment: 待审批列表组件
+ * P004-inventory-adjustment: 审批列表组件
  * 
- * 显示待审批的库存调整记录列表，支持审批通过/拒绝操作。
+ * 显示库存调整记录列表，支持状态筛选和审批通过/拒绝操作。
  * 实现 T047 任务。
  * 
  * @since US4 - 大额库存调整审批
@@ -24,7 +24,7 @@ import type { TableProps } from 'antd';
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { AdjustmentStatusTag } from './AdjustmentStatusTag';
-import { usePendingApprovals, useProcessApproval } from '../hooks/useApproval';
+import { useAdjustmentsByStatus, useProcessApproval } from '../hooks/useApproval';
 import type { InventoryAdjustment } from '../types/adjustment';
 
 const { Text, Title } = Typography;
@@ -33,6 +33,8 @@ const { TextArea } = Input;
 export interface ApprovalListProps {
   /** 门店ID过滤（可选） */
   storeId?: string;
+  /** 状态筛选: pending_approval | approved | rejected | withdrawn | 空表示全部 */
+  statusFilter?: string;
   /** 每页条数 */
   pageSize?: number;
   /** 点击查看详情回调 */
@@ -48,15 +50,16 @@ interface ApprovalModalData {
 }
 
 /**
- * 待审批列表组件
+ * 审批列表组件
  * 
  * @example
  * ```tsx
- * <ApprovalList onViewDetail={(adj) => setSelectedAdjustment(adj)} />
+ * <ApprovalList statusFilter="pending_approval" onViewDetail={(adj) => setSelectedAdjustment(adj)} />
  * ```
  */
 export const ApprovalList: React.FC<ApprovalListProps> = ({
   storeId,
+  statusFilter = 'pending_approval',
   pageSize = 10,
   onViewDetail,
 }) => {
@@ -64,11 +67,12 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
   const [modalData, setModalData] = useState<ApprovalModalData | null>(null);
   const [comments, setComments] = useState('');
 
-  // 获取待审批列表
-  const { data, isLoading, isError } = usePendingApprovals({
+  // 获取调整记录列表（支持状态筛选）
+  const { data, isLoading, isError } = useAdjustmentsByStatus({
     page,
     pageSize,
     storeId,
+    status: statusFilter || undefined,
   });
 
   // 审批操作
@@ -190,31 +194,55 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
               onClick={() => onViewDetail?.(record)}
             />
           </Tooltip>
-          <Button
-            type="primary"
-            size="small"
-            icon={<CheckOutlined />}
-            onClick={() => handleOpenModal(record, 'approve')}
-          >
-            通过
-          </Button>
-          <Button
-            danger
-            size="small"
-            icon={<CloseOutlined />}
-            onClick={() => handleOpenModal(record, 'reject')}
-          >
-            拒绝
-          </Button>
+          {/* 只有待审批状态才显示审批按钮 */}
+          {record.status === 'pending_approval' && (
+            <>
+              <Button
+                type="primary"
+                size="small"
+                icon={<CheckOutlined />}
+                onClick={() => handleOpenModal(record, 'approve')}
+              >
+                通过
+              </Button>
+              <Button
+                danger
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={() => handleOpenModal(record, 'reject')}
+              >
+                拒绝
+              </Button>
+            </>
+          )}
         </Space>
       ),
     },
   ];
 
+  // 根据状态筛选获取标题
+  const getListTitle = () => {
+    const titleMap: Record<string, string> = {
+      pending_approval: '待审批列表',
+      approved: '已通过列表',
+      rejected: '已拒绝列表',
+      withdrawn: '已撤回列表',
+    };
+    return titleMap[statusFilter || ''] || '全部记录';
+  };
+
+  // 根据状态筛选获取提示文字
+  const getCountLabel = () => {
+    if (statusFilter === 'pending_approval') {
+      return `${data?.total || 0} 条待处理`;
+    }
+    return `共 ${data?.total || 0} 条`;
+  };
+
   if (isError) {
     return (
       <Card>
-        <Empty description="加载待审批列表失败" />
+        <Empty description="加载列表失败" />
       </Card>
     );
   }
@@ -224,9 +252,9 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
       <Card
         title={
           <Space>
-            <Title level={5} style={{ margin: 0 }}>待审批列表</Title>
+            <Title level={5} style={{ margin: 0 }}>{getListTitle()}</Title>
             {data?.total !== undefined && (
-              <Text type="secondary">({data.total} 条待处理)</Text>
+              <Text type="secondary">({getCountLabel()})</Text>
             )}
           </Space>
         }
@@ -245,7 +273,7 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
               showTotal: (total) => `共 ${total} 条`,
               onChange: setPage,
             }}
-            locale={{ emptyText: <Empty description="暂无待审批记录" /> }}
+            locale={{ emptyText: <Empty description="暂无记录" /> }}
           />
         </Spin>
       </Card>

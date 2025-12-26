@@ -59,12 +59,24 @@ export interface PendingApprovalsParams {
 }
 
 /**
+ * 调整记录查询参数（支持状态筛选）
+ */
+export interface AdjustmentsQueryParams {
+  page?: number;
+  pageSize?: number;
+  storeId?: string;
+  status?: string; // pending_approval | approved | rejected | withdrawn | 空表示全部
+}
+
+/**
  * Query Keys
  */
 export const approvalKeys = {
   all: ['approvals'] as const,
   pending: () => [...approvalKeys.all, 'pending'] as const,
   pendingList: (params: PendingApprovalsParams) => [...approvalKeys.pending(), params] as const,
+  adjustments: () => [...approvalKeys.all, 'adjustments'] as const,
+  adjustmentsList: (params: AdjustmentsQueryParams) => [...approvalKeys.adjustments(), params] as const,
 };
 
 /**
@@ -73,6 +85,22 @@ export const approvalKeys = {
 async function fetchPendingApprovals(params: PendingApprovalsParams): Promise<PendingApprovalsResponse> {
   const searchParams = new URLSearchParams();
   searchParams.set('status', 'pending_approval');
+  if (params.page) searchParams.set('page', String(params.page));
+  if (params.pageSize) searchParams.set('pageSize', String(params.pageSize));
+  if (params.storeId) searchParams.set('storeId', params.storeId);
+
+  const response = await apiClient.get<PendingApprovalsResponse>(
+    `/adjustments?${searchParams.toString()}`
+  );
+  return response.data;
+}
+
+/**
+ * 获取调整记录列表（支持状态筛选）
+ */
+async function fetchAdjustments(params: AdjustmentsQueryParams): Promise<PendingApprovalsResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.status) searchParams.set('status', params.status);
   if (params.page) searchParams.set('page', String(params.page));
   if (params.pageSize) searchParams.set('pageSize', String(params.pageSize));
   if (params.storeId) searchParams.set('storeId', params.storeId);
@@ -118,6 +146,21 @@ export function usePendingApprovals(params: PendingApprovalsParams = {}, enabled
   return useQuery({
     queryKey: approvalKeys.pendingList(params),
     queryFn: () => fetchPendingApprovals(params),
+    enabled,
+    staleTime: 30 * 1000,
+  });
+}
+
+/**
+ * 调整记录列表 Hook（支持状态筛选）
+ * 
+ * @param params 查询参数，包含 status 筛选
+ * @param enabled 是否启用查询
+ */
+export function useAdjustmentsByStatus(params: AdjustmentsQueryParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: approvalKeys.adjustmentsList(params),
+    queryFn: () => fetchAdjustments(params),
     enabled,
     staleTime: 30 * 1000,
   });
@@ -211,6 +254,7 @@ export function useWithdrawAdjustment(options: UseWithdrawAdjustmentOptions = {}
 
 export default {
   usePendingApprovals,
+  useAdjustmentsByStatus,
   useProcessApproval,
   useWithdrawAdjustment,
 };

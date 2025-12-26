@@ -101,7 +101,7 @@ public class InventoryAdjustmentService {
 
         // 验证库存不能为负
         if (stockAfter < 0 || availableAfter < 0) {
-            throw new BusinessException("库存不足，无法执行此调整");
+            throw new BusinessException("INSUFFICIENT_STOCK", "库存不足，无法执行此调整");
         }
 
         // 3. 计算调整金额
@@ -220,11 +220,11 @@ public class InventoryAdjustmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("调整记录", id.toString()));
 
         if (!adjustment.canWithdraw()) {
-            throw new BusinessException("当前状态不允许撤回");
+            throw new BusinessException("INVALID_STATUS", "当前状态不允许撤回");
         }
 
         if (!adjustment.getOperatorId().equals(operatorId)) {
-            throw new BusinessException("只能撤回自己创建的调整申请");
+            throw new BusinessException("PERMISSION_DENIED", "只能撤回自己创建的调整申请");
         }
 
         adjustment.setStatus("withdrawn");

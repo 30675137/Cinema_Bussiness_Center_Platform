@@ -1,14 +1,22 @@
 package com.cinema.inventory.controller;
 
+import com.cinema.inventory.domain.StoreInventory;
+import com.cinema.inventory.repository.InventoryTransactionRepository;
+import com.cinema.inventory.repository.InventoryTransactionRepository.InventoryTransaction;
+import com.cinema.inventory.repository.StoreInventoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,8 +34,19 @@ public class SafetyStockController {
 
     private static final Logger logger = LoggerFactory.getLogger(SafetyStockController.class);
 
-    // 模拟版本号存储（实际应该从数据库获取）
+    private final StoreInventoryRepository inventoryRepository;
+    private final InventoryTransactionRepository transactionRepository;
+
+    // 版本号存储（用于乐观锁）
     private final ConcurrentHashMap<String, Integer> versionStore = new ConcurrentHashMap<>();
+
+    @Autowired
+    public SafetyStockController(
+            StoreInventoryRepository inventoryRepository,
+            InventoryTransactionRepository transactionRepository) {
+        this.inventoryRepository = inventoryRepository;
+        this.transactionRepository = transactionRepository;
+    }
 
     /**
      * 更新安全库存
@@ -86,12 +105,46 @@ public class SafetyStockController {
         int newVersion = currentVersion + 1;
         versionStore.put(id, newVersion);
 
-        // TODO: 实际实现应该：
-        // 1. 从数据库查询库存记录
-        // 2. 检查版本号是否匹配
-        // 3. 更新安全库存值和版本号
-        // 4. 重新计算库存状态（正常/低库存/缺货）
-        // 5. 保存到数据库
+        // 调用 Repository 更新数据库
+        UUID inventoryId;
+        StoreInventory inventory;
+        BigDecimal oldSafetyStock;
+        try {
+            inventoryId = UUID.fromString(id);
+            
+            // 先获取库存详情（获取 skuId, storeId 和旧的 safetyStock）
+            Optional<StoreInventory> inventoryOpt = inventoryRepository.findById(inventoryId);
+            if (inventoryOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("error", "NOT_FOUND");
+                response.put("message", "库存记录不存在");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            inventory = inventoryOpt.get();
+            oldSafetyStock = inventory.getSafetyStock();
+            
+            // 更新安全库存
+            boolean success = inventoryRepository.updateSafetyStock(inventoryId, BigDecimal.valueOf(newSafetyStock));
+            
+            if (!success) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("error", "UPDATE_FAILED");
+                response.put("message", "更新安全库存失败");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+            
+            // 创建库存流水记录
+            createSafetyStockTransaction(inventory, oldSafetyStock, BigDecimal.valueOf(newSafetyStock));
+            
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", "INVALID_ID");
+            response.put("message", "无效的库存记录ID");
+            return ResponseEntity.badRequest().body(response);
+        }
 
         logger.info("安全库存更新成功 - id={}, newSafetyStock={}, newVersion={}", 
                 id, newSafetyStock, newVersion);
@@ -133,5 +186,35 @@ public class SafetyStockController {
         response.put("data", data);
 
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 创建安全库存变更流水记录
+     */
+    private void createSafetyStockTransaction(StoreInventory inventory, BigDecimal oldSafetyStock, BigDecimal newSafetyStock) {
+        try {
+            InventoryTransaction txn = new InventoryTransaction();
+            txn.skuId = inventory.getSkuId();
+            txn.storeId = inventory.getStoreId();
+            txn.transactionType = "safety_stock_update";
+            txn.quantity = 0; // 安全库存变更不影响实际库存数量
+            txn.stockBefore = inventory.getOnHandQty() != null ? inventory.getOnHandQty().intValue() : 0;
+            txn.stockAfter = inventory.getOnHandQty() != null ? inventory.getOnHandQty().intValue() : 0;
+            txn.availableBefore = inventory.getAvailableQty() != null ? inventory.getAvailableQty().intValue() : 0;
+            txn.availableAfter = inventory.getAvailableQty() != null ? inventory.getAvailableQty().intValue() : 0;
+            txn.sourceType = "safety_stock_config";
+            txn.sourceDocument = "SAFETY-" + inventory.getId().toString().substring(0, 8).toUpperCase();
+            txn.operatorName = "系统";
+            txn.remarks = String.format("安全库存从 %s 调整为 %s", 
+                    oldSafetyStock != null ? oldSafetyStock.intValue() : 0, 
+                    newSafetyStock.intValue());
+
+            transactionRepository.create(txn);
+            logger.info("Created safety stock transaction for inventory {}: {} -> {}", 
+                    inventory.getId(), oldSafetyStock, newSafetyStock);
+        } catch (Exception e) {
+            // 流水创建失败不影响主流程，仅记录日志
+            logger.error("Failed to create safety stock transaction for inventory {}", inventory.getId(), e);
+        }
     }
 }

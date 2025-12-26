@@ -8,10 +8,12 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Table, DatePicker, Space, Empty, Spin, Typography, Tag } from 'antd';
+import { Table, DatePicker, Space, Empty, Spin, Typography, Tag, Button } from 'antd';
 import type { TableProps } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { TransactionQuantityTag, getTransactionTypeName } from './TransactionQuantityTag';
+import { TransactionDetailDrawer } from './TransactionDetailDrawer';
 import { useTransactions, type InventoryTransaction } from '../hooks/useTransactions';
 
 const { RangePicker } = DatePicker;
@@ -47,6 +49,14 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 }) => {
   const [dateRange, setDateRange] = useState<[string, string] | null>(null);
   const [page, setPage] = useState(1);
+  const [selectedTransaction, setSelectedTransaction] = useState<InventoryTransaction | null>(null);
+  const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+
+  // 查看详情
+  const handleViewDetail = (record: InventoryTransaction) => {
+    setSelectedTransaction(record);
+    setDetailDrawerOpen(true);
+  };
 
   // 构建查询参数
   const queryParams = useMemo(() => ({
@@ -120,6 +130,21 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       key: 'operatorName',
       width: 100,
     },
+    {
+      title: '操作',
+      key: 'action',
+      width: 80,
+      render: (_, record) => (
+        <Button
+          type="link"
+          size="small"
+          icon={<EyeOutlined />}
+          onClick={() => handleViewDetail(record)}
+        >
+          详情
+        </Button>
+      ),
+    },
   ];
 
   // 错误状态
@@ -156,8 +181,19 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             showSizeChanger: false,
           }}
           locale={{ emptyText: <Empty description="暂无流水记录" /> }}
+          onRow={(record) => ({
+            onClick: () => handleViewDetail(record),
+            style: { cursor: 'pointer' },
+          })}
         />
       </Spin>
+
+      {/* 流水详情抽屉 */}
+      <TransactionDetailDrawer
+        transaction={selectedTransaction}
+        open={detailDrawerOpen}
+        onClose={() => setDetailDrawerOpen(false)}
+      />
     </div>
   );
 };
