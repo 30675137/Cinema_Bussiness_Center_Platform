@@ -25,9 +25,9 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend inventory module structure in `backend/src/main/java/com/cinema/inventory/` with domain/, repository/, service/, controller/, dto/ subdirectories
-- [ ] T002 [P] Create frontend inventory feature structure in `frontend/src/features/inventory/` with components/, hooks/, services/, types/ subdirectories
-- [ ] T003 [P] Create database migration file `backend/src/main/resources/db/migration/V029__create_store_inventory.sql` per data-model.md
+- [x] T001 Create backend inventory module structure in `backend/src/main/java/com/cinema/inventory/` with domain/, repository/, service/, controller/, dto/ subdirectories
+- [x] T002 [P] Create frontend inventory feature structure in `frontend/src/features/inventory/` with components/, hooks/, services/, types/ subdirectories
+- [x] T003 [P] Create database migration file `backend/src/main/resources/db/migration/V033__create_store_inventory.sql` per data-model.md
 
 ---
 
@@ -39,21 +39,21 @@
 
 ### Backend Foundation
 
-- [ ] T004 [P] Create InventoryStatus enum in `backend/src/main/java/com/cinema/inventory/domain/InventoryStatus.java`
-- [ ] T005 [P] Create Category entity in `backend/src/main/java/com/cinema/inventory/domain/Category.java`
-- [ ] T006 [P] Create StoreInventory entity in `backend/src/main/java/com/cinema/inventory/domain/StoreInventory.java` with inventory status calculation
-- [ ] T007 [P] Create CategoryRepository in `backend/src/main/java/com/cinema/inventory/repository/CategoryRepository.java`
-- [ ] T008 [P] Create StoreInventoryRepository in `backend/src/main/java/com/cinema/inventory/repository/StoreInventoryRepository.java` with custom query methods
-- [ ] T009 Create InventoryQueryParams DTO in `backend/src/main/java/com/cinema/inventory/dto/InventoryQueryParams.java`
-- [ ] T010 [P] Create StoreInventoryItemDto in `backend/src/main/java/com/cinema/inventory/dto/StoreInventoryItemDto.java`
-- [ ] T011 [P] Create InventoryListResponse DTO in `backend/src/main/java/com/cinema/inventory/dto/InventoryListResponse.java`
+- [x] T004 [P] Create InventoryStatus enum in `backend/src/main/java/com/cinema/inventory/domain/InventoryStatus.java`
+- [x] T005 [P] Create Category entity in `backend/src/main/java/com/cinema/inventory/domain/Category.java`
+- [x] T006 [P] Create StoreInventory entity in `backend/src/main/java/com/cinema/inventory/domain/StoreInventory.java` with inventory status calculation
+- [x] T007 [P] Create CategoryRepository in `backend/src/main/java/com/cinema/inventory/repository/CategoryRepository.java`
+- [x] T008 [P] Create StoreInventoryRepository in `backend/src/main/java/com/cinema/inventory/repository/StoreInventoryRepository.java` with custom query methods
+- [x] T009 Create InventoryQueryParams DTO in `backend/src/main/java/com/cinema/inventory/dto/InventoryQueryParams.java`
+- [x] T010 [P] Create StoreInventoryItemDto in `backend/src/main/java/com/cinema/inventory/dto/StoreInventoryItemDto.java`
+- [x] T011 [P] Create InventoryListResponse DTO in `backend/src/main/java/com/cinema/inventory/dto/InventoryListResponse.java`
 
 ### Frontend Foundation
 
-- [ ] T012 [P] Create inventory types in `frontend/src/features/inventory/types/index.ts` per data-model.md TypeScript types
-- [ ] T013 [P] Create inventory API service in `frontend/src/features/inventory/services/inventoryService.ts` with listInventory, getInventoryDetail, listCategories, listAccessibleStores methods
-- [ ] T014 Create inventory hooks in `frontend/src/features/inventory/hooks/useInventory.ts` using TanStack Query
-- [ ] T015 [P] Create InventoryStatusTag atom component in `frontend/src/features/inventory/components/InventoryStatusTag.tsx`
+- [x] T012 [P] Create inventory types in `frontend/src/features/inventory/types/index.ts` per data-model.md TypeScript types
+- [x] T013 [P] Create inventory API service in `frontend/src/features/inventory/services/inventoryService.ts` with listInventory, getInventoryDetail, listCategories, listAccessibleStores methods
+- [x] T014 Create inventory hooks in `frontend/src/features/inventory/hooks/useInventory.ts` using TanStack Query
+- [x] T015 [P] Create InventoryStatusTag atom component in `frontend/src/features/inventory/components/InventoryStatusTag.tsx`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -67,19 +67,19 @@
 
 ### E2E Test for User Story 1
 
-- [ ] T016 [US1] Create E2E test for inventory list display in `frontend/tests/e2e/inventory/inventory-list.spec.ts` - verify table columns, pagination, empty state
+- [x] T016 [US1] Create E2E test for inventory list display in `frontend/tests/e2e/inventory/inventory-list.spec.ts` - verify table columns, pagination, empty state
 
 ### Backend Implementation for User Story 1
 
-- [ ] T017 [US1] Create InventoryService in `backend/src/main/java/com/cinema/inventory/service/InventoryService.java` with listInventory(params) method
-- [ ] T018 [US1] Create InventoryController GET /api/inventory endpoint in `backend/src/main/java/com/cinema/inventory/controller/InventoryController.java`
+- [x] T017 [US1] Create InventoryService in `backend/src/main/java/com/cinema/inventory/service/InventoryService.java` with listInventory(params) method
+- [x] T018 [US1] Create InventoryController GET /api/inventory endpoint in `backend/src/main/java/com/cinema/inventory/controller/InventoryController.java`
 
 ### Frontend Implementation for User Story 1
 
-- [ ] T019 [US1] Create InventoryTable organism component in `frontend/src/features/inventory/components/InventoryTable.tsx` with 7 columns per FR-001
-- [ ] T020 [US1] Create InventoryPage in `frontend/src/pages/inventory/InventoryPage.tsx` with basic list view
-- [ ] T021 [US1] Add inventory route to `frontend/src/router/index.tsx` path="/inventory"
-- [ ] T022 [US1] Add MSW handler for GET /api/inventory in `frontend/src/mocks/handlers/inventory.ts`
+- [x] T019 [US1] Create InventoryTable organism component in `frontend/src/features/inventory/components/InventoryTable.tsx` with 7 columns per FR-001
+- [x] T020 [US1] Create InventoryPage in `frontend/src/pages/inventory/InventoryPage.tsx` with basic list view
+- [x] T021 [US1] Add inventory route to `frontend/src/router/index.tsx` path="/inventory"
+- [x] T022 [US1] Add MSW handler for GET /api/inventory in `frontend/src/mocks/handlers/inventoryHandlers.ts`
 
 **Checkpoint**: User Story 1 complete - inventory list viewable with pagination
 
@@ -93,17 +93,17 @@
 
 ### E2E Test for User Story 2
 
-- [ ] T023 [US2] Create E2E test for search functionality in `frontend/tests/e2e/inventory/inventory-search.spec.ts` - verify search input, debounce, results filtering, empty results
+- [x] T023 [US2] Create E2E test for search functionality in `frontend/tests/e2e/inventory/inventory-search.spec.ts` - verify search input, debounce, results filtering, empty results
 
 ### Backend Implementation for User Story 2
 
-- [ ] T024 [US2] Add keyword search to StoreInventoryRepository in `backend/src/main/java/com/cinema/inventory/repository/StoreInventoryRepository.java` with ILIKE query for sku.name/code
-- [ ] T025 [US2] Update InventoryService to handle keyword parameter with 300ms debounce hint
+- [x] T024 [US2] Add keyword search to StoreInventoryRepository in `backend/src/main/java/com/cinema/inventory/repository/StoreInventoryRepository.java` with ILIKE query for sku.name/code
+- [x] T025 [US2] Update InventoryService to handle keyword parameter with 300ms debounce hint
 
 ### Frontend Implementation for User Story 2
 
-- [ ] T026 [US2] Create SearchInput component in `frontend/src/features/inventory/components/SearchInput.tsx` with 300ms debounce per FR-005
-- [ ] T027 [US2] Integrate SearchInput into InventoryPage with query param sync
+- [x] T026 [US2] Create SearchInput component in `frontend/src/features/inventory/components/SearchInput.tsx` with 300ms debounce per FR-005
+- [x] T027 [US2] Integrate SearchInput into InventoryPage with query param sync
 
 **Checkpoint**: User Story 2 complete - search functionality working
 
@@ -117,21 +117,21 @@
 
 ### E2E Test for User Story 3
 
-- [ ] T028 [US3] Create E2E test for filter functionality in `frontend/tests/e2e/inventory/inventory-filter.spec.ts` - verify store filter, status filter (multi-select), category filter, combined filters, reset button
+- [x] T028 [US3] Create E2E test for filter functionality in `frontend/tests/e2e/inventory/inventory-filter.spec.ts` - verify store filter, status filter (multi-select), category filter, combined filters, reset button
 
 ### Backend Implementation for User Story 3
 
-- [ ] T029 [US3] Create CategoryService in `backend/src/main/java/com/cinema/inventory/service/CategoryService.java` with listCategories method
-- [ ] T030 [US3] Add GET /api/categories endpoint to CategoryController in `backend/src/main/java/com/cinema/inventory/controller/CategoryController.java`
-- [ ] T031 [US3] Add status and categoryId filter support to StoreInventoryRepository query
-- [ ] T032 [US3] Add GET /api/stores/accessible endpoint (or reuse existing) for accessible stores list
+- [x] T029 [US3] Create CategoryService in `backend/src/main/java/com/cinema/inventory/service/CategoryService.java` with listCategories method
+- [x] T030 [US3] Add GET /api/categories endpoint to CategoryController in `backend/src/main/java/com/cinema/inventory/controller/CategoryController.java`
+- [x] T031 [US3] Add status and categoryId filter support to StoreInventoryRepository query
+- [x] T032 [US3] Add GET /api/stores/accessible endpoint (or reuse existing) for accessible stores list
 
 ### Frontend Implementation for User Story 3
 
-- [ ] T033 [US3] Create InventoryFilterBar molecule component in `frontend/src/features/inventory/components/InventoryFilterBar.tsx` with store Select, status multi-Select, category Select, reset Button
-- [ ] T034 [US3] Create inventory filter store in `frontend/src/features/inventory/stores/filterStore.ts` using Zustand for filter state
-- [ ] T035 [US3] Integrate InventoryFilterBar into InventoryPage with query param sync
-- [ ] T036 [US3] Add MSW handlers for GET /api/categories and GET /api/stores/accessible
+- [x] T033 [US3] Create InventoryFilterBar molecule component in `frontend/src/features/inventory/components/InventoryFilterBar.tsx` with store Select, status multi-Select, category Select, reset Button
+- [x] T034 [US3] Create inventory filter store in `frontend/src/features/inventory/stores/filterStore.ts` using Zustand for filter state
+- [x] T035 [US3] Integrate InventoryFilterBar into InventoryPage with query param sync
+- [x] T036 [US3] Add MSW handlers for GET /api/categories and GET /api/stores/accessible
 
 **Checkpoint**: User Story 3 complete - all filters working with combined logic
 
@@ -145,20 +145,20 @@
 
 ### E2E Test for User Story 4
 
-- [ ] T037 [US4] Create E2E test for detail drawer in `frontend/tests/e2e/inventory/inventory-detail.spec.ts` - verify row click opens drawer, detail fields displayed, close behavior, low stock warning
+- [x] T037 [US4] Create E2E test for detail drawer in `frontend/tests/e2e/inventory/inventory-detail.spec.ts` - verify row click opens drawer, detail fields displayed, close behavior, low stock warning
 
 ### Backend Implementation for User Story 4
 
-- [ ] T038 [US4] Create StoreInventoryDetailDto in `backend/src/main/java/com/cinema/inventory/dto/StoreInventoryDetailDto.java`
-- [ ] T039 [US4] Add getInventoryDetail method to InventoryService
-- [ ] T040 [US4] Add GET /api/inventory/{id} endpoint to InventoryController
+- [x] T038 [US4] Create StoreInventoryDetailDto in `backend/src/main/java/com/cinema/inventory/dto/StoreInventoryDetailDto.java`
+- [x] T039 [US4] Add getInventoryDetail method to InventoryService
+- [x] T040 [US4] Add GET /api/inventory/{id} endpoint to InventoryController
 
 ### Frontend Implementation for User Story 4
 
-- [ ] T041 [US4] Create InventoryDetailDrawer organism component in `frontend/src/features/inventory/components/InventoryDetailDrawer.tsx` with all detail fields per FR-010
-- [ ] T042 [US4] Add row click handler to InventoryTable to open drawer
-- [ ] T043 [US4] Add low stock warning display in InventoryDetailDrawer when available < safetyStock
-- [ ] T044 [US4] Add MSW handler for GET /api/inventory/{id}
+- [x] T041 [US4] Create InventoryDetailDrawer organism component in `frontend/src/features/inventory/components/InventoryDetailDrawer.tsx` with all detail fields per FR-010
+- [x] T042 [US4] Add row click handler to InventoryTable to open drawer
+- [x] T043 [US4] Add low stock warning display in InventoryDetailDrawer when available < safetyStock
+- [x] T044 [US4] Add MSW handler for GET /api/inventory/{id}
 
 **Checkpoint**: User Story 4 complete - detail drawer fully functional
 
@@ -168,12 +168,12 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T045 [P] Add loading and error states to InventoryPage in `frontend/src/pages/inventory/InventoryPage.tsx`
-- [ ] T046 [P] Add empty state component for no data / no search results per FR-011
-- [ ] T047 [P] Add retry button for network errors per Edge Cases
+- [x] T045 [P] Add loading and error states to InventoryPage in `frontend/src/pages/inventory/InventoryPage.tsx`
+- [x] T046 [P] Add empty state component for no data / no search results per FR-011
+- [x] T047 [P] Add retry button for network errors per Edge Cases
 - [ ] T048 Run all E2E tests and fix any failures
 - [ ] T049 Verify performance: list load <2s, search <1s, detail <500ms per Success Criteria
-- [ ] T050 Add inventory menu item to sidebar navigation
+- [x] T050 Add inventory menu item to sidebar navigation
 
 ---
 

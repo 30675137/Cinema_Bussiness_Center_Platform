@@ -258,6 +258,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '库存 & 仓店库存管理',
       children: [
         {
+          key: '/inventory/query',
+          label: 'P003-库存查询',
+        },
+        {
           key: '/inventory/ledger',
           label: '库存台账查看',
         },
