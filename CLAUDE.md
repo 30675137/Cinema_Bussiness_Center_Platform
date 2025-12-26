@@ -64,9 +64,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- T001-doc-writer-enhance: Added 文件系统
 - P004-inventory-adjustment: Added Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表
 - P003-inventory-query: Added Supabase (PostgreSQL) - 使用现有 `inventory` 表，关联 `skus`、`stores`、`categories` 表
-- P001-sku-master-data: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 
 
 <!-- MANUAL ADDITIONS START -->

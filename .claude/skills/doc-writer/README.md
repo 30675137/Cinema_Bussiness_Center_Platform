@@ -1,12 +1,57 @@
 # Doc-Writer Skill 使用指南
 
+**版本**: 2.1.0
+**更新日期**: 2025-12-27
+
 ## 概述
 
 `doc-writer` 是一个专业的设计文档编写 skill，支持生成多种类型的技术设计文档。
 
+## 新功能 (v2.1.0)
+
+- `/doc merge` 命令 - 合并多个相关或重叠规格的设计文档
+- 三种合并策略 - auto-dedup（自动去重）、preserve-all（保留全部）、interactive（交互式）
+- 智能重叠检测 - 自动检测并处理数据表、API 端点、用户故事等重叠内容
+- 合并报告生成 - 详细记录合并决策和需要人工审查的内容
+
+## 主要功能 (v2.0.0+)
+
+- `/doc` 命令入口 - 快速生成和管理设计文档
+- 智能意图识别 - 自然语言描述自动映射文档类型
+- 增量更新 - 保留用户手动修改的内容
+- 功能矩阵 - 自动汇总所有 spec 生成产品功能矩阵
+- 全量初始化 - 一键扫描所有 spec 生成完整文档集
+- 新增文档类型 - 用户手册、README、发布说明
+
 ## 触发方式
 
-### 1. 关键词触发（推荐）
+### 1. `/doc` 命令（推荐）
+
+```bash
+/doc              # 显示帮助和可用文档类型
+/doc tdd          # 生成技术设计文档
+/doc arch         # 生成架构设计文档
+/doc detail       # 生成详细设计文档
+/doc api          # 生成接口设计文档
+/doc db           # 生成数据库设计文档
+/doc manual       # 生成用户手册
+/doc readme       # 生成 README 文档
+/doc release-notes # 生成发布说明
+/doc matrix       # 生成产品功能矩阵
+/doc init         # 全量初始化所有文档
+/doc update       # 增量更新变更的文档
+/doc merge        # 合并多个相关 spec 的设计文档
+/doc help         # 显示帮助信息
+```
+
+**智能意图识别**:
+```bash
+/doc 技术方案      # → 识别为 tdd
+/doc 架构设计      # → 识别为 arch
+/doc API文档       # → 识别为 api
+```
+
+### 2. 关键词触发
 
 在对话中使用以下关键词自动触发 skill：
 
@@ -14,15 +59,17 @@
   - 设计文档、TDD、DDD、架构设计、详细设计
   - 技术方案、系统设计、接口设计、数据库设计
   - 写设计文档、生成设计文档
+  - 合并文档、文档合并
 
 - **示例**:
   ```
   帮我生成一份技术设计文档
   我需要写一份系统架构设计文档
   为 P004 功能生成接口设计文档
+  合并 P003 和 P004 的技术设计文档
   ```
 
-### 2. 斜杠命令触发
+### 3. 斜杠命令触发
 
 直接使用斜杠命令：
 
@@ -142,16 +189,32 @@ Claude：好的，请描述一下这个功能的背景和主要功能点...
 
 ## 输出位置
 
-生成的文档默认保存在：
+**新版输出位置** (v2.0.0): 文档输出到独立的 `docs/` 目录：
 
 ```
-specs/{specId}/design/{document-type}-{specId}.md
+docs/
+├── tdd/                    # 技术设计文档
+│   └── {specId}-tdd.md
+├── architecture/           # 架构设计文档
+│   └── {specId}-arch.md
+├── api/                    # 接口设计文档
+│   └── {specId}-api.md
+├── database/               # 数据库设计文档
+│   └── {specId}-db.md
+├── detail-design/{module}/ # 详细设计（按模块）
+├── manual/{module}/        # 用户手册（按模块）
+├── readme/                 # README 文档
+├── matrix/                 # 功能矩阵
+│   └── feature-matrix.md
+└── release-notes/          # 发布说明
+    └── v{version}.md
 ```
 
 **示例**:
-- 技术设计文档: `specs/P004-inventory-adjustment/design/tdd-P004.md`
-- 架构设计文档: `specs/P004-inventory-adjustment/design/architecture-P004.md`
-- 接口设计文档: `specs/P004-inventory-adjustment/design/interface-P004.md`
+- 技术设计文档: `docs/tdd/P004-inventory-adjustment-tdd.md`
+- 架构设计文档: `docs/architecture/P004-inventory-adjustment-arch.md`
+- 用户手册: `docs/manual/库存管理/P004-inventory-adjustment-manual.md`
+- 功能矩阵: `docs/matrix/feature-matrix.md`
 
 ## 文档质量标准
 
@@ -304,6 +367,84 @@ Claude：好的，请问这份文档是针对哪个系统或模块的？
 Claude：明白了，请描述一下系统的主要功能模块...
        [交互式提问]
        [生成架构设计文档]
+```
+
+### 示例 4: 合并相关 spec 的技术设计文档
+
+```bash
+# 场景：P003（库存查询）和 P004（库存调整）功能相关，需要合并为统一的库存管理 TDD
+/doc merge tdd P003 P004 --output P003-P004-inventory-system
+```
+
+**执行过程**:
+```
+Claude：正在加载源 spec 文档...
+       ✓ 已加载 P003-inventory-query
+       ✓ 已加载 P004-inventory-adjustment
+
+       正在检测重叠内容...
+       ✓ 发现 3 个重叠的数据表定义
+       ✓ 发现 2 个重叠的 API 端点
+       ✓ 发现 5 个重复的功能需求
+
+       正在应用 auto-dedup 策略合并...
+       ✓ 已合并 store_inventory 表（P004 扩展了 safe_stock 字段）
+       ✓ 已合并 GET /api/inventory（保留了 P004 的完整定义）
+       ✓ 已去重功能需求
+
+       ✅ 文档合并完成
+
+       输出路径: docs/merged/P003-P004-inventory-system.md
+       报告路径: docs/merged/P003-P004-inventory-system-merge-report.md
+
+       重叠内容统计:
+       - 数据表定义: 3 个表重叠（已合并字段）
+       - API 端点: 2 个端点重叠（保留了最完整定义）
+       - 功能需求: 5 个重复需求（已去重）
+
+       需要人工审查:
+       - store_inventory 表的 safe_stock 字段定义不一致
+
+       下一步建议:
+       - 查看合并报告了解详细的合并决策
+       - 手动审查标记为"需要人工审查"的部分
+```
+
+### 示例 5: 使用不同的合并策略
+
+```bash
+# 保留所有内容，不去重（适合需要对比两个 spec 的场景）
+/doc merge tdd P003 P004 --output P003-P004-comparison --strategy preserve-all
+
+# 交互式合并，遇到冲突时询问用户
+/doc merge tdd P003 P004 --output P003-P004-inventory-system --strategy interactive
+```
+
+**interactive 策略示例**:
+```
+Claude：检测到重叠内容：store_inventory 表
+
+       P003 定义:
+       - id (bigint, primary key)
+       - sku_id (bigint, not null)
+       - store_id (bigint, not null)
+       - quantity (integer, not null)
+
+       P004 定义:
+       - id (bigint, primary key)
+       - sku_id (bigint, not null)
+       - store_id (bigint, not null)
+       - quantity (integer, not null)
+       - safe_stock (integer, default 0)  ← 新增字段
+
+       请选择合并策略：
+       A) 使用 P004 的定义（包含新增字段）
+       B) 使用 P003 的定义
+       C) 手动合并（我将两者都保留，由您后续编辑）
+
+用户：A
+
+Claude：好的，将使用 P004 的定义。继续检测下一个重叠项...
 ```
 
 ## 技术支持
