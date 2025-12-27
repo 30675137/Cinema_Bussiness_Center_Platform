@@ -64,9 +64,9 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- O003-beverage-order: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 - O001-product-order-list: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 - T001-doc-writer-enhance: Added 文件系统
-- P004-inventory-adjustment: Added Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表
 
 
 <!-- MANUAL ADDITIONS START -->
