@@ -1,22 +1,20 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.5.0 → 1.6.0 -->
-<!-- Modified principles:
-  - 功能分支绑定 (Feature Branch Binding) - 更新规格编号格式从 ###-<slug> 改为 X###-<slug>
--->
+<!-- Version change: 1.6.0 → 1.7.0 -->
+<!-- Modified principles: None -->
 <!-- Added sections:
-  - 规格编号与模块映射规范 (Spec Numbering & Module Mapping Standards) - 新增模块字母编码规则
+  - 代码归属标识 (Code Attribution Marking) - 新增代码文件必须标识所属 spec 的强制要求
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ⚠ .specify/templates/spec-template.md (需要更新分支名格式占位符)
-  ⚠ .specify/templates/plan-template.md (需要检查分支名引用)
-  ⚠ .specify/templates/tasks-template.md (需要检查分支名引用)
-  ⚠ .specify/scripts/bash/create-new-feature.sh (需要重写编号生成逻辑)
+  ✅ .specify/templates/spec-template.md (已包含 Feature Branch 标识)
+  ⚠ .specify/templates/plan-template.md (需要添加代码归属标识指导)
+  ⚠ .specify/templates/tasks-template.md (需要在实现任务中强调添加归属标识)
+  ⚠ .claude/rules/ (需要在代码质量规则中添加归属标识检查项)
 -->
 <!-- Follow-up TODOs:
-  1. 迁移现有 specs 目录中的旧格式(###)到新格式(X###)
-  2. 更新所有相关脚本以支持模块字母前缀
-  3. 为现有 specs 分配合适的模块字母
+  1. 为现有代码文件添加 spec 归属标识注释
+  2. 在 ESLint/代码审查工具中添加归属标识检查规则
+  3. 更新开发文档说明归属标识的最佳实践
 -->
 
 # 影院商品管理中台宪法
@@ -48,13 +46,67 @@
 
 **基本原理**: 确保每个功能都有明确的规格定义和唯一的开发分支,通过模块字母前缀清晰区分功能所属的业务域,避免功能冲突和开发混乱,保证代码变更的可追溯性和规格的一致性。模块化编号便于快速识别功能归属,支持按模块并行开发和独立演进。
 
-### 二、测试驱动开发 (Test-Driven Development)
+### 二、代码归属标识 (Code Attribution Marking)
+
+所有新增或修改的代码文件必须在文件头部明确标识其所属的规格标识符(specId),确保代码与功能规格的可追溯性。
+
+**标识要求**:
+
+1. **文件头部注释格式**:
+   - TypeScript/JavaScript 文件:使用 `/** @spec <specId> */` 或 `// @spec <specId>` 注释
+   - Java 文件:使用 `/** @spec <specId> */` JavaDoc 注释
+   - CSS/SCSS 文件:使用 `/* @spec <specId> */` 注释
+   - 注释必须放在文件开头(license 头之后,import 语句之前)
+
+2. **标识内容**:
+   - 必须包含完整的 specId(如 `P003-inventory-query`)
+   - 可选:添加简短的功能描述
+   - 可选:添加相关规格文档路径
+
+3. **示例**:
+
+```typescript
+/**
+ * @spec P003-inventory-query
+ * 库存查询功能 - 商品库存列表组件
+ * Spec: specs/P003-inventory-query/spec.md
+ */
+import React from 'react';
+// ... rest of the code
+```
+
+```java
+/**
+ * @spec S019-store-association
+ * 门店关联管理 - 影厅关联服务层
+ * @see specs/S019-store-association/spec.md
+ */
+@Service
+public class StoreAssociationService {
+    // ... implementation
+}
+```
+
+4. **共享代码处理**:
+   - 对于被多个 spec 共享的工具类/组件,可标识多个 spec:`@spec P003,P004`
+   - 对于基础设施代码(不属于特定功能),使用 `@spec T###` 或 `@spec F###`
+   - 对于第三方依赖和框架代码,无需添加标识
+
+5. **强制要求**:
+   - 所有新增的业务逻辑文件(页面、组件、服务、控制器等)必须包含 `@spec` 标识
+   - 代码审查时必须检查归属标识的完整性和正确性
+   - 修改现有文件时,如文件无标识,应添加对应的 spec 标识
+   - 跨 spec 修改时,应在 commit message 中说明涉及的所有 spec
+
+**基本原理**: 代码归属标识建立了代码文件与功能规格之间的直接关联,显著提高代码的可追溯性和可维护性。通过明确的归属关系,开发者可以快速定位功能的规格文档、理解代码的业务背景、评估变更的影响范围,同时便于代码审查、依赖分析和重构决策。这一实践确保了"规格驱动开发"理念在代码层面的落地,避免孤立代码和规格文档脱节的问题。
+
+### 三、测试驱动开发 (Test-Driven Development)
 
 测试先行的开发策略是强制性的。所有功能必须先编写测试用例,确保测试失败后再实现功能代码。严格遵循 Red-Green-Refactor 循环:先写测试(Red),实现最小可行代码使测试通过(Green),然后重构优化(Refactor)。使用 Playwright 进行端到端测试,Vitest 进行单元测试,确保关键业务流程的测试覆盖率达到 100%。
 
 **基本原理**: 测试先行保证功能需求的明确性和代码设计的正确性,通过自动化测试确保代码质量和回归预防,提高代码的可维护性和系统的稳定性。
 
-### 三、组件化架构 (Component-Based Architecture)
+### 四、组件化架构 (Component-Based Architecture)
 
 系统采用原子设计理念的分层组件架构:原子组件(Atoms)、分子组件(Molecules)、有机体(Organisms)、模板(Templates)和页面(Pages)。所有组件必须遵循单一职责原则,具有清晰的 Props 接口定义和 TypeScript 类型注解。使用 React.memo、useMemo、useCallback 进行性能优化,避免不必要的重渲染。
 
@@ -64,7 +116,7 @@
 
 **基本原理**: 组件化架构确保代码的可复用性、可维护性和可测试性,通过清晰的组件层次和性能优化策略,构建高效的用户界面系统。针对不同端的特性选择合适的技术栈,B端注重功能完整性和数据处理能力,C端注重多端兼容和用户体验。
 
-### 四、前端技术栈分层 (Frontend Tech Stack Layering)
+### 五、前端技术栈分层 (Frontend Tech Stack Layering)
 
 项目前端开发必须明确区分B端(管理后台)和C端(客户端/用户端)的技术栈选择,不得混用:
 
@@ -93,13 +145,13 @@
 
 **基本原理**: 明确的技术栈分层避免技术选型混乱和跨端兼容性问题。B端技术栈专注于企业级管理能力和复杂交互,C端技术栈通过 Taro 框架实现"一次编写,多端运行",降低维护成本,提高开发效率,确保用户端体验的一致性。
 
-### 五、数据驱动与状态管理 (Data-Driven & State Management)
+### 六、数据驱动与状态管理 (Data-Driven & State Management)
 
 使用 Zustand 管理客户端状态,TanStack Query 管理服务器状态,实现数据与 UI 的分离。所有 API 数据获取必须通过 TanStack Query 进行,利用其缓存、重试、后台刷新等特性。本地数据持久化使用 localStorage(B端)或平台特定存储 API(C端 Taro 项目中使用 Taro.setStorage/getStorage)。Mock 数据使用 MSW(Mock Service Worker)进行模拟。状态变更必须是可预测和可追踪的。
 
 **基本原理**: 数据驱动的方法确保应用状态的一致性和可预测性,通过专业的状态管理工具和缓存策略,提供流畅的用户体验和可靠的数据处理能力。
 
-### 六、代码质量与工程化 (Code Quality & Engineering Excellence)
+### 七、代码质量与工程化 (Code Quality & Engineering Excellence)
 
 遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保前端类型安全,
 ESLint + Prettier 确保代码风格一致性,Husky + lint-staged 确保提交质量。
@@ -109,7 +161,8 @@ ESLint + Prettier 确保代码风格一致性,Husky + lint-staged 确保提交�
 与 Supabase 或外部系统交互的意图,禁止堆砌无信息量的"废话注释"。所有代码
 必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范(Conventional
 Commits),使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、
-性能考虑、测试覆盖、安全考虑以及关键 Java 代码是否具备足够的注释可读性。
+性能考虑、测试覆盖、安全考虑、代码归属标识(`@spec`)的完整性以及关键
+Java 代码是否具备足够的注释可读性。
 
 **基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期
 可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。
@@ -274,4 +327,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.6.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-23
+**版本**: 1.7.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-27
