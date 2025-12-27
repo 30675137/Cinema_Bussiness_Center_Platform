@@ -21,7 +21,7 @@ export enum ErrorCode {
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
   NOT_FOUND = 'NOT_FOUND',
-  
+
   // 业务错误
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   CONCURRENT_MODIFICATION = 'CONCURRENT_MODIFICATION',
@@ -44,7 +44,7 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.UNAUTHORIZED]: '登录已过期，请重新登录',
   [ErrorCode.FORBIDDEN]: '您没有权限执行此操作',
   [ErrorCode.NOT_FOUND]: '请求的资源不存在',
-  
+
   [ErrorCode.VALIDATION_ERROR]: '输入数据格式错误，请检查后重试',
   [ErrorCode.CONCURRENT_MODIFICATION]: '数据已被他人修改，请刷新后重试',
   [ErrorCode.INSUFFICIENT_STOCK]: '库存不足，无法完成调整',
@@ -73,7 +73,7 @@ export interface ApiErrorResponse {
 export function parseErrorCode(error: unknown): ErrorCode {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
-    
+
     // 网络错误
     if (!axiosError.response) {
       if (axiosError.code === 'ECONNABORTED') {
@@ -81,7 +81,7 @@ export function parseErrorCode(error: unknown): ErrorCode {
       }
       return ErrorCode.NETWORK_ERROR;
     }
-    
+
     // HTTP 状态码
     const status = axiosError.response.status;
     if (status === 401) return ErrorCode.UNAUTHORIZED;
@@ -89,14 +89,14 @@ export function parseErrorCode(error: unknown): ErrorCode {
     if (status === 404) return ErrorCode.NOT_FOUND;
     if (status === 409) return ErrorCode.CONCURRENT_MODIFICATION;
     if (status === 422) return ErrorCode.VALIDATION_ERROR;
-    
+
     // 业务错误码
     const code = axiosError.response.data?.code || axiosError.response.data?.error;
     if (code && Object.values(ErrorCode).includes(code as ErrorCode)) {
       return code as ErrorCode;
     }
   }
-  
+
   return ErrorCode.UNKNOWN;
 }
 
@@ -111,7 +111,7 @@ export function getErrorMessage(error: unknown): string {
       return axiosError.response.data.message;
     }
   }
-  
+
   // 使用错误码对应的默认消息
   const code = parseErrorCode(error);
   return ERROR_MESSAGES[code] || ERROR_MESSAGES[ErrorCode.UNKNOWN];
@@ -201,7 +201,7 @@ export function handleApiError(
   } = {}
 ): void {
   const code = parseErrorCode(error);
-  
+
   switch (code) {
     case ErrorCode.CONCURRENT_MODIFICATION:
       if (options.onConflict) {
@@ -210,7 +210,7 @@ export function handleApiError(
         showError(error);
       }
       break;
-      
+
     case ErrorCode.UNAUTHORIZED:
       if (options.onUnauthorized) {
         options.onUnauthorized();
@@ -218,7 +218,7 @@ export function handleApiError(
         showUnauthorizedError();
       }
       break;
-      
+
     case ErrorCode.NOT_FOUND:
       if (options.onNotFound) {
         options.onNotFound();
@@ -226,7 +226,7 @@ export function handleApiError(
         showError(error, options.fallbackMessage || '资源不存在');
       }
       break;
-      
+
     default:
       showError(error, options.fallbackMessage);
   }

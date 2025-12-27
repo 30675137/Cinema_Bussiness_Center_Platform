@@ -114,7 +114,7 @@ export const paginationUrlParams = {
   parse(searchParams: URLSearchParams): PaginationParams {
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || String(DEFAULT_PAGE_SIZE), 10);
-    
+
     return {
       page: isNaN(page) || page < 1 ? 1 : page,
       pageSize: PAGE_SIZE_OPTIONS.includes(String(pageSize)) ? pageSize : DEFAULT_PAGE_SIZE,
@@ -142,13 +142,13 @@ export const paginationUrlParams = {
 export const virtualListConfig = {
   /** 启用虚拟滚动的最小行数 */
   minRowsForVirtual: 100,
-  
+
   /** 虚拟列表项高度 */
   itemHeight: 54,
-  
+
   /** 预渲染的额外行数 */
   overscan: 5,
-  
+
   /**
    * 判断是否应该启用虚拟滚动
    */

@@ -22,144 +22,141 @@ import java.util.*;
 @RequestMapping("/api/adjustments")
 public class ApprovalController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApprovalController.class);
+  private static final Logger logger = LoggerFactory.getLogger(ApprovalController.class);
 
-    private final ApprovalService approvalService;
+  private final ApprovalService approvalService;
 
-    @Autowired
-    public ApprovalController(ApprovalService approvalService) {
-        this.approvalService = approvalService;
+  @Autowired
+  public ApprovalController(ApprovalService approvalService) {
+    this.approvalService = approvalService;
+  }
+
+  /**
+   * 审批通过
+   * 
+   * POST /api/adjustments/{id}/approve
+   * 
+   * @param id      调整记录ID
+   * @param request 审批请求（包含comments）
+   * @return 审批结果
+   */
+  @PostMapping("/{id}/approve")
+  public ResponseEntity<Map<String, Object>> approve(
+      @PathVariable String id,
+      @RequestBody(required = false) Map<String, String> request) {
+
+    logger.info("POST /api/adjustments/{}/approve", id);
+
+    String comments = request != null ? request.get("comments") : null;
+
+    // TODO: 从认证上下文获取审批人信息
+    UUID approverId = UUID.randomUUID();
+    String approverName = "运营总监";
+
+    ApprovalService.ApprovalResult result = approvalService.approve(
+        UUID.fromString(id),
+        approverId,
+        approverName,
+        comments);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("success", result.isSuccess());
+    response.put("message", result.getMessage());
+
+    if (result.isSuccess()) {
+      Map<String, Object> data = new HashMap<>();
+      data.put("id", result.getAdjustmentId().toString());
+      data.put("status", result.getNewStatus());
+      data.put("approvedAt", java.time.OffsetDateTime.now().toString());
+      data.put("approvedBy", approverName);
+      response.put("data", data);
+    } else {
+      response.put("error", result.getError());
     }
 
-    /**
-     * 审批通过
-     * 
-     * POST /api/adjustments/{id}/approve
-     * 
-     * @param id 调整记录ID
-     * @param request 审批请求（包含comments）
-     * @return 审批结果
-     */
-    @PostMapping("/{id}/approve")
-    public ResponseEntity<Map<String, Object>> approve(
-            @PathVariable String id,
-            @RequestBody(required = false) Map<String, String> request) {
+    return ResponseEntity.ok(response);
+  }
 
-        logger.info("POST /api/adjustments/{}/approve", id);
+  /**
+   * 审批拒绝
+   * 
+   * POST /api/adjustments/{id}/reject
+   * 
+   * @param id      调整记录ID
+   * @param request 拒绝请求（包含comments）
+   * @return 审批结果
+   */
+  @PostMapping("/{id}/reject")
+  public ResponseEntity<Map<String, Object>> reject(
+      @PathVariable String id,
+      @RequestBody(required = false) Map<String, String> request) {
 
-        String comments = request != null ? request.get("comments") : null;
+    logger.info("POST /api/adjustments/{}/reject", id);
 
-        // TODO: 从认证上下文获取审批人信息
-        UUID approverId = UUID.randomUUID();
-        String approverName = "运营总监";
+    String comments = request != null ? request.get("comments") : null;
 
-        ApprovalService.ApprovalResult result = approvalService.approve(
-                UUID.fromString(id),
-                approverId,
-                approverName,
-                comments
-        );
+    // TODO: 从认证上下文获取审批人信息
+    UUID approverId = UUID.randomUUID();
+    String approverName = "运营总监";
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
-        response.put("message", result.getMessage());
-        
-        if (result.isSuccess()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", result.getAdjustmentId().toString());
-            data.put("status", result.getNewStatus());
-            data.put("approvedAt", java.time.OffsetDateTime.now().toString());
-            data.put("approvedBy", approverName);
-            response.put("data", data);
-        } else {
-            response.put("error", result.getError());
-        }
+    ApprovalService.ApprovalResult result = approvalService.reject(
+        UUID.fromString(id),
+        approverId,
+        approverName,
+        comments);
 
-        return ResponseEntity.ok(response);
+    Map<String, Object> response = new HashMap<>();
+    response.put("success", result.isSuccess());
+    response.put("message", result.getMessage());
+
+    if (result.isSuccess()) {
+      Map<String, Object> data = new HashMap<>();
+      data.put("id", result.getAdjustmentId().toString());
+      data.put("status", result.getNewStatus());
+      data.put("rejectedAt", java.time.OffsetDateTime.now().toString());
+      data.put("rejectedBy", approverName);
+      response.put("data", data);
+    } else {
+      response.put("error", result.getError());
     }
 
-    /**
-     * 审批拒绝
-     * 
-     * POST /api/adjustments/{id}/reject
-     * 
-     * @param id 调整记录ID
-     * @param request 拒绝请求（包含comments）
-     * @return 审批结果
-     */
-    @PostMapping("/{id}/reject")
-    public ResponseEntity<Map<String, Object>> reject(
-            @PathVariable String id,
-            @RequestBody(required = false) Map<String, String> request) {
+    return ResponseEntity.ok(response);
+  }
 
-        logger.info("POST /api/adjustments/{}/reject", id);
+  /**
+   * 撤回调整申请
+   * 
+   * POST /api/adjustments/{id}/withdraw
+   * 
+   * @param id 调整记录ID
+   * @return 撤回结果
+   */
+  @PostMapping("/{id}/withdraw")
+  public ResponseEntity<Map<String, Object>> withdraw(@PathVariable String id) {
 
-        String comments = request != null ? request.get("comments") : null;
+    logger.info("POST /api/adjustments/{}/withdraw", id);
 
-        // TODO: 从认证上下文获取审批人信息
-        UUID approverId = UUID.randomUUID();
-        String approverName = "运营总监";
+    // TODO: 从认证上下文获取操作人信息
+    UUID operatorId = UUID.randomUUID();
 
-        ApprovalService.ApprovalResult result = approvalService.reject(
-                UUID.fromString(id),
-                approverId,
-                approverName,
-                comments
-        );
+    ApprovalService.ApprovalResult result = approvalService.withdraw(
+        UUID.fromString(id),
+        operatorId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
-        response.put("message", result.getMessage());
-        
-        if (result.isSuccess()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", result.getAdjustmentId().toString());
-            data.put("status", result.getNewStatus());
-            data.put("rejectedAt", java.time.OffsetDateTime.now().toString());
-            data.put("rejectedBy", approverName);
-            response.put("data", data);
-        } else {
-            response.put("error", result.getError());
-        }
+    Map<String, Object> response = new HashMap<>();
+    response.put("success", result.isSuccess());
+    response.put("message", result.getMessage());
 
-        return ResponseEntity.ok(response);
+    if (result.isSuccess()) {
+      Map<String, Object> data = new HashMap<>();
+      data.put("id", result.getAdjustmentId().toString());
+      data.put("status", result.getNewStatus());
+      data.put("withdrawnAt", java.time.OffsetDateTime.now().toString());
+      response.put("data", data);
+    } else {
+      response.put("error", result.getError());
     }
 
-    /**
-     * 撤回调整申请
-     * 
-     * POST /api/adjustments/{id}/withdraw
-     * 
-     * @param id 调整记录ID
-     * @return 撤回结果
-     */
-    @PostMapping("/{id}/withdraw")
-    public ResponseEntity<Map<String, Object>> withdraw(@PathVariable String id) {
-
-        logger.info("POST /api/adjustments/{}/withdraw", id);
-
-        // TODO: 从认证上下文获取操作人信息
-        UUID operatorId = UUID.randomUUID();
-
-        ApprovalService.ApprovalResult result = approvalService.withdraw(
-                UUID.fromString(id),
-                operatorId
-        );
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
-        response.put("message", result.getMessage());
-        
-        if (result.isSuccess()) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", result.getAdjustmentId().toString());
-            data.put("status", result.getNewStatus());
-            data.put("withdrawnAt", java.time.OffsetDateTime.now().toString());
-            response.put("data", data);
-        } else {
-            response.put("error", result.getError());
-        }
-
-        return ResponseEntity.ok(response);
-    }
+    return ResponseEntity.ok(response);
+  }
 }

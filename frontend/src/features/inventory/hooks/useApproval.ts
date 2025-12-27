@@ -10,8 +10,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import axios from 'axios';
-import type { 
-  InventoryAdjustment, 
+import type {
+  InventoryAdjustment,
   AdjustmentStatus,
   ApprovalRequest,
 } from '../types/adjustment';
@@ -115,7 +115,7 @@ async function fetchAdjustments(params: AdjustmentsQueryParams): Promise<Pending
  * 审批操作
  */
 async function processApproval(
-  adjustmentId: string, 
+  adjustmentId: string,
   action: 'approve' | 'reject',
   comments?: string
 ): Promise<ApprovalActionResponse> {
@@ -181,12 +181,12 @@ export function useProcessApproval(options: UseProcessApprovalOptions = {}) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ 
-      adjustmentId, 
-      action, 
-      comments 
-    }: { 
-      adjustmentId: string; 
+    mutationFn: async ({
+      adjustmentId,
+      action,
+      comments
+    }: {
+      adjustmentId: string;
       action: 'approve' | 'reject';
       comments?: string;
     }) => {
@@ -199,12 +199,12 @@ export function useProcessApproval(options: UseProcessApprovalOptions = {}) {
     onSuccess: (_, variables) => {
       const actionText = variables.action === 'approve' ? '通过' : '拒绝';
       message.success(`审批${actionText}成功`);
-      
+
       // 刷新待审批列表
       queryClient.invalidateQueries({ queryKey: approvalKeys.all });
       // 刷新调整记录列表
       queryClient.invalidateQueries({ queryKey: ['adjustments'] });
-      
+
       options.onSuccess?.();
     },
     onError: (error: Error) => {
@@ -238,11 +238,11 @@ export function useWithdrawAdjustment(options: UseWithdrawAdjustmentOptions = {}
     },
     onSuccess: () => {
       message.success('已撤回调整申请');
-      
+
       // 刷新相关列表
       queryClient.invalidateQueries({ queryKey: approvalKeys.all });
       queryClient.invalidateQueries({ queryKey: ['adjustments'] });
-      
+
       options.onSuccess?.();
     },
     onError: (error: Error) => {

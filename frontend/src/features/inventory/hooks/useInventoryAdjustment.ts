@@ -84,18 +84,18 @@ export function useCreateAdjustment(options: UseCreateAdjustmentOptions = {}) {
   return useMutation({
     mutationFn: async (data: CreateAdjustmentRequest) => {
       const response = await adjustmentService.createAdjustment(data);
-      
+
       if (!response.success || !response.data) {
         throw new Error(response.message || '创建调整失败');
       }
-      
+
       return response.data;
     },
 
     onSuccess: (data) => {
       // 刷新调整列表缓存
       queryClient.invalidateQueries({ queryKey: adjustmentKeys.lists() });
-      
+
       // 刷新库存列表缓存（因为库存数量可能已变化）
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
 

@@ -128,10 +128,10 @@ export function useSafetyStock(options: UseSafetyStockOptions = {}) {
     onSuccess: (response) => {
       if (response.success && response.data) {
         message.success('安全库存已更新');
-        
+
         // 刷新库存详情和列表缓存
         queryClient.invalidateQueries({ queryKey: ['inventory'] });
-        
+
         onSuccess?.(response.data);
       } else {
         throw new Error(response.message || '更新失败');
