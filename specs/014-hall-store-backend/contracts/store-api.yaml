@@ -1,0 +1,256 @@
+openapi: 3.0.3
+info:
+  title: Store Management API
+  description: |
+    门店管理 API - 提供门店主数据查询能力
+
+    功能特性：
+    - 查询所有门店列表
+    - 按状态筛选门店
+    - 一次性返回所有数据（前端分页）
+
+    技术栈：
+    - Backend: Spring Boot 3.3.5 + Supabase REST API
+    - Frontend: React 19.2.0 + TypeScript 5.9.3 + TanStack Query
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  - url: https://api.cinema-platform.example.com/api
+    description: Production server
+
+tags:
+  - name: stores
+    description: 门店查询接口
+
+paths:
+  /stores:
+    get:
+      tags:
+        - stores
+      summary: 查询门店列表
+      description: |
+        获取所有门店的列表，支持按状态筛选。
+
+        **使用场景**：
+        - 门店管理页面：显示所有门店列表
+        - 影厅资源管理页面：提供门店选择器选项
+        - 排期管理页面：提供门店上下文选择
+
+        **前端分页**：
+        - 后端一次性返回所有数据（预期 10-50 家门店）
+        - 前端使用 Ant Design Table 的 pagination 进行客户端分页
+        - 搜索和筛选在客户端完成
+
+        **性能目标**：
+        - 响应时间 < 3 秒
+        - 数据量 5-50KB
+      operationId: listStores
+      parameters:
+        - name: status
+          in: query
+          description: 门店状态筛选（可选）
+          required: false
+          schema:
+            $ref: '#/components/schemas/StoreStatus'
+          example: active
+      responses:
+        '200':
+          description: 成功返回门店列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreListResponse'
+              examples:
+                allStores:
+                  summary: 查询所有门店
+                  value:
+                    success: true
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "SH-001"
+                        name: "上海浦东店"
+                        region: "上海-浦东新区"
+                        status: "active"
+                        createdAt: "2025-01-01T10:00:00.000Z"
+                        updatedAt: "2025-01-01T10:00:00.000Z"
+                      - id: "550e8400-e29b-41d4-a716-446655440001"
+                        code: "BJ-002"
+                        name: "北京朝阳店"
+                        region: "北京-朝阳区"
+                        status: "active"
+                        createdAt: "2025-01-02T10:00:00.000Z"
+                        updatedAt: "2025-01-02T10:00:00.000Z"
+                    total: 2
+                    message: "查询门店列表成功"
+                    code: 200
+                activeStoresOnly:
+                  summary: 只查询启用的门店
+                  value:
+                    success: true
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "SH-001"
+                        name: "上海浦东店"
+                        region: "上海-浦东新区"
+                        status: "active"
+                        createdAt: "2025-01-01T10:00:00.000Z"
+                        updatedAt: "2025-01-01T10:00:00.000Z"
+                    total: 1
+                    message: "查询门店列表成功"
+                    code: 200
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "无效的门店状态参数"
+                code: 400
+                error: "VALIDATION_ERROR"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "服务器内部错误"
+                code: 500
+                error: "INTERNAL_SERVER_ERROR"
+
+components:
+  schemas:
+    Store:
+      type: object
+      description: 门店实体
+      required:
+        - id
+        - name
+        - region
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 门店唯一标识（UUID）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          nullable: true
+          maxLength: 50
+          description: 门店编码（可选，用于外部系统集成）
+          example: "SH-001"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: 门店名称
+          example: "上海浦东店"
+        region:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: 所属区域/城市
+          example: "上海-浦东新区"
+        status:
+          $ref: '#/components/schemas/StoreStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601 格式）
+          example: "2025-01-01T10:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 最后更新时间（ISO 8601 格式）
+          example: "2025-01-01T10:00:00.000Z"
+
+    StoreStatus:
+      type: string
+      description: |
+        门店状态枚举
+        - active: 启用状态，可在新建排期/预约中选择
+        - disabled: 停用状态，仅在历史查询中可见
+      enum:
+        - active
+        - disabled
+      example: active
+
+    StoreListResponse:
+      type: object
+      description: 门店列表响应（标准格式）
+      required:
+        - success
+        - data
+        - total
+        - message
+        - code
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: array
+          description: 门店列表数据
+          items:
+            $ref: '#/components/schemas/Store'
+        total:
+          type: integer
+          description: 门店总数
+          example: 10
+        message:
+          type: string
+          description: 响应消息
+          example: "查询门店列表成功"
+        code:
+          type: integer
+          description: 业务状态码
+          example: 200
+
+    ErrorResponse:
+      type: object
+      description: 错误响应
+      required:
+        - success
+        - message
+        - code
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功（错误时为 false）
+          example: false
+        message:
+          type: string
+          description: 错误消息
+          example: "无效的门店状态参数"
+        code:
+          type: integer
+          description: HTTP 状态码
+          example: 400
+        error:
+          type: string
+          description: 错误类型代码
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          description: 详细错误信息（可选）
+          additionalProperties: true
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth JWT token
+
+security:
+  - BearerAuth: []

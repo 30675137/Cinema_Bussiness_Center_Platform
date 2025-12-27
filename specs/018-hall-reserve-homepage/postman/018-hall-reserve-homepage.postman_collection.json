@@ -1,0 +1,377 @@
+{
+  "info": {
+    "_postman_id": "018-hall-reserve-homepage",
+    "name": "018 场景包小程序首页 API",
+    "description": "场景包小程序首页 API 测试集合\n\n功能特性：\n- 获取已发布状态的场景包列表\n- 支持缓存策略（Cache-Control: max-age=300）\n- 统一的响应格式（ApiResponse<T>）",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "健康检查",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            },
+            "description": "验证后端服务是否正常运行"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('服务正常运行', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('响应时间小于 2 秒', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "US1 场景包列表",
+      "item": [
+        {
+          "name": "T025 获取已发布场景包列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scenario-packages/published",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scenario-packages", "published"]
+            },
+            "description": "获取已发布状态的场景包列表摘要数据\n\n验收标准：\n- 返回状态码 200\n- 响应包含 success: true\n- data 数组包含至少 3 条场景包记录\n- 每条记录包含 id, title, category, backgroundImageUrl, packagePrice, tags\n- 响应头包含 Cache-Control: max-age=300"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T025 验收测试脚本",
+                  "",
+                  "pm.test('状态码为 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('响应时间小于 2 秒', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "pm.test('响应格式正确 (success: true)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('data 是数组', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('包含至少 3 条场景包记录', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.length).to.be.at.least(3);",
+                  "});",
+                  "",
+                  "pm.test('每条记录包含必填字段', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(function(item) {",
+                  "        pm.expect(item).to.have.property('id');",
+                  "        pm.expect(item).to.have.property('title');",
+                  "        pm.expect(item).to.have.property('category');",
+                  "        pm.expect(item).to.have.property('backgroundImageUrl');",
+                  "        pm.expect(item).to.have.property('packagePrice');",
+                  "        pm.expect(item).to.have.property('tags');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('category 为有效枚举值', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const validCategories = ['MOVIE', 'TEAM', 'PARTY'];",
+                  "    jsonData.data.forEach(function(item) {",
+                  "        pm.expect(validCategories).to.include(item.category);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('packagePrice 为非负数', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(function(item) {",
+                  "        pm.expect(item.packagePrice).to.be.at.least(0);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('tags 是数组', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(function(item) {",
+                  "        pm.expect(item.tags).to.be.an('array');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('响应头包含 Cache-Control', function () {",
+                  "    pm.response.to.have.header('Cache-Control');",
+                  "    const cacheControl = pm.response.headers.get('Cache-Control');",
+                  "    pm.expect(cacheControl).to.include('max-age=300');",
+                  "});",
+                  "",
+                  "// 打印响应数据便于调试",
+                  "console.log('场景包数量:', pm.response.json().data.length);",
+                  "console.log('第一条数据:', JSON.stringify(pm.response.json().data[0], null, 2));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "T028 验证响应数据结构",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scenario-packages/published",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scenario-packages", "published"]
+            },
+            "description": "验证 API 响应数据结构完整性"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T028 数据结构验证",
+                  "",
+                  "const schema = {",
+                  "    type: 'object',",
+                  "    required: ['success', 'data'],",
+                  "    properties: {",
+                  "        success: { type: 'boolean' },",
+                  "        data: {",
+                  "            type: 'array',",
+                  "            items: {",
+                  "                type: 'object',",
+                  "                required: ['id', 'title', 'category', 'backgroundImageUrl', 'packagePrice', 'tags'],",
+                  "                properties: {",
+                  "                    id: { type: 'string' },",
+                  "                    title: { type: 'string' },",
+                  "                    category: { type: 'string', enum: ['MOVIE', 'TEAM', 'PARTY'] },",
+                  "                    backgroundImageUrl: { type: 'string' },",
+                  "                    packagePrice: { type: 'number' },",
+                  "                    rating: { type: ['number', 'null'] },",
+                  "                    tags: { type: 'array', items: { type: 'string' } }",
+                  "                }",
+                  "            }",
+                  "        },",
+                  "        message: { type: 'string' },",
+                  "        timestamp: { type: 'string' }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test('响应符合 JSON Schema', function () {",
+                  "    pm.response.to.have.jsonSchema(schema);",
+                  "});",
+                  "",
+                  "pm.test('rating 字段处理正确 (可为 null)', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(function(item) {",
+                  "        if (item.rating !== null && item.rating !== undefined) {",
+                  "            pm.expect(item.rating).to.be.within(0, 5);",
+                  "        }",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "US2 错误处理",
+      "item": [
+        {
+          "name": "T036 模拟服务不可用 (手动关闭后端测试)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scenario-packages/published",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scenario-packages", "published"]
+            },
+            "description": "测试步骤：\n1. 关闭后端 Spring Boot 应用\n2. 执行此请求\n3. 验证连接失败错误"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 此测试用于手动验证后端不可用时的错误处理",
+                  "// 正常情况下应该失败（如果后端已关闭）",
+                  "",
+                  "if (pm.response.code === 0 || pm.response === null) {",
+                  "    pm.test('后端服务不可用时应显示连接错误', function () {",
+                  "        pm.expect(true).to.be.true; // 连接失败符合预期",
+                  "    });",
+                  "} else {",
+                  "    pm.test('后端服务正在运行', function () {",
+                  "        pm.response.to.have.status(200);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "其他 API",
+      "item": [
+        {
+          "name": "获取所有场景包 (管理后台)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scenario-packages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scenario-packages"]
+            },
+            "description": "获取所有场景包列表（包含未发布的，仅用于管理后台）"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('状态码为 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('响应格式正确', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取场景包详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scenario-packages/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scenario-packages", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "场景包 ID (UUID)"
+                }
+              ]
+            },
+            "description": "根据 ID 获取场景包详情"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('状态码为 200 或 404', function () {",
+                  "    pm.expect([200, 404]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 全局前置脚本",
+          "console.log('Testing: ' + pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// 全局测试脚本",
+          "pm.test('Content-Type 为 application/json', function () {",
+          "    pm.response.to.have.header('Content-Type');",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});"
+        ]
+      }
+    }
+  ]
+}

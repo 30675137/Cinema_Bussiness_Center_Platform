@@ -1,0 +1,597 @@
+/**
+ * 场景包编辑页（按设计图实现）
+ *
+ * 布局：左右两栏
+ * - 左侧：基础信息 + 使用规则
+ * - 右侧：封面图 + 定价策略
+ *
+ * @author Cinema Platform
+ * @since 2025-12-19
+ */
+
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Card,
+  Space,
+  Spin,
+  Alert,
+  Tag,
+  Descriptions,
+  Row,
+  Col,
+  message,
+} from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  ArrowLeftOutlined,
+  SaveOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  ClockCircleOutlined,
+  PictureOutlined,
+  ThunderboltOutlined,
+  InfoCircleOutlined,
+  ShopOutlined,
+} from '@ant-design/icons';
+import { usePackageDetail } from '../../features/scenario-package-management/hooks/usePackageDetail';
+import { useUpdatePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
+import { ContentConfigurator } from '../../features/scenario-package-management/components';
+import { ImageUpload } from '../../features/scenario-package-management/components/atoms';
+// 019-store-association: Import StoreSelector component
+import { StoreSelector } from '../../features/scenario-package-management/components/molecules';
+import type {
+  UpdatePackageRequest,
+  PackageRule,
+  PackageBenefit,
+  PackageItem,
+  PackageService,
+  PackageContent,
+} from '../../features/scenario-package-management/types';
+
+const { TextArea } = Input;
+
+// 预设的影厅类型选项（后续可从 API 获取）
+const HALL_TYPE_OPTIONS = [
+  { id: 'vip', name: 'VIP 厅' },
+  { id: 'party', name: 'Party 厅' },
+  { id: 'couple', name: '情侣厅' },
+  { id: 'imax', name: 'IMAX 厅' },
+];
+
+const ScenarioPackageEditPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [form] = Form.useForm();
+
+  // 选中的影厅类型
+  const [selectedHallTypes, setSelectedHallTypes] = useState<string[]>([]);
+
+  // 019-store-association: 选中的门店ID列表
+  const [selectedStoreIds, setSelectedStoreIds] = useState<string[]>([]);
+
+  // US2: 规则和内容状态
+  const [rule, setRule] = useState<Partial<PackageRule>>({});
+  const [content, setContent] = useState<Partial<PackageContent>>({
+    benefits: [],
+    items: [],
+    services: [],
+  });
+
+  const { data, isLoading, isError, error, refetch } = usePackageDetail(id);
+  const updateMutation = useUpdatePackage();
+
+  // 当数据加载完成时，填充表单
+  useEffect(() => {
+    if (data?.data) {
+      const pkg = data.data;
+      form.setFieldsValue({
+        name: pkg.name,
+        description: pkg.description,
+        backgroundImageUrl: pkg.backgroundImageUrl,
+        durationHours: pkg.rule?.durationHours,
+        minPeople: pkg.rule?.minPeople,
+        maxPeople: pkg.rule?.maxPeople,
+        packagePrice: (pkg as any).pricing?.packagePrice,
+      });
+      // 设置已选中的影厅类型
+      if (pkg.hallTypes?.length) {
+        setSelectedHallTypes(pkg.hallTypes.map((h) => h.id));
+      }
+      // 019-store-association: 回显已关联的门店
+      const pkgWithStores = pkg as any;
+      if (pkgWithStores.storeIds?.length) {
+        setSelectedStoreIds(pkgWithStores.storeIds);
+      }
+      // US2: 设置规则和内容
+      if (pkg.rule) {
+        setRule(pkg.rule);
+      }
+      // 映射后端返回的 benefits/items/services
+      const pkgAny = pkg as any;
+      setContent({
+        benefits: (pkgAny.benefits || []).map((b: any) => ({
+          id: b.id,
+          benefitType: b.benefitType,
+          discountRate: b.discountRate,
+          freeCount: b.freeCount,
+          description: b.description,
+          sortOrder: b.sortOrder,
+        })),
+        items: (pkgAny.items || []).map((i: any) => ({
+          id: i.id,
+          itemId: i.itemId,
+          quantity: i.quantity,
+          itemNameSnapshot: i.itemName || i.itemNameSnapshot,
+          itemPriceSnapshot: i.itemPrice || i.itemPriceSnapshot,
+          sortOrder: i.sortOrder,
+        })),
+        services: (pkgAny.services || []).map((s: any) => ({
+          id: s.id,
+          serviceId: s.serviceId,
+          serviceNameSnapshot: s.serviceName || s.serviceNameSnapshot,
+          servicePriceSnapshot: s.servicePrice || s.servicePriceSnapshot,
+          sortOrder: s.sortOrder,
+        })),
+      });
+    }
+  }, [data, form]);
+
+  /**
+   * 切换影厅类型选择状态
+   */
+  const handleHallTypeToggle = (hallId: string) => {
+    setSelectedHallTypes((prev) =>
+      prev.includes(hallId)
+        ? prev.filter((id) => id !== hallId)
+        : [...prev, hallId]
+    );
+  };
+
+  // US2: 内容变更回调
+  const handleRuleChange = useCallback((newRule: Partial<PackageRule>) => {
+    setRule(newRule);
+  }, []);
+
+  const handleBenefitsChange = useCallback((benefits: PackageBenefit[]) => {
+    setContent((prev) => ({ ...prev, benefits }));
+  }, []);
+
+  const handleItemsChange = useCallback((items: PackageItem[]) => {
+    setContent((prev) => ({ ...prev, items }));
+  }, []);
+
+  const handleServicesChange = useCallback((services: PackageService[]) => {
+    setContent((prev) => ({ ...prev, services }));
+  }, []);
+
+  /**
+   * 处理表单提交
+   */
+  const handleSubmit = async (values: any) => {
+    if (!data?.data) return;
+
+    // 019-store-association: 验证至少选择一个门店
+    if (selectedStoreIds.length === 0) {
+      message.error('请至少选择一个关联门店');
+      return;
+    }
+
+    try {
+      const request: UpdatePackageRequest = {
+        versionLock: data.data.versionLock, // 关键：传递乐观锁版本号
+        name: values.name,
+        description: values.description,
+        backgroundImageUrl: values.backgroundImageUrl,
+        rule: {
+          durationHours: values.durationHours,
+          minPeople: values.minPeople,
+          maxPeople: values.maxPeople,
+        },
+        hallTypeIds: selectedHallTypes,
+        packagePrice: values.packagePrice,
+        // 019-store-association: 包含门店关联
+        storeIds: selectedStoreIds,
+      } as any;
+
+      await updateMutation.mutateAsync({ id: id!, request });
+      navigate('/scenario-packages');
+    } catch (error: any) {
+      // 019-store-association: 增强 409 冲突处理
+      const statusCode = error?.response?.status || error?.status;
+      if (statusCode === 409) {
+        message.error({
+          content: '保存失败：数据已被其他用户修改，页面将自动刷新获取最新数据',
+          duration: 5,
+        });
+        // 重新加载数据
+        refetch();
+      } else {
+        // 其他错误由 mutation onError 处理
+        console.error('Update failed:', error);
+      }
+    }
+  };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: '24px', textAlign: 'center' }}>
+        <Spin size="large" tip="加载场景包数据中..." />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div style={{ padding: '24px' }}>
+        <Card>
+          <Alert
+            message="加载失败"
+            description={`无法加载场景包数据: ${(error as any)?.message || '未知错误'}`}
+            type="error"
+            showIcon
+            action={
+              <Space>
+                <Button size="small" onClick={handleRefresh}>
+                  重试
+                </Button>
+                <Button size="small" onClick={() => navigate('/scenario-packages')}>
+                  返回列表
+                </Button>
+              </Space>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
+  const pkg = data?.data;
+  if (!pkg) {
+    return (
+      <div style={{ padding: '24px' }}>
+        <Card>
+          <Alert
+            message="场景包不存在"
+            description="未找到指定的场景包"
+            type="warning"
+            showIcon
+            action={
+              <Button onClick={() => navigate('/scenario-packages')}>返回列表</Button>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
+  const getStatusTag = (status: string) => {
+    const statusConfig: Record<string, { color: string; text: string }> = {
+      DRAFT: { color: 'default', text: '草稿' },
+      PUBLISHED: { color: 'success', text: '已发布' },
+      UNPUBLISHED: { color: 'warning', text: '已下架' },
+    };
+    const config = statusConfig[status] || { color: 'default', text: status };
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
+
+  return (
+    <div style={{ padding: '24px' }}>
+      {/* 页面头部 - 按钮在右上角 */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 24,
+        }}
+      >
+        <Space>
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/scenario-packages')}
+          />
+          <span
+            style={{
+              fontSize: 20,
+              fontWeight: 600,
+              textDecoration: 'underline',
+              textUnderlineOffset: 4,
+            }}
+          >
+            编辑场景包
+          </span>
+          <Button
+            type="text"
+            icon={<ReloadOutlined />}
+            onClick={handleRefresh}
+            loading={isLoading}
+            size="small"
+          >
+            刷新
+          </Button>
+        </Space>
+        <Space>
+          <Button onClick={() => navigate('/scenario-packages')}>取消</Button>
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
+            onClick={() => form.submit()}
+            loading={updateMutation.isPending}
+          >
+            保存更新
+          </Button>
+        </Space>
+      </div>
+
+      {/* 场景包元数据展示 */}
+      <Card
+        size="small"
+        title={
+          <Space>
+            <InfoCircleOutlined style={{ color: '#1890ff' }} />
+            场景包信息
+          </Space>
+        }
+        style={{ marginBottom: 24, backgroundColor: '#fafafa' }}
+      >
+        <Descriptions size="small" column={4}>
+          <Descriptions.Item label="ID">
+            <span style={{ fontFamily: 'monospace', fontSize: 12 }}>
+              {pkg.id.substring(0, 8)}...
+            </span>
+          </Descriptions.Item>
+          <Descriptions.Item label="状态">{getStatusTag(pkg.status)}</Descriptions.Item>
+          <Descriptions.Item label="版本">v{pkg.version}</Descriptions.Item>
+          <Descriptions.Item label="乐观锁">{pkg.versionLock}</Descriptions.Item>
+        </Descriptions>
+      </Card>
+
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Row gutter={24}>
+          {/* 左侧主内容区 */}
+          <Col span={16}>
+            {/* 基础信息 Card */}
+            <Card
+              title={
+                <Space>
+                  <SettingOutlined style={{ color: '#1890ff' }} />
+                  基础信息
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+            >
+              <Form.Item
+                label="场景包名称"
+                name="name"
+                required
+                rules={[
+                  { required: true, message: '请输入场景包名称' },
+                  { max: 255, message: '名称长度不能超过255个字符' },
+                ]}
+              >
+                <Input placeholder="例如：VIP 生日派对专场" />
+              </Form.Item>
+
+              <Form.Item label="背景描述" name="description">
+                <TextArea
+                  rows={4}
+                  placeholder="介绍该场景包的特色服务..."
+                  maxLength={500}
+                  showCount
+                />
+              </Form.Item>
+
+              <Form.Item label="适用影厅类型">
+                <Space wrap>
+                  {HALL_TYPE_OPTIONS.map((hall) => (
+                    <Tag.CheckableTag
+                      key={hall.id}
+                      checked={selectedHallTypes.includes(hall.id)}
+                      onChange={() => handleHallTypeToggle(hall.id)}
+                      style={{
+                        padding: '4px 12px',
+                        border: '1px solid #d9d9d9',
+                        borderRadius: 16,
+                        backgroundColor: selectedHallTypes.includes(hall.id)
+                          ? '#1890ff'
+                          : 'transparent',
+                        color: selectedHallTypes.includes(hall.id)
+                          ? '#fff'
+                          : 'inherit',
+                      }}
+                    >
+                      {hall.name}
+                    </Tag.CheckableTag>
+                  ))}
+                </Space>
+              </Form.Item>
+            </Card>
+
+            {/* 019-store-association: 关联门店 Card */}
+            <Card
+              title={
+                <Space>
+                  <ShopOutlined style={{ color: '#1890ff' }} />
+                  关联门店
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+              extra={
+                <span style={{ color: '#8c8c8c', fontSize: 12 }}>
+                  必填，至少选择一个门店
+                </span>
+              }
+            >
+              <StoreSelector
+                value={selectedStoreIds}
+                onChange={setSelectedStoreIds}
+                required
+              />
+            </Card>
+
+            {/* 使用规则 Card - 三列横向排列 */}
+            <Card
+              title={
+                <Space>
+                  <ClockCircleOutlined style={{ color: '#1890ff' }} />
+                  使用规则
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+            >
+              <Row gutter={24}>
+                <Col span={8}>
+                  <Form.Item
+                    label="建议时长（小时）"
+                    name="durationHours"
+                    rules={[{ required: true, message: '请输入时长' }]}
+                  >
+                    <InputNumber
+                      min={0.1}
+                      step={0.5}
+                      precision={0}
+                      style={{ width: '100%' }}
+                      addonAfter="H"
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="最小人数" name="minPeople">
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item label="最大人数" name="maxPeople">
+                    <InputNumber min={0} style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* US2: 内容配置区域 */}
+            <Card
+              title={
+                <Space>
+                  <SettingOutlined style={{ color: '#52c41a' }} />
+                  内容组合配置
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+            >
+              <ContentConfigurator
+                rule={rule}
+                content={content}
+                packagePrice={form.getFieldValue('packagePrice')}
+                onRuleChange={handleRuleChange}
+                onBenefitsChange={handleBenefitsChange}
+                onItemsChange={handleItemsChange}
+                onServicesChange={handleServicesChange}
+              />
+            </Card>
+
+            {/* 乐观锁提示 */}
+            <Alert
+              message="并发编辑提示"
+              description={`当前版本锁: ${pkg.versionLock}。如果其他用户同时编辑了此场景包，保存时将提示冲突。`}
+              type="info"
+              showIcon
+              style={{ marginBottom: 24 }}
+            />
+          </Col>
+
+          {/* 右侧侧边栏 */}
+          <Col span={8}>
+            {/* 封面图 Card */}
+            <Card
+              title={
+                <Space>
+                  <PictureOutlined style={{ color: '#1890ff' }} />
+                  封面图
+                </Space>
+              }
+              style={{ marginBottom: 24 }}
+            >
+              <ImageUpload
+                packageId={id}
+                value={form.getFieldValue('backgroundImageUrl') || pkg.backgroundImageUrl}
+                onChange={(url) => form.setFieldValue('backgroundImageUrl', url)}
+              />
+            </Card>
+
+            {/* 定价策略 Card */}
+            <Card
+              title={
+                <Space>
+                  <ThunderboltOutlined style={{ color: '#1890ff' }} />
+                  定价策略
+                </Space>
+              }
+            >
+              {/* 价格汇总展示 */}
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: 8,
+                  }}
+                >
+                  <span style={{ color: '#8c8c8c' }}>单品累计总价</span>
+                  <span>¥{pkg.pricing?.itemTotalPrice?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: 8,
+                  }}
+                >
+                  <span style={{ color: '#8c8c8c' }}>服务项目总价</span>
+                  <span>¥{pkg.pricing?.serviceTotalPrice?.toFixed(2) || '0.00'}</span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontWeight: 600,
+                  }}
+                >
+                  <span>参考总价（不含硬权益）</span>
+                  <span style={{ fontSize: 18 }}>
+                    ¥{pkg.pricing?.referencePrice?.toFixed(2) || '0.00'}
+                  </span>
+                </div>
+              </div>
+
+              <Form.Item
+                label="打包一口价"
+                name="packagePrice"
+                required
+                rules={[{ required: true, message: '请输入打包一口价' }]}
+              >
+                <InputNumber
+                  prefix="¥"
+                  min={0}
+                  precision={2}
+                  style={{ width: '100%' }}
+                  placeholder="0"
+                />
+              </Form.Item>
+            </Card>
+          </Col>
+        </Row>
+      </Form>
+    </div>
+  );
+};
+
+export default ScenarioPackageEditPage;

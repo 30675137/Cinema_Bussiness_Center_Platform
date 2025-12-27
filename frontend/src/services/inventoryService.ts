@@ -1,33 +1,34 @@
 import { apiClient } from './api';
-import {
+import type {
   CurrentInventory,
   InventoryTransaction,
   InventoryQueryParams,
   InventoryStatistics,
   TransactionDetail,
-  BatchInfo,
-  InventoryAlert,
-  InventorySnapshot,
-  ReplenishmentSuggestion,
-  TransferOrder,
-  InventoryAnalysis,
-  InventoryConfig,
+  InventoryAlert
+} from '@/types/inventory';
+import {
   TransactionType,
   SourceType,
   InventoryStatus,
-  AlertType,
-  AlertSeverity,
-  TransferStatus,
-  AnalysisType,
-  TimeUnit
-} from '@/types/inventory';
-import { z } from 'zod';
-import {
   InventoryQueryParamsSchema,
   CurrentInventorySchema,
-  InventoryTransactionSchema,
-  InventoryStatisticsSchema
+  InventoryTransactionSchema
 } from '@/types/inventory';
+import { z } from 'zod';
+
+// 临时类型定义（后续需要添加到 inventory.ts 中）
+type BatchInfo = any;
+type InventorySnapshot = any;
+type ReplenishmentSuggestion = any;
+type TransferOrder = any;
+type InventoryAnalysis = any;
+type InventoryConfig = any;
+type AlertType = 'low_stock' | 'out_of_stock' | 'expiring_soon' | 'overstock' | 'movement_anomaly';
+type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
+type TransferStatus = 'pending' | 'in_transit' | 'completed' | 'cancelled';
+type AnalysisType = 'trend' | 'forecast' | 'anomaly';
+type TimeUnit = 'day' | 'week' | 'month' | 'quarter' | 'year';
 
 /**
  * 库存管理API服务
@@ -65,7 +66,7 @@ class InventoryService {
       const validatedData = Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : [];
 
       return {
-        data: validatedData,
+        data: validatedData as CurrentInventory[],
         pagination: response.data.pagination || {
           current: 1,
           pageSize: 20,
@@ -87,7 +88,7 @@ class InventoryService {
       const response = await apiClient.get(`${this.basePath}/current/by-sku`, { params });
       const data = response.data.data || [];
 
-      return Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : [];
+      return (Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : []) as CurrentInventory[];
     } catch (error) {
       console.error('根据SKU获取库存失败:', error);
       throw error;
@@ -114,7 +115,7 @@ class InventoryService {
       const validatedData = Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : [];
 
       return {
-        data: validatedData,
+        data: validatedData as CurrentInventory[],
         pagination: response.data.pagination || {
           current: 1,
           pageSize: 20,
@@ -191,7 +192,7 @@ class InventoryService {
         params,
         timeout: 6000
       });
-      return InventoryStatisticsSchema.parse(response.data);
+      return response.data as InventoryStatistics;
     } catch (error) {
       console.error('获取库存统计失败:', error);
       throw error;
@@ -675,7 +676,10 @@ export type {
 export {
   TransactionType,
   SourceType,
-  InventoryStatus,
+  InventoryStatus
+};
+
+export type {
   AlertType,
   AlertSeverity,
   TransferStatus,

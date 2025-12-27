@@ -1,0 +1,1121 @@
+openapi: 3.0.3
+info:
+  title: 场景包多标签页编辑 API
+  description: |
+    场景包编辑界面的后端API契约,包含5个标签页的所有CRUD操作:
+    1. 基础信息管理
+    2. 套餐管理
+    3. 加购项关联配置
+    4. 时段管理(模板+覆盖)
+    5. 发布设置
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api.cinema-platform.com
+    description: 生产环境
+
+tags:
+  - name: scenario-packages
+    description: 场景包管理
+  - name: package-tiers
+    description: 套餐管理
+  - name: add-on-items
+    description: 全局加购项管理
+  - name: time-slots
+    description: 时段管理(模板+覆盖)
+  - name: publishing
+    description: 发布管理
+
+paths:
+  # ==================== 场景包基础信息 ====================
+
+  /api/scenario-packages/{id}:
+    get:
+      tags: [scenario-packages]
+      summary: 获取场景包详情
+      description: 获取场景包的完整信息,包括基础信息、套餐列表、加购项关联、时段配置和发布设置
+      operationId: getScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 成功返回场景包详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ScenarioPackage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags: [scenario-packages]
+      summary: 更新场景包基础信息
+      description: 更新场景包的名称、描述、分类和主图
+      operationId: updateScenarioPackageBasicInfo
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BasicInfoUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ScenarioPackage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== 套餐管理 ====================
+
+  /api/scenario-packages/{id}/packages:
+    get:
+      tags: [package-tiers]
+      summary: 获取场景包的所有套餐
+      description: 返回指定场景包的套餐列表,按sortOrder排序
+      operationId: getPackageTiers
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 成功返回套餐列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_PackageTierList'
+
+    post:
+      tags: [package-tiers]
+      summary: 创建新套餐
+      description: 为场景包添加新的套餐选项
+      operationId: createPackageTier
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PackageTierCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_PackageTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/scenario-packages/{id}/packages/{packageId}:
+    put:
+      tags: [package-tiers]
+      summary: 更新套餐
+      description: 更新指定套餐的信息
+      operationId: updatePackageTier
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/PackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PackageTierUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_PackageTier'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [package-tiers]
+      summary: 删除套餐
+      description: 删除指定的套餐
+      operationId: deletePackageTier
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '204':
+          description: 删除成功,无返回内容
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 冲突 - 存在关联预订,无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== 加购项管理 ====================
+
+  /api/add-on-items:
+    get:
+      tags: [add-on-items]
+      summary: 获取全局加购项列表
+      description: 返回所有加购项,支持按分类筛选
+      operationId: getAllAddOnItems
+      parameters:
+        - name: category
+          in: query
+          description: 按分类筛选(CATERING/BEVERAGE/SERVICE/DECORATION)
+          required: false
+          schema:
+            type: string
+            enum: [CATERING, BEVERAGE, SERVICE, DECORATION]
+        - name: isActive
+          in: query
+          description: 是否仅显示上架商品
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: 成功返回加购项列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_AddOnItemList'
+
+  /api/scenario-packages/{id}/add-ons:
+    get:
+      tags: [add-on-items]
+      summary: 获取场景包已关联的加购项
+      description: 返回场景包已关联的加购项列表,包含排序和必选标记
+      operationId: getAssociatedAddOns
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 成功返回已关联加购项
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_AssociatedAddOnList'
+
+    put:
+      tags: [add-on-items]
+      summary: 批量更新场景包的加购项关联
+      description: 一次性更新场景包关联的所有加购项,包括新增、删除和排序
+      operationId: updateScenarioPackageAddOns
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddOnAssociationBatchRequest'
+      responses:
+        '200':
+          description: 批量更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_AssociatedAddOnList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  # ==================== 时段模板管理 ====================
+
+  /api/scenario-packages/{id}/time-slot-templates:
+    get:
+      tags: [time-slots]
+      summary: 获取周时段模板列表
+      description: 返回场景包的所有周时段模板
+      operationId: getTimeSlotTemplates
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 成功返回时段模板列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotTemplateList'
+
+    post:
+      tags: [time-slots]
+      summary: 创建周时段模板
+      description: 为场景包添加新的周时段模板
+      operationId: createTimeSlotTemplate
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSlotTemplateCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/scenario-packages/{id}/time-slot-templates/{templateId}:
+    put:
+      tags: [time-slots]
+      summary: 更新周时段模板
+      description: 更新指定的周时段模板
+      operationId: updateTimeSlotTemplate
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/TemplateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSlotTemplateUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [time-slots]
+      summary: 删除周时段模板
+      description: 删除指定的周时段模板
+      operationId: deleteTimeSlotTemplate
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/TemplateId'
+      responses:
+        '204':
+          description: 删除成功
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== 时段日期覆盖管理 ====================
+
+  /api/scenario-packages/{id}/time-slot-overrides:
+    get:
+      tags: [time-slots]
+      summary: 获取时段日期覆盖列表
+      description: 返回场景包的所有日期覆盖规则
+      operationId: getTimeSlotOverrides
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - name: startDate
+          in: query
+          description: 开始日期(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: 结束日期(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: 成功返回覆盖列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotOverrideList'
+
+    post:
+      tags: [time-slots]
+      summary: 创建时段日期覆盖
+      description: 为特定日期添加时段覆盖规则
+      operationId: createTimeSlotOverride
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSlotOverrideCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotOverride'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/scenario-packages/{id}/time-slot-overrides/{overrideId}:
+    put:
+      tags: [time-slots]
+      summary: 更新时段日期覆盖
+      description: 更新指定的日期覆盖规则
+      operationId: updateTimeSlotOverride
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/OverrideId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSlotOverrideUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_TimeSlotOverride'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [time-slots]
+      summary: 删除时段日期覆盖
+      description: 删除指定的日期覆盖规则
+      operationId: deleteTimeSlotOverride
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+        - $ref: '#/components/parameters/OverrideId'
+      responses:
+        '204':
+          description: 删除成功
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== 发布管理 ====================
+
+  /api/scenario-packages/{id}/publish-settings:
+    get:
+      tags: [publishing]
+      summary: 获取发布设置
+      description: 获取场景包的发布设置
+      operationId: getPublishSettings
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 成功返回发布设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_PublishSettings'
+
+    put:
+      tags: [publishing]
+      summary: 更新发布设置
+      description: 更新场景包的发布设置(生效时间范围、预订规则等)
+      operationId: updatePublishSettings
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishSettingsUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_PublishSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/scenario-packages/{id}/publish:
+    post:
+      tags: [publishing]
+      summary: 发布场景包
+      description: 将场景包状态设置为已发布,发布前会进行完整性验证
+      operationId: publishScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 发布成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ScenarioPackage'
+        '400':
+          description: 发布验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishValidationErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/scenario-packages/{id}/unpublish:
+    post:
+      tags: [publishing]
+      summary: 下架场景包
+      description: 将场景包状态设置为已下架,C端不再可见
+      operationId: unpublishScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/ScenarioPackageId'
+      responses:
+        '200':
+          description: 下架成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ScenarioPackage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# ==================== Components ====================
+
+components:
+  parameters:
+    ScenarioPackageId:
+      name: id
+      in: path
+      description: 场景包ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PackageId:
+      name: packageId
+      in: path
+      description: 套餐ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    TemplateId:
+      name: templateId
+      in: path
+      description: 时段模板ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    OverrideId:
+      name: overrideId
+      in: path
+      description: 时段覆盖ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    # ========== 通用响应结构 ==========
+
+    ApiResponse_ScenarioPackage:
+      type: object
+      required: [success, data, timestamp]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/ScenarioPackage'
+        timestamp:
+          type: string
+          format: date-time
+
+    ApiResponse_PackageTierList:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PackageTier'
+        total:
+          type: integer
+          example: 3
+
+    ApiResponse_PackageTier:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/PackageTier'
+
+    ApiResponse_AddOnItemList:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddOnItem'
+        total:
+          type: integer
+
+    ApiResponse_AssociatedAddOnList:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssociatedAddOn'
+
+    ApiResponse_TimeSlotTemplateList:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlotTemplate'
+
+    ApiResponse_TimeSlotTemplate:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/TimeSlotTemplate'
+
+    ApiResponse_TimeSlotOverrideList:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimeSlotOverride'
+
+    ApiResponse_TimeSlotOverride:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/TimeSlotOverride'
+
+    ApiResponse_PublishSettings:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/PublishSettings'
+
+    ErrorResponse:
+      type: object
+      required: [success, error, message]
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "请求参数验证失败"
+        details:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+
+    PublishValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            details:
+              type: object
+              properties:
+                missingItems:
+                  type: array
+                  description: 缺失的必填项列表
+                  items:
+                    type: string
+                  example: ["至少需要1个套餐", "至少需要1个可预订时段"]
+
+    # ========== 实体模型 ==========
+
+    ScenarioPackage:
+      type: object
+      required: [id, name, category, mainImage, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 100
+          example: "商务团建套餐"
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        category:
+          type: string
+          example: "团建活动"
+        mainImage:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+        effectiveStartDate:
+          type: string
+          format: date
+          nullable: true
+        effectiveEndDate:
+          type: string
+          format: date
+          nullable: true
+        advanceBookingDays:
+          type: integer
+          minimum: 0
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          format: uuid
+        updatedBy:
+          type: string
+          format: uuid
+
+    PackageTier:
+      type: object
+      required: [id, scenarioPackageId, name, price, sortOrder]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scenarioPackageId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "豪华套餐"
+        price:
+          type: integer
+          description: 价格(单位:分)
+          example: 388800
+        originalPrice:
+          type: integer
+          description: 原价(单位:分)
+          nullable: true
+          example: 499900
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+          example: ["推荐", "限时优惠"]
+        serviceDescription:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AddOnItem:
+      type: object
+      required: [id, name, price, category, isActive]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "高端茶歇"
+        price:
+          type: integer
+          description: 价格(单位:分)
+        category:
+          type: string
+          enum: [CATERING, BEVERAGE, SERVICE, DECORATION]
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+        inventory:
+          type: integer
+          minimum: 0
+          nullable: true
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AssociatedAddOn:
+      type: object
+      required: [id, scenarioPackageId, addOnItem, sortOrder, isRequired]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scenarioPackageId:
+          type: string
+          format: uuid
+        addOnItem:
+          $ref: '#/components/schemas/AddOnItem'
+        sortOrder:
+          type: integer
+        isRequired:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    TimeSlotTemplate:
+      type: object
+      required: [id, scenarioPackageId, dayOfWeek, startTime, endTime, isEnabled]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scenarioPackageId:
+          type: string
+          format: uuid
+        dayOfWeek:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: 0=周日, 1=周一, ..., 6=周六
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+          example: "10:00"
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+          example: "13:00"
+        capacity:
+          type: integer
+          minimum: 1
+          nullable: true
+        priceAdjustment:
+          type: object
+          nullable: true
+          properties:
+            type:
+              type: string
+              enum: [PERCENTAGE, FIXED]
+            value:
+              type: number
+        isEnabled:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    TimeSlotOverride:
+      type: object
+      required: [id, scenarioPackageId, date, overrideType]
+      properties:
+        id:
+          type: string
+          format: uuid
+        scenarioPackageId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        overrideType:
+          type: string
+          enum: [ADD, MODIFY, CANCEL]
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+          nullable: true
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+          nullable: true
+        capacity:
+          type: integer
+          minimum: 1
+          nullable: true
+        reason:
+          type: string
+          maxLength: 200
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PublishSettings:
+      type: object
+      required: [scenarioPackageId, status]
+      properties:
+        scenarioPackageId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+        effectiveStartDate:
+          type: string
+          format: date
+          nullable: true
+        effectiveEndDate:
+          type: string
+          format: date
+          nullable: true
+        advanceBookingDays:
+          type: integer
+          minimum: 0
+          nullable: true
+
+    # ========== 请求体 ==========
+
+    BasicInfoUpdateRequest:
+      type: object
+      required: [name, category, mainImage]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        category:
+          type: string
+        mainImage:
+          type: string
+          format: uri
+
+    PackageTierCreateRequest:
+      type: object
+      required: [name, price, sortOrder]
+      properties:
+        name:
+          type: string
+        price:
+          type: integer
+          minimum: 1
+        originalPrice:
+          type: integer
+          minimum: 1
+        tags:
+          type: array
+          items:
+            type: string
+        serviceDescription:
+          type: string
+        sortOrder:
+          type: integer
+
+    PackageTierUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/PackageTierCreateRequest'
+
+    AddOnAssociationBatchRequest:
+      type: object
+      required: [addOnItems]
+      properties:
+        addOnItems:
+          type: array
+          description: 完整的加购项关联列表(覆盖式更新)
+          items:
+            type: object
+            required: [addOnItemId, sortOrder, isRequired]
+            properties:
+              addOnItemId:
+                type: string
+                format: uuid
+              sortOrder:
+                type: integer
+              isRequired:
+                type: boolean
+
+    TimeSlotTemplateCreateRequest:
+      type: object
+      required: [dayOfWeek, startTime, endTime, isEnabled]
+      properties:
+        dayOfWeek:
+          type: integer
+          minimum: 0
+          maximum: 6
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        capacity:
+          type: integer
+          minimum: 1
+        priceAdjustment:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [PERCENTAGE, FIXED]
+            value:
+              type: number
+        isEnabled:
+          type: boolean
+          default: true
+
+    TimeSlotTemplateUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/TimeSlotTemplateCreateRequest'
+
+    TimeSlotOverrideCreateRequest:
+      type: object
+      required: [date, overrideType]
+      properties:
+        date:
+          type: string
+          format: date
+        overrideType:
+          type: string
+          enum: [ADD, MODIFY, CANCEL]
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+        capacity:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          maxLength: 200
+
+    TimeSlotOverrideUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/TimeSlotOverrideCreateRequest'
+
+    PublishSettingsUpdateRequest:
+      type: object
+      properties:
+        effectiveStartDate:
+          type: string
+          format: date
+        effectiveEndDate:
+          type: string
+          format: date
+        advanceBookingDays:
+          type: integer
+          minimum: 0
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "NOT_FOUND"
+            message: "未找到指定的场景包"
+            timestamp: "2025-12-23T10:00:00Z"
+
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "INTERNAL_ERROR"
+            message: "服务器内部错误"
+            timestamp: "2025-12-23T10:00:00Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

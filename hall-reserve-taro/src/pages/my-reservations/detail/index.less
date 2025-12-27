@@ -1,0 +1,224 @@
+.detail-page {
+  min-height: 100vh;
+  background: #f5f6fa;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading & Error */
+.loading,
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 28px;
+  color: #999;
+}
+
+.retry-btn {
+  margin-top: 20px;
+  padding: 16px 40px;
+  background: #667eea;
+  color: #fff;
+  border-radius: 24px;
+  font-size: 26px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 24px 20px;
+  background: #fff;
+}
+
+.back-btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #333;
+}
+
+.header-title {
+  font-size: 34px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.header-placeholder {
+  width: 60px;
+}
+
+/* Content Scroll */
+.content-scroll {
+  flex: 1;
+  padding: 24px;
+}
+
+/* Status Card */
+.status-card {
+  padding: 40px 32px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.status-label {
+  font-size: 40px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.order-number {
+  font-size: 26px;
+  opacity: 0.9;
+}
+
+/* Section */
+.section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a2e;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* Info Card */
+.info-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #f5f6fa;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 28px;
+  color: #999;
+}
+
+.info-value {
+  font-size: 28px;
+  color: #333;
+  flex: 1;
+  text-align: right;
+  margin-left: 20px;
+}
+
+.cancel-reason {
+  color: #e74c3c;
+}
+
+/* Addon Row */
+.addon-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f5f6fa;
+}
+
+.addon-row:last-child {
+  border-bottom: none;
+}
+
+.addon-name {
+  flex: 1;
+  font-size: 28px;
+  color: #333;
+}
+
+.addon-qty {
+  font-size: 26px;
+  color: #999;
+  margin-right: 20px;
+}
+
+.addon-price {
+  font-size: 28px;
+  color: #e74c3c;
+}
+
+/* Amount Card */
+.amount-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.amount-label {
+  font-size: 30px;
+  color: #333;
+}
+
+.amount-value {
+  font-size: 44px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+/* Bottom Spacer */
+.bottom-spacer {
+  height: 140px;
+}
+
+/* Action Bar */
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 20px;
+  padding: 20px 32px;
+  background: #fff;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+.action-btn {
+  flex: 1;
+  padding: 24px 0;
+  border-radius: 50px;
+  font-size: 30px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.action-btn.cancel {
+  background: #f5f6fa;
+  color: #666;
+}
+
+.action-btn.pay {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.action-btn.disabled {
+  opacity: 0.6;
+}

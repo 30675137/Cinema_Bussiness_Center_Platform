@@ -18,12 +18,12 @@ import {
   Tooltip,
   Badge,
   Dropdown,
-  MenuProps,
   Statistic,
   Progress,
   Tabs
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import type { MenuProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -69,10 +69,6 @@ import {
   PriceStatusConfig,
   PriceTypeConfig
 } from '@/types/price';
-import PriceForm from '@/components/price/PriceForm';
-import PriceHistory from '@/components/price/PriceHistory';
-import PriceRulesManager from '@/components/price/PriceRulesManager';
-import PriceSimulator from '@/components/price/PriceSimulator';
 
 const { Title, Text } = Typography;
 const { Search } = Input;

@@ -1,0 +1,658 @@
+openapi: 3.0.3
+info:
+  title: SKU Management Mock API
+  description: |
+    SKU管理功能的Mock API接口定义。
+    所有接口通过前端Mock服务实现，不依赖真实后端。
+    本API用于前端开发和测试，提供完整的数据操作能力。
+  version: 1.0.0
+  contact:
+    name: Frontend Team
+
+servers:
+  - url: /api/sku
+    description: Mock API Base URL
+
+tags:
+  - name: SKU
+    description: SKU管理相关接口
+
+paths:
+  /sku:
+    get:
+      tags:
+        - SKU
+      summary: 获取SKU列表
+      description: |
+        支持关键字搜索、多条件筛选、分页和排序。
+        关键字匹配SKU编码、名称、主条码。
+      operationId: listSkus
+      parameters:
+        - name: keyword
+          in: query
+          description: 关键字搜索（匹配SKU编码、名称、主条码）
+          required: false
+          schema:
+            type: string
+        - name: spuId
+          in: query
+          description: 所属SPU ID筛选
+          required: false
+          schema:
+            type: string
+        - name: brand
+          in: query
+          description: 品牌筛选
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: 类目筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [draft, enabled, disabled]
+        - name: manageInventory
+          in: query
+          description: 是否管理库存筛选
+          required: false
+          schema:
+            type: boolean
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sortField
+          in: query
+          description: 排序字段（如：createdAt, status, name）
+          required: false
+          schema:
+            type: string
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 成功返回SKU列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuListResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - SKU
+      summary: 创建新SKU
+      description: |
+        创建新的SKU记录。
+        系统自动生成SKU编码（code）。
+        验证必填字段、条码唯一性、格式等。
+      operationId: createSku
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuCreateRequest'
+      responses:
+        '201':
+          description: 成功创建SKU
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SKU'
+        '400':
+          description: 请求参数错误或验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 条码重复冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sku/{id}:
+    get:
+      tags:
+        - SKU
+      summary: 获取SKU详情
+      description: 根据ID获取SKU的完整详细信息
+      operationId: getSku
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: SKU ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回SKU详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SKU'
+        '404':
+          description: SKU不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - SKU
+      summary: 更新SKU信息
+      description: |
+        更新已存在的SKU信息。
+        验证必填字段、条码唯一性、格式等。
+      operationId: updateSku
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: SKU ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuUpdateRequest'
+      responses:
+        '200':
+          description: 成功更新SKU
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SKU'
+        '400':
+          description: 请求参数错误或验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: SKU不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 条码重复冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sku/{id}/status:
+    patch:
+      tags:
+        - SKU
+      summary: 切换SKU状态
+      description: |
+        切换SKU的启用/停用状态。
+        支持状态：draft → enabled, enabled → disabled, disabled → enabled
+      operationId: toggleSkuStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: SKU ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [draft, enabled, disabled]
+                  description: 目标状态
+      responses:
+        '200':
+          description: 成功切换状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SKU'
+        '400':
+          description: 状态转换无效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: SKU不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sku/check-barcode:
+    post:
+      tags:
+        - SKU
+      summary: 检查条码唯一性
+      description: |
+        检查条码是否已被其他SKU使用。
+        用于表单实时验证。
+      operationId: checkBarcode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - barcode
+              properties:
+                barcode:
+                  type: string
+                  description: 要检查的条码
+                excludeSkuId:
+                  type: string
+                  description: 排除的SKU ID（编辑时使用）
+      responses:
+        '200':
+          description: 检查结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                    description: 条码是否可用
+                  message:
+                    type: string
+                    description: 提示信息
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    SKU:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - spuId
+        - spuName
+        - mainUnit
+        - mainBarcode
+        - manageInventory
+        - allowNegativeStock
+        - status
+        - createdAt
+        - updatedAt
+        - createdBy
+        - updatedBy
+      properties:
+        id:
+          type: string
+          description: SKU唯一标识符
+          example: "sku-001"
+        code:
+          type: string
+          description: SKU编码（系统自动生成）
+          example: "SKU20250127001"
+        name:
+          type: string
+          description: SKU名称
+          example: "可口可乐 330ml 罐装"
+        spuId:
+          type: string
+          description: 所属SPU ID
+          example: "spu-001"
+        spuName:
+          type: string
+          description: 所属SPU名称
+          example: "可口可乐"
+        brand:
+          type: string
+          description: 品牌（继承自SPU）
+          example: "可口可乐"
+        category:
+          type: string
+          description: 类目（继承自SPU）
+          example: "饮料"
+        spec:
+          type: string
+          description: 规格/型号
+          example: "330ml"
+        mainUnit:
+          type: string
+          description: 主库存单位
+          example: "瓶"
+        mainBarcode:
+          type: string
+          description: 主条码
+          example: "6901234567890"
+        otherBarcodes:
+          type: array
+          description: 其他条码列表
+          items:
+            $ref: '#/components/schemas/Barcode'
+        salesUnits:
+          type: array
+          description: 销售单位配置
+          items:
+            $ref: '#/components/schemas/SalesUnit'
+        manageInventory:
+          type: boolean
+          description: 是否管理库存
+          example: true
+        allowNegativeStock:
+          type: boolean
+          description: 是否允许负库存
+          example: false
+        minOrderQty:
+          type: number
+          description: 最小起订量
+          example: 10
+        minSaleQty:
+          type: number
+          description: 最小销售量
+          example: 1
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          description: 状态
+          example: "enabled"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-27T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-01-27T10:00:00Z"
+        createdBy:
+          type: string
+          description: 创建人
+          example: "user-001"
+        updatedBy:
+          type: string
+          description: 更新人
+          example: "user-001"
+
+    Barcode:
+      type: object
+      required:
+        - id
+        - barcode
+      properties:
+        id:
+          type: string
+          description: 条码唯一标识符
+          example: "barcode-001"
+        barcode:
+          type: string
+          description: 条码值
+          example: "6901234567891"
+        remark:
+          type: string
+          description: 备注
+          example: "备用条码"
+
+    SalesUnit:
+      type: object
+      required:
+        - id
+        - unit
+        - conversionRate
+        - enabled
+      properties:
+        id:
+          type: string
+          description: 销售单位配置唯一标识符
+          example: "sales-unit-001"
+        unit:
+          type: string
+          description: 销售单位名称
+          example: "箱"
+        conversionRate:
+          type: number
+          description: 换算关系（1 销售单位 = X 主库存单位）
+          example: 24
+        enabled:
+          type: boolean
+          description: 是否启用
+          example: true
+
+    SkuCreateRequest:
+      type: object
+      required:
+        - name
+        - spuId
+        - mainUnit
+        - mainBarcode
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: SKU名称
+        spuId:
+          type: string
+          description: 所属SPU ID
+        spec:
+          type: string
+          maxLength: 200
+          description: 规格/型号
+        mainUnit:
+          type: string
+          description: 主库存单位
+        mainBarcode:
+          type: string
+          description: 主条码
+        otherBarcodes:
+          type: array
+          items:
+            type: object
+            properties:
+              barcode:
+                type: string
+              remark:
+                type: string
+          description: 其他条码列表
+        salesUnits:
+          type: array
+          items:
+            type: object
+            required:
+              - unit
+              - conversionRate
+            properties:
+              unit:
+                type: string
+              conversionRate:
+                type: number
+                minimum: 0.01
+              enabled:
+                type: boolean
+          description: 销售单位配置
+        manageInventory:
+          type: boolean
+          default: true
+          description: 是否管理库存
+        allowNegativeStock:
+          type: boolean
+          default: false
+          description: 是否允许负库存
+        minOrderQty:
+          type: number
+          minimum: 0.01
+          description: 最小起订量
+        minSaleQty:
+          type: number
+          minimum: 0.01
+          description: 最小销售量
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          default: draft
+          description: 状态
+
+    SkuUpdateRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: SKU ID
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: SKU名称
+        spuId:
+          type: string
+          description: 所属SPU ID
+        spec:
+          type: string
+          maxLength: 200
+          description: 规格/型号
+        mainUnit:
+          type: string
+          description: 主库存单位
+        mainBarcode:
+          type: string
+          description: 主条码
+        otherBarcodes:
+          type: array
+          items:
+            type: object
+            properties:
+              barcode:
+                type: string
+              remark:
+                type: string
+          description: 其他条码列表
+        salesUnits:
+          type: array
+          items:
+            type: object
+            required:
+              - unit
+              - conversionRate
+            properties:
+              unit:
+                type: string
+              conversionRate:
+                type: number
+                minimum: 0.01
+              enabled:
+                type: boolean
+          description: 销售单位配置
+        manageInventory:
+          type: boolean
+          description: 是否管理库存
+        allowNegativeStock:
+          type: boolean
+          description: 是否允许负库存
+        minOrderQty:
+          type: number
+          minimum: 0.01
+          description: 最小起订量
+        minSaleQty:
+          type: number
+          minimum: 0.01
+          description: 最小销售量
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          description: 状态
+
+    SkuListResponse:
+      type: object
+      required:
+        - items
+        - total
+        - page
+        - pageSize
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SKU'
+          description: SKU列表
+        total:
+          type: integer
+          description: 总记录数
+          example: 1000
+        page:
+          type: integer
+          description: 当前页码
+          example: 1
+        pageSize:
+          type: integer
+          description: 每页数量
+          example: 20
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: 错误消息
+          example: "条码已存在"
+        code:
+          type: string
+          description: 错误代码
+          example: "BARCODE_DUPLICATE"
+        details:
+          type: object
+          description: 错误详情
+          additionalProperties: true

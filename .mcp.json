@@ -1,27 +1,7 @@
 {
   "mcpServers": {
     "supabase": {
-      "type": "http",
       "url": "https://mcp.supabase.com/mcp"
-    },
-    "notionApi": {
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
-      "env": {
-        "NOTION_TOKEN": "${NOTION_TOKEN}"
-      }
-    },
-    "mcp-server-commands": {
-      "command": "npx",
-      "args": ["mcp-server-commands"]
-    },
-    "fetch": {
-      "command": "uvx",
-      "args": [
-        "mcp-server-fetch"
-      ]
     }
-
   }
 }
-

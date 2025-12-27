@@ -337,6 +337,40 @@ interface User {
 }
 
 // Zod 验证模式
+
+// Store Schema
+export const StoreSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  code: z.string(),
+  address: z.string().optional(),
+  contactInfo: z.string().optional(),
+  managerInfo: z.string().optional(),
+  isActive: z.boolean().optional(),
+});
+
+// Product (SKU) Schema
+export const ProductSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  skuId: z.string().optional(),
+  skuCode: z.string(),
+  description: z.string().optional(),
+  category: z.string().optional(),
+  categoryId: z.string().optional(),
+  categoryName: z.string().optional(),
+  unit: z.string().optional(),
+  mainUnit: z.string().optional(),
+  price: z.number().optional(),
+  weight: z.number().optional(),
+  dimensions: z.object({
+    length: z.number(),
+    width: z.number(),
+    height: z.number(),
+  }).optional(),
+  isActive: z.boolean().optional(),
+});
+
 export const InventoryTransactionSchema = z.object({
   id: z.string(),
   storeId: z.string(),
@@ -357,7 +391,7 @@ export const InventoryTransactionSchema = z.object({
   operatorId: z.string(),
   transactionTime: z.string(),
   remarks: z.string().max(500).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -384,22 +418,33 @@ export const InventoryQueryParamsSchema = z.object({
 export const CurrentInventorySchema = z.object({
   id: z.string(),
   skuId: z.string(),
+  sku: ProductSchema.optional(),
   storeId: z.string(),
+  store: StoreSchema.optional(),
   availableQty: z.number(),
   onHandQty: z.number(),
-  reservedQty: z.number(),
-  inTransitQty: z.number(),
-  damagedQty: z.number(),
-  expiredQty: number(),
+  reservedQty: z.number().optional().default(0),
+  inTransitQty: z.number().optional().default(0),
+  damagedQty: z.number().optional().default(0),
+  expiredQty: z.number().optional().default(0),
   lastTransactionTime: z.string().optional(),
   lastTransactionType: z.nativeEnum(TransactionType).optional(),
   totalValue: z.number().optional(),
   averageCost: z.number().optional(),
-  reorderPoint: z.number(),
-  maxStock: z.number(),
-  minStock: z.number(),
-  safetyStock: z.number(),
-  lastUpdated: z.string()
+  reorderPoint: z.number().optional().default(0),
+  maxStock: z.number().optional().default(0),
+  minStock: z.number().optional().default(0),
+  safetyStock: z.number().optional().default(0),
+  lastUpdated: z.string().optional(),
+  updatedAt: z.string().optional(),  // 后端返回的字段名
+  // 后端返回的额外字段
+  skuCode: z.string().optional(),
+  skuName: z.string().optional(),
+  storeName: z.string().optional(),
+  categoryId: z.string().nullable().optional(),
+  categoryName: z.string().nullable().optional(),
+  mainUnit: z.string().optional(),
+  inventoryStatus: z.string().optional()
 });
 
 // 配置选项

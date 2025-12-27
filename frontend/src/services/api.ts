@@ -3,7 +3,7 @@ import type { ApiResponse, ErrorResponse } from '@/types';
 
 // API基础配置
 const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 30000,
   withCredentials: true,
 };

@@ -39,9 +39,7 @@ import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
 
 import {
-  usePriceHistoryQuery,
-  useExportPriceHistoryMutation,
-  useComparePriceHistoryMutation
+  usePriceHistoryQuery
 } from '@/stores/priceStore';
 import { PriceHistory, PriceChangeType } from '@/types/price';
 
@@ -71,18 +69,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
     data: historyData,
     isLoading,
     refetch
-  } = usePriceHistoryQuery({
-    productId,
-    keyword: searchKeyword,
-    changeType: changeTypeFilter,
-    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
-    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
-    page: 1,
-    pageSize: 50
-  });
-
-  const exportMutation = useExportPriceHistoryMutation();
-  const compareMutation = useComparePriceHistoryMutation();
+  } = usePriceHistoryQuery(productId || '');
 
   // 价格变动类型配置
   const changeTypeConfig = {

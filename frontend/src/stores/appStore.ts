@@ -188,7 +188,11 @@ export const useUserLoading = () => useAppStore((state) => state.user.loading);
 export const useSidebarCollapsed = () => useAppStore((state) => state.ui.sidebarCollapsed);
 export const useTheme = () => useAppStore((state) => state.ui.theme);
 export const useLocale = () => useAppStore((state) => state.ui.locale);
-export const useBreadcrumbs = () => useAppStore((state) => state.ui.breadcrumbs);
+export const useBreadcrumbs = () => {
+  const breadcrumbs = useAppStore((state) => state.ui.breadcrumbs);
+  // 确保始终返回数组，避免 undefined 错误
+  return Array.isArray(breadcrumbs) ? breadcrumbs : [];
+};
 export const useGlobalLoading = () => useAppStore((state) => state.ui.loading);
 
 export const useApiConfig = () => useAppStore((state) => state.config);

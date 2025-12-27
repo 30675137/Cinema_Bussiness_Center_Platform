@@ -1,0 +1,857 @@
+# 库存管理API契约
+# 基于OpenAPI 3.0规范
+# 用于前端mock数据接口定义
+
+openapi: 3.0.0
+info:
+  title: 库存管理API
+  description: 库存与仓店库存管理系统接口规范
+  version: 1.0.0
+  contact:
+    name: 开发团队
+
+servers:
+  - url: /api/inventory
+    description: 库存管理服务
+
+paths:
+  # 库存台账相关接口
+  /ledger:
+    get:
+      summary: 获取库存台账列表
+      description: 分页获取库存台账数据，支持筛选和排序
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: keyword
+          in: query
+          description: SKU关键词搜索
+          required: false
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: 类目ID
+          required: false
+          schema:
+            type: string
+        - name: brandId
+          in: query
+          description: 品牌ID
+          required: false
+          schema:
+            type: string
+        - name: locationId
+          in: query
+          description: 位置ID
+          required: false
+          schema:
+            type: string
+        - name: stockStatus
+          in: query
+          description: 库存状态
+          required: false
+          schema:
+            type: string
+            enum: [low, normal, high]
+        - name: isSellable
+          in: query
+          description: 是否可售
+          required: false
+          schema:
+            type: boolean
+        - name: hasInTransit
+          in: query
+          description: 是否有在途库存
+          required: false
+          schema:
+            type: boolean
+        - name: sortBy
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            enum: [physicalQuantity, availableQuantity, inTransitQuantity, lastUpdated]
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 成功返回库存台账列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLedgerResponse'
+        '400':
+          description: 请求参数错误
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+        '500':
+          description: 服务器内部错误
+
+  /ledger/statistics:
+    get:
+      summary: 获取库存统计信息
+      description: 获取库存概览统计数据
+      responses:
+        '200':
+          description: 成功返回统计信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryStatistics'
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+        '500':
+          description: 服务器内部错误
+
+  /ledger/{id}:
+    get:
+      summary: 获取库存台账详情
+      description: 获取指定SKU在指定位置的库存详情
+      parameters:
+        - name: id
+          in: path
+          description: 库存台账ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回库存详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLedgerDetail'
+        '404':
+          description: 资源不存在
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  /ledger/export:
+    post:
+      summary: 导出库存台账
+      description: 导出库存台账数据到Excel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '200':
+          description: 成功导出
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: 请求参数错误
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  # 库存调整相关接口
+  /adjustments:
+    get:
+      summary: 获取库存调整记录列表
+      description: 分页获取库存调整记录
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          description: 调整状态
+          schema:
+            type: string
+            enum: [pending, approved, rejected, completed]
+        - name: adjustmentType
+          in: query
+          description: 调整类型
+          schema:
+            type: string
+            enum: [stocktaking_profit, stocktaking_loss, damage, expired, other]
+      responses:
+        '200':
+          description: 成功返回调整记录列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryAdjustmentListResponse'
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+    post:
+      summary: 创建库存调整申请
+      description: 提交库存调整申请
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdjustmentRequest'
+      responses:
+        '201':
+          description: 成功创建调整申请
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryAdjustment'
+        '400':
+          description: 请求参数错误
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  /adjustments/{id}/approve:
+    post:
+      summary: 审批库存调整
+      description: 审批库存调整申请
+      parameters:
+        - name: id
+          in: path
+          description: 调整ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproveAdjustmentRequest'
+      responses:
+        '200':
+          description: 成功审批
+        '404':
+          description: 调整记录不存在
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  # 库存流水相关接口
+  /movements:
+    get:
+      summary: 获取库存流水列表
+      description: 分页获取库存流水记录
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sku
+          in: query
+          description: 商品SKU
+          schema:
+            type: string
+        - name: locationId
+          in: query
+          description: 位置ID
+          schema:
+            type: string
+        - name: movementType
+          in: query
+          description: 变动类型
+          schema:
+            type: string
+            enum: [in, out, transfer_in, transfer_out, adjust_positive, adjust_negative]
+        - name: startTime
+          in: query
+          description: 开始时间
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          description: 结束时间
+          schema:
+            type: string
+            format: date-time
+        - name: operatorName
+          in: query
+          description: 操作员姓名
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回流水列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryMovementResponse'
+        '400':
+          description: 请求参数错误
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  /movements/export:
+    post:
+      summary: 导出库存流水
+      description: 导出库存流水数据到Excel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovementExportRequest'
+      responses:
+        '200':
+          description: 成功导出
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: 请求参数错误
+        '401':
+          description: 未授权
+        '403':
+          description: 权限不足
+
+  # 基础数据接口
+  /categories:
+    get:
+      summary: 获取商品类目列表
+      description: 获取所有商品类目
+      responses:
+        '200':
+          description: 成功返回类目列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+
+  /brands:
+    get:
+      summary: 获取品牌列表
+      description: 获取所有品牌
+      responses:
+        '200':
+          description: 成功返回品牌列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandListResponse'
+
+  /locations:
+    get:
+      summary: 获取仓库门店列表
+      description: 获取所有仓库和门店
+      parameters:
+        - name: type
+          in: query
+          description: 位置类型筛选
+          schema:
+            type: string
+            enum: [warehouse, store]
+      responses:
+        '200':
+          description: 成功返回位置列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationListResponse'
+
+components:
+  schemas:
+    # 库存台账相关模型
+    InventoryLedger:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 库存台账ID
+        sku:
+          type: string
+          description: 商品SKU
+        productName:
+          type: string
+          description: 商品名称
+        locationId:
+          type: string
+          description: 位置ID
+        locationName:
+          type: string
+          description: 位置名称
+        locationType:
+          type: string
+          enum: [warehouse, store]
+          description: 位置类型
+        physicalQuantity:
+          type: integer
+          format: int32
+          description: 现存库存
+        reservedQuantity:
+          type: integer
+          format: int32
+          description: 预占库存
+        availableQuantity:
+          type: integer
+          format: int32
+          description: 可用库存
+        inTransitQuantity:
+          type: integer
+          format: int32
+          description: 在途库存
+        safetyStock:
+          type: integer
+          format: int32
+          description: 安全库存
+        category:
+          type: string
+          description: 商品类目
+        brand:
+          type: string
+          description: 品牌
+        specification:
+          type: string
+          description: 规格
+        unit:
+          type: string
+          description: 单位
+        stockStatus:
+          type: string
+          enum: [low, normal, high]
+          description: 库存状态
+        isSellable:
+          type: boolean
+          description: 是否可售
+        lastUpdated:
+          type: string
+          format: date-time
+          description: 最后更新时间
+
+    InventoryLedgerResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryLedger'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        statistics:
+          $ref: '#/components/schemas/InventoryStatistics'
+
+    InventoryLedgerDetail:
+      allOf:
+        - $ref: '#/components/schemas/InventoryLedger'
+        - type: object
+          properties:
+            recentMovements:
+              type: array
+              items:
+                $ref: '#/components/schemas/InventoryMovement'
+              description: 最近流水记录
+            adjustmentHistory:
+              type: array
+              items:
+                $ref: '#/components/schemas/InventoryAdjustment'
+              description: 调整历史
+
+    # 库存流水相关模型
+    InventoryMovement:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 流水ID
+        transactionId:
+          type: string
+          description: 交易ID
+        sku:
+          type: string
+          description: 商品SKU
+        productName:
+          type: string
+          description: 商品名称
+        locationId:
+          type: string
+          description: 位置ID
+        locationName:
+          type: string
+          description: 位置名称
+        movementType:
+          type: string
+          enum: [in, out, transfer_in, transfer_out, adjust_positive, adjust_negative]
+          description: 变动类型
+        movementSubtype:
+          type: string
+          description: 变动子类型
+        quantity:
+          type: integer
+          format: int32
+          description: 变动数量
+        balanceAfter:
+          type: integer
+          format: int32
+          description: 变动后结余
+        referenceType:
+          type: string
+          description: 关联单据类型
+        referenceId:
+          type: string
+          description: 关联单据ID
+        referenceNo:
+          type: string
+          description: 单据编号
+        operatorName:
+          type: string
+          description: 操作员姓名
+        operationTime:
+          type: string
+          format: date-time
+          description: 操作时间
+        reason:
+          type: string
+          description: 变动原因
+        remark:
+          type: string
+          description: 备注
+        sourceSystem:
+          type: string
+          description: 来源系统
+
+    InventoryMovementResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryMovement'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # 库存调整相关模型
+    InventoryAdjustment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 调整ID
+        adjustmentNo:
+          type: string
+          description: 调整单号
+        sku:
+          type: string
+          description: 商品SKU
+        productName:
+          type: string
+          description: 商品名称
+        locationId:
+          type: string
+          description: 位置ID
+        locationName:
+          type: string
+          description: 位置名称
+        adjustmentType:
+          type: string
+          enum: [stocktaking_profit, stocktaking_loss, damage, expired, other]
+          description: 调整类型
+        originalQuantity:
+          type: integer
+          format: int32
+          description: 原始数量
+        adjustedQuantity:
+          type: integer
+          format: int32
+          description: 调整后数量
+        adjustmentQuantity:
+          type: integer
+          format: int32
+          description: 调整数量
+        requestUserName:
+          type: string
+          description: 申请人姓名
+        approveUserName:
+          type: string
+          description: 审批人姓名
+        status:
+          type: string
+          enum: [pending, approved, rejected, completed]
+          description: 状态
+        reason:
+          type: string
+          description: 调整原因
+        remark:
+          type: string
+          description: 备注
+        requestTime:
+          type: string
+          format: date-time
+          description: 申请时间
+        approveTime:
+          type: string
+          format: date-time
+          description: 审批时间
+        completedTime:
+          type: string
+          format: date-time
+          description: 完成时间
+
+    InventoryAdjustmentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryAdjustment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # 统计信息模型
+    InventoryStatistics:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          format: int32
+          description: 总商品数
+        lowStockItems:
+          type: integer
+          format: int32
+          description: 库存不足商品数
+        outOfStockItems:
+          type: integer
+          format: int32
+          description: 缺货商品数
+        totalValue:
+          type: number
+          format: double
+          description: 库存总值
+        totalQuantity:
+          type: integer
+          format: int32
+          description: 总库存数量
+        reservedQuantity:
+          type: integer
+          format: int32
+          description: 总预占数量
+        availableQuantity:
+          type: integer
+          format: int32
+          description: 总可用数量
+        inTransitQuantity:
+          type: integer
+          format: int32
+          description: 总在途数量
+
+    # 基础数据模型
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 类目ID
+        name:
+          type: string
+          description: 类目名称
+        parentId:
+          type: string
+          description: 父类目ID
+        level:
+          type: integer
+          format: int32
+          description: 层级
+
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 品牌ID
+        name:
+          type: string
+          description: 品牌名称
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 位置ID
+        code:
+          type: string
+          description: 位置编码
+        name:
+          type: string
+          description: 位置名称
+        type:
+          type: string
+          enum: [warehouse, store]
+          description: 位置类型
+
+    # 请求/响应模型
+    Pagination:
+      type: object
+      properties:
+        current:
+          type: integer
+          format: int32
+          description: 当前页码
+        pageSize:
+          type: integer
+          format: int32
+          description: 每页大小
+        total:
+          type: integer
+          format: int32
+          description: 总记录数
+        totalPages:
+          type: integer
+          format: int32
+          description: 总页数
+
+    ExportRequest:
+      type: object
+      properties:
+        filters:
+          type: object
+          description: 导出筛选条件
+        columns:
+          type: array
+          items:
+            type: string
+          description: 导出字段列表
+
+    MovementExportRequest:
+      type: object
+      properties:
+        filters:
+          type: object
+          description: 流水筛选条件
+        startTime:
+          type: string
+          format: date-time
+          description: 开始时间
+        endTime:
+          type: string
+          format: date-time
+          description: 结束时间
+
+    CreateAdjustmentRequest:
+      type: object
+      required:
+        - sku
+        - locationId
+        - adjustmentType
+        - adjustmentQuantity
+        - reason
+      properties:
+        sku:
+          type: string
+          description: 商品SKU
+        locationId:
+          type: string
+          description: 位置ID
+        adjustmentType:
+          type: string
+          enum: [stocktaking_profit, stocktaking_loss, damage, expired, other]
+          description: 调整类型
+        adjustmentQuantity:
+          type: integer
+          format: int32
+          description: 调整数量
+        reason:
+          type: string
+          description: 调整原因
+        remark:
+          type: string
+          description: 备注
+
+    ApproveAdjustmentRequest:
+      type: object
+      required:
+        - approved
+        - remark
+      properties:
+        approved:
+          type: boolean
+          description: 是否批准
+        remark:
+          type: string
+          description: 审批意见
+
+    CategoryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+
+    BrandListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Brand'
+
+    LocationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+
+  # 安全方案
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

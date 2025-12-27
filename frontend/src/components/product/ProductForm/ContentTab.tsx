@@ -143,6 +143,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
                 help={errors['content.title']?.message as string}
               >
                 <Input
+                  id="field-content-title"
                   placeholder="请输入商品展示标题"
                   {...control.register('content.title')}
                 />

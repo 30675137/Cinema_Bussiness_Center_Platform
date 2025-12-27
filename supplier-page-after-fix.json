@@ -1,0 +1,31 @@
+uid=34_0 RootWebArea "影院商品管理中台 - UI框架统一升级" url="http://localhost:3000/procurement/supplier"
+  uid=34_1 ignored
+    uid=34_2 ignored
+      uid=34_3 generic
+        uid=34_4 heading "Unexpected Application Error!" level="2"
+          uid=34_5 StaticText "Unexpected Application Error!"
+            uid=34_6 InlineTextBox "Unexpected Application Error!"
+        uid=34_7 heading "The requested module '/src/utils/formatters.ts' does not provide an export named 'formatPhoneNumber'" level="3"
+          uid=34_8 StaticText "The requested module '/src/utils/formatters.ts' does not provide an export named 'formatPhoneNumber'"
+            uid=34_9 InlineTextBox "The requested module '/src/utils/formatters.ts' does not provide an export named 'formatPhoneNumber'"
+        uid=34_10 generic
+          uid=34_11 StaticText "SyntaxError: The requested module '/src/utils/formatters.ts' does not provide an export named 'formatPhoneNumber'"
+            uid=34_12 InlineTextBox "SyntaxError: The requested module '/src/utils/formatters.ts' does not provide an export named 'formatPhoneNumber'"
+        uid=34_13 paragraph
+          uid=34_14 StaticText "💿 Hey developer 👋"
+            uid=34_15 InlineTextBox "💿 Hey developer 👋"
+        uid=34_16 paragraph
+          uid=34_17 StaticText "You can provide a way better UX than this when your app throws errors by providing your own "
+            uid=34_18 InlineTextBox "You can provide a way better UX than this when your app throws errors by providing your own "
+          uid=34_19 code
+            uid=34_20 StaticText "ErrorBoundary"
+              uid=34_21 InlineTextBox "ErrorBoundary"
+          uid=34_22 StaticText " or"
+            uid=34_23 InlineTextBox " or"
+          uid=34_24 StaticText " "
+            uid=34_25 InlineTextBox " "
+          uid=34_26 code
+            uid=34_27 StaticText "errorElement"
+              uid=34_28 InlineTextBox "errorElement"
+          uid=34_29 StaticText " prop on your route."
+            uid=34_30 InlineTextBox " prop on your route."

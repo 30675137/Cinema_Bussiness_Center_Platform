@@ -1,0 +1,736 @@
+# 采购与入库管理 Mock API 合约
+
+## 概述
+
+本文档定义了采购与入库管理模块的Mock API接口规范，所有接口均为前端模拟实现，不涉及后端服务。API设计遵循RESTful规范，使用标准的HTTP状态码和响应格式。
+
+## 基础配置
+
+### API 基础信息
+- **Base URL**: `/api/purchase-management`
+- **API版本**: v1
+- **数据格式**: JSON
+- **字符编码**: UTF-8
+- **时区**: Asia/Shanghai
+
+### 通用响应格式
+
+#### 成功响应
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "操作成功",
+  "data": {}, // 具体数据
+  "timestamp": "2025-12-11T10:30:00Z"
+}
+```
+
+#### 错误响应
+```json
+{
+  "success": false,
+  "code": 400,
+  "message": "请求参数错误",
+  "error": "具体错误信息",
+  "timestamp": "2025-12-11T10:30:00Z"
+}
+```
+
+#### 分页响应
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "items": [], // 数据列表
+    "pagination": {
+      "current": 1,
+      "pageSize": 20,
+      "total": 100,
+      "totalPages": 5
+    }
+  },
+  "timestamp": "2025-12-11T10:30:00Z"
+}
+```
+
+### 通用查询参数
+```typescript
+interface QueryParams {
+  /** 当前页码 */
+  current?: number;
+  /** 每页大小 */
+  pageSize?: number;
+  /** 排序字段 */
+  sortField?: string;
+  /** 排序方向 */
+  sortOrder?: 'ascend' | 'descend';
+  /** 搜索关键词 */
+  keyword?: string;
+}
+```
+
+## 采购订单管理 API
+
+### 1. 获取采购订单列表
+**接口地址**: `GET /purchase-orders`
+
+**接口描述**: 分页查询采购订单列表，支持多条件筛选和排序
+
+**请求参数**:
+```typescript
+interface GetPurchaseOrdersParams extends QueryParams {
+  /** 订单状态筛选 */
+  status?: PurchaseOrderStatus;
+  /** 供应商ID筛选 */
+  supplierId?: string;
+  /** 仓库ID筛选 */
+  warehouseId?: string;
+  /** 开始日期筛选 */
+  startDate?: string;
+  /** 结束日期筛选 */
+  endDate?: string;
+  /** 订单号模糊搜索 */
+  orderNumber?: string;
+  /** 供应商名称模糊搜索 */
+  supplierName?: string;
+}
+```
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "items": [
+      {
+        "id": "po_001",
+        "orderNumber": "PO202512000001",
+        "supplier": {
+          "id": "sup_001",
+          "name": "北京影视器材供应商",
+          "contact": {
+            "person": "张经理",
+            "phone": "13800138000"
+          }
+        },
+        "warehouse": {
+          "id": "wh_001",
+          "name": "北京总仓"
+        },
+        "status": "approved",
+        "orderDate": "2025-12-01T00:00:00Z",
+        "expectedDate": "2025-12-15T00:00:00Z",
+        "totalAmount": 15000.00,
+        "receiptProgress": 0.6,
+        "items": [],
+        "createdBy": {
+          "id": "user_001",
+          "name": "李采购"
+        },
+        "createdAt": "2025-12-01T09:00:00Z"
+      }
+    ],
+    "pagination": {
+      "current": 1,
+      "pageSize": 20,
+      "total": 50,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+### 2. 获取采购订单详情
+**接口地址**: `GET /purchase-orders/{id}`
+
+**接口描述**: 获取指定采购订单的详细信息
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**响应数据**: 完整的PurchaseOrder对象数据
+
+### 3. 创建采购订单
+**接口地址**: `POST /purchase-orders`
+
+**接口描述**: 创建新的采购订单
+
+**请求参数**:
+```typescript
+interface CreatePurchaseOrderParams {
+  /** 供应商ID */
+  supplierId: string;
+  /** 仓库ID */
+  warehouseId: string;
+  /** 下单日期 */
+  orderDate: string;
+  /** 计划到货日期 */
+  expectedDate: string;
+  /** 订单明细 */
+  items: CreateOrderItemParams[];
+  /** 备注 */
+  remarks?: string;
+}
+
+interface CreateOrderItemParams {
+  /** 商品ID */
+  productId: string;
+  /** 采购数量 */
+  quantity: number;
+  /** 采购单价 */
+  unitPrice: number;
+  /** 税率 */
+  taxRate: number;
+  /** 备注 */
+  remarks?: string;
+}
+```
+
+**响应数据**: 创建成功的PurchaseOrder对象
+
+### 4. 更新采购订单
+**接口地址**: `PUT /purchase-orders/{id}`
+
+**接口描述**: 更新采购订单信息（仅草稿和审批前状态可编辑）
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**请求参数**: CreatePurchaseOrderParams
+
+**响应数据**: 更新后的PurchaseOrder对象
+
+### 5. 删除采购订单
+**接口地址**: `DELETE /purchase-orders/{id}`
+
+**接口描述**: 删除采购订单（仅草稿状态可删除）
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "删除成功"
+}
+```
+
+### 6. 提交审批
+**接口地址**: `POST /purchase-orders/{id}/submit`
+
+**接口描述**: 提交采购订单进行审批
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**请求参数**:
+```typescript
+interface SubmitApprovalParams {
+  /** 审批意见 */
+  comments?: string;
+}
+```
+
+**响应数据**: 更新后的PurchaseOrder对象
+
+### 7. 审批处理
+**接口地址**: `POST /purchase-orders/{id}/approve`
+
+**接口描述**: 处理采购订单审批
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**请求参数**:
+```typescript
+interface ApproveOrderParams {
+  /** 审批状态 */
+  status: 'approved' | 'rejected';
+  /** 审批意见 */
+  comments?: string;
+}
+```
+
+### 8. 关闭订单
+**接口地址**: `POST /purchase-orders/{id}/close`
+
+**接口描述**: 关闭采购订单
+
+**路径参数**:
+- `id`: 采购订单ID
+
+**请求参数**:
+```typescript
+interface CloseOrderParams {
+  /** 关闭原因 */
+  reason: string;
+}
+```
+
+## 收货入库管理 API
+
+### 1. 获取收货入库单列表
+**接口地址**: `GET /goods-receipts`
+
+**接口描述**: 分页查询收货入库单列表
+
+**请求参数**:
+```typescript
+interface GetGoodsReceiptsParams extends QueryParams {
+  /** 收货单状态 */
+  status?: GoodsReceiptStatus;
+  /** 供应商ID筛选 */
+  supplierId?: string;
+  /** 仓库ID筛选 */
+  warehouseId?: string;
+  /** 关联采购订单ID */
+  purchaseOrderId?: string;
+  /** 收货日期范围 */
+  startDate?: string;
+  endDate?: string;
+  /** 收货单号搜索 */
+  receiptNumber?: string;
+}
+```
+
+**响应数据**: 分页的GoodsReceipt列表
+
+### 2. 获取收货入库单详情
+**接口地址**: `GET /goods-receipts/{id}`
+
+**接口描述**: 获取指定收货入库单的详细信息
+
+**路径参数**:
+- `id`: 收货入库单ID
+
+**响应数据**: 完整的GoodsReceipt对象
+
+### 3. 基于采购订单创建收货单
+**接口地址**: `POST /goods-receipts/from-purchase-order`
+
+**接口描述**: 基于采购订单创建收货入库单
+
+**请求参数**:
+```typescript
+interface CreateReceiptFromOrderParams {
+  /** 采购订单ID */
+  purchaseOrderId: string;
+  /** 收货日期 */
+  receiptDate: string;
+  /** 收货类型 */
+  receiptType: ReceiptType;
+  /** 收货明细 */
+  items: CreateReceiptItemParams[];
+  /** 备注 */
+  remarks?: string;
+}
+
+interface CreateReceiptItemParams {
+  /** 采购订单明细ID */
+  orderItemId: string;
+  /** 本次收货数量 */
+  quantity: number;
+  /** 质检状态 */
+  qualityStatus?: QualityStatus;
+  /** 质检备注 */
+  qualityRemarks?: string;
+  /** 库位 */
+  location?: string;
+  /** 批次号 */
+  batchNumber?: string;
+}
+```
+
+**响应数据**: 创建成功的GoodsReceipt对象
+
+### 4. 确认收货入库
+**接口地址**: `POST /goods-receipts/{id}/confirm`
+
+**接口描述**: 确认收货入库，更新采购订单收货状态
+
+**路径参数**:
+- `id`: 收货入库单ID
+
+**请求参数**:
+```typescript
+interface ConfirmReceiptParams {
+  /** 确认备注 */
+  remarks?: string;
+}
+```
+
+**响应数据**: 更新后的GoodsReceipt对象
+
+### 5. 作废收货单
+**接口地址**: `POST /goods-receipts/{id}/cancel`
+
+**接口描述**: 作废收货入库单
+
+**路径参数**:
+- `id`: 收货入库单ID
+
+**请求参数**:
+```typescript
+interface CancelReceiptParams {
+  /** 作废原因 */
+  reason: string;
+}
+```
+
+## 供应商管理 API
+
+### 1. 获取供应商列表
+**接口地址**: `GET /suppliers`
+
+**接口描述**: 获取供应商列表，用于下拉选择
+
+**请求参数**:
+```typescript
+interface GetSuppliersParams extends QueryParams {
+  /** 供应商状态 */
+  status?: SupplierStatus;
+  /** 供应商类型 */
+  category?: SupplierCategory;
+  /** 供应商名称搜索 */
+  name?: string;
+}
+```
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": [
+    {
+      "id": "sup_001",
+      "code": "SUP0001",
+      "name": "北京影视器材供应商",
+      "category": "product",
+      "status": "active",
+      "contact": {
+        "person": "张经理",
+        "phone": "13800138000",
+        "email": "zhang@example.com"
+      },
+      "rating": "A"
+    }
+  ]
+}
+```
+
+### 2. 获取供应商详情
+**接口地址**: `GET /suppliers/{id}`
+
+**接口描述**: 获取供应商详细信息
+
+**响应数据**: 完整的Supplier对象
+
+### 3. 搜索供应商
+**接口地址**: `GET /suppliers/search`
+
+**接口描述**: 快速搜索供应商，用于表单自动完成
+
+**请求参数**:
+```typescript
+interface SearchSuppliersParams {
+  /** 搜索关键词 */
+  keyword: string;
+  /** 返回结果数量限制 */
+  limit?: number;
+}
+```
+
+## 商品管理 API
+
+### 1. 获取商品列表
+**接口地址**: `GET /products`
+
+**接口描述**: 获取商品列表，用于采购订单商品选择
+
+**请求参数**:
+```typescript
+interface GetProductsParams extends QueryParams {
+  /** 商品状态 */
+  status?: ProductStatus;
+  /** 商品分类ID */
+  categoryId?: string;
+  /** 商品名称或SKU搜索 */
+  keyword?: string;
+}
+```
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": [
+    {
+      "id": "prod_001",
+      "sku": "CINEMA-POP-001",
+      "name": "爆米花专用玉米粒",
+      "specification": "25kg/袋",
+      "brand": "黄金玉米",
+      "category": {
+        "id": "cat_001",
+        "name": "食品原料"
+      },
+      "unit": "袋",
+      "status": "active",
+      "costPrice": 120.00,
+      "images": [
+        {
+          "url": "/images/products/popcorn.jpg",
+          "fileName": "popcorn.jpg"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 2. 搜索商品
+**接口地址**: `GET /products/search`
+
+**接口描述**: 快速搜索商品，支持SKU和名称搜索
+
+**请求参数**:
+```typescript
+interface SearchProductsParams {
+  /** 搜索关键词 */
+  keyword: string;
+  /** 返回结果数量限制 */
+  limit?: number;
+  /** 指定供应商的商品 */
+  supplierId?: string;
+}
+```
+
+### 3. 获取商品详情
+**接口地址**: `GET /products/{id}`
+
+**接口描述**: 获取商品详细信息，包括供应商信息
+
+**响应数据**: 完整的Product对象
+
+## 仓库管理 API
+
+### 1. 获取仓库列表
+**接口地址**: `GET /warehouses`
+
+**接口描述**: 获取仓库列表
+
+**请求参数**:
+```typescript
+interface GetWarehousesParams {
+  /** 仓库状态 */
+  status?: WarehouseStatus;
+  /** 仓库类型 */
+  type?: WarehouseType;
+}
+```
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": [
+    {
+      "id": "wh_001",
+      "code": "WH_BJ_01",
+      "name": "北京总仓",
+      "type": "main",
+      "status": "active",
+      "address": {
+        "province": "北京市",
+        "city": "北京市",
+        "district": "朝阳区",
+        "detail": "XX路XX号"
+      },
+      "contact": {
+        "person": "王管理员",
+        "phone": "13900139000"
+      },
+      "manager": {
+        "id": "user_002",
+        "name": "王管理员"
+      }
+    }
+  ]
+}
+```
+
+### 2. 获取仓库存储位置
+**接口地址**: `GET /warehouses/{id}/locations`
+
+**接口描述**: 获取指定仓库的存储位置列表
+
+**请求参数**:
+```typescript
+interface GetLocationsParams {
+  /** 库位状态 */
+  status?: LocationStatus;
+  /** 库位类型 */
+  type?: LocationType;
+  /** 区域筛选 */
+  area?: string;
+}
+```
+
+## 统计分析 API
+
+### 1. 采购统计数据
+**接口地址**: `GET /statistics/purchase-summary`
+
+**接口描述**: 获取采购统计数据，用于仪表板展示
+
+**请求参数**:
+```typescript
+interface GetPurchaseSummaryParams {
+  /** 统计开始日期 */
+  startDate: string;
+  /** 统计结束日期 */
+  endDate: string;
+  /** 仓库ID筛选 */
+  warehouseId?: string;
+}
+```
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "查询成功",
+  "data": {
+    "orderCount": 120,
+    "totalAmount": 1500000.00,
+    "receivedAmount": 1200000.00,
+    "pendingAmount": 300000.00,
+    "topSuppliers": [
+      {
+        "supplierId": "sup_001",
+        "supplierName": "北京影视器材供应商",
+        "orderCount": 25,
+        "totalAmount": 350000.00
+      }
+    ],
+    "statusDistribution": {
+      "draft": 10,
+      "pending": 15,
+      "approved": 30,
+      "partial_received": 20,
+      "received": 40,
+      "closed": 5
+    }
+  }
+}
+```
+
+### 2. 收货统计数据
+**接口地址**: `GET /statistics/receipt-summary`
+
+**接口描述**: 获取收货统计数据
+
+**请求参数**: 同GetPurchaseSummaryParams
+
+## 文件上传 API
+
+### 1. 附件上传
+**接口地址**: `POST /attachments/upload`
+
+**接口描述**: 上传采购订单或收货单的附件
+
+**请求格式**: `multipart/form-data`
+
+**请求参数**:
+- `file`: 上传的文件
+- `type`: 附件类型 ('purchase_order' | 'goods_receipt')
+- `relatedId`: 关联的订单ID
+
+**响应数据**:
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "上传成功",
+  "data": {
+    "id": "att_001",
+    "fileName": "采购合同.pdf",
+    "fileSize": 1024000,
+    "fileType": "application/pdf",
+    "url": "/api/files/attachments/att_001.pdf",
+    "uploadedAt": "2025-12-11T10:30:00Z"
+  }
+}
+```
+
+### 2. 附件下载
+**接口地址**: `GET /attachments/{id}/download`
+
+**接口描述**: 下载附件文件
+
+**路径参数**:
+- `id`: 附件ID
+
+## Mock数据实现说明
+
+### 数据存储策略
+- 使用浏览器 localStorage 进行本地数据持久化
+- 内存状态管理用于会话数据
+- 支持数据导入/导出功能
+
+### 数据初始化
+```typescript
+// 首次访问时初始化Mock数据
+const initializeMockData = () => {
+  if (!localStorage.getItem('purchase-orders')) {
+    localStorage.setItem('purchase-orders', JSON.stringify(mockPurchaseOrders));
+    localStorage.setItem('goods-receipts', JSON.stringify(mockGoodsReceipts));
+    localStorage.setItem('suppliers', JSON.stringify(mockSuppliers));
+    localStorage.setItem('products', JSON.stringify(mockProducts));
+    localStorage.setItem('warehouses', JSON.stringify(mockWarehouses));
+  }
+};
+```
+
+### 数据模拟规则
+1. **订单编号**: 自动生成唯一编号，格式为 PO{YYYYMM}{6位序列号}
+2. **收货单编号**: 自动生成唯一编号，格式为 GR{YYYYMM}{6位序列号}
+3. **状态流转**: 模拟真实的业务状态转换
+4. **数据关联**: 保持数据间的引用完整性
+5. **性能优化**: 大数据量时使用分页和懒加载
+
+### 错误处理
+```typescript
+// 统一错误处理
+const handleMockApiError = (error: any) => {
+  console.error('Mock API Error:', error);
+  return {
+    success: false,
+    code: 500,
+    message: '系统错误',
+    error: error.message,
+    timestamp: new Date().toISOString()
+  };
+};
+```
+
+---
+
+**创建日期**: 2025-12-11
+**创建人**: 系统
+**文档版本**: v1.0
+**分支**: claude-1-purchase-management

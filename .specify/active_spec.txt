@@ -1,0 +1,1 @@
+specs/P003-inventory-query

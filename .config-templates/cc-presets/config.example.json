@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "presets": {
+    "claude": {
+      "env_vars": {
+        "ANTHROPIC_API_KEY": "sk-ant-your-api-key-here",
+        "ANTHROPIC_MODEL": "claude-3-sonnet-20240229",
+        "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
+      },
+      "metadata": {
+        "created": "2025-12-13T10:30:00Z",
+        "modified": "2025-12-13T10:30:00Z",
+        "description": "Claude API configuration example"
+      }
+    },
+    "glm": {
+      "env_vars": {
+        "ANTHROPIC_AUTH_TOKEN": "your-glm-token-here",
+        "ANTHROPIC_MODEL": "GLM-4.6",
+        "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
+        "ANTHROPIC_SMALL_FAST_MODEL": "GLM-4.6"
+      },
+      "metadata": {
+        "created": "2025-12-13T11:00:00Z",
+        "modified": "2025-12-13T11:00:00Z",
+        "description": "GLM-4.6 API configuration via BigModel"
+      }
+    }
+  },
+  "settings": {
+    "active_preset": null,
+    "mask_sensitive": true
+  }
+}

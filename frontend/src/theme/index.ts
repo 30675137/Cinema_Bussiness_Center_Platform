@@ -1,8 +1,60 @@
-import type { ThemeConfig } from 'antd';
+/**
+ * 主题系统入口文件
+ * 提供完整的主题管理功能
+ */
+
+// 导出核心类
+import { themeManager } from './core';
+export { ThemeManager, themeManager } from './core';
+
+// 导出类型定义
+export type {
+  ThemeMode,
+  ThemeConfig,
+  ThemeSettings,
+  ThemePreset,
+  ThemeCustomization,
+  ColorPalette,
+  Typography,
+  Spacing,
+  BorderRadius,
+  BoxShadow,
+  Breakpoints,
+  Animation,
+  ZIndex,
+  ThemeEventType,
+  ThemeEventListener,
+  CSSVariableMap
+} from './types';
+
+// 导出React Hooks
+export {
+  useTheme,
+  useThemeSettings,
+  useCustomThemes,
+  useThemeToggle,
+  useThemeCSSVariables,
+  useThemeAdapt
+} from './hooks';
+
+// 导出工具函数
+export {
+  generateColorVariants,
+  blendColors,
+  getContrastColor,
+  generateCSSVariables,
+  applyCSSVariables,
+  createBreakpointHelper,
+  createColorHelper,
+  createSpacingHelper
+} from './utils';
+
+// 兼容旧的Ant Design主题配置
+import type { ThemeConfig as AntdThemeConfig } from 'antd';
 import { theme } from 'antd';
 
-// 耀莱影城品牌色彩配置
-const colors = {
+// 耀莱影城品牌色彩配置（保持向后兼容）
+export const colors = {
   primary: '#1890ff',      // 耀莱蓝
   success: '#52c41a',      // 成功绿
   warning: '#faad14',      // 警告橙
@@ -22,8 +74,8 @@ const colors = {
   backgroundColor: '#fafafa',
 };
 
-// Ant Design主题配置
-export const antdTheme: ThemeConfig = {
+// Ant Design主题配置（保持向后兼容）
+export const antdTheme: AntdThemeConfig = {
   algorithm: theme.defaultAlgorithm,
   token: {
     // 主色调
@@ -119,7 +171,7 @@ export const statusColors = {
 };
 
 // 暗色主题配置
-export const darkTheme: ThemeConfig = {
+export const darkTheme: AntdThemeConfig = {
   ...antdTheme,
   algorithm: theme.darkAlgorithm,
   token: {
@@ -132,9 +184,134 @@ export const darkTheme: ThemeConfig = {
   },
 };
 
+// 自定义样式类
+export const customStyles = `
+  .layout-header {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+  }
+
+  .layout-sider {
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.08);
+    z-index: 99;
+  }
+
+  .content-wrapper {
+    min-height: calc(100vh - 64px);
+    padding: 24px;
+    background: #f0f2f5;
+  }
+
+  .page-header {
+    background: #fff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    margin-bottom: 16px;
+  }
+
+  .page-content {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    padding: 24px;
+  }
+
+  .status-tag {
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-active {
+    color: ${colors.success};
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+  }
+
+  .status-inactive {
+    color: ${colors.error};
+    background: #fff2f0;
+    border: 1px solid #ffccc7;
+  }
+
+  .status-draft {
+    color: ${colors.warning};
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+  }
+
+  .table-hover-row {
+    transition: background-color 0.2s ease;
+  }
+
+  .table-hover-row:hover {
+    background-color: #f5f5f5;
+  }
+
+  .card-hover {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .form-section {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+  }
+
+  .form-section-title {
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .page-header, .page-content {
+      padding: 16px;
+    }
+
+    .form-section {
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+  }
+`;
+
+// 主题系统初始化
+export const initTheme = () => {
+  // 从localStorage加载主题设置
+  const savedSettings = localStorage.getItem('theme-settings');
+  if (savedSettings) {
+    try {
+      const settings = JSON.parse(savedSettings);
+      themeManager.updateSettings(settings);
+    } catch (error) {
+      console.warn('Failed to load theme settings:', error);
+    }
+  }
+
+  return themeManager;
+};
+
+// 创建全局主题管理器实例
+export const globalTheme = initTheme();
+
+// 默认导出（保持向后兼容）
 export default {
   light: antdTheme,
   dark: darkTheme,
   colors,
   statusColors,
+  customStyles,
 };
