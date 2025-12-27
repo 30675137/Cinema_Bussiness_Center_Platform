@@ -60,7 +60,7 @@ while [ $i -le $# ]; do
             echo "Options:"
             echo "  --json              Output in JSON format"
             echo "  --short-name <name> Provide a custom short name (2-4 words) for the branch"
-            echo "  --module <X>        Module prefix (S/P/B/A/U/T/F). Interactive prompt if not provided."
+            echo "  --module <X>        Module prefix (S/P/B/A/U/O/T/F). Interactive prompt if not provided."
             echo "  --number N          Specify module-specific branch number manually (overrides auto-detection)"
             echo "  --help, -h          Show this help message"
             echo ""
@@ -70,6 +70,7 @@ while [ $i -le $# ]; do
             echo "  B = 品牌/分类管理 (Brand/Category Management)"
             echo "  A = 活动/场景包管理 (Activity/Scenario Package Management)"
             echo "  U = 用户/预订管理 (User/Reservation Management)"
+            echo "  O = 订单管理 (Order Management - 商品订单)"
             echo "  T = 工具/基础设施 (Tool/Infrastructure)"
             echo "  F = 前端基础 (Frontend Infrastructure)"
             echo ""
@@ -277,7 +278,7 @@ generate_branch_name() {
 validate_module() {
     local module="$1"
     case "$module" in
-        S|P|B|A|U|T|F)
+        S|P|B|A|U|O|T|F)
             return 0
             ;;
         *)
@@ -299,6 +300,7 @@ if [ -z "$MODULE_PREFIX" ]; then
     echo "  B = 品牌/分类管理 (Brand/Category Management)"
     echo "  A = 活动/场景包管理 (Activity/Scenario Package Management)"
     echo "  U = 用户/预订管理 (User/Reservation Management)"
+    echo "  O = 订单管理 (Order Management - 商品订单)"
     echo "  T = 工具/基础设施 (Tool/Infrastructure)"
     echo "  F = 前端基础 (Frontend Infrastructure)"
     echo ""
@@ -308,7 +310,7 @@ fi
 
 # Validate module prefix
 if ! validate_module "$MODULE_PREFIX"; then
-    echo "Error: Invalid module prefix '$MODULE_PREFIX'. Must be one of: S, P, B, A, U, T, F" >&2
+    echo "Error: Invalid module prefix '$MODULE_PREFIX'. Must be one of: S, P, B, A, U, O, T, F" >&2
     exit 1
 fi
 

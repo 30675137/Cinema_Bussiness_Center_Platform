@@ -66,6 +66,41 @@ public class InventoryController {
     }
 
     /**
+     * 查询当前库存列表（别名接口）
+     * 
+     * GET /api/inventory/current?page=1&pageSize=20
+     * 
+     * 前端可能使用此端点获取库存列表
+     */
+    @GetMapping("/current")
+    public ResponseEntity<InventoryListResponse> listCurrentInventory(
+            @RequestParam(required = false) String storeId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String statuses,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortOrder) {
+
+        logger.info("GET /api/inventory/current - storeId={}, page={}, pageSize={}",
+                storeId, page, pageSize);
+
+        // 复用 listInventory 逻辑
+        InventoryQueryParams params = InventoryQueryParams.builder()
+                .storeId(parseUUID(storeId))
+                .keyword(keyword)
+                .categoryId(parseUUID(categoryId))
+                .statuses(parseStatuses(statuses))
+                .page(page)
+                .pageSize(pageSize)
+                .build();
+
+        InventoryListResponse response = inventoryService.listInventory(params);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * 获取库存详情
      * 
      * GET /api/inventory/{id}

@@ -114,12 +114,12 @@ public class ScenarioPackageService {
         // 3. 创建影厅关联
         // 开发阶段暂时跳过，因为前端发送的是字符串 ID，后续有真实影厅数据后恢复
         // if (request.getHallTypeIds() != null) {
-        //     for (UUID hallTypeId : request.getHallTypeIds()) {
-        //         PackageHallAssociation association = new PackageHallAssociation();
-        //         association.setPackageId(pkg.getId());
-        //         association.setHallTypeId(hallTypeId);
-        //         hallAssociationRepository.save(association);
-        //     }
+        // for (UUID hallTypeId : request.getHallTypeIds()) {
+        // PackageHallAssociation association = new PackageHallAssociation();
+        // association.setPackageId(pkg.getId());
+        // association.setHallTypeId(hallTypeId);
+        // hallAssociationRepository.save(association);
+        // }
         // }
 
         logger.info("Scenario package created successfully: {}", pkg.getId());
@@ -190,13 +190,13 @@ public class ScenarioPackageService {
         // 更新影厅关联
         // 开发阶段暂时跳过，因为前端发送的是字符串 ID，后续有真实影厅数据后恢复
         // if (request.getHallTypeIds() != null) {
-        //     hallAssociationRepository.deleteByPackageId(id);
-        //     for (UUID hallTypeId : request.getHallTypeIds()) {
-        //         PackageHallAssociation association = new PackageHallAssociation();
-        //         association.setPackageId(id);
-        //         association.setHallTypeId(hallTypeId);
-        //         hallAssociationRepository.save(association);
-        //     }
+        // hallAssociationRepository.deleteByPackageId(id);
+        // for (UUID hallTypeId : request.getHallTypeIds()) {
+        // PackageHallAssociation association = new PackageHallAssociation();
+        // association.setPackageId(id);
+        // association.setHallTypeId(hallTypeId);
+        // hallAssociationRepository.save(association);
+        // }
         // }
 
         // 019-store-association: 更新门店关联
@@ -465,7 +465,7 @@ public class ScenarioPackageService {
      * </p>
      *
      * @param packageId 场景包ID
-     * @param storeIds 门店ID列表
+     * @param storeIds  门店ID列表
      * @param createdBy 创建人
      */
     @Transactional
@@ -493,7 +493,8 @@ public class ScenarioPackageService {
 
         // 创建新关联
         for (UUID storeId : storeIds) {
-            ScenarioPackageStoreAssociation association = new ScenarioPackageStoreAssociation(packageId, storeId, createdBy);
+            ScenarioPackageStoreAssociation association = new ScenarioPackageStoreAssociation(packageId, storeId,
+                    createdBy);
             storeAssociationRepository.save(association);
         }
 
@@ -688,35 +689,35 @@ public class ScenarioPackageService {
 
         // 从 package_tiers 表获取真实套餐数据
         List<PackageTier> tiers = tierRepository.findByPackageIdOrderBySortOrder(pkg.getId());
-        
+
         if (tiers != null && !tiers.isEmpty()) {
             // 有套餐档位数据，使用真实数据
             List<ScenarioPackageListItemDTO.PackageSummary> packages = tiers.stream()
-                .map(tier -> {
-                    ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
-                    summary.setId(tier.getId().toString());
-                    summary.setName(tier.getName());
-                    summary.setPrice(tier.getPrice());
-                    summary.setOriginalPrice(tier.getOriginalPrice());
-                    summary.setDesc(tier.getServiceDescription() != null ? tier.getServiceDescription() : "");
-                    summary.setTags(tier.getTags() != null ? tier.getTags() : List.of());
-                    return summary;
-                })
-                .collect(java.util.stream.Collectors.toList());
+                    .map(tier -> {
+                        ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
+                        summary.setId(tier.getId().toString());
+                        summary.setName(tier.getName());
+                        summary.setPrice(tier.getPrice());
+                        summary.setOriginalPrice(tier.getOriginalPrice());
+                        summary.setDesc(tier.getServiceDescription() != null ? tier.getServiceDescription() : "");
+                        summary.setTags(tier.getTags() != null ? tier.getTags() : List.of());
+                        return summary;
+                    })
+                    .collect(java.util.stream.Collectors.toList());
             dto.setPackages(packages);
-            
+
             // 取最低价作为起价
             BigDecimal minPrice = tiers.stream()
-                .map(PackageTier::getPrice)
-                .filter(price -> price != null)
-                .min(BigDecimal::compareTo)
-                .orElse(BigDecimal.ZERO);
+                    .map(PackageTier::getPrice)
+                    .filter(price -> price != null)
+                    .min(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO);
             dto.setPackagePrice(minPrice);
         } else {
             // 没有套餐档位，回退到 package_pricing 表
             BigDecimal packagePrice = getPackagePrice(pkg.getId());
             dto.setPackagePrice(packagePrice);
-            
+
             ScenarioPackageListItemDTO.PackageSummary summary = new ScenarioPackageListItemDTO.PackageSummary();
             summary.setId(pkg.getId().toString());
             summary.setName("基础套餐");
@@ -882,7 +883,8 @@ public class ScenarioPackageService {
      * 更新时段模板
      */
     @Transactional
-    public TimeSlotTemplate updateTimeSlotTemplate(UUID packageId, UUID templateId, CreateTimeSlotTemplateRequest request) {
+    public TimeSlotTemplate updateTimeSlotTemplate(UUID packageId, UUID templateId,
+            CreateTimeSlotTemplateRequest request) {
         logger.info("Updating time slot template: {} for package: {}", templateId, packageId);
         // 验证场景包存在
         findById(packageId);
@@ -952,7 +954,8 @@ public class ScenarioPackageService {
      * 根据日期范围获取时段覆盖
      */
     @Transactional(readOnly = true)
-    public List<TimeSlotOverride> getTimeSlotOverridesByDateRange(UUID packageId, LocalDate startDate, LocalDate endDate) {
+    public List<TimeSlotOverride> getTimeSlotOverridesByDateRange(UUID packageId, LocalDate startDate,
+            LocalDate endDate) {
         logger.info("Getting time slot overrides for package: {} from {} to {}", packageId, startDate, endDate);
         // 验证场景包存在
         findById(packageId);
@@ -964,13 +967,13 @@ public class ScenarioPackageService {
      */
     @Transactional
     public TimeSlotOverride createTimeSlotOverride(UUID packageId, CreateTimeSlotOverrideRequest request) {
-        logger.info("Creating time slot override for package: {}, date: {}, type: {}", 
+        logger.info("Creating time slot override for package: {}, date: {}, type: {}",
                 packageId, request.getDate(), request.getOverrideType());
         // 验证场景包存在
         findById(packageId);
 
         // 业务规则验证：ADD/MODIFY 类型必须有时间
-        if (("ADD".equals(request.getOverrideType()) || "MODIFY".equals(request.getOverrideType())) 
+        if (("ADD".equals(request.getOverrideType()) || "MODIFY".equals(request.getOverrideType()))
                 && (request.getStartTime() == null || request.getEndTime() == null)) {
             throw new IllegalArgumentException("新增或修改类型的覆盖规则必须指定开始和结束时间");
         }
@@ -979,7 +982,7 @@ public class ScenarioPackageService {
         override.setPackageId(packageId);
         override.setDate(LocalDate.parse(request.getDate()));
         override.setOverrideType(request.getOverrideType());
-        
+
         if (request.getStartTime() != null) {
             override.setStartTime(java.time.LocalTime.parse(request.getStartTime()));
         }
@@ -996,7 +999,8 @@ public class ScenarioPackageService {
      * 更新时段覆盖
      */
     @Transactional
-    public TimeSlotOverride updateTimeSlotOverride(UUID packageId, UUID overrideId, CreateTimeSlotOverrideRequest request) {
+    public TimeSlotOverride updateTimeSlotOverride(UUID packageId, UUID overrideId,
+            CreateTimeSlotOverrideRequest request) {
         logger.info("Updating time slot override: {} for package: {}", overrideId, packageId);
         // 验证场景包存在
         findById(packageId);
@@ -1011,10 +1015,10 @@ public class ScenarioPackageService {
         // 业务规则验证
         String newType = request.getOverrideType() != null ? request.getOverrideType() : override.getOverrideType();
         if (("ADD".equals(newType) || "MODIFY".equals(newType))) {
-            String newStartTime = request.getStartTime() != null ? request.getStartTime() : 
-                    (override.getStartTime() != null ? override.getStartTime().toString() : null);
-            String newEndTime = request.getEndTime() != null ? request.getEndTime() : 
-                    (override.getEndTime() != null ? override.getEndTime().toString() : null);
+            String newStartTime = request.getStartTime() != null ? request.getStartTime()
+                    : (override.getStartTime() != null ? override.getStartTime().toString() : null);
+            String newEndTime = request.getEndTime() != null ? request.getEndTime()
+                    : (override.getEndTime() != null ? override.getEndTime().toString() : null);
             if (newStartTime == null || newEndTime == null) {
                 throw new IllegalArgumentException("新增或修改类型的覆盖规则必须指定开始和结束时间");
             }

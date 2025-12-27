@@ -17,7 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -123,18 +125,13 @@ public class StoreInventoryRepository {
         try {
             UriComponentsBuilder builder = UriComponentsBuilder
                     .fromUriString("/store_inventory")
-                    .queryParam("select", "count")
-                    .queryParam("count", "exact");
+                    .queryParam("select", "id");  // 只选择id字段，减少数据传输
 
             if (params.getStoreId() != null) {
                 builder.queryParam("store_id", "eq." + params.getStoreId());
             }
 
-            if (params.getCategoryId() != null) {
-                // 需要 join SKU 表来按分类过滤
-                // Supabase count 不支持直接 join，这里简化处理
-                builder.queryParam("sku_id", "in.(select id from skus where category_id=eq." + params.getCategoryId() + ")");
-            }
+            // 注：categoryId 过滤暂不支持，需要通过 RPC 或其他方式实现
 
             String uri = builder.build().toUriString();
             
@@ -143,6 +140,7 @@ public class StoreInventoryRepository {
                     .uri(uri)
                     .accept(MediaType.APPLICATION_JSON)
                     .header("Prefer", "count=exact")
+                    .header("Range", "0-0")  // 只请求第一条，减少数据传输
                     .retrieve()
                     .toBodilessEntity()
                     .block(supabaseConfig.getTimeoutDuration())
@@ -264,6 +262,109 @@ public class StoreInventoryRepository {
 
         @JsonProperty("name")
         public String name;
+    }
+
+    /**
+     * 根据 skuId 和 storeId 查询库存记录
+     */
+    public Optional<StoreInventory> findBySkuIdAndStoreId(UUID skuId, UUID storeId) {
+        try {
+            String uri = UriComponentsBuilder
+                    .fromUriString("/store_inventory")
+                    .queryParam("select", "id,store_id,sku_id,on_hand_qty,available_qty,reserved_qty,safety_stock,created_at,updated_at," +
+                            "skus!inner(code,name,main_unit,category_id,categories(id,name))," +
+                            "stores!inner(code,name)")
+                    .queryParam("sku_id", "eq." + skuId)
+                    .queryParam("store_id", "eq." + storeId)
+                    .build()
+                    .toUriString();
+
+            List<SupabaseInventoryRow> rows = webClient.get()
+                    .uri(uri)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(new ParameterizedTypeReference<List<SupabaseInventoryRow>>() {})
+                    .block(supabaseConfig.getTimeoutDuration());
+
+            if (rows == null || rows.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(toDomain(rows.get(0)));
+        } catch (WebClientResponseException.NotFound e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * 更新库存数量
+     * 
+     * @param id 库存记录ID
+     * @param onHandQty 新的现存数量
+     * @param availableQty 新的可用数量
+     * @return 是否更新成功
+     */
+    public boolean updateInventoryQty(UUID id, BigDecimal onHandQty, BigDecimal availableQty) {
+        try {
+            String uri = UriComponentsBuilder
+                    .fromUriString("/store_inventory")
+                    .queryParam("id", "eq." + id)
+                    .build()
+                    .toUriString();
+
+            Map<String, Object> updateData = new HashMap<>();
+            updateData.put("on_hand_qty", onHandQty);
+            updateData.put("available_qty", availableQty);
+            updateData.put("updated_at", java.time.Instant.now().toString());
+
+            webClient.patch()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(updateData)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block(supabaseConfig.getTimeoutDuration());
+
+            logger.info("Updated inventory {} - onHandQty: {}, availableQty: {}", id, onHandQty, availableQty);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to update inventory {}", id, e);
+            return false;
+        }
+    }
+
+    /**
+     * 更新安全库存
+     * 
+     * @param id 库存记录ID
+     * @param safetyStock 新的安全库存值
+     * @return 是否更新成功
+     */
+    public boolean updateSafetyStock(UUID id, BigDecimal safetyStock) {
+        try {
+            String uri = UriComponentsBuilder
+                    .fromUriString("/store_inventory")
+                    .queryParam("id", "eq." + id)
+                    .build()
+                    .toUriString();
+
+            Map<String, Object> updateData = new HashMap<>();
+            updateData.put("safety_stock", safetyStock);
+            updateData.put("updated_at", java.time.Instant.now().toString());
+
+            webClient.patch()
+                    .uri(uri)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(updateData)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block(supabaseConfig.getTimeoutDuration());
+
+            logger.info("Updated safety stock for inventory {} to {}", id, safetyStock);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to update safety stock for inventory {}", id, e);
+            return false;
+        }
     }
 
     // ========== Mapping Methods ==========

@@ -22,7 +22,19 @@
       "Bash(python tests/test_store_ops.py -v)",
       "Bash(python -m unittest discover -s tests -v)",
       "Skill(ops-expert)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --paths-only)"
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json --paths-only)",
+      "Bash(/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(cat /Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.claude/skills/doc-writer/SKILL.md)",
+      "Skill(doc-writer)",
+      "Bash(test -d /Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/docs)",
+      "Bash(xargs grep -l ^**System**)",
+      "Bash(python3 /tmp/scan_specs.py)",
+      "Bash(python3 .claude/skills/doc-writer/generate_tdd.py P003-inventory-query P004-inventory-adjustment)",
+      "Bash(python3 .claude/skills/doc-writer/generate_tdd.py P003 P004)",
+      "Bash(python3 .claude/skills/doc-writer/generate_tdd.py P003-inventory-query)",
+      "Bash(cat /Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/.specify/active_spec.txt)",
+      "Bash(test -f /Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/specs/P003-inventory-query/data-model.md)"
     ]
   }
 }

@@ -55,6 +55,8 @@ export interface StoreInventoryItem {
 export interface StoreInventoryDetail extends StoreInventoryItem {
   createdAt: string;
   storeCode?: string;
+  /** 乐观锁版本号 @since US5 - 安全库存编辑 */
+  version?: number;
 }
 
 /** 库存查询参数 */

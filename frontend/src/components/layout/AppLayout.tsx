@@ -263,8 +263,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/inventory/ledger',
-          label: '库存台账查看',
+          label: 'P004-库存台账查看',
         },
+        {
+          key: '/inventory/approvals',
+          label: 'P004-库存调整审批',
+        },
+        
         {
           key: '/inventory/operations',
           label: '入库/出库/报损/退库操作',
@@ -338,11 +343,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     {
       key: '/orders',
       icon: <FileTextOutlined />,
-      label: '订单与履约管理',
+      label: 'O-订单与履约管理',
       children: [
         {
           key: '/orders/list',
-          label: '订单列表/状态查看',
+          label: 'U004-订单列表/状态查看',
         },
         {
           key: '/orders/confirmation',

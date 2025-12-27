@@ -1,6 +1,7 @@
 package com.cinema.common.exception;
 
 import com.cinema.common.dto.ErrorResponse;
+import com.cinema.hallstore.exception.BusinessException;
 import com.cinema.hallstore.exception.OptimisticLockException;
 import com.cinema.hallstore.exception.StoreHasDependenciesException;
 import com.cinema.hallstore.exception.StoreNameConflictException;
@@ -197,6 +198,80 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    // ==================== Order Management Exceptions (O001-product-order-list) ====================
+
+    /**
+     * 处理订单未找到异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 404 响应
+     */
+    @ExceptionHandler(com.cinema.order.exception.OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFound(
+            com.cinema.order.exception.OrderNotFoundException ex, WebRequest request) {
+        logger.warn("Order not found: {}", ex.getOrderId());
+        ErrorResponse error = ErrorResponse.of("ORD_NTF_001", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * 处理无效订单状态转换异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 422 响应
+     */
+    @ExceptionHandler(com.cinema.order.exception.InvalidOrderStatusTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOrderStatusTransition(
+            com.cinema.order.exception.InvalidOrderStatusTransitionException ex, WebRequest request) {
+        logger.warn("Invalid order status transition: {} -> {} for order {}",
+                ex.getCurrentStatus(), ex.getTargetStatus(), ex.getOrderId());
+        Map<String, Object> details = new HashMap<>();
+        details.put("orderId", ex.getOrderId());
+        details.put("currentStatus", ex.getCurrentStatus());
+        details.put("targetStatus", ex.getTargetStatus());
+        ErrorResponse error = ErrorResponse.of("ORD_BIZ_001", ex.getMessage(), details);
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    /**
+     * 处理订单乐观锁冲突异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 409 响应
+     */
+    @ExceptionHandler(com.cinema.order.exception.OrderOptimisticLockException.class)
+    public ResponseEntity<ErrorResponse> handleOrderOptimisticLock(
+            com.cinema.order.exception.OrderOptimisticLockException ex, WebRequest request) {
+        logger.warn("Order optimistic lock conflict: orderId={}, expectedVersion={}, currentVersion={}",
+                ex.getOrderId(), ex.getExpectedVersion(), ex.getCurrentVersion());
+        Map<String, Object> details = new HashMap<>();
+        details.put("orderId", ex.getOrderId());
+        details.put("expectedVersion", ex.getExpectedVersion());
+        details.put("currentVersion", ex.getCurrentVersion());
+        ErrorResponse error = ErrorResponse.of("ORD_BIZ_002", ex.getMessage(), details);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    /**
+     * 处理取消原因必填异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 400 响应
+     */
+    @ExceptionHandler(com.cinema.order.exception.CancelReasonRequiredException.class)
+    public ResponseEntity<ErrorResponse> handleCancelReasonRequired(
+            com.cinema.order.exception.CancelReasonRequiredException ex, WebRequest request) {
+        logger.warn("Cancel reason required for order: {}", ex.getOrderId());
+        Map<String, Object> details = new HashMap<>();
+        details.put("orderId", ex.getOrderId());
+        ErrorResponse error = ErrorResponse.of("ORD_VAL_001", ex.getMessage(), details);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     /**
      * 处理验证异常
      *
@@ -249,6 +324,21 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex, WebRequest request) {
         logger.warn("Illegal argument: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.of("INVALID_ARGUMENT", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * 处理业务异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 400 响应
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(
+            BusinessException ex, WebRequest request) {
+        logger.warn("Business error: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("BUSINESS_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

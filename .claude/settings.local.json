@@ -78,7 +78,15 @@
       "Bash(git -C /Users/lining/qoder/Cinema_Bussiness_Center_Platform branch --show-current)",
       "Bash(SUPABASE_URL=\"https://fxhgyxceqrmnpezluaht.supabase.co\" )",
       "Bash(SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs\" )",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Skill(doc-writer)",
+      "Bash(touch \"docs/merged/库存&仓店库存管理.md\")",
+      "Bash(touch \"docs/merged/库存&仓店库存管理-merge-report.md\")",
+      "Bash(xargs ls:*)",
+      "Bash(javap:*)",
+      "Bash(jar tf:*)",
+      "Bash(kill:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

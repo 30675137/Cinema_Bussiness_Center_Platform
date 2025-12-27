@@ -1,0 +1,115 @@
+# Source Parser Configuration for Doc-Writer Skill
+# Defines how different file formats are parsed for document generation
+
+version: "1.0.0"
+
+# Parser definitions for different file formats
+parsers:
+  # Markdown parser (primary format for specs)
+  markdown:
+    extensions: [".md"]
+    metadata_pattern: "^\\*\\*(.+?)\\*\\*:\\s*(.+)$"
+    frontmatter_pattern: "^---([\\s\\S]*?)---"
+    content_sections:
+      - "## Summary"
+      - "## User Scenarios"
+      - "## Requirements"
+      - "## Success Criteria"
+      - "## Assumptions"
+      - "## Out of Scope"
+    metadata_fields:
+      - "Feature Branch"
+      - "System"
+      - "Module"
+      - "SubModule"
+      - "Created"
+      - "Status"
+
+  # YAML parser (for structured data definitions)
+  yaml:
+    extensions: [".yaml", ".yml"]
+    root_key: "spec"
+    required_fields:
+      - "name"
+      - "description"
+    optional_fields:
+      - "version"
+      - "system"
+      - "module"
+      - "submodule"
+      - "requirements"
+      - "entities"
+
+  # JSON parser (for structured data definitions)
+  json:
+    extensions: [".json"]
+    root_key: "spec"
+    required_fields:
+      - "name"
+      - "description"
+    optional_fields:
+      - "version"
+      - "system"
+      - "module"
+      - "submodule"
+      - "requirements"
+      - "entities"
+
+# Default source paths for scanning
+default_source_paths:
+  - "specs/"
+
+# Output configuration
+output:
+  base_dir: "docs/"
+
+  # Document type to directory mapping
+  directories:
+    tdd: "tdd/"
+    arch: "architecture/"
+    detail: "detail-design/"
+    api: "api/"
+    db: "database/"
+    manual: "manual/"
+    guide: "guide/"
+    product: "product/"
+    readme: "readme/"
+    release-notes: "release-notes/"
+    matrix: "matrix/"
+
+  # Document types that use module subdirectories
+  module_based_types:
+    - "detail"
+    - "manual"
+    - "guide"
+    - "product"
+
+# File naming patterns
+naming:
+  # Standard pattern for spec-based documents
+  standard: "{specId}-{name}.md"
+
+  # Pattern for release notes (by version)
+  release_notes: "v{version}.md"
+
+  # Pattern for feature matrix (single file)
+  matrix: "feature-matrix.md"
+
+# Metadata defaults (used when spec doesn't provide values)
+defaults:
+  system: "默认系统"
+  module: "未分类"
+  submodule: ""
+  status: "Draft"
+
+# Content markers for incremental updates
+markers:
+  auto_generated_start: "<!-- DOC-WRITER: AUTO-GENERATED START -->"
+  auto_generated_end: "<!-- DOC-WRITER: AUTO-GENERATED END -->"
+  user_section_start: "<!-- DOC-WRITER: USER-SECTION START -->"
+  user_section_end: "<!-- DOC-WRITER: USER-SECTION END -->"
+  conflict_start: "<!-- DOC-WRITER: CONFLICT START -->"
+  conflict_end: "<!-- DOC-WRITER: CONFLICT END -->"
+
+# State tracking file for incremental updates
+state_file: ".doc-writer-state.json"

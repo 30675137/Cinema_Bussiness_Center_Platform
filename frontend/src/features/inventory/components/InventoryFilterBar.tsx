@@ -64,17 +64,45 @@ export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({
     onFilterChange?.({ storeId: undefined, statuses: [], categoryId: undefined });
   }, [resetFilters, onFilterChange]);
 
-  // 分类选项
-  const categoryOptions = categoriesData?.data?.map((cat) => ({
-    label: cat.name,
-    value: cat.id,
-  })) || [];
+  // 分类选项 - 兼容两种格式: {data: [...]} 或 {data: {list: [...]}}
+  const categoryOptions = (() => {
+    const data = categoriesData?.data;
+    // 如果是分页格式 {list: [...]}
+    if (data && 'list' in data && Array.isArray(data.list)) {
+      return data.list.map((cat: { id: string; name: string }) => ({
+        label: cat.name,
+        value: cat.id,
+      }));
+    }
+    // 如果是数组格式
+    if (Array.isArray(data)) {
+      return data.map((cat) => ({
+        label: cat.name,
+        value: cat.id,
+      }));
+    }
+    return [];
+  })();
 
-  // 门店选项
-  const storeOptions = storesData?.data?.map((store) => ({
-    label: store.name,
-    value: store.id,
-  })) || [];
+  // 门店选项 - 兼容两种格式: {data: [...]} 或 {data: {list: [...]}}
+  const storeOptions = (() => {
+    const data = storesData?.data;
+    // 如果是分页格式 {list: [...]}
+    if (data && 'list' in data && Array.isArray(data.list)) {
+      return data.list.map((store: { id: string; name: string }) => ({
+        label: store.name,
+        value: store.id,
+      }));
+    }
+    // 如果是数组格式
+    if (Array.isArray(data)) {
+      return data.map((store) => ({
+        label: store.name,
+        value: store.id,
+      }));
+    }
+    return [];
+  })();
 
   return (
     <Space wrap className="inventory-filter-bar" style={{ marginBottom: 16 }}>

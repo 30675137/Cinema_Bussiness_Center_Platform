@@ -1,11 +1,14 @@
 /**
  * P003-inventory-query: 库存表格组件
+ * P004-inventory-adjustment: 添加调整按钮
  * 
  * 显示库存列表，包含7列：SKU编码、名称、现存数量、可用数量、预占数量、状态、单位
+ * 以及操作列（调整按钮）
  */
 
-import { Table, Typography } from 'antd';
+import { Table, Typography, Button, Space } from 'antd';
 import type { TableProps } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import type { StoreInventoryItem } from '../types';
 import { InventoryStatusTag } from './InventoryStatusTag';
 
@@ -19,6 +22,8 @@ interface InventoryTableProps {
   pageSize?: number;
   onPageChange?: (page: number, pageSize: number) => void;
   onRowClick?: (record: StoreInventoryItem) => void;
+  /** 调整按钮点击回调 */
+  onAdjustClick?: (record: StoreInventoryItem) => void;
 }
 
 /**
@@ -41,6 +46,7 @@ export function InventoryTable({
   pageSize = 20,
   onPageChange,
   onRowClick,
+  onAdjustClick,
 }: InventoryTableProps) {
   const columns: TableProps<StoreInventoryItem>['columns'] = [
     {
@@ -96,6 +102,29 @@ export function InventoryTable({
       key: 'mainUnit',
       width: 80,
       align: 'center',
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      width: 100,
+      align: 'center',
+      fixed: 'right',
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={(e) => {
+              e.stopPropagation(); // 阻止行点击事件
+              onAdjustClick?.(record);
+            }}
+            data-testid={`adjust-btn-${record.id}`}
+          >
+            调整
+          </Button>
+        </Space>
+      ),
     },
   ];
 
