@@ -7,6 +7,7 @@ import { reservationSettingsHandlers } from './reservationSettingsHandlers'
 import { scenarioPackageEditorHandlers } from './scenarioPackageEditorHandlers'
 import { skuHandlers } from './sku' // P001-sku-master-data
 import { conversionHandlers } from './conversion' // P002-unit-conversion
+import { orderHandlers } from './orderHandlers' // O001-product-order-list
 // 库存相关使用真实后端 API，已禁用 mock
 // import { inventoryHandlers } from './inventoryHandlers' // P003-inventory-query
 // import { adjustmentHandlers } from './adjustmentHandlers' // P004-inventory-adjustment
@@ -193,6 +194,7 @@ export const handlers = [
   ...scenarioPackageEditorHandlers, // 场景包编辑器处理器
   ...skuHandlers, // SKU主数据管理处理器 (P001-sku-master-data)
   ...conversionHandlers, // 单位换算管理处理器 (P002-unit-conversion)
+  ...orderHandlers, // 订单管理处理器 (O001-product-order-list)
   // 库存相关使用真实后端 API，已禁用 mock
   // ...inventoryHandlers, // 库存查询处理器 (P003-inventory-query)
   // ...adjustmentHandlers, // 库存调整处理器 (P004-inventory-adjustment)

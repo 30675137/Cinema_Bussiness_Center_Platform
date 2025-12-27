@@ -41,6 +41,9 @@ const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/prev
 // 预约单管理页面
 const ReservationOrderList = lazy(() => import('@/pages/reservation-orders/ReservationOrderList'));
 const ReservationOrderDetail = lazy(() => import('@/pages/reservation-orders/ReservationOrderDetail'));
+// 商品订单管理页面 (O001-product-order-list)
+const OrderListPage = lazy(() => import('@/pages/orders/OrderListPage'));
+const OrderDetailPage = lazy(() => import('@/pages/orders/OrderDetailPage'));
 // 单位换算管理页面 (P002-unit-conversion)
 const ConversionPage = lazy(() => import('@/pages/bom/ConversionPage'));
 // 暂时使用现有组件替代，后续可以实现具体页面
@@ -405,6 +408,35 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <ReservationOrderDetail />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 商品订单管理路由 (O001-product-order-list)
+  {
+    path: '/orders/list',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <OrderListPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/orders/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <OrderDetailPage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

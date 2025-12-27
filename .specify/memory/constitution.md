@@ -36,6 +36,7 @@
 - **B**: 品牌/分类管理 (Brand/Category Management)
 - **A**: 活动/场景包管理 (Activity/Scenario Package Management)
 - **U**: 用户/预订管理 (User/Reservation Management)
+- **O**: 订单管理 (Order Management - 商品订单)
 - **T**: 工具/基础设施 (Tool/Infrastructure)
 - **F**: 前端基础 (Frontend Infrastructure)
 
@@ -313,8 +314,8 @@ Java 代码是否具备足够的注释可读性。
 | INV | Inventory | 库存管理 |
 | CAT | Category | 分类管理 |
 | BRD | Brand | 品牌管理 |
-| ORD | Order | 订单管理 |
-| RSV | Reservation | 预订管理 |
+| ORD | Order | 订单管理(商品订单) |
+| RSV | Reservation | 预订管理(预约订单) |
 | PKG | Package | 场景包管理 |
 
 **基本原理**: 标准化的异常编号使错误处理更加精确和可维护。前端可以根据编号实现差异化的用户提示和自动化处理逻辑(如特定错误自动重试、跳转登录等),而不依赖可能变化的错误消息文本。同时,编号化的错误便于编写用户手册、FAQ 和技术支持文档,提高问题排查效率

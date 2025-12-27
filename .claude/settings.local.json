@@ -81,7 +81,12 @@
       "Bash(git branch:*)",
       "Skill(doc-writer)",
       "Bash(touch \"docs/merged/库存&仓店库存管理.md\")",
-      "Bash(touch \"docs/merged/库存&仓店库存管理-merge-report.md\")"
+      "Bash(touch \"docs/merged/库存&仓店库存管理-merge-report.md\")",
+      "Bash(xargs ls:*)",
+      "Bash(javap:*)",
+      "Bash(jar tf:*)",
+      "Bash(kill:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

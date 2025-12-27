@@ -19,6 +19,7 @@
 - **B**: 品牌/分类管理 (Brand/Category Management)
 - **A**: 活动/场景包管理 (Activity/Scenario Package Management)
 - **U**: 用户/预订管理 (User/Reservation Management)
+- **O**: 订单管理 (Order Management - 商品订单)
 - **T**: 工具/基础设施 (Tool/Infrastructure)
 - **F**: 前端基础 (Frontend Infrastructure)
 

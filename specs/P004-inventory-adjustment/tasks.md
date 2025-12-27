@@ -62,8 +62,8 @@
 
 - [x] T014 [P] [US1] Unit test for AdjustmentForm validation in frontend/src/features/inventory/components/__tests__/AdjustmentForm.test.tsx
 - [x] T015 [P] [US1] Unit test for ConfirmAdjustmentModal display in frontend/src/features/inventory/components/__tests__/ConfirmAdjustmentModal.test.tsx
-- [ ] T016 [P] [US1] Integration test for adjustment creation flow in frontend/src/__tests__/integration/adjustmentCreation.test.tsx
-- [ ] T017 [P] [US1] Backend service test for InventoryAdjustmentService in backend/src/test/java/com/cinema/service/InventoryAdjustmentServiceTest.java
+- [x] T016 [P] [US1] Integration test for adjustment creation flow in frontend/src/__tests__/integration/adjustmentCreation.test.tsx
+- [x] T017 [P] [US1] Backend service test for InventoryAdjustmentService in backend/src/test/java/com/cinema/inventory/service/InventoryAdjustmentServiceTest.java
 
 ### Implementation for User Story 1
 
@@ -91,7 +91,7 @@
 
 - [x] T027 [P] [US2] Unit test for TransactionList component in frontend/src/features/inventory/components/__tests__/TransactionList.test.tsx
 - [x] T028 [P] [US2] Unit test for TransactionQuantityTag color display in frontend/src/features/inventory/components/__tests__/TransactionQuantityTag.test.tsx
-- [ ] T029 [P] [US2] Integration test for transaction query with date filter in frontend/src/__tests__/integration/transactionQuery.test.tsx
+- [x] T029 [P] [US2] Integration test for transaction query with date filter in frontend/src/__tests__/integration/transactionQuery.test.tsx
 
 ### Implementation for User Story 2
 
@@ -139,8 +139,8 @@
 
 - [x] T041 [P] [US4] Unit test for approval threshold calculation in frontend/src/features/inventory/utils/__tests__/approvalUtils.test.ts
 - [x] T042 [P] [US4] Unit test for ApprovalList component in frontend/src/features/inventory/components/__tests__/ApprovalList.test.tsx
-- [ ] T043 [P] [US4] Integration test for approval workflow in frontend/src/__tests__/integration/approvalWorkflow.test.tsx
-- [ ] T044 [P] [US4] Backend service test for ApprovalService in backend/src/test/java/com/cinema/service/ApprovalServiceTest.java
+- [x] T043 [P] [US4] Integration test for approval workflow in frontend/src/__tests__/integration/approvalWorkflow.test.tsx
+- [x] T044 [P] [US4] Backend service test for ApprovalService in backend/src/test/java/com/cinema/inventory/service/ApprovalServiceTest.java
 
 ### Implementation for User Story 4
 
