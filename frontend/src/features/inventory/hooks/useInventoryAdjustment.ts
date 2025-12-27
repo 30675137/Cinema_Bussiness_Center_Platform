@@ -85,8 +85,9 @@ export function useCreateAdjustment(options: UseCreateAdjustmentOptions = {}) {
     mutationFn: async (data: CreateAdjustmentRequest) => {
       const response = await adjustmentService.createAdjustment(data);
 
-      if (!response.success || !response.data) {
-        throw new Error(response.message || '创建调整失败');
+      // 后端 ApiResponse 格式：成功时有 data，失败时有 error
+      if (response.error || !response.data) {
+        throw new Error(response.message || response.error || '创建调整失败');
       }
 
       return response.data;
@@ -145,7 +146,8 @@ export function useAdjustments(params: AdjustmentQueryParams = {}, enabled = tru
     queryKey: adjustmentKeys.list(params),
     queryFn: async () => {
       const response = await adjustmentService.listAdjustments(params);
-      if (!response.success) {
+      // 列表接口返回格式包含 success 字段
+      if (response.success === false) {
         throw new Error(response.message || '查询调整列表失败');
       }
       return response;
@@ -175,8 +177,9 @@ export function useAdjustmentDetail(id: string | undefined, enabled = true) {
     queryFn: async () => {
       if (!id) throw new Error('调整记录 ID 不能为空');
       const response = await adjustmentService.getAdjustment(id);
-      if (!response.success || !response.data) {
-        throw new Error(response.message || '查询调整详情失败');
+      // 后端 ApiResponse 格式：成功时有 data，失败时有 error
+      if (response.error || !response.data) {
+        throw new Error(response.message || response.error || '查询调整详情失败');
       }
       return response.data;
     },
@@ -222,8 +225,9 @@ export function useWithdrawAdjustment(options: UseWithdrawAdjustmentOptions = {}
   return useMutation({
     mutationFn: async (id: string) => {
       const response = await adjustmentService.withdrawAdjustment(id);
-      if (!response.success || !response.data) {
-        throw new Error(response.message || '撤回失败');
+      // 后端 ApiResponse 格式：成功时有 data，失败时有 error
+      if (response.error || !response.data) {
+        throw new Error(response.message || response.error || '撤回失败');
       }
       return response.data;
     },

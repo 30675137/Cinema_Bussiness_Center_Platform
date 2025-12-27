@@ -1,6 +1,7 @@
 package com.cinema.common.exception;
 
 import com.cinema.common.dto.ErrorResponse;
+import com.cinema.hallstore.exception.BusinessException;
 import com.cinema.hallstore.exception.OptimisticLockException;
 import com.cinema.hallstore.exception.StoreHasDependenciesException;
 import com.cinema.hallstore.exception.StoreNameConflictException;
@@ -249,6 +250,21 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex, WebRequest request) {
         logger.warn("Illegal argument: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.of("INVALID_ARGUMENT", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * 处理业务异常
+     *
+     * @param ex      异常对象
+     * @param request Web 请求
+     * @return 400 响应
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(
+            BusinessException ex, WebRequest request) {
+        logger.warn("Business error: {}", ex.getMessage());
+        ErrorResponse error = ErrorResponse.of("BUSINESS_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

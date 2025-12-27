@@ -104,4 +104,14 @@ public interface AdjustmentRepository extends JpaRepository<InventoryAdjustment,
   @Query("SELECT COUNT(a) > 0 FROM InventoryAdjustment a WHERE " +
       "a.skuId = :skuId AND a.storeId = :storeId AND a.status = 'pending_approval'")
   boolean existsPendingAdjustment(@Param("skuId") UUID skuId, @Param("storeId") UUID storeId);
+
+  /**
+   * 查找当天最大的调整单号
+   * 用于生成新的调整单号序列
+   * 
+   * @param prefix 单号前缀，如 "ADJ20251227"
+   * @return 当天最大单号，如 "ADJ202512270005"
+   */
+  @Query("SELECT MAX(a.adjustmentNumber) FROM InventoryAdjustment a WHERE a.adjustmentNumber LIKE :prefix%")
+  Optional<String> findMaxAdjustmentNumberByPrefix(@Param("prefix") String prefix);
 }

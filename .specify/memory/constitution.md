@@ -1,20 +1,21 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.6.0 → 1.7.0 -->
+<!-- Version change: 1.7.0 → 1.8.0 -->
 <!-- Modified principles: None -->
 <!-- Added sections:
-  - 代码归属标识 (Code Attribution Marking) - 新增代码文件必须标识所属 spec 的强制要求
+  - API 异常编号规范 (API Error Code Standards) - 新增后端异常必须使用标准化编号的强制要求
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/templates/spec-template.md (已包含 Feature Branch 标识)
-  ⚠ .specify/templates/plan-template.md (需要添加代码归属标识指导)
-  ⚠ .specify/templates/tasks-template.md (需要在实现任务中强调添加归属标识)
-  ⚠ .claude/rules/ (需要在代码质量规则中添加归属标识检查项)
+  ✅ .specify/memory/constitution.md (已添加异常编号规范)
+  ⚠ .claude/rules/08-api-standards.md (需要添加异常编号规则 R8.8)
+  ⚠ .specify/templates/plan-template.md (需要在 API 设计中提及异常编号)
+  ⚠ contracts/api.yaml (后续 spec 需要定义异常编号枚举)
 -->
 <!-- Follow-up TODOs:
-  1. 为现有代码文件添加 spec 归属标识注释
-  2. 在 ESLint/代码审查工具中添加归属标识检查规则
-  3. 更新开发文档说明归属标识的最佳实践
+  1. 为现有后端代码的异常添加标准化编号
+  2. 创建异常编号文档 docs/api-error-codes.md
+  3. 更新 GlobalExceptionHandler 统一使用编号格式
+  4. 前端 API 服务层添加按编号处理异常的工具函数
 -->
 
 # 影院商品管理中台宪法
@@ -248,6 +249,77 @@ Java 代码是否具备足够的注释可读性。
 
 **参考问题**: 见 `docs/问题总结/014-API响应格式不一致问题.md`
 
+### API 异常编号规范 (API Error Code Standards)
+
+所有后端 API 抛出的业务异常必须使用标准化的异常编号,以便前端针对编号编写统一的处理逻辑,并为用户文档提供可查询的错误参考。
+
+**异常编号格式规范**:
+
+1. **编号结构**: `<模块前缀>_<类别>_<序号>`
+   - 模块前缀:2-4 个大写字母,对应业务模块(如 `INV` 库存、`ORD` 订单、`SKU` 商品)
+   - 类别:3 个大写字母,表示错误类型(如 `VAL` 验证、`NTF` 未找到、`DUP` 重复、`AUT` 认证)
+   - 序号:3 位数字,模块内递增(001-999)
+   - 示例:`INV_NTF_001`(库存模块-未找到-001)、`SKU_VAL_003`(商品模块-验证错误-003)
+
+2. **标准错误类别**:
+   | 类别代码 | 含义 | HTTP 状态码 | 示例 |
+   |---------|------|------------|------|
+   | VAL | 验证错误 | 400 | 参数格式错误、必填字段缺失 |
+   | NTF | 未找到 | 404 | 资源不存在 |
+   | DUP | 重复冲突 | 409 | 唯一约束冲突 |
+   | AUT | 认证错误 | 401 | Token 无效或过期 |
+   | PRM | 权限错误 | 403 | 无操作权限 |
+   | BIZ | 业务规则 | 422 | 业务逻辑不允许的操作 |
+   | SYS | 系统错误 | 500 | 内部服务异常 |
+
+3. **错误响应格式要求**:
+   ```json
+   {
+     "success": false,
+     "error": "INV_NTF_001",
+     "message": "库存记录不存在",
+     "details": {
+       "inventoryId": "550e8400-e29b-41d4-a716-446655440000",
+       "storeId": "store-001"
+     },
+     "timestamp": "2025-12-27T10:30:00Z"
+   }
+   ```
+
+4. **后端实现要求**:
+   - 所有业务异常类必须定义对应的错误编号常量
+   - `GlobalExceptionHandler` 必须统一捕获并格式化异常响应
+   - 错误编号必须在异常类或枚举中集中定义,禁止硬编码字符串
+   - 每个模块的错误编号必须在 `contracts/api.yaml` 或独立文档中声明
+
+5. **前端处理要求**:
+   - 前端必须根据 `error` 编号而非 `message` 文本进行错误处理
+   - 提供统一的错误处理工具函数,支持按编号映射用户友好提示
+   - 对于未知编号,显示通用错误提示并记录日志
+
+6. **文档要求**:
+   - 必须维护 `docs/api-error-codes.md` 错误编号文档
+   - 文档包含:编号、含义、触发场景、建议处理方式
+   - 新增错误编号时必须同步更新文档
+
+**模块前缀映射**:
+| 前缀 | 模块 | 说明 |
+|-----|------|------|
+| CMN | Common | 通用/公共错误 |
+| AUT | Auth | 认证授权 |
+| USR | User | 用户管理 |
+| STR | Store | 门店管理 |
+| HAL | Hall | 影厅管理 |
+| SKU | SKU | 商品管理 |
+| INV | Inventory | 库存管理 |
+| CAT | Category | 分类管理 |
+| BRD | Brand | 品牌管理 |
+| ORD | Order | 订单管理 |
+| RSV | Reservation | 预订管理 |
+| PKG | Package | 场景包管理 |
+
+**基本原理**: 标准化的异常编号使错误处理更加精确和可维护。前端可以根据编号实现差异化的用户提示和自动化处理逻辑(如特定错误自动重试、跳转登录等),而不依赖可能变化的错误消息文本。同时,编号化的错误便于编写用户手册、FAQ 和技术支持文档,提高问题排查效率
+
 ### API 测试规范 (API Testing Standards)
 
 涉及 API 开发的功能必须提供 Postman 测试脚本,确保 API 契约的完整性验证和团队协作效率。
@@ -327,4 +399,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.7.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-27
+**版本**: 1.8.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-27

@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 库存调整服务层
@@ -37,11 +36,6 @@ public class InventoryAdjustmentService {
    * 调整金额 >= 此值时需要审批
    */
   private static final BigDecimal APPROVAL_THRESHOLD = new BigDecimal("1000");
-
-  /**
-   * 调整单号序列计数器
-   */
-  private static final AtomicLong adjustmentSequence = new AtomicLong(1);
 
   private final AdjustmentRepository adjustmentRepository;
   private final StoreInventoryRepository inventoryRepository;
@@ -84,11 +78,19 @@ public class InventoryAdjustmentService {
     UUID skuId = UUID.fromString(request.getSkuId());
     UUID storeId = UUID.fromString(request.getStoreId());
 
-    // TODO: 从库存表获取当前库存，这里暂用模拟数据
-    // 实际应该查询 store_inventory 表
-    int currentStock = 100;
-    int currentAvailable = 90;
+    // 从库存表获取当前库存
+    var inventoryOpt = inventoryRepository.findBySkuIdAndStoreId(skuId, storeId);
+    if (inventoryOpt.isEmpty()) {
+      throw new ResourceNotFoundException("库存记录", "skuId=" + skuId + ", storeId=" + storeId);
+    }
+    var inventory = inventoryOpt.get();
+    
+    int currentStock = inventory.getOnHandQty().intValue();
+    int currentAvailable = inventory.getAvailableQty().intValue();
+    // TODO: 从 SKU 表获取单价，暂用默认值
     BigDecimal unitPrice = new BigDecimal("50.00");
+    
+    logger.debug("Current inventory: onHand={}, available={}", currentStock, currentAvailable);
 
     // 2. 计算调整后库存
     boolean isIncrease = "surplus".equals(request.getAdjustmentType());
@@ -153,22 +155,58 @@ public class InventoryAdjustmentService {
   /**
    * 生成调整单号
    * 格式：ADJ + 日期 + 序号（如 ADJ202512260001）
+   * 从数据库查询当天最大序号，避免重启后序号冲突
    */
   private String generateAdjustmentNumber() {
     String dateStr = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-    long seq = adjustmentSequence.getAndIncrement();
-    return String.format("ADJ%s%04d", dateStr, seq);
+    String prefix = "ADJ" + dateStr;
+    
+    // 从数据库查询当天最大序号
+    long nextSeq = adjustmentRepository.findMaxAdjustmentNumberByPrefix(prefix)
+        .map(maxNumber -> {
+          // 解析序号部分，如 ADJ202512270005 -> 5
+          String seqPart = maxNumber.substring(prefix.length());
+          try {
+            return Long.parseLong(seqPart) + 1;
+          } catch (NumberFormatException e) {
+            logger.warn("Failed to parse adjustment number sequence: {}", maxNumber);
+            return 1L;
+          }
+        })
+        .orElse(1L);
+    
+    return String.format("%s%04d", prefix, nextSeq);
   }
 
   /**
    * 更新库存数量
-   * TODO: 实现库存更新逻辑
+   * 立即更新库存表中的现存数量和可用数量
    */
   private void updateInventoryStock(UUID skuId, UUID storeId, int stockAfter, int availableAfter) {
-    // 实际应该调用 inventoryRepository 更新库存
-    // 这里暂时只记录日志
     logger.info("Updating inventory: skuId={}, storeId={}, stockAfter={}, availableAfter={}",
         skuId, storeId, stockAfter, availableAfter);
+    
+    // 查询库存记录获取ID
+    var inventoryOpt = inventoryRepository.findBySkuIdAndStoreId(skuId, storeId);
+    if (inventoryOpt.isEmpty()) {
+      logger.error("Inventory record not found for update: skuId={}, storeId={}", skuId, storeId);
+      throw new ResourceNotFoundException("库存记录", "skuId=" + skuId + ", storeId=" + storeId);
+    }
+    
+    var inventory = inventoryOpt.get();
+    boolean success = inventoryRepository.updateInventoryQty(
+        inventory.getId(),
+        new BigDecimal(stockAfter),
+        new BigDecimal(availableAfter)
+    );
+    
+    if (!success) {
+      logger.error("Failed to update inventory: id={}", inventory.getId());
+      throw new BusinessException("UPDATE_FAILED", "更新库存失败");
+    }
+    
+    logger.info("Inventory updated successfully: id={}, stockAfter={}, availableAfter={}",
+        inventory.getId(), stockAfter, availableAfter);
   }
 
   /**

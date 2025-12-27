@@ -56,6 +56,28 @@ public class StoreQueryController {
     }
 
     /**
+     * 获取可访问的门店列表
+     * GET /api/stores/accessible
+     * 
+     * 注意：此端点必须放在 /{storeId} 之前，避免 "accessible" 被当作 UUID 解析
+     *
+     * @return 当前用户可访问的门店列表
+     * @since P003-inventory-query
+     */
+    @GetMapping("/accessible")
+    public ResponseEntity<Map<String, Object>> getAccessibleStores() {
+        // 返回所有活跃门店（后续可增加权限过滤逻辑）
+        List<StoreDTO> stores = storeService.getAllStores(StoreStatus.ACTIVE);
+
+        Map<String, Object> response = Map.of(
+                "success", true,
+                "data", stores
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * 获取门店详情
      * GET /api/stores/{storeId}
      *
