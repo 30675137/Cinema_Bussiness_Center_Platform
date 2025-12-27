@@ -66,7 +66,6 @@ tests/
 ## Recent Changes
 - T001-doc-writer-enhance: Added 文件系统
 - P004-inventory-adjustment: Added Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表
-- P003-inventory-query: Added Supabase (PostgreSQL) - 使用现有 `inventory` 表，关联 `skus`、`stores`、`categories` 表
 
 
 <!-- MANUAL ADDITIONS START -->
