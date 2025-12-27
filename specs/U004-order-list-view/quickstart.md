@@ -118,10 +118,10 @@ npm run dev -- --port 5173
 
 **Expected Output**:
 ```
-  VITE v6.0.7  ready in 1234 ms
+  VITE v7.x  ready in xxx ms
 
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://xxx.xxx.xxx.xxx:3000/
   ➜  press h + enter to show help
 ```
 
@@ -129,134 +129,16 @@ npm run dev -- --port 5173
 
 Open browser and navigate to:
 ```
-http://localhost:5173/orders/list
+http://localhost:3000/reservation-orders
 ```
 
-**Or** (depending on routing configuration):
-```
-http://localhost:5173/reservation-orders
-```
+> **Note**: 项目前端端口固定为 3000，路由为 `/reservation-orders`
 
 ---
 
-## Mock Data Setup (MSW)
+## Backend Setup (Required)
 
-### Step 1: Verify MSW Handlers
-
-Check that MSW handlers are configured:
-
-```bash
-# View MSW handlers for order endpoints
-cat frontend/src/mocks/handlers/orderHandlers.ts
-```
-
-**Expected Content** (minimal):
-```typescript
-/**
- * @spec U004-order-list-view
- * MSW handlers for order list API mocking
- */
-import { http, HttpResponse } from 'msw'
-import type { ReservationListResponse } from '@/types/reservationOrder'
-
-const API_BASE_URL = 'http://localhost:8080/api'
-
-export const orderHandlers = [
-  // GET /api/admin/reservations - Order list with filtering
-  http.get(`${API_BASE_URL}/admin/reservations`, ({ request }) => {
-    const url = new URL(request.url)
-    const page = Number(url.searchParams.get('page')) || 1
-    const size = Number(url.searchParams.get('size')) || 20
-
-    // TODO: Implement filtering logic
-    const mockOrders = generateMockOrders(size)
-
-    const response: ReservationListResponse = {
-      success: true,
-      data: mockOrders,
-      total: 100,
-      page,
-      size,
-      totalPages: Math.ceil(100 / size),
-    }
-
-    return HttpResponse.json(response)
-  }),
-
-  // POST /api/admin/reservations/:id/confirm
-  http.post(`${API_BASE_URL}/admin/reservations/:id/confirm`, async ({ params }) => {
-    // Mock confirmation logic
-    return HttpResponse.json({
-      success: true,
-      data: { id: params.id, status: 'CONFIRMED' },
-      message: '订单确认成功',
-    })
-  }),
-
-  // POST /api/admin/reservations/:id/cancel
-  http.post(`${API_BASE_URL}/admin/reservations/:id/cancel`, async ({ params }) => {
-    // Mock cancellation logic
-    return HttpResponse.json({
-      success: true,
-      data: { id: params.id, status: 'CANCELLED' },
-      message: '订单取消成功',
-    })
-  }),
-]
-
-function generateMockOrders(count: number) {
-  // TODO: Implement mock data generation
-  return []
-}
-```
-
-### Step 2: Enable MSW in Development
-
-Check `frontend/src/main.tsx`:
-
-```typescript
-import { setupWorker } from 'msw/browser'
-import { orderHandlers } from './mocks/handlers/orderHandlers'
-
-// Enable MSW in development
-if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
-  const worker = setupWorker(...orderHandlers)
-  worker.start({
-    onUnhandledRequest: 'bypass', // Don't warn for unhandled requests
-  })
-}
-```
-
-### Step 3: Test Mock API
-
-Open browser DevTools Console, you should see:
-```
-[MSW] Mocking enabled.
-[MSW] Intercepting requests with handlers...
-```
-
-Make a test request:
-```javascript
-fetch('http://localhost:8080/api/admin/reservations')
-  .then(r => r.json())
-  .then(console.log)
-```
-
-**Expected Output**:
-```json
-{
-  "success": true,
-  "data": [...],
-  "total": 100,
-  "page": 1,
-  "size": 20,
-  "totalPages": 5
-}
-```
-
----
-
-## Backend Setup (Optional - for U001 API Integration)
+> **Note**: 本项目使用真实后端 API，无需 MSW Mock 数据。后端需先启动才能正常使用订单列表功能。
 
 ### Step 1: Navigate to Backend Directory
 
@@ -465,39 +347,29 @@ git push origin U004-order-list-view
 
 ```
 frontend/src/
-├── features/
-│   └── orders/                      # U004 feature module
-│       ├── components/              # Feature components
-│       │   ├── OrderList.tsx       # Main list table
-│       │   ├── OrderListItem.tsx   # Table row (if needed)
-│       │   ├── OrderDetailDrawer.tsx # Detail slide-out
-│       │   ├── FilterBar.tsx       # Status/time filters
-│       │   ├── SearchBar.tsx       # Phone search
-│       │   └── OrderStatusTag.tsx  # Status badge
-│       ├── hooks/                   # Custom hooks
-│       │   ├── useOrders.ts        # TanStack Query
-│       │   ├── useOrderFilters.ts  # Zustand filters
-│       │   └── useOrderActions.ts  # Confirm/cancel
-│       ├── services/                # API services
-│       │   ├── orderService.ts     # API calls
-│       │   └── orderActionService.ts # Reuse U001
-│       ├── types/                   # TypeScript types
-│       │   ├── index.ts            # Re-export from contracts
-│       │   └── api.ts              # API types
-│       ├── utils/                   # Utility functions
-│       │   ├── orderHelpers.ts     # Status formatting
-│       │   └── validation.ts       # Zod schemas
-│       └── __tests__/               # Feature tests
-│           ├── OrderList.test.tsx
-│           ├── OrderDetailDrawer.test.tsx
-│           └── useOrderFilters.test.ts
 ├── pages/
-│   └── OrderListPage.tsx            # Route-level page
-├── stores/
-│   └── orderFiltersStore.ts         # Zustand store
-└── mocks/
-    └── handlers/
-        └── orderHandlers.ts         # MSW handlers
+│   └── reservation-orders/           # 订单管理模块
+│       ├── ReservationOrderList.tsx  # 列表页面
+│       ├── ReservationOrderDetail.tsx # 详情页面
+│       ├── components/               # 页面组件
+│       │   ├── OrderFilters.tsx      # 筛选器
+│       │   ├── OrderStatusBadge.tsx  # 状态徽章
+│       │   ├── ConfirmOrderModal.tsx # 确认弹窗
+│       │   ├── CancelOrderModal.tsx  # 取消弹窗
+│       │   └── OperationLogTimeline.tsx # 操作日志
+│       ├── hooks/                    # 自定义 Hooks
+│       │   ├── useReservationOrders.ts
+│       │   ├── useReservationDetail.ts
+│       │   └── useReservationMutations.ts
+│       ├── services/                 # API 封装
+│       │   └── reservationOrderService.ts
+│       └── types/                    # 类型定义
+│           └── reservation-order.types.ts
+├── types/
+│   └── reservationOrder.ts       # 全局类型定义
+└── components/layout/
+    ├── AppLayout.tsx             # 侧边栏菜单
+    └── Router.tsx                # 路由配置
 
 specs/U004-order-list-view/
 ├── spec.md                          # Feature specification
@@ -534,63 +406,25 @@ bash .specify/scripts/bash/setup-plan.sh
 
 ---
 
-### Issue 2: MSW not intercepting requests
+### Issue 2: Port already in use
 
-**Symptoms**:
-- Requests go to real backend instead of mock handlers
-- Console shows "404 Not Found" errors
+**Error**:
+```
+Port 3000 is already in use
+```
 
 **Solution**:
 ```bash
-# Check VITE_USE_MOCK is set to true
-cat frontend/.env.local | grep VITE_USE_MOCK
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
 
-# Restart dev server
-cd frontend
+# Then restart dev server
 npm run dev
 ```
 
 ---
 
-### Issue 3: Type errors after installing dependencies
-
-**Error**:
-```
-Cannot find module '@/types/reservationOrder'
-```
-
-**Solution**:
-```bash
-# Ensure U001 types exist
-ls frontend/src/types/reservationOrder.ts
-
-# If missing, check out from U001 branch
-git checkout origin/U001-reservation-order-management -- frontend/src/types/reservationOrder.ts
-
-# Or create minimal type definitions
-```
-
----
-
-### Issue 4: Port already in use
-
-**Error**:
-```
-Port 5173 is already in use
-```
-
-**Solution**:
-```bash
-# Kill process on port 5173
-lsof -ti:5173 | xargs kill -9
-
-# Or use different port
-npm run dev -- --port 5174
-```
-
----
-
-### Issue 5: Backend connection refused
+### Issue 3: Backend connection refused
 
 **Error**:
 ```
@@ -633,9 +467,9 @@ After completing the setup:
    - Write tests **before** implementation
 
 4. **Integrate with U001**:
-   - Reuse existing types from `@/types/reservationOrder`
-   - Call existing APIs from `reservationOrderService.ts`
-   - Test integration with real backend (disable mock mode)
+   - 订单列表基于 U001 预约订单模块实现
+   - 复用 `@/types/reservationOrder` 类型定义
+   - 调用 `reservationOrderService.ts` 中的现有 API
 
 ---
 
