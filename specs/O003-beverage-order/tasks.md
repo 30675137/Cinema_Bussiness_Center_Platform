@@ -31,7 +31,7 @@
 - [x] T005 [P] Add B端 dependencies: TanStack Query, Zustand, Ant Design to `frontend/package.json` ✅
 - [x] T006 [P] Add C端 dependencies: Taro UI, TanStack Query, Zustand to `hall-reserve-taro/package.json` ✅
 - [x] T007 Configure backend environment variables for Supabase connection in `backend/src/main/resources/application.yml` ✅
-- [ ] T007.1 [P] Create Supabase Storage bucket 'beverage-images' with public read access for beverage image URLs
+- [x] T007.1 [P] Create Supabase Storage bucket 'beverage-images' with public read access for beverage image URLs ✅ 2025-12-28 (手动创建)
 - [x] T008 Configure C端 environment variables for API endpoints in `hall-reserve-taro/src/config/index.ts` ✅
 - [x] T008.1 [P] Define polling interval constant (POLLING_INTERVAL_MS=8000) and Mock payment delay (MOCK_PAYMENT_DELAY_MS=500) in config files ✅
 - [x] T009 [P] Setup ESLint/Prettier for B端 in `frontend/eslint.config.js` ✅ (使用 flat config 格式)
@@ -68,7 +68,7 @@
 - [x] T024.1 [P] Create `BeverageErrorCode` enum at `backend/src/main/java/com/cinema/beverage/exception/BeverageErrorCode.java` defining all error codes (BEV_NTF_001, BEV_VAL_002, ORD_NTF_001, ORD_VAL_002, ORD_BIZ_001, etc.) ✅
 - [x] T024.2 [P] Document all error codes in `specs/O003-beverage-order/contracts/error-codes.md` with trigger scenarios and handling recommendations ✅
 - [x] T025 [P] Add @spec O003-beverage-order comment to all backend beverage common files (ApiResponse, ErrorResponse, GlobalExceptionHandler) ✅
-- [x] T026 Configure JWT authentication filter at `backend/src/main/java/com/cinema/config/SecurityConfig.java` ✅
+- [x] T026 Configure JWT authentication filter at `backend/src/main/java/com/cinema/config/SecurityConfig.java` (C端需要JWT认证,B端MVP阶段允许`/api/admin/**`路径匿名访问) ✅
 
 ### Shared Frontend Components
 
@@ -170,7 +170,7 @@
 
 **Goal**: B端工作人员实时接收订单、查看详情、管理出品流程（制作 → 完成 → 叫号）、BOM扣料
 
-**Independent Test**: B端工作人员登录 → 实时接收新订单通知(轮询8s) → 查看订单详情和配方 → 开始制作(BOM扣料) → 标记完成 → 叫号通知
+**Independent Test**: B端工作人员打开管理后台(MVP阶段无需登录,使用Mock认证) → 实时接收新订单通知(轮询8s) → 查看订单详情和配方 → 开始制作(BOM扣料) → 标记完成 → 叫号通知
 
 ### Backend - BOM Integration (P003/P004)
 
@@ -285,7 +285,7 @@
 - [x] T139 [P] Add logging (INFO level) for all critical operations (order creation, BOM deduction, status changes) using SLF4J with structured JSON format per FR-027 ✅ 2025-12-27
 - [x] T140 Code cleanup and remove unused imports across all modules ✅ 2025-12-27
 - [ ] T141 Performance optimization: add Redis caching for beverage menu queries
-- [x] T142 Security hardening: validate JWT tokens in all admin endpoints ✅ (SecurityConfig + JwtAuthenticationFilter)
+- [x] T142 Security hardening: validate JWT tokens in C端 endpoints,B端MVP阶段允许匿名访问(Phase 2升级为完整认证) ✅ (SecurityConfig + JwtAuthenticationFilter)
 - [ ] T143 [P] Add Sentry error tracking integration for production monitoring
 - [x] T144 Run quickstart.md validation and fix any broken steps ✅ 2025-12-28
 - [x] T145 Update project README.md with beverage order feature overview, API endpoints, development setup, and troubleshooting guide ✅ 2025-12-27
@@ -455,6 +455,8 @@ With 3 developers after Foundational phase:
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
 - **@spec O003-beverage-order** comment MUST be added to all new business logic files (T025, T033)
+- **B端认证**: MVP阶段工作人员无需登录(Mock认证),SpringSecurity允许`/api/admin/**`路径匿名访问,假设内网环境;Phase 2升级为完整JWT认证+角色权限
+- **C端认证**: 完整JWT认证,所有订单操作需要用户登录状态
 - Mock payment and mock calling are MVP implementations - real integrations in Phase 2
 - BOM integration uses real P003/P004 APIs - ensure those modules are available
 - Database migrations (T011-T020) MUST succeed before backend development

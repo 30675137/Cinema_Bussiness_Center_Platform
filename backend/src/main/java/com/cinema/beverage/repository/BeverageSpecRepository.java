@@ -38,6 +38,14 @@ public interface BeverageSpecRepository extends JpaRepository<BeverageSpec, UUID
     );
 
     /**
+     * 根据饮品ID和规格类型查询规格（用于默认规格切换）
+     */
+    List<BeverageSpec> findByBeverageIdAndSpecType(
+            UUID beverageId,
+            SpecType specType
+    );
+
+    /**
      * 批量查询多个饮品的规格
      */
     @Query("SELECT s FROM BeverageSpec s WHERE s.beverageId IN :beverageIds ORDER BY s.beverageId, s.specType, s.sortOrder")

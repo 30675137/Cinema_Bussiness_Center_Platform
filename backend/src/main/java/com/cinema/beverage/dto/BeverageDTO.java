@@ -4,10 +4,6 @@
  */
 package com.cinema.beverage.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import com.cinema.beverage.entity.Beverage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +11,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 饮品DTO - 用于C端饮品列表展示
+ * 饮品DTO - 用于B端/C端饮品列表展示
  *
  * 对应 spec: O003-beverage-order
- * 使用场景: C端饮品菜单列表
+ * 使用场景: B端饮品管理列表、C端饮品菜单列表
  */
 @Data
 @Builder
@@ -27,9 +23,9 @@ import lombok.NoArgsConstructor;
 public class BeverageDTO {
 
     /**
-     * 饮品ID
+     * 饮品ID (UUID字符串)
      */
-    private UUID id;
+    private String id;
 
     /**
      * 饮品名称
@@ -44,22 +40,22 @@ public class BeverageDTO {
     /**
      * 饮品分类
      */
-    private String category;
+    private Beverage.BeverageCategory category;
 
     /**
      * 主图URL
      */
-    private String imageUrl;
+    private String mainImage;
 
     /**
-     * 基础价格
+     * 基础价格（单位：分）
      */
-    private BigDecimal basePrice;
+    private Long basePrice;
 
     /**
      * 饮品状态
      */
-    private String status;
+    private Beverage.BeverageStatus status;
 
     /**
      * 是否推荐
@@ -72,35 +68,32 @@ public class BeverageDTO {
     private Integer sortOrder;
 
     /**
-     * 创建时间
+     * 创建时间 (ISO 8601字符串)
      */
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     /**
-     * 更新时间
+     * 更新时间 (ISO 8601字符串)
      */
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     /**
-     * 从实体转换为DTO
+     * 创建人ID
      */
-    public static BeverageDTO fromEntity(Beverage beverage) {
-        if (beverage == null) {
-            return null;
-        }
+    private String createdBy;
 
-        return BeverageDTO.builder()
-                .id(beverage.getId())
-                .name(beverage.getName())
-                .description(beverage.getDescription())
-                .category(beverage.getCategory() != null ? beverage.getCategory().name() : null)
-                .imageUrl(beverage.getImageUrl())
-                .basePrice(beverage.getBasePrice())
-                .status(beverage.getStatus() != null ? beverage.getStatus().name() : null)
-                .isRecommended(beverage.getIsRecommended())
-                .sortOrder(beverage.getSortOrder())
-                .createdAt(beverage.getCreatedAt())
-                .updatedAt(beverage.getUpdatedAt())
-                .build();
-    }
+    /**
+     * 更新人ID
+     */
+    private String updatedBy;
+
+    /**
+     * 规格数量
+     */
+    private Integer specCount;
+
+    /**
+     * 配方数量
+     */
+    private Integer recipeCount;
 }

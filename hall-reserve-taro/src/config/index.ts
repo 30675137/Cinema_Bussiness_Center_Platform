@@ -5,15 +5,15 @@
 
 // API 端点配置
 export const API_CONFIG = {
-  // 后端 API 基础 URL
-  BASE_URL: process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080',
+  // 后端 API 基础 URL (小程序需使用局域网IP)
+  BASE_URL: 'http://192.168.10.71:8080',
 
   // API 超时时间（毫秒）
   TIMEOUT: 30000,
 
   // Supabase 配置
-  SUPABASE_URL: process.env.TARO_APP_SUPABASE_URL || 'https://fxhgyxceqrmnpezluaht.supabase.co',
-  SUPABASE_ANON_KEY: process.env.TARO_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs',
+  SUPABASE_URL: 'https://fxhgyxceqrmnpezluaht.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs',
 }
 
 // 饮品订单相关常量 (@spec O003-beverage-order)
@@ -58,10 +58,10 @@ export const APP_CONFIG = {
   VERSION: '1.0.0',
 
   // 环境标识
-  ENV: process.env.NODE_ENV || 'development',
+  ENV: 'development',
 
   // 是否启用调试模式
-  DEBUG: process.env.NODE_ENV === 'development',
+  DEBUG: true,
 }
 
 // 导出所有配置

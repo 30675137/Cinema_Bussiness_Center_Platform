@@ -222,7 +222,7 @@ export async function getBeverages(params?: {
   status?: string
 }): Promise<ListResponse<Beverage>> {
   return request<ListResponse<Beverage>>({
-    url: '/api/beverages',
+    url: '/api/client/beverages',
     method: 'GET',
     data: params,
   })
@@ -233,7 +233,7 @@ export async function getBeverages(params?: {
  */
 export async function getBeverageById(id: string): Promise<ApiResponse<Beverage>> {
   return request<ApiResponse<Beverage>>({
-    url: `/api/beverages/${id}`,
+    url: `/api/client/beverages/${id}`,
     method: 'GET',
   })
 }
@@ -243,7 +243,7 @@ export async function getBeverageById(id: string): Promise<ApiResponse<Beverage>
  */
 export async function getBeverageSpecs(beverageId: string): Promise<ListResponse<BeverageSpec>> {
   return request<ListResponse<BeverageSpec>>({
-    url: `/api/beverages/${beverageId}/specs`,
+    url: `/api/client/beverages/${beverageId}/specs`,
     method: 'GET',
   })
 }
@@ -352,7 +352,7 @@ export async function getOrderHistory(params: {
   return response.data
 }
 
-export default {
+export const beverageService = {
   getBeverages,
   getBeverageById,
   getBeverageSpecs,
@@ -364,3 +364,5 @@ export default {
   getQueueNumber,
   getOrderHistory,
 }
+
+export default beverageService

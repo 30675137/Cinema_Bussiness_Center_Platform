@@ -4,23 +4,19 @@
  */
 package com.cinema.beverage.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import com.cinema.beverage.entity.Beverage;
-import com.cinema.beverage.entity.BeverageSpec;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 饮品详情DTO - 用于C端饮品详情展示
+ * 饮品详情DTO - 用于B端/C端饮品详情展示
  *
  * 对应 spec: O003-beverage-order
- * 使用场景: C端饮品详情页，包含完整信息和可选规格列表
+ * 使用场景: B端饮品管理详情页、C端饮品详情页，包含完整信息、规格列表和配方列表
  */
 @Data
 @Builder
@@ -29,9 +25,9 @@ import lombok.NoArgsConstructor;
 public class BeverageDetailDTO {
 
     /**
-     * 饮品ID
+     * 饮品ID (UUID字符串)
      */
-    private UUID id;
+    private String id;
 
     /**
      * 饮品名称
@@ -46,32 +42,27 @@ public class BeverageDetailDTO {
     /**
      * 饮品分类
      */
-    private String category;
+    private Beverage.BeverageCategory category;
 
     /**
      * 主图URL
      */
-    private String imageUrl;
+    private String mainImage;
 
     /**
      * 详情图片列表
      */
-    private String[] detailImages;
+    private List<String> detailImages;
 
     /**
-     * 基础价格
+     * 基础价格（单位：分）
      */
-    private BigDecimal basePrice;
-
-    /**
-     * 营养信息 (JSON字符串)
-     */
-    private String nutritionInfo;
+    private Long basePrice;
 
     /**
      * 饮品状态
      */
-    private String status;
+    private Beverage.BeverageStatus status;
 
     /**
      * 是否推荐
@@ -79,19 +70,14 @@ public class BeverageDetailDTO {
     private Boolean isRecommended;
 
     /**
-     * 排序顺序
-     */
-    private Integer sortOrder;
-
-    /**
      * 创建时间
      */
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     /**
      * 更新时间
      */
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 
     /**
      * 可选规格列表（按规格类型分组）
@@ -99,89 +85,8 @@ public class BeverageDetailDTO {
     private List<BeverageSpecDTO> specs;
 
     /**
-     * 从实体转换为详情DTO
+     * 配方列表
      */
-    public static BeverageDetailDTO fromEntity(Beverage beverage, List<BeverageSpec> specs) {
-        if (beverage == null) {
-            return null;
-        }
+    private List<BeverageRecipeDTO> recipes;
 
-        List<BeverageSpecDTO> specDTOs = specs != null
-                ? specs.stream().map(BeverageSpecDTO::fromEntity).toList()
-                : List.of();
-
-        return BeverageDetailDTO.builder()
-                .id(beverage.getId())
-                .name(beverage.getName())
-                .description(beverage.getDescription())
-                .category(beverage.getCategory() != null ? beverage.getCategory().name() : null)
-                .imageUrl(beverage.getImageUrl())
-                .detailImages(beverage.getDetailImages())
-                .basePrice(beverage.getBasePrice())
-                .nutritionInfo(beverage.getNutritionInfo())
-                .status(beverage.getStatus() != null ? beverage.getStatus().name() : null)
-                .isRecommended(beverage.getIsRecommended())
-                .sortOrder(beverage.getSortOrder())
-                .createdAt(beverage.getCreatedAt())
-                .updatedAt(beverage.getUpdatedAt())
-                .specs(specDTOs)
-                .build();
-    }
-
-    /**
-     * 饮品规格DTO
-     */
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BeverageSpecDTO {
-        /**
-         * 规格ID
-         */
-        private UUID id;
-
-        /**
-         * 饮品ID
-         */
-        private UUID beverageId;
-
-        /**
-         * 规格类型
-         */
-        private String specType;
-
-        /**
-         * 规格名称
-         */
-        private String specName;
-
-        /**
-         * 价格调整
-         */
-        private BigDecimal priceAdjustment;
-
-        /**
-         * 排序顺序
-         */
-        private Integer sortOrder;
-
-        /**
-         * 从实体转换为DTO
-         */
-        public static BeverageSpecDTO fromEntity(BeverageSpec spec) {
-            if (spec == null) {
-                return null;
-            }
-
-            return BeverageSpecDTO.builder()
-                    .id(spec.getId())
-                    .beverageId(spec.getBeverageId())
-                    .specType(spec.getSpecType() != null ? spec.getSpecType().name() : null)
-                    .specName(spec.getSpecName())
-                    .priceAdjustment(spec.getPriceAdjustment())
-                    .sortOrder(spec.getSortOrder())
-                    .build();
-        }
-    }
 }

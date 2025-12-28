@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,7 +25,7 @@ import com.cinema.beverage.entity.Beverage.BeverageStatus;
  * 提供饮品数据的CRUD操作和自定义查询
  */
 @Repository
-public interface BeverageRepository extends JpaRepository<Beverage, UUID> {
+public interface BeverageRepository extends JpaRepository<Beverage, UUID>, JpaSpecificationExecutor<Beverage> {
 
     /**
      * 查询所有启用的饮品，按排序顺序和创建时间降序

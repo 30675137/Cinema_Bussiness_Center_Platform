@@ -20,20 +20,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 /**
- * 认证 API 控制器
+ * 认证 API 控制器 (B端管理人员登录)
  *
  * 提供以下端点:
- * - POST /api/auth/login - 用户登录
- * - POST /api/auth/refresh - 刷新访问令牌
+ * - POST /api/beverage-auth/login - B端用户登录
+ * - POST /api/beverage-auth/refresh - 刷新访问令牌
  *
  * 注意: 此实现为简化版本，使用固定的测试用户
  * 生产环境应连接实际用户数据库 (Supabase Auth)
  */
 @RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+@RequestMapping("/api/beverage-auth")
+public class BeverageAuthController {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger log = LoggerFactory.getLogger(BeverageAuthController.class);
 
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -51,7 +51,7 @@ public class AuthController {
     @Value("${jwt.access-token-expiration:3600000}")
     private long accessTokenExpiration;
 
-    public AuthController(JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
+    public BeverageAuthController(JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
     }

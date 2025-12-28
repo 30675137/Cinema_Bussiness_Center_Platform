@@ -4,14 +4,13 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import Taro from '@tarojs/taro'
-import { orderService } from '../services/orderService'
-import type { CreateBeverageOrderRequest, BeverageOrderDTO } from '../types/order'
+import { orderService, type CreateOrderRequest, type BeverageOrder } from '../services/orderService'
 
 /**
  * 创建订单成功回调参数
  */
 interface CreateOrderSuccessContext {
-  order: BeverageOrderDTO
+  order: BeverageOrder
 }
 
 /**
@@ -21,7 +20,7 @@ interface UseCreateOrderOptions {
   /**
    * 创建成功回调
    */
-  onSuccess?: (data: BeverageOrderDTO) => void
+  onSuccess?: (data: BeverageOrder) => void
 
   /**
    * 创建失败回调
@@ -39,11 +38,11 @@ export const useCreateOrder = (options?: UseCreateOrderOptions) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (request: CreateBeverageOrderRequest) => {
+    mutationFn: async (request: CreateOrderRequest) => {
       return orderService.createOrder(request)
     },
 
-    onSuccess: (data: BeverageOrderDTO) => {
+    onSuccess: (data: BeverageOrder) => {
       // 刷新"我的订单"列表缓存
       queryClient.invalidateQueries({ queryKey: ['my-orders'] })
 

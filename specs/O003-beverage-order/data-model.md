@@ -1,1025 +1,960 @@
-# 数据模型文档 (Data Model)
+# Data Model: 饮品订单创建与出品管理
 
-**Feature**: 饮品订单创建与出品管理 (Beverage Order & Production Management)
-**Spec ID**: O003-beverage-order
-**Date**: 2025-12-27
-**Version**: 1.0.0
-**Status**: Draft
+**Feature**: O003-beverage-order | **Date**: 2025-12-28 | **Version**: 1.1.0
 
----
+## Overview
 
-## 目录
+本文档定义了饮品订单创建与出品管理功能的完整数据模型，包括饮品管理、订单管理、配方管理（BOM）三大核心领域。数据模型设计遵循以下原则:
 
-1. [实体概览](#实体概览)
-2. [详细实体定义](#详细实体定义)
-3. [实体关系图](#实体关系图)
-4. [数据完整性规则](#数据完整性规则)
-5. [验证规则总结](#验证规则总结)
-6. [索引策略](#索引策略)
-7. [数据迁移说明](#数据迁移说明)
+- **快照机制**: 订单项保存饮品和规格的快照数据，避免菜单变更影响历史订单
+- **状态驱动**: 订单和取餐号采用明确的状态机模型，确保状态流转可控
+- **BOM集成**: 配方设计支持与P003/P004库存管理模块集成，实现自动扣料
+- **性能优化**: 合理使用索引、JSON字段、外键约束，平衡查询性能和数据一致性
 
----
+## Entity Relationship Diagram
 
-## 实体概览
+```
+┌──────────────┐         ┌──────────────────┐         ┌─────────────────┐
+│   Beverage   │◄────┐   │  BeverageRecipe  │         │    Ingredient   │
+│   (饮品)     │     │   │   (饮品配方)     │         │    (原料SKU)    │
+└──────────────┘     │   └──────────────────┘         └─────────────────┘
+       │             │            │                            △
+       │ 1       1-N │            │ ingredients JSON           │
+       │             │            │ (关联原料SKU)              │
+       ▼             │            └────────────────────────────┘
+┌──────────────────┐ │
+│  BeverageSpec    │ │                    ┌─────────────────────┐
+│  (饮品规格)      │─┘                    │  BeverageOrder      │
+└──────────────────┘                      │  (饮品订单)         │
+                                          └─────────────────────┘
+                                                   │
+                                                   │ 1
+                                                   │
+                                        ┌──────────┴──────────┐
+                                        │                     │
+                                    1-N │                     │ 1-1
+                                        ▼                     ▼
+                          ┌─────────────────────┐  ┌──────────────────┐
+                          │ BeverageOrderItem   │  │  QueueNumber     │
+                          │ (订单项)            │  │  (取餐号)        │
+                          └─────────────────────┘  └──────────────────┘
+                                    │
+                                    │ beverage_snapshot JSON
+                                    │ spec_snapshot JSON
+                                    │ (快照机制防止菜单变更)
+                                    ▼
+                          快照数据包含饮品名称、规格、价格
+```
 
-本功能涉及 **7 个核心实体**，分为三个业务域：
-
-| 实体名称 (中文) | 实体名称 (英文) | 表名 (PostgreSQL) | 业务域 | 说明 |
-|----------------|----------------|------------------|--------|------|
-| 饮品 | Beverage | `beverages` | 商品管理 | 菜单中的饮品商品 |
-| 饮品规格 | BeverageSpec | `beverage_specs` | 商品管理 | 饮品的可选规格（大小/温度/甜度/配料） |
-| 饮品配方 | BeverageRecipe | `beverage_recipes` | BOM管理 | 饮品制作配方 |
-| 配方原料关联 | RecipeIngredient | `recipe_ingredients` | BOM管理 | 配方与原料的关联表 |
-| 饮品订单 | BeverageOrder | `beverage_orders` | 订单管理 | 顾客的饮品订单主表 |
-| 订单商品项 | BeverageOrderItem | `beverage_order_items` | 订单管理 | 订单中的具体饮品项 |
-| 取餐号 | QueueNumber | `queue_numbers` | 叫号系统 | 叫号取餐的号码 |
-
-**依赖关系说明**：
-- `recipe_ingredients` 依赖 `skus` 表（来自 P001-sku-master-data）
-- BOM 扣料依赖 `store_inventory` 表（来自 P003-inventory-query）
-- 库存扣减依赖 `inventory_adjustments` 表（来自 P004-inventory-adjustment）
-
----
-
-## 详细实体定义
+## Entity Definitions
 
 ### 1. Beverage (饮品)
 
-**用途**: 代表菜单中的饮品商品，包含基本信息、价格、分类等。
+饮品是菜单的核心实体，代表可供顾客点单的饮品商品。
 
-#### 表定义
+#### Entity Properties
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 饮品唯一标识 |
+| name | VARCHAR(100) | NOT NULL | 饮品名称（如：拿铁咖啡、珍珠奶茶） |
+| category | VARCHAR(50) | NOT NULL | 分类（COFFEE/TEA/JUICE/SMOOTHIE/MILK_TEA/OTHER） |
+| base_price | DECIMAL(10,2) | NOT NULL, CHECK (base_price >= 0) | 基础价格（单位：元），规格调整在此基础上加减 |
+| description | TEXT | NULL | 饮品描述/介绍 |
+| main_image | TEXT | NULL | 主图URL（Supabase Storage） |
+| detail_images | JSONB | NULL, DEFAULT '[]' | 详情图URL数组（Supabase Storage） |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'INACTIVE' | 状态（ACTIVE/INACTIVE/OUT_OF_STOCK） |
+| is_recommended | BOOLEAN | NOT NULL, DEFAULT false | 是否推荐商品（显示标签） |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间 |
+| updated_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 更新时间 |
+
+#### Validation Rules
+
+- **名称唯一性**: 同一门店内饮品名称不能重复（门店维度由业务逻辑控制）
+- **分类枚举**: category 必须是以下值之一：`COFFEE`, `TEA`, `JUICE`, `SMOOTHIE`, `MILK_TEA`, `OTHER`
+- **价格非负**: base_price 必须 >= 0
+- **状态枚举**: status 必须是以下值之一：`ACTIVE`（上架）, `INACTIVE`（下架）, `OUT_OF_STOCK`（缺货）
+
+#### State Transitions (Status)
+
+```
+INACTIVE (下架)
+    │
+    ├──→ ACTIVE (上架) ──────→ OUT_OF_STOCK (缺货)
+    │         ↑                      │
+    │         └──────────────────────┘
+    │
+    └──→ 软删除（更新 status = 'INACTIVE'，不物理删除）
+```
+
+#### Indexes
 
 ```sql
+CREATE INDEX idx_beverage_category ON beverages(category);
+CREATE INDEX idx_beverage_status ON beverages(status);
+CREATE INDEX idx_beverage_is_recommended ON beverages(is_recommended);
+CREATE INDEX idx_beverage_created_at ON beverages(created_at DESC);
+```
+
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
 CREATE TABLE beverages (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 基本信息
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  category VARCHAR(50) NOT NULL,
-
-  -- 图片资源
-  image_url TEXT,                           -- 主图 URL (Supabase Storage)
-  detail_images JSONB DEFAULT '[]'::jsonb,  -- 详情图数组 ["url1", "url2"]
-
-  -- 价格
-  base_price DECIMAL(10,2) NOT NULL,        -- 基础价格（小杯/标准规格）
-
-  -- 营养信息（可选）
-  nutrition_info JSONB,                     -- {"calories": 150, "sugar": "10g"}
-
-  -- 状态管理
-  status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-  is_recommended BOOLEAN DEFAULT false,     -- 推荐标签
-  sort_order INTEGER DEFAULT 0,             -- 排序权重
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  created_by UUID,
-  updated_by UUID,
-
-  -- 约束
-  CONSTRAINT check_category CHECK (category IN ('COFFEE', 'TEA', 'JUICE', 'SMOOTHIE', 'MILK_TEA', 'OTHER')),
-  CONSTRAINT check_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK')),
-  CONSTRAINT check_base_price CHECK (base_price >= 0)
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL CHECK (category IN ('COFFEE', 'TEA', 'JUICE', 'SMOOTHIE', 'MILK_TEA', 'OTHER')),
+    base_price DECIMAL(10,2) NOT NULL CHECK (base_price >= 0),
+    description TEXT,
+    main_image TEXT,
+    detail_images JSONB DEFAULT '[]',
+    status VARCHAR(20) NOT NULL DEFAULT 'INACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK')),
+    is_recommended BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- 索引
-CREATE INDEX idx_beverage_category_status ON beverages(category, status) WHERE status = 'ACTIVE';
-CREATE INDEX idx_beverage_sort ON beverages(sort_order DESC, created_at DESC);
+CREATE INDEX idx_beverage_category ON beverages(category);
+CREATE INDEX idx_beverage_status ON beverages(status);
+CREATE INDEX idx_beverage_is_recommended ON beverages(is_recommended);
+CREATE INDEX idx_beverage_created_at ON beverages(created_at DESC);
+
+-- 更新时间触发器
+CREATE TRIGGER update_beverage_updated_at
+    BEFORE UPDATE ON beverages
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 ```
 
-#### 字段说明
+#### JSON Field Structure
 
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| name | VARCHAR(100) | NOT NULL | - | 饮品名称 |
-| description | TEXT | NULL | - | 饮品描述 |
-| category | VARCHAR(50) | NOT NULL | - | 分类（咖啡/茶饮/果汁等） |
-| image_url | TEXT | NULL | - | 主图 URL |
-| detail_images | JSONB | NULL | '[]' | 详情图数组 |
-| base_price | DECIMAL(10,2) | NOT NULL, >= 0 | - | 基础价格 |
-| nutrition_info | JSONB | NULL | - | 营养信息 |
-| status | VARCHAR(20) | NOT NULL | 'ACTIVE' | 状态 |
-| is_recommended | BOOLEAN | NULL | false | 是否推荐 |
-| sort_order | INTEGER | NULL | 0 | 排序权重 |
-| created_at | TIMESTAMP | NOT NULL | NOW() | 创建时间 |
-| updated_at | TIMESTAMP | NOT NULL | NOW() | 更新时间 |
-
-#### 验证规则
-
-- **FR-001**: `status = 'ACTIVE'` 的饮品才能在 C 端菜单中展示
-- **边界情况**: `category = 'OUT_OF_STOCK'` 时前端显示"暂时缺货"标签
-- **价格验证**: `base_price` 必须 >= 0，不允许负价格
+**detail_images** (JSONB Array):
+```json
+[
+    "https://supabase-storage-url/beverages/123/detail1.jpg",
+    "https://supabase-storage-url/beverages/123/detail2.jpg"
+]
+```
 
 ---
 
 ### 2. BeverageSpec (饮品规格)
 
-**用途**: 定义饮品的可选规格（大小、温度、甜度、配料），每个规格可以有价格调整。
+饮品规格定义了饮品的可选配置（如大小、温度、甜度、配料），每个规格可设置价格调整。
 
-#### 表定义
+#### Entity Properties
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 规格唯一标识 |
+| beverage_id | UUID | FK → beverages(id), NOT NULL, ON DELETE CASCADE | 关联饮品ID |
+| spec_type | VARCHAR(50) | NOT NULL | 规格类型（SIZE/TEMPERATURE/SWEETNESS/TOPPING） |
+| spec_name | VARCHAR(100) | NOT NULL | 规格选项名称（如：大杯、热、半糖、加珍珠） |
+| price_adjustment | DECIMAL(10,2) | NOT NULL, DEFAULT 0 | 价格调整（正数加价，负数减价，0不调整） |
+| is_default | BOOLEAN | NOT NULL, DEFAULT false | 是否默认选中（同一饮品同一类型最多一个默认） |
+| sort_order | INTEGER | NOT NULL, DEFAULT 0 | 排序权重（越小越靠前） |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间 |
+| updated_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 更新时间 |
+
+#### Validation Rules
+
+- **类型枚举**: spec_type 必须是以下值之一：`SIZE`, `TEMPERATURE`, `SWEETNESS`, `TOPPING`
+- **默认规格唯一**: 同一饮品同一类型最多只能有一个 is_default=true 的规格（业务逻辑控制）
+- **价格调整范围**: price_adjustment 建议在 -100 ~ 100 元之间（业务逻辑控制）
+
+#### Indexes
 
 ```sql
+CREATE INDEX idx_beverage_spec_beverage_id ON beverage_specs(beverage_id);
+CREATE INDEX idx_beverage_spec_type ON beverage_specs(spec_type);
+CREATE INDEX idx_beverage_spec_sort_order ON beverage_specs(sort_order);
+```
+
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
 CREATE TABLE beverage_specs (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 外键
-  beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
-
-  -- 规格信息
-  spec_type VARCHAR(50) NOT NULL,           -- SIZE/TEMPERATURE/SWEETNESS/TOPPING
-  spec_name VARCHAR(50) NOT NULL,           -- 具体规格值（如：小杯/中杯/大杯）
-  spec_code VARCHAR(50),                    -- 规格代码（用于配方匹配）
-  price_adjustment DECIMAL(10,2) DEFAULT 0, -- 价格调整（±）
-
-  -- 展示与排序
-  sort_order INTEGER DEFAULT 0,
-  is_default BOOLEAN DEFAULT false,         -- 是否默认选中
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束
-  CONSTRAINT check_spec_type CHECK (spec_type IN ('SIZE', 'TEMPERATURE', 'SWEETNESS', 'TOPPING')),
-  CONSTRAINT unique_beverage_spec UNIQUE (beverage_id, spec_type, spec_name)
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
+    spec_type VARCHAR(50) NOT NULL CHECK (spec_type IN ('SIZE', 'TEMPERATURE', 'SWEETNESS', 'TOPPING')),
+    spec_name VARCHAR(100) NOT NULL,
+    price_adjustment DECIMAL(10,2) NOT NULL DEFAULT 0,
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- 索引
-CREATE INDEX idx_spec_beverage ON beverage_specs(beverage_id, spec_type);
+CREATE INDEX idx_beverage_spec_beverage_id ON beverage_specs(beverage_id);
+CREATE INDEX idx_beverage_spec_type ON beverage_specs(spec_type);
+CREATE INDEX idx_beverage_spec_sort_order ON beverage_specs(sort_order);
+
+-- 更新时间触发器
+CREATE TRIGGER update_beverage_spec_updated_at
+    BEFORE UPDATE ON beverage_specs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 ```
 
-#### 字段说明
+#### Example Data
 
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| beverage_id | UUID | FK, NOT NULL | - | 关联的饮品 ID |
-| spec_type | VARCHAR(50) | NOT NULL | - | 规格类型 |
-| spec_name | VARCHAR(50) | NOT NULL | - | 规格名称 |
-| spec_code | VARCHAR(50) | NULL | - | 规格代码 |
-| price_adjustment | DECIMAL(10,2) | NULL | 0 | 价格调整 |
-| sort_order | INTEGER | NULL | 0 | 排序权重 |
-| is_default | BOOLEAN | NULL | false | 是否默认 |
-
-#### 验证规则
-
-- **FR-003**: 每个 `spec_type` 至少有一个选项
-- **唯一性**: 同一饮品的同一规格类型下，`spec_name` 不能重复
-- **价格调整**: `price_adjustment` 可以为负数（如折扣），但最终价格不能 < 0
-
-#### 规格类型说明
-
-| spec_type | 说明 | 示例 spec_name |
-|-----------|------|----------------|
-| SIZE | 容量大小 | 小杯, 中杯, 大杯 |
-| TEMPERATURE | 温度 | 冷, 热, 去冰, 少冰 |
-| SWEETNESS | 甜度 | 无糖, 半糖, 标准, 多糖 |
-| TOPPING | 配料/加料 | 珍珠, 椰果, 布丁, 奶盖 |
+```sql
+-- 拿铁咖啡的规格配置示例
+INSERT INTO beverage_specs (beverage_id, spec_type, spec_name, price_adjustment, is_default, sort_order) VALUES
+    ('beverage-uuid', 'SIZE', '中杯', 0, true, 1),
+    ('beverage-uuid', 'SIZE', '大杯', 3, false, 2),
+    ('beverage-uuid', 'TEMPERATURE', '热', 0, true, 1),
+    ('beverage-uuid', 'TEMPERATURE', '冰', 0, false, 2),
+    ('beverage-uuid', 'SWEETNESS', '标准糖', 0, true, 1),
+    ('beverage-uuid', 'SWEETNESS', '半糖', 0, false, 2),
+    ('beverage-uuid', 'SWEETNESS', '无糖', 0, false, 3),
+    ('beverage-uuid', 'TOPPING', '不加配料', 0, true, 1),
+    ('beverage-uuid', 'TOPPING', '珍珠', 2, false, 2),
+    ('beverage-uuid', 'TOPPING', '椰果', 2, false, 3);
+```
 
 ---
 
-### 3. BeverageRecipe (饮品配方)
+### 3. BeverageRecipe (饮品配方/BOM)
 
-**用途**: 定义饮品的制作配方（BOM），关联具体的规格组合和所需原料。
+饮品配方定义了制作饮品所需的原料及用量，用于BOM自动扣料。
 
-#### 表定义
+#### Entity Properties
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 配方唯一标识 |
+| beverage_id | UUID | FK → beverages(id), NOT NULL, ON DELETE CASCADE | 关联饮品ID |
+| spec_combination | JSONB | NULL, DEFAULT '{}' | 规格组合（JSON对象，指定适用的规格） |
+| ingredients | JSONB | NOT NULL | 原料列表（JSON数组，包含SKU ID、用量、单位） |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间 |
+| updated_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 更新时间 |
+
+#### Validation Rules
+
+- **原料关联**: ingredients 中的 sku_id 必须存在于 P003 库存管理的 skus 表中（业务逻辑校验）
+- **单位一致性**: ingredients 中的 unit 必须与 skus 表中的单位一致（业务逻辑校验）
+- **用量非负**: ingredients 中的 quantity 必须 > 0
+
+#### Indexes
 
 ```sql
+CREATE INDEX idx_beverage_recipe_beverage_id ON beverage_recipes(beverage_id);
+CREATE INDEX idx_beverage_recipe_spec_combination ON beverage_recipes USING gin(spec_combination);
+```
+
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
 CREATE TABLE beverage_recipes (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 外键
-  beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
-
-  -- 规格组合（可选）
-  spec_combination JSONB,                   -- {"size":"large","temperature":"hot"}
-
-  -- 制作说明
-  instructions TEXT,                        -- 制作步骤文本
-  preparation_time INTEGER DEFAULT 120,     -- 预计制作时间（秒）
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束（一个饮品+规格组合只有一个配方）
-  CONSTRAINT unique_beverage_recipe UNIQUE (beverage_id, spec_combination)
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
+    spec_combination JSONB DEFAULT '{}',
+    ingredients JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- 索引
-CREATE INDEX idx_recipe_beverage ON beverage_recipes(beverage_id);
+CREATE INDEX idx_beverage_recipe_beverage_id ON beverage_recipes(beverage_id);
+CREATE INDEX idx_beverage_recipe_spec_combination ON beverage_recipes USING gin(spec_combination);
+
+-- 更新时间触发器
+CREATE TRIGGER update_beverage_recipe_updated_at
+    BEFORE UPDATE ON beverage_recipes
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 ```
 
-#### 字段说明
+#### JSON Field Structure
 
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| beverage_id | UUID | FK, NOT NULL | - | 关联的饮品 ID |
-| spec_combination | JSONB | NULL | - | 规格组合 |
-| instructions | TEXT | NULL | - | 制作步骤 |
-| preparation_time | INTEGER | NULL | 120 | 预计制作时间（秒） |
-
-#### 验证规则
-
-- **FR-014**: BOM 扣料前必须查询到对应的配方
-- **SC-004**: BOM 扣料准确率 100%，配方数据必须准确
-- **规格匹配**: `spec_combination` 为 NULL 表示基础配方（适用所有规格），非 NULL 时精确匹配
-
-#### spec_combination 示例
-
+**spec_combination** (JSONB Object):
 ```json
-// 示例 1: 基础配方（适用所有规格）
-null
+{
+    "SIZE": "大杯",
+    "TOPPING": "珍珠"
+}
+```
+*说明*: 空对象 `{}` 表示基础配方（不指定规格），适用于所有规格组合。
 
-// 示例 2: 大杯热饮配方
-{"size": "large", "temperature": "hot"}
+**ingredients** (JSONB Array):
+```json
+[
+    {
+        "sku_id": "sku-uuid-001",
+        "sku_name": "咖啡豆",
+        "quantity": 20,
+        "unit": "g"
+    },
+    {
+        "sku_id": "sku-uuid-002",
+        "sku_name": "牛奶",
+        "quantity": 200,
+        "unit": "ml"
+    },
+    {
+        "sku_id": "sku-uuid-003",
+        "sku_name": "糖浆",
+        "quantity": 10,
+        "unit": "ml"
+    }
+]
+```
 
-// 示例 3: 加珍珠配方（配料叠加）
-{"topping": "pearl"}
+#### Example Data
+
+```sql
+-- 拿铁咖啡基础配方（中杯）
+INSERT INTO beverage_recipes (beverage_id, spec_combination, ingredients) VALUES
+    ('beverage-uuid', '{}', '[
+        {"sku_id": "sku-uuid-001", "sku_name": "咖啡豆", "quantity": 15, "unit": "g"},
+        {"sku_id": "sku-uuid-002", "sku_name": "牛奶", "quantity": 150, "unit": "ml"}
+    ]');
+
+-- 拿铁咖啡大杯配方（原料加量）
+INSERT INTO beverage_recipes (beverage_id, spec_combination, ingredients) VALUES
+    ('beverage-uuid', '{"SIZE": "大杯"}', '[
+        {"sku_id": "sku-uuid-001", "sku_name": "咖啡豆", "quantity": 20, "unit": "g"},
+        {"sku_id": "sku-uuid-002", "sku_name": "牛奶", "quantity": 200, "unit": "ml"}
+    ]');
+
+-- 拿铁咖啡加珍珠配方（额外原料）
+INSERT INTO beverage_recipes (beverage_id, spec_combination, ingredients) VALUES
+    ('beverage-uuid', '{"TOPPING": "珍珠"}', '[
+        {"sku_id": "sku-uuid-001", "sku_name": "咖啡豆", "quantity": 15, "unit": "g"},
+        {"sku_id": "sku-uuid-002", "sku_name": "牛奶", "quantity": 150, "unit": "ml"},
+        {"sku_id": "sku-uuid-004", "sku_name": "珍珠", "quantity": 30, "unit": "g"}
+    ]');
 ```
 
 ---
 
-### 4. RecipeIngredient (配方原料关联)
+### 4. BeverageOrder (饮品订单)
 
-**用途**: 关联饮品配方与具体原料（SKU），定义用量。
+饮品订单代表顾客的一笔点单，包含订单状态、支付信息、取餐号等核心数据。
 
-#### 表定义
+#### Entity Properties
 
-```sql
-CREATE TABLE recipe_ingredients (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 订单唯一标识 |
+| order_no | VARCHAR(50) | UNIQUE, NOT NULL | 订单号（业务生成，如：BO20251228001） |
+| queue_number | VARCHAR(10) | NOT NULL | 取餐号（如：001、002，每日重置） |
+| user_id | UUID | NOT NULL | 用户ID（关联用户表） |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'PENDING_PAYMENT' | 订单状态 |
+| total_price | DECIMAL(10,2) | NOT NULL, CHECK (total_price >= 0) | 订单总价（单位：元） |
+| payment_method | VARCHAR(50) | NULL | 支付方式（MOCK/WECHAT/ALIPAY） |
+| payment_time | TIMESTAMP WITH TIME ZONE | NULL | 支付时间 |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间（下单时间） |
+| completed_at | TIMESTAMP WITH TIME ZONE | NULL | 完成时间（状态变为COMPLETED时） |
+| remark | TEXT | NULL | 顾客备注 |
 
-  -- 外键
-  recipe_id UUID NOT NULL REFERENCES beverage_recipes(id) ON DELETE CASCADE,
-  sku_id UUID NOT NULL REFERENCES skus(id) ON DELETE RESTRICT,  -- 依赖 P001
+#### Validation Rules
 
-  -- 用量信息
-  quantity DECIMAL(10,3) NOT NULL,          -- 用量（支持小数）
-  unit VARCHAR(20) NOT NULL,                -- 单位（g/ml/个）
+- **订单号唯一性**: order_no 必须全局唯一
+- **状态枚举**: status 必须是以下值之一：`PENDING_PAYMENT`, `PENDING_PREPARATION`, `PREPARING`, `COMPLETED`, `DELIVERED`, `CANCELLED`
+- **总价非负**: total_price 必须 >= 0
 
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束
-  CONSTRAINT check_quantity CHECK (quantity > 0),
-  CONSTRAINT unique_recipe_sku UNIQUE (recipe_id, sku_id)
-);
-
--- 索引
-CREATE INDEX idx_recipe_ingredient ON recipe_ingredients(recipe_id);
-CREATE INDEX idx_ingredient_sku ON recipe_ingredients(sku_id);
-```
-
-#### 字段说明
-
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| recipe_id | UUID | FK, NOT NULL | - | 关联的配方 ID |
-| sku_id | UUID | FK, NOT NULL | - | 关联的 SKU ID (原料) |
-| quantity | DECIMAL(10,3) | NOT NULL, > 0 | - | 用量 |
-| unit | VARCHAR(20) | NOT NULL | - | 单位 |
-
-#### 验证规则
-
-- **SC-004**: BOM 扣料时，必须精确按照 `quantity` 扣减库存
-- **FR-015**: 扣料前必须校验 `store_inventory.available_quantity >= quantity * order_item.quantity`
-- **单位一致性**: `unit` 必须与 `skus.unit` 一致
-
-#### 常用单位
-
-| unit | 说明 | 适用原料 |
-|------|------|---------|
-| g | 克 | 咖啡豆、茶叶、糖 |
-| ml | 毫升 | 牛奶、水、糖浆 |
-| piece | 个 | 杯子、吸管 |
-
----
-
-### 5. BeverageOrder (饮品订单)
-
-**用途**: 代表顾客的一笔饮品订单，包含订单状态、支付信息、时间追踪等。
-
-#### 表定义
-
-```sql
-CREATE TABLE beverage_orders (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 订单编号（业务主键）
-  order_number VARCHAR(50) NOT NULL UNIQUE, -- "BORDT" + yyyyMMddHHmmss + 4位随机
-
-  -- 用户与门店
-  user_id UUID NOT NULL,                    -- 下单用户（关联认证系统）
-  store_id UUID NOT NULL,                   -- 门店 ID
-
-  -- 订单金额
-  total_price DECIMAL(10,2) NOT NULL,       -- 订单总价
-
-  -- 订单状态
-  status VARCHAR(20) NOT NULL DEFAULT 'PENDING_PAYMENT',
-
-  -- 支付信息（MVP 阶段为 Mock）
-  payment_method VARCHAR(50),               -- MOCK_WECHAT_PAY
-  transaction_id VARCHAR(100),              -- 支付流水号
-  paid_at TIMESTAMP,                        -- 支付时间
-
-  -- 时间追踪
-  production_start_time TIMESTAMP,          -- 开始制作时间
-  completed_at TIMESTAMP,                   -- 完成时间
-  delivered_at TIMESTAMP,                   -- 交付时间
-  cancelled_at TIMESTAMP,                   -- 取消时间
-
-  -- 顾客备注
-  customer_note TEXT,
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束
-  CONSTRAINT check_status CHECK (status IN (
-    'PENDING_PAYMENT',      -- 待支付
-    'PENDING_PRODUCTION',   -- 待制作
-    'PRODUCING',            -- 制作中
-    'COMPLETED',            -- 已完成（待取餐）
-    'DELIVERED',            -- 已交付
-    'CANCELLED'             -- 已取消
-  )),
-  CONSTRAINT check_total_price CHECK (total_price >= 0)
-);
-
--- 索引
-CREATE INDEX idx_order_user ON beverage_orders(user_id, created_at DESC);
-CREATE INDEX idx_order_store_status ON beverage_orders(store_id, status, created_at DESC);
-CREATE INDEX idx_order_number ON beverage_orders(order_number);
-CREATE INDEX idx_order_created_at ON beverage_orders(created_at DESC);
-```
-
-#### 字段说明
-
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| order_number | VARCHAR(50) | NOT NULL, UNIQUE | - | 订单号（业务主键） |
-| user_id | UUID | NOT NULL | - | 下单用户 |
-| store_id | UUID | NOT NULL | - | 门店 ID |
-| total_price | DECIMAL(10,2) | NOT NULL, >= 0 | - | 订单总价 |
-| status | VARCHAR(20) | NOT NULL | 'PENDING_PAYMENT' | 订单状态 |
-| payment_method | VARCHAR(50) | NULL | - | 支付方式 |
-| transaction_id | VARCHAR(100) | NULL | - | 支付流水号 |
-| paid_at | TIMESTAMP | NULL | - | 支付时间 |
-| production_start_time | TIMESTAMP | NULL | - | 开始制作时间 |
-| completed_at | TIMESTAMP | NULL | - | 完成时间 |
-| delivered_at | TIMESTAMP | NULL | - | 交付时间 |
-| cancelled_at | TIMESTAMP | NULL | - | 取消时间 |
-| customer_note | TEXT | NULL | - | 顾客备注 |
-
-#### 验证规则
-
-- **FR-002**: `order_number` 格式为 "BORDT" + yyyyMMddHHmmss + 4位随机数
-- **FR-007**: 支付成功后，`status` 从 'PENDING_PAYMENT' 变更为 'PENDING_PRODUCTION'
-- **FR-014**: 标记为 'PRODUCING' 时，必须先执行 BOM 扣料
-- **SC-005**: 状态更新延迟不超过 3 秒（通过轮询机制保证）
-
-#### 状态流转图
+#### State Transitions (Status)
 
 ```
 PENDING_PAYMENT (待支付)
-  ↓ [用户支付成功]
-PENDING_PRODUCTION (待制作)
-  ↓ [工作人员开始制作 + BOM扣料]
-PRODUCING (制作中)
-  ↓ [工作人员标记完成 + 触发叫号]
-COMPLETED (已完成/待取餐)
-  ↓ [顾客取餐，工作人员确认]
-DELIVERED (已交付)
-
-特殊流程:
-PENDING_PAYMENT → CANCELLED (支付失败/用户取消)
-PENDING_PRODUCTION → CANCELLED (原料不足/用户申请取消)
-PRODUCING → CANCELLED (制作失败/不可抗力)
+    │
+    ├──→ PENDING_PREPARATION (待制作) ──→ PREPARING (制作中)
+    │                                          │
+    │                                          ▼
+    │                                    COMPLETED (已完成)
+    │                                          │
+    │                                          ▼
+    │                                    DELIVERED (已交付)
+    │
+    └──→ CANCELLED (已取消)
 ```
 
-#### 状态变更记录（FR-026）
+**状态流转规则**:
+- `PENDING_PAYMENT` → `PENDING_PREPARATION`: 支付成功
+- `PENDING_PREPARATION` → `PREPARING`: 工作人员点击"开始制作"（触发BOM扣料）
+- `PREPARING` → `COMPLETED`: 工作人员点击"已完成"（触发叫号）
+- `COMPLETED` → `DELIVERED`: 工作人员点击"已交付"
+- `PENDING_PAYMENT` → `CANCELLED`: 用户取消订单或支付超时
+- `PENDING_PREPARATION` → `CANCELLED`: 用户申请取消（需工作人员审批）
+
+#### Indexes
 
 ```sql
--- 订单状态变更日志表（用于审计和问题排查）
-CREATE TABLE beverage_order_status_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
-  from_status VARCHAR(20),
-  to_status VARCHAR(20) NOT NULL,
-  changed_by UUID,                          -- 操作人（NULL表示系统自动）
-  change_reason TEXT,                       -- 变更原因
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+CREATE INDEX idx_beverage_order_user_id ON beverage_orders(user_id);
+CREATE INDEX idx_beverage_order_status ON beverage_orders(status);
+CREATE INDEX idx_beverage_order_created_at ON beverage_orders(created_at DESC);
+CREATE INDEX idx_beverage_order_queue_number ON beverage_orders(queue_number);
+```
 
-  CONSTRAINT check_from_status CHECK (from_status IN (
-    'PENDING_PAYMENT', 'PENDING_PRODUCTION', 'PRODUCING', 'COMPLETED', 'DELIVERED', 'CANCELLED'
-  )),
-  CONSTRAINT check_to_status CHECK (to_status IN (
-    'PENDING_PAYMENT', 'PENDING_PRODUCTION', 'PRODUCING', 'COMPLETED', 'DELIVERED', 'CANCELLED'
-  ))
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
+CREATE TABLE beverage_orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_no VARCHAR(50) UNIQUE NOT NULL,
+    queue_number VARCHAR(10) NOT NULL,
+    user_id UUID NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING_PAYMENT' CHECK (status IN ('PENDING_PAYMENT', 'PENDING_PREPARATION', 'PREPARING', 'COMPLETED', 'DELIVERED', 'CANCELLED')),
+    total_price DECIMAL(10,2) NOT NULL CHECK (total_price >= 0),
+    payment_method VARCHAR(50),
+    payment_time TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    completed_at TIMESTAMP WITH TIME ZONE,
+    remark TEXT
 );
 
-CREATE INDEX idx_status_log_order ON beverage_order_status_logs(order_id, created_at DESC);
+-- 索引
+CREATE INDEX idx_beverage_order_user_id ON beverage_orders(user_id);
+CREATE INDEX idx_beverage_order_status ON beverage_orders(status);
+CREATE INDEX idx_beverage_order_created_at ON beverage_orders(created_at DESC);
+CREATE INDEX idx_beverage_order_queue_number ON beverage_orders(queue_number);
 ```
 
 ---
 
-### 6. BeverageOrderItem (订单商品项)
+### 5. BeverageOrderItem (订单项)
 
-**用途**: 订单中的具体饮品项，记录下单时的饮品快照（价格、规格等），避免菜单变更影响历史订单。
+订单项代表订单中的单个饮品项，包含饮品和规格的快照数据。
 
-#### 表定义
+#### Entity Properties
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 订单项唯一标识 |
+| order_id | UUID | FK → beverage_orders(id), NOT NULL, ON DELETE CASCADE | 关联订单ID |
+| beverage_id | UUID | NOT NULL | 饮品ID（原始引用，不作外键约束） |
+| beverage_snapshot | JSONB | NOT NULL | 饮品快照（名称、分类、主图等） |
+| spec_snapshot | JSONB | NOT NULL, DEFAULT '[]' | 规格快照（规格类型、名称、价格调整） |
+| quantity | INTEGER | NOT NULL, CHECK (quantity > 0) | 数量 |
+| unit_price | DECIMAL(10,2) | NOT NULL, CHECK (unit_price >= 0) | 单价（含规格调整后的最终价格） |
+| subtotal | DECIMAL(10,2) | NOT NULL, CHECK (subtotal >= 0) | 小计（unit_price * quantity） |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间 |
+
+#### Validation Rules
+
+- **数量正整数**: quantity 必须 > 0
+- **单价非负**: unit_price 必须 >= 0
+- **小计一致性**: subtotal = unit_price * quantity（业务逻辑保证）
+
+#### Indexes
 
 ```sql
+CREATE INDEX idx_beverage_order_item_order_id ON beverage_order_items(order_id);
+CREATE INDEX idx_beverage_order_item_beverage_id ON beverage_order_items(beverage_id);
+```
+
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
 CREATE TABLE beverage_order_items (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 外键
-  order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
-  beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE RESTRICT,
-
-  -- 饮品快照（下单时的数据）
-  beverage_name VARCHAR(100) NOT NULL,      -- 饮品名称快照
-  beverage_image_url TEXT,                  -- 图片快照
-  selected_specs JSONB NOT NULL,            -- 选中的规格快照
-
-  -- 数量与价格
-  quantity INTEGER NOT NULL DEFAULT 1,
-  unit_price DECIMAL(10,2) NOT NULL,        -- 单价快照（含规格调整）
-  subtotal DECIMAL(10,2) NOT NULL,          -- 小计 = unit_price * quantity
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束
-  CONSTRAINT check_quantity CHECK (quantity > 0),
-  CONSTRAINT check_unit_price CHECK (unit_price >= 0),
-  CONSTRAINT check_subtotal CHECK (subtotal >= 0),
-  CONSTRAINT check_subtotal_calculation CHECK (subtotal = unit_price * quantity)
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
+    beverage_id UUID NOT NULL,
+    beverage_snapshot JSONB NOT NULL,
+    spec_snapshot JSONB NOT NULL DEFAULT '[]',
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(10,2) NOT NULL CHECK (unit_price >= 0),
+    subtotal DECIMAL(10,2) NOT NULL CHECK (subtotal >= 0),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- 索引
-CREATE INDEX idx_order_item_order ON beverage_order_items(order_id);
-CREATE INDEX idx_order_item_beverage ON beverage_order_items(beverage_id);
+CREATE INDEX idx_beverage_order_item_order_id ON beverage_order_items(order_id);
+CREATE INDEX idx_beverage_order_item_beverage_id ON beverage_order_items(beverage_id);
 ```
 
-#### 字段说明
+#### JSON Field Structure
 
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| order_id | UUID | FK, NOT NULL | - | 关联的订单 ID |
-| beverage_id | UUID | FK, NOT NULL | - | 关联的饮品 ID |
-| beverage_name | VARCHAR(100) | NOT NULL | - | 饮品名称快照 |
-| beverage_image_url | TEXT | NULL | - | 图片 URL 快照 |
-| selected_specs | JSONB | NOT NULL | - | 选中的规格快照 |
-| quantity | INTEGER | NOT NULL, > 0 | 1 | 数量 |
-| unit_price | DECIMAL(10,2) | NOT NULL, >= 0 | - | 单价快照 |
-| subtotal | DECIMAL(10,2) | NOT NULL, >= 0 | - | 小计 |
-
-#### 验证规则
-
-- **快照不可变**: 订单创建后，`beverage_name`, `unit_price`, `selected_specs` 不可修改
-- **小计计算**: `subtotal` 必须等于 `unit_price * quantity`
-- **订单总价**: `beverage_orders.total_price` 必须等于 SUM(subtotal)
-
-#### selected_specs 示例
-
+**beverage_snapshot** (JSONB Object):
 ```json
-// 示例: 大杯热美式咖啡，半糖，加珍珠
 {
-  "size": {
-    "name": "大杯",
-    "code": "large",
-    "priceAdjustment": 5.00
-  },
-  "temperature": {
-    "name": "热",
-    "code": "hot",
-    "priceAdjustment": 0
-  },
-  "sweetness": {
-    "name": "半糖",
-    "code": "half",
-    "priceAdjustment": 0
-  },
-  "topping": {
-    "name": "珍珠",
-    "code": "pearl",
-    "priceAdjustment": 3.00
-  }
+    "id": "beverage-uuid",
+    "name": "拿铁咖啡",
+    "category": "COFFEE",
+    "base_price": 18.00,
+    "main_image": "https://supabase-storage-url/beverages/latte.jpg"
 }
+```
 
-// 价格计算:
-// base_price = 15.00 (美式咖啡基础价)
-// unit_price = 15.00 + 5.00 (大杯) + 0 + 0 + 3.00 (珍珠) = 23.00
+**spec_snapshot** (JSONB Array):
+```json
+[
+    {
+        "spec_type": "SIZE",
+        "spec_name": "大杯",
+        "price_adjustment": 3.00
+    },
+    {
+        "spec_type": "TEMPERATURE",
+        "spec_name": "热",
+        "price_adjustment": 0
+    },
+    {
+        "spec_type": "SWEETNESS",
+        "spec_name": "半糖",
+        "price_adjustment": 0
+    },
+    {
+        "spec_type": "TOPPING",
+        "spec_name": "珍珠",
+        "price_adjustment": 2.00
+    }
+]
+```
+
+**单价计算逻辑**:
+```
+unit_price = beverage_snapshot.base_price
+            + SUM(spec_snapshot[*].price_adjustment)
+
+示例: 18 + 3 + 0 + 0 + 2 = 23 元
 ```
 
 ---
 
-### 7. QueueNumber (取餐号)
+### 6. QueueNumber (取餐号)
 
-**用途**: 叫号系统的取餐号，每日重置，支持语音播报和顾客取餐。
+取餐号用于叫号系统，顾客凭取餐号取餐。
 
-#### 表定义
+#### Entity Properties
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| id | UUID | PK, NOT NULL, DEFAULT uuid_generate_v4() | 取餐号唯一标识 |
+| queue_no | VARCHAR(10) | NOT NULL | 取餐号码（如：001、002） |
+| order_id | UUID | FK → beverage_orders(id), UNIQUE, NOT NULL, ON DELETE CASCADE | 关联订单ID（一对一） |
+| status | VARCHAR(20) | NOT NULL, DEFAULT 'WAITING' | 叫号状态 |
+| called_at | TIMESTAMP WITH TIME ZONE | NULL | 叫号时间 |
+| created_at | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT now() | 创建时间 |
+
+#### Validation Rules
+
+- **状态枚举**: status 必须是以下值之一：`WAITING`（待叫号）, `CALLED`（已叫号）, `PICKED_UP`（已取餐）
+- **订单唯一**: 一个订单只能对应一个取餐号（UNIQUE约束）
+
+#### State Transitions (Status)
+
+```
+WAITING (待叫号)
+    │
+    ▼
+CALLED (已叫号)
+    │
+    ▼
+PICKED_UP (已取餐)
+```
+
+#### Indexes
 
 ```sql
+CREATE INDEX idx_queue_number_queue_no ON queue_numbers(queue_no);
+CREATE INDEX idx_queue_number_status ON queue_numbers(status);
+CREATE INDEX idx_queue_number_created_at ON queue_numbers(created_at DESC);
+```
+
+#### PostgreSQL Table Definition
+
+```sql
+-- @spec O003-beverage-order
 CREATE TABLE queue_numbers (
-  -- 主键
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  -- 取餐号
-  queue_number VARCHAR(10) NOT NULL,        -- 格式: D001-D999
-
-  -- 外键
-  order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
-  store_id UUID NOT NULL,
-
-  -- 日期与序号
-  date DATE NOT NULL,                       -- 生成日期（每日重置）
-  sequence INTEGER NOT NULL,                -- 当日序号（1-999）
-
-  -- 状态
-  status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-  called_at TIMESTAMP,                      -- 叫号时间
-  picked_at TIMESTAMP,                      -- 取餐时间
-
-  -- 审计字段
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-  -- 约束
-  CONSTRAINT check_status CHECK (status IN ('PENDING', 'CALLED', 'PICKED')),
-  CONSTRAINT check_sequence CHECK (sequence >= 1 AND sequence <= 999),
-  CONSTRAINT unique_store_date_sequence UNIQUE (store_id, date, sequence),
-  CONSTRAINT unique_order UNIQUE (order_id)  -- 一个订单只有一个取餐号
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    queue_no VARCHAR(10) NOT NULL,
+    order_id UUID UNIQUE NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT 'WAITING' CHECK (status IN ('WAITING', 'CALLED', 'PICKED_UP')),
+    called_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
 -- 索引
-CREATE INDEX idx_queue_number ON queue_numbers(store_id, date, status);
-CREATE INDEX idx_queue_order ON queue_numbers(order_id);
+CREATE INDEX idx_queue_number_queue_no ON queue_numbers(queue_no);
+CREATE INDEX idx_queue_number_status ON queue_numbers(status);
+CREATE INDEX idx_queue_number_created_at ON queue_numbers(created_at DESC);
 ```
 
-#### 字段说明
+#### Queue Number Generation Rule
 
-| 字段名 | 类型 | 约束 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| id | UUID | PK, NOT NULL | gen_random_uuid() | 主键 |
-| queue_number | VARCHAR(10) | NOT NULL | - | 取餐号（D001-D999） |
-| order_id | UUID | FK, NOT NULL, UNIQUE | - | 关联的订单 ID |
-| store_id | UUID | NOT NULL | - | 门店 ID |
-| date | DATE | NOT NULL | - | 生成日期 |
-| sequence | INTEGER | NOT NULL, 1-999 | - | 当日序号 |
-| status | VARCHAR(20) | NOT NULL | 'PENDING' | 状态 |
-| called_at | TIMESTAMP | NULL | - | 叫号时间 |
-| picked_at | TIMESTAMP | NULL | - | 取餐时间 |
+取餐号生成规则：
+- 格式：3位数字（001, 002, ..., 999）
+- 每日0点重置，从001重新开始
+- 生成逻辑：
+  ```sql
+  -- 获取今日最大取餐号
+  SELECT COALESCE(MAX(CAST(queue_no AS INTEGER)), 0) + 1
+  FROM queue_numbers
+  WHERE DATE(created_at) = CURRENT_DATE;
 
-#### 验证规则
-
-- **FR-015**: 取餐号格式为 "D" + 三位序号（D001-D999）
-- **每日重置**: `date` 字段变化时，`sequence` 从 1 重新开始
-- **唯一性**: 同一门店、同一天、同一序号不能重复
-- **并发安全**: 使用 PostgreSQL Advisory Lock 保证并发生成时序号不冲突
-
-#### 取餐号生成算法
-
-```java
-// QueueNumberGenerator.java
-public String generate(String storeId, String orderId) {
-    LocalDate today = LocalDate.now();
-
-    // 使用分布式锁（事务级）
-    long lockKey = (storeId + today.toString()).hashCode();
-    acquireAdvisoryLock(lockKey);
-
-    // 查询当日最大序号
-    Integer maxSequence = queueNumberRepository
-        .findMaxSequenceByStoreAndDate(storeId, today);
-    Integer nextSequence = (maxSequence == null ? 0 : maxSequence) + 1;
-
-    if (nextSequence > 999) {
-        throw new QueueNumberExhaustedException("当日取餐号已用尽");
-    }
-
-    // 格式化: D + 三位序号
-    String queueNumber = String.format("D%03d", nextSequence);
-
-    // 插入数据库
-    QueueNumber qn = new QueueNumber();
-    qn.setQueueNumber(queueNumber);
-    qn.setOrderId(orderId);
-    qn.setStoreId(storeId);
-    qn.setDate(today);
-    qn.setSequence(nextSequence);
-    queueNumberRepository.save(qn);
-
-    return queueNumber;
-}
-```
-
-#### 状态流转
-
-```
-PENDING (待叫号)
-  ↓ [订单完成，系统触发叫号]
-CALLED (已叫号)
-  ↓ [顾客取餐，工作人员确认]
-PICKED (已取餐)
-```
+  -- 格式化为3位数字
+  -- 001, 002, ..., 999
+  ```
 
 ---
 
-## 实体关系图
+## Relationships
 
-```mermaid
-erDiagram
-    beverages ||--o{ beverage_specs : "has specs"
-    beverages ||--o{ beverage_recipes : "has recipes"
-    beverage_recipes ||--o{ recipe_ingredients : "contains"
-    recipe_ingredients }o--|| skus : "uses (P001)"
-
-    beverage_orders ||--o{ beverage_order_items : "contains"
-    beverage_order_items }o--|| beverages : "references"
-
-    beverage_orders ||--|| queue_numbers : "assigned"
-
-    beverage_orders {
-        UUID id PK
-        VARCHAR order_number UK "BORDT+timestamp+random"
-        UUID user_id
-        UUID store_id
-        VARCHAR status "状态机"
-        DECIMAL total_price
-        TIMESTAMP paid_at
-        TIMESTAMP completed_at
-    }
-
-    beverage_order_items {
-        UUID id PK
-        UUID order_id FK
-        UUID beverage_id FK
-        VARCHAR beverage_name "快照"
-        JSONB selected_specs "规格快照"
-        INTEGER quantity
-        DECIMAL unit_price "价格快照"
-        DECIMAL subtotal
-    }
-
-    queue_numbers {
-        UUID id PK
-        VARCHAR queue_number "D001-D999"
-        UUID order_id FK,UK
-        UUID store_id
-        DATE date "每日重置"
-        INTEGER sequence "1-999"
-        VARCHAR status
-    }
-
-    beverages {
-        UUID id PK
-        VARCHAR name
-        VARCHAR category
-        DECIMAL base_price
-        VARCHAR status
-        TEXT image_url
-    }
-
-    beverage_specs {
-        UUID id PK
-        UUID beverage_id FK
-        VARCHAR spec_type "SIZE/TEMPERATURE/SWEETNESS/TOPPING"
-        VARCHAR spec_name
-        DECIMAL price_adjustment
-    }
-
-    beverage_recipes {
-        UUID id PK
-        UUID beverage_id FK
-        JSONB spec_combination "规格组合"
-        TEXT instructions
-    }
-
-    recipe_ingredients {
-        UUID id PK
-        UUID recipe_id FK
-        UUID sku_id FK "关联P001"
-        DECIMAL quantity
-        VARCHAR unit
-    }
-
-    skus {
-        UUID id PK "来自P001"
-        VARCHAR name
-        VARCHAR unit
-    }
-```
-
----
-
-## 数据完整性规则
-
-### 外键级联规则
-
-| 父表 | 子表 | 删除策略 | 更新策略 | 说明 |
-|------|------|---------|---------|------|
-| beverages | beverage_specs | CASCADE | CASCADE | 删除饮品时同时删除规格 |
-| beverages | beverage_recipes | CASCADE | CASCADE | 删除饮品时同时删除配方 |
-| beverage_recipes | recipe_ingredients | CASCADE | CASCADE | 删除配方时同时删除原料关联 |
-| skus | recipe_ingredients | RESTRICT | CASCADE | 原料被配方引用时不允许删除 |
-| beverage_orders | beverage_order_items | CASCADE | CASCADE | 删除订单时同时删除订单项 |
-| beverage_orders | queue_numbers | CASCADE | CASCADE | 删除订单时同时删除取餐号 |
-| beverages | beverage_order_items | RESTRICT | CASCADE | 饮品被订单引用时不允许删除 |
-
-### Check 约束
-
-#### beverages 表
-- `category IN ('COFFEE', 'TEA', 'JUICE', 'SMOOTHIE', 'MILK_TEA', 'OTHER')`
-- `status IN ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK')`
-- `base_price >= 0`
-
-#### beverage_specs 表
-- `spec_type IN ('SIZE', 'TEMPERATURE', 'SWEETNESS', 'TOPPING')`
-
-#### recipe_ingredients 表
-- `quantity > 0`
-
-#### beverage_orders 表
-- `status IN ('PENDING_PAYMENT', 'PENDING_PRODUCTION', 'PRODUCING', 'COMPLETED', 'DELIVERED', 'CANCELLED')`
-- `total_price >= 0`
-
-#### beverage_order_items 表
-- `quantity > 0`
-- `unit_price >= 0`
-- `subtotal >= 0`
-- `subtotal = unit_price * quantity`
-
-#### queue_numbers 表
-- `status IN ('PENDING', 'CALLED', 'PICKED')`
-- `sequence >= 1 AND sequence <= 999`
-
-### 唯一约束
-
-| 表名 | 字段组合 | 说明 |
-|------|---------|------|
-| beverage_orders | order_number | 订单号全局唯一 |
-| beverage_specs | (beverage_id, spec_type, spec_name) | 同一饮品的同一规格类型下名称唯一 |
-| beverage_recipes | (beverage_id, spec_combination) | 同一饮品的同一规格组合只有一个配方 |
-| recipe_ingredients | (recipe_id, sku_id) | 同一配方中同一原料只能出现一次 |
-| queue_numbers | (store_id, date, sequence) | 同一门店同一天序号唯一 |
-| queue_numbers | order_id | 一个订单只有一个取餐号 |
-
----
-
-## 验证规则总结
-
-### 功能需求映射
-
-| 需求编号 | 验证规则 | 实现方式 |
-|---------|---------|---------|
-| FR-001 | 菜单只展示 ACTIVE 状态的饮品 | 查询条件: `WHERE status = 'ACTIVE'` |
-| FR-002 | 订单号格式验证 | 后端生成: "BORDT" + yyyyMMddHHmmss + 4位随机 |
-| FR-007 | 支付成功后状态变更 | 状态机: PENDING_PAYMENT → PENDING_PRODUCTION |
-| FR-014 | BOM 扣料时机 | 状态机: PENDING_PRODUCTION → PRODUCING + 扣料事务 |
-| FR-015 | BOM 扣料前库存校验 | 悲观锁查询: SELECT FOR UPDATE + 库存判断 |
-| FR-015 | 取餐号格式 | 后端生成: "D" + 三位序号（001-999） |
-| FR-016 | 叫号触发时机 | 状态机: PRODUCING → COMPLETED + 叫号通知 |
-
-### 成功标准映射
-
-| 成功标准 | 验证规则 | 实现方式 |
-|---------|---------|---------|
-| SC-004 | BOM 扣料准确率 100% | recipe_ingredients.quantity 精确扣减 + 事务保证 |
-| SC-006 | 订单状态变更记录完整性 100% | beverage_order_status_logs 表记录所有状态变更 |
-
----
-
-## 索引策略
-
-### 性能关键索引
-
-| 表名 | 索引名 | 字段 | 类型 | 用途 |
-|------|-------|------|------|------|
-| beverages | idx_beverage_category_status | (category, status) WHERE status='ACTIVE' | 部分索引 | C端菜单查询 |
-| beverage_orders | idx_order_store_status | (store_id, status, created_at DESC) | 复合索引 | B端订单列表查询 |
-| beverage_orders | idx_order_user | (user_id, created_at DESC) | 复合索引 | C端订单历史查询 |
-| queue_numbers | idx_queue_number | (store_id, date, status) | 复合索引 | 叫号系统查询 |
-| beverage_order_status_logs | idx_status_log_order | (order_id, created_at DESC) | 复合索引 | 状态变更审计 |
-
-### 查询优化建议
+### Foreign Key Constraints
 
 ```sql
--- 优化 1: C端菜单查询（按分类）
-SELECT * FROM beverages
-WHERE status = 'ACTIVE' AND category = 'COFFEE'
-ORDER BY sort_order DESC, created_at DESC;
--- 使用索引: idx_beverage_category_status
+-- beverage_specs 关联 beverages
+ALTER TABLE beverage_specs
+    ADD CONSTRAINT fk_beverage_spec_beverage
+    FOREIGN KEY (beverage_id) REFERENCES beverages(id) ON DELETE CASCADE;
 
--- 优化 2: B端待制作订单列表
-SELECT * FROM beverage_orders
-WHERE store_id = :storeId
-  AND status IN ('PENDING_PRODUCTION', 'PRODUCING')
-ORDER BY created_at ASC;
--- 使用索引: idx_order_store_status
+-- beverage_recipes 关联 beverages
+ALTER TABLE beverage_recipes
+    ADD CONSTRAINT fk_beverage_recipe_beverage
+    FOREIGN KEY (beverage_id) REFERENCES beverages(id) ON DELETE CASCADE;
 
--- 优化 3: 查询订单详情（含订单项）
-SELECT o.*, oi.*, qn.queue_number
+-- beverage_order_items 关联 beverage_orders
+ALTER TABLE beverage_order_items
+    ADD CONSTRAINT fk_beverage_order_item_order
+    FOREIGN KEY (order_id) REFERENCES beverage_orders(id) ON DELETE CASCADE;
+
+-- queue_numbers 关联 beverage_orders
+ALTER TABLE queue_numbers
+    ADD CONSTRAINT fk_queue_number_order
+    FOREIGN KEY (order_id) REFERENCES beverage_orders(id) ON DELETE CASCADE;
+```
+
+### Relationship Summary
+
+| Relationship | Type | Description |
+|--------------|------|-------------|
+| Beverage → BeverageSpec | 1-N | 一个饮品可有多个规格（不同类型） |
+| Beverage → BeverageRecipe | 1-N | 一个饮品可有多个配方（对应不同规格组合） |
+| BeverageOrder → BeverageOrderItem | 1-N | 一个订单包含多个订单项 |
+| BeverageOrder → QueueNumber | 1-1 | 一个订单对应一个取餐号 |
+
+---
+
+## Snapshot Mechanism
+
+### Why Snapshot?
+
+订单数据采用快照机制的原因：
+1. **防止菜单变更影响历史订单**: 管理员修改饮品名称、价格、规格后，历史订单仍显示下单时的数据
+2. **保证财务一致性**: 订单金额不随菜单变更而变化
+3. **简化查询**: 无需关联多张表即可获取订单完整信息
+
+### Snapshot Design
+
+**BeverageOrderItem.beverage_snapshot**:
+- 保存下单时的饮品核心信息（id, name, category, base_price, main_image）
+- 不保存完整 detail_images 和 description（减少数据冗余）
+
+**BeverageOrderItem.spec_snapshot**:
+- 保存下单时选择的所有规格（spec_type, spec_name, price_adjustment）
+- 按规格类型排序，便于展示
+
+### Snapshot vs Foreign Key
+
+| 字段 | 存储方式 | 原因 |
+|------|---------|------|
+| beverage_id | 外键引用（但不加FK约束） | 保留原始饮品ID，便于统计分析（如"拿铁咖啡销量"） |
+| beverage_snapshot | JSON快照 | 保证历史订单不受菜单变更影响 |
+| spec_snapshot | JSON快照 | 保证历史订单不受规格变更影响 |
+
+---
+
+## BOM Integration
+
+### BOM Deduction Flow
+
+```
+订单状态: PENDING_PREPARATION → PREPARING
+    │
+    ├─→ 1. 根据 order_id 查询所有 beverage_order_items
+    │
+    ├─→ 2. 遍历每个 order_item:
+    │       ├─→ 根据 beverage_id + spec_snapshot 匹配 beverage_recipes
+    │       │   （精确匹配规格组合，或使用基础配方）
+    │       │
+    │       └─→ 获取 recipes.ingredients (JSONB数组)
+    │
+    ├─→ 3. 合并同一SKU的用量（quantity * item.quantity）
+    │
+    ├─→ 4. 调用 P004 库存扣减API:
+    │       POST /api/admin/inventory/adjustments
+    │       {
+    │           "type": "BEVERAGE_ORDER_DEDUCTION",
+    │           "order_id": "xxx",
+    │           "items": [
+    │               {"sku_id": "sku-001", "quantity": -60, "unit": "g"},
+    │               {"sku_id": "sku-002", "quantity": -400, "unit": "ml"}
+    │           ]
+    │       }
+    │
+    └─→ 5. 库存扣减成功 → 订单状态更新为 PREPARING
+        库存不足 → 返回错误，订单保持 PENDING_PREPARATION
+```
+
+### Recipe Matching Logic
+
+```sql
+-- 1. 优先匹配精确规格组合的配方
+SELECT * FROM beverage_recipes
+WHERE beverage_id = :beverageId
+  AND spec_combination @> :specSnapshotJson  -- 包含所有选中规格
+ORDER BY jsonb_array_length(spec_combination::jsonb) DESC
+LIMIT 1;
+
+-- 2. 如无精确匹配，使用基础配方（spec_combination = '{}'）
+SELECT * FROM beverage_recipes
+WHERE beverage_id = :beverageId
+  AND spec_combination = '{}'::jsonb
+LIMIT 1;
+```
+
+**示例**:
+- 订单选择：大杯 + 珍珠
+- 配方1：`{"SIZE": "大杯", "TOPPING": "珍珠"}` ✅ 精确匹配
+- 配方2：`{"SIZE": "大杯"}` ❌ 不完全匹配
+- 配方3：`{}` ✅ 基础配方（备选）
+
+---
+
+## Performance Optimization
+
+### Index Strategy
+
+1. **高频查询字段**: status, created_at, user_id, category
+2. **关联查询**: beverage_id, order_id（外键字段）
+3. **JSON字段**: 使用 GIN 索引支持 JSON 查询（spec_combination）
+
+### Query Optimization
+
+**C端菜单查询**（按分类，只显示上架饮品）:
+```sql
+SELECT id, name, category, base_price, main_image, is_recommended
+FROM beverages
+WHERE status = 'ACTIVE'
+ORDER BY category, is_recommended DESC, created_at DESC;
+```
+*使用索引*: `idx_beverage_status`, `idx_beverage_category`
+
+**B端订单列表查询**（支持轮询新订单）:
+```sql
+SELECT o.id, o.order_no, o.queue_number, o.status, o.total_price, o.created_at,
+       COUNT(oi.id) AS item_count
 FROM beverage_orders o
 LEFT JOIN beverage_order_items oi ON o.id = oi.order_id
-LEFT JOIN queue_numbers qn ON o.id = qn.order_id
-WHERE o.id = :orderId;
--- 使用索引: PK (o.id), idx_order_item_order, idx_queue_order
+WHERE o.status IN ('PENDING_PREPARATION', 'PREPARING', 'COMPLETED')
+  AND o.created_at > :lastPollTime
+GROUP BY o.id
+ORDER BY o.created_at DESC;
 ```
+*使用索引*: `idx_beverage_order_status`, `idx_beverage_order_created_at`
 
----
-
-## 数据迁移说明
-
-### MVP 阶段初始化
-
-#### 步骤 1: 创建基础数据表
-
+**我的订单查询**（C端用户历史订单）:
 ```sql
--- 执行顺序（按依赖关系）:
--- 1. beverages
--- 2. beverage_specs
--- 3. beverage_recipes
--- 4. recipe_ingredients (依赖 skus 表，来自 P001)
--- 5. beverage_orders
--- 6. beverage_order_items
--- 7. queue_numbers
--- 8. beverage_order_status_logs (可选)
-```
-
-#### 步骤 2: 插入初始饮品数据
-
-```sql
--- 示例: 创建美式咖啡
-INSERT INTO beverages (id, name, description, category, base_price, status, image_url)
-VALUES (
-  gen_random_uuid(),
-  '美式咖啡',
-  '经典美式咖啡，浓郁香醇',
-  'COFFEE',
-  15.00,
-  'ACTIVE',
-  'https://storage.supabase.co/.../americano.jpg'
-) RETURNING id;
-
--- 添加规格
-INSERT INTO beverage_specs (beverage_id, spec_type, spec_name, price_adjustment, is_default)
-VALUES
-  (:beverage_id, 'SIZE', '小杯', 0, true),
-  (:beverage_id, 'SIZE', '大杯', 5, false),
-  (:beverage_id, 'TEMPERATURE', '热', 0, true),
-  (:beverage_id, 'TEMPERATURE', '冰', 0, false);
-
--- 添加基础配方
-INSERT INTO beverage_recipes (id, beverage_id, spec_combination, preparation_time)
-VALUES (
-  gen_random_uuid(),
-  :beverage_id,
-  NULL,  -- 基础配方，适用所有规格
-  120
-) RETURNING id;
-
--- 添加配方原料（假设 SKU 已存在）
-INSERT INTO recipe_ingredients (recipe_id, sku_id, quantity, unit)
-VALUES
-  (:recipe_id, :coffee_beans_sku_id, 20, 'g'),
-  (:recipe_id, :water_sku_id, 300, 'ml');
-```
-
-#### 步骤 3: 数据校验脚本
-
-```sql
--- 校验 1: 检查所有饮品都有规格
-SELECT b.id, b.name
-FROM beverages b
-LEFT JOIN beverage_specs bs ON b.id = bs.beverage_id
-WHERE b.status = 'ACTIVE'
-GROUP BY b.id, b.name
-HAVING COUNT(bs.id) = 0;
--- 预期结果: 空（所有饮品都有规格）
-
--- 校验 2: 检查所有配方都有原料
-SELECT r.id, r.beverage_id
-FROM beverage_recipes r
-LEFT JOIN recipe_ingredients ri ON r.id = ri.recipe_id
-GROUP BY r.id, r.beverage_id
-HAVING COUNT(ri.id) = 0;
--- 预期结果: 空（所有配方都有原料）
-
--- 校验 3: 检查订单总价与订单项小计一致性
-SELECT o.id, o.order_number, o.total_price, SUM(oi.subtotal) AS calculated_total
-FROM beverage_orders o
-JOIN beverage_order_items oi ON o.id = oi.order_id
-GROUP BY o.id, o.order_number, o.total_price
-HAVING o.total_price != SUM(oi.subtotal);
--- 预期结果: 空（所有订单总价正确）
-```
-
-### 数据清理策略
-
-```sql
--- 定时任务: 每日凌晨 1 点清理 30 天前的取餐号记录
-DELETE FROM queue_numbers
-WHERE date < CURRENT_DATE - INTERVAL '30 days';
-
--- 定时任务: 每周日凌晨归档 90 天前的已完成订单（可选）
--- 将订单数据移动到归档表，保持主表性能
-INSERT INTO beverage_orders_archive
 SELECT * FROM beverage_orders
-WHERE status IN ('DELIVERED', 'CANCELLED')
-  AND created_at < CURRENT_DATE - INTERVAL '90 days';
+WHERE user_id = :userId
+ORDER BY created_at DESC
+LIMIT 20 OFFSET 0;
+```
+*使用索引*: `idx_beverage_order_user_id`, `idx_beverage_order_created_at`
 
-DELETE FROM beverage_orders
-WHERE status IN ('DELIVERED', 'CANCELLED')
-  AND created_at < CURRENT_DATE - INTERVAL '90 days';
+---
+
+## Database Migration Script
+
+完整的数据库迁移脚本位于：
+`backend/src/main/resources/db/migration/V003__create_beverage_order_tables.sql`
+
+```sql
+-- @spec O003-beverage-order
+-- Supabase PostgreSQL 数据库迁移脚本
+
+-- 1. 创建更新时间触发器函数
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 2. 创建饮品表
+CREATE TABLE beverages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL CHECK (category IN ('COFFEE', 'TEA', 'JUICE', 'SMOOTHIE', 'MILK_TEA', 'OTHER')),
+    base_price DECIMAL(10,2) NOT NULL CHECK (base_price >= 0),
+    description TEXT,
+    main_image TEXT,
+    detail_images JSONB DEFAULT '[]',
+    status VARCHAR(20) NOT NULL DEFAULT 'INACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK')),
+    is_recommended BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_beverage_category ON beverages(category);
+CREATE INDEX idx_beverage_status ON beverages(status);
+CREATE INDEX idx_beverage_is_recommended ON beverages(is_recommended);
+CREATE INDEX idx_beverage_created_at ON beverages(created_at DESC);
+
+CREATE TRIGGER update_beverage_updated_at
+    BEFORE UPDATE ON beverages
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 3. 创建饮品规格表
+CREATE TABLE beverage_specs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
+    spec_type VARCHAR(50) NOT NULL CHECK (spec_type IN ('SIZE', 'TEMPERATURE', 'SWEETNESS', 'TOPPING')),
+    spec_name VARCHAR(100) NOT NULL,
+    price_adjustment DECIMAL(10,2) NOT NULL DEFAULT 0,
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_beverage_spec_beverage_id ON beverage_specs(beverage_id);
+CREATE INDEX idx_beverage_spec_type ON beverage_specs(spec_type);
+CREATE INDEX idx_beverage_spec_sort_order ON beverage_specs(sort_order);
+
+CREATE TRIGGER update_beverage_spec_updated_at
+    BEFORE UPDATE ON beverage_specs
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 4. 创建饮品配方表
+CREATE TABLE beverage_recipes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
+    spec_combination JSONB DEFAULT '{}',
+    ingredients JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_beverage_recipe_beverage_id ON beverage_recipes(beverage_id);
+CREATE INDEX idx_beverage_recipe_spec_combination ON beverage_recipes USING gin(spec_combination);
+
+CREATE TRIGGER update_beverage_recipe_updated_at
+    BEFORE UPDATE ON beverage_recipes
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+-- 5. 创建饮品订单表
+CREATE TABLE beverage_orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_no VARCHAR(50) UNIQUE NOT NULL,
+    queue_number VARCHAR(10) NOT NULL,
+    user_id UUID NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING_PAYMENT' CHECK (status IN ('PENDING_PAYMENT', 'PENDING_PREPARATION', 'PREPARING', 'COMPLETED', 'DELIVERED', 'CANCELLED')),
+    total_price DECIMAL(10,2) NOT NULL CHECK (total_price >= 0),
+    payment_method VARCHAR(50),
+    payment_time TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    completed_at TIMESTAMP WITH TIME ZONE,
+    remark TEXT
+);
+
+CREATE INDEX idx_beverage_order_user_id ON beverage_orders(user_id);
+CREATE INDEX idx_beverage_order_status ON beverage_orders(status);
+CREATE INDEX idx_beverage_order_created_at ON beverage_orders(created_at DESC);
+CREATE INDEX idx_beverage_order_queue_number ON beverage_orders(queue_number);
+
+-- 6. 创建订单项表
+CREATE TABLE beverage_order_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
+    beverage_id UUID NOT NULL,
+    beverage_snapshot JSONB NOT NULL,
+    spec_snapshot JSONB NOT NULL DEFAULT '[]',
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(10,2) NOT NULL CHECK (unit_price >= 0),
+    subtotal DECIMAL(10,2) NOT NULL CHECK (subtotal >= 0),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_beverage_order_item_order_id ON beverage_order_items(order_id);
+CREATE INDEX idx_beverage_order_item_beverage_id ON beverage_order_items(beverage_id);
+
+-- 7. 创建取餐号表
+CREATE TABLE queue_numbers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    queue_no VARCHAR(10) NOT NULL,
+    order_id UUID UNIQUE NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT 'WAITING' CHECK (status IN ('WAITING', 'CALLED', 'PICKED_UP')),
+    called_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_queue_number_queue_no ON queue_numbers(queue_no);
+CREATE INDEX idx_queue_number_status ON queue_numbers(status);
+CREATE INDEX idx_queue_number_created_at ON queue_numbers(created_at DESC);
+
+-- 8. 插入测试数据（可选）
+-- 示例饮品：拿铁咖啡
+INSERT INTO beverages (id, name, category, base_price, description, main_image, status, is_recommended)
+VALUES (
+    'aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
+    '拿铁咖啡',
+    'COFFEE',
+    18.00,
+    '经典意式拿铁，香浓醇厚',
+    'https://example.com/latte.jpg',
+    'ACTIVE',
+    true
+);
+
+-- 拿铁规格配置
+INSERT INTO beverage_specs (beverage_id, spec_type, spec_name, price_adjustment, is_default, sort_order)
+VALUES
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'SIZE', '中杯', 0, true, 1),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'SIZE', '大杯', 3, false, 2),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'TEMPERATURE', '热', 0, true, 1),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'TEMPERATURE', '冰', 0, false, 2),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'SWEETNESS', '标准糖', 0, true, 1),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'SWEETNESS', '半糖', 0, false, 2),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'TOPPING', '不加配料', 0, true, 1),
+    ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', 'TOPPING', '珍珠', 2, false, 2);
+
+-- 拿铁基础配方
+INSERT INTO beverage_recipes (beverage_id, spec_combination, ingredients)
+VALUES (
+    'aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d',
+    '{}',
+    '[
+        {"sku_id": "sku-001", "sku_name": "咖啡豆", "quantity": 15, "unit": "g"},
+        {"sku_id": "sku-002", "sku_name": "牛奶", "quantity": 150, "unit": "ml"}
+    ]'
+);
+
+COMMENT ON TABLE beverages IS '@spec O003-beverage-order 饮品表';
+COMMENT ON TABLE beverage_specs IS '@spec O003-beverage-order 饮品规格表';
+COMMENT ON TABLE beverage_recipes IS '@spec O003-beverage-order 饮品配方表';
+COMMENT ON TABLE beverage_orders IS '@spec O003-beverage-order 饮品订单表';
+COMMENT ON TABLE beverage_order_items IS '@spec O003-beverage-order 订单项表';
+COMMENT ON TABLE queue_numbers IS '@spec O003-beverage-order 取餐号表';
 ```
 
 ---
 
-## 附录: 数据示例
+## Summary
 
-### 完整订单数据示例
+本数据模型设计涵盖了饮品订单创建与出品管理的核心业务实体：
 
-```json
-// beverage_orders 表记录
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "order_number": "BORDT202512271430251234",
-  "user_id": "user-123",
-  "store_id": "store-456",
-  "total_price": 46.00,
-  "status": "COMPLETED",
-  "payment_method": "MOCK_WECHAT_PAY",
-  "transaction_id": "MOCK_1735291825000",
-  "paid_at": "2025-12-27T14:30:30Z",
-  "production_start_time": "2025-12-27T14:31:00Z",
-  "completed_at": "2025-12-27T14:35:00Z",
-  "customer_note": "少冰，谢谢",
-  "created_at": "2025-12-27T14:30:25Z"
-}
+1. **饮品管理**: Beverage（饮品）、BeverageSpec（规格）、BeverageRecipe（配方）
+2. **订单管理**: BeverageOrder（订单）、BeverageOrderItem（订单项）、QueueNumber（取餐号）
+3. **快照机制**: 订单项保存饮品和规格快照，确保历史订单不受菜单变更影响
+4. **状态驱动**: 订单和取餐号采用明确的状态机模型，支持完整的业务流程
+5. **BOM集成**: 配方设计支持与P003/P004库存管理集成，实现自动扣料
+6. **性能优化**: 合理使用索引、JSON字段、外键约束，平衡查询性能和数据一致性
 
-// beverage_order_items 表记录（2 个饮品）
-[
-  {
-    "id": "item-001",
-    "order_id": "550e8400-e29b-41d4-a716-446655440000",
-    "beverage_id": "beverage-americano",
-    "beverage_name": "美式咖啡",
-    "beverage_image_url": "https://.../americano.jpg",
-    "selected_specs": {
-      "size": {"name": "大杯", "code": "large", "priceAdjustment": 5.00},
-      "temperature": {"name": "冰", "code": "cold", "priceAdjustment": 0}
-    },
-    "quantity": 2,
-    "unit_price": 20.00,  // base_price 15 + size 5
-    "subtotal": 40.00     // 20 * 2
-  },
-  {
-    "id": "item-002",
-    "order_id": "550e8400-e29b-41d4-a716-446655440000",
-    "beverage_id": "beverage-milk-tea",
-    "beverage_name": "珍珠奶茶",
-    "beverage_image_url": "https://.../milk-tea.jpg",
-    "selected_specs": {
-      "size": {"name": "小杯", "code": "small", "priceAdjustment": 0},
-      "sweetness": {"name": "半糖", "code": "half", "priceAdjustment": 0},
-      "topping": {"name": "珍珠", "code": "pearl", "priceAdjustment": 3.00}
-    },
-    "quantity": 1,
-    "unit_price": 18.00,  // base_price 15 + topping 3
-    "subtotal": 18.00     // 18 * 1
-  }
-]
-
-// queue_numbers 表记录
-{
-  "id": "queue-001",
-  "queue_number": "D042",
-  "order_id": "550e8400-e29b-41d4-a716-446655440000",
-  "store_id": "store-456",
-  "date": "2025-12-27",
-  "sequence": 42,
-  "status": "CALLED",
-  "called_at": "2025-12-27T14:35:10Z",
-  "created_at": "2025-12-27T14:30:30Z"
-}
-```
+所有表结构、索引、约束、触发器已在迁移脚本中定义，可直接在Supabase PostgreSQL执行。
 
 ---
 
@@ -1027,7 +962,8 @@ WHERE status IN ('DELIVERED', 'CANCELLED')
 
 | 版本 | 日期 | 变更说明 | 作者 |
 |------|------|---------|------|
-| 1.0.0 | 2025-12-27 | 初始版本，定义 7 个核心实体 | Claude |
+| 1.0.0 | 2025-12-27 | 初始版本，定义核心实体 | Claude |
+| 1.1.0 | 2025-12-28 | 增强数据模型文档，完善快照机制、BOM集成、性能优化说明 | Claude |
 
 ---
 

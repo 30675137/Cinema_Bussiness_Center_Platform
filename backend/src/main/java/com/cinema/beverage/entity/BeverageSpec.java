@@ -78,6 +78,13 @@ public class BeverageSpec {
     private Integer sortOrder = 0;
 
     /**
+     * 是否为默认选项
+     * 同一类型下只能有一个默认选项
+     */
+    @Column(name = "is_default", nullable = false)
+    private Boolean isDefault = false;
+
+    /**
      * 规格类型枚举
      */
     public enum SpecType {

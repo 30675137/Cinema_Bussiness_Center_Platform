@@ -56,8 +56,15 @@ public class SecurityConfig {
             // 配置请求授权规则
             .authorizeHttpRequests(auth -> auth
                 // 公共端点 (不需要认证)
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/beverage-auth/**").permitAll()
+
+                // 原有项目公共端点
+                .requestMatchers(HttpMethod.GET, "/api/scenario-packages/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/halls/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/cinemas/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
+                .requestMatchers("/api/reservation/**").permitAll()
 
                 // C端公共端点 (饮品浏览、下单)
                 .requestMatchers(HttpMethod.GET, "/api/client/beverages/**").permitAll()
@@ -66,6 +73,11 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/client/beverage-orders/*/pay").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/my").permitAll()
+
+                // B端公共端点 (饮品管理 - 临时开放用于开发测试)
+                .requestMatchers(HttpMethod.POST, "/api/admin/beverages/upload-image").permitAll()
+                .requestMatchers("/api/admin/beverages/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/skus/**").permitAll() // SKU列表查询
 
                 // B端管理端点 (需要认证)
                 .requestMatchers("/api/admin/**").authenticated()

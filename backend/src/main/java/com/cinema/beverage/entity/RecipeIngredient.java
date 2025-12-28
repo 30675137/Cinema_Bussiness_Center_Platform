@@ -44,9 +44,16 @@ public class RecipeIngredient {
 
     /**
      * 关联的 SKU ID (原料)
+     * UUID 格式（与 skus 表的 id 类型一致）
      */
-    @Column(name = "sku_id", nullable = false)
+    @Column(name = "sku_id", nullable = false, columnDefinition = "uuid")
     private UUID skuId;
+
+    /**
+     * 原料名称（冗余存储，便于展示）
+     */
+    @Column(name = "ingredient_name", nullable = false, length = 100)
+    private String ingredientName;
 
     /**
      * 原料用量（支持小数）
@@ -59,6 +66,12 @@ public class RecipeIngredient {
      */
     @Column(nullable = false, length = 20)
     private String unit;
+
+    /**
+     * 备注（如"室温"、"需加热"等）
+     */
+    @Column(name = "note", length = 200)
+    private String note;
 
     /**
      * 创建时间

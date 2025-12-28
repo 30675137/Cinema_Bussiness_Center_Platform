@@ -90,7 +90,14 @@
       "Bash(timeout 60 mvn spring-boot:run:*)",
       "Bash(timeout 30 mvn spring-boot:run:*)",
       "Bash(npm run lint)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(./mvnw clean compile:*)",
+      "Bash(wc:*)",
+      "Bash(mvn compile:*)",
+      "Bash(npx chrome-devtools-mcp:*)",
+      "Bash(convert:*)",
+      "Bash(java:*)",
+      "Bash(mvn clean install:*)"
     ]
   }
 }

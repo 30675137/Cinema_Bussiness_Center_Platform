@@ -43,7 +43,7 @@ public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredie
      * @param skuId SKU ID (原料)
      * @return 配方关联列表
      */
-    List<RecipeIngredient> findBySkuId(UUID skuId);
+    List<RecipeIngredient> findBySkuId(Long skuId);
 
     /**
      * 检查配方是否包含指定原料
@@ -52,7 +52,14 @@ public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredie
      * @param skuId SKU ID (原料)
      * @return 是否存在
      */
-    boolean existsByRecipeIdAndSkuId(UUID recipeId, UUID skuId);
+    boolean existsByRecipeIdAndSkuId(UUID recipeId, Long skuId);
+
+    /**
+     * 删除指定配方的所有原料
+     *
+     * @param recipeId 配方 ID
+     */
+    void deleteByRecipeId(UUID recipeId);
 
     /**
      * 批量查询配方的原料数量
