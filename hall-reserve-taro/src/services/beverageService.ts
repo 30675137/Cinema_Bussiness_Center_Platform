@@ -39,10 +39,19 @@ export interface ErrorResponse {
 }
 
 /**
- * 统一请求封装
+ * 统一请求封装 - 包含网络错误重试和离线处理
  */
-async function request<T>(options: Taro.request.Option): Promise<T> {
+async function request<T>(options: Taro.request.Option, retryCount = 0): Promise<T> {
+  const MAX_RETRIES = 3
+  const RETRY_DELAY = 1000 // 1秒
+
   try {
+    // 检查网络状态
+    const networkInfo = await Taro.getNetworkType()
+    if (networkInfo.networkType === 'none') {
+      throw new Error('NETWORK_OFFLINE')
+    }
+
     const token = Taro.getStorageSync('access_token')
 
     const response = await Taro.request({
@@ -64,7 +73,42 @@ async function request<T>(options: Taro.request.Option): Promise<T> {
     const errorData = response.data as ErrorResponse
     throw new Error(errorData.message || '请求失败')
   } catch (error: any) {
+    // 网络离线错误
+    if (error.message === 'NETWORK_OFFLINE') {
+      Taro.showToast({
+        title: '网络已断开，请检查网络连接',
+        icon: 'none',
+        duration: 2000,
+      })
+      throw error
+    }
+
+    // 网络超时或连接错误，尝试重试
+    const isNetworkError = 
+      error.errMsg?.includes('timeout') ||
+      error.errMsg?.includes('fail') ||
+      error.errMsg?.includes('abort')
+
+    if (isNetworkError && retryCount < MAX_RETRIES) {
+      console.warn(`网络请求失败，正在重试... (第${retryCount + 1}次)`)
+      
+      // 等待一段时间后重试
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)))
+      
+      return request<T>(options, retryCount + 1)
+    }
+
+    // 重试耗尽或其他错误
     console.error('API请求失败:', error)
+    
+    if (retryCount >= MAX_RETRIES) {
+      Taro.showToast({
+        title: '网络请求失败，请稍后重试',
+        icon: 'none',
+        duration: 2000,
+      })
+    }
+    
     throw error
   }
 }
@@ -209,11 +253,11 @@ export async function getBeverageSpecs(beverageId: string): Promise<ListResponse
 /**
  * 创建订单
  */
-export async function createOrder(request: CreateOrderRequest): Promise<ApiResponse<BeverageOrder>> {
+export async function createOrder(orderRequest: CreateOrderRequest): Promise<ApiResponse<BeverageOrder>> {
   return request<ApiResponse<BeverageOrder>>({
     url: '/api/beverage-orders',
     method: 'POST',
-    data: request,
+    data: orderRequest,
   })
 }
 
