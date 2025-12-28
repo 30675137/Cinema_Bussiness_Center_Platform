@@ -1,0 +1,76 @@
+/**
+ * @spec O003-beverage-order
+ * 规格选择器样式
+ */
+
+.spec-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 32rpx;
+
+  // 规格分组
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
+  }
+
+  &__label {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #333;
+  }
+
+  // 规格选项容器
+  &__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16rpx;
+  }
+
+  // 单个规格选项
+  &__option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 160rpx;
+    padding: 20rpx 24rpx;
+    background: #f5f5f5;
+    border: 2rpx solid transparent;
+    border-radius: 12rpx;
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &.selected {
+      background: #fff;
+      border-color: #ff6b6b;
+      box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.2);
+
+      .spec-selector__option-name {
+        color: #ff6b6b;
+        font-weight: 600;
+      }
+
+      .spec-selector__option-price {
+        color: #ff6b6b;
+      }
+    }
+  }
+
+  &__option-name {
+    font-size: 28rpx;
+    color: #666;
+    margin-bottom: 4rpx;
+    transition: all 0.3s ease;
+  }
+
+  &__option-price {
+    font-size: 22rpx;
+    color: #999;
+    transition: all 0.3s ease;
+  }
+}

@@ -1,0 +1,99 @@
+/**
+ * @spec O003-beverage-order
+ * 饮品菜单页面样式
+ */
+
+.beverage-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+
+  &.loading,
+  &.error {
+    justify-content: center;
+    align-items: center;
+    color: #999;
+    font-size: 28rpx;
+  }
+
+  // 分类标签页
+  &__tabs {
+    background: #fff;
+    border-bottom: 1rpx solid #e5e5e5;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  &__tabs-scroll {
+    white-space: nowrap;
+  }
+
+  &__tabs-container {
+    display: inline-flex;
+    padding: 0 24rpx;
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24rpx 32rpx;
+    margin-right: 16rpx;
+    position: relative;
+    transition: all 0.3s ease;
+
+    &:active {
+      opacity: 0.7;
+    }
+
+    &.active {
+      .beverage-menu__tab-text {
+        color: #ff6b6b;
+        font-weight: 600;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40rpx;
+        height: 4rpx;
+        background: #ff6b6b;
+        border-radius: 2rpx;
+      }
+    }
+  }
+
+  &__tab-text {
+    font-size: 28rpx;
+    color: #666;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  // 内容区域
+  &__content {
+    flex: 1;
+    padding: 24rpx;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24rpx;
+    padding-bottom: 24rpx;
+  }
+
+  &__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400rpx;
+    color: #999;
+    font-size: 28rpx;
+  }
+}

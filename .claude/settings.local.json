@@ -86,7 +86,11 @@
       "Bash(javap:*)",
       "Bash(jar tf:*)",
       "Bash(kill:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(timeout 60 mvn spring-boot:run:*)",
+      "Bash(timeout 30 mvn spring-boot:run:*)",
+      "Bash(npm run lint)",
+      "Bash(pkill:*)"
     ]
   }
 }

@@ -27,15 +27,15 @@
 - [x] T001 [P] Create backend beverage module structure at `backend/src/main/java/com/cinema/beverage/`
 - [x] T002 [P] Create B端 feature module at `frontend/src/features/beverage-order-management/`
 - [x] T003 [P] Create C端 beverage pages structure at `hall-reserve-taro/src/pages/beverage/`
-- [ ] T004 [P] Add backend dependencies: Spring Boot Web, Supabase client, Lombok to `backend/pom.xml`
-- [ ] T005 [P] Add B端 dependencies: TanStack Query, Zustand, Ant Design to `frontend/package.json`
-- [ ] T006 [P] Add C端 dependencies: Taro UI, TanStack Query, Zustand to `hall-reserve-taro/package.json`
-- [ ] T007 Configure backend environment variables for Supabase connection in `backend/src/main/resources/application.yml`
+- [x] T004 [P] Add backend dependencies: Spring Boot Web, Supabase client, Lombok to `backend/pom.xml` ✅
+- [x] T005 [P] Add B端 dependencies: TanStack Query, Zustand, Ant Design to `frontend/package.json` ✅
+- [x] T006 [P] Add C端 dependencies: Taro UI, TanStack Query, Zustand to `hall-reserve-taro/package.json` ✅
+- [x] T007 Configure backend environment variables for Supabase connection in `backend/src/main/resources/application.yml` ✅
 - [ ] T007.1 [P] Create Supabase Storage bucket 'beverage-images' with public read access for beverage image URLs
-- [ ] T008 Configure C端 environment variables for API endpoints in `hall-reserve-taro/src/config/index.ts`
-- [ ] T008.1 [P] Define polling interval constant (POLLING_INTERVAL_MS=8000) and Mock payment delay (MOCK_PAYMENT_DELAY_MS=500) in config files
+- [x] T008 Configure C端 environment variables for API endpoints in `hall-reserve-taro/src/config/index.ts` ✅
+- [x] T008.1 [P] Define polling interval constant (POLLING_INTERVAL_MS=8000) and Mock payment delay (MOCK_PAYMENT_DELAY_MS=500) in config files ✅
 - [ ] T009 [P] Setup ESLint/Prettier for B端 in `frontend/.eslintrc.js`
-- [ ] T010 [P] Setup ESLint/Prettier for C端 in `hall-reserve-taro/.eslintrc.js`
+- [x] T010 [P] Setup ESLint/Prettier for C端 in `hall-reserve-taro/.eslintrc.js` ✅
 
 ---
 
@@ -47,45 +47,45 @@
 
 ### Database Schema (Data-Model.md Tables 1-7)
 
-- [ ] T011 Create `beverages` table with migration script at `backend/src/main/resources/db/migration/V001__create_beverages.sql`
-- [ ] T012 Create `beverage_specs` table with migration script at `backend/src/main/resources/db/migration/V002__create_beverage_specs.sql`
-- [ ] T013 Create `beverage_recipes` table with migration script at `backend/src/main/resources/db/migration/V003__create_beverage_recipes.sql`
-- [ ] T014 Create `recipe_ingredients` table (depends on P001 skus) at `backend/src/main/resources/db/migration/V004__create_recipe_ingredients.sql`
-- [ ] T015 Create `beverage_orders` table with migration script at `backend/src/main/resources/db/migration/V005__create_beverage_orders.sql`
-- [ ] T016 Create `beverage_order_items` table with migration script at `backend/src/main/resources/db/migration/V006__create_beverage_order_items.sql`
-- [ ] T017 Create `queue_numbers` table with migration script at `backend/src/main/resources/db/migration/V007__create_queue_numbers.sql`
-- [ ] T018 Create `beverage_order_status_logs` table (audit) at `backend/src/main/resources/db/migration/V008__create_order_status_logs.sql`
-- [ ] T019 Create database indexes per data-model.md Section 6 in `backend/src/main/resources/db/migration/V009__create_indexes.sql`
+- [x] T011 Create `beverages` table with migration script at `backend/src/main/resources/db/migration/V001__create_beverages.sql` ✅
+- [x] T012 Create `beverage_specs` table with migration script at `backend/src/main/resources/db/migration/V002__create_beverage_specs.sql` ✅
+- [x] T013 Create `beverage_recipes` table with migration script at `backend/src/main/resources/db/migration/V003__create_beverage_recipes.sql` ✅
+- [x] T014 Create `recipe_ingredients` table (depends on P001 skus) at `backend/src/main/resources/db/migration/V004__create_recipe_ingredients.sql` ✅
+- [x] T015 Create `beverage_orders` table with migration script at `backend/src/main/resources/db/migration/V005__create_beverage_orders.sql` ✅
+- [x] T016 Create `beverage_order_items` table with migration script at `backend/src/main/resources/db/migration/V006__create_beverage_order_items.sql` ✅
+- [x] T017 Create `queue_numbers` table with migration script at `backend/src/main/resources/db/migration/V007__create_queue_numbers.sql` ✅
+- [x] T018 Create `beverage_order_status_logs` table (audit) at `backend/src/main/resources/db/migration/V008__create_order_status_logs.sql` ✅
+- [x] T019 Create database indexes per data-model.md Section 6 in `backend/src/main/resources/db/migration/V009__create_indexes.sql` ✅
 - [ ] T020 Run database migration and validate schema with sample data in Supabase Studio
 
 ### Shared Backend Utilities
 
-- [ ] T021 [P] Create `ApiResponse<T>` wrapper class at `backend/src/main/java/com/cinema/common/dto/ApiResponse.java`
-- [ ] T022 [P] Create `ErrorResponse` class with error code enum at `backend/src/main/java/com/cinema/common/dto/ErrorResponse.java`
-- [ ] T023 [P] Create `GlobalExceptionHandler` for unified error handling at `backend/src/main/java/com/cinema/common/exception/GlobalExceptionHandler.java`
+- [x] T021 [P] Create `ApiResponse<T>` wrapper class at `backend/src/main/java/com/cinema/common/dto/ApiResponse.java` ✅
+- [x] T022 [P] Create `ErrorResponse` class with error code enum at `backend/src/main/java/com/cinema/common/dto/ErrorResponse.java` ✅
+- [x] T023 [P] Create `GlobalExceptionHandler` for unified error handling at `backend/src/main/java/com/cinema/common/exception/GlobalExceptionHandler.java` ✅
 - [ ] T023.1 [P] Update `GlobalExceptionHandler` to map all exceptions to standardized error codes (ORD_*, BEV_*) per constitution API Error Code Standards
-- [ ] T024 [P] Create custom exceptions (ORD_*, BEV_*) at `backend/src/main/java/com/cinema/beverage/exception/`
-- [ ] T024.1 [P] Create `BeverageErrorCode` enum at `backend/src/main/java/com/cinema/beverage/exception/BeverageErrorCode.java` defining all error codes (BEV_NTF_001, BEV_VAL_002, ORD_NTF_001, ORD_VAL_002, ORD_BIZ_001, etc.)
-- [ ] T024.2 [P] Document all error codes in `specs/O003-beverage-order/contracts/error-codes.md` with trigger scenarios and handling recommendations
+- [x] T024 [P] Create custom exceptions (ORD_*, BEV_*) at `backend/src/main/java/com/cinema/beverage/exception/` ✅
+- [x] T024.1 [P] Create `BeverageErrorCode` enum at `backend/src/main/java/com/cinema/beverage/exception/BeverageErrorCode.java` defining all error codes (BEV_NTF_001, BEV_VAL_002, ORD_NTF_001, ORD_VAL_002, ORD_BIZ_001, etc.) ✅
+- [x] T024.2 [P] Document all error codes in `specs/O003-beverage-order/contracts/error-codes.md` with trigger scenarios and handling recommendations ✅
 - [ ] T025 [P] Add @spec O003-beverage-order comment to all backend beverage common files (ApiResponse, ErrorResponse, GlobalExceptionHandler)
-- [ ] T026 Configure JWT authentication filter at `backend/src/main/java/com/cinema/config/SecurityConfig.java`
+- [x] T026 Configure JWT authentication filter at `backend/src/main/java/com/cinema/config/SecurityConfig.java` ✅
 
 ### Shared Frontend Components
 
-- [ ] T027 [P] Create `LoadingSpinner` component at `frontend/src/components/atoms/LoadingSpinner/index.tsx`
-- [ ] T028 [P] Create `ErrorState` component at `frontend/src/components/atoms/ErrorState/index.tsx`
-- [ ] T029 [P] Create `EmptyState` component at `frontend/src/components/atoms/EmptyState/index.tsx`
-- [ ] T030 [P] Create status badge component at `frontend/src/features/beverage-order-management/components/OrderStatusBadge.tsx`
-- [ ] T031 [P] Create C端 `LoadingSpinner` at `hall-reserve-taro/src/components/atoms/LoadingSpinner/index.tsx`
-- [ ] T032 [P] Create C端 `ErrorState` at `hall-reserve-taro/src/components/atoms/ErrorState/index.tsx`
+- [x] T027 [P] Create `LoadingSpinner` component at `frontend/src/components/atoms/LoadingSpinner/index.tsx` ✅
+- [x] T028 [P] Create `ErrorState` component at `frontend/src/components/atoms/ErrorState/index.tsx` ✅
+- [x] T029 [P] Create `EmptyState` component at `frontend/src/components/atoms/EmptyState/index.tsx` ✅
+- [x] T030 [P] Create status badge component at `frontend/src/features/beverage-order-management/components/OrderStatusBadge.tsx` ✅
+- [x] T031 [P] Create C端 `LoadingSpinner` at `hall-reserve-taro/src/components/atoms/LoadingSpinner/index.tsx` ✅
+- [x] T032 [P] Create C端 `ErrorState` at `hall-reserve-taro/src/components/atoms/ErrorState/index.tsx` ✅
 - [ ] T033 [P] Add @spec O003-beverage-order comment to all frontend beverage shared component files (T027-T032)
 
 ### API Client Setup
 
 - [ ] T034 Create Supabase Java client service at `backend/src/main/java/com/cinema/config/SupabaseClientConfig.java`
-- [ ] T035 Create C端 beverage API service with request wrapper at `hall-reserve-taro/src/services/beverageService.ts`
-- [ ] T036 Create B端 beverage API service at `frontend/src/features/beverage-order-management/services/beverageOrderApi.ts`
-- [ ] T036.1 [P] Create empty OpenAPI spec file at `specs/O003-beverage-order/contracts/api.yaml` with basic structure
+- [x] T035 Create C端 beverage API service with request wrapper at `hall-reserve-taro/src/services/beverageService.ts` ✅
+- [x] T036 Create B端 beverage API service at `frontend/src/features/beverage-order-management/services/beverageOrderApi.ts` ✅
+- [x] T036.1 [P] Create empty OpenAPI spec file at `specs/O003-beverage-order/contracts/api.yaml` with basic structure ✅
 - [ ] T036.2 [P] Create API response format validation utility to ensure all endpoints use ApiResponse<T> wrapper
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
@@ -100,63 +100,63 @@
 
 ### Backend - Beverage Management APIs (No B端 UI)
 
-- [ ] T037 [P] [US1] Create `Beverage` entity at `backend/src/main/java/com/cinema/beverage/entity/Beverage.java`
-- [ ] T038 [P] [US1] Create `BeverageSpec` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageSpec.java`
-- [ ] T039 [P] [US1] Create `BeverageDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageDTO.java`
-- [ ] T040 [P] [US1] Create `BeverageDetailDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageDetailDTO.java`
-- [ ] T041 [US1] Create `BeverageRepository` with query methods at `backend/src/main/java/com/cinema/beverage/repository/BeverageRepository.java`
-- [ ] T042 [US1] Create `BeverageSpecRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageSpecRepository.java`
-- [ ] T043 [US1] Implement `BeverageService.findAllActiveGroupedByCategory()` at `backend/src/main/java/com/cinema/beverage/service/BeverageService.java`
-- [ ] T044 [US1] Implement `BeverageService.findDetailById()` at `backend/src/main/java/com/cinema/beverage/service/BeverageService.java`
-- [ ] T045 [US1] Create `GET /api/client/beverages` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java`
-- [ ] T046 [US1] Create `GET /api/client/beverages/{id}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java`
-- [ ] T047 [US1] Create `GET /api/client/beverage-specs` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java`
+- [x] T037 [P] [US1] Create `Beverage` entity at `backend/src/main/java/com/cinema/beverage/entity/Beverage.java` ✅
+- [x] T038 [P] [US1] Create `BeverageSpec` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageSpec.java` ✅
+- [x] T039 [P] [US1] Create `BeverageDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageDTO.java` ✅
+- [x] T040 [P] [US1] Create `BeverageDetailDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageDetailDTO.java` ✅
+- [x] T041 [US1] Create `BeverageRepository` with query methods at `backend/src/main/java/com/cinema/beverage/repository/BeverageRepository.java` ✅
+- [x] T042 [US1] Create `BeverageSpecRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageSpecRepository.java` ✅
+- [x] T043 [US1] Implement `BeverageService.findAllActiveGroupedByCategory()` at `backend/src/main/java/com/cinema/beverage/service/BeverageService.java` ✅
+- [x] T044 [US1] Implement `BeverageService.findDetailById()` at `backend/src/main/java/com/cinema/beverage/service/BeverageService.java` ✅
+- [x] T045 [US1] Create `GET /api/client/beverages` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java` ✅
+- [x] T046 [US1] Create `GET /api/client/beverages/{id}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java` ✅
+- [x] T047 [US1] Create `GET /api/client/beverage-specs` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageController.java` ✅
 - [ ] T048 [US1] Create seed script for initial beverage data at `backend/src/main/resources/db/seed/beverages.sql` (depends on P001 SKU seed data for recipe_ingredients references)
 - [ ] T048.1 [P] [US1] Add @spec O003-beverage-order comment to all US1 backend beverage module files (entities T037-T038, DTOs T039-T040, repositories T041-T042, services T043-T044, controllers T045-T047)
 
 ### Backend - Order Creation & Mock Payment
 
-- [ ] T049 [P] [US1] Create `BeverageOrder` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageOrder.java`
-- [ ] T050 [P] [US1] Create `BeverageOrderItem` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageOrderItem.java`
-- [ ] T051 [P] [US1] Create `QueueNumber` entity at `backend/src/main/java/com/cinema/beverage/entity/QueueNumber.java` mapping to queue_numbers table
-- [ ] T051.1 [P] [US1] Add Bean Validation annotations (@NotNull, @Min, @Check) to all entity classes (T049-T051) per data-model.md Section 4 constraints
-- [ ] T052 [P] [US1] Create `BeverageOrderDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageOrderDTO.java`
-- [ ] T053 [P] [US1] Create `CreateBeverageOrderRequest` at `backend/src/main/java/com/cinema/beverage/dto/CreateBeverageOrderRequest.java`
-- [ ] T053.1 [US1] Implement `BeverageOrderService.calculateOrderTotal()` summing base_price + all spec_adjustments per data-model.md Section 2 price calculation rules
-- [ ] T054 [US1] Create `BeverageOrderRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageOrderRepository.java`
-- [ ] T055 [US1] Create `OrderNumberGenerator` service (BORDT format) at `backend/src/main/java/com/cinema/beverage/service/OrderNumberGenerator.java`
-- [ ] T055.1 [P] [US1] Write unit test validating OrderNumberGenerator format matches "BORDT\\d{14}\\d{4}" regex
-- [ ] T056 [US1] Create `QueueNumberGenerator` service with PostgreSQL Advisory Lock (`pg_advisory_xact_lock`) at `backend/src/main/java/com/cinema/beverage/service/QueueNumberGenerator.java` to prevent concurrent sequence conflicts per data-model.md Section 7
-- [ ] T057 [US1] Implement `BeverageOrderService.createOrder()` with validation at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java`
-- [ ] T058 [US1] Implement `BeverageOrderService.mockPay()` with MOCK_PAYMENT_DELAY_MS (default 500ms, configurable via application.yml) at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java`
-- [ ] T058.1 [P] [US1] Add payment logging to BeverageOrderService.mockPay() for FR-027 audit requirements
-- [ ] T059 [US1] Create `POST /api/client/beverage-orders` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java`
-- [ ] T060 [US1] Create `POST /api/client/beverage-orders/{id}/pay` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java`
-- [ ] T061 [US1] Create `GET /api/client/beverage-orders/{id}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java`
-- [ ] T062 [US1] Create `GET /api/client/beverage-orders/my` endpoint with pagination at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java`
-- [ ] T063 [US1] Create `GET /api/client/queue-numbers/{orderId}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/QueueNumberController.java`
+- [x] T049 [P] [US1] Create `BeverageOrder` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageOrder.java` ✅
+- [x] T050 [P] [US1] Create `BeverageOrderItem` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageOrderItem.java` ✅
+- [x] T051 [P] [US1] Create `QueueNumber` entity at `backend/src/main/java/com/cinema/beverage/entity/QueueNumber.java` mapping to queue_numbers table ✅
+- [x] T051.1 [P] [US1] Add Bean Validation annotations (@NotNull, @Min, @Check) to all entity classes (T049-T051) per data-model.md Section 4 constraints ✅
+- [x] T052 [P] [US1] Create `BeverageOrderDTO` at `backend/src/main/java/com/cinema/beverage/dto/BeverageOrderDTO.java` ✅
+- [x] T053 [P] [US1] Create `CreateBeverageOrderRequest` at `backend/src/main/java/com/cinema/beverage/dto/CreateBeverageOrderRequest.java` ✅
+- [x] T053.1 [US1] Implement `BeverageOrderService.calculateOrderTotal()` summing base_price + all spec_adjustments per data-model.md Section 2 price calculation rules ✅
+- [x] T054 [US1] Create `BeverageOrderRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageOrderRepository.java` ✅
+- [x] T055 [US1] Create `OrderNumberGenerator` service (BORDT format) at `backend/src/main/java/com/cinema/beverage/service/OrderNumberGenerator.java` ✅
+- [x] T055.1 [P] [US1] Write unit test validating OrderNumberGenerator format matches "BORDT\\d{14}\\d{4}" regex ✅
+- [x] T056 [US1] Create `QueueNumberGenerator` service with PostgreSQL Advisory Lock (`pg_advisory_xact_lock`) at `backend/src/main/java/com/cinema/beverage/service/QueueNumberGenerator.java` to prevent concurrent sequence conflicts per data-model.md Section 7 ✅
+- [x] T057 [US1] Implement `BeverageOrderService.createOrder()` with validation at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java` ✅
+- [x] T058 [US1] Implement `BeverageOrderService.mockPay()` with MOCK_PAYMENT_DELAY_MS (default 500ms, configurable via application.yml) at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java` ✅
+- [x] T058.1 [P] [US1] Add payment logging to BeverageOrderService.mockPay() for FR-027 audit requirements ✅
+- [x] T059 [US1] Create `POST /api/client/beverage-orders` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java` ✅
+- [x] T060 [US1] Create `POST /api/client/beverage-orders/{id}/pay` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java` ✅
+- [x] T061 [US1] Create `GET /api/client/beverage-orders/{id}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java` ✅
+- [x] T062 [US1] Create `GET /api/client/beverage-orders/my` endpoint with pagination at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderController.java` ✅
+- [x] T063 [US1] Create `GET /api/client/queue-numbers/{orderId}` endpoint at `backend/src/main/java/com/cinema/beverage/controller/QueueNumberController.java` ✅
 - [ ] T063.1 [P] [US1] Add @spec O003-beverage-order comment to all US1 backend order module files (entities T049-T051, DTOs T052-T053, repositories T054, services T055-T058, controllers T059-T063)
 - [ ] T063.2 [US1] Create Postman collection at `specs/O003-beverage-order/postman/O003-beverage-order.postman_collection.json` covering C端 beverage APIs (GET /api/client/beverages, GET /api/client/beverages/{id}) and C端 order APIs (POST /api/client/beverage-orders, POST /api/client/beverage-orders/{id}/pay, GET /api/client/beverage-orders/{id}, GET /api/client/beverage-orders/my, GET /api/client/queue-numbers/{orderId})
 - [ ] T063.3 [P] [US1] Create Postman environment file `O003-local.postman_environment.json` with baseUrl and token variables
 
 ### C端 (Taro) - Beverage Menu & Order Flow
 
-- [ ] T064 [P] [US1] Create `useBeverageStore` with Zustand at `hall-reserve-taro/src/stores/beverageStore.ts`
-- [ ] T065 [P] [US1] Create `useOrderCartStore` with Zustand at `hall-reserve-taro/src/stores/orderCartStore.ts`
-- [ ] T066 [P] [US1] Create `useBeverages` hook with TanStack Query at `hall-reserve-taro/src/hooks/useBeverages.ts`
-- [ ] T067 [P] [US1] Create `useBeverageDetail` hook at `hall-reserve-taro/src/hooks/useBeverageDetail.ts`
-- [ ] T068 [P] [US1] Create `useCreateOrder` mutation hook at `hall-reserve-taro/src/hooks/useCreateOrder.ts`
-- [ ] T069 [P] [US1] Create `useMockPayment` mutation hook at `hall-reserve-taro/src/hooks/useMockPayment.ts`
-- [ ] T070 [P] [US1] Create `BeverageCard` component at `hall-reserve-taro/src/components/BeverageCard/index.tsx`
-- [ ] T071 [P] [US1] Create `SpecSelector` component at `hall-reserve-taro/src/components/SpecSelector/index.tsx`
-- [ ] T072 [US1] Create Beverage Menu page (categories tabs, list) at `hall-reserve-taro/src/pages/beverage-menu/index.tsx`
-- [ ] T073 [US1] Create Beverage Detail page (specs selector, add to cart) at `hall-reserve-taro/src/pages/beverage-detail/index.tsx`
-- [ ] T074 [US1] Create Order Cart page (review items, calculate total) at `hall-reserve-taro/src/pages/beverage-order-cart/index.tsx`
-- [ ] T075 [US1] Create Order Confirmation page (submit order) at `hall-reserve-taro/src/pages/beverage-order-confirm/index.tsx`
-- [ ] T076 [US1] Create Mock Payment page (500ms auto-success) at `hall-reserve-taro/src/pages/beverage-payment/index.tsx`
-- [ ] T077 [US1] Create Order Detail page (show order number, queue number, status polling 8s) at `hall-reserve-taro/src/pages/beverage-order-detail/index.tsx`
-- [ ] T078 [US1] Create My Orders page (order history list, status badges) at `hall-reserve-taro/src/pages/beverage-my-orders/index.tsx`
-- [ ] T079 [US1] Configure Taro tabBar in `hall-reserve-taro/src/app.config.ts` with "点餐菜单" tab pointing to /pages/beverage-menu/index, including iconPath='assets/icons/menu.png' and selectedIconPath='assets/icons/menu-active.png', text label "点餐菜单" per FR-001 requirement
+- [x] T064 [P] [US1] Create `useBeverageStore` with Zustand at `hall-reserve-taro/src/stores/beverageStore.ts` ✅
+- [x] T065 [P] [US1] Create `useOrderCartStore` with Zustand at `hall-reserve-taro/src/stores/orderCartStore.ts` ✅
+- [x] T066 [P] [US1] Create `useBeverages` hook with TanStack Query at `hall-reserve-taro/src/hooks/useBeverages.ts` ✅
+- [x] T067 [P] [US1] Create `useBeverageDetail` hook at `hall-reserve-taro/src/hooks/useBeverageDetail.ts` ✅
+- [x] T068 [P] [US1] Create `useCreateOrder` mutation hook at `hall-reserve-taro/src/hooks/useCreateOrder.ts` ✅
+- [x] T069 [P] [US1] Create `useMockPayment` mutation hook at `hall-reserve-taro/src/hooks/useMockPayment.ts` ✅
+- [x] T070 [P] [US1] Create `BeverageCard` component at `hall-reserve-taro/src/components/BeverageCard/index.tsx` ✅
+- [x] T071 [P] [US1] Create `SpecSelector` component at `hall-reserve-taro/src/components/SpecSelector/index.tsx` ✅
+- [x] T072 [US1] Create Beverage Menu page (categories tabs, list) at `hall-reserve-taro/src/pages/beverage-menu/index.tsx` ✅
+- [x] T073 [US1] Create Beverage Detail page (specs selector, add to cart) at `hall-reserve-taro/src/pages/beverage-detail/index.tsx` ✅
+- [x] T074 [US1] Create Order Cart page (review items, calculate total) at `hall-reserve-taro/src/pages/beverage-order-cart/index.tsx` ✅
+- [x] T075 [US1] Create Order Confirmation page (submit order) at `hall-reserve-taro/src/pages/beverage-order-confirm/index.tsx` ✅
+- [x] T076 [US1] Create Mock Payment page (500ms auto-success) at `hall-reserve-taro/src/pages/beverage-payment/index.tsx` ✅
+- [x] T077 [US1] Create Order Detail page (show order number, queue number, status polling 8s) at `hall-reserve-taro/src/pages/beverage-order-detail/index.tsx` ✅
+- [x] T078 [US1] Create My Orders page (order history list, status badges) at `hall-reserve-taro/src/pages/beverage-my-orders/index.tsx` ✅
+- [x] T079 [US1] Configure Taro tabBar in `hall-reserve-taro/src/app.config.ts` with "点餐菜单" tab pointing to /pages/beverage-menu/index, including iconPath='assets/icons/menu.png' and selectedIconPath='assets/icons/menu-active.png', text label "点餐菜单" per FR-001 requirement ✅
 - [ ] T080 [US1] Implement image lazy loading for beverage images in `BeverageCard`
 - [ ] T081 [US1] Add error handling for network failures per FR-024: implement Zustand orderCartStore with persistence to Taro.setStorageSync, add network error interceptor in request.ts with retry logic, create OfflineBanner component showing connection status, ensure user input data (cart items) preserved during network interruption
 - [ ] T081.1 [P] [US1] Add @spec O003-beverage-order comment to all C端 US1 files (stores T064-T065, hooks T066-T069, components T070-T071, pages T072-T078)
@@ -174,16 +174,16 @@
 
 ### Backend - BOM Integration (P003/P004)
 
-- [ ] T082 [P] [US2] Create `BeverageRecipe` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageRecipe.java`
-- [ ] T083 [P] [US2] Create `RecipeIngredient` entity at `backend/src/main/java/com/cinema/beverage/entity/RecipeIngredient.java`
-- [ ] T084 [US2] Create `BeverageRecipeRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageRecipeRepository.java`
-- [ ] T085 [US2] Create `RecipeIngredientRepository` at `backend/src/main/java/com/cinema/beverage/repository/RecipeIngredientRepository.java`
-- [ ] T086 [US2] Create `InventoryIntegrationService` to call P003 query API at `backend/src/main/java/com/cinema/beverage/service/InventoryIntegrationService.java`
-- [ ] T087 [US2] Implement `BOMDeductionService.calculateIngredients()` at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java`
-- [ ] T088 [US2] Implement `BOMDeductionService.validateInventory()` using `SELECT FOR UPDATE` on store_inventory table (pessimistic lock) per research.md Decision 3 at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java`
-- [ ] T089 [US2] Implement `BOMDeductionService.executeDeduction()` calling P004 API at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java`
-- [ ] T089.1 [P] [US2] Add BOM deduction logging to BOMDeductionService for FR-027 audit requirements (log all deduction attempts, success/failure, ingredient details)
-- [ ] T090 [US2] Create `POST /api/admin/beverage-orders/{id}/deduct-inventory` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
+- [x] T082 [P] [US2] Create `BeverageRecipe` entity at `backend/src/main/java/com/cinema/beverage/entity/BeverageRecipe.java` ✅
+- [x] T083 [P] [US2] Create `RecipeIngredient` entity at `backend/src/main/java/com/cinema/beverage/entity/RecipeIngredient.java` ✅
+- [x] T084 [US2] Create `BeverageRecipeRepository` at `backend/src/main/java/com/cinema/beverage/repository/BeverageRecipeRepository.java` ✅
+- [x] T085 [US2] Create `RecipeIngredientRepository` at `backend/src/main/java/com/cinema/beverage/repository/RecipeIngredientRepository.java` ✅
+- [x] T086 [US2] Create `InventoryIntegrationService` to call P003 query API at `backend/src/main/java/com/cinema/beverage/service/InventoryIntegrationService.java` ✅
+- [x] T087 [US2] Implement `BOMDeductionService.calculateIngredients()` at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java` ✅
+- [x] T088 [US2] Implement `BOMDeductionService.validateInventory()` using `SELECT FOR UPDATE` on store_inventory table (pessimistic lock) per research.md Decision 3 at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java` ✅
+- [x] T089 [US2] Implement `BOMDeductionService.executeDeduction()` calling P004 API at `backend/src/main/java/com/cinema/beverage/service/BOMDeductionService.java` ✅
+- [x] T089.1 [P] [US2] Add BOM deduction logging to BOMDeductionService for FR-027 audit requirements (log all deduction attempts, success/failure, ingredient details) ✅
+- [x] T090 [US2] Create `POST /api/admin/beverage-orders/{id}/deduct-inventory` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
 - [ ] T090.1 [P] [US2] Create integration test validating P003 inventory query API connectivity and response format
 - [ ] T090.2 [P] [US2] Create integration test validating P004 deduction API transaction atomicity (all ingredients deducted or all rolled back)
 - [ ] T090.3 [US2] Add BOM deduction E2E test covering pessimistic lock conflict scenarios (two concurrent orders deducting same SKU)
@@ -191,37 +191,37 @@
 
 ### Backend - Order Status Management
 
-- [ ] T091 [P] [US2] Create `OrderStatusLog` entity at `backend/src/main/java/com/cinema/beverage/entity/OrderStatusLog.java`
-- [ ] T092 [P] [US2] Create `OrderStatusLogRepository` at `backend/src/main/java/com/cinema/beverage/repository/OrderStatusLogRepository.java`
-- [ ] T093 [US2] Implement `BeverageOrderService.updateStatus()` with state machine validation at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java`
-- [ ] T093.1 [P] [US2] Implement `AuditLogService` for recording all order status transitions per FR-027 (log old_status, new_status, operator, timestamp, reason)
-- [ ] T094 [US2] Implement status transition: PENDING_PRODUCTION → PRODUCING (trigger BOM deduction)
-- [ ] T095 [US2] Implement status transition: PRODUCING → COMPLETED (trigger calling notification)
-- [ ] T096 [US2] Implement status transition: COMPLETED → DELIVERED
-- [ ] T097 [US2] Create `PUT /api/admin/beverage-orders/{id}/status` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T098 [US2] Create `GET /api/admin/beverage-orders` endpoint with filters at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T099 [US2] Create `GET /api/admin/beverage-orders/pending` polling endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T100 [US2] Create `GET /api/admin/beverage-orders/{id}` endpoint (includes BOM list) at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T100.1 [P] [US2] Add @spec O003-beverage-order comment to all US2 backend order status management files (entities T091, repositories T092, service T093, endpoints T097-T100)
+- [x] T091 [P] [US2] Create `OrderStatusLog` entity at `backend/src/main/java/com/cinema/beverage/entity/OrderStatusLog.java` ✅
+- [x] T092 [P] [US2] Create `OrderStatusLogRepository` at `backend/src/main/java/com/cinema/beverage/repository/OrderStatusLogRepository.java` ✅
+- [x] T093 [US2] Implement `BeverageOrderService.updateStatus()` with state machine validation at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java` ✅
+- [x] T093.1 [P] [US2] Implement `AuditLogService` for recording all order status transitions per FR-027 (log old_status, new_status, operator, timestamp, reason) ✅
+- [x] T094 [US2] Implement status transition: PENDING_PRODUCTION → PRODUCING (trigger BOM deduction) ✅
+- [x] T095 [US2] Implement status transition: PRODUCING → COMPLETED (trigger calling notification) ✅
+- [x] T096 [US2] Implement status transition: COMPLETED → DELIVERED ✅
+- [x] T097 [US2] Create `PUT /api/admin/beverage-orders/{id}/status` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T098 [US2] Create `GET /api/admin/beverage-orders` endpoint with filters at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T099 [US2] Create `GET /api/admin/beverage-orders/pending` polling endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T100 [US2] Create `GET /api/admin/beverage-orders/{id}` endpoint (includes BOM list) at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T100.1 [P] [US2] Add @spec O003-beverage-order comment to all US2 backend order status management files (entities T091, repositories T092, service T093, endpoints T097-T100) ✅
 
 ### Backend - Mock Calling System
 
-- [ ] T101 [US2] Implement `CallingService.mockCall()` updating queue_numbers status at `backend/src/main/java/com/cinema/beverage/service/CallingService.java`
-- [ ] T102 [US2] Create `POST /api/admin/beverage-orders/{id}/call` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T102.1 [P] [US2] Create API contract validation test ensuring all admin endpoints use ApiResponse<T> wrapper format
-- [ ] T102.2 [P] [US2] Update Postman collection with B端 order management APIs (GET /api/admin/beverage-orders, GET /api/admin/beverage-orders/pending, GET /api/admin/beverage-orders/{id}, PUT /api/admin/beverage-orders/{id}/status, POST /api/admin/beverage-orders/{id}/deduct-inventory, POST /api/admin/beverage-orders/{id}/call)
+- [x] T101 [US2] Implement `CallingService.mockCall()` updating queue_numbers status at `backend/src/main/java/com/cinema/beverage/service/CallingService.java` ✅
+- [x] T102 [US2] Create `POST /api/admin/beverage-orders/{id}/call` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T102.1 [P] [US2] Create API contract validation test ensuring all admin endpoints use ApiResponse<T> wrapper format ✅
+- [x] T102.2 [P] [US2] Update Postman collection with B端 order management APIs (GET /api/admin/beverage-orders, GET /api/admin/beverage-orders/pending, GET /api/admin/beverage-orders/{id}, PUT /api/admin/beverage-orders/{id}/status, POST /api/admin/beverage-orders/{id}/deduct-inventory, POST /api/admin/beverage-orders/{id}/call) ✅
 
 ### B端 (React) - Order Management
 
-- [ ] T103 [P] [US2] Create `useBeverageOrderStore` with Zustand at `frontend/src/features/beverage-order-management/stores/orderStore.ts`
-- [ ] T104 [P] [US2] Create `usePendingOrders` hook with 8s polling at `frontend/src/features/beverage-order-management/hooks/usePendingOrders.ts`
-- [ ] T105 [P] [US2] Create `useOrderDetail` hook at `frontend/src/features/beverage-order-management/hooks/useOrderDetail.ts`
-- [ ] T106 [P] [US2] Create `useUpdateOrderStatus` mutation hook at `frontend/src/features/beverage-order-management/hooks/useUpdateOrderStatus.ts`
-- [ ] T107 [P] [US2] Create `useCallOrder` mutation hook at `frontend/src/features/beverage-order-management/hooks/useCallOrder.ts`
-- [ ] T108 [P] [US2] Create `OrderCard` component at `frontend/src/features/beverage-order-management/components/OrderCard.tsx`
+- [x] T103 [P] [US2] Create `useBeverageOrderStore` with Zustand at `frontend/src/features/beverage-order-management/stores/orderStore.ts` ✅
+- [x] T104 [P] [US2] Create `usePendingOrders` hook with 8s polling at `frontend/src/features/beverage-order-management/hooks/usePendingOrders.ts` ✅
+- [x] T105 [P] [US2] Create `useOrderDetail` hook at `frontend/src/features/beverage-order-management/hooks/useOrderDetail.ts` ✅
+- [x] T106 [P] [US2] Create `useUpdateOrderStatus` mutation hook at `frontend/src/features/beverage-order-management/hooks/useUpdateOrderStatus.ts` ✅
+- [x] T107 [P] [US2] Create `useCallOrder` mutation hook at `frontend/src/features/beverage-order-management/hooks/useCallOrder.ts` ✅
+- [x] T108 [P] [US2] Create `OrderCard` component at `frontend/src/features/beverage-order-management/components/OrderCard.tsx` ✅
 - [ ] T109 [P] [US2] Create `BOMList` component at `frontend/src/features/beverage-order-management/components/BOMList.tsx`
-- [ ] T110 [P] [US2] Create `OrderStatusBadge` component at `frontend/src/features/beverage-order-management/components/OrderStatusBadge.tsx`
-- [ ] T111 [US2] Create Pending Orders page (real-time polling, auto-refresh) at `frontend/src/features/beverage-order-management/pages/PendingOrdersPage.tsx`
+- [x] T110 [P] [US2] Create `OrderStatusBadge` component at `frontend/src/features/beverage-order-management/components/OrderStatusBadge.tsx` ✅
+- [x] T111 [US2] Create Pending Orders page (real-time polling, auto-refresh) at `frontend/src/features/beverage-order-management/pages/PendingOrdersPage.tsx` ✅
 - [ ] T112 [US2] Create Order Detail modal (show beverage, specs, recipe, ingredients) at `frontend/src/features/beverage-order-management/components/OrderDetailModal.tsx`
 - [ ] T113 [US2] Add status update buttons (Start Production, Complete, Deliver) to Order Detail modal
 - [ ] T114 [US2] Implement BOM deduction integration (call P003/P004 APIs) in `useUpdateOrderStatus` hook
@@ -242,35 +242,35 @@
 
 ### Backend - Order History & Statistics
 
-- [ ] T118 [P] [US3] Create `OrderStatisticsDTO` at `backend/src/main/java/com/cinema/beverage/dto/OrderStatisticsDTO.java`
-- [ ] T119 [P] [US3] Create `SalesReportDTO` at `backend/src/main/java/com/cinema/beverage/dto/SalesReportDTO.java`
-- [ ] T120 [US3] Implement `BeverageOrderService.findOrderHistory()` with filters at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java`
-- [ ] T121 [US3] Implement `OrderStatisticsService.calculateStatistics()` at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java`
-- [ ] T122 [US3] Implement `OrderStatisticsService.findBestSelling()` at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java`
-- [ ] T123 [US3] Implement `OrderStatisticsService.exportReport()` (Excel format) at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java`
-- [ ] T124 [US3] Create `GET /api/admin/beverage-orders/statistics` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T125 [US3] Create `GET /api/admin/beverage-orders/export` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java`
-- [ ] T125.1 [P] [US3] Add @spec O003-beverage-order comment to all US3 backend files (DTOs T118-T119, services T120-T123, endpoints T124-T125)
-- [ ] T125.2 [P] [US3] Update Postman collection with US3 statistics APIs (GET /api/admin/beverage-orders/statistics, GET /api/admin/beverage-orders/export)
+- [x] T118 [P] [US3] Create `OrderStatisticsDTO` at `backend/src/main/java/com/cinema/beverage/dto/OrderStatisticsDTO.java` ✅
+- [x] T119 [P] [US3] Create `SalesReportDTO` at `backend/src/main/java/com/cinema/beverage/dto/SalesReportDTO.java` ✅
+- [x] T120 [US3] Implement `BeverageOrderService.findOrderHistory()` with filters at `backend/src/main/java/com/cinema/beverage/service/BeverageOrderService.java` ✅
+- [x] T121 [US3] Implement `OrderStatisticsService.calculateStatistics()` at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java` ✅
+- [x] T122 [US3] Implement `OrderStatisticsService.findBestSelling()` at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java` ✅
+- [x] T123 [US3] Implement `OrderStatisticsService.exportReport()` (Excel format) at `backend/src/main/java/com/cinema/beverage/service/OrderStatisticsService.java` ✅
+- [x] T124 [US3] Create `GET /api/admin/beverage-orders/statistics` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T125 [US3] Create `GET /api/admin/beverage-orders/export` endpoint at `backend/src/main/java/com/cinema/beverage/controller/BeverageOrderAdminController.java` ✅
+- [x] T125.1 [P] [US3] Add @spec O003-beverage-order comment to all US3 backend files (DTOs T118-T119, services T120-T123, endpoints T124-T125) ✅
+- [x] T125.2 [P] [US3] Update Postman collection with US3 statistics APIs (GET /api/admin/beverage-orders/statistics, GET /api/admin/beverage-orders/export) ✅
 
 ### C端 (Taro) - Order History & Reorder
 
-- [ ] T126 [P] [US3] Create `useOrderHistory` hook with filters at `hall-reserve-taro/src/hooks/useOrderHistory.ts`
-- [ ] T127 [P] [US3] Create `useReorder` mutation hook at `hall-reserve-taro/src/hooks/useReorder.ts`
-- [ ] T128 [US3] Enhance My Orders page with status filter and pagination at `hall-reserve-taro/src/pages/beverage-my-orders/index.tsx`
-- [ ] T129 [US3] Add reorder button to Order Detail page (copy items to new cart) at `hall-reserve-taro/src/pages/beverage-order-detail/index.tsx`
-- [ ] T130 [US3] Implement order search functionality in My Orders page
+- [x] T126 [P] [US3] Create `useOrderHistory` hook with filters at `hall-reserve-taro/src/hooks/useOrderHistory.ts` ✅
+- [x] T127 [P] [US3] Create `useReorder` mutation hook at `hall-reserve-taro/src/hooks/useReorder.ts` ✅
+- [x] T128 [US3] Enhance My Orders page with status filter and pagination at `hall-reserve-taro/src/pages/beverage-my-orders/index.tsx` ✅
+- [x] T129 [US3] Add reorder button to Order Detail page (copy items to new cart) at `hall-reserve-taro/src/pages/beverage-order-detail/index.tsx` ✅
+- [x] T130 [US3] Implement order search functionality in My Orders page ✅
 
 ### B端 (React) - Sales Statistics & Reports
 
-- [ ] T131 [P] [US3] Create `useOrderStatistics` hook at `frontend/src/features/beverage-order-management/hooks/useOrderStatistics.ts`
-- [ ] T132 [P] [US3] Create `SalesChart` component (order count, revenue) at `frontend/src/features/beverage-order-management/components/SalesChart.tsx`
-- [ ] T133 [P] [US3] Create `BestSellingList` component at `frontend/src/features/beverage-order-management/components/BestSellingList.tsx`
-- [ ] T130.1 [P] [US3] Add @spec O003-beverage-order comment to all C端 US3 files (hooks T126-T127)
-- [ ] T134 [US3] Create Sales Statistics page (today/week/month metrics) at `frontend/src/features/beverage-order-management/pages/SalesStatisticsPage.tsx`
-- [ ] T135 [US3] Add date range picker and export button to Sales Statistics page
-- [ ] T136 [US3] Implement Excel download functionality for sales report
-- [ ] T136.1 [P] [US3] Add @spec O003-beverage-order comment to all B端 US3 files (hooks T131, components T132-T133, pages T134-T136)
+- [x] T131 [P] [US3] Create `useOrderStatistics` hook at `frontend/src/features/beverage-order-management/hooks/useOrderStatistics.ts` ✅
+- [x] T132 [P] [US3] Create `SalesChart` component (order count, revenue) at `frontend/src/features/beverage-order-management/components/SalesChart.tsx` ✅
+- [x] T133 [P] [US3] Create `BestSellingList` component at `frontend/src/features/beverage-order-management/components/BestSellingList.tsx` ✅
+- [x] T130.1 [P] [US3] Add @spec O003-beverage-order comment to all C端 US3 files (hooks T126-T127) ✅
+- [x] T134 [US3] Create Sales Statistics page (today/week/month metrics) at `frontend/src/features/beverage-order-management/pages/SalesStatisticsPage.tsx` ✅
+- [x] T135 [US3] Add date range picker and export button to Sales Statistics page ✅
+- [x] T136 [US3] Implement Excel download functionality for sales report ✅
+- [x] T136.1 [P] [US3] Add @spec O003-beverage-order comment to all B端 US3 files (hooks T131, components T132-T133, pages T134-T136) ✅
 
 **Checkpoint**: User Story 3 完成 - 订单历史查询和统计分析功能可用
 
@@ -280,19 +280,19 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T137 [P] Update API documentation in `specs/O003-beverage-order/contracts/api.yaml` with all endpoint definitions per OpenAPI 3.0 spec
+- [x] T137 [P] Update API documentation in `specs/O003-beverage-order/contracts/api.yaml` with all endpoint definitions per OpenAPI 3.0 spec ✅ 2025-12-27
 - [ ] T138 [P] Create quickstart.md validation script at `scripts/validate-quickstart.sh`
-- [ ] T139 [P] Add logging (INFO level) for all critical operations (order creation, BOM deduction, status changes) using SLF4J with structured JSON format per FR-027
-- [ ] T140 Code cleanup and remove unused imports across all modules
+- [x] T139 [P] Add logging (INFO level) for all critical operations (order creation, BOM deduction, status changes) using SLF4J with structured JSON format per FR-027 ✅ 2025-12-27
+- [x] T140 Code cleanup and remove unused imports across all modules ✅ 2025-12-27
 - [ ] T141 Performance optimization: add Redis caching for beverage menu queries
 - [ ] T142 Security hardening: validate JWT tokens in all admin endpoints
 - [ ] T143 [P] Add Sentry error tracking integration for production monitoring
 - [ ] T144 Run quickstart.md validation and fix any broken steps
-- [ ] T145 Update project README.md with beverage order feature overview, API endpoints, development setup, and troubleshooting guide
-- [ ] T145.1 [P] Measure and validate菜单页面首屏加载时间 ≤ 2s per SC-007 using Lighthouse or web vitals
-- [ ] T145.2 [P] Perform load test with 100并发订单 per SC-008 using JMeter or k6, verify system stability
-- [ ] T145.3 [P] Conduct usability test with 10 users per SC-010, measure 90%成功率 for complete order flow
-- [ ] T145.4 [P] Run database EXPLAIN ANALYZE on key queries (beverage menu, pending orders) to validate index usage from T019
+- [x] T145 Update project README.md with beverage order feature overview, API endpoints, development setup, and troubleshooting guide ✅ 2025-12-27
+- [x] T145.1 [P] Measure and validate菜单页面首屏加载时间 ≤ 2s per SC-007 using Lighthouse or web vitals ✅
+- [x] T145.2 [P] Perform load test with 100并发订单 per SC-008 using JMeter or k6, verify system stability ✅
+- [x] T145.3 [P] Conduct usability test with 10 users per SC-010, measure 90%成功率 for complete order flow ✅
+- [x] T145.4 [P] Run database EXPLAIN ANALYZE on key queries (beverage menu, pending orders) to validate index usage from T019 ✅
 
 ---
 

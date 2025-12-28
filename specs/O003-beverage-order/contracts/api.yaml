@@ -1319,6 +1319,334 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  # ==================== C端 - 订单历史查询 (US3) ====================
+  /api/beverage-orders/history:
+    get:
+      tags:
+        - Client - Orders
+      summary: 订单历史查询
+      description: |
+        查询用户的历史订单列表（US3: FR-019）
+        - 按时间倒序排列
+        - 支持状态筛选
+        - 支持分页加载
+        - 返回订单基本信息和订单项
+      operationId: getOrderHistory
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: 用户ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: 订单状态筛选（可选）
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_PAYMENT, PENDING_PRODUCTION, PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+        - name: page
+          in: query
+          description: 页码（从0开始，Spring Data分页）
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功返回订单历史
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            type: array
+                            description: 订单列表
+                            items:
+                              $ref: '#/components/schemas/BeverageOrderDetailDTO'
+                          totalElements:
+                            type: integer
+                            description: 总记录数
+                          totalPages:
+                            type: integer
+                            description: 总页数
+                          number:
+                            type: integer
+                            description: 当前页码
+                          size:
+                            type: integer
+                            description: 每页数量
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      content:
+                        - id: "order-123"
+                          orderNumber: "BORDT202512271430251234"
+                          userId: "user-789"
+                          totalPrice: 46.00
+                          status: "DELIVERED"
+                          queueNumber: "D042"
+                          items:
+                            - beverageName: "美式咖啡"
+                              quantity: 2
+                              unitPrice: 20.00
+                          createdAt: "2025-12-27T14:30:25Z"
+                      totalElements: 25
+                      totalPages: 3
+                      number: 0
+                      size: 10
+                    timestamp: "2025-12-27T15:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/beverage-orders/by-number/{orderNumber}:
+    get:
+      tags:
+        - Client - Orders
+      summary: 根据订单号搜索订单
+      description: |
+        根据订单号查询订单详情（US3: T130）
+        - 用于订单搜索功能
+        - 验证订单归属
+      operationId: getOrderByNumber
+      parameters:
+        - name: orderNumber
+          in: path
+          required: true
+          description: 订单号
+          schema:
+            type: string
+            example: "BORDT202512271430251234"
+      responses:
+        '200':
+          description: 成功返回订单详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageOrderDetailDTO'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== B端 - 订单统计与报表 (US3) ====================
+  /api/admin/beverage-orders/statistics:
+    get:
+      tags:
+        - Admin - Orders
+      summary: 订单统计数据
+      description: |
+        获取订单统计数据（US3: FR-022）
+        - 支持今日/本周/本月/自定义时间范围
+        - 显示订单数量、销售额、完成率
+        - 显示热销饮品排行
+      operationId: getOrderStatistics
+      parameters:
+        - name: storeId
+          in: query
+          description: 门店ID（可选，不传则查询所有门店）
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: rangeType
+          in: query
+          description: 时间范围类型
+          required: false
+          schema:
+            type: string
+            enum: [TODAY, WEEK, MONTH, CUSTOM]
+            default: TODAY
+        - name: startDate
+          in: query
+          description: 起始日期（rangeType=CUSTOM时必填）
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-01"
+        - name: endDate
+          in: query
+          description: 截止日期（rangeType=CUSTOM时必填）
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+      responses:
+        '200':
+          description: 成功返回统计数据
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderStatisticsDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      dateRange:
+                        startDate: "2025-12-27"
+                        endDate: "2025-12-27"
+                        rangeType: "TODAY"
+                      orderMetrics:
+                        totalOrders: 125
+                        completedOrders: 118
+                        cancelledOrders: 7
+                        completionRate: 94.4
+                        averagePreparationTime: 4.5
+                      salesMetrics:
+                        totalRevenue: 3580.00
+                        averageOrderValue: 28.64
+                        totalQuantity: 342
+                        topSellingBeverage: "美式咖啡"
+                        topSellingQuantity: 85
+                      bestSellingBeverages:
+                        - rank: 1
+                          beverageId: "bev-001"
+                          beverageName: "美式咖啡"
+                          quantity: 85
+                          revenue: 1275.00
+                          percentage: 35.6
+                        - rank: 2
+                          beverageId: "bev-002"
+                          beverageName: "珍珠奶茶"
+                          quantity: 62
+                          revenue: 1116.00
+                          percentage: 31.2
+                    timestamp: "2025-12-27T16:00:00Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_parameters:
+                  value:
+                    success: false
+                    error: "STAT_VAL_001"
+                    message: "无效的统计参数"
+                    details:
+                      reason: "自定义时间范围需要提供起始日期和截止日期"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/export:
+    get:
+      tags:
+        - Admin - Orders
+      summary: 导出销售报表
+      description: |
+        导出Excel格式销售报表（US3: FR-023）
+        - 包含订单明细、销售汇总、热销商品
+        - 使用Apache POI生成Excel
+        - 返回二进制文件流
+      operationId: exportSalesReport
+      parameters:
+        - name: storeId
+          in: query
+          description: 门店ID（可选）
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          required: true
+          description: 起始日期
+          schema:
+            type: string
+            format: date
+            example: "2025-12-01"
+        - name: endDate
+          in: query
+          required: true
+          description: 截止日期
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+      responses:
+        '200':
+          description: 成功返回Excel文件
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: 文件名
+              schema:
+                type: string
+                example: 'attachment; filename="销售报表_2025-12-01_2025-12-31.xlsx"'
+            Content-Length:
+              description: 文件大小（字节）
+              schema:
+                type: integer
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_dates:
+                  value:
+                    success: false
+                    error: "STAT_VAL_002"
+                    message: "导出报表需要提供起始日期和截止日期"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                export_failed:
+                  value:
+                    success: false
+                    error: "STAT_SYS_001"
+                    message: "导出报表失败"
+                    details:
+                      reason: "Excel文件生成异常"
+                    timestamp: "2025-12-27T10:30:00Z"
+
 components:
   securitySchemes:
     BearerAuth:
@@ -1867,6 +2195,163 @@ components:
         - date
         - sequence
         - status
+
+    # ==================== 统计分析相关（US3） ====================
+    DateRangeDTO:
+      type: object
+      description: 时间范围
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: 开始日期
+          example: "2025-12-20"
+        endDate:
+          type: string
+          format: date
+          description: 结束日期
+          example: "2025-12-27"
+        rangeType:
+          type: string
+          enum: [TODAY, WEEK, MONTH, CUSTOM]
+          description: 时间范围类型
+          example: "TODAY"
+      required:
+        - startDate
+        - endDate
+        - rangeType
+
+    OrderMetrics:
+      type: object
+      description: 订单指标
+      properties:
+        totalOrders:
+          type: integer
+          description: 订单总数
+          example: 156
+        completedOrders:
+          type: integer
+          description: 已完成订单数
+          example: 142
+        cancelledOrders:
+          type: integer
+          description: 已取消订单数
+          example: 8
+        completionRate:
+          type: number
+          format: double
+          description: 完成率（百分比）
+          example: 91.03
+        averagePreparationTime:
+          type: number
+          format: double
+          description: 平均制作时长（分钟）
+          example: 5.8
+      required:
+        - totalOrders
+        - completedOrders
+        - cancelledOrders
+        - completionRate
+        - averagePreparationTime
+
+    SalesMetrics:
+      type: object
+      description: 销售指标
+      properties:
+        totalRevenue:
+          type: number
+          format: decimal
+          description: 销售总额（元）
+          example: 12850.00
+        averageOrderValue:
+          type: number
+          format: decimal
+          description: 平均客单价（元）
+          example: 82.37
+        totalQuantity:
+          type: integer
+          description: 总销量（杯数）
+          example: 285
+        topSellingBeverage:
+          type: string
+          nullable: true
+          description: 最畅销饮品名称
+          example: "拿铁咖啡"
+        topSellingQuantity:
+          type: integer
+          nullable: true
+          description: 最畅销饮品销量
+          example: 48
+      required:
+        - totalRevenue
+        - averageOrderValue
+        - totalQuantity
+
+    BestSellingItem:
+      type: object
+      description: 热销商品项
+      properties:
+        rank:
+          type: integer
+          description: 排名
+          example: 1
+        beverageId:
+          type: string
+          format: uuid
+          description: 饮品ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        beverageName:
+          type: string
+          description: 饮品名称
+          example: "拿铁咖啡"
+        quantity:
+          type: integer
+          description: 销售数量
+          example: 48
+        revenue:
+          type: number
+          format: decimal
+          description: 销售额（元）
+          example: 1920.00
+        percentage:
+          type: number
+          format: double
+          description: 占比（百分比）
+          example: 16.84
+      required:
+        - rank
+        - beverageId
+        - beverageName
+        - quantity
+        - revenue
+        - percentage
+
+    OrderStatisticsDTO:
+      type: object
+      description: 订单统计数据
+      properties:
+        dateRange:
+          $ref: '#/components/schemas/DateRangeDTO'
+        orderMetrics:
+          $ref: '#/components/schemas/OrderMetrics'
+        salesMetrics:
+          $ref: '#/components/schemas/SalesMetrics'
+        bestSellingBeverages:
+          type: array
+          description: 热销饮品排行
+          items:
+            $ref: '#/components/schemas/BestSellingItem'
+        storeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 门店ID（如果按门店筛选）
+          example: "660e8400-e29b-41d4-a716-446655440001"
+      required:
+        - dateRange
+        - orderMetrics
+        - salesMetrics
+        - bestSellingBeverages
 
   responses:
     BadRequest:

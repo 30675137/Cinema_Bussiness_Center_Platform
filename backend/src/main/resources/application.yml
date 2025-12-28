@@ -49,6 +49,7 @@ supabase:
 
   storage:
     bucket: scenario-packages # 场景包背景图片存储桶
+    beverage-images-bucket: beverage-images # 饮品图片存储桶
     base-url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}/storage/v1
 
 # 微信小程序配置（用于微信登录功能）
@@ -59,11 +60,43 @@ wechat:
     app-id: ${WECHAT_APPID:wx23d19fd65c65af26}
     app-secret: ${WECHAT_APP_SECRET:e8550f82e70ba2278b0e030786b9653d}
 
+# JWT 认证配置 (@spec O003-beverage-order T026)
+jwt:
+  # JWT 签名密钥 (生产环境必须使用强密钥并通过环境变量注入)
+  secret: ${JWT_SECRET:cinema-beverage-order-secret-key-please-change-in-production-environment}
+  # Access Token 有效期 (毫秒) - 默认 1 小时
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  # Refresh Token 有效期 (毫秒) - 默认 7 天
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+
+# 测试用户配置 (生产环境应使用 Supabase Auth)
+auth:
+  test:
+    username: ${TEST_USERNAME:admin}
+    password: ${TEST_PASSWORD:admin123}
+    userId: ${TEST_USER_ID:00000000-0000-0000-0000-000000000001}
+
+# 饮品订单配置 (@spec O003-beverage-order)
+beverage:
+  payment:
+    # Mock 支付延迟时间（毫秒）- MVP 阶段使用模拟支付
+    mock-delay-ms: ${MOCK_PAYMENT_DELAY_MS:500}
+
+  order:
+    # 订单状态轮询间隔（毫秒）- C端/B端实时更新频率
+    polling-interval-ms: ${ORDER_POLLING_INTERVAL_MS:8000}
+    # 取餐号格式配置
+    queue-number-prefix: D # 取餐号前缀 (D001-D999)
+    queue-number-max: 999  # 每日最大取餐号
+    # 订单号前缀
+    order-number-prefix: BORDT # 格式: BORDT + yyyyMMddHHmmss + 4位随机数
+
 # 日志配置
 logging:
   level:
     root: INFO
     com.cinema.hallstore: DEBUG
+    com.cinema.beverage: DEBUG # 饮品模块日志
     org.springframework.web: DEBUG
     org.springframework.web.reactive.function.client: TRACE
   pattern:
