@@ -8,6 +8,7 @@ import Taro from '@tarojs/taro'
 import { useBeverages } from '../../../hooks'
 import { BeverageCard } from '../../../components/BeverageCard'
 import { useBeverageStore } from '../../../stores/beverageStore'
+import CartIcon from '../../../components/cart/CartIcon'
 import type { BeverageDTO } from '../../../types/beverage'
 import './index.scss'
 
@@ -66,6 +67,9 @@ const BeverageMenu: React.FC = () => {
 
   return (
     <View className="beverage-menu">
+      {/* 购物车图标 */}
+      <CartIcon />
+
       {/* 分类标签页 */}
       <View className="beverage-menu__tabs">
         <ScrollView scrollX className="beverage-menu__tabs-scroll">

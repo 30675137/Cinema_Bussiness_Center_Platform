@@ -45,7 +45,7 @@ export const useMockPayment = (options?: UseMockPaymentOptions) => {
       })
 
       try {
-        const result = await orderService.mockPayOrder(orderId)
+        const result = await orderService.payOrder(orderId)
         return result
       } finally {
         Taro.hideLoading()

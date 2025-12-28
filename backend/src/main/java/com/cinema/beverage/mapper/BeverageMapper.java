@@ -86,8 +86,8 @@ public class BeverageMapper {
         dto.setName(recipe.getName());
         dto.setApplicableSpecs(recipe.getApplicableSpecs());
         dto.setDescription(recipe.getDescription());
-        dto.setCreatedAt(recipe.getCreatedAt().toString());
-        dto.setUpdatedAt(recipe.getUpdatedAt().toString());
+        dto.setCreatedAt(recipe.getCreatedAt() != null ? recipe.getCreatedAt().toString() : null);
+        dto.setUpdatedAt(recipe.getUpdatedAt() != null ? recipe.getUpdatedAt().toString() : null);
 
         if (ingredients != null) {
             dto.setIngredients(ingredients.stream()

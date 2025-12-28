@@ -130,6 +130,8 @@ export interface Beverage {
   sortOrder: number
   createdAt: string
   updatedAt: string
+  specs?: BeverageSpec[] // 饮品规格列表（可选，详情页包含）
+  recipes?: any[] // 饮品配方列表（可选，详情页包含）
 }
 
 /**
@@ -255,7 +257,7 @@ export async function getBeverageSpecs(beverageId: string): Promise<ListResponse
  */
 export async function createOrder(orderRequest: CreateOrderRequest): Promise<ApiResponse<BeverageOrder>> {
   return request<ApiResponse<BeverageOrder>>({
-    url: '/api/beverage-orders',
+    url: '/api/client/beverage-orders',
     method: 'POST',
     data: orderRequest,
   })
@@ -266,7 +268,7 @@ export async function createOrder(orderRequest: CreateOrderRequest): Promise<Api
  */
 export async function payOrder(orderId: string): Promise<ApiResponse<BeverageOrder>> {
   return request<ApiResponse<BeverageOrder>>({
-    url: `/api/beverage-orders/${orderId}/pay`,
+    url: `/api/client/beverage-orders/${orderId}/pay`,
     method: 'POST',
   })
 }
@@ -276,7 +278,7 @@ export async function payOrder(orderId: string): Promise<ApiResponse<BeverageOrd
  */
 export async function getOrderById(orderId: string): Promise<ApiResponse<BeverageOrder>> {
   return request<ApiResponse<BeverageOrder>>({
-    url: `/api/beverage-orders/${orderId}`,
+    url: `/api/client/beverage-orders/${orderId}`,
     method: 'GET',
   })
 }
@@ -286,7 +288,7 @@ export async function getOrderById(orderId: string): Promise<ApiResponse<Beverag
  */
 export async function getOrderByNumber(orderNumber: string): Promise<ApiResponse<BeverageOrder>> {
   return request<ApiResponse<BeverageOrder>>({
-    url: `/api/beverage-orders/by-number/${orderNumber}`,
+    url: `/api/client/beverage-orders/by-number/${orderNumber}`,
     method: 'GET',
   })
 }
@@ -300,7 +302,7 @@ export async function getMyOrders(params?: {
   pageSize?: number
 }): Promise<ListResponse<BeverageOrder>> {
   return request<ListResponse<BeverageOrder>>({
-    url: '/api/beverage-orders/my',
+    url: '/api/client/beverage-orders/my',
     method: 'GET',
     data: params,
   })
@@ -311,7 +313,7 @@ export async function getMyOrders(params?: {
  */
 export async function getQueueNumber(orderId: string): Promise<ApiResponse<QueueNumber>> {
   return request<ApiResponse<QueueNumber>>({
-    url: `/api/beverage-orders/${orderId}/queue-number`,
+    url: `/api/client/beverage-orders/${orderId}/queue-number`,
     method: 'GET',
   })
 }
@@ -345,16 +347,47 @@ export async function getOrderHistory(params: {
   if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString())
 
   const response = await request<ApiResponse<OrderHistoryResponse>>({
-    url: `/api/beverage-orders/history?${queryParams.toString()}`,
+    url: `/api/client/beverage-orders/history?${queryParams.toString()}`,
     method: 'GET',
   })
 
   return response.data
 }
 
+/**
+ * 获取饮品详情（包含规格和配方信息）
+ */
+export async function getBeverageDetail(id: string): Promise<Beverage> {
+  const response = await request<ApiResponse<any>>({
+    url: `/api/client/beverages/${id}`,
+    method: 'GET',
+  })
+
+  // 将后端字段映射到前端类型
+  const beverage = response.data
+  return {
+    id: beverage.id,
+    name: beverage.name,
+    description: beverage.description,
+    category: beverage.category,
+    imageUrl: beverage.mainImage || '', // 后端 mainImage -> 前端 imageUrl
+    detailImages: beverage.detailImages || [],
+    basePrice: beverage.basePrice,
+    nutritionInfo: beverage.nutritionInfo,
+    status: beverage.status,
+    isRecommended: beverage.isRecommended,
+    sortOrder: beverage.sortOrder,
+    createdAt: beverage.createdAt,
+    updatedAt: beverage.updatedAt,
+    specs: beverage.specs || [], // 添加规格数据
+    recipes: beverage.recipes || [], // 添加配方数据
+  } as Beverage
+}
+
 export const beverageService = {
   getBeverages,
   getBeverageById,
+  getBeverageDetail, // 添加详情查询方法
   getBeverageSpecs,
   createOrder,
   payOrder,

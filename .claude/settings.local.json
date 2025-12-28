@@ -97,7 +97,13 @@
       "Bash(npx chrome-devtools-mcp:*)",
       "Bash(convert:*)",
       "Bash(java:*)",
-      "Bash(mvn clean install:*)"
+      "Bash(mvn clean install:*)",
+      "Bash(npx chrome-devtools-mcp@latest)",
+      "Bash(mcp__chrome-devtools__new_page:*)",
+      "Bash(npm run dev:h5:*)",
+      "Bash(tee:*)",
+      "Bash(timeout:*)",
+      "Bash(PGPASSWORD='Pgsql.2024' psql:*)"
     ]
   }
 }

@@ -8,6 +8,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useBeverageDetail } from '../../../hooks'
 import { SpecSelector } from '../../../components/SpecSelector'
 import { useOrderCartStore } from '../../../stores/orderCartStore'
+import CartIcon from '../../../components/cart/CartIcon'
 import type { CartItem } from '../../../stores/orderCartStore'
 import './index.scss'
 
@@ -125,6 +126,9 @@ const BeverageDetail: React.FC = () => {
 
   return (
     <View className="beverage-detail">
+      {/* 购物车图标 */}
+      <CartIcon />
+
       <ScrollView scrollY className="beverage-detail__scroll">
         {/* 饮品图片 */}
         <View className="beverage-detail__banner">

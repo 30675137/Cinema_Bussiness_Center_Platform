@@ -74,6 +74,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/*").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/my").permitAll()
 
+                // C端饮品订单端点 (开发测试临时开放)
+                .requestMatchers(HttpMethod.POST, "/api/beverage-orders").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/beverage-orders/**").permitAll()
+
                 // B端公共端点 (饮品管理 - 临时开放用于开发测试)
                 .requestMatchers(HttpMethod.POST, "/api/admin/beverages/upload-image").permitAll()
                 .requestMatchers("/api/admin/beverages/**").permitAll()
