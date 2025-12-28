@@ -391,6 +391,38 @@ export const useUpdatePriceRuleMutation = () => {
   });
 };
 
+export const useDeletePriceRuleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: priceService.deletePriceRule,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['price-rules'] });
+    },
+  });
+};
+
+export const useApplyPriceRuleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<PriceRule> }) =>
+      priceService.applyPriceRule(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['price-rules'] });
+      queryClient.invalidateQueries({ queryKey: ['prices'] });
+    },
+  });
+};
+
+export const usePriceStatistics = () => {
+  return useQuery({
+    queryKey: ['price-statistics'],
+    queryFn: () => priceService.getPriceStatistics(),
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
 // 价格历史查询hooks
 export const usePriceHistoryQuery = (priceConfigId: string) => {
   return useQuery({

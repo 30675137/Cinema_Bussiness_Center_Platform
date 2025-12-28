@@ -1,0 +1,472 @@
+openapi: 3.0.3
+info:
+  title: 活动类型管理 API
+  description: 活动类型管理功能的REST API接口定义
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+
+paths:
+  /activity-types:
+    get:
+      summary: 获取活动类型列表（运营后台）
+      description: 获取所有活动类型列表，包括启用和停用状态，不包括已删除状态。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: 过滤状态（ENABLED/DISABLED），不传则返回所有非删除状态
+          schema:
+            type: string
+            enum: [ENABLED, DISABLED]
+      responses:
+        '200':
+          description: 成功返回活动类型列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityTypeListResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: 创建活动类型
+      description: 创建新的活动类型，默认状态为启用。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActivityTypeRequest'
+      responses:
+        '200':
+          description: 成功创建活动类型
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseActivityType'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 活动类型名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /activity-types/enabled:
+    get:
+      summary: 获取启用状态的活动类型列表（小程序端）
+      description: 获取所有启用状态的活动类型列表，供小程序端用户在预约时选择。公开接口，无需认证。
+      tags:
+        - ActivityTypes
+      responses:
+        '200':
+          description: 成功返回启用状态的活动类型列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityTypeListResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /activity-types/{id}:
+    get:
+      summary: 获取单个活动类型
+      description: 根据ID获取活动类型详情。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 活动类型ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回活动类型详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseActivityType'
+        '404':
+          description: 活动类型不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: 更新活动类型
+      description: 更新活动类型信息（名称、描述、排序号）。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 活动类型ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActivityTypeRequest'
+      responses:
+        '200':
+          description: 成功更新活动类型
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseActivityType'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 活动类型不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 活动类型名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: 删除活动类型（软删除）
+      description: 软删除活动类型，将状态设置为DELETED，数据保留在数据库中。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 活动类型ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功删除活动类型
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseActivityType'
+        '404':
+          description: 活动类型不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /activity-types/{id}/status:
+    patch:
+      summary: 启用/停用活动类型
+      description: 切换活动类型状态（ENABLED/DISABLED）。仅运营人员和管理员可访问。
+      tags:
+        - ActivityTypes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 活动类型ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        '200':
+          description: 成功更新活动类型状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseActivityType'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 活动类型不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权限访问
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ActivityType:
+      type: object
+      required:
+        - id
+        - name
+        - status
+        - sort
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 活动类型ID
+        name:
+          type: string
+          maxLength: 100
+          description: 活动类型名称
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 活动类型描述
+        status:
+          type: string
+          enum: [ENABLED, DISABLED, DELETED]
+          description: 状态
+        sort:
+          type: integer
+          description: 排序号
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: 删除时间（软删除时记录）
+        createdBy:
+          type: string
+          nullable: true
+          description: 创建人
+        updatedBy:
+          type: string
+          nullable: true
+          description: 更新人
+
+    CreateActivityTypeRequest:
+      type: object
+      required:
+        - name
+        - sort
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: 活动类型名称
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 活动类型描述
+        sort:
+          type: integer
+          description: 排序号
+
+    UpdateActivityTypeRequest:
+      type: object
+      required:
+        - name
+        - sort
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: 活动类型名称
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 活动类型描述
+        sort:
+          type: integer
+          description: 排序号
+
+    UpdateStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ENABLED, DISABLED]
+          description: 目标状态
+
+    ApiResponseActivityType:
+      type: object
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          $ref: '#/components/schemas/ActivityType'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ActivityTypeListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+      properties:
+        success:
+          type: boolean
+          description: 是否成功
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityType'
+          description: 活动类型列表
+        total:
+          type: integer
+          description: 总数
+        message:
+          type: string
+          nullable: true
+          description: 消息
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误类型
+        message:
+          type: string
+          description: 错误消息
+        details:
+          type: object
+          nullable: true
+          description: 错误详情
+

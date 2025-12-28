@@ -36,17 +36,35 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'antd', 'react-router-dom'],
+    include: ['react', 'react-dom', 'antd', 'react-router-dom', 'zustand', '@tanstack/react-query'],
   },
   server: {
     port: 3000,
     host: true,
+    // 代理配置：将前端 /api 请求代理到后端 Spring Boot 服务
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
+        // 可选：打印代理日志便于调试
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('❌ Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('→ Sending Request:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('← Received Response:', proxyRes.statusCode, req.url);
+          });
+        },
       },
     },
+  },
+  // Vitest configuration
+  define: {
+    __VUE_OPTIONS_API__: false,
+    __VUE_PROD_DEVTOOLS__: false,
   },
 })

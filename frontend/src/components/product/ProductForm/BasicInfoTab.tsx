@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
-import { useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { MaterialType } from '@/types';
 
 const { Title, Text } = Typography;
@@ -50,9 +50,16 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.name ? 'error' : undefined}
                 help={errors.name?.message as string}
               >
-                <Input
-                  placeholder="请输入商品名称"
-                  {...control.register('name')}
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id="field-name"
+                      placeholder="请输入商品名称"
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -62,9 +69,15 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.shortTitle ? 'error' : undefined}
                 help={errors.shortTitle?.message as string}
               >
-                <Input
-                  placeholder="请输入短标题（可选）"
-                  {...control.register('shortTitle')}
+                <Controller
+                  name="shortTitle"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="请输入短标题（可选）"
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -78,17 +91,23 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.categoryId ? 'error' : undefined}
                 help={errors.categoryId?.message as string}
               >
-                <Select
-                  placeholder="请选择商品类目"
-                  {...control.register('categoryId')}
-                  onChange={(value) => setValue('categoryId', value)}
-                >
+                <Controller
+                  name="categoryId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      id="field-categoryId"
+                      placeholder="请选择商品类目"
+                    >
                   <Option value="food">食品</Option>
                   <Option value="beverage">饮料</Option>
                   <Option value="merchandise">商品</Option>
                   <Option value="ticket">票券</Option>
                   <Option value="service">服务</Option>
-                </Select>
+                    </Select>
+                  )}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -98,17 +117,22 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.materialType ? 'error' : undefined}
                 help={errors.materialType?.message as string}
               >
-                <Select
-                  placeholder="请选择物料类型"
-                  {...control.register('materialType')}
-                  onChange={(value) => setValue('materialType', value)}
-                >
+                <Controller
+                  name="materialType"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="请选择物料类型"
+                    >
                   <Option value="raw_material">原材料</Option>
                   <Option value="semi_finished">半成品</Option>
                   <Option value="finished_goods">成品</Option>
                   <Option value="consumable">消耗品</Option>
                   <Option value="packaging">包装材料</Option>
-                </Select>
+                    </Select>
+                  )}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -118,10 +142,16 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
             validateStatus={errors.description ? 'error' : undefined}
             help={errors.description?.message as string}
           >
-            <TextArea
-              rows={3}
-              placeholder="请输入商品描述（可选）"
-              {...control.register('description')}
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <TextArea
+                  {...field}
+                  rows={3}
+                  placeholder="请输入商品描述（可选）"
+                />
+              )}
             />
           </Form.Item>
         </div>
@@ -141,17 +171,25 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.basePrice ? 'error' : undefined}
                 help={errors.basePrice?.message as string}
               >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0.00"
-                  min={0}
-                  max={999999}
-                  precision={2}
-                  addonBefore="¥"
-                  {...control.register('basePrice', {
-                    valueAsNumber: true
-                  })}
-                  onChange={(value) => setValue('basePrice', value || 0)}
+                <Controller
+                  name="basePrice"
+                  control={control}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      id="field-basePrice"
+                      style={{ width: '100%' }}
+                      placeholder="0.00"
+                      min={0}
+                      max={999999}
+                      precision={2}
+                      addonBefore="¥"
+                      value={field.value || 0}
+                      onChange={(value) => {
+                        field.onChange(value || 0);
+                      }}
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -161,12 +199,15 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.unit ? 'error' : undefined}
                 help={errors.unit?.message as string}
               >
-                <Select
-                  placeholder="请选择单位"
-                  {...control.register('unit')}
-                  onChange={(value) => setValue('unit', value)}
-                  allowClear
-                >
+                <Controller
+                  name="unit"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="请选择单位"
+                      allowClear
+                    >
                   <Option value="个">个</Option>
                   <Option value="件">件</Option>
                   <Option value="盒">盒</Option>
@@ -179,7 +220,9 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   <Option value="克">克</Option>
                   <Option value="升">升</Option>
                   <Option value="毫升">毫升</Option>
-                </Select>
+                    </Select>
+                  )}
+                />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -188,9 +231,15 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.brand ? 'error' : undefined}
                 help={errors.brand?.message as string}
               >
-                <Input
-                  placeholder="请输入品牌（可选）"
-                  {...control.register('brand')}
+                <Controller
+                  name="brand"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="请输入品牌（可选）"
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -214,17 +263,24 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.weight ? 'error' : undefined}
                 help={errors.weight?.message as string}
               >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0.00"
-                  min={0}
-                  max={1000000}
-                  precision={3}
-                  step={0.001}
-                  {...control.register('weight', {
-                    valueAsNumber: true
-                  })}
-                  onChange={(value) => setValue('weight', value || undefined)}
+                <Controller
+                  name="weight"
+                  control={control}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      style={{ width: '100%' }}
+                      placeholder="0.00"
+                      min={0}
+                      max={1000000}
+                      precision={3}
+                      step={0.001}
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value || undefined);
+                      }}
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -234,17 +290,24 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.volume ? 'error' : undefined}
                 help={errors.volume?.message as string}
               >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0.00"
-                  min={0}
-                  max={1000000}
-                  precision={4}
-                  step={0.0001}
-                  {...control.register('volume', {
-                    valueAsNumber: true
-                  })}
-                  onChange={(value) => setValue('volume', value || undefined)}
+                <Controller
+                  name="volume"
+                  control={control}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      style={{ width: '100%' }}
+                      placeholder="0.00"
+                      min={0}
+                      max={1000000}
+                      precision={4}
+                      step={0.0001}
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value || undefined);
+                      }}
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -254,16 +317,23 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.shelfLife ? 'error' : undefined}
                 help={errors.shelfLife?.message as string}
               >
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0"
-                  min={0}
-                  max={36500}
-                  precision={0}
-                  {...control.register('shelfLife', {
-                    valueAsNumber: true
-                  })}
-                  onChange={(value) => setValue('shelfLife', value || undefined)}
+                <Controller
+                  name="shelfLife"
+                  control={control}
+                  render={({ field }) => (
+                    <InputNumber
+                      {...field}
+                      style={{ width: '100%' }}
+                      placeholder="0"
+                      min={0}
+                      max={36500}
+                      precision={0}
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value || undefined);
+                      }}
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -273,9 +343,15 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.barcode ? 'error' : undefined}
                 help={errors.barcode?.message as string}
               >
-                <Input
-                  placeholder="请输入条形码"
-                  {...control.register('barcode')}
+                <Controller
+                  name="barcode"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      placeholder="请输入条形码"
+                    />
+                  )}
                 />
               </Form.Item>
             </Col>
@@ -286,9 +362,15 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
             validateStatus={errors.storageCondition ? 'error' : undefined}
             help={errors.storageCondition?.message as string}
           >
-            <Input
-              placeholder="请输入储存条件（可选）"
-              {...control.register('storageCondition')}
+            <Controller
+              name="storageCondition"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="请输入储存条件（可选）"
+                />
+              )}
             />
           </Form.Item>
         </div>
@@ -308,18 +390,23 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 validateStatus={errors.status ? 'error' : undefined}
                 help={errors.status?.message as string}
               >
-                <Select
-                  placeholder="请选择商品状态"
-                  {...control.register('status')}
-                  onChange={(value) => setValue('status', value)}
-                >
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      placeholder="请选择商品状态"
+                    >
                   <Option value="draft">草稿</Option>
                   <Option value="active">上架</Option>
                   <Option value="inactive">下架</Option>
                   <Option value="pending">待审核</Option>
                   <Option value="rejected">已驳回</Option>
                   <Option value="discontinued">已停产</Option>
-                </Select>
+                    </Select>
+                  )}
+                />
               </Form.Item>
             </Col>
           </Row>

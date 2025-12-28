@@ -393,3 +393,6 @@ export const useProductCountByStatus = () => {
     return acc;
   }, {} as Record<string, number>);
 };
+
+// 导出别名，方便旧代码兼容
+export const useProductStore = useProductListStore;

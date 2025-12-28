@@ -179,3 +179,4 @@ export interface AppState {
 
 // 导出所有类型
 export * from './product';
+export * from './reservationOrder';

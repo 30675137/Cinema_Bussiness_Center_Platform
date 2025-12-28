@@ -1,0 +1,1023 @@
+/**
+ * SKU测试数据 - 影院酒吧场景
+ * @since P001-sku-master-data
+ *
+ * 数据结构：
+ * - 5个原料 SKU (威士忌、可乐糖浆、薄荷叶、玉米粒、黄油)
+ * - 5个包材 SKU (玻璃杯、纸杯、吸管、爆米花桶(大)、爆米花袋(小))
+ * - 8个成品 SKU (含BOM配置)
+ * - 3个套餐 SKU (含子项配置)
+ */
+
+import type { SKU, BomComponent, ComboItem, SkuType, SkuStatus } from '@/types/sku';
+
+// ==================== 原料 SKU (5个) ====================
+
+export const rawMaterials: SKU[] = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440001',
+    code: '6901234567001',
+    name: '威士忌',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [], // 全门店可用
+    standardCost: 50.00, // 50元/瓶
+    wasteRate: 0,
+    spuId: 'spu-whisky',
+    spuName: '威士忌',
+    brand: '芝华士',
+    category: '酒水 > 烈酒',
+    categoryId: 'cat-spirits',
+    spec: '700ml',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567001',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440002',
+    code: '6901234567002',
+    name: '可乐糖浆',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 30.00, // 30元/瓶
+    wasteRate: 0,
+    spuId: 'spu-cola-syrup',
+    spuName: '可乐糖浆',
+    brand: '可口可乐',
+    category: '饮料 > 糖浆',
+    categoryId: 'cat-syrup',
+    spec: '2L',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567002',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440003',
+    code: '6901234567003',
+    name: '薄荷叶',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 5.00, // 5元/袋
+    wasteRate: 0,
+    spuId: 'spu-mint',
+    spuName: '薄荷叶',
+    brand: '新鲜原料',
+    category: '配料 > 香料',
+    categoryId: 'cat-spices',
+    spec: '50g',
+    mainUnit: 'g',
+    mainUnitId: 'unit-g',
+    salesUnits: [],
+    mainBarcode: '6901234567003',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440004',
+    code: '6901234567004',
+    name: '玉米粒',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 15.00, // 15元/kg
+    wasteRate: 0,
+    spuId: 'spu-corn',
+    spuName: '玉米粒',
+    brand: '金黄玉米',
+    category: '食材 > 谷物',
+    categoryId: 'cat-grain',
+    spec: '1kg',
+    mainUnit: 'g',
+    mainUnitId: 'unit-g',
+    salesUnits: [],
+    mainBarcode: '6901234567004',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440005',
+    code: '6901234567005',
+    name: '黄油',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 25.00, // 25元/块
+    wasteRate: 0,
+    spuId: 'spu-butter',
+    spuName: '黄油',
+    brand: '安佳',
+    category: '食材 > 油脂',
+    categoryId: 'cat-oil',
+    spec: '500g',
+    mainUnit: 'g',
+    mainUnitId: 'unit-g',
+    salesUnits: [],
+    mainBarcode: '6901234567005',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  }
+];
+
+// ==================== 包材 SKU (5个) ====================
+
+export const packagingMaterials: SKU[] = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440011',
+    code: '6901234567011',
+    name: '玻璃杯',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 8.00, // 8元/个
+    wasteRate: 0,
+    spuId: 'spu-glass-cup',
+    spuName: '玻璃杯',
+    brand: '优质玻璃',
+    category: '包材 > 杯具',
+    categoryId: 'cat-cups',
+    spec: '300ml',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567011',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440012',
+    code: '6901234567012',
+    name: '纸杯',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 0.50, // 0.5元/个
+    wasteRate: 0,
+    spuId: 'spu-paper-cup',
+    spuName: '纸杯',
+    brand: '环保纸杯',
+    category: '包材 > 杯具',
+    categoryId: 'cat-cups',
+    spec: '500ml',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567012',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440013',
+    code: '6901234567013',
+    name: '吸管',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 0.10, // 0.1元/根
+    wasteRate: 0,
+    spuId: 'spu-straw',
+    spuName: '吸管',
+    brand: '环保吸管',
+    category: '包材 > 配件',
+    categoryId: 'cat-accessories',
+    spec: '标准',
+    mainUnit: '根',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567013',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440014',
+    code: '6901234567014',
+    name: '爆米花桶(大)',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 1.50, // 1.5元/个
+    wasteRate: 0,
+    spuId: 'spu-popcorn-bucket-large',
+    spuName: '爆米花桶(大)',
+    brand: '影院包材',
+    category: '包材 > 容器',
+    categoryId: 'cat-containers',
+    spec: '大号',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567014',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440015',
+    code: '6901234567015',
+    name: '爆米花袋(小)',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 0.80, // 0.8元/个
+    wasteRate: 0,
+    spuId: 'spu-popcorn-bag-small',
+    spuName: '爆米花袋(小)',
+    brand: '影院包材',
+    category: '包材 > 容器',
+    categoryId: 'cat-containers',
+    spec: '小号',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567015',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  }
+];
+
+// ==================== 成品 SKU (8个) ====================
+
+export const finishedProducts: SKU[] = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440021',
+    code: '6901234567021',
+    name: '威士忌可乐',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 29.93, // 自动计算: (50ml*0.071 + 200ml*0.015 + 8 + 0.1) * 1.05
+    wasteRate: 5.0, // 5%损耗率
+    spuId: 'spu-whisky-cola',
+    spuName: '威士忌可乐',
+    brand: '自制饮品',
+    category: '酒水 > 调酒',
+    categoryId: 'cat-cocktail',
+    spec: '标准杯',
+    mainUnit: '杯',
+    mainUnitId: 'unit-cup',
+    salesUnits: [],
+    mainBarcode: '6901234567021',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440022',
+    code: '6901234567022',
+    name: '薄荷威士忌',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 26.78, // (50ml*0.071 + 3g*0.1 + 8 + 0.1) * 1.05
+    wasteRate: 5.0,
+    spuId: 'spu-mint-whisky',
+    spuName: '薄荷威士忌',
+    brand: '自制饮品',
+    category: '酒水 > 调酒',
+    categoryId: 'cat-cocktail',
+    spec: '标准杯',
+    mainUnit: '杯',
+    mainUnitId: 'unit-cup',
+    salesUnits: [],
+    mainBarcode: '6901234567022',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440023',
+    code: '6901234567023',
+    name: '冰镇可乐',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 3.78, // (300ml*0.015 + 0.5 + 0.1) * 1.05
+    wasteRate: 5.0,
+    spuId: 'spu-iced-cola',
+    spuName: '冰镇可乐',
+    brand: '自制饮品',
+    category: '饮料 > 碳酸饮料',
+    categoryId: 'cat-soft-drink',
+    spec: '中杯',
+    mainUnit: '杯',
+    mainUnitId: 'unit-cup',
+    salesUnits: [],
+    mainBarcode: '6901234567023',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440024',
+    code: '6901234567024',
+    name: '听装可乐',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 3.50, // 直接包装，无BOM
+    wasteRate: 0,
+    spuId: 'spu-canned-cola',
+    spuName: '听装可乐',
+    brand: '可口可乐',
+    category: '饮料 > 碳酸饮料',
+    categoryId: 'cat-soft-drink',
+    spec: '330ml',
+    mainUnit: '听',
+    mainUnitId: 'unit-can',
+    salesUnits: [],
+    mainBarcode: '6901234567024',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440025',
+    code: '6901234567025',
+    name: '瓶装啤酒',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 8.00, // 直接包装，无BOM
+    wasteRate: 0,
+    spuId: 'spu-bottled-beer',
+    spuName: '瓶装啤酒',
+    brand: '青岛啤酒',
+    category: '酒水 > 啤酒',
+    categoryId: 'cat-beer',
+    spec: '500ml',
+    mainUnit: '瓶',
+    mainUnitId: 'unit-bottle',
+    salesUnits: [],
+    mainBarcode: '6901234567025',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440026',
+    code: '6901234567026',
+    name: '奶油爆米花(大)',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 7.40, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
+    wasteRate: 5.0,
+    spuId: 'spu-butter-popcorn-large',
+    spuName: '奶油爆米花(大)',
+    brand: '影院小食',
+    category: '小食 > 爆米花',
+    categoryId: 'cat-popcorn',
+    spec: '大份',
+    mainUnit: '桶',
+    mainUnitId: 'unit-bucket',
+    salesUnits: [],
+    mainBarcode: '6901234567026',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440027',
+    code: '6901234567027',
+    name: '黄油爆米花(大)',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 7.40, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
+    wasteRate: 5.0,
+    spuId: 'spu-butter-popcorn-large-2',
+    spuName: '黄油爆米花(大)',
+    brand: '影院小食',
+    category: '小食 > 爆米花',
+    categoryId: 'cat-popcorn',
+    spec: '大份',
+    mainUnit: '桶',
+    mainUnitId: 'unit-bucket',
+    salesUnits: [],
+    mainBarcode: '6901234567027',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440028',
+    code: '6901234567028',
+    name: '焦糖爆米花(小)',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    standardCost: 4.20, // (50g*0.015 + 10g*0.05 + 0.8) * 1.05
+    wasteRate: 5.0,
+    spuId: 'spu-caramel-popcorn-small',
+    spuName: '焦糖爆米花(小)',
+    brand: '影院小食',
+    category: '小食 > 爆米花',
+    categoryId: 'cat-popcorn',
+    spec: '小份',
+    mainUnit: '袋',
+    mainUnitId: 'unit-bag',
+    salesUnits: [],
+    mainBarcode: '6901234567028',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  }
+];
+
+// ==================== 套餐 SKU (3个) ====================
+
+export const comboProducts: SKU[] = [
+  {
+    id: '550e8400-e29b-41d4-a716-446655440031',
+    code: '6901234567031',
+    name: '经典观影套餐',
+    skuType: 'combo' as SkuType,
+    storeScope: [],
+    standardCost: 11.20, // 奶油爆米花(大) 7.40 + 听装可乐 3.50 = 10.90, 向上取整
+    wasteRate: 0,
+    spuId: 'spu-classic-combo',
+    spuName: '经典观影套餐',
+    brand: '影院套餐',
+    category: '套餐 > 观影套餐',
+    categoryId: 'cat-combo',
+    spec: '标准',
+    mainUnit: '份',
+    mainUnitId: 'unit-set',
+    salesUnits: [],
+    mainBarcode: '6901234567031',
+    otherBarcodes: [],
+    manageInventory: false, // 套餐不管理库存
+    allowNegativeStock: true,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440032',
+    code: '6901234567032',
+    name: '豪华观影套餐',
+    skuType: 'combo' as SkuType,
+    storeScope: [],
+    standardCost: 45.93, // 威士忌可乐 29.93 + 奶油爆米花(大) 7.40 + 瓶装啤酒 8.00 = 45.33
+    wasteRate: 0,
+    spuId: 'spu-premium-combo',
+    spuName: '豪华观影套餐',
+    brand: '影院套餐',
+    category: '套餐 > 观影套餐',
+    categoryId: 'cat-combo',
+    spec: '豪华',
+    mainUnit: '份',
+    mainUnitId: 'unit-set',
+    salesUnits: [],
+    mainBarcode: '6901234567032',
+    otherBarcodes: [],
+    manageInventory: false,
+    allowNegativeStock: true,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440033',
+    code: '6901234567033',
+    name: '情侣畅饮套餐',
+    skuType: 'combo' as SkuType,
+    storeScope: [],
+    standardCost: 56.71, // 威士忌可乐*2 29.93*2 + 薄荷威士忌 26.78 = 86.64, 但这里算两杯
+    wasteRate: 0,
+    spuId: 'spu-couple-combo',
+    spuName: '情侣畅饮套餐',
+    brand: '影院套餐',
+    category: '套餐 > 观影套餐',
+    categoryId: 'cat-combo',
+    spec: '情侣',
+    mainUnit: '份',
+    mainUnitId: 'unit-set',
+    salesUnits: [],
+    mainBarcode: '6901234567033',
+    otherBarcodes: [],
+    manageInventory: false,
+    allowNegativeStock: true,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统'
+  }
+];
+
+// ==================== BOM 配置 (成品SKU的配方) ====================
+
+export const bomConfigurations: Record<string, BomComponent[]> = {
+  // 威士忌可乐的BOM
+  '550e8400-e29b-41d4-a716-446655440021': [
+    {
+      id: 'bom-001-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440021',
+      componentId: '550e8400-e29b-41d4-a716-446655440001', // 威士忌
+      quantity: 50,
+      unit: 'ml',
+      unitCost: 0.071, // 50ml * (50元/700ml) = 3.57
+      totalCost: 3.57,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-001-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440021',
+      componentId: '550e8400-e29b-41d4-a716-446655440002', // 可乐糖浆
+      quantity: 200,
+      unit: 'ml',
+      unitCost: 0.015, // 30元/2000ml = 0.015元/ml
+      totalCost: 3.00,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-001-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440021',
+      componentId: '550e8400-e29b-41d4-a716-446655440011', // 玻璃杯
+      quantity: 1,
+      unit: '个',
+      unitCost: 8.00,
+      totalCost: 8.00,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-001-04',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440021',
+      componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
+      quantity: 1,
+      unit: '根',
+      unitCost: 0.10,
+      totalCost: 0.10,
+      isOptional: false,
+      sortOrder: 4,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 薄荷威士忌的BOM
+  '550e8400-e29b-41d4-a716-446655440022': [
+    {
+      id: 'bom-002-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440022',
+      componentId: '550e8400-e29b-41d4-a716-446655440001', // 威士忌
+      quantity: 50,
+      unit: 'ml',
+      unitCost: 0.071,
+      totalCost: 3.57,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-002-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440022',
+      componentId: '550e8400-e29b-41d4-a716-446655440003', // 薄荷叶
+      quantity: 3,
+      unit: 'g',
+      unitCost: 0.10, // 5元/50g = 0.1元/g
+      totalCost: 0.30,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-002-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440022',
+      componentId: '550e8400-e29b-41d4-a716-446655440011', // 玻璃杯
+      quantity: 1,
+      unit: '个',
+      unitCost: 8.00,
+      totalCost: 8.00,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-002-04',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440022',
+      componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
+      quantity: 1,
+      unit: '根',
+      unitCost: 0.10,
+      totalCost: 0.10,
+      isOptional: false,
+      sortOrder: 4,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 冰镇可乐的BOM
+  '550e8400-e29b-41d4-a716-446655440023': [
+    {
+      id: 'bom-003-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440023',
+      componentId: '550e8400-e29b-41d4-a716-446655440002', // 可乐糖浆
+      quantity: 300,
+      unit: 'ml',
+      unitCost: 0.015,
+      totalCost: 4.50,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-003-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440023',
+      componentId: '550e8400-e29b-41d4-a716-446655440012', // 纸杯
+      quantity: 1,
+      unit: '个',
+      unitCost: 0.50,
+      totalCost: 0.50,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-003-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440023',
+      componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
+      quantity: 1,
+      unit: '根',
+      unitCost: 0.10,
+      totalCost: 0.10,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 奶油爆米花(大)的BOM
+  '550e8400-e29b-41d4-a716-446655440026': [
+    {
+      id: 'bom-006-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440026',
+      componentId: '550e8400-e29b-41d4-a716-446655440004', // 玉米粒
+      quantity: 100,
+      unit: 'g',
+      unitCost: 0.015, // 15元/1000g
+      totalCost: 1.50,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-006-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440026',
+      componentId: '550e8400-e29b-41d4-a716-446655440005', // 黄油
+      quantity: 20,
+      unit: 'g',
+      unitCost: 0.05, // 25元/500g
+      totalCost: 1.00,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-006-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440026',
+      componentId: '550e8400-e29b-41d4-a716-446655440014', // 爆米花桶(大)
+      quantity: 1,
+      unit: '个',
+      unitCost: 1.50,
+      totalCost: 1.50,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 黄油爆米花(大)的BOM (与奶油爆米花相同配方)
+  '550e8400-e29b-41d4-a716-446655440027': [
+    {
+      id: 'bom-007-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440027',
+      componentId: '550e8400-e29b-41d4-a716-446655440004', // 玉米粒
+      quantity: 100,
+      unit: 'g',
+      unitCost: 0.015,
+      totalCost: 1.50,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-007-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440027',
+      componentId: '550e8400-e29b-41d4-a716-446655440005', // 黄油
+      quantity: 20,
+      unit: 'g',
+      unitCost: 0.05,
+      totalCost: 1.00,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-007-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440027',
+      componentId: '550e8400-e29b-41d4-a716-446655440014', // 爆米花桶(大)
+      quantity: 1,
+      unit: '个',
+      unitCost: 1.50,
+      totalCost: 1.50,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 焦糖爆米花(小)的BOM
+  '550e8400-e29b-41d4-a716-446655440028': [
+    {
+      id: 'bom-008-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440028',
+      componentId: '550e8400-e29b-41d4-a716-446655440004', // 玉米粒
+      quantity: 50,
+      unit: 'g',
+      unitCost: 0.015,
+      totalCost: 0.75,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-008-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440028',
+      componentId: '550e8400-e29b-41d4-a716-446655440005', // 黄油
+      quantity: 10,
+      unit: 'g',
+      unitCost: 0.05,
+      totalCost: 0.50,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'bom-008-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440028',
+      componentId: '550e8400-e29b-41d4-a716-446655440015', // 爆米花袋(小)
+      quantity: 1,
+      unit: '个',
+      unitCost: 0.80,
+      totalCost: 0.80,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ]
+};
+
+// ==================== 套餐子项配置 ====================
+
+export const comboConfigurations: Record<string, ComboItem[]> = {
+  // 经典观影套餐
+  '550e8400-e29b-41d4-a716-446655440031': [
+    {
+      id: 'combo-001-01',
+      comboId: '550e8400-e29b-41d4-a716-446655440031',
+      subItemId: '550e8400-e29b-41d4-a716-446655440026', // 奶油爆米花(大)
+      quantity: 1,
+      unit: '桶',
+      unitCost: 7.40,
+      totalCost: 7.40,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'combo-001-02',
+      comboId: '550e8400-e29b-41d4-a716-446655440031',
+      subItemId: '550e8400-e29b-41d4-a716-446655440024', // 听装可乐
+      quantity: 1,
+      unit: '听',
+      unitCost: 3.50,
+      totalCost: 3.50,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 豪华观影套餐
+  '550e8400-e29b-41d4-a716-446655440032': [
+    {
+      id: 'combo-002-01',
+      comboId: '550e8400-e29b-41d4-a716-446655440032',
+      subItemId: '550e8400-e29b-41d4-a716-446655440021', // 威士忌可乐
+      quantity: 1,
+      unit: '杯',
+      unitCost: 29.93,
+      totalCost: 29.93,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'combo-002-02',
+      comboId: '550e8400-e29b-41d4-a716-446655440032',
+      subItemId: '550e8400-e29b-41d4-a716-446655440026', // 奶油爆米花(大)
+      quantity: 1,
+      unit: '桶',
+      unitCost: 7.40,
+      totalCost: 7.40,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'combo-002-03',
+      comboId: '550e8400-e29b-41d4-a716-446655440032',
+      subItemId: '550e8400-e29b-41d4-a716-446655440025', // 瓶装啤酒
+      quantity: 1,
+      unit: '瓶',
+      unitCost: 8.00,
+      totalCost: 8.00,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ],
+
+  // 情侣畅饮套餐
+  '550e8400-e29b-41d4-a716-446655440033': [
+    {
+      id: 'combo-003-01',
+      comboId: '550e8400-e29b-41d4-a716-446655440033',
+      subItemId: '550e8400-e29b-41d4-a716-446655440021', // 威士忌可乐
+      quantity: 2,
+      unit: '杯',
+      unitCost: 29.93,
+      totalCost: 59.86,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z'
+    },
+    {
+      id: 'combo-003-02',
+      comboId: '550e8400-e29b-41d4-a716-446655440033',
+      subItemId: '550e8400-e29b-41d4-a716-446655440022', // 薄荷威士忌
+      quantity: 1,
+      unit: '杯',
+      unitCost: 26.78,
+      totalCost: 26.78,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z'
+    }
+  ]
+};
+
+// ==================== 导出所有测试数据 ====================
+
+export const allTestSkus: SKU[] = [
+  ...rawMaterials,
+  ...packagingMaterials,
+  ...finishedProducts,
+  ...comboProducts
+];
+
+export const testDataSummary = {
+  totalSkus: allTestSkus.length,
+  rawMaterials: rawMaterials.length,
+  packaging: packagingMaterials.length,
+  finishedProducts: finishedProducts.length,
+  combos: comboProducts.length,
+  bomConfigurations: Object.keys(bomConfigurations).length,
+  comboConfigurations: Object.keys(comboConfigurations).length
+};
+
+console.log('SKU测试数据加载完成:', testDataSummary);

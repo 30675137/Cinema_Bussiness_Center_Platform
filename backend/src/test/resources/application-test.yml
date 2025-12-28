@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: cinema-hall-store-backend-test
+
+  # 测试环境数据源配置
+  datasource:
+    url: jdbc:postgresql://aws-0-us-east-2.pooler.supabase.com:6543/postgres
+    username: postgres.fxhgyxceqrmnpezluaht
+    password: ppkZ8sGUEHB0qjFs
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 1
+      connection-timeout: 30000
+
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate # 测试环境使用 validate，不自动创建表
+    show-sql: false # 减少测试日志输出
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+server:
+  port: 0 # 随机端口，避免测试冲突
+
+supabase:
+  url: https://fxhgyxceqrmnpezluaht.supabase.co
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:test-key}
+  api-timeout: 30000
+  storage:
+    bucket: scenario-packages-test
+    base-url: https://fxhgyxceqrmnpezluaht.supabase.co/storage/v1
+
+# 日志配置
+logging:
+  level:
+    root: WARN
+    com.cinema.scenariopackage: DEBUG
+    org.springframework.test: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

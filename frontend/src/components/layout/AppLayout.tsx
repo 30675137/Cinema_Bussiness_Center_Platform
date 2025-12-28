@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Button, Avatar, Dropdown, Breadcrumb, Space, Badge, Tooltip } from 'antd';
-import type { MenuProps } from 'antd';
+import type { MenuProps as AntdMenuProps } from 'antd/es/menu';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -14,6 +14,17 @@ import {
   DollarOutlined,
   AuditOutlined,
   DatabaseOutlined,
+  ControlOutlined,
+  ReconciliationOutlined,
+  GoldOutlined,
+  CalendarOutlined,
+  FileTextOutlined,
+  BarChartOutlined,
+  SafetyOutlined,
+  ShoppingCartOutlined,
+  InboxOutlined,
+  StockOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore, useCurrentUser, useSidebarCollapsed, useBreadcrumbs } from '@/stores/appStore';
@@ -32,7 +43,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const breadcrumbs = useBreadcrumbs();
   const { toggleSidebar } = useAppStore();
 
-  // 菜单项配置
+  // 菜单项配置 - 影院业务中台完整菜单
   const menuItems = [
     {
       key: '/dashboard',
@@ -40,62 +51,401 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '工作台',
     },
     {
-      key: '/products',
-      icon: <ShoppingOutlined />,
-      label: '商品管理',
+      key: '/basic-settings',
+      icon: <ControlOutlined />,
+      label: '基础设置与主数据',
       children: [
         {
-          key: '/products/list',
-          label: '商品列表',
+          key: '/basic-settings/organization',
+          label: '组织/门店/仓库管理',
         },
         {
-          key: '/products/create',
-          label: '创建商品',
+          key: '/basic-settings/units',
+          label: '单位 & 换算规则管理',
+        },
+        {
+          key: '/basic-settings/dictionary',
+          label: '字典与规则配置',
+        },
+        {
+          key: '/basic-settings/roles',
+          label: '角色与权限管理',
+        },
+        {
+          key: '/basic-settings/approval',
+          label: '审批流配置',
+        },
+      ],
+    },
+    {
+      key: '/products',
+      icon: <ShoppingOutlined />,
+      label: '商品管理 (MDM/PIM)',
+      children: [
+        {
+          key: '/mdm-pim/category',
+          label: '类目管理',
+        },
+        {
+          key: '/mdm-pim/brands',
+          label: 'P001-品牌管理',
+        },
+        {
+          key: '/mdm-pim/attribute',
+          label: '属性字典管理',
+        },
+        {
+          key: '/products/spu',
+          label: 'P001-SPU 管理',
+        },
+        
+        {
+          key: '/products/sku',
+          label: 'P001-SKU 管理',
+        },
+        {
+          key: '/products/attributes',
+          label: '属性/规格/条码设置',
+        },
+        {
+          key: '/products/status',
+          label: '商品状态/上下架管理',
+        },
+        {
+          key: '/products/content',
+          label: '内容编辑',
+        },
+        {
+          key: '/products/media',
+          label: '素材库管理',
+        },
+        {
+          key: '/products/channel-mapping',
+          label: '渠道映射字段管理',
+        },
+        {
+          key: '/products/publish',
+          label: '内容发布/审核/版本管理',
+        },
+      ],
+    },
+    {
+      key: '/bom',
+      icon: <ReconciliationOutlined />,
+      label: 'BOM/配方 & 成本管理',
+      children: [
+        {
+          key: '/bom/materials',
+          label: '原料库/物料主数据',
+        },
+        {
+          key: '/bom/formula',
+          label: 'BOM/配方配置',
+        },
+        {
+          key: '/bom/conversion',
+          label: '单位换算/损耗率配置',
+        },
+        {
+          key: '/bom/cost',
+          label: '成本/毛利预估与校验',
+        },
+        {
+          key: '/bom/version',
+          label: 'BOM/配方版本管理',
+        },
+      ],
+    },
+    {
+      key: '/scenario-package',
+      icon: <GoldOutlined />,
+      label: '场景包/套餐管理',
+      children: [
+        {
+          key: '/scenario-packages',
+          label: '17-场景包模板管理',
+        },
+        {
+          key: '/scenario-package/template',
+          label: '场景包模板管理',
+        },
+        {
+          key: '/scenario-package/resources',
+          label: '适用资源/影厅/门店规则',
+        },
+        {
+          key: '/scenario-package/content',
+          label: '内容组合配置',
+        },
+        {
+          key: '/scenario-package/add-on',
+          label: '加购策略管理',
+        },
+        {
+          key: '/scenario-package/pricing',
+          label: '定价策略配置',
+        },
+        {
+          key: '/scenario-package/package-price',
+          label: '包装价格 & 一口价设定',
+        },
+        {
+          key: '/scenario-package/version',
+          label: '场景包版本管理',
         },
       ],
     },
     {
       key: '/pricing',
       icon: <DollarOutlined />,
-      label: '价格配置',
+      label: '价格体系管理',
       children: [
         {
-          key: '/pricing/configs',
-          label: '价格配置单',
+          key: '/pricing/price-list',
+          label: '价目表管理',
         },
         {
-          key: '/pricing/preview',
-          label: '价格预览',
+          key: '/pricing/audit',
+          label: '价格审核与生效',
+        },
+        {
+          key: '/pricing/rules',
+          label: '价格规则配置',
         },
       ],
     },
     {
-      key: '/audit',
-      icon: <AuditOutlined />,
-      label: '审核流程',
+      key: '/procurement',
+      icon: <ShoppingCartOutlined />,
+      label: '采购与入库管理',
       children: [
         {
-          key: '/audit/pending',
-          label: '待审核',
+          key: '/purchase-management/suppliers',
+          label: '供应商管理',
         },
         {
-          key: '/audit/history',
-          label: '审核历史',
+          key: '/purchase-management/orders',
+          label: '采购订单 (PO)',
+        },
+        {
+          key: '/purchase-management/orders/list',
+          label: '采购订单列表',
+        },
+        {
+          key: '/purchase-management/receipts/create',
+          label: '新建收货入库',
+        },
+        {
+          key: '/purchase-management/receipts',
+          label: '到货验收 & 收货入库',
+        },
+        {
+          key: '/procurement/exceptions',
+          label: '异常/短缺/拒收/报损登记',
+        },
+        {
+          key: '/procurement/history',
+          label: '入库单历史/查询',
+        },
+        {
+          key: '/procurement/transfer',
+          label: '调拨管理',
         },
       ],
     },
     {
       key: '/inventory',
       icon: <DatabaseOutlined />,
-      label: '库存追溯',
+      label: '库存 & 仓店库存管理',
       children: [
         {
           key: '/inventory/query',
-          label: '库存查询',
+          label: 'P003-库存查询',
         },
         {
-          key: '/inventory/transactions',
-          label: '交易流水',
+          key: '/inventory/ledger',
+          label: 'P004-库存台账查看',
+        },
+        {
+          key: '/inventory/approvals',
+          label: 'P004-库存调整审批',
+        },
+        
+        {
+          key: '/inventory/operations',
+          label: '入库/出库/报损/退库操作',
+        },
+        {
+          key: '/inventory/transfer',
+          label: '调拨管理',
+        },
+        {
+          key: '/inventory/stocktaking',
+          label: '盘点模块',
+        },
+        {
+          key: '/inventory/reservation',
+          label: '库存预占/释放管理',
+        },
+        {
+          key: '/inventory/movements',
+          label: '库存变动日志/审计',
+        },
+      ],
+    },
+    {
+      key: '/schedule',
+      icon: <CalendarOutlined />,
+      label: '档期/排期/资源预约',
+      children: [
+        {
+          key: '/stores',
+          label: '14-门店管理',
+        },
+        // 016-store-reservation-settings: 已整合到门店管理页面，移除独立菜单项
+        // {
+        //   key: '/store-reservation-settings',
+        //   label: '门店预约设置',
+        // },
+        {
+          key: '/activity-types',
+          label: '活动类型管理',
+        },
+        {
+          key: '/schedule/hall-resources',
+          label: '14-影厅资源管理',
+        },
+        {
+          key: '/schedule/gantt',
+          label: '甘特图/日历视图排期',
+        },
+        {
+          key: '/schedule/create',
+          label: '新建排期',
+        },
+        {
+          key: '/schedule/conflict',
+          label: '冲突校验/占用规则',
+        },
+        {
+          key: '/schedule/status',
+          label: '排期状态管理',
+        },
+        {
+          key: '/schedule/publish',
+          label: '渠道发布/同步',
+        },
+        {
+          key: '/schedule/changes',
+          label: '排期变更/取消/改期',
+        },
+      ],
+    },
+    {
+      key: '/beverage',
+      icon: <CoffeeOutlined />,
+      label: 'O003-饮品订单管理',
+      children: [
+        {
+          key: '/beverage/list',
+          label: 'US3-饮品配置管理',
+        },
+        {
+          key: '/beverage/orders',
+          label: 'US2-饮品订单/出品',
+        },
+      ],
+    },
+    {
+      key: '/orders',
+      icon: <FileTextOutlined />,
+      label: 'O-订单与履约管理',
+      children: [
+        {
+          key: '/orders/list',
+          label: 'U004-订单列表/状态查看',
+        },
+        {
+          key: '/orders/confirmation',
+          label: '二次确认队列',
+        },
+        {
+          key: '/orders/verification',
+          label: '核销码/到店核销',
+        },
+        {
+          key: '/orders/deduction',
+          label: '库存扣减/BOM扣原料',
+        },
+        {
+          key: '/orders/refund',
+          label: '退款/改期/取消/回滚',
+        },
+        {
+          key: '/orders/exceptions',
+          label: '异常订单/审计日志',
+        },
+        {
+          key: '/reservation-orders',
+          label: 'U001-预约单管理',
+        },
+      ],
+    },
+    {
+      key: '/operations',
+      icon: <BarChartOutlined />,
+      label: '运营 & 报表/指标看板',
+      children: [
+        {
+          key: '/operations/launch-report',
+          label: '上新/发布时效报表',
+        },
+        {
+          key: '/operations/quality-report',
+          label: '商品数据质量报表',
+        },
+        {
+          key: '/operations/inventory-accuracy',
+          label: '库存准确性/盘点差异报表',
+        },
+        {
+          key: '/operations/sales-analysis',
+          label: '销售/场景包表现分析',
+        },
+        {
+          key: '/operations/resource-utilization',
+          label: '资源利用率/影厅利用率',
+        },
+        {
+          key: '/operations/summary',
+          label: '库存&订单&收入&成本汇总',
+        },
+      ],
+    },
+    {
+      key: '/system',
+      icon: <SettingOutlined />,
+      label: '系统管理/设置/权限',
+      children: [
+        {
+          key: '/system/users',
+          label: '系统用户管理与角色权限',
+        },
+        {
+          key: '/system/audit-log',
+          label: '审计日志/操作日志查询',
+        },
+        {
+          key: '/system/parameters',
+          label: '参数与规则配置',
+        },
+        {
+          key: '/system/import-export',
+          label: '数据导入导出',
+        },
+        {
+          key: '/system/notifications',
+          label: '消息/告警管理',
         },
       ],
     },
@@ -166,7 +516,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   // 渲染面包屑
   const renderBreadcrumb = () => {
-    if (breadcrumbs.length === 0) return null;
+    // 安全检查：确保 breadcrumbs 存在且是数组
+    if (!breadcrumbs || !Array.isArray(breadcrumbs) || breadcrumbs.length === 0) {
+      return null;
+    }
 
     return (
       <Breadcrumb
@@ -223,7 +576,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 color: '#fff',
               }}
             >
-              商品管理中台
+              影院业务中台
             </span>
           )}
         </div>
@@ -292,7 +645,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
             {/* 用户信息 */}
             <Dropdown
-              menu={{ items: userMenuItems as MenuProps['items'] }}
+              menu={{ items: userMenuItems as AntdMenuProps['items'] }}
               placement="bottomRight"
               arrow
             >

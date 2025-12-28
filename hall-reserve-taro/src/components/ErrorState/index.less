@@ -1,0 +1,39 @@
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px;
+  min-height: 400px;
+  background: #ffffff;
+
+  .error-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    opacity: 0.8;
+  }
+
+  .error-message {
+    font-size: 16px;
+    color: #666666;
+    text-align: center;
+    line-height: 24px;
+    margin-bottom: 32px;
+    max-width: 300px;
+  }
+
+  .retry-button {
+    background: #1890ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 48px;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}

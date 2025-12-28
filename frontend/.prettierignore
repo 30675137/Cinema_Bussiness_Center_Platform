@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env*
+
+# Log files
+*.log
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Public assets
+public/
+
+# Config files that shouldn't be formatted
+eslint.config.js
+vite.config.ts
+tsconfig*.json

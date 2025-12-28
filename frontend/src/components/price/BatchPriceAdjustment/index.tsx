@@ -36,10 +36,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
-  useProductsQuery,
-  useBatchUpdatePriceMutation,
-  useExportPriceTemplateMutation,
-  useImportPriceMutation
+  usePricesQuery,
+  useBatchUpdatePricesMutation
 } from '@/stores/priceStore';
 import { PriceConfig, PriceType } from '@/types/price';
 import { z } from 'zod';
@@ -82,15 +80,13 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     data: productsData,
     isLoading,
     refetch
-  } = useProductsQuery({
+  } = usePricesQuery({
     keyword: searchKeyword,
     page: 1,
     pageSize: 100
   });
 
-  const batchUpdateMutation = useBatchUpdatePriceMutation();
-  const exportTemplateMutation = useExportPriceTemplateMutation();
-  const importMutation = useImportPriceMutation();
+  const batchUpdateMutation = useBatchUpdatePricesMutation();
 
   const form = useForm<BatchPriceAdjustmentData>({
     resolver: zodResolver(BatchPriceAdjustmentSchema),

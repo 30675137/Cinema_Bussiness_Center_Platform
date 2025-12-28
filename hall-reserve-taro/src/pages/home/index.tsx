@@ -1,0 +1,257 @@
+import { View, Text, Image } from '@tarojs/components'
+import Taro from '@tarojs/taro'
+import { useState, useEffect } from 'react'
+import { useAppStore } from '@/stores/appStore'
+import { THEME_CONFIG } from '@/constants'
+import type { Scenario } from '@/types'
+import ErrorState from '@/components/ErrorState'
+import EmptyState from '@/components/EmptyState'
+import './index.less'
+
+// API Base URL
+const API_BASE = 'http://192.168.10.71:8080'
+
+export default function Home() {
+  const [scenarios, setScenarios] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const setActiveScenario = useAppStore((s) => s.setActiveScenario)
+
+  useEffect(() => {
+    console.log('Home: 开始加载数据...')
+    Taro.request({
+      url: `${API_BASE}/api/scenario-packages/published`,
+      method: 'GET',
+    })
+      .then((res) => {
+        console.log('Home: API 响应', res)
+        if (res.statusCode === 200 && res.data.success) {
+          const data = res.data.data.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            image: item.image,
+            category: item.category,
+            tags: item.tags || [],
+            location: item.location || '北京·精选场馆',
+            rating: item.rating || 0,
+            packages: item.packages || [{
+              id: item.id,
+              name: '基础套餐',
+              price: item.packagePrice || 0,
+              originalPrice: item.packagePrice * 1.2,
+              desc: '',
+              tags: []
+            }]
+          }))
+          console.log('Home: 转换后数据', data)
+          setScenarios(data)
+        } else {
+          setError(new Error(res.data.message || '加载失败'))
+        }
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        console.error('Home: 请求失败', err)
+        setError(err)
+        setIsLoading(false)
+      })
+  }, [])
+
+  const refetch = () => {
+    setIsLoading(true)
+    setError(null)
+    Taro.request({
+      url: `${API_BASE}/api/scenario-packages/published`,
+      method: 'GET',
+    }).then((res) => {
+      if (res.statusCode === 200 && res.data.success) {
+        setScenarios(res.data.data)
+      }
+      setIsLoading(false)
+    }).catch((err) => {
+      setError(err)
+      setIsLoading(false)
+    })
+  }
+
+  const handleSelectScenario = (scenario: Scenario) => {
+    setActiveScenario(scenario)
+    Taro.navigateTo({ url: `/pages/detail/index?id=${scenario.id}` })
+  }
+
+  const handleOpenAdmin = () => {
+    Taro.navigateTo({ url: '/pages/admin/index' })
+  }
+
+  const handleRetry = () => {
+    refetch()
+  }
+
+  // 加载状态
+  if (isLoading) {
+    return (
+      <View className="loading-container">
+        <Text>加载中...</Text>
+      </View>
+    )
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <View className="home-page">
+        <View className="header">
+          <View className="location">
+            <Text className="icon-location">📍</Text>
+            <Text className="city">北京</Text>
+            <Text className="dot">·</Text>
+            <Text className="sub">严选场馆</Text>
+          </View>
+          <View className="settings" onClick={handleOpenAdmin}>
+            <Text>⚙️</Text>
+          </View>
+        </View>
+        <ErrorState
+          message={error instanceof Error ? error.message : '服务暂时不可用，请稍后重试'}
+          onRetry={handleRetry}
+        />
+      </View>
+    )
+  }
+
+  // 空状态
+  if (!scenarios || scenarios.length === 0) {
+    return (
+      <View className="home-page">
+        <View className="header">
+          <View className="location">
+            <Text className="icon-location">📍</Text>
+            <Text className="city">北京</Text>
+            <Text className="dot">·</Text>
+            <Text className="sub">严选场馆</Text>
+          </View>
+          <View className="settings" onClick={handleOpenAdmin}>
+            <Text>⚙️</Text>
+          </View>
+        </View>
+        <EmptyState />
+      </View>
+    )
+  }
+
+  return (
+    <View className="home-page">
+      {/* Header */}
+      <View className="header">
+        <View className="location">
+          <Text className="icon-location">📍</Text>
+          <Text className="city">北京</Text>
+          <Text className="dot">·</Text>
+          <Text className="sub">严选场馆</Text>
+        </View>
+        <View className="settings" onClick={handleOpenAdmin}>
+          <Text>⚙️</Text>
+        </View>
+      </View>
+
+      {/* Hero */}
+      <View className="hero">
+        <Text className="title">
+          不仅仅是 <Text className="highlight">电影</Text>
+        </Text>
+        <Text className="subtitle">会议路演 · 求婚策划 · 粉丝应援</Text>
+      </View>
+
+      {/* Scenario List */}
+      <View className="scenario-list">
+        {scenarios?.map((scenario) => {
+          const theme = THEME_CONFIG[scenario.category]
+          // 计算所有套餐中的最低价
+          const minPrice = scenario.packages?.length > 0
+            ? Math.min(...scenario.packages.map((pkg: any) => pkg.price || 0))
+            : 0
+          return (
+            <View
+              key={scenario.id}
+              className="scenario-card"
+              onClick={() => handleSelectScenario(scenario)}
+            >
+              {/* Image */}
+              <View className="card-image">
+                <Image
+                  src={scenario.image}
+                  mode="aspectFill"
+                  className="image"
+                  lazyLoad
+                  onError={(e) => {
+                    console.warn('Image load failed:', scenario.image, e)
+                    // Fallback to placeholder handled by CSS
+                  }}
+                />
+                {/* Rating Badge */}
+                {scenario.rating != null && (
+                  <View className="rating-badge">
+                    <Text>⭐</Text>
+                    <Text className="rating-text">{scenario.rating}</Text>
+                  </View>
+                )}
+                {/* Category Badge */}
+                <View className={`category-badge ${theme.badgeStyle}`}>
+                  <Text className="category-text">{theme.label}</Text>
+                </View>
+                {/* Title Overlay */}
+                <View className="title-overlay">
+                  <Text className="card-title">{scenario.title}</Text>
+                  <View className="tags">
+                    {scenario.tags.map((tag, i) => (
+                      <Text key={i} className="tag">{tag}</Text>
+                    ))}
+                  </View>
+                </View>
+              </View>
+
+              {/* Footer */}
+              <View className="card-footer">
+                <View className="footer-left">
+                  <View className="location-row">
+                    <Text className="location-icon">📍</Text>
+                    <Text className="location-text">{scenario.location}</Text>
+                  </View>
+                  <View className="price-row">
+                    <Text className="price-label">起价 </Text>
+                    <Text className="price">¥{minPrice}</Text>
+                  </View>
+                </View>
+                <View className="arrow">
+                  <Text>›</Text>
+                </View>
+              </View>
+            </View>
+          )
+        })}
+      </View>
+
+      {/* Quick Rebook */}
+      <View className="quick-rebook">
+        <Text className="section-title">猜你喜欢</Text>
+        <View className="rebook-card">
+          <Image
+            src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=100&q=80"
+            className="rebook-image"
+            lazyLoad
+            onError={(e) => {
+              console.warn('Rebook image load failed', e)
+            }}
+          />
+          <View className="rebook-info">
+            <Text className="rebook-title">电竞对战团建包</Text>
+            <Text className="rebook-location">耀莱成龙影城（五棵松店）</Text>
+          </View>
+          <View className="rebook-btn">
+            <Text>去看看</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  )
+}

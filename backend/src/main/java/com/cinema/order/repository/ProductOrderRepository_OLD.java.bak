@@ -1,0 +1,92 @@
+/**
+ * @spec O001-product-order-list
+ * 商品订单数据访问层
+ */
+package com.cinema.order.repository;
+
+import com.cinema.order.domain.ProductOrder;
+import com.cinema.order.domain.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+ * 商品订单数据访问层
+ *
+ * 使用 Spring Data JPA 访问 Supabase PostgreSQL
+ */
+@Repository
+public interface ProductOrderRepository extends JpaRepository<ProductOrder, UUID> {
+
+    /**
+     * 根据订单号查询订单
+     *
+     * @param orderNumber 订单号
+     * @return 订单对象
+     */
+    ProductOrder findByOrderNumber(String orderNumber);
+
+    /**
+     * 根据状态查询订单列表（分页）
+     *
+     * @param status   订单状态
+     * @param pageable 分页参数
+     * @return 订单分页列表
+     */
+    Page<ProductOrder> findByStatus(OrderStatus status, Pageable pageable);
+
+    /**
+     * 根据创建时间范围查询订单列表（分页）
+     *
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @param pageable  分页参数
+     * @return 订单分页列表
+     */
+    Page<ProductOrder> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    /**
+     * 复杂查询：支持状态、时间范围、搜索关键字的组合查询
+     *
+     * @param status    订单状态（可选）
+     * @param startDate 开始时间（可选）
+     * @param endDate   结束时间（可选）
+     * @param search    搜索关键字（订单号、用户名、手机号）
+     * @param pageable  分页参数
+     * @return 订单分页列表
+     */
+    @Query("""
+        SELECT DISTINCT o FROM ProductOrder o
+        LEFT JOIN FETCH o.user u
+        WHERE (:status IS NULL OR o.status = :status)
+        AND (:startDate IS NULL OR o.createdAt >= :startDate)
+        AND (:endDate IS NULL OR o.createdAt <= :endDate)
+        AND (:search IS NULL OR
+             o.orderNumber LIKE %:search% OR
+             u.username LIKE %:search% OR
+             u.phone LIKE %:search%)
+        ORDER BY o.createdAt DESC
+    """)
+    Page<ProductOrder> findByMultipleConditions(
+        @Param("status") OrderStatus status,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("search") String search,
+        Pageable pageable
+    );
+
+    /**
+     * 根据用户ID查询订单列表（分页）
+     *
+     * @param userId   用户ID
+     * @param pageable 分页参数
+     * @return 订单分页列表
+     */
+    Page<ProductOrder> findByUserId(UUID userId, Pageable pageable);
+}

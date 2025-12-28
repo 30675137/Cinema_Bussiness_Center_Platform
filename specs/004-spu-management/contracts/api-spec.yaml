@@ -1,0 +1,2345 @@
+openapi: 3.0.3
+info:
+  title: SPU 管理系统 API
+  description: |
+    影院商业中心平台 SPU（Standard Product Unit）管理功能接口文档
+
+    SPU 管理是商品主数据（MDM）的核心组件，定义"这一类商品是什么"而非"具体哪一条 SKU"，
+    为影院商业中心平台建立统一的商品数据框架，为 SKU、PIM 内容、价格、BOM、场景包等模块
+    提供标准化的上游数据基础。
+
+    ## 核心概念
+    - **SPU**: 标准产品单元，在同一品牌、同一属性组合下的标准产品单元
+    - **SKU**: 库存量单位，具体的可销售单位，隶属于某个 SPU
+    - **三级分类**: 一级/二级/三级分类体系
+    - **属性模板**: 基于分类的动态属性定义
+
+    ## 状态说明
+    - **草稿 (draft)**: 未对外使用，仅内部编辑阶段
+    - **启用 (active)**: 可被 SKU 使用，可被其他模块引用
+    - **停用 (inactive)**: 保留历史数据，不允许创建新 SKU 关联
+  version: 1.0.0
+  contact:
+    name: Cinema Business Platform Team
+    email: support@cinema-platform.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.cinema-platform.com/v1
+    description: 生产环境
+  - url: https://staging-api.cinema-platform.com/v1
+    description: 测试环境
+  - url: http://localhost:8080/v1
+    description: 开发环境（Mock API）
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: SPU管理
+    description: SPU 基础管理接口
+  - name: 分类管理
+    description: 商品分类管理接口
+  - name: 品牌管理
+    description: 品牌管理接口
+  - name: 属性模板
+    description: 属性模板管理接口
+  - name: 导入导出
+    description: 数据导入导出接口
+
+paths:
+  # ===============================
+  # SPU 管理接口
+  # ===============================
+  /spu:
+    get:
+      tags:
+        - SPU管理
+      summary: 获取SPU列表
+      description: |
+        分页获取SPU列表，支持多条件搜索和筛选。
+
+        列表显示字段：SPU 编码、SPU 名称、品牌、类目、状态、创建时间/创建人、
+        最近修改时间/修改人、关联 SKU 数量。
+      operationId: getSpus
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从1开始
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量，最大100
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: keyword
+          in: query
+          description: 搜索关键词（支持SPU名称、编码模糊搜索）
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: brandId
+          in: query
+          description: 品牌ID筛选
+          required: false
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: 分类ID筛选（支持各级分类）
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SPUStatus'
+        - name: sortBy
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, name, code]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: createdAtStart
+          in: query
+          description: 创建时间开始筛选
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: createdAtEnd
+          in: query
+          description: 创建时间结束筛选
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags:
+        - SPU管理
+      summary: 创建SPU
+      description: |
+        创建新的SPU记录。
+
+        必填字段：SPU 名称、品牌、三级类目、核心属性。
+        SPU 名称在同一品牌下必须唯一。
+      operationId: createSpu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSPURequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: SPU名称在品牌下已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /spu/{id}:
+    get:
+      tags:
+        - SPU管理
+      summary: 获取SPU详情
+      description: 获取指定SPU的详细信息，包括属性、关联SKU等
+      operationId: getSpu
+      parameters:
+        - name: id
+          in: path
+          description: SPU ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - SPU管理
+      summary: 更新SPU
+      description: |
+        更新SPU信息。
+
+        注意：已启用且存在关联SKU时，修改类目/品牌需要审批流程。
+      operationId: updateSpu
+      parameters:
+        - name: id
+          in: path
+          description: SPU ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSPURequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: 核心字段修改需要审批
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequiredResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - SPU管理
+      summary: 删除SPU
+      description: 删除指定的SPU（仅草稿状态可删除）
+      operationId: deleteSpu
+      parameters:
+        - name: id
+          in: path
+          description: SPU ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: SPU状态不允许删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # SPU 批量操作接口
+  # ===============================
+  /spu/batch:
+    post:
+      tags:
+        - SPU管理
+      summary: 批量操作SPU
+      description: 支持批量状态变更、删除等操作
+      operationId: batchOperationSpu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchSPURequest'
+      responses:
+        '200':
+          description: 批量操作成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /spu/{id}/duplicate:
+    post:
+      tags:
+        - SPU管理
+      summary: 复制SPU
+      description: 基于现有SPU创建副本，自动生成新的编码
+      operationId: duplicateSpu
+      parameters:
+        - name: id
+          in: path
+          description: 源SPU ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 新SPU名称，不填则自动添加"副本"后缀
+      responses:
+        '201':
+          description: 复制成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # SPU 状态管理接口
+  # ===============================
+  /spu/{id}/status:
+    patch:
+      tags:
+        - SPU管理
+      summary: 更新SPU状态
+      description: 状态流转：草稿 → 启用 → 停用
+      operationId: updateSpuStatus
+      parameters:
+        - name: id
+          in: path
+          description: SPU ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: '#/components/schemas/SPUStatus'
+                reason:
+                  type: string
+                  description: 状态变更原因
+      responses:
+        '200':
+          description: 状态更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUResponse'
+        '400':
+          description: 状态流转不合法
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # 分类管理接口
+  # ===============================
+  /categories:
+    get:
+      tags:
+        - 分类管理
+      summary: 获取分类列表
+      description: 获取商品分类树形结构
+      operationId: getCategories
+      parameters:
+        - name: level
+          in: query
+          description: 分类级别（1-3）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+        - name: parentId
+          in: query
+          description: 父分类ID
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 分类状态
+          required: false
+          schema:
+            $ref: '#/components/schemas/CategoryStatus'
+        - name: includeChildren
+          in: query
+          description: 是否包含子分类
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags:
+        - 分类管理
+      summary: 创建分类
+      description: 创建新的商品分类
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /categories/{id}:
+    get:
+      tags:
+        - 分类管理
+      summary: 获取分类详情
+      description: 获取指定分类的详细信息
+      operationId: getCategory
+      parameters:
+        - name: id
+          in: path
+          description: 分类ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - 分类管理
+      summary: 更新分类
+      description: 更新分类信息
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          description: 分类ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - 分类管理
+      summary: 删除分类
+      description: 删除指定分类（需检查是否有SPU使用）
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          description: 分类ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 分类下存在SPU，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /categories/{id}/move:
+    post:
+      tags:
+        - 分类管理
+      summary: 移动分类
+      description: 移动分类到新的父分类下
+      operationId: moveCategory
+      parameters:
+        - name: id
+          in: path
+          description: 分类ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveCategoryRequest'
+      responses:
+        '200':
+          description: 移动成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /categories/batch/sort:
+    post:
+      tags:
+        - 分类管理
+      summary: 批量排序分类
+      description: 批量更新分类排序
+      operationId: batchSortCategories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchSortCategoriesRequest'
+      responses:
+        '200':
+          description: 排序更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchOperationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /categories/{id}/stats:
+    get:
+      tags:
+        - 分类管理
+      summary: 获取分类统计
+      description: 获取分类下的商品统计信息
+      operationId: getCategoryStats
+      parameters:
+        - name: id
+          in: path
+          description: 分类ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryStatsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # 品牌管理接口
+  # ===============================
+  /brands:
+    get:
+      tags:
+        - 品牌管理
+      summary: 获取品牌列表
+      description: 获取品牌列表，支持搜索和筛选
+      operationId: getBrands
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: keyword
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 品牌状态
+          required: false
+          schema:
+            $ref: '#/components/schemas/BrandStatus'
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandListResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags:
+        - 品牌管理
+      summary: 创建品牌
+      description: 创建新品牌
+      operationId: createBrand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: 品牌名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /brands/{id}:
+    get:
+      tags:
+        - 品牌管理
+      summary: 获取品牌详情
+      description: 获取指定品牌的详细信息
+      operationId: getBrand
+      parameters:
+        - name: id
+          in: path
+          description: 品牌ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - 品牌管理
+      summary: 更新品牌
+      description: 更新品牌信息
+      operationId: updateBrand
+      parameters:
+        - name: id
+          in: path
+          description: 品牌ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBrandRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - 品牌管理
+      summary: 删除品牌
+      description: 删除指定品牌（需检查是否有SPU使用）
+      operationId: deleteBrand
+      parameters:
+        - name: id
+          in: path
+          description: 品牌ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 品牌下存在SPU，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # 属性模板管理接口
+  # ===============================
+  /attribute-templates:
+    get:
+      tags:
+        - 属性模板
+      summary: 获取属性模板列表
+      description: 获取属性模板列表，可按分类筛选
+      operationId: getAttributeTemplates
+      parameters:
+        - name: categoryId
+          in: query
+          description: 分类ID
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 模板状态
+          required: false
+          schema:
+            $ref: '#/components/schemas/TemplateStatus'
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateListResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags:
+        - 属性模板
+      summary: 创建属性模板
+      description: 为指定分类创建属性模板
+      operationId: createAttributeTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttributeTemplateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /attribute-templates/{id}:
+    get:
+      tags:
+        - 属性模板
+      summary: 获取属性模板详情
+      description: 获取指定属性模板的详细信息
+      operationId: getAttributeTemplate
+      parameters:
+        - name: id
+          in: path
+          description: 模板ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - 属性模板
+      summary: 更新属性模板
+      description: 更新属性模板
+      operationId: updateAttributeTemplate
+      parameters:
+        - name: id
+          in: path
+          description: 模板ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAttributeTemplateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - 属性模板
+      summary: 删除属性模板
+      description: 删除指定属性模板
+      operationId: deleteAttributeTemplate
+      parameters:
+        - name: id
+          in: path
+          description: 模板ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 删除成功
+        '400':
+          description: 模板正在被使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ===============================
+  # 导入导出接口
+  # ===============================
+  /spu/export:
+    get:
+      tags:
+        - 导入导出
+      summary: 导出SPU数据
+      description: 导出SPU数据为Excel文件
+      operationId: exportSpus
+      parameters:
+        - name: format
+          in: query
+          description: 导出格式
+          required: false
+          schema:
+            type: string
+            enum: [xlsx, csv]
+            default: xlsx
+        - name: fields
+          in: query
+          description: 导出字段（逗号分隔）
+          required: false
+          schema:
+            type: string
+        # 支持所有列表查询参数
+        - name: keyword
+          in: query
+          description: 搜索关键词
+          required: false
+          schema:
+            type: string
+        - name: brandId
+          in: query
+          description: 品牌ID筛选
+          required: false
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: 分类ID筛选
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态筛选
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SPUStatus'
+      responses:
+        '200':
+          description: 导出成功
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: 文件下载信息
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /spu/import:
+    post:
+      tags:
+        - 导入导出
+      summary: 导入SPU数据
+      description: 从Excel文件导入SPU数据
+      operationId: importSpus
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Excel文件（最大10MB）
+                options:
+                  type: object
+                  description: 导入选项
+                  properties:
+                    skipDuplicates:
+                      type: boolean
+                      description: 跳过重复数据
+                      default: true
+                    updateExisting:
+                      type: boolean
+                      description: 更新已存在的数据
+                      default: false
+      responses:
+        '200':
+          description: 导入成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          description: 文件大小超出限制
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /spu/import/template:
+    get:
+      tags:
+        - 导入导出
+      summary: 下载导入模板
+      description: 下载SPU导入的标准Excel模板
+      operationId: downloadImportTemplate
+      responses:
+        '200':
+          description: 模板下载成功
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: 文件下载信息
+              schema:
+                type: string
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+# ===============================
+# 组件定义
+# ===============================
+components:
+  # 安全定义
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  # ===============================
+  # 通用响应定义
+  # ===============================
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: 未授权访问
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  # ===============================
+  # Schema 定义
+  # ===============================
+  schemas:
+    # ===============================
+    # 基础类型定义
+    # ===============================
+    SPUStatus:
+      type: string
+      enum:
+        - draft    # 草稿
+        - active   # 启用
+        - inactive # 停用
+      description: SPU状态
+
+    CategoryStatus:
+      type: string
+      enum:
+        - active   # 启用
+        - inactive # 停用
+      description: 分类状态
+
+    BrandStatus:
+      type: string
+      enum:
+        - active   # 启用
+        - inactive # 停用
+      description: 品牌状态
+
+    TemplateStatus:
+      type: string
+      enum:
+        - active   # 启用
+        - inactive # 停用
+      description: 模板状态
+
+    AttributeType:
+      type: string
+      enum:
+        - text      # 文本
+        - number    # 数字
+        - select    # 单选
+        - multiSelect # 多选
+        - boolean   # 布尔值
+        - date      # 日期
+        - image     # 图片
+        - textarea  # 长文本
+      description: 属性类型
+
+    BatchOperationType:
+      type: string
+      enum:
+        - activate      # 批量启用
+        - deactivate    # 批量停用
+        - delete        # 批量删除
+        - export        # 批量导出
+      description: 批量操作类型
+
+    # ===============================
+    # 通用响应格式
+    # ===============================
+    BaseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 操作是否成功
+        message:
+          type: string
+          description: 响应消息
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: false
+            error:
+              type: object
+              required:
+                - code
+                - message
+              properties:
+                code:
+                  type: string
+                  description: 错误码
+                  example: VALIDATION_ERROR
+                message:
+                  type: string
+                  description: 错误描述
+                  example: 数据验证失败
+                details:
+                  type: object
+                  description: 详细错误信息
+
+    PaginationInfo:
+      type: object
+      properties:
+        current:
+          type: integer
+          description: 当前页码
+        pageSize:
+          type: integer
+          description: 每页数量
+        total:
+          type: integer
+          description: 总记录数
+        totalPages:
+          type: integer
+          description: 总页数
+        hasNext:
+          type: boolean
+          description: 是否有下一页
+        hasPrev:
+          type: boolean
+          description: 是否有上一页
+
+    # ===============================
+    # SPU 相关 Schema
+    # ===============================
+    SPUItem:
+      type: object
+      description: SPU基础信息
+      properties:
+        id:
+          type: string
+          description: SPU唯一标识
+          example: "spu_001"
+        code:
+          type: string
+          description: SPU编码（系统生成）
+          example: "SPU20251212001"
+        name:
+          type: string
+          description: SPU名称
+          example: "可口可乐 500ml 瓶装"
+          maxLength: 100
+        shortName:
+          type: string
+          description: 标准简称
+          example: "可口可乐500ml"
+        description:
+          type: string
+          description: 商品基础描述信息
+        unit:
+          type: string
+          description: 标准单位
+          example: "瓶"
+        categoryId:
+          type: string
+          description: 三级分类ID
+          example: "cat_001_002_003"
+        categoryName:
+          type: string
+          description: 分类名称（完整路径）
+          example: "食品饮料/碳酸饮料/可乐"
+        categoryPath:
+          type: array
+          description: 分类路径数组
+          items:
+            type: string
+          example: ["食品饮料", "碳酸饮料", "可乐"]
+        brandId:
+          type: string
+          description: 品牌ID
+          example: "brand_001"
+        brandName:
+          type: string
+          description: 品牌名称
+          example: "可口可乐"
+        status:
+          $ref: '#/components/schemas/SPUStatus'
+        attributes:
+          type: array
+          description: 动态属性列表
+          items:
+            $ref: '#/components/schemas/SPUAttribute'
+        images:
+          type: array
+          description: 商品图片数组
+          items:
+            $ref: '#/components/schemas/ProductImage'
+        tags:
+          type: array
+          description: 标签数组
+          items:
+            type: string
+        priceInfo:
+          $ref: '#/components/schemas/PriceAggregate'
+        stockInfo:
+          $ref: '#/components/schemas/StockAggregate'
+        skuCount:
+          type: integer
+          description: 关联SKU数量
+          example: 5
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        createdBy:
+          type: string
+          description: 创建人
+        updatedBy:
+          type: string
+          description: 更新人
+      required:
+        - id
+        - code
+        - name
+        - categoryId
+        - categoryName
+        - categoryPath
+        - brandId
+        - brandName
+        - status
+        - createdAt
+        - updatedAt
+
+    SPUAttribute:
+      type: object
+      description: SPU属性
+      properties:
+        id:
+          type: string
+          description: 属性ID
+        name:
+          type: string
+          description: 属性名称
+        code:
+          type: string
+          description: 属性编码
+        type:
+          $ref: '#/components/schemas/AttributeType'
+        value:
+          description: 属性值（根据类型不同）
+        required:
+          type: boolean
+          description: 是否必填
+        options:
+          type: array
+          description: 可选值列表（用于select类型）
+          items:
+            type: string
+        validation:
+          type: object
+          description: 验证规则
+          properties:
+            min:
+              type: number
+              description: 最小值
+            max:
+              type: number
+              description: 最大值
+            pattern:
+              type: string
+              description: 正则表达式
+        sortOrder:
+          type: integer
+          description: 排序序号
+      required:
+        - id
+        - name
+        - code
+        - type
+        - required
+
+    ProductImage:
+      type: object
+      description: 商品图片
+      properties:
+        id:
+          type: string
+          description: 图片ID
+        url:
+          type: string
+          format: uri
+          description: 图片URL
+        alt:
+          type: string
+          description: 图片描述
+        type:
+          type: string
+          enum:
+            - main     # 主图
+            - detail   # 详情图
+            - gallery  # 商品图库
+            - packaging # 包装图
+          description: 图片类型
+        sortOrder:
+          type: integer
+          description: 排序序号
+        isMain:
+          type: boolean
+          description: 是否主图
+      required:
+        - id
+        - url
+        - type
+        - sortOrder
+        - isMain
+
+    PriceAggregate:
+      type: object
+      description: 价格聚合信息
+      properties:
+        minPrice:
+          type: number
+          format: decimal
+          description: 最低价格
+        maxPrice:
+          type: number
+          format: decimal
+          description: 最高价格
+        avgPrice:
+          type: number
+          format: decimal
+          description: 平均价格
+        currency:
+          type: string
+          description: 货币单位
+          example: "CNY"
+      required:
+        - minPrice
+        - maxPrice
+        - avgPrice
+        - currency
+
+    StockAggregate:
+      type: object
+      description: 库存聚合信息
+      properties:
+        totalStock:
+          type: integer
+          description: 总库存
+        availableStock:
+          type: integer
+          description: 可用库存
+        reservedStock:
+          type: integer
+          description: 预留库存
+      required:
+        - totalStock
+        - availableStock
+
+    CreateSPURequest:
+      type: object
+      description: 创建SPU请求
+      properties:
+        name:
+          type: string
+          description: SPU名称
+          maxLength: 100
+          example: "可口可乐 500ml 瓶装"
+        shortName:
+          type: string
+          description: 标准简称
+          example: "可口可乐500ml"
+        description:
+          type: string
+          description: 商品基础描述信息
+        unit:
+          type: string
+          description: 标准单位
+          example: "瓶"
+        categoryId:
+          type: string
+          description: 三级分类ID
+          example: "cat_001_002_003"
+        brandId:
+          type: string
+          description: 品牌ID
+          example: "brand_001"
+        attributes:
+          type: array
+          description: 属性值列表
+          items:
+            type: object
+            properties:
+              attributeId:
+                type: string
+                description: 属性ID
+              value:
+                description: 属性值
+        images:
+          type: array
+          description: 商品图片数组
+          items:
+            $ref: '#/components/schemas/ProductImage'
+        tags:
+          type: array
+          description: 标签数组
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/SPUStatus'
+          default: draft
+      required:
+        - name
+        - categoryId
+        - brandId
+
+    UpdateSPURequest:
+      type: object
+      description: 更新SPU请求
+      allOf:
+        - $ref: '#/components/schemas/CreateSPURequest'
+        - type: object
+          description: 所有字段可选，支持部分更新
+
+    SPUResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              $ref: '#/components/schemas/SPUItem'
+
+    SPUDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              allOf:
+                - $ref: '#/components/schemas/SPUItem'
+                - type: object
+                  properties:
+                    relatedSKUs:
+                      type: array
+                      description: 关联的SKU列表
+                      items:
+                        $ref: '#/components/schemas/RelatedSKU'
+                    changeHistory:
+                      type: array
+                      description: 变更历史
+                      items:
+                        $ref: '#/components/schemas/SPUChangeHistory'
+
+    RelatedSKU:
+      type: object
+      description: 关联的SKU信息
+      properties:
+        id:
+          type: string
+          description: SKU ID
+        code:
+          type: string
+          description: SKU编码
+        name:
+          type: string
+          description: SKU名称
+        price:
+          type: number
+          format: decimal
+          description: SKU价格
+        stock:
+          type: integer
+          description: SKU库存
+        status:
+          type: string
+          description: SKU状态
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+
+    SPUChangeHistory:
+      type: object
+      description: SPU变更历史
+      properties:
+        id:
+          type: string
+          description: 历史记录ID
+        operation:
+          type: string
+          description: 操作类型
+        operator:
+          type: string
+          description: 操作人
+        changes:
+          type: object
+          description: 变更内容
+        reason:
+          type: string
+          description: 变更原因
+        createdAt:
+          type: string
+          format: date-time
+          description: 操作时间
+
+    SPUListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SPUItem'
+            pagination:
+              $ref: '#/components/schemas/PaginationInfo'
+
+    # ===============================
+    # 批量操作相关 Schema
+    # ===============================
+    BatchSPURequest:
+      type: object
+      description: 批量操作SPU请求
+      required:
+        - operation
+        - ids
+      properties:
+        operation:
+          $ref: '#/components/schemas/BatchOperationType'
+        ids:
+          type: array
+          description: SPU ID列表
+          items:
+            type: string
+        reason:
+          type: string
+          description: 操作原因
+        data:
+          type: object
+          description: 批量更新数据（用于批量更新操作）
+
+    BatchOperationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: object
+              properties:
+                totalCount:
+                  type: integer
+                  description: 总操作数量
+                successCount:
+                  type: integer
+                  description: 成功数量
+                failureCount:
+                  type: integer
+                  description: 失败数量
+                errors:
+                  type: array
+                  description: 错误列表
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: 失败的ID
+                      error:
+                        type: string
+                        description: 错误信息
+
+    ApprovalRequiredResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: false
+            data:
+              type: object
+              properties:
+                approvalRequired:
+                  type: boolean
+                  example: true
+                workflowId:
+                  type: string
+                  description: 审批流程ID
+                message:
+                  type: string
+                  description: 提示信息
+
+    # ===============================
+    # 分类相关 Schema
+    # ===============================
+    Category:
+      type: object
+      description: 商品分类
+      properties:
+        id:
+          type: string
+          description: 分类ID
+        name:
+          type: string
+          description: 分类名称
+        code:
+          type: string
+          description: 分类编码
+        level:
+          type: integer
+          description: 分类级别（1-3）
+        parentId:
+          type: string
+          description: 父分类ID
+        path:
+          type: string
+          description: 分类路径
+        sortOrder:
+          type: integer
+          description: 排序序号
+        status:
+          $ref: '#/components/schemas/CategoryStatus'
+        description:
+          type: string
+          description: 分类描述
+        icon:
+          type: string
+          description: 分类图标
+        children:
+          type: array
+          description: 子分类列表
+          items:
+            $ref: '#/components/schemas/Category'
+        spuCount:
+          type: integer
+          description: 分类下SPU数量
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - name
+        - code
+        - level
+        - status
+
+    CreateCategoryRequest:
+      type: object
+      description: 创建分类请求
+      required:
+        - name
+        - code
+        - level
+      properties:
+        name:
+          type: string
+          description: 分类名称
+        code:
+          type: string
+          description: 分类编码
+        level:
+          type: integer
+          description: 分类级别
+          minimum: 1
+          maximum: 3
+        parentId:
+          type: string
+          description: 父分类ID
+        sortOrder:
+          type: integer
+          description: 排序序号
+        description:
+          type: string
+          description: 分类描述
+        icon:
+          type: string
+          description: 分类图标
+
+    UpdateCategoryRequest:
+      type: object
+      description: 更新分类请求
+      allOf:
+        - $ref: '#/components/schemas/CreateCategoryRequest'
+        - type: object
+          description: 所有字段可选，支持部分更新
+
+    MoveCategoryRequest:
+      type: object
+      description: 移动分类请求
+      required:
+        - newParentId
+      properties:
+        newParentId:
+          type: string
+          description: 新父分类ID
+        newSortOrder:
+          type: integer
+          description: 新排序序号
+
+    BatchSortCategoriesRequest:
+      type: object
+      description: 批量排序分类请求
+      required:
+        - categories
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - sortOrder
+            properties:
+              id:
+                type: string
+                description: 分类ID
+              sortOrder:
+                type: integer
+                description: 排序序号
+
+    CategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              $ref: '#/components/schemas/Category'
+
+    CategoryDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              allOf:
+                - $ref: '#/components/schemas/Category'
+                - type: object
+                  properties:
+                    attributeTemplate:
+                      $ref: '#/components/schemas/AttributeTemplate'
+                    subCategories:
+                      type: array
+                      description: 子分类统计
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          spuCount:
+                            type: integer
+
+    CategoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+
+    CategoryStatsResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: object
+              properties:
+                categoryId:
+                  type: string
+                  description: 分类ID
+                totalProducts:
+                  type: integer
+                  description: 总SPU数量
+                activeProducts:
+                  type: integer
+                  description: 启用状态SPU数量
+                draftProducts:
+                  type: integer
+                  description: 草稿状态SPU数量
+                inactiveProducts:
+                  type: integer
+                  description: 停用状态SPU数量
+                subCategories:
+                  type: array
+                  description: 子分类统计
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      productCount:
+                        type: integer
+
+    # ===============================
+    # 品牌相关 Schema
+    # ===============================
+    Brand:
+      type: object
+      description: 品牌信息
+      properties:
+        id:
+          type: string
+          description: 品牌ID
+        name:
+          type: string
+          description: 品牌名称
+        code:
+          type: string
+          description: 品牌编码
+        logo:
+          type: string
+          format: uri
+          description: 品牌Logo URL
+        description:
+          type: string
+          description: 品牌描述
+        website:
+          type: string
+          format: uri
+          description: 品牌官网
+        status:
+          $ref: '#/components/schemas/BrandStatus'
+        sortOrder:
+          type: integer
+          description: 排序序号
+        spuCount:
+          type: integer
+          description: 品牌下SPU数量
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - name
+        - code
+        - status
+
+    CreateBrandRequest:
+      type: object
+      description: 创建品牌请求
+      required:
+        - name
+        - code
+      properties:
+        name:
+          type: string
+          description: 品牌名称
+        code:
+          type: string
+          description: 品牌编码
+        logo:
+          type: string
+          format: uri
+          description: 品牌Logo URL
+        description:
+          type: string
+          description: 品牌描述
+        website:
+          type: string
+          format: uri
+          description: 品牌官网
+        sortOrder:
+          type: integer
+          description: 排序序号
+
+    UpdateBrandRequest:
+      type: object
+      description: 更新品牌请求
+      allOf:
+        - $ref: '#/components/schemas/CreateBrandRequest'
+        - type: object
+          description: 所有字段可选，支持部分更新
+
+    BrandResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              $ref: '#/components/schemas/Brand'
+
+    BrandDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              allOf:
+                - $ref: '#/components/schemas/Brand'
+                - type: object
+                  properties:
+                    spus:
+                      type: array
+                      description: 品牌下SPU列表
+                      items:
+                        $ref: '#/components/schemas/SPUItem'
+
+    BrandListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Brand'
+            pagination:
+              $ref: '#/components/schemas/PaginationInfo'
+
+    # ===============================
+    # 属性模板相关 Schema
+    # ===============================
+    AttributeTemplate:
+      type: object
+      description: 属性模板
+      properties:
+        id:
+          type: string
+          description: 模板ID
+        name:
+          type: string
+          description: 模板名称
+        categoryId:
+          type: string
+          description: 关联分类ID
+        categoryName:
+          type: string
+          description: 关联分类名称
+        attributes:
+          type: array
+          description: 属性定义列表
+          items:
+            $ref: '#/components/schemas/AttributeDefinition'
+        status:
+          $ref: '#/components/schemas/TemplateStatus'
+        description:
+          type: string
+          description: 模板描述
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - name
+        - categoryId
+        - status
+
+    AttributeDefinition:
+      type: object
+      description: 属性定义
+      properties:
+        id:
+          type: string
+          description: 属性ID
+        name:
+          type: string
+          description: 属性名称
+        code:
+          type: string
+          description: 属性编码
+        type:
+          $ref: '#/components/schemas/AttributeType'
+        required:
+          type: boolean
+          description: 是否必填
+        options:
+          type: array
+          description: 可选值列表（用于select类型）
+          items:
+            type: string
+        validation:
+          type: object
+          description: 验证规则
+          properties:
+            min:
+              type: number
+              description: 最小值
+            max:
+              type: number
+              description: 最大值
+            pattern:
+              type: string
+              description: 正则表达式
+        defaultValue:
+          description: 默认值
+        placeholder:
+          type: string
+          description: 占位符文本
+        helpText:
+          type: string
+          description: 帮助文本
+        sortOrder:
+          type: integer
+          description: 排序序号
+      required:
+        - id
+        - name
+        - code
+        - type
+        - required
+
+    CreateAttributeTemplateRequest:
+      type: object
+      description: 创建属性模板请求
+      required:
+        - name
+        - categoryId
+        - attributes
+      properties:
+        name:
+          type: string
+          description: 模板名称
+        categoryId:
+          type: string
+          description: 关联分类ID
+        attributes:
+          type: array
+          description: 属性定义列表
+          items:
+            $ref: '#/components/schemas/AttributeDefinition'
+        description:
+          type: string
+          description: 模板描述
+
+    UpdateAttributeTemplateRequest:
+      type: object
+      description: 更新属性模板请求
+      allOf:
+        - $ref: '#/components/schemas/CreateAttributeTemplateRequest'
+        - type: object
+          description: 所有字段可选，支持部分更新
+
+    AttributeTemplateResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              $ref: '#/components/schemas/AttributeTemplate'
+
+    AttributeTemplateDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              allOf:
+                - $ref: '#/components/schemas/AttributeTemplate'
+                - type: object
+                  properties:
+                    category:
+                      $ref: '#/components/schemas/Category'
+                    usageStats:
+                      type: object
+                      description: 使用统计
+                      properties:
+                        spuCount:
+                          type: integer
+                          description: 使用此模板的SPU数量
+
+    AttributeTemplateListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AttributeTemplate'
+
+    # ===============================
+    # 导入导出相关 Schema
+    # ===============================
+    ImportResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            success:
+              example: true
+            data:
+              type: object
+              properties:
+                taskId:
+                  type: string
+                  description: 导入任务ID
+                totalCount:
+                  type: integer
+                  description: 总记录数
+                successCount:
+                  type: integer
+                  description: 成功导入数量
+                failureCount:
+                  type: integer
+                  description: 失败数量
+                errors:
+                  type: array
+                  description: 错误详情
+                  items:
+                    type: object
+                    properties:
+                      row:
+                        type: integer
+                        description: 行号
+                      field:
+                        type: string
+                        description: 字段名
+                      value:
+                        description: 错误值
+                      message:
+                        type: string
+                        description: 错误信息
+                downloadUrl:
+                  type: string
+                  description: 错误报告下载链接
+
+# ===============================
+# 示例数据
+# ===============================
+examples:
+  # SPU 示例
+  CreateSPUExample:
+    summary: 创建SPU示例
+    value:
+      name: "可口可乐 500ml 瓶装"
+      shortName: "可口可乐500ml"
+      description: "经典可口可乐500ml玻璃瓶装"
+      unit: "瓶"
+      categoryId: "cat_001_002_003"
+      brandId: "brand_001"
+      attributes:
+        - attributeId: "attr_001"
+          value: "500ml"
+        - attributeId: "attr_002"
+          value: "玻璃瓶"
+      images:
+        - url: "https://example.com/image1.jpg"
+          type: "main"
+          sortOrder: 1
+          isMain: true
+      tags: ["饮料", "碳酸饮料", "经典"]
+      status: "draft"
+
+  # 批量操作示例
+  BatchOperationExample:
+    summary: 批量操作示例
+    value:
+      operation: "activate"
+      ids: ["spu_001", "spu_002", "spu_003"]
+      reason: "批量启用新品"
+
+  # 导入响应示例
+  ImportResponseExample:
+    summary: 导入响应示例
+    value:
+      success: true
+      message: "导入完成"
+      data:
+        taskId: "task_001"
+        totalCount: 100
+        successCount: 95
+        failureCount: 5
+        errors:
+          - row: 10
+            field: "price"
+            value: "abc"
+            message: "价格格式错误"
+        downloadUrl: "https://example.com/reports/task_001_errors.xlsx"

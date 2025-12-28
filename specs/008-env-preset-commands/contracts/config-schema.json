@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yourusername/cc-presets/config-schema.json",
+  "title": "CC-Presets Configuration Schema",
+  "description": "JSON Schema for cc-presets environment manager configuration file",
+  "type": "object",
+  "required": ["version", "presets"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Configuration file format version",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "examples": ["1.0"]
+    },
+    "presets": {
+      "type": "object",
+      "description": "Collection of environment presets",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*$": {
+          "$ref": "#/definitions/preset"
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 0
+    },
+    "settings": {
+      "type": "object",
+      "description": "Global settings for cc-presets",
+      "properties": {
+        "active_preset": {
+          "type": ["string", "null"],
+          "description": "Name of the currently active preset",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "mask_sensitive": {
+          "type": "boolean",
+          "description": "Whether to mask sensitive values in list/status commands",
+          "default": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "preset": {
+      "type": "object",
+      "required": ["env_vars"],
+      "properties": {
+        "env_vars": {
+          "type": "object",
+          "description": "Environment variables to set when activating this preset",
+          "patternProperties": {
+            "^[A-Z_][A-Z0-9_]*$": {
+              "type": "string",
+              "description": "Environment variable value",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "minProperties": 1
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Metadata about the preset",
+          "properties": {
+            "created": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when preset was created"
+            },
+            "modified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "ISO 8601 timestamp when preset was last modified"
+            },
+            "description": {
+              "type": "string",
+              "description": "Optional human-readable description of the preset",
+              "maxLength": 200
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "version": "1.0",
+      "presets": {
+        "claude": {
+          "env_vars": {
+            "ANTHROPIC_API_KEY": "sk-ant-xxxxx",
+            "ANTHROPIC_MODEL": "claude-3-sonnet-20240229",
+            "ANTHROPIC_BASE_URL": "https://api.anthropic.com"
+          },
+          "metadata": {
+            "created": "2025-12-13T10:30:00Z",
+            "modified": "2025-12-13T10:30:00Z",
+            "description": "Claude API configuration"
+          }
+        },
+        "glm": {
+          "env_vars": {
+            "ANTHROPIC_AUTH_TOKEN": "f40832ea44204eb9a91ae1751f70eac6.mPvF5krl5N7wsEqq",
+            "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic",
+            "ANTHROPIC_SMALL_FAST_MODEL": "GLM-4.6",
+            "ANTHROPIC_MODEL": "GLM-4.6"
+          },
+          "metadata": {
+            "created": "2025-12-13T11:00:00Z",
+            "modified": "2025-12-13T11:00:00Z",
+            "description": "GLM-4.6 API configuration via BigModel"
+          }
+        }
+      },
+      "settings": {
+        "active_preset": "claude",
+        "mask_sensitive": true
+      }
+    }
+  ]
+}

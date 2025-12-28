@@ -1,0 +1,962 @@
+openapi: 3.0.3
+info:
+  title: 类目管理API (前端Mock)
+  description: 影院商品管理中台 - 类目管理功能前端Mock API接口文档，用于纯前端开发和测试
+  version: 1.0.0
+  contact:
+    name: 开发团队
+    email: dev@cinema-platform.com
+servers:
+  - url: /api
+    description: Mock API环境 (MSW模拟)
+
+paths:
+  # 类目管理相关接口
+  /categories/tree:
+    get:
+      tags:
+        - 类目管理
+      summary: 获取类目树结构
+      description: 获取完整的类目树结构，支持虚拟滚动和懒加载
+      parameters:
+        - name: level
+          in: query
+          description: 按类目等级筛选 (1/2/3)
+          schema:
+            type: integer
+            enum: [1, 2, 3]
+        - name: status
+          in: query
+          description: 按状态筛选
+          schema:
+            type: string
+            enum: [enabled, disabled]
+        - name: keyword
+          in: query
+          description: 搜索关键词（按类目名称搜索）
+          schema:
+            type: string
+        - name: lazy
+          in: query
+          description: 是否启用懒加载模式
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 成功获取类目树
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryTreeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        
+  /categories:
+    get:
+      tags:
+        - 类目管理
+      summary: 获取类目列表
+      description: 分页获取类目列表，支持多种筛选条件
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页大小
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: level
+          in: query
+          description: 按类目等级筛选
+          schema:
+            type: integer
+            enum: [1, 2, 3]
+        - name: parentId
+          in: query
+          description: 按父类目ID筛选
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 按状态筛选
+          schema:
+            type: string
+            enum: [enabled, disabled]
+        - name: keyword
+          in: query
+          description: 搜索关键词
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [name, sortOrder, createdAt]
+            default: name
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: 成功获取类目列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        
+    post:
+      tags:
+        - 类目管理
+      summary: 创建类目
+      description: 创建新的类目，支持一级、二级、三级类目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCategoryRequest'
+      responses:
+        '201':
+          description: 类目创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '409':
+          description: 类目名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{categoryId}:
+    get:
+      tags:
+        - 类目管理
+      summary: 获取类目详情
+      description: 根据类目ID获取类目详细信息
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取类目详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - 类目管理
+      summary: 更新类目
+      description: 更新类目基本信息，不能修改类目等级和父类目
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+      responses:
+        '200':
+          description: 类目更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - 类目管理
+      summary: 删除类目
+      description: 删除类目，需要检查类目是否被SPU使用
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 类目删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: 类目下存在子类目或已被SPU使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+
+  /categories/{categoryId}/children:
+    get:
+      tags:
+        - 类目管理
+      summary: 获取子类目列表
+      description: 获取指定类目的直接子类目列表，用于懒加载
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 父类目ID
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 按状态筛选
+          schema:
+            type: string
+            enum: [enabled, disabled]
+      responses:
+        '200':
+          description: 成功获取子类目列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryChildrenResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # 属性模板相关接口
+  /categories/{categoryId}/attribute-template:
+    get:
+      tags:
+        - 属性模板
+      summary: 获取类目属性模板
+      description: 获取指定类目的属性模板配置
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取属性模板
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateResponse'
+        '404':
+          description: 类目不存在或未配置属性模板
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - 属性模板
+      summary: 保存属性模板
+      description: 创建或更新类目的属性模板配置
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveAttributeTemplateRequest'
+      responses:
+        '200':
+          description: 属性模板保存成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeTemplateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+
+  /categories/{categoryId}/attributes:
+    post:
+      tags:
+        - 属性模板
+      summary: 添加属性
+      description: 向类目属性模板中添加新属性
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAttributeRequest'
+      responses:
+        '201':
+          description: 属性添加成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 属性名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories/{categoryId}/attributes/{attributeId}:
+    put:
+      tags:
+        - 属性模板
+      summary: 更新属性
+      description: 更新类目属性模板中的指定属性
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+        - name: attributeId
+          in: path
+          required: true
+          description: 属性ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAttributeRequest'
+      responses:
+        '200':
+          description: 属性更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - 属性模板
+      summary: 删除属性
+      description: 从类目属性模板中删除指定属性
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          description: 类目ID
+          schema:
+            type: string
+        - name: attributeId
+          in: path
+          required: true
+          description: 属性ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 属性删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: 属性已被SPU使用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+                '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    # 类目相关模型
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 类目唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          description: 类目名称
+          example: "饮料"
+        code:
+          type: string
+          description: 类目编码
+          example: "DRINK_001"
+        level:
+          type: integer
+          description: 类目等级
+          enum: [1, 2, 3]
+          example: 1
+        parentId:
+          type: string
+          description: 父类目ID（一级类目为空）
+          example: null
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 1
+        status:
+          type: string
+          description: 类目状态
+          enum: [enabled, disabled]
+          example: "enabled"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-01-27T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-01-27T10:00:00Z"
+        createdBy:
+          type: string
+          description: 创建人ID
+        updatedBy:
+          type: string
+          description: 更新人ID
+      required:
+        - id
+        - name
+        - level
+        - status
+        - createdAt
+        - updatedAt
+
+    CategoryTreeNode:
+      allOf:
+        - $ref: '#/components/schemas/Category'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoryTreeNode'
+              description: 子节点列表
+            path:
+              type: string
+              description: 完整路径
+              example: "食品/饮料/碳酸饮料"
+            isLeaf:
+              type: boolean
+              description: 是否为叶子节点
+              example: true
+
+    CreateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 类目名称
+          example: "饮料"
+          minLength: 2
+          maxLength: 50
+        parentId:
+          type: string
+          description: 父类目ID（创建一级类目时为空）
+          example: null
+        sortOrder:
+          type: integer
+          description: 排序序号
+          minimum: 0
+          example: 1
+        status:
+          type: string
+          description: 类目状态
+          enum: [enabled, disabled]
+          default: "enabled"
+      required:
+        - name
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 类目名称
+          minLength: 2
+          maxLength: 50
+          example: "饮料类"
+        sortOrder:
+          type: integer
+          description: 排序序号
+          minimum: 0
+          example: 2
+        status:
+          type: string
+          description: 类目状态
+          enum: [enabled, disabled]
+          example: "disabled"
+
+    # 属性模板相关模型
+    AttributeTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 属性模板唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        categoryId:
+          type: string
+          description: 关联的类目ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryAttribute'
+          description: 属性列表
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - categoryId
+        - attributes
+        - createdAt
+        - updatedAt
+
+    CategoryAttribute:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 属性唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440002"
+        name:
+          type: string
+          description: 属性名称
+          example: "品牌"
+        type:
+          type: string
+          description: 属性类型
+          enum: [text, number, single-select, multi-select]
+          example: "single-select"
+        required:
+          type: boolean
+          description: 是否必填
+          example: true
+        optionalValues:
+          type: array
+          items:
+            type: string
+          description: 可选值列表（用于select类型）
+          example: ["可口可乐", "百事可乐", "农夫山泉"]
+        defaultValue:
+          type: string
+          description: 默认值
+          example: "可口可乐"
+        placeholder:
+          type: string
+          description: 占位符文本
+          example: "请选择品牌"
+        description:
+          type: string
+          description: 属性描述
+          example: "饮料的品牌选择"
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 1
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRule'
+          description: 验证规则列表
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - name
+        - type
+        - required
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    ValidationRule:
+      type: object
+      properties:
+        type:
+          type: string
+          description: 验证类型
+          enum: [minLength, maxLength, min, max, pattern, custom]
+          example: "minLength"
+        value:
+          description: 验证值
+          oneOf:
+            - type: string
+            - type: number
+          example: 2
+        message:
+          type: string
+          description: 错误提示信息
+          example: "至少输入2个字符"
+      required:
+        - type
+        - value
+        - message
+
+    CreateAttributeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 属性名称
+          minLength: 2
+          maxLength: 30
+          example: "容量"
+        type:
+          type: string
+          description: 属性类型
+          enum: [text, number, single-select, multi-select]
+          example: "single-select"
+        required:
+          type: boolean
+          description: 是否必填
+          example: false
+        optionalValues:
+          type: array
+          items:
+            type: string
+          description: 可选值列表（select类型必填）
+          example: ["330ml", "500ml", "1.5L", "2L"]
+        defaultValue:
+          type: string
+          description: 默认值
+          example: "500ml"
+        placeholder:
+          type: string
+          description: 占位符文本
+          example: "请选择容量"
+        description:
+          type: string
+          description: 属性描述
+          example: "饮料的容量规格"
+        sortOrder:
+          type: integer
+          description: 排序序号
+          minimum: 0
+          example: 2
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRule'
+          description: 验证规则列表
+      required:
+        - name
+        - type
+        - required
+        - sortOrder
+
+    UpdateAttributeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 30
+          example: "容量规格"
+        type:
+          type: string
+          enum: [text, number, single-select, multi-select]
+          example: "single-select"
+        required:
+          type: boolean
+          example: false
+        optionalValues:
+          type: array
+          items:
+            type: string
+          example: ["330ml", "500ml", "1L", "2L"]
+        defaultValue:
+          type: string
+          example: "500ml"
+        placeholder:
+          type: string
+          example: "请选择容量规格"
+        description:
+          type: string
+          example: "饮料的容量规格选项"
+        sortOrder:
+          type: integer
+          minimum: 0
+          example: 2
+        validation:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRule'
+
+    SaveAttributeTemplateRequest:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateAttributeRequest'
+          description: 属性列表
+          minItems: 0
+          maxItems: 50
+      required:
+        - attributes
+
+    # 通用响应模型
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        message:
+          type: string
+          description: 响应消息
+          example: "操作成功"
+        data:
+          description: 响应数据
+        code:
+          type: string
+          description: 错误代码（失败时返回）
+        details:
+          description: 错误详情
+      required:
+        - success
+
+    CategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/Category'
+
+    CategoryTreeResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/CategoryTreeNode'
+            total:
+              type: integer
+              description: 总节点数
+              example: 15
+
+    CategoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Category'
+                total:
+                  type: integer
+                  description: 总记录数
+                  example: 50
+                page:
+                  type: integer
+                  description: 当前页码
+                  example: 1
+                pageSize:
+                  type: integer
+                  description: 每页大小
+                  example: 20
+                totalPages:
+                  type: integer
+                  description: 总页数
+                  example: 3
+
+    CategoryChildrenResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+
+    AttributeTemplateResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AttributeTemplate'
+
+    AttributeResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/CategoryAttribute'
+
+    SuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            message:
+              type: string
+              example: "操作成功"
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: false
+            code:
+              type: string
+              description: 错误代码
+              example: "CATEGORY_NOT_FOUND"
+            message:
+              type: string
+              description: 错误信息
+              example: "类目不存在"
+            details:
+              description: 错误详情
+              example: null
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            code: "INVALID_REQUEST"
+            message: "请求参数无效"
+            details: { name: "类目名称不能为空" }
+
+    Unauthorized:
+      description: 未授权访问
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            code: "UNAUTHORIZED"
+            message: "未授权访问"
+
+    # Forbidden response removed - no permission control in frontend mock implementation
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            code: "NOT_FOUND"
+            message: "资源不存在"
+
+  # No authentication required for frontend mock implementation
+
+tags:
+  - name: 类目管理
+    description: 类目的增删改查和树结构管理
+  - name: 属性模板
+    description: 类目属性模板的配置管理
