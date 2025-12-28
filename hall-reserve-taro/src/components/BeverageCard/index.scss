@@ -1,0 +1,130 @@
+/**
+ * @spec O003-beverage-order
+ * 饮品卡片样式
+ */
+
+.beverage-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.out-of-stock {
+    opacity: 0.6;
+
+    .beverage-card__image {
+      filter: grayscale(100%);
+    }
+  }
+
+  // 图片容器
+  &__image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 75%; // 4:3 宽高比
+    overflow: hidden;
+  }
+
+  &__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // 角标
+  &__badge {
+    position: absolute;
+    top: 16rpx;
+    right: 16rpx;
+    padding: 8rpx 16rpx;
+    font-size: 20rpx;
+    font-weight: 500;
+    color: #fff;
+    border-radius: 8rpx;
+    z-index: 1;
+
+    &--recommend {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+    }
+
+    &--sold-out {
+      background: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  // 内容区域
+  &__content {
+    display: flex;
+    flex-direction: column;
+    padding: 24rpx;
+  }
+
+  &__name {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__description {
+    font-size: 24rpx;
+    color: #999;
+    line-height: 1.5;
+    margin-bottom: 16rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  // 底部区域
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    color: #ff6b6b;
+  }
+
+  &__price-symbol {
+    font-size: 24rpx;
+    font-weight: 600;
+    margin-right: 4rpx;
+  }
+
+  &__price-value {
+    font-size: 36rpx;
+    font-weight: 700;
+  }
+
+  &__action {
+    padding: 12rpx 24rpx;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+    border-radius: 24rpx;
+    box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+  }
+
+  &__action-text {
+    font-size: 24rpx;
+    font-weight: 500;
+    color: #fff;
+  }
+}

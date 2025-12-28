@@ -1,1 +1,1 @@
-specs/O001-product-order-list
+specs/O003-beverage-order

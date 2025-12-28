@@ -24,14 +24,48 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
  * 静默登录
  *
  * 调用 wx.login 获取 code，然后调用后端登录接口获取令牌和用户信息
+ * H5 环境下使用 Mock 用户数据（开发/测试用）
  *
  * @returns Promise<LoginResponse> 登录响应
  * @throws Error 如果登录失败
  */
 export const silentLogin = async (): Promise<LoginResponse> => {
   console.log('[AuthService] Starting silent login...')
+  console.log('[AuthService] Platform:', process.env.TARO_ENV)
 
   try {
+    // H5 环境：使用 Mock 用户（开发/测试）
+    if (process.env.TARO_ENV === 'h5') {
+      console.log('[AuthService] H5 environment detected, using mock user')
+
+      const mockLoginResponse: LoginResponse = {
+        accessToken: 'mock-access-token-h5-' + Date.now(),
+        refreshToken: 'mock-refresh-token-h5-' + Date.now(),
+        expiresIn: 7 * 24 * 60 * 60, // 7 天
+        user: {
+          id: 'mock-user-h5',
+          openId: 'mock-openid-h5',
+          nickName: 'H5测试用户',
+          avatarUrl: 'https://via.placeholder.com/100',
+          createdAt: new Date().toISOString(),
+        }
+      }
+
+      // 存储 Mock 令牌和用户信息
+      setToken(
+        mockLoginResponse.accessToken,
+        mockLoginResponse.refreshToken,
+        mockLoginResponse.expiresIn
+      )
+      setUser(mockLoginResponse.user)
+
+      console.log('[AuthService] Mock login successful (H5 mode)')
+      return mockLoginResponse
+    }
+
+    // 小程序环境：正常微信登录流程
+    console.log('[AuthService] WeChat mini-program environment, proceeding with wx.login')
+
     // Step 1: 调用 Taro.login 获取微信 code
     const { code } = await Taro.login()
 
@@ -76,19 +110,22 @@ export const silentLogin = async (): Promise<LoginResponse> => {
   } catch (error: any) {
     console.error('[AuthService] Silent login failed:', error)
 
-    // 网络异常提示
-    if (error.errMsg?.includes('request:fail')) {
-      Taro.showToast({
-        title: '网络异常，请重试',
-        icon: 'none',
-        duration: 2000,
-      })
-    } else {
-      Taro.showToast({
-        title: error.message || '登录失败',
-        icon: 'none',
-        duration: 2000,
-      })
+    // H5 环境下不显示错误提示（避免干扰开发体验）
+    if (process.env.TARO_ENV !== 'h5') {
+      // 网络异常提示
+      if (error.errMsg?.includes('request:fail')) {
+        Taro.showToast({
+          title: '网络异常，请重试',
+          icon: 'none',
+          duration: 2000,
+        })
+      } else {
+        Taro.showToast({
+          title: error.message || '登录失败',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
     }
 
     throw error

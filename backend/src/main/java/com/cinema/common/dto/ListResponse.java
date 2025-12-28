@@ -4,138 +4,50 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 列表响应类
- * <p>
- * 用于包装列表查询的 API 响应，包含数据列表和总数
- * </p>
- *
- * @param <T> 列表元素类型
- * @author Cinema Platform
- * @since 2025-12-19
+ * @spec O003-beverage-order
+ * 列表响应包装类
  */
 public class ListResponse<T> {
-
-    /**
-     * 是否成功
-     */
-    private boolean success = true;
-
-    /**
-     * 数据列表
-     */
+    private boolean success;
     private List<T> data;
-
-    /**
-     * 总记录数（用于分页）
-     */
     private long total;
-
-    /**
-     * 消息（可选）
-     */
+    private int page;
+    private int pageSize;
     private String message;
 
-    /**
-     * 响应时间戳（ISO 8601 格式）
-     */
-    private String timestamp;
-
-    /**
-     * 默认构造函数
-     */
-    public ListResponse() {
-        this.timestamp = Instant.now().toString();
-    }
-
-    /**
-     * 带数据的构造函数
-     *
-     * @param data  数据列表
-     * @param total 总记录数
-     */
-    public ListResponse(List<T> data, long total) {
-        this.data = data;
-        this.total = total;
-        this.timestamp = Instant.now().toString();
-    }
-
-    /**
-     * 静态工厂方法：创建成功的列表响应
-     *
-     * @param data  数据列表
-     * @param total 总记录数
-     * @param <T>   列表元素类型
-     * @return ListResponse 实例
-     */
-    public static <T> ListResponse<T> success(List<T> data, long total) {
-        return new ListResponse<>(data, total);
-    }
-
-    /**
-     * 静态工厂方法：创建带消息的成功响应
-     *
-     * @param data    数据列表
-     * @param total   总记录数
-     * @param message 消息
-     * @param <T>     列表元素类型
-     * @return ListResponse 实例
-     */
-    public static <T> ListResponse<T> success(List<T> data, long total, String message) {
-        ListResponse<T> response = new ListResponse<>(data, total);
-        response.setMessage(message);
-        return response;
-    }
-
-    // Getters and Setters
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
+    public ListResponse(boolean success, List<T> data, long total, int page, int pageSize, String message) {
         this.success = success;
-    }
-
-    public List<T> getData() {
-        return data;
-    }
-
-    public void setData(List<T> data) {
         this.data = data;
-    }
-
-    public long getTotal() {
-        return total;
-    }
-
-    public void setTotal(long total) {
         this.total = total;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
+        this.page = page;
+        this.pageSize = pageSize;
         this.message = message;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public static <T> ListResponse<T> success(List<T> data, long total, int page, int pageSize) {
+        return new ListResponse<>(true, data, total, page, pageSize, "");
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public static <T> ListResponse<T> success(List<T> data, long total) {
+        return new ListResponse<>(true, data, total, 0, (int)total, "");
     }
 
-    @Override
-    public String toString() {
-        return "ListResponse{" +
-                "success=" + success +
-                ", data=" + data +
-                ", total=" + total +
-                ", message='" + message + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                '}';
+    public static <T> ListResponse<T> failure(String message) {
+        return new ListResponse<>(false, null, 0, 0, 0, message);
     }
+
+    // Getters and Setters
+    public boolean isSuccess() { return success; }
+    public List<T> getData() { return data; }
+    public long getTotal() { return total; }
+    public int getPage() { return page; }
+    public int getPageSize() { return pageSize; }
+    public String getMessage() { return message; }
+
+    public void setSuccess(boolean success) { this.success = success; }
+    public void setData(List<T> data) { this.data = data; }
+    public void setTotal(long total) { this.total = total; }
+    public void setPage(int page) { this.page = page; }
+    public void setPageSize(int pageSize) { this.pageSize = pageSize; }
+    public void setMessage(String message) { this.message = message; }
 }

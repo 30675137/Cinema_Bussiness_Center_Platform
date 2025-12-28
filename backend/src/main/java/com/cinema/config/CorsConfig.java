@@ -16,34 +16,18 @@ import java.util.List;
  *
  * @author Cinema Platform
  * @since 2025-12-19
+ *
+ * NOTE: 已禁用此配置，使用 WebConfig 的 addCorsMappings 代替
  */
-@Configuration
+// @Configuration
 public class CorsConfig {
 
-    @Bean
+    // @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // 允许的源（明确指定，不使用通配符）
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:3002",
-                "http://localhost:3003",
-                "http://localhost:3004",
-                "http://localhost:3005",
-                "http://localhost:5173",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:3001",
-                "http://127.0.0.1:3002",
-                "http://127.0.0.1:3003",
-                "http://127.0.0.1:3004",
-                "http://127.0.0.1:3005",
-                "http://127.0.0.1:5173",
-                "http://localhost:10086",    // C端Taro H5
-                "http://localhost:10087",    // C端Taro H5 (备用端口)
-                "http://127.0.0.1:10086",    // C端Taro H5
-                "http://127.0.0.1:10087"));  // C端Taro H5 (备用端口)
+        // 允许的源（开发环境允许所有来源，使用 allowedOriginPatterns 支持 allowCredentials=true）
+        config.setAllowedOriginPatterns(List.of("*"));
 
         // 允许的HTTP方法
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

@@ -1,0 +1,61 @@
+/**
+ * @spec O003-beverage-order
+ * 购物车图标样式
+ */
+
+.cart-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100rpx;
+  height: 100rpx;
+  background: #1890ff;
+  border-radius: 50%;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  }
+
+  // 固定在右上角
+  &--fixed {
+    position: fixed;
+    right: 30rpx;
+    top: 30rpx;
+    z-index: 999;
+  }
+
+  // 购物车图标
+  &__icon {
+    font-size: 48rpx;
+    line-height: 1;
+  }
+
+  // 数量徽章
+  &__badge {
+    position: absolute;
+    top: -8rpx;
+    right: -8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36rpx;
+    height: 36rpx;
+    padding: 0 8rpx;
+    background: #ff4d4f;
+    border: 2rpx solid #fff;
+    border-radius: 18rpx;
+    box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+  }
+
+  &__badge-text {
+    font-size: 20rpx;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+  }
+}

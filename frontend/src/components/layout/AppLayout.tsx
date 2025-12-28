@@ -24,6 +24,7 @@ import {
   ShoppingCartOutlined,
   InboxOutlined,
   StockOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore, useCurrentUser, useSidebarCollapsed, useBreadcrumbs } from '@/stores/appStore';
@@ -337,6 +338,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {
           key: '/schedule/changes',
           label: '排期变更/取消/改期',
+        },
+      ],
+    },
+    {
+      key: '/beverage',
+      icon: <CoffeeOutlined />,
+      label: 'O003-饮品订单管理',
+      children: [
+        {
+          key: '/beverage/list',
+          label: 'US3-饮品配置管理',
+        },
+        {
+          key: '/beverage/orders',
+          label: 'US2-饮品订单/出品',
         },
       ],
     },

@@ -9,6 +9,7 @@ import {
   ShoppingCartOutlined,
   BarChartOutlined,
   SettingOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons'
 import { useNavigate, useLocation } from 'react-router-dom'
 import type { MenuProps } from 'antd'
@@ -67,6 +68,18 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
           key: '/inventory/trace',
           icon: <BarChartOutlined />,
           label: '库存追溯',
+        },
+      ],
+    },
+    {
+      key: '/beverage',
+      icon: <CoffeeOutlined />,
+      label: '饮品管理',
+      children: [
+        {
+          key: '/beverage/list',
+          icon: <CoffeeOutlined />,
+          label: '饮品配置',
         },
       ],
     },

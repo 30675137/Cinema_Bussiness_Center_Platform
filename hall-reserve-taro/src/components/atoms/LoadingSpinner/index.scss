@@ -1,0 +1,24 @@
+/**
+ * @spec O003-beverage-order
+ * LoadingSpinner 样式
+ */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &--fullscreen {
+    min-height: 100vh;
+  }
+
+  &--default {
+    padding: 64rpx;
+  }
+
+  &__tip {
+    margin-top: 32rpx;
+    font-size: 28rpx;
+    color: #999;
+  }
+}

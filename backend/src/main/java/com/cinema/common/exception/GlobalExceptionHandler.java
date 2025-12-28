@@ -272,6 +272,53 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    // ==================== Beverage Order Exceptions (O003-beverage-order) ====================
+
+    /**
+     * 处理饮品订单业务异常
+     * <p>
+     * 统一处理饮品订单模块的所有业务异常，包括：
+     * - 饮品不存在 (BEV_NTF_001)
+     * - 饮品规格不存在 (BEV_NTF_002)
+     * - 饮品配方不存在 (BEV_NTF_003)
+     * - 饮品已下架 (BEV_VAL_001)
+     * - 饮品已售罄 (BEV_VAL_002)
+     * - 饮品规格无效 (BEV_VAL_003)
+     * - 原料库存不足 (BEV_BIZ_001)
+     * - 订单不存在 (ORD_NTF_001)
+     * - 取餐号不存在 (ORD_NTF_002)
+     * - 订单状态无效 (ORD_VAL_001)
+     * - 订单金额无效 (ORD_VAL_002)
+     * - 订单商品项为空 (ORD_VAL_003)
+     * - 订单状态流转非法 (ORD_BIZ_001)
+     * - 支付失败 (ORD_BIZ_002)
+     * - BOM扣料失败 (ORD_BIZ_003)
+     * - 取餐号已用尽 (ORD_BIZ_004)
+     * - 订单已取消 (ORD_BIZ_005)
+     * - 数据库错误 (SYS_001)
+     * - 外部服务调用失败 (SYS_002)
+     * - 并发冲突 (SYS_003)
+     * </p>
+     *
+     * @param ex      饮品订单业务异常对象
+     * @param request Web 请求
+     * @return 对应 HTTP 状态码的 ErrorResponse
+     * @spec O003-beverage-order
+     */
+    @ExceptionHandler(com.cinema.beverage.exception.BeverageException.class)
+    public ResponseEntity<ErrorResponse> handleBeverageException(
+            com.cinema.beverage.exception.BeverageException ex, WebRequest request) {
+        logger.warn("Beverage exception: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
+        ErrorResponse error = ErrorResponse.of(
+                ex.getErrorCode().getCode(),
+                ex.getMessage(),
+                ex.getDetails()
+        );
+        return ResponseEntity
+                .status(ex.getErrorCode().getHttpStatus())
+                .body(error);
+    }
+
     /**
      * 处理验证异常
      *
