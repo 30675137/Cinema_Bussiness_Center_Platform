@@ -3,6 +3,7 @@ package com.cinema.common.dto;
 import java.time.Instant;
 
 /**
+ * @spec O003-beverage-order
  * 统一 API 响应包装类
  * <p>
  * 用于包装所有 API 响应，提供一致的响应格式
