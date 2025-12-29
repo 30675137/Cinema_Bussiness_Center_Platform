@@ -1,0 +1,5 @@
+# @spec T001-e2e-scenario-author
+# Python dependencies for test-scenario-author skill
+
+PyYAML>=6.0
+jsonschema>=4.17
