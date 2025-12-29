@@ -67,7 +67,6 @@ tests/
 ## Recent Changes
 - P005-bom-inventory-deduction: Added Supabase PostgreSQL 作为主要数据源，扩展现有表结构:
 - O003-beverage-order: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
-- O001-product-order-list: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 
 
 <!-- MANUAL ADDITIONS START -->

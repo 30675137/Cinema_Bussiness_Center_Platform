@@ -1,20 +1,26 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.8.0 → 1.9.0 -->
-<!-- Modified principles: None -->
+<!-- Version change: 1.9.0 → 1.10.0 → 1.11.0 -->
+<!-- Modified principles:
+  - 测试驱动开发 (Test-Driven Development) - 移除E2E测试强制要求,改为可选策略 (v1.10.0)
+-->
 <!-- Added sections:
-  - 业务概念澄清文档要求 (Business Clarification Documentation) - 新增spec目录下必须创建business-clarification.md文档的强制要求
+  - Principle 8: Claude Code Skills 开发规范 (Claude Code Skills Development Standards) (v1.11.0)
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (已添加业务概念澄清文档要求)
-  ⚠ .specify/templates/spec-template.md (需要添加business-clarification.md章节说明)
-  ⚠ specs/*/spec.md (现有spec需要补充business-clarification.md文档)
+  ✅ .specify/memory/constitution.md (已更新测试驱动开发原则 + 新增 Principle 8)
+  ✅ .claude/rules/02-test-driven-development.md (已更新R2.2测试框架说明,标注E2E测试为可选)
+  ⚠ .specify/templates/spec-template.md (User Scenarios & Testing章节说明需明确E2E测试为可选)
+  ⚠ .specify/templates/plan-template.md (Constitution Check中保留测试覆盖率检查,但不强制E2E)
+  ⚠ .specify/templates/spec-template.md (T###类spec需包含skill.md/data-model.md/quickstart.md的文档要求)
 -->
 <!-- Follow-up TODOs:
-  1. 为现有spec创建business-clarification.md文档模板
-  2. 在spec-template.md中添加业务概念澄清章节的指导说明
-  3. 更新文档生成工具支持business-clarification.md的自动创建
-  4. 在代码审查清单中添加业务概念澄清文档的完整性检查
+  1. ✅ 已完成: 更新 .claude/rules/02-test-driven-development.md 明确E2E测试为可选(Playwright非强制)
+  2. 在代码审查清单中调整测试覆盖率检查,区分必须覆盖(单元测试)和可选覆盖(E2E测试)
+  3. 更新CI/CD流水线配置,E2E测试失败不阻塞发布(可设置为警告)
+  4. 为团队提供E2E测试编写指南,说明在哪些场景下建议编写E2E测试(如关键业务流程、支付流程等)
+  5. 更新 spec-template.md,为 T### 类型的 spec 添加 Claude Code Skills 强制文档要求提示
+  6. 创建 Claude Code Skills 开发最佳实践文档,提供示例和模板
 -->
 
 # 影院商品管理中台宪法
@@ -103,9 +109,30 @@ public class StoreAssociationService {
 
 ### 三、测试驱动开发 (Test-Driven Development)
 
-测试先行的开发策略是强制性的。所有功能必须先编写测试用例,确保测试失败后再实现功能代码。严格遵循 Red-Green-Refactor 循环:先写测试(Red),实现最小可行代码使测试通过(Green),然后重构优化(Refactor)。使用 Playwright 进行端到端测试,Vitest 进行单元测试,确保关键业务流程的测试覆盖率达到 100%。
+测试先行的开发策略是强制性的。所有功能必须先编写测试用例,确保测试失败后再实现功能代码。严格遵循 Red-Green-Refactor 循环:先写测试(Red),实现最小可行代码使测试通过(Green),然后重构优化(Refactor)。
 
-**基本原理**: 测试先行保证功能需求的明确性和代码设计的正确性,通过自动化测试确保代码质量和回归预防,提高代码的可维护性和系统的稳定性。
+**测试策略与覆盖率要求**:
+
+1. **强制测试类型**:
+   - **单元测试(Unit Tests)**: 必须使用 Vitest 进行单元测试,测试覆盖工具函数、业务逻辑、组件行为
+   - **集成测试(Integration Tests)**: 必须测试模块间交互、API 调用、数据流转
+
+2. **可选测试类型**:
+   - **端到端测试(E2E Tests)**: 使用 Playwright 进行端到端测试为**可选策略**,不强制要求每个 spec 都编写 E2E 测试
+   - **建议编写 E2E 测试的场景**: 关键业务流程(如支付流程、订单创建)、复杂用户交互(如多步骤表单)、跨模块集成场景
+
+3. **覆盖率标准**:
+   - 关键业务逻辑的单元测试覆盖率: **100%**(强制)
+   - 工具函数测试覆盖率: ≥ 80%
+   - 组件测试覆盖率: ≥ 70%
+   - E2E 测试覆盖率: 无强制要求,由团队根据功能重要性和风险评估决定
+
+4. **测试框架与工具**:
+   - **单元测试**: Vitest(前端)、JUnit(后端)
+   - **集成测试**: MSW(API Mock)、Supertest(后端 API 测试)
+   - **E2E 测试**(可选): Playwright(B端)、微信开发者工具(C端小程序)
+
+**基本原理**: 测试先行保证功能需求的明确性和代码设计的正确性,通过自动化测试确保代码质量和回归预防,提高代码的可维护性和系统的稳定性。强制单元测试和集成测试确保代码逻辑的正确性,而将 E2E 测试设为可选策略,允许团队根据功能特点、风险评估和资源情况灵活决定是否编写,避免过度测试增加开发成本。对于关键业务流程,仍建议编写 E2E 测试以确保用户体验的完整性。
 
 ### 四、组件化架构 (Component-Based Architecture)
 
@@ -167,6 +194,84 @@ Java 代码是否具备足够的注释可读性。
 
 **基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期
 可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。
+
+### 八、Claude Code Skills 开发规范 (Claude Code Skills Development Standards)
+
+当创建 Claude Code skill(即通过 Claude Code CLI 调用的命令行工具扩展)时,必须遵循特定的规格文档结构和开发规范,确保 skill 的可维护性、可发现性和团队协作效率。
+
+**Skill Spec 识别**:
+- 所有创建 Claude Code skill 的规格必须使用 `T###` 模块前缀(Tool/Infrastructure)
+- Spec 标题必须明确标注"Claude Code skill"或"skill"关键词
+- 示例:`T001-e2e-scenario-author`, `T002-api-test-generator`
+
+**强制文档要求**:
+
+1. **skill.md 文件**:
+   - 位置: `.claude/skills/<skill-name>/skill.md`
+   - 内容: Skill 的完整功能说明、命令参数、使用示例、工作流程
+   - 必须包含 `@spec T###` 归属标识
+
+2. **spec.md 文件**:
+   - 位置: `specs/T###-<skill-name>/spec.md`
+   - 内容: 用户故事、功能需求、验收标准、成功指标
+   - 必须包含明确的 skill 调用方式说明(如 `/scenario-author create`)
+
+3. **data-model.md 文件**:
+   - 位置: `specs/T###-<skill-name>/data-model.md`
+   - 内容: Skill 处理的数据模型定义(如 YAML schema, JSON schema)
+   - 必须包含数据验证规则和约束条件
+
+4. **quickstart.md 文件**:
+   - 位置: `specs/T###-<skill-name>/quickstart.md`
+   - 内容: 快速上手指南、基本用法示例、常见问题排查
+   - 必须包含完整的命令使用示例和预期输出
+
+**Skill 实现规范**:
+
+1. **命令调用格式**:
+   - 统一使用 `/<skill-name>` 格式(如 `/scenario-author`, `/doc-writer`)
+   - 支持参数传递(如 `/scenario-author create --spec P005`)
+   - 必须提供清晰的帮助文档(`/<skill-name> --help`)
+
+2. **工作流定义**:
+   - 必须在 skill.md 中明确定义对话流程或自动化流程
+   - 对话式 skill 必须提供引导性问题和选项
+   - 自动化 skill 必须提供详细的执行步骤说明
+
+3. **输出规范**:
+   - 生成的文件必须使用标准化命名(如 `E2E-MODULE-001.yaml`)
+   - 必须提供执行结果摘要(成功/失败、生成文件列表)
+   - 错误信息必须清晰说明问题和解决建议
+
+4. **资源文件组织**:
+   - 模板文件: `.claude/skills/<skill-name>/assets/templates/`
+   - 参考文档: `.claude/skills/<skill-name>/references/`
+   - 辅助脚本: `.claude/skills/<skill-name>/scripts/`(可选)
+
+**验证与测试**:
+
+1. **Skill 功能测试**:
+   - 必须提供至少 3 个真实使用场景的测试用例
+   - 必须验证 skill 对话流程的完整性和容错性
+   - 必须验证生成文件的格式正确性和完整性
+
+2. **文档完整性检查**:
+   - 必须确保 spec.md, data-model.md, quickstart.md 三个文档齐全
+   - 必须确保 skill.md 与 spec.md 中的功能描述一致
+   - 必须确保所有示例代码和命令可正常执行
+
+3. **Constitution Check 适配**:
+   - Skill 开发的 Constitution Check 应标注 N/A 的规则(如组件化架构、前端技术栈等)
+   - 必须保留适用的规则检查(如功能分支绑定、代码归属标识、测试驱动开发)
+
+**禁止行为**:
+- ❌ 禁止创建 skill 而不编写完整的 spec 文档
+- ❌ 禁止 skill.md 与 spec.md 功能描述不一致
+- ❌ 禁止跳过 data-model.md 或 quickstart.md 文档
+- ❌ 禁止 skill 生成的文件缺少格式验证
+- ❌ 禁止 skill 功能变更后不同步更新文档
+
+**基本原理**: Claude Code skills 作为开发工作流的自动化扩展,必须有完整的规格文档确保可维护性和可发现性。通过强制文档要求和标准化规范,团队成员可以快速理解 skill 功能、正确使用 skill 命令、贡献改进建议。明确的数据模型定义和 quickstart 指南降低 skill 的学习成本,提高开发效率。
 
 ## 后端架构与技术栈
 
@@ -473,7 +578,9 @@ Java 代码是否具备足够的注释可读性。
 
 ### 持续集成与质量门禁 (Continuous Integration & Quality Gates)
 
-建立完整的质量门禁体系,包括代码规范检查、类型检查、单元测试、集成测试、端到端测试等。所有质量检查必须通过后才能合并代码。使用自动化工具确保质量标准的执行,减少人工审查的工作量和主观性。
+建立完整的质量门禁体系,包括代码规范检查、类型检查、单元测试、集成测试等。所有质量检查必须通过后才能合并代码。使用自动化工具确保质量标准的执行,减少人工审查的工作量和主观性。
+
+**注意**: E2E 测试为可选策略,E2E 测试失败可设置为警告而非阻塞发布,由团队根据功能重要性决定是否强制通过 E2E 测试。
 
 ## 质量标准
 
@@ -509,4 +616,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.9.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-27
+**版本**: 1.11.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-29
