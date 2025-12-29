@@ -1,3 +1,9 @@
+// 导出基础类型和枚举（从 base.ts）
+export * from './base';
+
+// 导出用户类型（从 user.ts）
+export * from './user';
+
 // 通用类型定义
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -27,72 +33,6 @@ export interface ErrorResponse {
   code: string;
   details?: Record<string, any>;
   timestamp: string;
-}
-
-// 状态枚举
-export enum MaterialType {
-  RAW_MATERIAL = 'raw_material',      // 原材料
-  SEMI_FINISHED = 'semi_finished',  // 半成品
-  FINISHED_GOOD = 'finished_good'   // 成品
-}
-
-export enum ProductStatus {
-  DRAFT = 'draft',                   // 草稿
-  PENDING_REVIEW = 'pending_review', // 待审核
-  APPROVED = 'approved',             // 已审核
-  PUBLISHED = 'published',           // 已发布
-  DISABLED = 'disabled',              // 已禁用
-  ARCHIVED = 'archived'             // 已归档
-}
-
-export enum StoreType {
-  CINEMA = 'cinema',        // 影院
-  THEATER = 'theater',      // 剧院
-  CONCERT_HALL = 'concert_hall', // 音乐厅
-  MIXED = 'mixed'           // 综合体
-}
-
-export enum ChannelType {
-  MINI_PROGRAM = 'mini_program', // 小程序
-  APP = 'app',                   // APP
-  WEBSITE = 'website',           // 官网
-  OFFLINE = 'offline'            // 线下
-}
-
-// 基础实体类型
-export interface BaseEntity {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
-  version: number;
-}
-
-// 用户相关类型
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  phone?: string;
-  name: string;
-  avatar?: string;
-  department?: string;
-  position?: string;
-  status: 'active' | 'inactive' | 'locked';
-  permissions: Permission[];
-  lastLoginAt?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Permission {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  module: string;
-  type: 'view' | 'create' | 'edit' | 'delete' | 'approve' | 'export' | 'import';
 }
 
 // UI状态类型

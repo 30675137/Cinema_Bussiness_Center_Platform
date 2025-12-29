@@ -57,13 +57,13 @@ public class InventoryTransaction {
      * Negative = decrease (e.g., deduction, damage)
      * Zero = informational (e.g., reservation events)
      */
-    @Column(name = "quantity", nullable = false, precision = 15, scale = 4)
+    @Column(name = "quantity", nullable = false)
     private BigDecimal quantity;
 
-    @Column(name = "quantity_before", nullable = false, precision = 15, scale = 4)
+    @Column(name = "stock_before", nullable = false)
     private BigDecimal quantityBefore;
 
-    @Column(name = "quantity_after", nullable = false, precision = 15, scale = 4)
+    @Column(name = "stock_after", nullable = false)
     private BigDecimal quantityAfter;
 
     /**
@@ -80,16 +80,16 @@ public class InventoryTransaction {
     @Column(name = "bom_snapshot_id")
     private UUID bomSnapshotId;
 
-    @Column(name = "adjustment_reason_id")
+    @Column(name = "adjustment_reason_id", insertable = false, updatable = false)
     private UUID adjustmentReasonId;
 
     @Column(name = "operator_id", nullable = false)
     private UUID operatorId;
 
-    @Column(name = "operated_at", nullable = false)
+    @Column(name = "transaction_time", nullable = false)
     private Instant operatedAt;
 
-    @Column(name = "notes")
+    @Column(name = "remarks")
     private String notes;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -219,46 +219,20 @@ public class InventoryTransaction {
 
     /**
      * Transaction Type Enum
+     * Note: Enum names MUST match database check constraint values (lowercase with underscores)
+     * Database allows: purchase_in, sale_out, adjustment_in, adjustment_out, damage_out,
+     *                  transfer_in, transfer_out, return_in, return_out, safety_stock_update
      */
     public enum TransactionType {
-        /**
-         * BOM reservation created (informational, quantity = 0)
-         */
-        BOM_RESERVATION,
-
-        /**
-         * Actual inventory deduction for order fulfillment (quantity < 0)
-         */
-        BOM_DEDUCTION,
-
-        /**
-         * Reservation released due to cancellation/expiry (informational, quantity = 0)
-         */
-        RESERVATION_RELEASE,
-
-        /**
-         * Manual adjustment - surplus/increase (quantity > 0)
-         */
-        ADJUSTMENT_SURPLUS,
-
-        /**
-         * Manual adjustment - shortage/decrease (quantity < 0)
-         */
-        ADJUSTMENT_SHORTAGE,
-
-        /**
-         * Damaged goods write-off (quantity < 0)
-         */
-        DAMAGE,
-
-        /**
-         * Inter-store transfer in (quantity > 0)
-         */
-        TRANSFER_IN,
-
-        /**
-         * Inter-store transfer out (quantity < 0)
-         */
-        TRANSFER_OUT
+        purchase_in,
+        sale_out,
+        adjustment_in,
+        adjustment_out,
+        damage_out,
+        transfer_in,
+        transfer_out,
+        return_in,
+        return_out,
+        safety_stock_update
     }
 }

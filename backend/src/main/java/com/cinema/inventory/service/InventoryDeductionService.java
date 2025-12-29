@@ -159,7 +159,7 @@ public class InventoryDeductionService {
             InventoryTransaction transaction = new InventoryTransaction();
             transaction.setStoreId(storeId);
             transaction.setSkuId(skuId);
-            transaction.setTransactionType(InventoryTransaction.TransactionType.BOM_DEDUCTION);
+            transaction.setTransactionType(InventoryTransaction.TransactionType.sale_out); // Use sale_out for BOM deduction
             transaction.setQuantity(deductQuantity.negate()); // Negative for deduction
             transaction.setQuantityBefore(previousQty);
             transaction.setQuantityAfter(inventory.getOnHandQty());

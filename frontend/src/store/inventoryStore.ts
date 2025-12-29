@@ -1,19 +1,23 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { createQueries, createQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import inventoryService, {
-  type CurrentInventory,
-  type InventoryTransaction,
-  type InventoryStatistics,
-  type TransactionDetail,
-  type InventoryQueryParams,
-  type BatchInfo,
-  type InventoryAlert,
-  type ReplenishmentSuggestion,
-  type TransferOrder
-} from '@/services/inventoryService';
-import type { TransactionType, SourceType, InventoryStatus } from '@/types/inventory';
+import type {
+  CurrentInventory,
+  InventoryTransaction,
+  InventoryStatistics,
+  TransactionDetail,
+  InventoryQueryParams,
+  InventoryAlert,
+  TransactionType,
+  SourceType,
+  InventoryStatus
+} from '@/types/inventory';
+import inventoryService from '@/services/inventoryService';
+
+// 临时类型定义（与 inventoryService 保持一致）
+type BatchInfo = any;
+type ReplenishmentSuggestion = any;
+type TransferOrder = any;
 
 /**
  * 库存状态管理接口
