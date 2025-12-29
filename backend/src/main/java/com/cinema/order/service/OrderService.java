@@ -1,5 +1,6 @@
 /**
  * @spec O001-product-order-list
+ * @spec O003-beverage-order
  * 订单服务层
  */
 package com.cinema.order.service;
@@ -9,6 +10,7 @@ import com.cinema.order.dto.*;
 import com.cinema.order.exception.*;
 import com.cinema.order.mapper.OrderMapper;
 import com.cinema.order.repository.JdbcProductOrderRepository;
+import com.cinema.order.repository.UnifiedOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,21 +31,30 @@ public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final JdbcProductOrderRepository repository;
+    private final UnifiedOrderRepository unifiedOrderRepository;
     private final OrderMapper mapper;
 
-    public OrderService(JdbcProductOrderRepository repository, OrderMapper mapper) {
+    public OrderService(
+        JdbcProductOrderRepository repository,
+        UnifiedOrderRepository unifiedOrderRepository,
+        OrderMapper mapper
+    ) {
         this.repository = repository;
+        this.unifiedOrderRepository = unifiedOrderRepository;
         this.mapper = mapper;
     }
 
     /**
      * 查询订单列表（支持筛选和分页）
      *
+     * 注意：此方法仅查询商品订单，不包含饮品订单
+     * 如需查询所有订单类型，请使用 findUnifiedOrders 方法
+     *
      * @param params 查询参数
      * @return 订单列表响应
      */
     public OrderListResponse findOrders(OrderQueryParams params) {
-        logger.info("Querying orders with params: status={}, page={}, pageSize={}",
+        logger.info("Querying product orders with params: status={}, page={}, pageSize={}",
             params.getStatus(), params.getPage(), params.getPageSize());
 
         JdbcProductOrderRepository.PageResult<ProductOrder> pageResult =
@@ -53,6 +64,28 @@ public class OrderService {
 
         return OrderListResponse.success(
             orderDTOs,
+            pageResult.getTotal(),
+            params.getPage(),
+            params.getPageSize(),
+            "查询成功"
+        );
+    }
+
+    /**
+     * 查询统一订单列表（包含商品订单和饮品订单）
+     *
+     * @param params 查询参数
+     * @return 统一订单列表响应
+     */
+    public UnifiedOrderListResponse findUnifiedOrders(OrderQueryParams params) {
+        logger.info("Querying unified orders with params: status={}, page={}, pageSize={}",
+            params.getStatus(), params.getPage(), params.getPageSize());
+
+        UnifiedOrderRepository.PageResult<UnifiedOrderDTO> pageResult =
+            unifiedOrderRepository.findUnifiedOrders(params);
+
+        return UnifiedOrderListResponse.success(
+            pageResult.getData(),
             pageResult.getTotal(),
             params.getPage(),
             params.getPageSize(),

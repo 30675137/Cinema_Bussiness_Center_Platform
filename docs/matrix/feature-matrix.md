@@ -1,8 +1,8 @@
 # 产品功能矩阵 (Feature Matrix)
 
-**生成日期**: 2025-12-26
-**总功能数**: 37
-**文档版本**: 1.0
+**生成日期**: 2025-12-28
+**总功能数**: 39
+**文档版本**: 1.1
 
 ---
 
@@ -10,16 +10,17 @@
 
 | 系统 | 模块数 | 功能数 |
 |------|--------|--------|
-| 商品管理中台 | 4 | 37 |
+| 商品管理中台 | 5 | 39 |
 
 ### 按模块统计
 
 | 模块 | 功能数 | 占比 |
 |------|--------|------|
-| 通用功能 | 28 | 75.7% |
-| 库存管理 | 4 | 10.8% |
-| 用户/预订管理 | 3 | 8.1% |
-| 工具/基础设施 | 2 | 5.4% |
+| 通用功能 | 28 | 71.8% |
+| 库存管理 | 4 | 10.3% |
+| 订单管理 | 2 | 5.1% |
+| 用户/预订管理 | 4 | 10.3% |
+| 工具/基础设施 | 2 | 5.1% |
 
 ### 完整度统计
 
@@ -33,6 +34,13 @@
 
 ## 功能清单
 
+### 订单管理 (2 个功能)
+
+| 功能编码 | 功能名称 | 简述 | 工件 | 路径 |
+|---------|---------|------|------|------|
+| O001-product-order-list | 商品订单列表查看与管理 | B端订单列表查询、筛选、导出 | - | [specs/O001-product-order-list](../../specs/O001-product-order-list) |
+| O003-beverage-order | 饮品订单创建与出品管理 | C端下单、B端出品、BOM扣料、叫号取餐 | Plan, Data, API | [specs/O003-beverage-order](../../specs/O003-beverage-order) |
+
 ### 库存管理 (4 个功能)
 
 | 功能编码 | 功能名称 | 简述 | 工件 | 路径 |
@@ -42,13 +50,14 @@
 | P003-inventory-query | 门店SKU库存查询 | - | - | [specs/P003-inventory-query](../../specs/P003-inventory-query) |
 | P004-inventory-adjustment | 库存调整管理 | - | - | [specs/P004-inventory-adjustment](../../specs/P004-inventory-adjustment) |
 
-### 用户/预订管理 (3 个功能)
+### 用户/预订管理 (4 个功能)
 
 | 功能编码 | 功能名称 | 简述 | 工件 | 路径 |
 |---------|---------|------|------|------|
-| U001-reservation-order-management | 预订订单管理 | - | - | [specs/U001-reservation-order-management](../../specs/U001-reservation-order-management) |
-| U002-reservation-card-ui-compact | 预订卡片 UI 紧凑化 | - | - | [specs/U002-reservation-card-ui-compact](../../specs/U002-reservation-card-ui-compact) |
-| U003-wechat-miniapp-login | 微信小程序登录 | - | - | [specs/U003-wechat-miniapp-login](../../specs/U003-wechat-miniapp-login) |
+| U001-reservation-order-management | 预订订单管理 | C端预约、B端确认、支付、完成闭环 | - | [specs/U001-reservation-order-management](../../specs/U001-reservation-order-management) |
+| U002-reservation-card-ui-compact | 预订卡片 UI 紧凑化 | UI优化 | - | [specs/U002-reservation-card-ui-compact](../../specs/U002-reservation-card-ui-compact) |
+| U003-wechat-miniapp-login | 微信小程序登录 | C端微信授权登录 | - | [specs/U003-wechat-miniapp-login](../../specs/U003-wechat-miniapp-login) |
+| U004-order-list-view | 订单列表与状态查看 | C端订单列表、状态追踪 | - | [specs/U004-order-list-view](../../specs/U004-order-list-view) |
 
 ### 工具/基础设施 (2 个功能)
 
@@ -112,13 +121,15 @@
 ### 设计文档
 | 功能编码 | TDD | 架构设计 | API 设计 | 数据库设计 |
 |---------|-----|---------|---------|-----------|
+| O003 | [TDD](../tdd/O003-beverage-order-tdd.md) | - | [API设计](../api/O003-beverage-order-api.md) | [数据库设计](../database/O003-beverage-order-db.md) |
 | P003 | [TDD](../tdd/P003-inventory-query.md) | - | - | - |
 | P004 | [TDD](../tdd/P004-inventory-adjustment.md) | - | - | - |
 
 ### 用户文档
 | 功能编码 | 用户手册 | README |
 |---------|---------|--------|
-| *(待生成)* | - | - |
+| O003 | [用户手册](../manual/饮品订单/O003-beverage-order-manual.md) | - |
+| *(其他待生成)* | - | - |
 
 ---
 
@@ -137,4 +148,4 @@
 
 ---
 
-*本文档由 [doc-writer](../../.claude/skills/doc-writer) 自动生成 | 最后更新: 2025-12-26*
+*本文档由 [doc-writer](../../.claude/skills/doc-writer) 自动生成 | 最后更新: 2025-12-28*

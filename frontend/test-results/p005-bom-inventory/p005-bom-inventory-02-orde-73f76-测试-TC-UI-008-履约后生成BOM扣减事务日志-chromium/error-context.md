@@ -1,0 +1,262 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "appstore" [ref=e7]:
+            - img [ref=e8]
+          - generic [ref=e10]: 影院业务中台
+        - menu [ref=e11]:
+          - menuitem "home 工作台" [ref=e12] [cursor=pointer]:
+            - img "home" [ref=e13]:
+              - img [ref=e14]
+            - generic [ref=e16]: 工作台
+          - menuitem "control 基础设置与主数据" [ref=e17] [cursor=pointer]:
+            - img "control" [ref=e18]:
+              - img [ref=e19]
+            - generic [ref=e21]: 基础设置与主数据
+          - menuitem "shopping 商品管理 (MDM/PIM)" [ref=e22] [cursor=pointer]:
+            - img "shopping" [ref=e23]:
+              - img [ref=e24]
+            - generic [ref=e26]: 商品管理 (MDM/PIM)
+          - menuitem "reconciliation BOM/配方 & 成本管理" [ref=e27] [cursor=pointer]:
+            - img "reconciliation" [ref=e28]:
+              - img [ref=e29]
+            - generic [ref=e31]: BOM/配方 & 成本管理
+          - menuitem "gold 场景包/套餐管理" [ref=e32] [cursor=pointer]:
+            - img "gold" [ref=e33]:
+              - img [ref=e34]
+            - generic [ref=e36]: 场景包/套餐管理
+          - menuitem "dollar 价格体系管理" [ref=e37] [cursor=pointer]:
+            - img "dollar" [ref=e38]:
+              - img [ref=e39]
+            - generic [ref=e41]: 价格体系管理
+          - menuitem "shopping-cart 采购与入库管理" [ref=e42] [cursor=pointer]:
+            - img "shopping-cart" [ref=e43]:
+              - img [ref=e44]
+            - generic [ref=e46]: 采购与入库管理
+          - menuitem "database 库存 & 仓店库存管理" [ref=e47] [cursor=pointer]:
+            - img "database" [ref=e48]:
+              - img [ref=e49]
+            - generic [ref=e51]: 库存 & 仓店库存管理
+          - menuitem "calendar 档期/排期/资源预约" [ref=e52] [cursor=pointer]:
+            - img "calendar" [ref=e53]:
+              - img [ref=e54]
+            - generic [ref=e56]: 档期/排期/资源预约
+          - menuitem "coffee O003-饮品订单管理" [ref=e57] [cursor=pointer]:
+            - img "coffee" [ref=e58]:
+              - img [ref=e59]
+            - generic [ref=e61]: O003-饮品订单管理
+          - menuitem "file-text O-订单与履约管理" [ref=e62] [cursor=pointer]:
+            - img "file-text" [ref=e63]:
+              - img [ref=e64]
+            - generic [ref=e66]: O-订单与履约管理
+          - menuitem "bar-chart 运营 & 报表/指标看板" [ref=e67] [cursor=pointer]:
+            - img "bar-chart" [ref=e68]:
+              - img [ref=e69]
+            - generic [ref=e71]: 运营 & 报表/指标看板
+          - menuitem "setting 系统管理/设置/权限" [ref=e72] [cursor=pointer]:
+            - img "setting" [ref=e73]:
+              - img [ref=e74]
+            - generic [ref=e76]: 系统管理/设置/权限
+    - generic [ref=e77]:
+      - banner [ref=e78]:
+        - button "menu-fold" [ref=e81] [cursor=pointer]:
+          - img "menu-fold" [ref=e83]:
+            - img [ref=e84]
+        - generic [ref=e86]:
+          - button "bell" [ref=e89] [cursor=pointer]:
+            - img "bell" [ref=e91]:
+              - img [ref=e92]
+          - generic [ref=e95] [cursor=pointer]:
+            - img "user" [ref=e98]:
+              - img [ref=e99]
+            - generic [ref=e101]: 用户
+      - main [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]:
+            - generic [ref=e106]:
+              - generic [ref=e107]: 库存流水追踪
+              - generic [ref=e109]:
+                - button "loading 刷新" [ref=e111]:
+                  - img "loading" [ref=e113]:
+                    - img [ref=e114]
+                  - generic [ref=e116]: 刷新
+                - button "download 导出" [ref=e118] [cursor=pointer]:
+                  - img "download" [ref=e120]:
+                    - img [ref=e121]
+                  - generic [ref=e123]: 导出
+            - generic [ref=e125]:
+              - generic [ref=e127]:
+                - strong [ref=e129]: "当前角色:"
+                - generic [ref=e130] [cursor=pointer]:
+                  - generic [ref=e131]:
+                    - generic [ref=e133]:
+                      - img "user" [ref=e135]:
+                        - img [ref=e136]
+                      - generic [ref=e138]: 查看者
+                    - combobox [ref=e139]
+                  - img "down" [ref=e141]:
+                    - img [ref=e142]
+                - generic [ref=e144]:
+                  - img "user" [ref=e145]:
+                    - img [ref=e146]
+                  - text: 查看者
+              - generic [ref=e149]: 仅可查看库存台账和流水
+              - separator [ref=e151]
+              - generic [ref=e153]:
+                - generic [ref=e154]: "当前权限 (2):"
+                - generic [ref=e155]:
+                  - generic [ref=e156]: 查看库存台账
+                  - generic [ref=e157]: 查看库存流水
+          - alert [ref=e158]:
+            - img "info-circle" [ref=e159]:
+              - img [ref=e160]
+            - generic [ref=e162]:
+              - generic [ref=e163]: 提示
+              - generic [ref=e164]: 库存流水记录了所有库存变动历史，包括入库、出库、调拨、盘点等操作。您可以通过筛选条件快速查找特定的流水记录。
+            - button "close" [ref=e165] [cursor=pointer]:
+              - img "close" [ref=e166]:
+                - img [ref=e167]
+          - generic [ref=e171]:
+            - generic [ref=e172]:
+              - generic [ref=e174]:
+                - generic "关键词" [ref=e176]: "关键词 :"
+                - generic [ref=e180]:
+                  - img "search" [ref=e182]:
+                    - img [ref=e183]
+                  - textbox "关键词 :" [ref=e185]:
+                    - /placeholder: SKU编码/单据号
+                    - text: 33333333-0000-0000-0000-000000000008
+                  - button "close-circle" [ref=e187] [cursor=pointer]:
+                    - img "close-circle" [ref=e188]:
+                      - img [ref=e189]
+              - generic [ref=e192]:
+                - generic "门店/仓库" [ref=e194]: "门店/仓库 :"
+                - generic [ref=e198] [cursor=pointer]:
+                  - generic [ref=e199]:
+                    - generic: 选择门店
+                    - combobox "门店/仓库 :" [ref=e200]
+                  - img "down" [ref=e202]:
+                    - img [ref=e203]
+              - generic [ref=e206]:
+                - generic "交易类型" [ref=e208]: "交易类型 :"
+                - generic [ref=e212] [cursor=pointer]:
+                  - generic [ref=e213]:
+                    - generic:
+                      - generic: 选择交易类型
+                    - combobox "交易类型 :" [ref=e215]
+                  - img "down" [ref=e217]:
+                    - img [ref=e218]
+              - generic [ref=e221]:
+                - generic "来源类型" [ref=e223]: "来源类型 :"
+                - generic [ref=e227] [cursor=pointer]:
+                  - generic [ref=e228]:
+                    - generic:
+                      - generic: 选择来源类型
+                    - combobox "来源类型 :" [ref=e230]
+                  - img "down" [ref=e232]:
+                    - img [ref=e233]
+            - generic [ref=e237]:
+              - generic "交易时间" [ref=e239]: "交易时间 :"
+              - generic [ref=e243]:
+                - textbox "交易时间 :" [ref=e245]:
+                  - /placeholder: 开始日期
+                - generic "to" [ref=e247]:
+                  - img "swap-right" [ref=e248]:
+                    - img [ref=e249]
+                - textbox "结束日期" [ref=e252]
+                - generic:
+                  - img "calendar":
+                    - img
+            - generic [ref=e258]:
+              - button "reload 重置" [ref=e260] [cursor=pointer]:
+                - img "reload" [ref=e262]:
+                  - img [ref=e263]
+                - generic [ref=e265]: 重置
+              - button "loading 查询" [active] [ref=e267]:
+                - img "loading" [ref=e269]:
+                  - img [ref=e270]
+                - generic [ref=e272]: 查询
+          - generic [ref=e276]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - table:
+                      - rowgroup:
+                        - row "交易时间 SKU编码 SKU名称 门店/仓库 交易类型 filter 变动数量 库存前 库存后 单价 总价 来源类型 单据号 操作人 备注 操作":
+                          - columnheader "交易时间":
+                            - generic:
+                              - generic: 交易时间
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                          - columnheader "SKU编码"
+                          - columnheader "SKU名称"
+                          - columnheader "门店/仓库"
+                          - columnheader "交易类型 filter":
+                            - generic:
+                              - generic: 交易类型
+                              - button "filter":
+                                - img "filter":
+                                  - img
+                          - columnheader "变动数量":
+                            - generic:
+                              - generic: 变动数量
+                              - generic:
+                                - generic:
+                                  - img:
+                                    - img
+                                  - img:
+                                    - img
+                          - columnheader "库存前"
+                          - columnheader "库存后"
+                          - columnheader "单价"
+                          - columnheader "总价"
+                          - columnheader "来源类型"
+                          - columnheader "单据号"
+                          - columnheader "操作人"
+                          - columnheader "备注"
+                          - columnheader "操作"
+                  - generic:
+                    - table:
+                      - rowgroup:
+                        - generic:
+                          - generic: 交易时间
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                              - img:
+                                - img
+                        - generic:
+                          - generic: 交易类型
+                          - button:
+                            - img:
+                              - img
+                        - generic:
+                          - generic: 变动数量
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                              - img:
+                                - img
+                        - row "暂无数据 暂无数据":
+                          - cell "暂无数据 暂无数据":
+                            - generic:
+                              - generic:
+                                - img "暂无数据"
+                              - generic: 暂无数据
+  - generic [ref=e284]:
+    - img [ref=e286]
+    - button "Open Tanstack query devtools" [ref=e334] [cursor=pointer]:
+      - img [ref=e335]
+```

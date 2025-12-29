@@ -1,5 +1,5 @@
 /**
- * @spec O003-beverage-order
+ * @spec O003-beverage-order, P005-bom-inventory-deduction
  * 订单确认页面
  */
 import React, { useState } from 'react'
@@ -8,6 +8,9 @@ import Taro from '@tarojs/taro'
 import { useOrderCartStore } from '../../../stores/orderCartStore'
 import { useCreateOrder } from '../../../hooks'
 import type { CreateBeverageOrderRequest } from '../../../types/order'
+import { inventoryService } from '../../../services/inventoryService'
+import { handleInventoryError } from '../../../utils/errorHandler'
+import type { ReservationRequest } from '../../../types/inventory'
 import './index.scss'
 
 /**
@@ -40,7 +43,8 @@ const OrderConfirm: React.FC = () => {
     }
 
     try {
-      const request: CreateBeverageOrderRequest = {
+      // Step 1: Create order request
+      const orderRequest: CreateBeverageOrderRequest = {
         storeId,
         items: items.map((item) => ({
           beverageId: item.beverageId,
@@ -51,16 +55,61 @@ const OrderConfirm: React.FC = () => {
         customerNote: orderNote || undefined,
       }
 
-      const order = await createOrder(request)
+      // Step 2: Create order first (to get orderId)
+      const order = await createOrder(orderRequest)
 
-      // 清空购物车
-      clearCart()
+      // Step 3: Reserve inventory with the new orderId
+      // Map beverage items to SKU items (beverage = finished product SKU)
+      const reservationRequest: ReservationRequest = {
+        orderId: order.id,
+        storeId,
+        items: items.map((item) => ({
+          skuId: item.beverageId, // beverageId maps to finished product SKU
+          quantity: item.quantity,
+          unit: 'cup', // Default unit for beverages
+        })),
+      }
 
-      // 跳转到支付页面
-      Taro.redirectTo({
-        url: `/pages/order/payment/index?orderId=${order.id}`,
-      })
+      try {
+        const reservationResponse = await inventoryService.reserveInventory(reservationRequest)
+
+        // Step 4: Show reservation success feedback
+        Taro.showToast({
+          title: '下单成功，库存已预占',
+          icon: 'success',
+          duration: 2000,
+        })
+
+        // Log reserved components for debugging
+        console.log('Reserved components:', reservationResponse.data?.reservedComponents)
+
+        // Step 5: Clear cart and navigate to payment
+        clearCart()
+        Taro.redirectTo({
+          url: `/pages/order/payment/index?orderId=${order.id}`,
+        })
+      } catch (reservationError: any) {
+        // Handle inventory reservation errors
+        console.error('Inventory reservation failed:', reservationError)
+
+        // Use centralized error handler for inventory errors
+        if (reservationError.response?.data) {
+          handleInventoryError(reservationError.response.data)
+        } else {
+          Taro.showToast({
+            title: reservationError.message || '库存预占失败',
+            icon: 'error',
+            duration: 2000,
+          })
+        }
+
+        // TODO: Rollback order creation if reservation fails
+        // For MVP, we'll leave the order in PENDING_PAYMENT state
+        // In production, should call order cancellation API here
+      }
     } catch (error: any) {
+      // Handle order creation errors
+      console.error('Order creation failed:', error)
       Taro.showToast({
         title: error.message || '订单创建失败',
         icon: 'error',

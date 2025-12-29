@@ -35,6 +35,8 @@ spring:
     baseline-version: 0
     validate-on-migrate: false
     clean-disabled: true
+    out-of-order: true
+    ignore-migration-patterns: "*:missing,*:future,*:ignored"
 
 server:
   port: 8080

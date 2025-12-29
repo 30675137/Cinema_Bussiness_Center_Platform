@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img "appstore" [ref=e7]:
+            - img [ref=e8]
+          - generic [ref=e10]: 影院业务中台
+        - menu [ref=e11]:
+          - menuitem "home 工作台" [ref=e12] [cursor=pointer]:
+            - img "home" [ref=e13]:
+              - img [ref=e14]
+            - generic [ref=e16]: 工作台
+          - menuitem "control 基础设置与主数据" [ref=e17] [cursor=pointer]:
+            - img "control" [ref=e18]:
+              - img [ref=e19]
+            - generic [ref=e21]: 基础设置与主数据
+          - menuitem "shopping 商品管理 (MDM/PIM)" [ref=e22] [cursor=pointer]:
+            - img "shopping" [ref=e23]:
+              - img [ref=e24]
+            - generic [ref=e26]: 商品管理 (MDM/PIM)
+          - menuitem "reconciliation BOM/配方 & 成本管理" [ref=e27] [cursor=pointer]:
+            - img "reconciliation" [ref=e28]:
+              - img [ref=e29]
+            - generic [ref=e31]: BOM/配方 & 成本管理
+          - menuitem "gold 场景包/套餐管理" [ref=e32] [cursor=pointer]:
+            - img "gold" [ref=e33]:
+              - img [ref=e34]
+            - generic [ref=e36]: 场景包/套餐管理
+          - menuitem "dollar 价格体系管理" [ref=e37] [cursor=pointer]:
+            - img "dollar" [ref=e38]:
+              - img [ref=e39]
+            - generic [ref=e41]: 价格体系管理
+          - menuitem "shopping-cart 采购与入库管理" [ref=e42] [cursor=pointer]:
+            - img "shopping-cart" [ref=e43]:
+              - img [ref=e44]
+            - generic [ref=e46]: 采购与入库管理
+          - menuitem "database 库存 & 仓店库存管理" [expanded] [ref=e47] [cursor=pointer]:
+            - img "database" [ref=e48]:
+              - img [ref=e49]
+            - generic [ref=e51]: 库存 & 仓店库存管理
+          - menu [ref=e52]:
+            - menuitem "P003-库存查询" [ref=e53] [cursor=pointer]:
+              - generic [ref=e54]: P003-库存查询
+            - menuitem "P004-库存台账查看" [ref=e55] [cursor=pointer]:
+              - generic [ref=e56]: P004-库存台账查看
+            - menuitem "P004-库存调整审批" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: P004-库存调整审批
+            - menuitem "入库/出库/报损/退库操作" [ref=e59] [cursor=pointer]:
+              - generic [ref=e60]: 入库/出库/报损/退库操作
+            - menuitem "调拨管理" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: 调拨管理
+            - menuitem "盘点模块" [ref=e63] [cursor=pointer]:
+              - generic [ref=e64]: 盘点模块
+            - menuitem "库存预占/释放管理" [ref=e65] [cursor=pointer]:
+              - generic [ref=e66]: 库存预占/释放管理
+            - menuitem "库存变动日志/审计" [ref=e67] [cursor=pointer]:
+              - generic [ref=e68]: 库存变动日志/审计
+          - menuitem "calendar 档期/排期/资源预约" [ref=e69] [cursor=pointer]:
+            - img "calendar" [ref=e70]:
+              - img [ref=e71]
+            - generic [ref=e73]: 档期/排期/资源预约
+          - menuitem "coffee O003-饮品订单管理" [ref=e74] [cursor=pointer]:
+            - img "coffee" [ref=e75]:
+              - img [ref=e76]
+            - generic [ref=e78]: O003-饮品订单管理
+          - menuitem "file-text O-订单与履约管理" [ref=e79] [cursor=pointer]:
+            - img "file-text" [ref=e80]:
+              - img [ref=e81]
+            - generic [ref=e83]: O-订单与履约管理
+          - menuitem "bar-chart 运营 & 报表/指标看板" [ref=e84] [cursor=pointer]:
+            - img "bar-chart" [ref=e85]:
+              - img [ref=e86]
+            - generic [ref=e88]: 运营 & 报表/指标看板
+          - menuitem "setting 系统管理/设置/权限" [ref=e89] [cursor=pointer]:
+            - img "setting" [ref=e90]:
+              - img [ref=e91]
+            - generic [ref=e93]: 系统管理/设置/权限
+    - generic [ref=e94]:
+      - banner [ref=e95]:
+        - button "menu-fold" [ref=e98] [cursor=pointer]:
+          - img "menu-fold" [ref=e100]:
+            - img [ref=e101]
+        - generic [ref=e103]:
+          - button "bell" [ref=e106] [cursor=pointer]:
+            - img "bell" [ref=e108]:
+              - img [ref=e109]
+          - generic [ref=e112] [cursor=pointer]:
+            - img "user" [ref=e115]:
+              - img [ref=e116]
+            - generic [ref=e118]: 用户
+      - main [ref=e119]:
+        - alert [ref=e122]:
+          - generic [ref=e123]:
+            - generic [ref=e124]: 加载失败
+            - generic [ref=e125]: Request failed with status code 500
+          - button "reload 重试" [ref=e127] [cursor=pointer]:
+            - img "reload" [ref=e129]:
+              - img [ref=e130]
+            - generic [ref=e132]: 重试
+  - generic [ref=e133]:
+    - img [ref=e135]
+    - button "Open Tanstack query devtools" [ref=e184] [cursor=pointer]:
+      - img [ref=e185]
+```

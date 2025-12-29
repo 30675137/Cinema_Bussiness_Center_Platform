@@ -1,11 +1,13 @@
 /**
  * @spec O001-product-order-list
- * 订单管理 API 服务
+ * @spec O003-beverage-order
+ * 订单管理 API 服务（支持统一订单查询）
  */
 
 import type {
   OrderQueryParams,
   OrderListResponse,
+  UnifiedOrderListResponse,
   OrderDetailResponse,
   UpdateStatusRequest,
   ApiErrorResponse
@@ -32,13 +34,13 @@ const buildQueryString = (params: OrderQueryParams): string => {
 }
 
 /**
- * 获取订单列表
+ * 获取统一订单列表（包含商品订单和饮品订单）
  * @param params 查询参数
- * @returns 订单列表响应
+ * @returns 统一订单列表响应
  */
 export const fetchOrders = async (
   params: OrderQueryParams = {}
-): Promise<OrderListResponse> => {
+): Promise<UnifiedOrderListResponse> => {
   const queryString = buildQueryString(params)
   const url = `${API_BASE_URL}/orders${queryString ? `?${queryString}` : ''}`
 

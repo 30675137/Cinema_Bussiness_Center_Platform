@@ -103,7 +103,14 @@
       "Bash(npm run dev:h5:*)",
       "Bash(tee:*)",
       "Bash(timeout:*)",
-      "Bash(PGPASSWORD='Pgsql.2024' psql:*)"
+      "Bash(PGPASSWORD='Pgsql.2024' psql:*)",
+      "Skill(skill-creator)",
+      "Skill(skill-creator:*)",
+      "Skill(e2e-test-writer)",
+      "Skill(e2e-test-writer:*)",
+      "Bash(unzip:*)",
+      "Bash(NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest:*)",
+      "Bash(npx jest:*)"
     ]
   }
 }

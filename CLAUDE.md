@@ -44,6 +44,7 @@ Auto-generated from all feature plans. Last updated: 2025-12-21
 - 无需数据存储(纯UI样式优化) (U002-reservation-card-ui-compact)
 - Supabase (PostgreSQL) - 使用现有 `inventory` 表，关联 `skus`、`stores`、`categories` 表 (P003-inventory-query)
 - Supabase (PostgreSQL) - 扩展现有 `store_inventory` 表，新增 `inventory_adjustments`、`adjustment_reasons`、`approval_records` 表 (P004-inventory-adjustment)
+- Supabase PostgreSQL 作为主要数据源，扩展现有表结构: (P005-bom-inventory-deduction)
 
 - (003-inventory-management)
 
@@ -64,6 +65,7 @@ tests/
 : Follow standard conventions
 
 ## Recent Changes
+- P005-bom-inventory-deduction: Added Supabase PostgreSQL 作为主要数据源，扩展现有表结构:
 - O003-beverage-order: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 - O001-product-order-list: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 

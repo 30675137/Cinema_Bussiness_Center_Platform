@@ -100,6 +100,26 @@ export interface OrderQueryParams {
   sortOrder?: 'asc' | 'desc'
 }
 
+// 统一订单类型（包含商品订单和饮品订单）
+export enum OrderType {
+  PRODUCT = 'PRODUCT',
+  BEVERAGE = 'BEVERAGE'
+}
+
+export interface UnifiedOrder {
+  id: string
+  orderNumber: string
+  userId: string
+  userName?: string
+  orderType: OrderType
+  status: string
+  totalPrice: number
+  paymentMethod: string | null
+  paidAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 export interface OrderListResponse {
   success: boolean
   data: ProductOrder[]
@@ -108,6 +128,15 @@ export interface OrderListResponse {
   pageSize: number
   message?: string
   timestamp: string
+}
+
+export interface UnifiedOrderListResponse {
+  success: boolean
+  data: UnifiedOrder[]
+  total: number
+  page: number
+  pageSize: number
+  message?: string
 }
 
 export interface OrderDetailResponse {

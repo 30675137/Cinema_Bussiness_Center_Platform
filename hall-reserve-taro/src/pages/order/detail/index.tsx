@@ -138,13 +138,13 @@ const OrderDetail: React.FC = () => {
           )}
 
           {/* 状态提示 */}
-          {order.status === BeverageOrderStatus.PRODUCING && (
+          {order.status === 'PRODUCING' && (
             <Text className="order-detail__status-hint">您的饮品正在制作中，请稍候...</Text>
           )}
-          {order.status === BeverageOrderStatus.COMPLETED && (
+          {order.status === 'COMPLETED' && (
             <Text className="order-detail__status-hint">您的饮品已完成，请凭取餐号取餐</Text>
           )}
-          {order.status === BeverageOrderStatus.DELIVERED && (
+          {order.status === 'DELIVERED' && (
             <Text className="order-detail__status-hint">感谢您的光临，期待下次再见！</Text>
           )}
         </View>

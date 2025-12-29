@@ -1,23 +1,23 @@
 /**
  * @spec O001-product-order-list
- * 订单列表组件 - 使用 Ant Design Table 展示订单列表
+ * @spec O003-beverage-order
+ * 订单列表组件 - 使用 Ant Design Table 展示统一订单列表（包含商品订单和饮品订单）
  */
 
 import React from 'react'
-import { Table, type TableProps, Typography } from 'antd'
+import { Table, type TableProps, Typography, Tag } from 'antd'
 import { Link } from 'react-router-dom'
-import type { ProductOrder } from '../types/order'
+import type { UnifiedOrder, OrderType } from '../types/order'
 import { OrderStatusBadge } from './OrderStatusBadge'
-import { maskPhone } from '../utils/maskPhone'
 import dayjs from 'dayjs'
 
 const { Text } = Typography
 
 export interface OrderListProps {
   /**
-   * 订单数据
+   * 统一订单数据（包含商品订单和饮品订单）
    */
-  data: ProductOrder[]
+  data: UnifiedOrder[]
 
   /**
    * 总记录数
@@ -48,10 +48,10 @@ export interface OrderListProps {
 /**
  * 订单列表组件
  *
- * 使用 Ant Design Table 展示订单列表，包含:
+ * 使用 Ant Design Table 展示统一订单列表（包含商品订单和饮品订单），包含:
  * - 订单号（可点击跳转详情）
- * - 用户信息（用户名 + 脱敏手机号）
- * - 商品信息（商品摘要）
+ * - 订单类型（商品订单/饮品订单）
+ * - 用户ID
  * - 订单金额
  * - 订单状态（Tag 徽章）
  * - 创建时间
@@ -71,46 +71,51 @@ export interface OrderListProps {
  */
 export const OrderList: React.FC<OrderListProps> = React.memo(
   ({ data, total, page, pageSize, loading = false, onPaginationChange }) => {
-    const columns: TableProps<ProductOrder>['columns'] = [
+    // 订单类型标签映射
+    const getOrderTypeTag = (orderType: OrderType) => {
+      if (orderType === 'BEVERAGE') {
+        return <Tag color="blue">饮品订单</Tag>
+      }
+      return <Tag color="green">商品订单</Tag>
+    }
+
+    const columns: TableProps<UnifiedOrder>['columns'] = [
       {
         title: '订单号',
         dataIndex: 'orderNumber',
         key: 'orderNumber',
-        width: 180,
+        width: 200,
         fixed: 'left',
-        render: (orderNumber: string, record: ProductOrder) => (
+        render: (orderNumber: string, record: UnifiedOrder) => (
           <Link to={`/orders/${record.id}`}>
             <Text strong>{orderNumber}</Text>
           </Link>
         )
       },
       {
-        title: '用户',
-        key: 'user',
-        width: 180,
-        render: (_: unknown, record: ProductOrder) => (
-          <div>
-            <div>{record.user?.username || '-'}</div>
-            <Text type="secondary" style={{ fontSize: '12px' }}>
-              {record.user?.phone ? maskPhone(record.user.phone) : '-'}
-            </Text>
-          </div>
-        )
+        title: '订单类型',
+        dataIndex: 'orderType',
+        key: 'orderType',
+        width: 120,
+        align: 'center',
+        render: (orderType: OrderType) => getOrderTypeTag(orderType)
       },
       {
-        title: '商品',
-        dataIndex: 'productSummary',
-        key: 'productSummary',
-        width: 200,
+        title: '用户ID',
+        dataIndex: 'userId',
+        key: 'userId',
+        width: 280,
         ellipsis: true,
-        render: (summary: string) => (
-          <Text ellipsis={{ tooltip: summary }}>{summary || '-'}</Text>
+        render: (userId: string) => (
+          <Text ellipsis={{ tooltip: userId }} type="secondary">
+            {userId}
+          </Text>
         )
       },
       {
         title: '订单金额',
-        dataIndex: 'totalAmount',
-        key: 'totalAmount',
+        dataIndex: 'totalPrice',
+        key: 'totalPrice',
         width: 120,
         align: 'right',
         render: (amount: number) => (
@@ -121,9 +126,9 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
         title: '状态',
         dataIndex: 'status',
         key: 'status',
-        width: 100,
+        width: 120,
         align: 'center',
-        render: (status) => <OrderStatusBadge status={status} />
+        render: (status: string) => <OrderStatusBadge status={status} />
       },
       {
         title: '创建时间',
@@ -137,7 +142,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
     ]
 
     return (
-      <Table<ProductOrder>
+      <Table<UnifiedOrder>
         columns={columns}
         dataSource={data}
         rowKey="id"
@@ -152,7 +157,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
           pageSizeOptions: ['10', '20', '50', '100'],
           onChange: onPaginationChange
         }}
-        scroll={{ x: 1000 }}
+        scroll={{ x: 1200 }}
         bordered
       />
     )

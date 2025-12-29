@@ -1,5 +1,6 @@
 /**
  * @spec O001-product-order-list
+ * @spec O003-beverage-order
  * 订单管理 REST API 控制器
  */
 package com.cinema.order.controller;
@@ -31,27 +32,29 @@ public class OrderController {
     }
 
     /**
-     * GET /api/orders - 订单列表查询 (US1, US2)
+     * GET /api/orders - 统一订单列表查询 (US1, US2)
+     *
+     * 返回所有类型的订单（商品订单 + 饮品订单）
      *
      * 支持筛选条件：
      * - status: 订单状态
      * - startDate: 开始日期 (YYYY-MM-DD)
      * - endDate: 结束日期 (YYYY-MM-DD)
-     * - search: 搜索关键字（订单号、用户名、手机号）
+     * - search: 搜索关键字（订单号）
      * - page: 页码（默认1）
      * - pageSize: 每页数量（默认20）
      *
      * @param params 查询参数
-     * @return 订单列表响应
+     * @return 统一订单列表响应
      */
     @GetMapping
-    public ResponseEntity<OrderListResponse> getOrders(
+    public ResponseEntity<UnifiedOrderListResponse> getOrders(
         @ModelAttribute OrderQueryParams params
     ) {
         logger.info("GET /api/orders - status={}, page={}, pageSize={}",
             params.getStatus(), params.getPage(), params.getPageSize());
 
-        OrderListResponse response = orderService.findOrders(params);
+        UnifiedOrderListResponse response = orderService.findUnifiedOrders(params);
 
         return ResponseEntity.ok(response);
     }

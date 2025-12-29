@@ -341,17 +341,28 @@ export async function getOrderHistory(params: {
   pageSize?: number
 }): Promise<OrderHistoryResponse> {
   const queryParams = new URLSearchParams()
-  queryParams.append('userId', params.userId)
+  // 后端期望页码从 0 开始，前端传入从 1 开始，需要减 1
+  const backendPage = params.page ? params.page - 1 : 0
+  queryParams.append('page', backendPage.toString())
+  queryParams.append('pageSize', (params.pageSize || 20).toString())
   if (params.status) queryParams.append('status', params.status)
-  if (params.page) queryParams.append('page', params.page.toString())
-  if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString())
 
-  const response = await request<ApiResponse<OrderHistoryResponse>>({
-    url: `/api/client/beverage-orders/history?${queryParams.toString()}`,
+  const response = await request<ApiResponse<any>>({
+    url: `/api/client/beverage-orders/my?${queryParams.toString()}`,
     method: 'GET',
+    header: {
+      'X-User-Id': params.userId,
+    },
   })
 
-  return response.data
+  // 后端返回 Spring Page 格式，需要转换为前端期望的格式
+  return {
+    content: response.data.content || [],
+    totalElements: response.data.totalElements || 0,
+    totalPages: response.data.totalPages || 0,
+    number: response.data.number || 0,
+    size: response.data.size || 20,
+  }
 }
 
 /**

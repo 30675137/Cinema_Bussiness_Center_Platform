@@ -1,15 +1,16 @@
 /**
  * @spec O001-product-order-list
- * 订单列表查询 Hook - 使用 TanStack Query
+ * @spec O003-beverage-order
+ * 订单列表查询 Hook - 使用 TanStack Query（支持统一订单）
  */
 
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { fetchOrders } from '../services/orderService'
-import type { OrderQueryParams, OrderListResponse, OrderStatus } from '../types/order'
+import type { OrderQueryParams, UnifiedOrderListResponse, OrderStatus } from '../types/order'
 
 /**
- * 订单列表查询 Hook
+ * 统一订单列表查询 Hook（包含商品订单和饮品订单）
  *
  * @param params 查询参数（page, pageSize, status, startDate, endDate, search, sortBy, sortOrder）
  * @returns TanStack Query 查询结果
@@ -21,7 +22,7 @@ import type { OrderQueryParams, OrderListResponse, OrderStatus } from '../types/
  */
 export const useOrders = (
   params: OrderQueryParams = {}
-): UseQueryResult<OrderListResponse, Error> => {
+): UseQueryResult<UnifiedOrderListResponse, Error> => {
   return useQuery({
     queryKey: ['orders', params],
     queryFn: () => fetchOrders(params),

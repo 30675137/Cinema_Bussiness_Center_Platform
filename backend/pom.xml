@@ -69,6 +69,16 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Caffeine cache for BOM formula caching (P005) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- Jackson for JSON processing (explicit declaration) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -183,6 +193,25 @@
                             <version>${project.parent.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <!-- Flyway Maven Plugin for database migrations -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>10.10.0</version>
+                <configuration>
+                    <url>jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0</url>
+                    <user>postgres.fxhgyxceqrmnpezluaht</user>
+                    <password>ppkZ8sGUEHB0qjFs</password>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                    <baselineOnMigrate>true</baselineOnMigrate>
+                    <baselineVersion>0</baselineVersion>
+                    <validateOnMigrate>false</validateOnMigrate>
+                    <cleanDisabled>true</cleanDisabled>
+                    <outOfOrder>true</outOfOrder>
                 </configuration>
             </plugin>
         </plugins>

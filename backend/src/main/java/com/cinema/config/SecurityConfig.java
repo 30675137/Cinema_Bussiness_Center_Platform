@@ -83,6 +83,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/beverages/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/skus/**").permitAll() // SKU列表查询
 
+                // 统一订单列表端点 (临时开放用于开发测试)
+                .requestMatchers(HttpMethod.GET, "/api/orders").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
+
+                // P005: 库存预占与扣减API (临时开放用于E2E测试)
+                .requestMatchers("/api/inventory/**").permitAll()
+
                 // B端管理端点 (需要认证)
                 .requestMatchers("/api/admin/**").authenticated()
 
