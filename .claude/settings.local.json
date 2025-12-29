@@ -124,7 +124,15 @@
       "Bash(npx madge --circular --extensions ts,tsx src/types/)",
       "mcp__chrome-devtools__take_screenshot",
       "Bash(PGPASSWORD='Pgsql.2024' psql -h aws-1-us-east-2.pooler.supabase.com -p 6543 -U postgres.fxhgyxceqrmnpezluaht -d postgres -c \"\\\\d inventory_reservations\")",
-      "Bash(git rm ../frontend/src/types/inventory.ts)"
+      "Bash(git rm ../frontend/src/types/inventory.ts)",
+      "Bash(PGPASSWORD='Pgsql.2024' psql -h aws-1-us-east-2.pooler.supabase.com -p 6543 -U postgres.fxhgyxceqrmnpezluaht -d postgres -c \"\\\\d inventory_transactions\")",
+      "Skill(e2e-test-executor)",
+      "Bash(for i in {1..24})",
+      "Bash(do)",
+      "Bash(break)",
+      "Bash(echo \"Waiting for backend... \\($i/24\\)\")",
+      "Bash(PGPASSWORD='Pgsql.2024' psql -h aws-1-us-east-2.pooler.supabase.com -p 6543 -U postgres.fxhgyxceqrmnpezluaht -d postgres -c \"SELECT COUNT\\(*\\) FROM store_inventory;\")",
+      "Bash(PGPASSWORD='Pgsql.2024' psql -h aws-1-us-east-2.pooler.supabase.com -p 6543 -U postgres.fxhgyxceqrmnpezluaht -d postgres -c \"SELECT COUNT\\(*\\) FROM skus;\")"
     ]
   }
 }
