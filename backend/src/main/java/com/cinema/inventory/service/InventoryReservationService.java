@@ -229,7 +229,7 @@ public class InventoryReservationService {
                         new com.cinema.inventory.entity.InventoryTransaction();
                 transaction.setStoreId(reservation.getStoreId());
                 transaction.setSkuId(reservation.getSkuId());
-                transaction.setTransactionType(com.cinema.inventory.entity.InventoryTransaction.TransactionType.RESERVATION_RELEASE);
+                transaction.setTransactionType(com.cinema.inventory.entity.InventoryTransaction.TransactionType.return_in); // Use return_in for reservation release
                 transaction.setQuantity(BigDecimal.ZERO); // No on_hand_qty change, only reserved_qty
                 transaction.setQuantityBefore(inventory.getOnHandQty());
                 transaction.setQuantityAfter(inventory.getOnHandQty());

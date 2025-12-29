@@ -272,6 +272,76 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    // ==================== Inventory Management Exceptions (P005-bom-inventory-deduction) ====================
+
+    /**
+     * 处理库存不足异常（P005）
+     * <p>
+     * 统一处理 BOM 库存预占和扣减时的库存不足异常，返回详细的缺货信息数组
+     * </p>
+     *
+     * @param ex      库存不足异常对象
+     * @param request Web 请求
+     * @return 422 Unprocessable Entity 响应，包含 shortages 数组详情
+     * @spec P005-bom-inventory-deduction
+     */
+    @ExceptionHandler(com.cinema.inventory.exception.InsufficientInventoryException.class)
+    public ResponseEntity<ErrorResponse> handleInventoryInsufficientInventory(
+            com.cinema.inventory.exception.InsufficientInventoryException ex, WebRequest request) {
+        logger.warn("Insufficient inventory for order: {} shortages detected", ex.getShortages().size());
+        ErrorResponse error = ErrorResponse.of("INV_BIZ_001", ex.getMessage(), ex.getDetails());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    /**
+     * 处理当前库存小于预占库存异常（P005）
+     * <p>
+     * 当执行库存扣减时，发现 on_hand_qty < reserved_qty，表示数据不一致
+     * 这是严重的数据完整性问题，需要管理员介入
+     * </p>
+     *
+     * @param ex      当前库存不足异常对象
+     * @param request Web 请求
+     * @return 500 Internal Server Error 响应
+     * @spec P005-bom-inventory-deduction
+     */
+    @ExceptionHandler(com.cinema.inventory.exception.InsufficientCurrentInventoryException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientCurrentInventory(
+            com.cinema.inventory.exception.InsufficientCurrentInventoryException ex, WebRequest request) {
+        logger.error("Data inconsistency detected: current_qty < reserved_qty for SKU: {}. Current: {}, Reserved: {}",
+                ex.getSkuName(), ex.getCurrentQuantity(), ex.getReservedQuantity());
+        Map<String, Object> details = new HashMap<>();
+        details.put("skuName", ex.getSkuName());
+        details.put("currentQuantity", ex.getCurrentQuantity());
+        details.put("reservedQuantity", ex.getReservedQuantity());
+        details.put("shortage", ex.getReservedQuantity().subtract(ex.getCurrentQuantity()));
+        ErrorResponse error = ErrorResponse.of("INV_BIZ_002", ex.getMessage(), details);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    /**
+     * 处理通用库存业务异常（P005）
+     * <p>
+     * 处理 BOM 深度超限、预占记录未找到等库存模块业务异常
+     * </p>
+     *
+     * @param ex      库存业务异常对象
+     * @param request Web 请求
+     * @return 对应 HTTP 状态码的 ErrorResponse
+     * @spec P005-bom-inventory-deduction
+     */
+    @ExceptionHandler(com.cinema.inventory.exception.BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleInventoryBusinessException(
+            com.cinema.inventory.exception.BusinessException ex, WebRequest request) {
+        logger.warn("Inventory business exception: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
+        ErrorResponse error = ErrorResponse.of(
+                ex.getErrorCode().getCode(),
+                ex.getMessage(),
+                ex.getDetails()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     // ==================== Beverage Order Exceptions (O003-beverage-order) ====================
 
     /**
