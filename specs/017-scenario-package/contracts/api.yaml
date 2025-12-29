@@ -1,0 +1,983 @@
+openapi: 3.0.3
+info:
+  title: 场景包管理 API
+  description: |
+    场景包管理模块的 REST API 规范，包含场景包的创建、查询、更新、删除、发布、图片上传和定价计算功能。
+
+    **核心功能**:
+    - 场景包 CRUD 操作
+    - 状态管理（草稿、已发布、已下架）
+    - 版本管理（修改已发布包创建新版本）
+    - 背景图片上传（Supabase Storage）
+    - 定价计算（参考总价、优惠比例）
+    - 乐观锁并发控制
+
+    **响应格式标准**:
+    - 所有成功响应使用 `ApiResponse<T>` 包装
+    - 列表响应包含 `{ success, data, total }`
+    - 错误响应包含 `{ success: false, error, message }`
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Team
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api-dev.cinema.com/api
+    description: 开发环境
+tags:
+  - name: ScenarioPackages
+    description: 场景包管理相关接口
+  - name: Pricing
+    description: 定价计算相关接口
+  - name: Images
+    description: 图片上传相关接口
+
+paths:
+  /scenario-packages:
+    get:
+      tags: [ScenarioPackages]
+      summary: 查询场景包列表
+      description: |
+        分页查询场景包列表，支持按状态、影厅类型、创建时间筛选。
+        默认仅返回最新版本（`is_latest=true`）且未删除的场景包。
+      operationId: listScenarioPackages
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从 0 开始）
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: status
+          in: query
+          description: 筛选状态
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, UNPUBLISHED]
+        - name: hallTypeId
+          in: query
+          description: 筛选影厅类型 ID（可多选，逗号分隔）
+          schema:
+            type: string
+            example: "uuid1,uuid2"
+        - name: sortBy
+          in: query
+          description: 排序字段
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, name]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data, total]
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScenarioPackageSummary'
+                  total:
+                    type: integer
+                    description: 总数量（用于分页）
+                    example: 156
+                  message:
+                    type: string
+                    example: "查询成功"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags: [ScenarioPackages]
+      summary: 创建场景包
+      description: 创建新的场景包（草稿状态），包含基本信息、规则、内容组合和定价。
+      operationId: createScenarioPackage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScenarioPackageRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /scenario-packages/{id}:
+    get:
+      tags: [ScenarioPackages]
+      summary: 查询场景包详情
+      description: 根据 ID 查询单个场景包的完整信息，包括所有关联数据。
+      operationId: getScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags: [ScenarioPackages]
+      summary: 更新场景包
+      description: |
+        更新场景包信息。支持乐观锁并发控制（通过 `versionLock` 字段）。
+        - 如果更新的是已发布状态的包，将创建新版本（version+1）
+        - 如果更新的是草稿状态的包，直接覆盖
+      operationId: updateScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScenarioPackageRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags: [ScenarioPackages]
+      summary: 删除场景包（软删除）
+      description: |
+        软删除场景包（设置 `deleted_at` 字段）。仅允许删除草稿或已下架状态的场景包。
+        如果场景包有进行中的订单，将阻止删除并返回 409 错误。
+      operationId: deleteScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '204':
+          description: 删除成功（无响应体）
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 无法删除（有进行中的订单或状态不允许）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "CONFLICT"
+                message: "该场景包有进行中的订单，无法删除"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /scenario-packages/{id}/publish:
+    post:
+      tags: [ScenarioPackages]
+      summary: 发布场景包
+      description: |
+        将草稿状态的场景包发布上架。发布前会验证配置完整性：
+        - 必须包含至少一项内容（硬权益、软权益或服务项目）
+        - 必须设置定价
+      operationId: publishScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '200':
+          description: 发布成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          description: 配置不完整，无法发布
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "VALIDATION_FAILED"
+                message: "请先完成内容配置和定价设置"
+                details:
+                  missingFields: ["pricing", "content"]
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /scenario-packages/{id}/unpublish:
+    post:
+      tags: [ScenarioPackages]
+      summary: 下架场景包
+      description: 将已发布的场景包下架（状态改为 UNPUBLISHED），在小程序端隐藏。
+      operationId: unpublishScenarioPackage
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '200':
+          description: 下架成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /scenario-packages/{id}/image:
+    post:
+      tags: [Images]
+      summary: 生成背景图片上传预签名 URL
+      description: |
+        生成用于上传背景图片的预签名 URL（有效期 10 分钟）。
+        前端直接使用该 URL 上传图片到 Supabase Storage，上传成功后调用回调接口更新数据库。
+      operationId: generateImageUploadUrl
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fileName, fileSize, mimeType]
+              properties:
+                fileName:
+                  type: string
+                  description: 文件名（含扩展名）
+                  example: "birthday-party.jpg"
+                fileSize:
+                  type: integer
+                  description: 文件大小（字节）
+                  example: 2048000
+                  maximum: 5242880  # 5MB
+                mimeType:
+                  type: string
+                  description: MIME 类型
+                  enum: [image/jpeg, image/png, image/webp]
+                  example: "image/jpeg"
+      responses:
+        '200':
+          description: 生成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    type: object
+                    required: [uploadUrl, publicUrl, expiresIn]
+                    properties:
+                      uploadUrl:
+                        type: string
+                        description: 预签名上传 URL
+                        example: "https://supabase-storage.com/sign?token=xxx"
+                      publicUrl:
+                        type: string
+                        description: 上传成功后的公开访问 URL
+                        example: "https://supabase-storage.com/backgrounds/uuid-filename.jpg"
+                      expiresIn:
+                        type: integer
+                        description: 有效期（秒）
+                        example: 600
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          description: 文件验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "VALIDATION_FAILED"
+                message: "文件大小超过5MB限制"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    patch:
+      tags: [Images]
+      summary: 确认图片上传成功
+      description: |
+        前端上传图片到 Supabase Storage 成功后，调用此接口更新数据库中的 `background_image_url` 字段。
+      operationId: confirmImageUpload
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [publicUrl]
+              properties:
+                publicUrl:
+                  type: string
+                  description: 图片的公开访问 URL
+                  example: "https://supabase-storage.com/backgrounds/uuid-filename.jpg"
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScenarioPackageDetail'
+                  timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /scenario-packages/{id}/pricing/reference:
+    get:
+      tags: [Pricing]
+      summary: 计算参考总价
+      description: |
+        实时计算场景包的参考总价（软权益单品 + 服务项目的价格总和）。
+        硬权益不计入参考总价。
+      operationId: calculateReferencePrice
+      parameters:
+        - $ref: '#/components/parameters/PackageId'
+      responses:
+        '200':
+          description: 计算成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, timestamp]
+                properties:
+                  data:
+                    type: object
+                    required: [referencePrice, itemsTotal, servicesTotal]
+                    properties:
+                      referencePrice:
+                        type: number
+                        format: double
+                        description: 参考总价（元）
+                        example: 2500.00
+                      itemsTotal:
+                        type: number
+                        format: double
+                        description: 单品总价（元）
+                        example: 1800.00
+                      servicesTotal:
+                        type: number
+                        format: double
+                        description: 服务总价（元）
+                        example: 700.00
+                      packagePrice:
+                        type: number
+                        format: double
+                        description: 当前打包价格（元），如果已设置
+                        example: 1888.00
+                      discountPercentage:
+                        type: number
+                        format: double
+                        description: 优惠比例（%），如果已设置打包价格
+                        example: 75.52
+                      discountAmount:
+                        type: number
+                        format: double
+                        description: 优惠金额（元），如果已设置打包价格
+                        example: 612.00
+                  timestamp:
+                    type: string
+                    format: date-time
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  parameters:
+    PackageId:
+      name: id
+      in: path
+      required: true
+      description: 场景包 ID（UUID）
+      schema:
+        type: string
+        format: uuid
+      example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    ScenarioPackageSummary:
+      type: object
+      description: 场景包列表项（摘要信息）
+      required: [id, name, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        basePackageId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 基础包 ID（首版本为 null）
+        version:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "VIP 生日派对专场"
+        description:
+          type: string
+          nullable: true
+        backgroundImageUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://supabase-storage.com/backgrounds/uuid-filename.jpg"
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, UNPUBLISHED]
+        hallTypeCount:
+          type: integer
+          description: 关联的影厅类型数量
+          example: 2
+        itemCount:
+          type: integer
+          description: 包含的单品数量
+          example: 5
+        serviceCount:
+          type: integer
+          description: 包含的服务数量
+          example: 2
+        packagePrice:
+          type: number
+          format: double
+          nullable: true
+          example: 1888.00
+        discountPercentage:
+          type: number
+          format: double
+          nullable: true
+          example: 75.52
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          nullable: true
+
+    ScenarioPackageDetail:
+      type: object
+      description: 场景包详情（完整信息）
+      required: [id, name, status, rule, content, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        basePackageId:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
+        versionLock:
+          type: integer
+          description: 乐观锁版本号（更新时必须提供）
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        backgroundImageUrl:
+          type: string
+          format: uri
+          nullable: true
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, UNPUBLISHED]
+        isLatest:
+          type: boolean
+        rule:
+          $ref: '#/components/schemas/PackageRule'
+        hallTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/HallType'
+        content:
+          type: object
+          required: [benefits, items, services]
+          properties:
+            benefits:
+              type: array
+              items:
+                $ref: '#/components/schemas/PackageBenefit'
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PackageItem'
+            services:
+              type: array
+              items:
+                $ref: '#/components/schemas/PackageService'
+        pricing:
+          $ref: '#/components/schemas/PackagePricing'
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+
+    CreateScenarioPackageRequest:
+      type: object
+      required: [name, rule, hallTypeIds, content]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        backgroundImageUrl:
+          type: string
+          format: uri
+          nullable: true
+        rule:
+          type: object
+          required: [durationHours]
+          properties:
+            durationHours:
+              type: number
+              format: double
+              minimum: 0.01
+              example: 3.0
+            minPeople:
+              type: integer
+              minimum: 0
+              nullable: true
+            maxPeople:
+              type: integer
+              minimum: 0
+              nullable: true
+        hallTypeIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        content:
+          type: object
+          properties:
+            benefits:
+              type: array
+              items:
+                type: object
+                required: [benefitType]
+                properties:
+                  benefitType:
+                    type: string
+                    enum: [DISCOUNT_TICKET, FREE_SCREENING]
+                  discountRate:
+                    type: number
+                    format: double
+                    minimum: 0
+                    maximum: 1
+                    nullable: true
+                  freeCount:
+                    type: integer
+                    minimum: 0
+                    nullable: true
+                  description:
+                    type: string
+                    nullable: true
+                  sortOrder:
+                    type: integer
+                    default: 0
+            items:
+              type: array
+              items:
+                type: object
+                required: [itemId, quantity]
+                properties:
+                  itemId:
+                    type: string
+                    format: uuid
+                  quantity:
+                    type: integer
+                    minimum: 1
+                  sortOrder:
+                    type: integer
+                    default: 0
+            services:
+              type: array
+              items:
+                type: object
+                required: [serviceId]
+                properties:
+                  serviceId:
+                    type: string
+                    format: uuid
+                  sortOrder:
+                    type: integer
+                    default: 0
+        pricing:
+          type: object
+          required: [packagePrice]
+          nullable: true
+          properties:
+            packagePrice:
+              type: number
+              format: double
+              minimum: 0.01
+
+    UpdateScenarioPackageRequest:
+      type: object
+      required: [versionLock]
+      properties:
+        versionLock:
+          type: integer
+          description: 当前乐观锁版本号（防并发冲突）
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        backgroundImageUrl:
+          type: string
+          format: uri
+          nullable: true
+        rule:
+          type: object
+          properties:
+            durationHours:
+              type: number
+              format: double
+              minimum: 0.01
+            minPeople:
+              type: integer
+              minimum: 0
+              nullable: true
+            maxPeople:
+              type: integer
+              minimum: 0
+              nullable: true
+        hallTypeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        content:
+          type: object
+          properties:
+            benefits:
+              type: array
+              items:
+                type: object
+            items:
+              type: array
+              items:
+                type: object
+            services:
+              type: array
+              items:
+                type: object
+        pricing:
+          type: object
+          nullable: true
+          properties:
+            packagePrice:
+              type: number
+              format: double
+              minimum: 0.01
+
+    PackageRule:
+      type: object
+      required: [durationHours]
+      properties:
+        durationHours:
+          type: number
+          format: double
+          example: 3.0
+        minPeople:
+          type: integer
+          nullable: true
+          example: 10
+        maxPeople:
+          type: integer
+          nullable: true
+          example: 20
+
+    HallType:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "1号厅 VIP"
+
+    PackageBenefit:
+      type: object
+      required: [id, benefitType]
+      properties:
+        id:
+          type: string
+          format: uuid
+        benefitType:
+          type: string
+          enum: [DISCOUNT_TICKET, FREE_SCREENING]
+        discountRate:
+          type: number
+          format: double
+          nullable: true
+          example: 0.75
+        freeCount:
+          type: integer
+          nullable: true
+          example: 2
+        description:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+
+    PackageItem:
+      type: object
+      required: [id, itemId, quantity, itemNameSnapshot, itemPriceSnapshot]
+      properties:
+        id:
+          type: string
+          format: uuid
+        itemId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          example: 20
+        itemNameSnapshot:
+          type: string
+          example: "莫吉托"
+        itemPriceSnapshot:
+          type: number
+          format: double
+          example: 38.00
+        sortOrder:
+          type: integer
+
+    PackageService:
+      type: object
+      required: [id, serviceId, serviceNameSnapshot, servicePriceSnapshot]
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceId:
+          type: string
+          format: uuid
+        serviceNameSnapshot:
+          type: string
+          example: "管家服务"
+        servicePriceSnapshot:
+          type: number
+          format: double
+          example: 500.00
+        sortOrder:
+          type: integer
+
+    PackagePricing:
+      type: object
+      required: [packagePrice]
+      properties:
+        packagePrice:
+          type: number
+          format: double
+          example: 1888.00
+        referencePriceSnapshot:
+          type: number
+          format: double
+          nullable: true
+          example: 2500.00
+        discountPercentage:
+          type: number
+          format: double
+          nullable: true
+          example: 75.52
+        discountAmount:
+          type: number
+          format: double
+          nullable: true
+          example: 612.00
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [success, error, message]
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误代码
+          example: "VALIDATION_FAILED"
+        message:
+          type: string
+          description: 错误消息
+          example: "请求参数验证失败"
+        details:
+          type: object
+          description: 详细错误信息（可选）
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "BAD_REQUEST"
+            message: "请求参数验证失败"
+            details:
+              field: "name"
+              reason: "名称不能为空"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "NOT_FOUND"
+            message: "场景包不存在或已被删除"
+
+    Conflict:
+      description: 并发冲突（乐观锁）
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "CONFLICT"
+            message: "该场景包已被他人修改，请刷新后重试"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "INTERNAL_SERVER_ERROR"
+            message: "服务器内部错误，请稍后重试"

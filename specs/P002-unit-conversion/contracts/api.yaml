@@ -1,0 +1,613 @@
+openapi: 3.0.3
+info:
+  title: 单位换算管理 API
+  description: |
+    P002-unit-conversion 功能的 REST API 契约定义。
+    支持单位换算规则的 CRUD 操作和换算路径计算。
+  version: 1.0.0
+  contact:
+    name: Cinema Platform Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发服务器
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: unit-conversions
+    description: 单位换算规则管理
+  - name: conversion-calculation
+    description: 换算路径计算
+
+paths:
+  /unit-conversions:
+    get:
+      tags:
+        - unit-conversions
+      summary: 获取所有换算规则
+      description: 返回所有配置的单位换算规则列表
+      operationId: getAllConversions
+      parameters:
+        - name: category
+          in: query
+          description: 按类别过滤 (volume/weight/quantity)
+          required: false
+          schema:
+            type: string
+            enum: [volume, weight, quantity]
+        - name: search
+          in: query
+          description: 搜索关键词（匹配 from_unit 或 to_unit）
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功获取换算规则列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionListResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - unit-conversions
+      summary: 创建换算规则
+      description: |
+        创建新的单位换算规则。
+        - 验证源单位和目标单位不能相同
+        - 检测循环依赖
+        - 验证换算率为正数
+      operationId: createConversion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversionRequest'
+      responses:
+        '201':
+          description: 换算规则创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResponse'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: 换算规则已存在或检测到循环依赖
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /unit-conversions/{id}:
+    get:
+      tags:
+        - unit-conversions
+      summary: 获取单个换算规则
+      description: 根据 ID 获取换算规则详情
+      operationId: getConversionById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 换算规则 UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功获取换算规则
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResponse'
+        '404':
+          description: 换算规则不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - unit-conversions
+      summary: 更新换算规则
+      description: |
+        更新现有的单位换算规则。
+        - 重新验证循环依赖
+        - 验证唯一性约束
+      operationId: updateConversion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 换算规则 UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversionRequest'
+      responses:
+        '200':
+          description: 换算规则更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionResponse'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '404':
+          description: 换算规则不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 换算规则冲突或循环依赖
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictErrorResponse'
+
+    delete:
+      tags:
+        - unit-conversions
+      summary: 删除换算规则
+      description: |
+        删除指定的换算规则。
+        - 检查是否被 BOM 引用
+        - 如有引用则阻止删除
+      operationId: deleteConversion
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 换算规则 UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 换算规则删除成功
+        '404':
+          description: 换算规则不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 换算规则被 BOM 引用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReferenceErrorResponse'
+
+  /unit-conversions/stats:
+    get:
+      tags:
+        - unit-conversions
+      summary: 获取换算规则统计
+      description: 返回按类别分组的换算规则数量统计
+      operationId: getConversionStats
+      responses:
+        '200':
+          description: 成功获取统计信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+
+  /unit-conversions/validate-cycle:
+    post:
+      tags:
+        - unit-conversions
+      summary: 验证循环依赖
+      description: |
+        在保存前验证新规则是否会产生循环依赖。
+        返回循环路径（如有）。
+      operationId: validateCycle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateCycleRequest'
+      responses:
+        '200':
+          description: 验证通过，无循环依赖
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CycleValidationResponse'
+        '409':
+          description: 检测到循环依赖
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CycleDetectedResponse'
+
+  /unit-conversions/calculate-path:
+    post:
+      tags:
+        - conversion-calculation
+      summary: 计算换算路径
+      description: |
+        计算从源单位到目标单位的最短换算路径。
+        返回路径和累积换算率。
+      operationId: calculateConversionPath
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculatePathRequest'
+      responses:
+        '200':
+          description: 成功计算换算路径
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversionPathResponse'
+        '404':
+          description: 找不到换算路径
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PathNotFoundResponse'
+
+components:
+  schemas:
+    # 基础响应
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - timestamp
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    # 换算规则
+    UnitConversion:
+      type: object
+      required:
+        - id
+        - fromUnit
+        - toUnit
+        - conversionRate
+        - category
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 换算规则唯一标识
+        fromUnit:
+          type: string
+          maxLength: 20
+          description: 源单位
+          example: "瓶"
+        toUnit:
+          type: string
+          maxLength: 20
+          description: 目标单位
+          example: "ml"
+        conversionRate:
+          type: number
+          format: decimal
+          minimum: 0
+          exclusiveMinimum: true
+          description: 换算率 (1 fromUnit = ? toUnit)
+          example: 750
+        category:
+          type: string
+          enum: [volume, weight, quantity]
+          description: 单位类别（数据库存储值）
+        categoryDisplay:
+          type: string
+          enum: [VOLUME, WEIGHT, COUNT]
+          description: 单位类别（前端显示值）
+
+    # 请求模型
+    CreateConversionRequest:
+      type: object
+      required:
+        - fromUnit
+        - toUnit
+        - conversionRate
+        - category
+      properties:
+        fromUnit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: 源单位
+        toUnit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: 目标单位
+        conversionRate:
+          type: number
+          format: decimal
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 999999.999999
+          description: 换算率
+        category:
+          type: string
+          enum: [volume, weight, quantity]
+          description: 单位类别
+        description:
+          type: string
+          maxLength: 200
+          description: 备注说明（可选）
+
+    ValidateCycleRequest:
+      type: object
+      required:
+        - fromUnit
+        - toUnit
+      properties:
+        fromUnit:
+          type: string
+        toUnit:
+          type: string
+        excludeId:
+          type: string
+          format: uuid
+          description: 编辑时排除当前规则的 ID
+
+    CalculatePathRequest:
+      type: object
+      required:
+        - fromUnit
+        - toUnit
+      properties:
+        fromUnit:
+          type: string
+          description: 源单位
+        toUnit:
+          type: string
+          description: 目标单位
+
+    # 响应模型
+    ConversionResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/UnitConversion'
+
+    ConversionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/UnitConversion'
+            total:
+              type: integer
+              description: 总数量
+
+    StatsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                volumeCount:
+                  type: integer
+                  description: 体积类规则数量
+                weightCount:
+                  type: integer
+                  description: 重量类规则数量
+                countCount:
+                  type: integer
+                  description: 计数类规则数量
+                totalCount:
+                  type: integer
+                  description: 总规则数量
+
+    CycleValidationResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                valid:
+                  type: boolean
+                  example: true
+                message:
+                  type: string
+                  example: "无循环依赖"
+
+    CycleDetectedResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                valid:
+                  type: boolean
+                  example: false
+                cyclePath:
+                  type: array
+                  items:
+                    type: string
+                  description: 循环路径
+                  example: ["A", "B", "C", "A"]
+                message:
+                  type: string
+                  example: "检测到循环：A→B→C→A"
+
+    ConversionPathResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                fromUnit:
+                  type: string
+                toUnit:
+                  type: string
+                path:
+                  type: array
+                  items:
+                    type: string
+                  description: 换算路径
+                  example: ["瓶", "ml", "L"]
+                totalRate:
+                  type: number
+                  format: decimal
+                  description: 累积换算率
+                  example: 0.75
+                steps:
+                  type: integer
+                  description: 中间步骤数
+                  example: 2
+                found:
+                  type: boolean
+                  example: true
+
+    PathNotFoundResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                fromUnit:
+                  type: string
+                toUnit:
+                  type: string
+                found:
+                  type: boolean
+                  example: false
+                message:
+                  type: string
+                  example: "找不到从 '瓶' 到 'kg' 的换算路径"
+
+    # 错误响应
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "请求参数验证失败"
+        details:
+          type: object
+          additionalProperties:
+            type: string
+          description: 字段级错误详情
+        timestamp:
+          type: string
+          format: date-time
+
+    ConflictErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          enum: [DUPLICATE_RULE, CYCLE_DETECTED]
+        message:
+          type: string
+        cyclePath:
+          type: array
+          items:
+            type: string
+          description: 循环路径（仅 CYCLE_DETECTED 时返回）
+        timestamp:
+          type: string
+          format: date-time
+
+    ReferenceErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "RULE_REFERENCED"
+        message:
+          type: string
+          example: "该换算规则被 BOM 引用，无法删除"
+        references:
+          type: array
+          items:
+            type: object
+            properties:
+              bomId:
+                type: string
+                format: uuid
+              productName:
+                type: string
+          description: 引用该规则的 BOM 列表
+        timestamp:
+          type: string
+          format: date-time

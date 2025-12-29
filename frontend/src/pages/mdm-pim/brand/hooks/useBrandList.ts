@@ -68,9 +68,9 @@ export const useBrandList = (options: UseBrandListOptions = {}) => {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  // 获取品牌列表数据
-  const brands = brandListData?.data?.data || [];
-  const paginationData = brandListData?.data?.pagination || {
+  // 获取品牌列表数据 - brandService.getBrands直接返回后端响应
+  const brands = brandListData?.data || [];
+  const paginationData = brandListData?.pagination || {
     current: 1,
     pageSize: initialPageSize,
     total: 0,

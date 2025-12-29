@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { BaseEntity } from './index';
-import { MaterialType, ProductStatus } from './index';
+import type { BaseEntity } from './base';
+import { MaterialType, ProductStatus } from './base';
 
 // 重新导出常用的枚举类型，方便其他文件直接从 product.ts 导入
 export { MaterialType, ProductStatus };

@@ -2,6 +2,17 @@ import { http, HttpResponse } from 'msw'
 import { categoryHandlers } from './categoryHandlers'
 import { brandHandlers } from './brandHandlers'
 import { attributeHandlers_ } from './attributeHandlers'
+import { scheduleHandlers } from './scheduleHandlers'
+import { reservationSettingsHandlers } from './reservationSettingsHandlers'
+import { scenarioPackageEditorHandlers } from './scenarioPackageEditorHandlers'
+import { skuHandlers } from './sku' // P001-sku-master-data
+import { conversionHandlers } from './conversion' // P002-unit-conversion
+import { orderHandlers } from './orderHandlers' // O001-product-order-list
+// 库存相关使用真实后端 API，已禁用 mock
+// import { inventoryHandlers } from './inventoryHandlers' // P003-inventory-query
+// import { adjustmentHandlers } from './adjustmentHandlers' // P004-inventory-adjustment
+// 场景包使用真实后端 API，不再使用 mock
+// import { scenarioPackageHandlers } from './scenarioPackageHandlers'
 
 // 动态导入 generators（延迟加载），避免在 MSW 启动时立即加载所有依赖
 const getGenerators = async () => {
@@ -177,7 +188,18 @@ export const handlers = [
   ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
   ...legacyCategoryHandlers, // 旧版兼容处理器
   ...brandHandlers, // 使用新的brandHandlers
-  ...attributeHandlers_ // 属性字典管理处理器
+  ...attributeHandlers_, // 属性字典管理处理器
+  ...scheduleHandlers, // 排期管理处理器
+  ...reservationSettingsHandlers, // 门店预约设置处理器
+  ...scenarioPackageEditorHandlers, // 场景包编辑器处理器
+  ...skuHandlers, // SKU主数据管理处理器 (P001-sku-master-data)
+  ...conversionHandlers, // 单位换算管理处理器 (P002-unit-conversion)
+  ...orderHandlers, // 订单管理处理器 (O001-product-order-list)
+  // 库存相关使用真实后端 API，已禁用 mock
+  // ...inventoryHandlers, // 库存查询处理器 (P003-inventory-query)
+  // ...adjustmentHandlers, // 库存调整处理器 (P004-inventory-adjustment)
+  // 场景包使用真实后端 API，已禁用 mock
+  // ...scenarioPackageHandlers,
 ]
 
 // 默认导出所有处理器

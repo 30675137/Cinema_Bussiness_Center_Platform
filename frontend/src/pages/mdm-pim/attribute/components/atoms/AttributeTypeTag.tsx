@@ -64,3 +64,4 @@ const AttributeTypeTag: React.FC<AttributeTypeTagProps> = ({
 
 export default AttributeTypeTag;
 
+

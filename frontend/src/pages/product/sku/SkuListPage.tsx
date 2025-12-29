@@ -2,13 +2,13 @@
  * SKU列表页面
  * 整合筛选器、表格等组件，提供完整的SKU列表查看和搜索功能
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Space, message, Modal, Alert, Empty, Card } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { showError } from '@/utils/errorHandler';
 import { SkuFilters } from '@/components/sku/SkuFilters';
 import { SkuTable } from '@/components/sku/SkuTable';
-import { SkuForm } from '@/components/sku';
+import { SkuSimpleForm } from '@/components/sku/SkuSimpleForm';
 import { SkuDetail } from '@/components/sku/SkuDetail';
 import { useSkuStore } from '@/stores/skuStore';
 import {
@@ -25,6 +25,11 @@ import { useNavigate } from 'react-router-dom';
 const SkuListPage: React.FC = () => {
   const navigate = useNavigate();
   const store = useSkuStore();
+  
+  // 简化表单状态
+  const [simpleFormOpen, setSimpleFormOpen] = useState(false);
+  const [simpleFormMode, setSimpleFormMode] = useState<'create' | 'edit'>('create');
+  const [simpleFormSkuId, setSimpleFormSkuId] = useState<string | undefined>(undefined);
   
   // 安全地获取 store 值，确保不为 undefined
   const filters = store.filters || { status: 'all' };
@@ -93,9 +98,18 @@ const SkuListPage: React.FC = () => {
     openDetailDrawer(record.id);
   };
 
-  // 处理编辑
+  // 处理编辑 - 使用简化表单
   const handleEdit = (record: SKU) => {
-    openFormDrawer('edit', record.id);
+    setSimpleFormMode('edit');
+    setSimpleFormSkuId(record.id);
+    setSimpleFormOpen(true);
+  };
+
+  // 从详情页面编辑（接收skuId）
+  const handleEditById = (skuId: string) => {
+    setSimpleFormMode('edit');
+    setSimpleFormSkuId(skuId);
+    setSimpleFormOpen(true);
   };
 
   // 处理状态切换
@@ -123,9 +137,17 @@ const SkuListPage: React.FC = () => {
     });
   };
 
-  // 处理新建SKU
+  // 处理新建SKU - 使用简化表单
   const handleCreate = () => {
-    openFormDrawer('create');
+    setSimpleFormMode('create');
+    setSimpleFormSkuId(undefined);
+    setSimpleFormOpen(true);
+  };
+
+  // 关闭简化表单
+  const handleSimpleFormClose = () => {
+    setSimpleFormOpen(false);
+    setSimpleFormSkuId(undefined);
   };
 
   // 处理表单成功
@@ -225,20 +247,21 @@ const SkuListPage: React.FC = () => {
         )}
       </Card>
 
-      {/* 表单和详情抽屉 */}
-      <SkuForm
-        open={formDrawerOpen}
-        mode={formDrawerMode}
-        skuId={formDrawerSkuId || undefined}
-        onClose={closeFormDrawer}
+      {/* 简化创建/编辑表单 */}
+      <SkuSimpleForm
+        open={simpleFormOpen}
+        onClose={handleSimpleFormClose}
         onSuccess={handleFormSuccess}
+        mode={simpleFormMode}
+        skuId={simpleFormSkuId}
       />
 
+      {/* 详情抽屉 */}
       <SkuDetail
         open={detailDrawerOpen}
         skuId={detailDrawerSkuId}
         onClose={closeDetailDrawer}
-        onEdit={handleEdit}
+        onEdit={handleEditById}
       />
     </div>
   );

@@ -1,1 +1,1 @@
-010-attribute-dict-management
+specs/O003-beverage-order

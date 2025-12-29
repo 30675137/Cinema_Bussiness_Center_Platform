@@ -818,6 +818,19 @@ const mockMenus: MenuItem[] = [
         isActive: true,
         isVisible: true,
         functionalArea: FunctionalArea.ORDER_MANAGEMENT
+      },
+      {
+        id: 'menu_reservation_orders',
+        parentId: 'menu_order_management',
+        name: '预约单管理',
+        code: 'reservation_orders',
+        path: '/reservation-orders',
+        level: MenuLevel.SUB,
+        sortOrder: 5,
+        requiredPermissions: [],
+        isActive: true,
+        isVisible: true,
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT
       }
     ]
   },

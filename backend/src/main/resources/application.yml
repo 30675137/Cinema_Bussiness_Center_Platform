@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: cinema-hall-store-backend
+
+  # 数据源配置（Supabase PostgreSQL - Pooler 模式）
+  datasource:
+    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0
+    username: postgres.fxhgyxceqrmnpezluaht
+    password: ppkZ8sGUEHB0qjFs
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none # 暂时禁用，避免启动失败
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+  # Flyway 配置
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: false
+    clean-disabled: true
+    out-of-order: true
+    ignore-migration-patterns: "*:missing,*:future,*:ignored"
+
+server:
+  port: 8080
+
+supabase:
+  # Supabase 项目基础配置，通过环境变量注入，避免泄露密钥
+  url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}
+  anon-key: ${SUPABASE_ANON_KEY:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs}
+  service-role-key: ${SUPABASE_SERVICE_ROLE_KEY:sb_secret_FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
+  jwt-secret: ${SUPABASE_JWT_SECRET:FkEDAlCy8cOBZex8J7f34g_YJLufeNC}
+  api-timeout: 60000 # 毫秒，默认 60s
+
+  storage:
+    bucket: scenario-packages # 场景包背景图片存储桶
+    beverage-images-bucket: beverage-images # 饮品图片存储桶
+    base-url: ${SUPABASE_URL:https://fxhgyxceqrmnpezluaht.supabase.co}/storage/v1
+
+# 微信小程序配置（用于微信登录功能）
+wechat:
+  miniprogram:
+    # AppID 和 AppSecret 必须通过环境变量注入，禁止硬编码
+    # 从微信公众平台 > 开发 > 开发设置 获取
+    app-id: ${WECHAT_APPID:wx23d19fd65c65af26}
+    app-secret: ${WECHAT_APP_SECRET:e8550f82e70ba2278b0e030786b9653d}
+
+# JWT 认证配置 (@spec O003-beverage-order T026)
+jwt:
+  # JWT 签名密钥 (生产环境必须使用强密钥并通过环境变量注入)
+  secret: ${JWT_SECRET:cinema-beverage-order-secret-key-please-change-in-production-environment}
+  # Access Token 有效期 (毫秒) - 默认 1 小时
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  # Refresh Token 有效期 (毫秒) - 默认 7 天
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+
+# 测试用户配置 (生产环境应使用 Supabase Auth)
+auth:
+  test:
+    username: ${TEST_USERNAME:admin}
+    password: ${TEST_PASSWORD:admin123}
+    userId: ${TEST_USER_ID:00000000-0000-0000-0000-000000000001}
+
+# 饮品订单配置 (@spec O003-beverage-order)
+beverage:
+  payment:
+    # Mock 支付延迟时间（毫秒）- MVP 阶段使用模拟支付
+    mock-delay-ms: ${MOCK_PAYMENT_DELAY_MS:500}
+
+  order:
+    # 订单状态轮询间隔（毫秒）- C端/B端实时更新频率
+    polling-interval-ms: ${ORDER_POLLING_INTERVAL_MS:8000}
+    # 取餐号格式配置
+    queue-number-prefix: D # 取餐号前缀 (D001-D999)
+    queue-number-max: 999  # 每日最大取餐号
+    # 订单号前缀
+    order-number-prefix: BORDT # 格式: BORDT + yyyyMMddHHmmss + 4位随机数
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.cinema.hallstore: DEBUG
+    com.cinema.beverage: DEBUG # 饮品模块日志
+    org.springframework.web: DEBUG
+    org.springframework.web.reactive.function.client: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+
+

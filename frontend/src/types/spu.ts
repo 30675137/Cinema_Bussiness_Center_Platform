@@ -1,5 +1,16 @@
 // SPU 状态枚举
-export type SPUStatus = 'draft' | 'active' | 'inactive'
+type SPUStatus = 'draft' | 'active' | 'inactive'
+
+// SPU 产品类型枚举
+export type ProductType = 'raw_material' | 'packaging' | 'finished_product' | 'combo'
+
+// 产品类型选项配置
+export const PRODUCT_TYPE_OPTIONS = [
+  { value: 'raw_material', label: '原料', color: 'blue' },
+  { value: 'packaging', label: '包材', color: 'green' },
+  { value: 'finished_product', label: '成品', color: 'orange' },
+  { value: 'combo', label: '套餐', color: 'purple' },
+] as const
 
 // 基础SPU类型
 export interface SPUItem {
@@ -33,6 +44,9 @@ export interface SPUItem {
   // 状态管理
   status: SPUStatus
   auditStatus?: 'approved' | 'pending' | 'rejected'
+
+  // 产品类型（SKU继承此类型）
+  productType?: ProductType
 
   // 属性信息
   attributes?: SPUAttribute[]
@@ -122,6 +136,7 @@ export interface SPUCreationForm {
   unit?: string
   categoryId: string
   brandId: string
+  productType: ProductType  // 产品类型（必填）
   attributes: Record<string, any>
   tags: string[]
   images: ProductImage[]
@@ -375,4 +390,4 @@ export interface ImportResponse {
   message: string
 }
 
-// 所有类型已在定义时导出，无需重复导出
+export type { SPUStatus }

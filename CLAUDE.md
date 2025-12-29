@@ -1,49 +1,517 @@
-# Cinema_Bussiness_Center_Platform Development Guidelines
+# CLAUDE.md
 
-Auto-generated from all feature plans. Last updated: 2025-12-11
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Active Technologies
-- TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand, TanStack Query, React Router 6 (005-sku-management)
-- 无后端存储，前端Mock数据服务 (005-sku-management)
-- TypeScript 5.0.4 + React 18.2.0, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13 (005-sku-management)
-- 前端 Mock 数据（内存存储），不依赖后端数据库 (005-sku-management)
-- TypeScript 5.0.4, React 18.2.0 + Vite 6.0.7, Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 6, React Hook Form 7.68.0, Zod 4.1.13 (006-frontend-structure-refactor)
-- N/A (前端文件系统重构，不涉及数据存储) (006-frontend-structure-refactor)
-- TypeScript 5.9.3 + React 19.2.0, Ant Design 6.1.0, TanStack Query 5.90.12, Zustand 5.0.9, MSW 2.12.4, React Router 7.10.1 (007-category-management)
-- Mock data (in-memory state + MSW handlers + localStorage for persistence) (007-category-management)
-- Python 3.8+ (001-claude-cleanup-script)
-- Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致） (001-claude-cleanup-script)
-- TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4 (001-brand-management)
-- Python 3.8+ (标准库 + pathlib, re, shutil) + 无外部依赖，仅使用 Python 标准库 (011-uninstall-env-cleanup)
-- 文件系统操作（读取/写入 ~/.zshrc 等配置文件） (011-uninstall-env-cleanup)
-- Python 3.8+ (标准库 + argparse) (012-set-config-enhancement)
+## Project Overview
 
-- (003-inventory-management)
+**Cinema Business Center Platform** (影院商品管理中台) - A full-stack cinema business management system with:
+- **B端 (Admin)**: React 19 + Ant Design management dashboard
+- **C端 (User)**: Taro 4.1.9 multi-platform app (WeChat mini-program + H5)
+- **Backend**: Spring Boot 3.3.5 + Supabase (PostgreSQL)
 
 ## Project Structure
 
-```text
-backend/
-frontend/
-tests/
+```
+Cinema_Bussiness_Center_Platform/
+├── frontend/              # B端 React Admin Dashboard
+│   ├── src/
+│   │   ├── components/    # Reusable UI components (32 directories)
+│   │   ├── features/      # Feature modules (beverage-order-management, etc.)
+│   │   ├── pages/         # Page components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── services/      # API services
+│   │   ├── stores/        # Zustand state management
+│   │   ├── types/         # TypeScript type definitions
+│   │   └── mocks/         # MSW mock handlers and data
+│   └── tests/e2e/         # Playwright E2E tests
+│
+├── hall-reserve-taro/     # C端 Taro Multi-platform App
+│   ├── src/
+│   │   ├── pages/         # 14 Taro pages
+│   │   ├── components/    # 11 reusable components
+│   │   ├── services/      # API calls
+│   │   └── stores/        # Zustand state management
+│   └── config/            # Taro build configuration
+│
+├── backend/               # Spring Boot Backend (Java 17)
+│   ├── src/main/java/com/cinema/
+│   │   ├── beverage/      # Beverage order module (@spec O003-beverage-order)
+│   │   ├── inventory/     # Inventory management
+│   │   ├── hallstore/     # Hall/Store management
+│   │   ├── order/         # Order processing
+│   │   └── common/        # Common utilities
+│   └── src/main/resources/
+│       └── application.yml
+│
+├── specs/                 # Feature specifications (49 specs)
+│   └── <specId>-<slug>/
+│       ├── spec.md        # Feature specification
+│       ├── plan.md        # Implementation plan
+│       ├── tasks.md       # Task breakdown
+│       └── contracts/
+│           └── api.yaml   # OpenAPI 3.0 spec
+│
+├── .claude/               # Claude Code configuration
+│   ├── rules/             # 9 project rules (see below)
+│   └── skills/            # 14 custom skills
+│
+└── scenarios/             # E2E test scenarios (YAML format)
 ```
 
-## Commands
+## Development Commands
 
-# Add commands for 
+### Full Stack Development
 
-## Code Style
+```bash
+# Terminal 1: Backend (Spring Boot)
+cd backend
+./mvnw spring-boot:run                # Starts on http://localhost:8080
 
-: Follow standard conventions
+# Terminal 2: Frontend B端 (React Admin)
+cd frontend
+npm install
+npm run dev                           # Starts on http://localhost:3000
+                                     # Proxies /api to http://localhost:8080
 
-## Recent Changes
-- 010-attribute-dict-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
-- 001-brand-management: Added TypeScript 5.9.3 + React 19.2.0 + Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4
-- 012-set-config-enhancement: Added Python 3.8+ (标准库 + argparse)
-- 011-uninstall-env-cleanup: Added 文件系统操作（读取/写入 ~/.zshrc 等配置文件）
-- 011-uninstall-env-cleanup: Added Python 3.8+ (标准库 + pathlib, re, shutil) + 无外部依赖，仅使用 Python 标准库
-- 001-claude-cleanup-script: Added Python 3.8+（与项目 CLAUDE.md 中指定的 Python 3.8+ 一致）
+# Terminal 3: Frontend C端 (Taro App)
+cd hall-reserve-taro
+npm install
+npm run dev:h5                       # H5 development on http://localhost:10086
+npm run dev:weapp                    # WeChat mini-program development
+```
 
+### Backend Commands (Maven)
 
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->
+```bash
+cd backend
+
+# Build
+./mvnw clean install                 # Clean build and install
+./mvnw clean package                 # Package to JAR
+
+# Run
+./mvnw spring-boot:run              # Start development server
+
+# Test
+./mvnw test                         # Run all tests
+./mvnw test -Dtest=ClassName        # Run specific test class
+
+# Format & Lint
+./mvnw spotless:apply               # Format Java code (if configured)
+```
+
+### Frontend B端 Commands (React)
+
+```bash
+cd frontend
+
+# Development
+npm run dev                         # Vite dev server (port 3000)
+npm run build                       # TypeScript compilation + Vite build
+npm run preview                     # Preview production build
+
+# Testing
+npm run test:unit                   # Vitest unit tests
+npm run test:unit:ui                # Vitest UI mode
+npm run test:e2e                    # Playwright E2E tests
+npm run test:e2e:ui                 # Playwright UI mode
+npm run test:coverage               # Coverage report
+
+# Code Quality
+npm run lint                        # ESLint check
+npm run lint:fix                    # Auto-fix ESLint issues
+npm run format                      # Prettier format
+npm run format:check                # Check formatting
+
+# Mock Setup
+npm run mock:init                   # Initialize MSW (first time only)
+```
+
+### Frontend C端 Commands (Taro)
+
+```bash
+cd hall-reserve-taro
+
+# Development
+npm run dev:h5                      # H5 mode (http://localhost:10086)
+npm run dev:weapp                   # WeChat mini-program (use WeChat DevTools)
+
+# Build
+npm run build:h5                    # Build for H5
+npm run build:weapp                 # Build for WeChat mini-program
+
+# Testing
+npm run test                        # Run Vitest tests
+npm run test:ui                     # Vitest UI mode
+npm run test:coverage               # Coverage report
+```
+
+### Root Level Commands
+
+```bash
+# From repository root
+npm run dev                         # Vite dev server (legacy, same as frontend)
+npm run test                        # Run all Vitest tests
+npm run test:e2e                    # Run Playwright E2E tests
+npm run lint                        # ESLint check
+npm run lint:fix                    # Auto-fix linting
+```
+
+## Technology Stack
+
+### Frontend B端 (Admin Dashboard)
+- **React** 19.2.0 - UI framework
+- **TypeScript** 5.9.3 - Type safety
+- **Vite** 7.2.4 - Build tool
+- **Ant Design** 6.1.0 - UI component library
+- **Zustand** 5.0.9 - Client state management
+- **TanStack Query** 5.90.12 - Server state management
+- **React Router** 7.10.1 - Routing
+- **React Hook Form** 7.68.0 + Zod 4.1.13 - Form handling & validation
+- **MSW** 2.12.4 - API mocking
+- **Vitest** 4.0.15 - Unit testing
+- **Playwright** 1.57.0 - E2E testing
+
+### Frontend C端 (User App)
+- **Taro** 4.1.9 - Multi-platform framework
+- **React** 18.3.1 - UI framework
+- **TypeScript** 5.4.0 - Type safety
+- **Zustand** 4.5.5 - State management
+- **TanStack Query** 5.90.12 - Data fetching
+
+### Backend
+- **Java** 17 - Runtime
+- **Spring Boot** 3.3.5 - Application framework
+- **Supabase** - Database/Auth/Storage (PostgreSQL 14+)
+- **Maven** - Build tool
+- **Spring Data JPA** - ORM
+- **Spring Security** - Authentication
+- **Caffeine** - Caching
+- **Apache POI** 5.2.5 - Excel reports
+
+## Architecture Patterns
+
+### State Management Strategy
+- **Client State** (UI, modals, drafts): Zustand
+- **Server State** (API data, caching): TanStack Query
+- **Persistence**:
+  - B端: `localStorage`
+  - C端: `Taro.setStorageSync()`
+
+### API Proxy Configuration
+Frontend dev server proxies `/api` to backend:
+```typescript
+// frontend/vite.config.ts
+server: {
+  proxy: {
+    '/api': 'http://localhost:8080'
+  }
+}
+```
+
+### Component Architecture (B端)
+Follows atomic design:
+- **Atoms**: Button, Input, Icon
+- **Molecules**: SearchBar, FormField
+- **Organisms**: Header, Sidebar, Table
+- **Templates**: PageLayout
+- **Pages**: Feature pages
+
+### Backend Architecture
+- **Controller Layer**: REST API endpoints
+- **Service Layer**: Business logic
+- **Repository Layer**: Data access (JPA)
+- **DTO Layer**: Data transfer objects
+- **Entity Layer**: JPA entities
+
+## Project Rules & Standards
+
+The project follows 9 strict rules defined in `.claude/rules/`:
+
+1. **Branch-Spec Binding** (`01-branch-spec-binding.md`):
+   - Branch format: `feat/<specId>-<slug>` (e.g., `feat/O003-beverage-order`)
+   - Spec location: `specs/<specId>-<slug>/spec.md`
+   - Active spec: `.specify/active_spec.txt`
+   - **Module prefixes**: S (Store), P (Product), B (Brand), A (Activity), U (User), O (Order), T (Tool), F (Frontend)
+
+2. **Test-Driven Development** (`02-test-driven-development.md`):
+   - **Red-Green-Refactor** cycle is mandatory
+   - Coverage requirements:
+     - Critical business logic: **100%**
+     - Utilities: ≥80%
+     - Components: ≥70%
+   - E2E tests (Playwright): Optional, use for critical flows
+
+3. **Frontend B端 Tech Stack** (`03-frontend-b-tech-stack.md`):
+   - Must use: React 19 + Ant Design 6 + Zustand + TanStack Query
+   - Prohibited: Non-Ant Design UI libraries, direct DOM manipulation
+
+4. **Frontend C端 Tech Stack** (`04-frontend-c-tech-stack.md`):
+   - **All C端 features must use Taro framework**
+   - Multi-platform support: WeChat mini-program + H5 (minimum)
+   - Prohibited: Ant Design, browser APIs without platform checks
+
+5. **State Management** (`05-state-management.md`):
+   - Client state: Zustand stores
+   - Server state: TanStack Query (mandatory for API calls)
+   - Prohibited: Direct API calls in components, Redux (unless complex C端)
+
+6. **Code Quality** (`06-code-quality.md`):
+   - **@spec annotation required** in all business logic files:
+     ```typescript
+     /** @spec O003-beverage-order */
+     export const OrderList = () => { ... }
+     ```
+   - TypeScript strict mode: `"strict": true`
+   - No `any` types (document exceptions)
+   - ESLint + Prettier enforcement
+   - Git commit format: Conventional Commits
+
+7. **Backend Architecture** (`07-backend-architecture.md`):
+   - **Supabase is the single source of truth** for all data
+   - Java 21 features preferred (currently Java 17)
+   - Timeout control: 30 seconds for Supabase calls
+   - Prohibited: Additional database access bypassing Supabase
+
+8. **API Standards** (`08-api-standards.md`):
+   - **Unified response format**:
+     ```json
+     {
+       "success": true,
+       "data": { ... },
+       "timestamp": "2025-12-30T10:00:00Z"
+     }
+     ```
+   - **Error numbering**: `<MODULE>_<CATEGORY>_<SEQUENCE>` (e.g., `INV_NTF_001`)
+   - HTTP status codes: 200 (success), 201 (created), 400 (validation), 404 (not found), 500 (error)
+
+9. **Quality Standards** (`09-quality-standards.md`):
+   - Performance: API P95 ≤ 1s, page switch ≤ 500ms
+   - Security: Zod validation, JWT auth, HTTPS (production)
+   - Accessibility: WCAG 2.1 AA level
+
+## Spec-Driven Development Workflow
+
+Every feature has a unique `specId` (e.g., `O003-beverage-order`):
+
+```
+specs/O003-beverage-order/
+├── spec.md                 # Functional requirements
+├── plan.md                 # Implementation plan
+├── tasks.md                # Task breakdown
+└── contracts/
+    └── api.yaml            # OpenAPI 3.0 specification
+```
+
+**Current Active Spec**: Check `.specify/active_spec.txt`
+
+**Spec ID Prefixes**:
+- **S###**: Store/Hall management
+- **P###**: Product/Inventory
+- **B###**: Brand/Category
+- **A###**: Activity/Scenario package
+- **U###**: User/Reservation
+- **O###**: Order (beverage orders)
+- **T###**: Tools/Infrastructure
+- **F###**: Frontend infrastructure
+
+## Testing Strategy
+
+### Unit Tests (Vitest)
+```bash
+# Frontend B端
+cd frontend && npm run test:unit
+
+# Frontend C端
+cd hall-reserve-taro && npm run test
+
+# Backend
+cd backend && ./mvnw test
+```
+
+Coverage thresholds defined in `vitest.config.ts`:
+- Branches: 60-80%
+- Functions: 60-80%
+- Lines: 60-80%
+- Statements: 60-80%
+
+### E2E Tests (Playwright)
+```bash
+cd frontend
+
+npm run test:e2e              # Headless mode
+npm run test:e2e:ui           # UI mode
+npm run test:headed           # Headed browser
+npm run test:debug            # Debug mode
+```
+
+Test browsers: Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari
+
+### Integration Tests (MSW)
+Mock Service Worker provides realistic API mocking:
+```bash
+cd frontend
+npm run mock:init             # First-time setup
+npm run dev                   # MSW auto-enabled in dev mode
+```
+
+## Common Development Patterns
+
+### API Service Pattern (B端)
+```typescript
+// frontend/src/services/orderService.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+export const useOrders = (storeId: string) => {
+  return useQuery({
+    queryKey: ['orders', storeId],
+    queryFn: () => fetchOrders(storeId),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  })
+}
+
+export const useCreateOrder = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+    }
+  })
+}
+```
+
+### Storage Pattern (C端 Taro)
+```typescript
+import Taro from '@tarojs/taro'
+
+// Never use localStorage in C端
+Taro.setStorageSync('token', value)  // ✅ Correct
+const token = Taro.getStorageSync('token')
+```
+
+### Error Handling (Backend)
+```java
+/**
+ * @spec O003-beverage-order
+ */
+@RestController
+public class OrderController {
+
+  @GetMapping("/api/orders/{id}")
+  public ResponseEntity<ApiResponse<Order>> getOrder(@PathVariable String id) {
+    try {
+      Order order = orderService.findById(id);
+      return ResponseEntity.ok(ApiResponse.success(order));
+    } catch (NotFoundException e) {
+      return ResponseEntity.status(404)
+        .body(ApiResponse.failure("ORD_NTF_001", e.getMessage()));
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+### Backend Issues
+- **Supabase connection failed**: Check `application.yml` for `SUPABASE_URL` and `SUPABASE_ANON_KEY`
+- **Table not found**: Run migrations in `specs/<specId>/migrations/`
+- **Logs**: Use structured logging filters: `grep "operation=CREATE_ORDER" logs/application.log`
+
+### Frontend B端 Issues
+- **401 Unauthorized**: Clear localStorage token, re-login
+- **State not updating**: Check TanStack Query polling config (default: 8s)
+- **Proxy errors**: Ensure backend is running on http://localhost:8080
+
+### Frontend C端 Issues
+- **Image loading failed**: Add domain to WeChat mini-program whitelist, use HTTPS
+- **Compilation errors**: `rm -rf node_modules dist && npm install && npm run dev:weapp`
+- **Platform API errors**: Check `process.env.TARO_ENV` for conditional logic
+
+## Git Commit Convention
+
+Follow Conventional Commits:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+
+**Example**:
+```
+feat(O003-beverage-order): add order history pagination
+
+- Implement TanStack Query infinite scroll
+- Add order status filter
+- Support order number search
+
+Closes #123
+```
+
+## Performance Targets
+
+| Metric | Target |
+|--------|--------|
+| API Response Time (P95) | ≤ 1 second |
+| Page Switch | ≤ 500ms |
+| App Startup | ≤ 3 seconds |
+| Taro Mini-program Main Bundle | < 2MB |
+| First Screen Render (C端) | < 1.5s |
+
+## Key Ports
+
+| Service | Port | URL |
+|---------|------|-----|
+| Backend (Spring Boot) | 8080 | http://localhost:8080 |
+| Frontend B端 (Vite) | 3000 | http://localhost:3000 |
+| Frontend C端 (Taro H5) | 10086 | http://localhost:10086 |
+
+## Important Files
+
+- `.claude/rules/` - 9 project rules (mandatory reading)
+- `specs/<specId>/` - Feature specifications
+- `.specify/active_spec.txt` - Current active spec
+- `frontend/vite.config.ts` - Vite configuration (includes API proxy)
+- `backend/src/main/resources/application.yml` - Backend configuration
+- `hall-reserve-taro/config/index.ts` - Taro build configuration
+
+## Code Attribution
+
+**All business logic files must include @spec annotation**:
+
+```typescript
+/** @spec O003-beverage-order */
+export const OrderList = () => { ... }
+```
+
+```java
+/**
+ * @spec O003-beverage-order
+ */
+@Service
+public class OrderService { ... }
+```
+
+Shared code can reference multiple specs: `@spec P003,P004`
+
+## Claude Code Skills
+
+14 custom skills available in `.claude/skills/`:
+- `doc-writer` - Design documentation generation
+- `ops-expert` - Operations management (门店/场景包/预约查询)
+- `retail-audit` - Code/architecture audit
+- `test-scenario-author` - E2E scenario creation
+- `speckit.*` - Spec-driven workflow tools (specify, plan, tasks, implement, etc.)
+
+Invoke with: `/skill-name` (e.g., `/doc-writer`)
+
+---
+
+**Last Updated**: 2025-12-30
+**Main Branch**: `001-ui-implementation`
+**Active Branch**: `T001-e2e-scenario-author`

@@ -194,6 +194,50 @@ export const useSpusQuery = (enabled: boolean = true) => {
 };
 
 /**
+ * 获取原料和包材列表Hook (BOM选择用)
+ * 返回 sku_type 为 raw_material 或 packaging 的 SKU
+ */
+export const useIngredientsQuery = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: skuKeys.custom('ingredients'),
+    queryFn: async (): Promise<SKU[]> => {
+      // 获取所有 SKU，然后在前端过滤原料和包材
+      const response = await skuService.getSkus({ page: 1, pageSize: 1000 });
+      const allSkus = response.items || [];
+      // 过滤出原料和包材类型
+      return allSkus.filter((sku: SKU) => 
+        sku.skuType === 'raw_material' || sku.skuType === 'packaging'
+      );
+    },
+    enabled,
+    staleTime: 5 * 60 * 1000, // 5分钟
+    select: (data: SKU[]) => data || [],
+  });
+};
+
+/**
+ * 获取套餐子项列表Hook (Combo选择用)
+ * 套餐只能包含成品类型 (finished_product)
+ */
+export const useComboItemsQuery = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: skuKeys.custom('comboItems'),
+    queryFn: async (): Promise<SKU[]> => {
+      // 获取所有 SKU，然后在前端过滤
+      const response = await skuService.getSkus({ page: 1, pageSize: 1000 });
+      const allSkus = response.items || [];
+      // 套餐子项只能选择成品类型
+      return allSkus.filter((sku: SKU) => 
+        sku.skuType === 'finished_product'
+      );
+    },
+    enabled,
+    staleTime: 5 * 60 * 1000, // 5分钟
+    select: (data: SKU[]) => data || [],
+  });
+};
+
+/**
  * 获取单位列表Hook
  */
 export const useUnitsQuery = (enabled: boolean = true) => {

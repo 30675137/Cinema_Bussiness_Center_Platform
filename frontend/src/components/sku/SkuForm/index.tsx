@@ -32,6 +32,8 @@ import { skuService } from '@/services/skuService';
 import { BasicInfoTab } from './BasicInfoTab';
 import { UnitBarcodeTab } from './UnitBarcodeTab';
 import { SpecAttrTab } from './SpecAttrTab';
+import { BomConfigTab } from './BomConfigTab'; // P001-sku-master-data
+import { ComboConfigTab } from './ComboConfigTab'; // P001-sku-master-data
 import { OtherConfigTab } from './OtherConfigTab';
 
 const { Step } = Steps;
@@ -43,7 +45,9 @@ enum FormStep {
   BASIC_INFO = 0,      // 基础信息
   UNIT_BARCODE = 1,    // 单位条码
   SPEC_ATTR = 2,       // 规格属性
-  OTHER_CONFIG = 3,    // 其他配置
+  BOM_CONFIG = 3,      // BOM配置 (P001-sku-master-data)
+  COMBO_CONFIG = 4,    // 套餐配置 (P001-sku-master-data)
+  OTHER_CONFIG = 5,    // 其他配置
 }
 
 /**
@@ -52,7 +56,7 @@ enum FormStep {
 const steps = [
   {
     title: '基础信息',
-    description: 'SPU、名称等',
+    description: 'SPU、名称、类型',
     key: FormStep.BASIC_INFO,
     required: true,
   },
@@ -69,8 +73,20 @@ const steps = [
     required: false,
   },
   {
+    title: 'BOM配置',
+    description: '成品BOM管理', // P001-sku-master-data
+    key: FormStep.BOM_CONFIG,
+    required: false,
+  },
+  {
+    title: '套餐配置',
+    description: '套餐子项管理', // P001-sku-master-data
+    key: FormStep.COMBO_CONFIG,
+    required: false,
+  },
+  {
     title: '其他配置',
-    description: '库存、状态等',
+    description: '库存、门店等',
     key: FormStep.OTHER_CONFIG,
     required: false,
   },
@@ -299,6 +315,9 @@ export const SkuForm: React.FC<SkuFormProps> = ({
       case FormStep.SPEC_ATTR:
         // 规格属性为可选，不需要验证
         return { isValid: true, failedFields: [], firstFailedFieldName: null };
+      case FormStep.BOM_CONFIG:
+        // BOM配置为可选，不需要验证 (P001-sku-master-data)
+        return { isValid: true, failedFields: [], firstFailedFieldName: null };
       case FormStep.OTHER_CONFIG:
         // 其他配置为可选，不需要验证
         return { isValid: true, failedFields: [], firstFailedFieldName: null };
@@ -332,6 +351,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({
         return !!(values.mainUnitId && values.mainBarcode);
       case FormStep.SPEC_ATTR:
         return true; // 可选步骤
+      case FormStep.BOM_CONFIG:
+        return true; // 可选步骤 (P001-sku-master-data)
       case FormStep.OTHER_CONFIG:
         return true; // 可选步骤
       default:
@@ -349,8 +370,10 @@ export const SkuForm: React.FC<SkuFormProps> = ({
         return !!(currentErrors.mainUnitId || currentErrors.mainBarcode);
       case FormStep.SPEC_ATTR:
         return !!(currentErrors.spec || currentErrors.flavor || currentErrors.packaging);
+      case FormStep.BOM_CONFIG:
+        return !!(currentErrors.bomComponents || currentErrors.wasteRate); // P001-sku-master-data
       case FormStep.OTHER_CONFIG:
-        return !!(currentErrors.manageInventory || currentErrors.allowNegativeStock || 
+        return !!(currentErrors.manageInventory || currentErrors.allowNegativeStock ||
                   currentErrors.minOrderQty || currentErrors.minSaleQty || currentErrors.status);
       default:
         return false;
@@ -491,6 +514,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({
                 return ['mainUnitId', 'mainBarcode', 'salesUnits', 'otherBarcodes'].includes(firstErrorField);
               case FormStep.SPEC_ATTR:
                 return ['spec', 'flavor', 'packaging'].includes(firstErrorField);
+              case FormStep.BOM_CONFIG:
+                return ['bomComponents', 'wasteRate'].includes(firstErrorField); // P001-sku-master-data
               case FormStep.OTHER_CONFIG:
                 return ['manageInventory', 'allowNegativeStock', 'minOrderQty', 'minSaleQty', 'status'].includes(firstErrorField);
               default:
@@ -544,6 +569,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({
                 return ['mainUnitId', 'mainBarcode', 'salesUnits', 'otherBarcodes'].includes(firstFailedFieldName);
               case FormStep.SPEC_ATTR:
                 return ['spec', 'flavor', 'packaging'].includes(firstFailedFieldName);
+              case FormStep.BOM_CONFIG:
+                return ['bomComponents', 'wasteRate'].includes(firstFailedFieldName); // P001-sku-master-data
               case FormStep.OTHER_CONFIG:
                 return ['manageInventory', 'allowNegativeStock', 'minOrderQty', 'minSaleQty', 'status'].includes(firstFailedFieldName);
               default:
@@ -778,6 +805,7 @@ export const SkuForm: React.FC<SkuFormProps> = ({
                 initialData={skuData}
                 setValue={setValue}
                 watch={watch}
+                getValues={getValues}
               />
             )}
             {currentStep === FormStep.UNIT_BARCODE && (
@@ -799,6 +827,16 @@ export const SkuForm: React.FC<SkuFormProps> = ({
                 initialData={skuData}
                 setValue={setValue}
                 watch={watch}
+              />
+            )}
+            {currentStep === FormStep.BOM_CONFIG && (
+              <BomConfigTab
+                control={control}
+                errors={errors}
+                setValue={setValue}
+                getValues={getValues}
+                watch={watch}
+                mode={mode}
               />
             )}
             {currentStep === FormStep.OTHER_CONFIG && (

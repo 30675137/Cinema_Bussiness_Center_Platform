@@ -1,0 +1,584 @@
+openapi: 3.0.3
+info:
+  title: 场景包场馆关联 API
+  description: |
+    019-store-association 功能的 API 契约定义。
+
+    本功能扩展现有场景包管理 API，增加门店关联能力。
+    - 获取可选门店列表
+    - 创建/更新场景包时包含门店关联
+    - 查询场景包详情时返回关联门店
+  version: 1.0.0
+  contact:
+    name: Cinema Platform Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+
+tags:
+  - name: Stores
+    description: 门店查询（复用 014-hall-store-backend）
+  - name: ScenarioPackages
+    description: 场景包管理（扩展门店关联）
+
+paths:
+  # ============================================================
+  # 门店查询 API（复用现有 API）
+  # ============================================================
+  /stores:
+    get:
+      tags:
+        - Stores
+      summary: 获取门店列表
+      description: |
+        获取所有门店列表，用于场景包关联配置时的门店选择。
+
+        **注意**: 此 API 由 014-hall-store-backend 提供，本功能仅复用。
+      operationId: getStores
+      parameters:
+        - name: status
+          in: query
+          description: 门店状态筛选
+          required: false
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+            default: active
+      responses:
+        '200':
+          description: 成功返回门店列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreListResponse'
+              example:
+                success: true
+                data:
+                  - id: "550e8400-e29b-41d4-a716-446655440001"
+                    code: "SH001"
+                    name: "上海万达影城（五角场店）"
+                    region: "上海市杨浦区"
+                    status: "active"
+                    createdAt: "2025-01-15T10:30:00Z"
+                    updatedAt: "2025-01-15T10:30:00Z"
+                  - id: "550e8400-e29b-41d4-a716-446655440002"
+                    code: "SH002"
+                    name: "上海百丽宫影城（环贸店）"
+                    region: "上海市徐汇区"
+                    status: "active"
+                    createdAt: "2025-01-16T14:20:00Z"
+                    updatedAt: "2025-01-16T14:20:00Z"
+                total: 2
+                message: "查询成功"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ============================================================
+  # 场景包 API（扩展门店关联）
+  # ============================================================
+  /scenario-packages:
+    post:
+      tags:
+        - ScenarioPackages
+      summary: 创建场景包（含门店关联）
+      description: |
+        创建新的场景包，必须包含至少一个门店关联。
+
+        **扩展字段**: `storeIds` - 关联的门店ID列表
+      operationId: createScenarioPackage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioPackageCreateRequest'
+            example:
+              name: "VIP 生日派对专场"
+              description: "为您打造专属的生日派对体验"
+              backgroundImageUrl: "https://example.com/images/birthday.jpg"
+              hallTypeIds:
+                - "VIP"
+                - "PARTY"
+              storeIds:
+                - "550e8400-e29b-41d4-a716-446655440001"
+                - "550e8400-e29b-41d4-a716-446655440002"
+              rules:
+                durationHours: 3
+                minPeople: 10
+                maxPeople: 20
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioPackageResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "VALIDATION_ERROR"
+                message: "请至少选择一个门店"
+                details:
+                  field: "storeIds"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /scenario-packages/{id}:
+    get:
+      tags:
+        - ScenarioPackages
+      summary: 获取场景包详情（含门店关联）
+      description: |
+        获取场景包详细信息，包含关联的门店列表。
+
+        **扩展响应字段**:
+        - `stores` - 关联的门店详细信息列表
+        - `storeIds` - 关联的门店ID列表（便于表单回显）
+      operationId: getScenarioPackageById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 场景包ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回场景包详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioPackageDetailResponse'
+              example:
+                data:
+                  id: "660e8400-e29b-41d4-a716-446655440000"
+                  name: "VIP 生日派对专场"
+                  description: "为您打造专属的生日派对体验"
+                  backgroundImageUrl: "https://example.com/images/birthday.jpg"
+                  status: "DRAFT"
+                  versionLock: 1
+                  hallTypes:
+                    - id: "VIP"
+                      name: "VIP厅"
+                    - id: "PARTY"
+                      name: "派对厅"
+                  stores:
+                    - id: "550e8400-e29b-41d4-a716-446655440001"
+                      code: "SH001"
+                      name: "上海万达影城（五角场店）"
+                      region: "上海市杨浦区"
+                      status: "active"
+                    - id: "550e8400-e29b-41d4-a716-446655440002"
+                      code: "SH002"
+                      name: "上海百丽宫影城（环贸店）"
+                      region: "上海市徐汇区"
+                      status: "active"
+                  storeIds:
+                    - "550e8400-e29b-41d4-a716-446655440001"
+                    - "550e8400-e29b-41d4-a716-446655440002"
+                  rules:
+                    durationHours: 3
+                    minPeople: 10
+                    maxPeople: 20
+                  createdAt: "2025-12-21T10:00:00Z"
+                  updatedAt: "2025-12-21T10:00:00Z"
+                timestamp: "2025-12-21T15:30:00Z"
+        '404':
+          description: 场景包不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "NOT_FOUND"
+                message: "未找到指定的场景包"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - ScenarioPackages
+      summary: 更新场景包（含门店关联）
+      description: |
+        更新场景包信息，包括门店关联。
+
+        **乐观锁**: 请求必须包含当前 `versionLock` 值，若版本不匹配则返回 409 冲突错误。
+
+        **门店关联更新**: 传入的 `storeIds` 将完全覆盖原有关联（全量更新）。
+      operationId: updateScenarioPackage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 场景包ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioPackageUpdateRequest'
+            example:
+              name: "VIP 生日派对专场（升级版）"
+              description: "为您打造专属的生日派对体验，全新升级！"
+              versionLock: 1
+              storeIds:
+                - "550e8400-e29b-41d4-a716-446655440001"
+                - "550e8400-e29b-41d4-a716-446655440003"
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioPackageResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 场景包不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 版本冲突（乐观锁）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "VERSION_CONFLICT"
+                message: "场馆关联已被其他用户修改，请刷新后重试"
+                details:
+                  currentVersion: 2
+                  expectedVersion: 1
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    # ============================================================
+    # 门店相关 Schema
+    # ============================================================
+    Store:
+      type: object
+      description: 门店信息
+      required:
+        - id
+        - code
+        - name
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 门店唯一标识
+        code:
+          type: string
+          description: 门店编码
+          example: "SH001"
+        name:
+          type: string
+          description: 门店名称
+          example: "上海万达影城（五角场店）"
+        region:
+          type: string
+          nullable: true
+          description: 所属区域
+          example: "上海市杨浦区"
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+          description: 门店状态
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    StoreListResponse:
+      type: object
+      description: 门店列表响应
+      required:
+        - success
+        - data
+        - total
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+        total:
+          type: integer
+          description: 总数量
+          example: 10
+        message:
+          type: string
+          description: 响应消息
+          example: "查询成功"
+
+    # ============================================================
+    # 场景包相关 Schema
+    # ============================================================
+    HallType:
+      type: object
+      description: 影厅类型
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: 影厅类型ID
+          example: "VIP"
+        name:
+          type: string
+          description: 影厅类型名称
+          example: "VIP厅"
+
+    PackageRules:
+      type: object
+      description: 场景包规则
+      properties:
+        durationHours:
+          type: number
+          format: float
+          description: 时长（小时）
+          minimum: 0.5
+          example: 3
+        minPeople:
+          type: integer
+          description: 最少人数
+          minimum: 1
+          example: 10
+        maxPeople:
+          type: integer
+          description: 最多人数
+          example: 20
+
+    ScenarioPackageCreateRequest:
+      type: object
+      description: 创建场景包请求
+      required:
+        - name
+        - storeIds
+      properties:
+        name:
+          type: string
+          description: 场景包名称
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          description: 场景包描述
+        backgroundImageUrl:
+          type: string
+          description: 背景图片URL
+        hallTypeIds:
+          type: array
+          items:
+            type: string
+          description: 关联的影厅类型ID列表
+        storeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          description: 关联的门店ID列表（至少一个）
+        rules:
+          $ref: '#/components/schemas/PackageRules'
+
+    ScenarioPackageUpdateRequest:
+      type: object
+      description: 更新场景包请求
+      required:
+        - versionLock
+        - storeIds
+      properties:
+        name:
+          type: string
+          description: 场景包名称
+        description:
+          type: string
+          description: 场景包描述
+        backgroundImageUrl:
+          type: string
+          description: 背景图片URL
+        hallTypeIds:
+          type: array
+          items:
+            type: string
+          description: 关联的影厅类型ID列表
+        storeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          description: 关联的门店ID列表（至少一个）
+        rules:
+          $ref: '#/components/schemas/PackageRules'
+        versionLock:
+          type: integer
+          description: 乐观锁版本号（必须与当前版本匹配）
+
+    ScenarioPackageDetail:
+      type: object
+      description: 场景包详情（含门店关联）
+      required:
+        - id
+        - name
+        - status
+        - stores
+        - storeIds
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 场景包ID
+        name:
+          type: string
+          description: 场景包名称
+        description:
+          type: string
+          description: 场景包描述
+        backgroundImageUrl:
+          type: string
+          description: 背景图片URL
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - PUBLISHED
+            - UNPUBLISHED
+          description: 场景包状态
+        versionLock:
+          type: integer
+          description: 乐观锁版本号
+        hallTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/HallType'
+          description: 关联的影厅类型列表
+        stores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Store'
+          description: 关联的门店列表
+        storeIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: 关联的门店ID列表（便于表单回显）
+        rules:
+          $ref: '#/components/schemas/PackageRules'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    ScenarioPackageResponse:
+      type: object
+      description: 场景包操作响应
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          $ref: '#/components/schemas/ScenarioPackageDetail'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ScenarioPackageDetailResponse:
+      type: object
+      description: 场景包详情响应
+      required:
+        - data
+        - timestamp
+      properties:
+        data:
+          $ref: '#/components/schemas/ScenarioPackageDetail'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    # ============================================================
+    # 通用 Schema
+    # ============================================================
+    ErrorResponse:
+      type: object
+      description: 错误响应
+      required:
+        - success
+        - error
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误代码
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          description: 错误消息
+          example: "请求参数无效"
+        details:
+          type: object
+          description: 错误详情
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误发生时间

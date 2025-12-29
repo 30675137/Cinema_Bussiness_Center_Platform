@@ -1,0 +1,147 @@
+{
+  "timestamp": "2025-12-21T06:53:41.477Z",
+  "url": "http://localhost:10087/",
+  "tests": [
+    {
+      "name": "Page Load Time",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:44.483Z",
+      "loadTime": "2115ms",
+      "expected": "< 5000ms"
+    },
+    {
+      "name": "Page Errors",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.484Z",
+      "message": "No page errors found"
+    },
+    {
+      "name": "Console Errors",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.484Z",
+      "message": "No console errors found"
+    },
+    {
+      "name": "Console Warnings",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.484Z",
+      "message": "No console warnings found"
+    },
+    {
+      "name": "Hero Title Exists",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.494Z",
+      "text": "不仅仅是 电影"
+    },
+    {
+      "name": "Scenario Cards Count",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.498Z",
+      "expected": 3,
+      "actual": 3
+    },
+    {
+      "name": "Loading State Hidden",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:46.499Z",
+      "message": "Loading completed"
+    },
+    {
+      "name": "Failed Network Requests",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:49.359Z",
+      "count": 0,
+      "requests": []
+    },
+    {
+      "name": "Images Loaded",
+      "status": "warning",
+      "timestamp": "2025-12-21T06:53:49.374Z",
+      "total": 3,
+      "loaded": 0,
+      "failed": 0
+    },
+    {
+      "name": "Lazy Load Enabled",
+      "status": "warning",
+      "timestamp": "2025-12-21T06:53:49.461Z",
+      "message": "Some images missing lazy load attribute"
+    },
+    {
+      "name": "Rating Badges Count",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:49.463Z",
+      "count": 3,
+      "message": "Rating badges displayed"
+    },
+    {
+      "name": "React Query Initialized",
+      "status": "warning",
+      "timestamp": "2025-12-21T06:53:49.464Z",
+      "message": "Cannot detect React Query"
+    },
+    {
+      "name": "Cache Strategy",
+      "status": "warning",
+      "timestamp": "2025-12-21T06:53:54.092Z",
+      "firstLoad": 28,
+      "secondLoad": 28,
+      "message": "Possible cache miss"
+    },
+    {
+      "name": "Responsive Layout (iPhone 6/7/8)",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:54.762Z",
+      "viewport": "375x667",
+      "horizontalScroll": false
+    },
+    {
+      "name": "Responsive Layout (iPhone 6/7/8 Plus)",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:55.320Z",
+      "viewport": "414x736",
+      "horizontalScroll": false
+    },
+    {
+      "name": "Responsive Layout (iPad)",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:55.929Z",
+      "viewport": "768x1024",
+      "horizontalScroll": false
+    },
+    {
+      "name": "DOM Content Loaded",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:55.930Z",
+      "time": "37ms",
+      "expected": "< 3000ms"
+    },
+    {
+      "name": "First Contentful Paint",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:55.930Z",
+      "time": "108ms",
+      "expected": "< 2000ms"
+    },
+    {
+      "name": "JavaScript Heap Size",
+      "status": "passed",
+      "timestamp": "2025-12-21T06:53:55.930Z",
+      "size": "44MB",
+      "expected": "< 50MB"
+    },
+    {
+      "name": "Card Click Navigation",
+      "status": "warning",
+      "timestamp": "2025-12-21T06:53:58.596Z",
+      "currentUrl": "http://localhost:10087/#/pages/home/index",
+      "message": "Navigation may not be implemented yet"
+    }
+  ],
+  "summary": {
+    "total": 20,
+    "passed": 15,
+    "failed": 0,
+    "warnings": 5
+  }
+}

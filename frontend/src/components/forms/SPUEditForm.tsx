@@ -31,7 +31,8 @@ import {
 } from '@ant-design/icons'
 import type { FormInstance } from 'antd/es/form'
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface'
-import type { SPUItem, SPUStatus, SPUAttribute, AttributeType } from '@/types/spu'
+import type { SPUItem, SPUStatus, SPUAttribute, AttributeType, ProductType } from '@/types/spu'
+import { PRODUCT_TYPE_OPTIONS } from '@/types/spu'
 import { spuService } from '@/services/spuService'
 import { BrandSelect } from '@/components/forms/BrandSelect'
 import { CategorySelector } from '@/components/forms/CategorySelector'
@@ -96,6 +97,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
           brandId: spuData.brandId,
           categoryId: spuData.categoryId,
           status: spuData.status,
+          productType: spuData.productType,
           tags: spuData.tags || []
         })
 
@@ -337,7 +339,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
       </Row>
 
       <Row gutter={16}>
-        <Col span={8}>
+        <Col span={6}>
           <Form.Item
             name="unit"
             label="标准单位"
@@ -345,7 +347,23 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
             <Input placeholder="如：个、箱、件等" />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
+          <Form.Item
+            name="productType"
+            label="产品类型"
+            tooltip="产品类型决定了SKU的用途，创建SKU时将继承此类型"
+            rules={[{ required: true, message: '请选择产品类型' }]}
+          >
+            <Select placeholder="请选择产品类型">
+              {PRODUCT_TYPE_OPTIONS.map(opt => (
+                <Option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col span={6}>
           <Form.Item
             name="status"
             label="状态"
@@ -358,7 +376,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
             </Select>
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Form.Item
             name="tags"
             label="标签"

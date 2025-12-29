@@ -11,6 +11,8 @@ import ProductsWorkspace from '@/pages/Products/ProductsWorkspace';
 import PricingList from '@/pages/pricing/PricingList';
 import ReviewList from '@/pages/review/ReviewList';
 import InventoryList from '@/pages/inventory/InventoryList';
+import { InventoryPage } from '@/pages/inventory';
+import { BeverageListPage } from '@/features/beverage-config/pages';
 
 // 路由配置
 const routes = [
@@ -71,6 +73,23 @@ const routes = [
       {
         path: 'list',
         element: <InventoryList />,
+      },
+      {
+        path: 'query',
+        element: <InventoryPage />,
+      },
+    ],
+  },
+  {
+    path: '/beverage',
+    children: [
+      {
+        index: true,
+        element: <BeverageListPage />,
+      },
+      {
+        path: 'list',
+        element: <BeverageListPage />,
       },
     ],
   },

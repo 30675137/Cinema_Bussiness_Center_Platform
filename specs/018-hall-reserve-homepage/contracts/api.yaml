@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: 场景包小程序首页 API
+  description: |
+    为 Taro 小程序提供场景包列表数据的 RESTful API。
+
+    功能特性：
+    - 服务端过滤（仅返回已发布状态的场景包）
+    - 列表摘要数据（不包含完整的定价、规则、权益等嵌套对象）
+    - 统一的响应格式（ApiResponse<T>）
+    - 支持缓存策略（客户端 5 分钟缓存）
+
+    关联规格：
+    - 018-hall-reserve-homepage: 小程序首页 API 集成
+    - 017-scenario-package: 场景包管理（后端数据源）
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+    url: https://github.com/cinema-platform/hall-reserve
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api.staging.cinema.com
+    description: 测试环境
+  - url: https://api.cinema.com
+    description: 生产环境
+
+tags:
+  - name: 场景包
+    description: 场景包相关 API
+
+paths:
+  /api/scenario-packages:
+    get:
+      summary: 获取场景包列表
+      description: |
+        获取已发布状态的场景包列表摘要数据，用于小程序首页展示。
+
+        业务规则：
+        1. 仅返回 status = PUBLISHED 的场景包（服务端过滤）
+        2. 仅返回列表摘要字段（id, title, category, backgroundImageUrl, packagePrice, rating, tags）
+        3. 不包含完整的 pricing、rules、benefits、items、services 等嵌套对象
+        4. 软删除的场景包（deleted_at IS NOT NULL）不返回
+
+        性能要求：
+        - 响应时间 < 2 秒（正常网络环境）
+        - 支持客户端缓存（Cache-Control: max-age=300，即 5 分钟）
+
+        错误处理：
+        - 超时时间 10 秒
+        - 数据库查询失败返回 500 错误
+        - 数据格式错误返回 500 错误
+      operationId: getScenarioPackages
+      tags:
+        - 场景包
+      responses:
+        '200':
+          description: 成功获取场景包列表
+          headers:
+            Cache-Control:
+              description: 缓存控制头
+              schema:
+                type: string
+                example: 'max-age=300, public'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioPackageListResponse'
+              examples:
+                success:
+                  summary: 成功响应示例
+                  value:
+                    success: true
+                    data:
+                      - id: 'uuid-001'
+                        title: 'VIP 生日派对专场'
+                        category: 'PARTY'
+                        backgroundImageUrl: 'https://storage.supabase.co/scenarios/party-001.jpg'
+                        packagePrice: 1888.00
+                        rating: 4.5
+                        tags: ['生日', '派对', 'VIP', '浪漫']
+                      - id: 'uuid-002'
+                        title: '企业年会包场'
+                        category: 'TEAM'
+                        backgroundImageUrl: 'https://storage.supabase.co/scenarios/team-001.jpg'
+                        packagePrice: 5888.00
+                        rating: 4.8
+                        tags: ['年会', '团建', '商务']
+                      - id: 'uuid-003'
+                        title: '求婚惊喜专场'
+                        category: 'MOVIE'
+                        backgroundImageUrl: 'https://storage.supabase.co/scenarios/movie-001.jpg'
+                        packagePrice: 3888.00
+                        tags: ['求婚', '惊喜', '浪漫']
+                    timestamp: '2025-12-21T10:00:00Z'
+                emptyData:
+                  summary: 无可用场景包（空数组）
+                  value:
+                    success: true
+                    data: []
+                    message: '暂无可用场景包'
+                    timestamp: '2025-12-21T10:00:00Z'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                databaseError:
+                  summary: 数据库查询失败
+                  value:
+                    success: false
+                    data: null
+                    message: '服务暂时不可用，请稍后重试'
+                    timestamp: '2025-12-21T10:00:00Z'
+                validationError:
+                  summary: 数据格式验证失败
+                  value:
+                    success: false
+                    data: null
+                    message: 'API 返回数据格式不正确'
+                    timestamp: '2025-12-21T10:00:00Z'
+
+components:
+  schemas:
+    ScenarioPackageListItem:
+      type: object
+      description: 场景包列表项（摘要数据）
+      required:
+        - id
+        - title
+        - category
+        - backgroundImageUrl
+        - packagePrice
+        - tags
+      properties:
+        id:
+          type: string
+          description: 场景包唯一标识符（UUID 或自增 ID）
+          example: 'uuid-001'
+        title:
+          type: string
+          description: 场景包标题
+          minLength: 1
+          maxLength: 255
+          example: 'VIP 生日派对专场'
+        category:
+          type: string
+          description: 分类枚举
+          enum:
+            - MOVIE
+            - TEAM
+            - PARTY
+          example: 'PARTY'
+        backgroundImageUrl:
+          type: string
+          format: uri
+          description: 背景图片 URL（由 017 场景包管理后台上传至 Supabase Storage）
+          example: 'https://storage.supabase.co/scenarios/party-001.jpg'
+        packagePrice:
+          type: number
+          format: double
+          description: 打包一口价（起价），单位：元
+          minimum: 0
+          example: 1888.00
+        rating:
+          type: number
+          format: double
+          description: 运营人员配置的固定评分（0-5分），非用户评价
+          minimum: 0
+          maximum: 5
+          nullable: true
+          example: 4.5
+        tags:
+          type: array
+          description: 标签列表（业务标签，如"生日"、"浪漫"等）
+          items:
+            type: string
+          example: ['生日', '派对', 'VIP', '浪漫']
+
+    ScenarioPackageListResponse:
+      type: object
+      description: 场景包列表 API 响应
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: array
+          description: 场景包列表数据
+          items:
+            $ref: '#/components/schemas/ScenarioPackageListItem'
+        message:
+          type: string
+          description: 错误或提示信息（可选）
+          example: '暂无可用场景包'
+        timestamp:
+          type: string
+          format: date-time
+          description: 服务器时间戳（ISO 8601 格式）
+          example: '2025-12-21T10:00:00Z'
+
+    ErrorResponse:
+      type: object
+      description: 错误响应格式
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功（错误时为 false）
+          example: false
+        data:
+          type: 'null'
+          description: 错误时数据为 null
+          example: null
+        message:
+          type: string
+          description: 错误信息
+          example: '服务暂时不可用，请稍后重试'
+        timestamp:
+          type: string
+          format: date-time
+          description: 服务器时间戳
+          example: '2025-12-21T10:00:00Z'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Token 认证（可选）
+        当前版本的场景包列表 API 为公开接口，不需要认证。
+        未来如需支持用户个性化推荐，可引入 JWT 认证。
+
+# 注意事项
+# 1. 前端需使用 Zod 对 API 响应进行运行时验证
+# 2. 后端需在 Spring Boot Controller 中实现缓存控制头
+# 3. 数据库查询需包含 WHERE status = 'PUBLISHED' AND deleted_at IS NULL
+# 4. rating 字段为可选字段，前端需处理 null 值
+# 5. 所有响应需包含 timestamp 字段，供客户端缓存策略使用

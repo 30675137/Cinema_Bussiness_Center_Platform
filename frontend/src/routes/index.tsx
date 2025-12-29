@@ -31,6 +31,8 @@ const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'))
 // Attribute Template Pages
 const AttributeTemplate = React.lazy(() => import('@/pages/AttributeTemplate'))
 
+// Schedule Management Pages
+const ScheduleManagement = React.lazy(() => import('@/pages/schedule'))
 // Legacy product pages
 const ProductList = React.lazy(() => import('@/pages/product/ProductList'))
 const ProductForm = React.lazy(() => import('@/pages/product/ProductForm'))
@@ -39,6 +41,9 @@ const ProductForm = React.lazy(() => import('@/pages/product/ProductForm'))
 const PriceManagement = React.lazy(() => import('@/pages/price/PriceManagement'))
 const PricingConfig = React.lazy(() => import('@/pages/pricing/PricingConfig'))
 const InventoryTrace = React.lazy(() => import('@/pages/inventory/InventoryTrace'))
+
+// Inventory Adjustment Pages (P004)
+const InventoryApproval = React.lazy(() => import('@/pages/inventory/ApprovalPage'))
 
 // Loading component for lazy loaded pages
 const PageLoader: React.FC = () => (
@@ -125,6 +130,10 @@ export const router = createBrowserRouter([
     element: withLayout(AttributeTemplate),
   },
   {
+    path: '/schedule/gantt',
+    element: withLayout(ScheduleManagement),
+  },
+  {
     path: '/product',
     element: withLayout(ProductList),
   },
@@ -147,6 +156,10 @@ export const router = createBrowserRouter([
   {
     path: '/inventory/trace',
     element: withLayout(InventoryTrace),
+  },
+  {
+    path: '/inventory/approvals',
+    element: withLayout(InventoryApproval),
   },
   {
     path: '*',

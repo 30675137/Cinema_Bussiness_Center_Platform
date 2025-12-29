@@ -1,0 +1,149 @@
+/**
+ * @spec O003-beverage-order
+ * JWT认证与授权配置 (T026)
+ */
+package com.cinema.config;
+
+import com.cinema.security.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+/**
+ * Spring Security 配置类
+ *
+ * 功能:
+ * 1. 配置HTTP安全规则 (公共端点 vs 需要认证的端点)
+ * 2. 集成 JWT 认证过滤器
+ * 3. 禁用 CSRF (API-only 后端)
+ * 4. 配置 CORS 跨域策略
+ * 5. 使用无状态会话策略
+ */
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    /**
+     * 配置安全过滤链
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // 禁用 CSRF (API-only 后端使用 JWT 认证)
+            .csrf(csrf -> csrf.disable())
+
+            // 配置 CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+            // 配置请求授权规则
+            .authorizeHttpRequests(auth -> auth
+                // 公共端点 (不需要认证)
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/beverage-auth/**").permitAll()
+
+                // 原有项目公共端点
+                .requestMatchers(HttpMethod.GET, "/api/scenario-packages/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/halls/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/cinemas/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/stores/**").permitAll()
+                .requestMatchers("/api/reservation/**").permitAll()
+
+                // C端公共端点 (饮品浏览、下单)
+                .requestMatchers(HttpMethod.GET, "/api/client/beverages/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/client/beverage-specs/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/client/beverage-orders").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/client/beverage-orders/*/pay").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/client/beverage-orders/my").permitAll()
+
+                // C端饮品订单端点 (开发测试临时开放)
+                .requestMatchers(HttpMethod.POST, "/api/beverage-orders").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/beverage-orders/**").permitAll()
+
+                // B端公共端点 (饮品管理 - 临时开放用于开发测试)
+                .requestMatchers(HttpMethod.POST, "/api/admin/beverages/upload-image").permitAll()
+                .requestMatchers("/api/admin/beverages/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/skus/**").permitAll() // SKU列表查询
+
+                // 统一订单列表端点 (临时开放用于开发测试)
+                .requestMatchers(HttpMethod.GET, "/api/orders").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
+
+                // P005: 库存预占与扣减API (临时开放用于E2E测试)
+                .requestMatchers("/api/inventory/**").permitAll()
+
+                // B端管理端点 (需要认证)
+                .requestMatchers("/api/admin/**").authenticated()
+
+                // 其他所有请求需要认证
+                .anyRequest().authenticated()
+            )
+
+            // 无状态会话策略 (不使用 HttpSession)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+
+            // 添加 JWT 认证过滤器 (在 UsernamePasswordAuthenticationFilter 之前)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    /**
+     * CORS 配置
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // 允许的来源 (开发环境允许所有来源，生产环境应限制)
+        configuration.setAllowedOriginPatterns(List.of("*"));
+
+        // 允许的 HTTP 方法
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // 允许的请求头
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // 允许携带凭证 (Cookies)
+        configuration.setAllowCredentials(true);
+
+        // 暴露的响应头
+        configuration.setExposedHeaders(List.of("Authorization"));
+
+        // 预检请求缓存时间 (3600秒 = 1小时)
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
+    /**
+     * 密码加密器 (BCrypt)
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}

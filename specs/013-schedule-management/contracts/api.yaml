@@ -1,0 +1,494 @@
+openapi: 3.0.0
+info:
+  title: 排期管理 API
+  version: 1.0.0
+  description: 影院排期管理甘特图视图的 API 契约
+
+servers:
+  - url: /api
+    description: 本地开发服务器
+
+paths:
+  /schedules:
+    get:
+      summary: 获取排期事件列表
+      description: 根据日期获取所有排期事件
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2025-01-27"
+          description: 查询日期，格式 YYYY-MM-DD
+        - name: hallId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 筛选影厅ID（可选）
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [public, private, maintenance, cleaning]
+          description: 筛选事件类型（可选）
+      responses:
+        '200':
+          description: 成功返回排期事件列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduleEvent'
+                  total:
+                    type: integer
+                    example: 10
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: 创建排期事件
+      description: 创建新的排期事件
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScheduleEventRequest'
+      responses:
+        '201':
+          description: 成功创建排期事件
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScheduleEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: 时间冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "时间冲突"
+                message: "该时间段已被占用，请选择其他时间"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /schedules/{id}:
+    get:
+      summary: 获取排期事件详情
+      description: 根据ID获取单个排期事件的详细信息
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 排期事件ID
+      responses:
+        '200':
+          description: 成功返回排期事件详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScheduleEvent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: 更新排期事件
+      description: 更新已存在的排期事件
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 排期事件ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScheduleEventRequest'
+      responses:
+        '200':
+          description: 成功更新排期事件
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ScheduleEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 时间冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: 删除排期事件
+      description: 删除指定的排期事件
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 排期事件ID
+      responses:
+        '204':
+          description: 成功删除
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /schedules/{id}/conflict-check:
+    post:
+      summary: 检查时间冲突
+      description: 检查指定时间段是否存在冲突
+      parameters:
+        - name: id
+          in: path
+          required: false
+          schema:
+            type: string
+            nullable: true
+          description: 排期事件ID（更新时传入，新建时不传）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hallId
+                - date
+                - startHour
+                - duration
+              properties:
+                hallId:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                startHour:
+                  type: number
+                duration:
+                  type: number
+      responses:
+        '200':
+          description: 冲突检查结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hasConflict:
+                    type: boolean
+                  conflictingEvents:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScheduleEvent'
+
+  /halls:
+    get:
+      summary: 获取影厅列表
+      description: 获取所有可用的影厅资源
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [active, inactive, maintenance]
+          description: 筛选影厅状态（可选）
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [VIP, Public, CP, Party]
+          description: 筛选影厅类型（可选）
+      responses:
+        '200':
+          description: 成功返回影厅列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Hall'
+                  total:
+                    type: integer
+
+  /halls/{id}:
+    get:
+      summary: 获取影厅详情
+      description: 根据ID获取单个影厅的详细信息
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 影厅ID
+      responses:
+        '200':
+          description: 成功返回影厅详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Hall'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    ScheduleEvent:
+      type: object
+      required:
+        - id
+        - hallId
+        - date
+        - startHour
+        - duration
+        - title
+        - type
+      properties:
+        id:
+          type: string
+          example: "e1"
+        hallId:
+          type: string
+          example: "h1"
+        date:
+          type: string
+          format: date
+          example: "2025-01-27"
+        startHour:
+          type: number
+          description: 开始时间（小时），支持小数，如 10.5 = 10:30
+          example: 10.5
+        duration:
+          type: number
+          description: 持续时间（小时），支持小数
+          example: 3
+        title:
+          type: string
+          example: "刘总生日派对"
+        type:
+          type: string
+          enum: [public, private, maintenance, cleaning]
+          example: "private"
+        status:
+          type: string
+          enum: [confirmed, pending, locked]
+          example: "confirmed"
+        customer:
+          type: string
+          example: "刘先生 138****0000"
+        serviceManager:
+          type: string
+          example: "王经理"
+        occupancy:
+          type: string
+          pattern: '^\d+/\d+$'
+          example: "85/120"
+        details:
+          type: string
+          example: "含豪华果盘 x2"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateScheduleEventRequest:
+      type: object
+      required:
+        - hallId
+        - date
+        - startHour
+        - duration
+        - title
+        - type
+      properties:
+        hallId:
+          type: string
+        date:
+          type: string
+          format: date
+        startHour:
+          type: number
+        duration:
+          type: number
+        title:
+          type: string
+        type:
+          type: string
+          enum: [public, private, maintenance, cleaning]
+        status:
+          type: string
+          enum: [confirmed, pending, locked]
+        customer:
+          type: string
+        serviceManager:
+          type: string
+        occupancy:
+          type: string
+          pattern: '^\d+/\d+$'
+        details:
+          type: string
+
+    UpdateScheduleEventRequest:
+      type: object
+      properties:
+        hallId:
+          type: string
+        date:
+          type: string
+          format: date
+        startHour:
+          type: number
+        duration:
+          type: number
+        title:
+          type: string
+        type:
+          type: string
+          enum: [public, private, maintenance, cleaning]
+        status:
+          type: string
+          enum: [confirmed, pending, locked]
+        customer:
+          type: string
+        serviceManager:
+          type: string
+        occupancy:
+          type: string
+          pattern: '^\d+/\d+$'
+        details:
+          type: string
+
+    Hall:
+      type: object
+      required:
+        - id
+        - name
+        - capacity
+        - type
+        - status
+      properties:
+        id:
+          type: string
+          example: "h1"
+        name:
+          type: string
+          example: "1号厅 (VIP)"
+        capacity:
+          type: integer
+          example: 12
+        type:
+          type: string
+          enum: [VIP, Public, CP, Party]
+          example: "VIP"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["真皮沙发", "管家服务"]
+        operatingHours:
+          type: object
+          properties:
+            startHour:
+              type: number
+            endHour:
+              type: number
+        status:
+          type: string
+          enum: [active, inactive, maintenance]
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Bad Request"
+            message: "参数验证失败"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Not Found"
+            message: "资源不存在"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal Server Error"
+            message: "服务器内部错误"
+

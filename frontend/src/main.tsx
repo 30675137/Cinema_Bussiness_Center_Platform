@@ -17,12 +17,14 @@ import './index.css'
 import './monitoring/PerformanceInterceptor'
 import './monitoring/WebVitalsMonitor'
 
-// 启动应用（先启动 MSW，再渲染应用）
+// 启动应用（根据环境变量决定是否启动 MSW）
 async function initApp() {
   console.log('🚀 Starting application initialization...')
-  
-  // 在开发环境中，先启动 MSW
-  if (import.meta.env.DEV) {
+
+  // 使用环境变量控制是否启用 MSW
+  const useMock = import.meta.env.VITE_USE_MOCK === 'true'
+
+  if (import.meta.env.DEV && useMock) {
     console.log('🔧 Development mode: Initializing MSW...')
     try {
       const { startMSW } = await import('./mocks/browser')
@@ -36,11 +38,14 @@ async function initApp() {
       }
       // 即使 MSW 启动失败，也继续启动应用
     }
+  } else if (import.meta.env.DEV) {
+    console.log('✅ Development mode: Using real backend API via Vite proxy')
+    console.log(`📡 Backend URL: ${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'}`)
   } else {
     console.log('ℹ️ Production mode: MSW disabled')
   }
-  
-  // MSW 启动完成后，渲染应用
+
+  // MSW 启动完成（或跳过）后，渲染应用
   console.log('🎨 Rendering application...')
   renderApp()
 }

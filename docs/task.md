@@ -46,7 +46,39 @@
   - 优化构建配置
   - 提升整体性能
 
-### ✅ 采购管理模块完整开发 (当前主要任务)
+### ✅ U002 预约卡片紧凑布局优化
+- **完成时间**: 2025-12-24
+- **状态**: 已完成
+- **负责模块**: C端小程序预约流程
+- **开发内容**:
+
+#### 1. 预约表单页优化 ✅
+- **修改文件**: `hall-reserve-taro/src/pages/reservation-form/index.tsx`
+- **内容**: 移除日期/时段/套餐的重复选择，改为只读摘要卡片展示
+
+#### 2. 数据传递修复 ✅
+- **修改文件**: `hall-reserve-taro/src/pages/detail/index.tsx`
+- **内容**: 确保从详情页传递到表单页的预约信息正确显示
+
+#### 3. 日期格式优化 ✅
+- **修改文件**: `hall-reserve-taro/src/stores/reservationStore.ts`
+- **内容**: 显示具体日期如"12月25日（今天）"，同时保存API格式"yyyy-MM-dd"
+
+#### 4. API URL修复 ✅
+- **修改文件**: `hall-reserve-taro/src/services/reservationService.ts`
+- **内容**: 修复 API URL 从 localhost:8080 改为正确地址
+
+#### 5. 起价计算优化 ✅
+- **修改文件**: `hall-reserve-taro/src/pages/home/index.tsx`
+- **内容**: 从取第一个套餐价格改为取所有套餐最低价
+
+#### 6. 后端数据一致性修复 ✅
+- **修改文件**: `backend/src/main/java/com/cinema/scenariopackage/service/ScenarioPackageService.java`
+- **内容**: 修复 toListItemDTO 方法，从 package_tiers 表获取真实套餐数据而非硬编码
+
+---
+
+### ✅ 采购管理模块完整开发
 - **完成时间**: 2025-12-11
 - **状态**: 已完成
 - **负责模块**: 采购管理系统
@@ -249,5 +281,5 @@ docs/               # 项目文档
 
 ---
 
-*最后更新时间: 2025-12-11*
-*更新内容: 完成采购管理模块全面开发，包括供应商管理、收货管理、调拨管理系统*
+*最后更新时间: 2025-12-24*
+*更新内容: 完成 U002 预约卡片紧凑布局优化，修复前后端数据一致性问题*

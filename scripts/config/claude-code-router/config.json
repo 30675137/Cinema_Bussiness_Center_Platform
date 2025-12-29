@@ -1,6 +1,6 @@
 {
-  "PORT": 3456,
-  "HOST": "127.0.0.1",
+  "APIKEY": "your-secret-key",
+  "PROXY_URL": "http://127.0.0.1:7890",
   "LOG": true,
   "API_TIMEOUT_MS": 600000,
   "NON_INTERACTIVE_MODE": false,
@@ -22,4 +22,3 @@
     "longContextThreshold": 60000
   }
 }
-

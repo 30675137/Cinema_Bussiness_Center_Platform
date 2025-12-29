@@ -135,9 +135,9 @@ const BrandList: React.FC<BrandListProps> = ({
     refetch();
   };
 
-  // 获取品牌列表数据
-  const brands = brandListData?.data?.data || [];
-  const paginationData = brandListData?.data?.pagination || {
+  // 获取品牌列表数据 - API直接返回 {success, data: [...], pagination: {...}}
+  const brands = brandListData?.data || [];
+  const paginationData = brandListData?.pagination || {
     current: 1,
     pageSize: 20,
     total: 0,

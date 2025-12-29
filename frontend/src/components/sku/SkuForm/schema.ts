@@ -3,7 +3,7 @@
  * 使用Zod进行表单验证
  */
 import { z } from 'zod';
-import { SkuStatus } from '@/types/sku';
+import { SkuStatus, SkuType } from '@/types/sku';
 
 /**
  * 销售单位表单Schema
@@ -23,6 +23,36 @@ export const barcodeSchema = z.object({
 });
 
 /**
+ * BOM组件表单Schema (P001-sku-master-data)
+ */
+export const bomComponentSchema = z.object({
+  id: z.string(),
+  componentId: z.string().min(1, '请选择组件SKU'),
+  componentName: z.string(),
+  quantity: z.number().min(0.01, '数量必须大于0'),
+  unit: z.string(),
+  unitCost: z.number().optional(),
+  totalCost: z.number().optional(),
+  isOptional: z.boolean().default(false),
+  sortOrder: z.number().default(0),
+});
+
+/**
+ * 套餐子项表单Schema (P001-sku-master-data)
+ */
+export const comboItemSchema = z.object({
+  id: z.string(),
+  subItemId: z.string().min(1, '请选择子项SKU'),
+  subItemName: z.string(),
+  quantity: z.number().min(0.01, '数量必须大于0'),
+  unit: z.string(),
+  unitCost: z.number().optional(),
+  totalCost: z.number().optional(),
+  isOptional: z.boolean().default(false),
+  sortOrder: z.number().default(0),
+});
+
+/**
  * SKU表单完整Schema
  */
 export const skuFormSchema = z.object({
@@ -30,6 +60,7 @@ export const skuFormSchema = z.object({
   spuId: z.string().min(1, '请选择所属SPU'),
   name: z.string().min(1, '请输入SKU名称').max(200, 'SKU名称不能超过200个字符'),
   code: z.string().optional(), // 只读，系统生成
+  skuType: z.nativeEnum(SkuType, { required_error: '请选择SKU类型' }), // P001-sku-master-data
 
   // 规格属性
   spec: z.string().max(200, '规格/型号不能超过200个字符').optional(),
@@ -43,6 +74,17 @@ export const skuFormSchema = z.object({
   // 条码信息
   mainBarcode: z.string().min(1, '请输入主条码').max(20, '条码长度不能超过20个字符'),
   otherBarcodes: z.array(barcodeSchema).default([]),
+
+  // 成本和门店配置 (P001-sku-master-data)
+  standardCost: z.number().min(0, '标准成本不能为负数').optional(), // 原料/包材必填，成品/套餐自动计算
+  wasteRate: z.number().min(0, '损耗率不能为负数').max(100, '损耗率不能超过100%').optional(), // 仅成品类型使用
+  storeScope: z.array(z.string()).default([]), // 空数组表示全门店
+
+  // BOM配置 (P001-sku-master-data)
+  bomComponents: z.array(bomComponentSchema).default([]), // BOM组件列表（仅成品类型）
+
+  // 套餐配置 (P001-sku-master-data)
+  comboItems: z.array(comboItemSchema).default([]), // 套餐子项列表（仅套餐类型）
 
   // 其他配置
   manageInventory: z.boolean().default(true),

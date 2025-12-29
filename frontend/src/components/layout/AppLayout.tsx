@@ -24,6 +24,7 @@ import {
   ShoppingCartOutlined,
   InboxOutlined,
   StockOutlined,
+  CoffeeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore, useCurrentUser, useSidebarCollapsed, useBreadcrumbs } from '@/stores/appStore';
@@ -87,7 +88,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/mdm-pim/brands',
-          label: '品牌管理',
+          label: 'P001-品牌管理',
         },
         {
           key: '/mdm-pim/attribute',
@@ -95,12 +96,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/products/spu',
-          label: 'SPU 管理',
+          label: 'P001-SPU 管理',
         },
         
         {
           key: '/products/sku',
-          label: 'SKU 管理',
+          label: 'P001-SKU 管理',
         },
         {
           key: '/products/attributes',
@@ -160,6 +161,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       icon: <GoldOutlined />,
       label: '场景包/套餐管理',
       children: [
+        {
+          key: '/scenario-packages',
+          label: '17-场景包模板管理',
+        },
         {
           key: '/scenario-package/template',
           label: '场景包模板管理',
@@ -254,9 +259,18 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '库存 & 仓店库存管理',
       children: [
         {
-          key: '/inventory/ledger',
-          label: '库存台账查看',
+          key: '/inventory/query',
+          label: 'P003-库存查询',
         },
+        {
+          key: '/inventory/ledger',
+          label: 'P004-库存台账查看',
+        },
+        {
+          key: '/inventory/approvals',
+          label: 'P004-库存调整审批',
+        },
+        
         {
           key: '/inventory/operations',
           label: '入库/出库/报损/退库操作',
@@ -285,8 +299,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       label: '档期/排期/资源预约',
       children: [
         {
+          key: '/stores',
+          label: '14-门店管理',
+        },
+        // 016-store-reservation-settings: 已整合到门店管理页面，移除独立菜单项
+        // {
+        //   key: '/store-reservation-settings',
+        //   label: '门店预约设置',
+        // },
+        {
+          key: '/activity-types',
+          label: '活动类型管理',
+        },
+        {
           key: '/schedule/hall-resources',
-          label: '影厅资源管理',
+          label: '14-影厅资源管理',
         },
         {
           key: '/schedule/gantt',
@@ -315,13 +342,28 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       ],
     },
     {
+      key: '/beverage',
+      icon: <CoffeeOutlined />,
+      label: 'O003-饮品订单管理',
+      children: [
+        {
+          key: '/beverage/list',
+          label: 'US3-饮品配置管理',
+        },
+        {
+          key: '/beverage/orders',
+          label: 'US2-饮品订单/出品',
+        },
+      ],
+    },
+    {
       key: '/orders',
       icon: <FileTextOutlined />,
-      label: '订单与履约管理',
+      label: 'O-订单与履约管理',
       children: [
         {
           key: '/orders/list',
-          label: '订单列表/状态查看',
+          label: 'U004-订单列表/状态查看',
         },
         {
           key: '/orders/confirmation',
@@ -342,6 +384,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {
           key: '/orders/exceptions',
           label: '异常订单/审计日志',
+        },
+        {
+          key: '/reservation-orders',
+          label: 'U001-预约单管理',
         },
       ],
     },

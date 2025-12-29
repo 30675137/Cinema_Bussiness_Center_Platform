@@ -9,7 +9,8 @@ import {
   MoreOutlined,
   SettingOutlined,
 } from '@ant-design/icons'
-import type { SPUItem, SPUStatus } from '@/types/spu'
+import type { SPUItem, SPUStatus, ProductType } from '@/types/spu'
+import { PRODUCT_TYPE_OPTIONS } from '@/types/spu'
 import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers'
 import { statusColors } from '@/theme'
 
@@ -78,7 +79,19 @@ const SPUList: React.FC<SPUListProps> = ({
     )
   }
 
-  // 获取品牌标签
+  // 获取产品类型标签
+    const getProductTypeTag = (productType?: ProductType) => {
+      if (!productType) return '-'
+      const typeOption = PRODUCT_TYPE_OPTIONS.find(opt => opt.value === productType)
+      if (!typeOption) return '-'
+      return (
+        <Tag color={typeOption.color} style={{ fontSize: '12px' }}>
+          {typeOption.label}
+        </Tag>
+      )
+    }
+  
+    // 获取品牌标签
   const getBrandTag = (brand?: { name: string; code?: string }) => {
     if (!brand) return '-'
     return (
@@ -277,14 +290,34 @@ const SPUList: React.FC<SPUListProps> = ({
       dataIndex: 'brand',
       key: 'brand',
       width: 120,
-      render: getBrandTag,
+      render: (_: any, record: SPUItem) => {
+        // 支持brand对象或brandName字符串
+        const brandName = record.brand?.name || record.brandName;
+        if (!brandName) return '-';
+        return (
+          <Tag color="blue" style={{ fontSize: '12px' }}>
+            {brandName}
+          </Tag>
+        );
+      },
     },
     {
       title: '分类',
       dataIndex: 'category',
       key: 'category',
       width: 150,
-      render: getCategoryTag,
+      render: (_: any, record: SPUItem) => {
+        // 支持category对象或categoryName字符串
+        const categoryName = record.category?.name || record.categoryName;
+        if (!categoryName) return '-';
+        return (
+          <Tooltip title={record.category?.path?.join(' / ') || categoryName}>
+            <Tag color="green" style={{ fontSize: '12px', maxWidth: '150px' }}>
+              {categoryName}
+            </Tag>
+          </Tooltip>
+        );
+      },
     },
     {
       title: '状态',
@@ -300,6 +333,14 @@ const SPUList: React.FC<SPUListProps> = ({
           {getStatusTag(status)}
         </div>
       ),
+    },
+    {
+      title: '产品类型',
+      dataIndex: 'productType',
+      key: 'productType',
+      width: 90,
+      align: 'center',
+      render: (productType: ProductType) => getProductTypeTag(productType),
     },
     {
       title: '规格参数',

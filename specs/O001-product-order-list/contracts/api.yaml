@@ -1,0 +1,616 @@
+openapi: 3.0.3
+info:
+  title: 商品订单管理 API
+  description: |
+    商品订单列表查看与管理功能的 API 接口定义。
+
+    **Feature**: O001-product-order-list
+    **Version**: 1.0.0
+    **Created**: 2025-12-27
+  version: 1.0.0
+  contact:
+    name: 影院商品管理中台团队
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: Orders
+    description: 订单管理相关接口
+  - name: Export
+    description: 订单导出相关接口
+
+paths:
+  /orders:
+    get:
+      summary: 查询订单列表
+      description: |
+        获取商品订单列表，支持分页、筛选、排序。
+
+        **权限**: 运营人员
+        **默认行为**: 显示近30天订单，按创建时间倒序排列
+      operationId: listOrders
+      tags:
+        - Orders
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页记录数
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          description: 订单状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+        - name: startDate
+          in: query
+          description: 创建时间起始日期（ISO 8601格式）
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2025-12-01T00:00:00Z'
+        - name: endDate
+          in: query
+          description: 创建时间结束日期（ISO 8601格式）
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2025-12-27T23:59:59Z'
+        - name: search
+          in: query
+          description: 搜索关键词（支持用户名、手机号、订单号）
+          required: false
+          schema:
+            type: string
+            example: '138****8000'
+        - name: sortBy
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            enum: [createdAt, totalAmount]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ProductOrder'
+                      total:
+                        type: integer
+                        description: 总记录数
+                        example: 1250
+                      page:
+                        type: integer
+                        description: 当前页码
+                        example: 1
+                      pageSize:
+                        type: integer
+                        description: 每页记录数
+                        example: 20
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders/{id}:
+    get:
+      summary: 获取订单详情
+      description: 根据订单ID获取完整订单信息，包括商品项和操作日志。
+      operationId: getOrderById
+      tags:
+        - Orders
+      parameters:
+        - name: id
+          in: path
+          description: 订单ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders/{id}/status:
+    put:
+      summary: 更新订单状态
+      description: |
+        手动更新订单状态（发货、完成、取消）。
+
+        **状态转换规则**:
+        - PAID → SHIPPED（标记发货）
+        - SHIPPED → COMPLETED（标记完成）
+        - PENDING_PAYMENT/PAID → CANCELLED（取消订单，需填写原因）
+
+        **乐观锁**: 需要传入当前版本号，防止并发冲突
+      operationId: updateOrderStatus
+      tags:
+        - Orders
+      parameters:
+        - name: id
+          in: path
+          description: 订单ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ProductOrder'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 版本冲突（乐观锁失败）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: 'ORD_BIZ_002'
+                message: '订单已被他人修改，请刷新后重试'
+                timestamp: '2025-12-27T10:30:00Z'
+        '422':
+          description: 业务规则冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: 'ORD_BIZ_001'
+                message: '已完成订单不允许取消'
+                timestamp: '2025-12-27T10:30:00Z'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /orders/export:
+    post:
+      summary: 导出订单数据
+      description: |
+        导出订单列表为 Excel 或 CSV 格式。
+
+        **限制**: 单次最多导出 10000 条记录
+      operationId: exportOrders
+      tags:
+        - Export
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '200':
+          description: 导出成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          downloadUrl:
+                            type: string
+                            description: 文件下载链接
+                            example: '/downloads/orders-20251227.xlsx'
+                          expiresAt:
+                            type: string
+                            format: date-time
+                            description: 链接过期时间
+                            example: '2025-12-27T18:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  schemas:
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING_PAYMENT
+        - PAID
+        - SHIPPED
+        - COMPLETED
+        - CANCELLED
+      description: |
+        订单状态枚举
+        - PENDING_PAYMENT: 待支付
+        - PAID: 已支付
+        - SHIPPED: 已发货
+        - COMPLETED: 已完成
+        - CANCELLED: 已取消
+
+    ProductOrder:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 订单ID
+        orderNumber:
+          type: string
+          description: 订单号
+          example: 'ORD20251227AB12CD'
+        userId:
+          type: string
+          format: uuid
+          description: 用户ID
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        productTotal:
+          type: number
+          format: decimal
+          description: 商品总额（元）
+          example: 150.00
+        shippingFee:
+          type: number
+          format: decimal
+          description: 运费（元）
+          example: 10.00
+        discountAmount:
+          type: number
+          format: decimal
+          description: 优惠金额（元）
+          example: 5.00
+        totalAmount:
+          type: number
+          format: decimal
+          description: 实付金额（元）
+          example: 155.00
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: '2025-12-27T10:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        version:
+          type: integer
+          description: 乐观锁版本号
+          example: 1
+        user:
+          $ref: '#/components/schemas/UserSummary'
+        productSummary:
+          type: string
+          description: 商品摘要（用于列表显示）
+          example: '可口可乐 等2件商品'
+
+    OrderDetail:
+      allOf:
+        - $ref: '#/components/schemas/ProductOrder'
+        - type: object
+          properties:
+            shippingAddress:
+              $ref: '#/components/schemas/ShippingAddress'
+            paymentMethod:
+              type: string
+              description: 支付方式
+              example: 'WECHAT_PAY'
+            paymentTime:
+              type: string
+              format: date-time
+              nullable: true
+            shippedTime:
+              type: string
+              format: date-time
+              nullable: true
+            completedTime:
+              type: string
+              format: date-time
+              nullable: true
+            cancelledTime:
+              type: string
+              format: date-time
+              nullable: true
+            cancelReason:
+              type: string
+              nullable: true
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItem'
+            logs:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderLog'
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        productName:
+          type: string
+          example: '可口可乐'
+        productSpec:
+          type: string
+          nullable: true
+          example: '500ml'
+        productImage:
+          type: string
+          nullable: true
+          example: 'https://example.com/images/coke.jpg'
+        quantity:
+          type: integer
+          example: 2
+        unitPrice:
+          type: number
+          format: decimal
+          example: 5.00
+        subtotal:
+          type: number
+          format: decimal
+          example: 10.00
+
+    OrderLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        action:
+          type: string
+          enum: [CREATE_ORDER, PAYMENT, SHIP, COMPLETE, CANCEL, SYSTEM_AUTO]
+        statusBefore:
+          $ref: '#/components/schemas/OrderStatus'
+        statusAfter:
+          $ref: '#/components/schemas/OrderStatus'
+        operatorId:
+          type: string
+          format: uuid
+        operatorName:
+          type: string
+          example: '张三'
+        comments:
+          type: string
+          nullable: true
+          example: '用户主动取消'
+        createdAt:
+          type: string
+          format: date-time
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          example: '张三'
+        phone:
+          type: string
+          description: 脱敏手机号
+          example: '138****8000'
+
+    ShippingAddress:
+      type: object
+      properties:
+        province:
+          type: string
+          example: '广东省'
+        city:
+          type: string
+          example: '深圳市'
+        district:
+          type: string
+          example: '南山区'
+        detail:
+          type: string
+          example: '科技园南区18号楼'
+
+    UpdateStatusRequest:
+      type: object
+      required:
+        - status
+        - version
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        version:
+          type: integer
+          description: 当前版本号（乐观锁）
+          example: 1
+        cancelReason:
+          type: string
+          description: 取消原因（status=CANCELLED时必填）
+          example: '用户主动取消'
+
+    ExportRequest:
+      type: object
+      required:
+        - format
+      properties:
+        format:
+          type: string
+          enum: [xlsx, csv]
+          description: 导出文件格式
+        filters:
+          type: object
+          description: 筛选条件（与列表查询参数相同）
+          properties:
+            status:
+              $ref: '#/components/schemas/OrderStatus'
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+            search:
+              type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: '操作成功'
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误编号
+          example: 'ORD_NTF_001'
+        message:
+          type: string
+          description: 错误描述
+          example: '订单不存在'
+        details:
+          type: object
+          description: 错误详情
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: 'ORD_VAL_001'
+            message: '订单状态参数无效'
+            timestamp: '2025-12-27T10:30:00Z'
+
+    Unauthorized:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: 'AUTH_001'
+            message: 'Token 已过期，请重新登录'
+            timestamp: '2025-12-27T10:30:00Z'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: 'ORD_NTF_001'
+            message: '订单不存在'
+            details:
+              orderId: '550e8400-e29b-41d4-a716-446655440000'
+            timestamp: '2025-12-27T10:30:00Z'
+
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: 'SYS_ERR_001'
+            message: '服务器内部错误'
+            timestamp: '2025-12-27T10:30:00Z'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Token 认证
+
+security:
+  - BearerAuth: []

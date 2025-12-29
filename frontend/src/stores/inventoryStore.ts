@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventoryService';
-import {
+import inventoryService from '@/services/inventoryService';
+import type {
   InventoryTransaction,
   InventoryQueryParams,
   InventoryStatistics,
