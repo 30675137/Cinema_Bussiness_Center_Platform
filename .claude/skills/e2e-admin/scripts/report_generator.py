@@ -13,7 +13,10 @@ from typing import Dict, Any, Optional
 from pathlib import Path
 from datetime import datetime
 
-from .utils import ensure_directory
+try:
+    from .utils import ensure_directory
+except ImportError:
+    from utils import ensure_directory
 
 
 class ReportGenerator:

@@ -11,7 +11,10 @@ from typing import List, Dict, Any
 from pathlib import Path
 import yaml
 
-from .utils import generate_run_id, load_yaml
+try:
+    from .utils import generate_run_id, load_yaml
+except ImportError:
+    from utils import generate_run_id, load_yaml
 
 
 @dataclass
