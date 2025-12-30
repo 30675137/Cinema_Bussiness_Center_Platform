@@ -1,0 +1,53 @@
+{
+  "name": "@cinema-platform/e2e-testdata-planner",
+  "version": "1.0.0",
+  "description": "E2E测试数据规划器 - Claude Code Skill",
+  "main": "dist/cli.js",
+  "types": "dist/cli.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint scripts tests --ext .ts",
+    "lint:fix": "eslint scripts tests --ext .ts --fix",
+    "format": "prettier --write \"scripts/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"scripts/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "e2e",
+    "testing",
+    "playwright",
+    "test-data",
+    "fixtures",
+    "claude-code",
+    "skill"
+  ],
+  "author": "Cinema Business Center Platform",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "inquirer": "^9.2.12",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
