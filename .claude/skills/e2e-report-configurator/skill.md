@@ -126,14 +126,54 @@ All checks completed successfully:
 
 ### `docs` Command
 
-Generate CI/CD integration documentation.
+Generate CI/CD integration documentation with platform-specific examples.
 
 **Syntax**:
 ```bash
-/e2e-report-configurator docs
+/e2e-report-configurator docs [options]
 ```
 
-**Output**: `docs/e2e-reports.md` with GitHub Actions, GitLab CI, and Jenkins examples.
+**Options**:
+- `--formats` (string): Reporter formats configured (default: `html`)
+- `--report-dir` (string): Report directory path (default: `reports/e2e`)
+- `--output` (string): Output file path (default: `docs/e2e-reports.md`)
+
+**Examples**:
+```bash
+# Generate docs with default settings
+/e2e-report-configurator docs
+
+# Generate docs with custom configuration
+/e2e-report-configurator docs --formats html,json,junit --report-dir test-reports
+
+# Custom output path
+/e2e-report-configurator docs --output docs/ci-cd-integration.md
+```
+
+**Output**: Comprehensive documentation file with:
+- ✅ GitHub Actions workflow YAML
+- ✅ GitLab CI pipeline configuration
+- ✅ Jenkins pipeline (Groovy) script
+- ✅ Best practices and troubleshooting guide
+- ✅ Platform-specific plugin requirements
+
+**Generated Content**:
+```
+✅ CI/CD integration documentation generated successfully
+
+📄 Documentation: docs/e2e-reports.md
+
+Included platforms:
+  ✓ GitHub Actions
+  ✓ GitLab CI
+  ✓ Jenkins
+
+Next steps:
+  1. Review the generated documentation
+  2. Copy the configuration for your CI/CD platform
+  3. Customize paths and retention periods
+  4. Add to your repository
+```
 
 ## Prerequisites
 

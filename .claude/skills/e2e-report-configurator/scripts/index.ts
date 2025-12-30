@@ -23,6 +23,8 @@ import {
   validateReporterPathsUniqueness,
   type ValidationResult
 } from './validator'
+import { writeCICDDocs, type DocsOptions } from './docs-generator'
+import { ensureDirectories } from './file-utils'
 import type { SkillCommandOptions } from './types'
 
 /**
@@ -439,6 +441,121 @@ function buildValidationSummary(
   return lines.join('\n')
 }
 
+/**
+ * Docs command result
+ */
+export interface DocsResult {
+  /** True if documentation was generated successfully */
+  success: boolean
+  /** Human-readable message */
+  message: string
+  /** Path to generated documentation file */
+  docPath?: string
+  /** Error message if failed */
+  error?: string
+}
+
+/**
+ * Executes the docs command to generate CI/CD integration documentation
+ *
+ * Generates comprehensive documentation with examples for:
+ * - GitHub Actions
+ * - GitLab CI
+ * - Jenkins
+ *
+ * @param options - Documentation options
+ * @param outputPath - Output file path (default: 'docs/e2e-reports.md')
+ * @returns Documentation result with file path
+ *
+ * @example
+ * ```ts
+ * // Generate docs with default settings
+ * const result = await docsCommand()
+ *
+ * // Generate docs with custom configuration
+ * const result = await docsCommand({
+ *   formats: ['html', 'json', 'junit'],
+ *   reportDir: 'test-reports/e2e'
+ * }, 'docs/ci-cd-integration.md')
+ *
+ * if (result.success) {
+ *   console.log(`Documentation written to ${result.docPath}`)
+ * }
+ * ```
+ */
+export async function docsCommand(
+  options: DocsOptions = {},
+  outputPath: string = 'docs/e2e-reports.md'
+): Promise<DocsResult> {
+  try {
+    // Ensure docs directory exists
+    const docsDir = outputPath.split('/').slice(0, -1).join('/')
+    if (docsDir) {
+      await ensureDirectories([docsDir])
+    }
+
+    // Generate and write documentation
+    const docPath = await writeCICDDocs(options, outputPath)
+
+    // Build success message
+    const message = buildDocsSuccessMessage(options, docPath)
+
+    return {
+      success: true,
+      message,
+      docPath
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: `Documentation generation failed: ${(error as Error).message}`,
+      error: (error as Error).message
+    }
+  }
+}
+
+/**
+ * Builds human-readable success message for docs command
+ *
+ * @param options - Documentation options
+ * @param docPath - Path to generated documentation
+ * @returns Formatted success message
+ */
+function buildDocsSuccessMessage(
+  options: DocsOptions,
+  docPath: string
+): string {
+  const lines: string[] = []
+
+  lines.push('✅ CI/CD integration documentation generated successfully')
+  lines.push('')
+  lines.push(`📄 Documentation: ${docPath}`)
+  lines.push('')
+
+  lines.push('Included platforms:')
+  lines.push('  ✓ GitHub Actions')
+  lines.push('  ✓ GitLab CI')
+  lines.push('  ✓ Jenkins')
+  lines.push('')
+
+  if (options.formats && options.formats.length > 0) {
+    lines.push(`Reporter formats: ${options.formats.join(', ')}`)
+  }
+
+  if (options.reportDir) {
+    lines.push(`Report directory: ${options.reportDir}`)
+  }
+
+  lines.push('')
+  lines.push('Next steps:')
+  lines.push('  1. Review the generated documentation')
+  lines.push('  2. Copy the configuration for your CI/CD platform')
+  lines.push('  3. Customize paths and retention periods')
+  lines.push('  4. Add to your repository')
+
+  return lines.join('\n')
+}
+
 // Export all modules for advanced usage
 export * from './options-parser'
 export * from './directory-builder'
@@ -447,5 +564,6 @@ export * from './config-generator'
 export * from './config-updater'
 export * from './gitignore-updater'
 export * from './validator'
+export * from './docs-generator'
 export * from './file-utils'
 export * from './types'
