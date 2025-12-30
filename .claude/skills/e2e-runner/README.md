@@ -173,10 +173,12 @@ See `specs/T003-e2e-runner/tasks.md` for detailed task breakdown.
 - ✅ Phase 3 (P1): Execute E2E Tests (US1)
 - ✅ Phase 4 (P1): Generate Test Reports (US2)
 - ✅ Phase 5 (P1): Manage Credentials Securely (US3)
-- ⏸️ Phase 6 (P2): Multi-Browser Testing (removed from MVP scope - Chrome-only)
+- ✅ Phase 6 (P2): Multi-Browser/Device Testing (US4) - Implemented in Phase 2 via projects array
 - ✅ Phase 7 (P2): Workflow Integration (US5)
 - ✅ Phase 8 (P3): Validate Configuration (US6)
 - ✅ Phase 9: Polish & Cross-Cutting Concerns
+
+**Note**: Phase 6 (Multi-Browser) was already implemented through the `projects` array schema (T006) and runner logic. Users can configure multiple browsers (Chromium, Firefox, WebKit) and device viewports through the Playwright projects configuration.
 
 ## Testing
 
