@@ -5,7 +5,12 @@
 
 import { parseSkillOptions } from './options-parser'
 import { buildDirectoryStructure, getRequiredDirectories } from './directory-builder'
-import { createDirectories, verifyDirectoriesExist } from './directory-manager'
+import {
+  createDirectories,
+  verifyDirectoriesExist,
+  createGitkeepFiles,
+  getArtifactSubdirectories
+} from './directory-manager'
 import {
   generateReporterArray,
   generateArtifactRetentionPolicy,
@@ -77,6 +82,10 @@ export async function setupCommand(
 
     // Step 4: Create directories
     const createResult = await createDirectories(requiredDirs)
+
+    // Step 4.5: Create .gitkeep files in artifact subdirectories
+    const artifactDirs = getArtifactSubdirectories(requiredDirs)
+    await createGitkeepFiles(artifactDirs)
 
     // Step 5: Build reporter paths
     const formats = validatedOptions.format.split(',').map((f) => f.trim())

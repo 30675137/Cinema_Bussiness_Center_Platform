@@ -3,7 +3,8 @@
  * Directory management for E2E test reports and artifacts
  */
 
-import { ensureDirectories, fileExists } from './file-utils'
+import { ensureDirectories, fileExists, writeFileContent } from './file-utils'
+import { join } from 'path'
 
 /**
  * Result of directory creation operation
@@ -173,4 +174,75 @@ export async function createDirectoriesWithMessage(
   }
 
   return parts.join('; ')
+}
+
+/**
+ * Creates .gitkeep files in artifact subdirectories
+ *
+ * Keeps empty artifact directories tracked in git by adding .gitkeep placeholder files.
+ * This ensures the directory structure is preserved even when no test artifacts exist.
+ *
+ * @param artifactDirs - Array of artifact directory paths
+ * @returns Number of .gitkeep files created
+ *
+ * @example
+ * ```ts
+ * const count = await createGitkeepFiles([
+ *   'reports/e2e/artifacts/screenshots',
+ *   'reports/e2e/artifacts/videos',
+ *   'reports/e2e/artifacts/traces'
+ * ])
+ * // => 3
+ * ```
+ */
+export async function createGitkeepFiles(artifactDirs: string[]): Promise<number> {
+  let count = 0
+
+  for (const dir of artifactDirs) {
+    const gitkeepPath = join(dir, '.gitkeep')
+
+    try {
+      // Create empty .gitkeep file
+      await writeFileContent(gitkeepPath, '')
+      count++
+    } catch {
+      // Ignore errors (file may already exist or directory doesn't exist)
+    }
+  }
+
+  return count
+}
+
+/**
+ * Identifies artifact subdirectories from directory list
+ *
+ * Filters directory list to find artifact subdirectories (screenshots, videos, traces)
+ * that should have .gitkeep files.
+ *
+ * @param directories - Array of all directory paths
+ * @returns Array of artifact subdirectory paths
+ *
+ * @example
+ * ```ts
+ * const dirs = [
+ *   'reports/e2e/html',
+ *   'reports/e2e/artifacts',
+ *   'reports/e2e/artifacts/screenshots',
+ *   'reports/e2e/artifacts/videos',
+ *   'reports/e2e/artifacts/traces'
+ * ]
+ *
+ * const artifactDirs = getArtifactSubdirectories(dirs)
+ * // => ['reports/e2e/artifacts/screenshots', 'reports/e2e/artifacts/videos', 'reports/e2e/artifacts/traces']
+ * ```
+ */
+export function getArtifactSubdirectories(directories: string[]): string[] {
+  return directories.filter((dir) => {
+    const normalized = dir.replace(/\\/g, '/')
+    return (
+      normalized.endsWith('/screenshots') ||
+      normalized.endsWith('/videos') ||
+      normalized.endsWith('/traces')
+    )
+  })
 }
