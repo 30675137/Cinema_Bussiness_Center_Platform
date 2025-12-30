@@ -11,7 +11,10 @@ from typing import List, Dict, Any, Set
 from pathlib import Path
 import re
 
-from .utils import load_yaml
+try:
+    from .utils import load_yaml
+except ImportError:
+    from utils import load_yaml
 
 
 @dataclass
