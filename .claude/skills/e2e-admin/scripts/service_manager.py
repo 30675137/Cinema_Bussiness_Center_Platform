@@ -12,7 +12,10 @@ import signal
 from typing import Optional, Dict
 from pathlib import Path
 
-from .utils import load_yaml
+try:
+    from .utils import load_yaml
+except ImportError:
+    from utils import load_yaml
 
 
 class ServiceManager:

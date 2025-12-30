@@ -14,12 +14,21 @@ from typing import List, Optional
 from pathlib import Path
 from datetime import datetime
 
-from .scenario_filter import load_scenarios, filter_by_tags, detect_required_systems
-from .config_assembler import RunConfig, assemble_config_from_args, validate_config
-from .service_manager import ServiceManager
-from .skill_executor import SkillExecutor
-from .report_generator import ReportGenerator
-from .utils import generate_run_id
+try:
+    from .scenario_filter import load_scenarios, filter_by_tags, detect_required_systems
+    from .config_assembler import RunConfig, assemble_config_from_args, validate_config
+    from .service_manager import ServiceManager
+    from .skill_executor import SkillExecutor
+    from .report_generator import ReportGenerator
+    from .utils import generate_run_id
+except ImportError:
+    # 绝对导入（当作为脚本直接运行时）
+    from scenario_filter import load_scenarios, filter_by_tags, detect_required_systems
+    from config_assembler import RunConfig, assemble_config_from_args, validate_config
+    from service_manager import ServiceManager
+    from skill_executor import SkillExecutor
+    from report_generator import ReportGenerator
+    from utils import generate_run_id
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -123,6 +132,12 @@ def parse_arguments() -> argparse.Namespace:
         help='跳过产物策略配置（Step 5）'
     )
 
+    parser.add_argument(
+        '--skip-service-management',
+        action='store_true',
+        help='跳过开发服务器自动启动（假设服务已手动启动）'
+    )
+
     # 调试选项
     parser.add_argument(
         '--dry-run',
@@ -221,8 +236,9 @@ def execute_playwright_tests(
     # 添加 timeout 参数
     cmd.append(f'--timeout={config.timeout}')
 
-    # 指定场景目录
-    cmd.append(scenarios_dir)
+    # 指定测试文件路径（使用 glob 模式匹配 .spec.ts 文件）
+    test_pattern = f"{scenarios_dir}/**/*.spec.ts"
+    cmd.append(test_pattern)
 
     print(f"\n▶️  执行命令: {' '.join(cmd)}\n")
 
@@ -329,7 +345,11 @@ def main() -> int:
             return 0
 
         # 7. 启动服务
-        if required_systems:
+        if args.skip_service_management:
+            print("\n⏭️  跳过服务管理（假设服务已手动启动）")
+            service_manager = None
+            started_services = []
+        elif required_systems:
             service_manager = ServiceManager()
             print("\n🔧 启动开发服务器...")
 
