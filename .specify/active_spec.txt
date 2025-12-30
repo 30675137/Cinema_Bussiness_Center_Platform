@@ -1,1 +1,1 @@
-specs/O003-beverage-order
+specs/T006-e2e-report-configurator/spec.md
