@@ -1,7 +1,7 @@
 ---
 name: e2e-test-generator
-description: Generate Playwright E2E tests from YAML scenarios. Automatically converts scenario YAML files (created by test-scenario-author) into executable Playwright TypeScript test scripts with test data loading, page object imports, and custom code protection. Trigger keywords e2e test generator, playwright generator, test generation, 测试生成, E2E脚本生成, Playwright测试生成.
-version: 1.0.0
+description: Generate and run Playwright E2E tests from YAML scenarios. Automatically converts scenario YAML files into executable Playwright TypeScript test scripts with test data loading, page object imports, and can execute them with various options (UI mode, debug, cross-system). Trigger keywords e2e test generator, playwright generator, test generation, run tests, execute tests, 测试生成, E2E脚本生成, 运行测试, 执行测试.
+version: 1.1.0
 ---
 
 # e2e-test-generator
@@ -20,6 +20,7 @@ e2e-test-generator 是一个 Claude Code Skill,用于将 T001-e2e-scenario-autho
 - 🔄 **智能更新**: 检测文件修改,保留手动代码区域
 - 🧩 **页面对象生成**: 自动生成缺失的页面对象模板
 - ✅ **脚本验证**: TypeScript语法检查和Playwright dry-run验证
+- 🚀 **脚本执行**: 直接运行生成的测试脚本（支持UI模式、调试模式、跨系统测试）
 
 **支持的测试框架**:
 - ✅ Playwright (UI + API测试) - P1优先级
@@ -126,6 +127,87 @@ e2e-test-generator 是一个 Claude Code Skill,用于将 T001-e2e-scenario-autho
 ⚠️  Page Object Method: LoginPage.login() - Method not implemented
 
 Validation Score: 75% (3/4 checks passed)
+```
+
+### 执行生成的测试脚本
+
+```bash
+/e2e-test-generator run <scenario-id> [options]
+```
+
+**执行选项**:
+- `--ui`: 使用 Playwright UI 模式运行
+- `--headed`: 显示浏览器窗口
+- `--debug`: 调试模式（逐步执行）
+- `--project <name>`: 指定浏览器（chromium, firefox, webkit）
+- `--cross-system`: 启用跨系统测试模式（自动启动多个服务器）
+
+**示例**:
+```bash
+# 基本运行（无头模式）
+/e2e-test-generator run E2E-INVENTORY-002
+
+# UI 模式运行（推荐）
+/e2e-test-generator run E2E-INVENTORY-002 --ui
+
+# 跨系统测试（自动启动 C端 + B端服务器）
+/e2e-test-generator run E2E-INVENTORY-002 --cross-system
+
+# 调试模式
+/e2e-test-generator run E2E-INVENTORY-002 --debug
+
+# 指定浏览器
+/e2e-test-generator run E2E-INVENTORY-002 --project chromium
+```
+
+**执行输出**:
+```
+🚀 Running E2E-INVENTORY-002.spec.ts
+
+✓ Checking prerequisites...
+  ✓ Playwright installed
+  ✓ Test file exists
+
+✓ Starting services...
+  ✓ C端 (http://localhost:10086) - Ready
+  ✓ B端 (http://localhost:3000) - Ready
+
+Running 1 test using 1 worker
+
+✓ [chromium] › E2E-INVENTORY-002.spec.ts:32:3 › 成品下单BOM库存预占与实扣流程验证 (12.5s)
+
+  1 passed (12.5s)
+
+📊 Test Results:
+   Passed: 1/1
+   Duration: 12.5s
+   Browser: chromium
+
+📁 Artifacts:
+   Screenshots: 2
+   Videos: 0
+   Traces: 1
+
+✅ All tests passed!
+```
+
+**失败时的输出**:
+```
+❌ Test Failed: E2E-INVENTORY-002
+
+Error: LoginPage.login() method not implemented
+  at LoginPage.login (pages/LoginPage.ts:28:11)
+
+💡 Suggestions:
+   1. Implement LoginPage.login() method
+   2. Check test data configuration
+   3. Verify services are running
+
+📸 Screenshots saved to: test-results/
+📹 Video saved to: test-results/video.webm
+🔍 Trace saved to: test-results/trace.zip
+
+Run 'npx playwright show-trace test-results/trace.zip' to debug
 ```
 
 ### 指定测试框架 (P2功能)
