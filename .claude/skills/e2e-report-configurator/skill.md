@@ -177,6 +177,60 @@ The skill supports three reporter formats that can be used in combination:
 - GitLab CI test reports
 - Jenkins JUnit plugin
 
+## Artifact Retention Policies
+
+Control when to capture test artifacts (screenshots, videos, traces) using the `--artifacts` parameter.
+
+### Policy Options
+
+| Policy | Screenshot | Video | Trace | Use Case |
+|--------|-----------|-------|-------|----------|
+| **on-failure** (default) | only-on-failure | retain-on-failure | on-first-retry | Development, CI/CD |
+| **always** | on | on | on | Debug sessions, troubleshooting |
+| **never** | off | off | off | Production smoke tests, minimal overhead |
+
+### Policy Examples
+
+```bash
+# Default: Capture artifacts only on test failure
+/e2e-report-configurator setup --artifacts on-failure
+
+# Always capture all artifacts (debug mode)
+/e2e-report-configurator setup --artifacts always
+
+# Never capture artifacts (minimal overhead)
+/e2e-report-configurator setup --artifacts never
+```
+
+### Policy Details
+
+**on-failure (Development & CI/CD)**:
+- Screenshots: Only when test fails
+- Videos: Capture all, delete on success
+- Traces: On first retry only
+- Best for debugging failures while minimizing disk usage
+
+**always (Debug Sessions)**:
+- Screenshots: Every test
+- Videos: Every test
+- Traces: Every test
+- Best for comprehensive debugging and analysis
+
+**never (Production Smoke Tests)**:
+- Screenshots: Disabled
+- Videos: Disabled
+- Traces: Disabled
+- Best for minimal overhead in production environments
+
+### Use Case Recommendations
+
+| Environment | Recommended Policy | Rationale |
+|-------------|-------------------|-----------|
+| Local Development | `on-failure` | Debug failures, minimize disk usage |
+| CI/CD Pipeline | `on-failure` | Save storage costs, debug failures |
+| Debug Session | `always` | Maximum debugging information |
+| Production Smoke Tests | `never` | Minimal overhead |
+
 ## Directory Structure
 
 After running `setup --format html,json,junit`, you'll have:
