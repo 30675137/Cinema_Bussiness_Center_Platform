@@ -1,0 +1,7 @@
+{
+  "name": "e2e-scenarios",
+  "version": "1.0.0",
+  "description": "E2E test scenarios for Cinema Business Center Platform",
+  "type": "module",
+  "private": true
+}

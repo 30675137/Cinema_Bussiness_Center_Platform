@@ -1,0 +1,37 @@
+[
+  {
+    "key": "low-stock-alert-scenario",
+    "adminBaseUrl": "http://localhost:3000",
+    "manager_user": {
+      "username": "store_manager",
+      "password": "manager123",
+      "email": "manager@cinema.com"
+    },
+    "safety_stock_config": {
+      "sku_id": "SKU-POPCORN-LARGE",
+      "safety_stock_threshold": 50,
+      "warning_threshold": 30
+    },
+    "product_sku": {
+      "id": "SKU-POPCORN-LARGE",
+      "name": "爆米花（大）",
+      "initial_stock": 100,
+      "current_stock": 25,
+      "unit": "份"
+    },
+    "alert_notification": {
+      "type": "low_stock_alert",
+      "severity": "warning",
+      "sku_id": "SKU-POPCORN-LARGE",
+      "sku_name": "爆米花（大）",
+      "current_stock": 25,
+      "safety_threshold": 30,
+      "recommended_restock": 75
+    },
+    "manager_email": {
+      "to": "manager@cinema.com",
+      "subject": "库存预警通知",
+      "body_contains": ["爆米花（大）", "库存不足", "当前库存: 25"]
+    }
+  }
+]

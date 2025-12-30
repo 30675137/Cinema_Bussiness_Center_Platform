@@ -1,0 +1,40 @@
+[
+  {
+    "key": "bom-deduction-scenario",
+    "h5BaseUrl": "http://localhost:10086",
+    "user_normal": {
+      "phone": "13800138000",
+      "verifyCode": "123456"
+    },
+    "product_with_bom": {
+      "id": "PRODUCT-COCKTAIL-001",
+      "name": "威士忌可乐鸡尾酒",
+      "price": 5000
+    },
+    "bom_materials": [
+      {
+        "skuId": "SKU-WHISKEY-40ML",
+        "skuName": "威士忌 40ml",
+        "initial_stock": 500,
+        "required_quantity": 40,
+        "unit": "ml"
+      },
+      {
+        "skuId": "SKU-COLA-150ML",
+        "skuName": "可乐 150ml",
+        "initial_stock": 2000,
+        "required_quantity": 150,
+        "unit": "ml"
+      }
+    ],
+    "order_data": {
+      "product_id": "PRODUCT-COCKTAIL-001",
+      "quantity": 2,
+      "total_price": 10000
+    },
+    "payment_wechat": {
+      "method": "wechat_pay",
+      "amount": 10000
+    }
+  }
+]
