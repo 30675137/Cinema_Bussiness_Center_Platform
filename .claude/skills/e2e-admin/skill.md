@@ -1,7 +1,7 @@
 ---
 name: e2e-admin
-description: E2E 测试编排管理器 - 按标签选择场景、配置测试参数、自动启动跨系统服务、执行 Playwright 测试并生成报告。触发关键词 e2e admin, test orchestration, playwright orchestrator, 测试编排, 场景管理, E2E管理。
-version: 1.0.0
+description: E2E 测试编排管理器 - 按标签选择场景、自动生成测试脚本、配置测试参数、自动启动跨系统服务、执行 Playwright 测试并生成报告。触发关键词 e2e admin, test orchestration, playwright orchestrator, 测试编排, 场景管理, E2E管理。
+version: 1.1.0
 ---
 
 # e2e-admin
@@ -16,6 +16,7 @@ e2e-admin 是一个 Claude Code Skill，通过编排多个专业 skill（test-sc
 
 **核心功能**:
 - 🎯 **场景选择**: 按标签（module、channel、deploy、priority）或显式 ID 过滤场景
+- 🛠️ **脚本生成**: 自动调用 e2e-test-generator 批量生成选中场景的 Playwright 测试脚本
 - ⚙️ **配置组装**: 设置 workers、retries、timeout、环境等测试参数
 - 🚀 **服务管理**: 自动检测并启动 C端/B端开发服务器
 - 🧪 **测试执行**: 调用 Playwright CLI 执行测试（仅 Chromium）
@@ -107,7 +108,7 @@ e2e-admin 是一个 Claude Code Skill，通过编排多个专业 skill（test-sc
    ↓
 3. 数据验证 (e2e-testdata-planner) → 可跳过，若 skill 不可用则提示用户
    ↓
-4. 测试生成 (e2e-test-generator) → 可跳过
+4. 测试生成 (e2e-test-generator) → 可跳过，自动调用批量生成选中场景的测试脚本
    ↓
 5. 报告配置 (e2e-report-configurator) → 可跳过，缺失时使用 Playwright 默认
    ↓
@@ -120,6 +121,31 @@ e2e-admin 是一个 Claude Code Skill，通过编排多个专业 skill（test-sc
 9. 生成报告包 (HTML 报告 + summary.json + artifacts/)
    ↓
 10. 停止开发服务器 → 输出报告路径
+```
+
+### Step 4: 测试脚本生成详解
+
+**自动调用 e2e-test-generator**:
+- 编排器会自动调用 `/e2e-test-generator batch --scenario-ids <ids>` 为选中的场景批量生成 Playwright 测试脚本
+- 生成的脚本位于 `scenarios/<module>/<scenario-id>.spec.ts`
+- 如果 e2e-test-generator skill 不可用，会提示用户手动运行生成命令
+- 可通过 `--skip-generation` 跳过此步骤（假设测试脚本已存在）
+
+**示例**:
+```bash
+# 完整流程（包括自动生成测试脚本）
+/e2e-admin --tags "module:inventory AND priority:p1"
+
+# 输出:
+# 🛠️  Step 3: 测试脚本生成
+#    生成 5 个场景的测试脚本...
+#    🔧 执行 Skill: e2e-test-generator batch --scenario-ids E2E-INVENTORY-001,E2E-INVENTORY-002,...
+#    ✅ Generated: scenarios/inventory/E2E-INVENTORY-001.spec.ts
+#    ✅ Generated: scenarios/inventory/E2E-INVENTORY-002.spec.ts
+#    ...
+
+# 跳过测试生成（假设脚本已存在）
+/e2e-admin --tags "module:inventory" --skip-generation
 ```
 
 ## Output
@@ -264,7 +290,10 @@ ls scenarios/inventory/
 - **test-scenario-author** (T005-e2e-scenario-author): 场景 YAML 验证
 - **e2e-testdata-planner** (计划中): 测试数据验证（若不可用则提示用户手动运行）
 - **e2e-test-generator** (T002-e2e-test-generator): Playwright 测试脚本生成
-- **e2e-report-configurator** (可选): HTML 报告配置
+  - **集成方式**: 通过 skill_executor.py 调用 `/e2e-test-generator batch --scenario-ids <ids>`
+  - **功能**: 自动为选中的场景批量生成 `.spec.ts` 测试脚本
+  - **回退策略**: 若 skill 不可用，提示用户手动运行生成命令
+- **e2e-report-configurator** (T006-e2e-report-configurator): HTML 报告配置（可选）
 - **e2e-artifacts-policy** (可选): 工件策略配置
 
 ### 外部依赖
@@ -283,6 +312,9 @@ ls scenarios/inventory/
 - `config_assembler.py`: RunConfig 组装和验证
 - `service_manager.py`: 开发服务器管理（启动/停止/端口检查）
 - `skill_executor.py`: Skill 编排调用框架
+  - **集成 e2e-test-generator**: 在 Step 3 调用 `execute_skill('e2e-test-generator', ['batch', '--scenario-ids', '<ids>'])`
+  - **参数传递**: 从 `config['selected_scenarios']` 提取场景 ID 列表
+  - **回退处理**: 若 skill 不可用，输出清晰的手动操作提示
 - `report_generator.py`: 报告摘要生成
 - `utils.py`: 工具函数（run_id 生成等）
 
@@ -310,6 +342,11 @@ ls scenarios/inventory/
 ```
 
 ## Version History
+
+**1.1.0** (2025-12-30):
+- **NEW**: 集成 e2e-test-generator skill，自动生成选中场景的测试脚本
+- **NEW**: 在 Step 3 批量调用 `/e2e-test-generator batch --scenario-ids <ids>`
+- **Improved**: 优化回退策略，提供清晰的手动操作提示
 
 **1.0.0** (2025-12-30):
 - Initial MVP release

@@ -165,11 +165,13 @@ class SkillExecutor:
 
         # Step 3: e2e-test-generator (测试脚本生成)
         elif skill_name == 'e2e-test-generator':
-            print("⚠️  跳过测试脚本生成（skill 不可用）")
-            print("   假设测试脚本已手动创建或已存在")
+            print("⚠️  e2e-test-generator skill 不可用")
+            print("📝 请手动运行以下命令生成测试脚本:")
+            print("   /e2e-test-generator batch --scenario-ids <scenario-id-1>,<scenario-id-2>")
+            print("   或确保测试脚本文件已存在于 scenarios/ 目录")
             return {
                 'success': True,
-                'output': 'Test script generation skipped',
+                'output': 'Test script generation skipped (skill not available)',
                 'error': '',
                 'used_fallback': True
             }
@@ -219,12 +221,13 @@ class SkillExecutor:
         按顺序编排执行多个 skills（FR-004 的 6 步流程）。
 
         Args:
-            config: 运行配置，包含 skip_flags
+            config: 运行配置，包含 skip_flags 和 selected_scenarios
 
         Returns:
             Dict 包含总体执行结果
         """
         skip_flags = config.get('skip_flags', {})
+        selected_scenarios = config.get('selected_scenarios', [])
         results = {}
 
         # Step 1: Scenario Validation
@@ -253,13 +256,28 @@ class SkillExecutor:
             print("\n⏭️  Step 2: 跳过数据验证")
             results['data_validation'] = {'success': True, 'skipped': True}
 
-        # Step 3: Test Script Generation
+        # Step 3: Test Script Generation (调用 e2e-test-generator)
         if not skip_flags.get('generation', False):
             print("\n🛠️  Step 3: 测试脚本生成")
-            results['generation'] = self.execute_skill(
-                'e2e-test-generator',
-                ['batch', '--all']
-            )
+
+            # 如果有选中的场景，批量生成它们的测试脚本
+            if selected_scenarios:
+                scenario_ids = [s['scenario_id'] for s in selected_scenarios]
+                print(f"   生成 {len(scenario_ids)} 个场景的测试脚本...")
+
+                # 调用 e2e-test-generator batch 命令
+                # 传递场景 ID 列表作为参数
+                results['generation'] = self.execute_skill(
+                    'e2e-test-generator',
+                    ['batch', '--scenario-ids', ','.join(scenario_ids)]
+                )
+            else:
+                # 如果没有选中场景（理论上不应该发生），生成所有场景
+                print("   未指定场景，生成所有场景的测试脚本...")
+                results['generation'] = self.execute_skill(
+                    'e2e-test-generator',
+                    ['batch', '--all']
+                )
         else:
             print("\n⏭️  Step 3: 跳过脚本生成")
             results['generation'] = {'success': True, 'skipped': True}
