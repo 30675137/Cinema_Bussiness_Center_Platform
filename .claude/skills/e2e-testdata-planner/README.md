@@ -93,22 +93,36 @@ See `specs/T004-e2e-testdata-planner/tasks.md` for detailed task breakdown.
 - [x] T016-T018: Blueprint validator (TDD Red-Green-Refactor)
 - [x] T019-T021: Acceptance scenarios (integration tests)
 
-**Phase 4-9**: See tasks.md for full breakdown
+**Phase 4: User Story 2 - Select Data Supply Strategies (P1)** ✅ Complete
+- [x] T022-T023: Strategy selector (TDD Red-Green)
+- [x] T024: Refactoring (SKIPPED)
+- [x] T025-T026: Seed provider (TDD Red-Green)
+- [x] T027: Refactoring (SKIPPED)
+- [x] T028-T030: US2 acceptance scenarios
 
-**Test Results**: ✅ 83 tests passed (83 passed, 0 failed)
+**Phase 5-9**: See tasks.md for full breakdown
 
-Unit Tests (76):
+**Test Results**: ✅ 122 tests passed (122 passed, 0 failed)
+
+Unit Tests (114):
 - schemas.test.ts: 20 passed
 - file-utils.test.ts: 19 passed
 - error-handler.test.ts: 10 passed
 - blueprint-loader.test.ts: 13 passed
 - validator.test.ts: 14 passed
+- strategy-selector.test.ts: 13 passed
+- seed-provider.test.ts: 18 passed
 
-Integration Tests (7):
+Integration Tests (15):
 - us1-acceptance.test.ts: 7 passed
   - T019: Load and validate blueprint structure (2 tests)
   - T020: Reference testdata_ref in test scenarios (2 tests)
   - T021: Detect dependency problems (3 tests)
+- us2-acceptance.test.ts: 8 passed
+  - T028: Seed strategy - JSON/YAML loading (3 tests)
+  - T029: API strategy - configuration validation (2 tests)
+  - T030: DB-script strategy - configuration validation (2 tests)
+  - Cross-strategy validation (1 test)
 
 ## Testing
 
