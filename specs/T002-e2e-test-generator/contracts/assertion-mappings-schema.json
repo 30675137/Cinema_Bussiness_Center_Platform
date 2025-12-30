@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cinema-platform.com/schemas/assertion-mappings.schema.json",
+  "title": "Assertion Mappings Configuration Schema",
+  "description": "JSON Schema for validating assertion-mappings.yaml configuration files used by e2e-test-generator skill (@spec T002-e2e-test-generator)",
+  "type": "object",
+  "patternProperties": {
+    "^[a-z_][a-z0-9_]*$": {
+      "type": "object",
+      "description": "Assertion check type mapping to framework-specific code templates",
+      "properties": {
+        "playwright": {
+          "type": "object",
+          "description": "Playwright assertion code template",
+          "required": ["code"],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Assertion code template with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "await expect(page.locator('{{selector}}')).toBeVisible()",
+                "expect(response.status).toBe({{expected}})"
+              ]
+            },
+            "imports": {
+              "type": "array",
+              "description": "Additional modules to import for this assertion",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true,
+              "examples": [
+                ["expect"]
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "postman": {
+          "type": "object",
+          "description": "Postman test script template",
+          "required": ["code"],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "pm.test() code template with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "pm.test('Status code is {{expected}}', () => { pm.response.to.have.status({{expected}}); });"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "restclient": {
+          "type": "object",
+          "description": "REST Client expectation format",
+          "required": ["expect"],
+          "properties": {
+            "expect": {
+              "type": "string",
+              "description": "Expected response format with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "HTTP/1.1 {{expected}} OK",
+                "response.body.data.id exists"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "element_visible": {
+        "playwright": {
+          "code": "await expect(page.locator('{{selector}}')).toBeVisible()"
+        }
+      },
+      "toast_message_shown": {
+        "playwright": {
+          "code": "await expect(page.locator('.toast')).toContainText('{{message}}')"
+        }
+      },
+      "response_status_is": {
+        "playwright": {
+          "code": "expect(response.status).toBe({{expected}})"
+        },
+        "postman": {
+          "code": "pm.test('Status code is {{expected}}', () => { pm.response.to.have.status({{expected}}); });"
+        },
+        "restclient": {
+          "expect": "HTTP/1.1 {{expected}} OK"
+        }
+      },
+      "response_body_contains": {
+        "playwright": {
+          "code": "expect(JSON.stringify(response.body)).toContain('{{text}}')"
+        },
+        "postman": {
+          "code": "pm.test('Response contains {{text}}', () => { pm.expect(pm.response.text()).to.include('{{text}}'); });"
+        }
+      },
+      "database_field_equals": {
+        "playwright": {
+          "code": "// TODO: Implement database check for {{table}}.{{field}} == {{expected}}"
+        },
+        "postman": {
+          "code": "// TODO: Add database assertion via pre-request script"
+        }
+      }
+    }
+  ]
+}

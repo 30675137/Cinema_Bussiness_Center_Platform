@@ -1,0 +1,182 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cinema-platform.com/schemas/action-mappings.schema.json",
+  "title": "Action Mappings Configuration Schema",
+  "description": "JSON Schema for validating action-mappings.yaml configuration files used by e2e-test-generator skill (@spec T002-e2e-test-generator)",
+  "type": "object",
+  "patternProperties": {
+    "^[a-z_][a-z0-9_]*$": {
+      "type": "object",
+      "description": "Action name mapping to framework-specific code templates",
+      "properties": {
+        "playwright": {
+          "type": "object",
+          "description": "Playwright test code template",
+          "required": ["code"],
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Code template with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "await loginPage.login({{testdata_ref}})",
+                "await page.click('{{selector}}')"
+              ]
+            },
+            "imports": {
+              "type": "array",
+              "description": "Page objects or modules to import",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z][a-zA-Z0-9]*$"
+              },
+              "uniqueItems": true,
+              "examples": [
+                ["LoginPage", "ProductPage"]
+              ]
+            },
+            "params": {
+              "type": "array",
+              "description": "Parameter names used in code template",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]*$"
+              },
+              "uniqueItems": true,
+              "examples": [
+                ["testdata_ref", "selector"]
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "postman": {
+          "type": "object",
+          "description": "Postman Collection request template",
+          "required": ["method", "url"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "HTTP method",
+              "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+            },
+            "url": {
+              "type": "string",
+              "description": "Request URL template with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "/api/orders",
+                "/api/orders/{{orderId}}"
+              ]
+            },
+            "body": {
+              "type": "string",
+              "description": "Request body template (JSON string with placeholders)",
+              "examples": [
+                "{{testdata_ref}}",
+                "{\"orderId\": \"{{orderId}}\"}"
+              ]
+            },
+            "tests": {
+              "type": "string",
+              "description": "Postman test script (JavaScript code)",
+              "examples": [
+                "pm.test('Status code is 200', () => { pm.response.to.have.status(200); });"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "restclient": {
+          "type": "object",
+          "description": "REST Client .http file template",
+          "required": ["method", "url"],
+          "properties": {
+            "method": {
+              "type": "string",
+              "description": "HTTP method",
+              "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+            },
+            "url": {
+              "type": "string",
+              "description": "Request URL template with {{param}} placeholders",
+              "minLength": 1,
+              "examples": [
+                "/api/orders",
+                "/api/orders/{{orderId}}"
+              ]
+            },
+            "body": {
+              "type": "string",
+              "description": "Request body template (JSON string with placeholders)",
+              "examples": [
+                "{{testdata_ref}}",
+                "{\"orderId\": \"{{orderId}}\"}"
+              ]
+            },
+            "expect": {
+              "type": "string",
+              "description": "Expected response format or status",
+              "examples": [
+                "HTTP/1.1 200 OK",
+                "response.body.success == true"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "login": {
+        "playwright": {
+          "code": "await loginPage.login({{testdata_ref}})",
+          "imports": ["LoginPage"],
+          "params": ["testdata_ref"]
+        },
+        "postman": {
+          "method": "POST",
+          "url": "/api/auth/login",
+          "body": "{{testdata_ref}}",
+          "tests": "pm.test('Login success', () => { pm.response.to.have.status(200); });"
+        }
+      },
+      "create_order": {
+        "playwright": {
+          "code": "await orderPage.createOrder({{testdata_ref}})",
+          "imports": ["OrderPage"],
+          "params": ["testdata_ref"]
+        },
+        "postman": {
+          "method": "POST",
+          "url": "/api/orders",
+          "body": "{{testdata_ref}}",
+          "tests": "pm.test('Order created', () => { pm.response.to.have.status(201); });"
+        },
+        "restclient": {
+          "method": "POST",
+          "url": "/api/orders",
+          "body": "{{testdata_ref}}",
+          "expect": "HTTP/1.1 201 Created"
+        }
+      },
+      "navigate": {
+        "playwright": {
+          "code": "await page.goto(testData.{{testdata_ref}})",
+          "params": ["testdata_ref"]
+        }
+      },
+      "click": {
+        "playwright": {
+          "code": "await page.click('{{selector}}')",
+          "params": ["selector"]
+        }
+      }
+    }
+  ]
+}
