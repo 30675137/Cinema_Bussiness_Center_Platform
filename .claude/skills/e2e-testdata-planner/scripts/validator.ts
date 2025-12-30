@@ -7,10 +7,28 @@ import type { BlueprintRegistry } from './blueprint-loader';
 import * as logger from './utils/logger';
 
 /**
+ * Constants for validation rules
+ */
+const DESCRIPTION_MIN_LENGTH = 10;
+const DESCRIPTION_MAX_LENGTH = 500;
+const MAX_RECOMMENDED_TIMEOUT_MS = 120000; // 2 minutes
+
+/**
  * Blueprint validator class
  * Validates business rules beyond schema validation
  */
 export class BlueprintValidator {
+  /**
+   * Helper method to create ValidationResult from issues
+   * @param issues - List of validation issues
+   * @returns ValidationResult with valid flag set based on error count
+   */
+  private createValidationResult(issues: ValidationIssue[]): ValidationResult {
+    return {
+      valid: !issues.some((i) => i.type === 'error'),
+      issues,
+    };
+  }
   /**
    * Validate blueprint structure (basic checks)
    * @param blueprint - Blueprint to validate
@@ -20,26 +38,23 @@ export class BlueprintValidator {
     const issues: ValidationIssue[] = [];
 
     // Check description length
-    if (blueprint.description.length < 10) {
+    if (blueprint.description.length < DESCRIPTION_MIN_LENGTH) {
       issues.push({
         type: 'error',
         code: 'INVALID_DESCRIPTION',
-        message: `Description too short (${blueprint.description.length} characters). Must be at least 10 characters.`,
+        message: `Description too short (${blueprint.description.length} characters). Must be at least ${DESCRIPTION_MIN_LENGTH} characters.`,
       });
     }
 
-    if (blueprint.description.length > 500) {
+    if (blueprint.description.length > DESCRIPTION_MAX_LENGTH) {
       issues.push({
         type: 'error',
         code: 'INVALID_DESCRIPTION',
-        message: `Description too long (${blueprint.description.length} characters). Must be at most 500 characters.`,
+        message: `Description too long (${blueprint.description.length} characters). Must be at most ${DESCRIPTION_MAX_LENGTH} characters.`,
       });
     }
 
-    return {
-      valid: issues.filter((i) => i.type === 'error').length === 0,
-      issues,
-    };
+    return this.createValidationResult(issues);
   }
 
   /**
@@ -119,10 +134,7 @@ export class BlueprintValidator {
 
     detectCycle(blueprint.id, [blueprint.id]);
 
-    return {
-      valid: issues.filter((i) => i.type === 'error').length === 0,
-      issues,
-    };
+    return this.createValidationResult(issues);
   }
 
   /**
@@ -156,10 +168,7 @@ export class BlueprintValidator {
       });
     }
 
-    return {
-      valid: issues.length === 0,
-      issues,
-    };
+    return this.createValidationResult(issues);
   }
 
   /**
@@ -200,22 +209,19 @@ export class BlueprintValidator {
     }
 
     // Warn about large timeouts (> 2 minutes)
-    if (blueprint.timeout > 120000) {
+    if (blueprint.timeout > MAX_RECOMMENDED_TIMEOUT_MS) {
       issues.push({
         type: 'warning',
         code: 'LARGE_TIMEOUT',
         message: `Timeout is very large (${blueprint.timeout}ms / ${Math.round(blueprint.timeout / 1000)}s). Consider optimizing data setup.`,
         details: {
           timeout: blueprint.timeout,
-          recommendedMax: 120000,
+          recommendedMax: MAX_RECOMMENDED_TIMEOUT_MS,
         },
       });
     }
 
-    return {
-      valid: issues.filter((i) => i.type === 'error').length === 0,
-      issues,
-    };
+    return this.createValidationResult(issues);
   }
 
   /**
