@@ -1,0 +1,254 @@
+# DataProvenance Schema Definition
+# Zod-compatible YAML schema for data provenance tracking validation
+# Feature: T004-e2e-testdata-planner
+# Version: 1.0.0
+
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://cinema-platform.example.com/schemas/data-provenance.json
+
+title: DataProvenance
+description: 测试数据来源跟踪，记录测试数据实例的完整生命周期
+
+type: object
+required:
+  - id
+  - testdataRef
+  - testRunId
+  - testId
+  - environment
+  - strategy
+  - createdAt
+  - cleanupStatus
+
+properties:
+  id:
+    type: string
+    description: 唯一标识符（UUID v4）
+    format: uuid
+    examples:
+      - 550e8400-e29b-41d4-a716-446655440000
+
+  testdataRef:
+    type: string
+    description: 关联的测试数据引用
+    pattern: ^TD-[A-Z]+-\d{3,}$
+    examples:
+      - TD-ORDER-001
+      - TD-USER-ADMIN
+
+  testRunId:
+    type: string
+    description: 测试运行批次 ID
+    pattern: ^run-\d{8}-\d{6}$
+    examples:
+      - run-20251230-140532
+      - run-20251231-093045
+
+  testId:
+    type: string
+    description: 具体测试用例标识，格式 {文件名}:{行号}
+    pattern: ^.+\.spec\.ts:\d+$
+    examples:
+      - order-creation.spec.ts:42
+      - user-registration.spec.ts:15
+
+  environment:
+    type: string
+    description: 测试环境
+    enum:
+      - ci
+      - staging
+      - production
+      - local
+    examples:
+      - staging
+
+  strategy:
+    type: string
+    description: 使用的供给策略
+    enum:
+      - seed
+      - api
+      - db-script
+    examples:
+      - api
+
+  dataId:
+    type: string
+    description: 创建的数据实例 ID（如 orderId、userId），根据实体类型不同
+    examples:
+      - ORD-20251230-001234
+      - user-uuid-123
+      - store-001
+
+  createdAt:
+    type: string
+    description: 数据创建时间（ISO 8601，包含毫秒）
+    format: date-time
+    pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$
+    examples:
+      - 2025-12-30T14:05:35.123Z
+
+  createdBy:
+    type: string
+    description: 创建者（用户或系统）
+    default: e2e-testdata-planner
+    examples:
+      - e2e-testdata-planner
+      - manual-setup
+
+  cleanedAt:
+    type: string
+    description: 数据清理时间（ISO 8601，包含毫秒）
+    format: date-time
+    pattern: ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$
+    examples:
+      - 2025-12-30T14:06:10.456Z
+
+  cleanupStatus:
+    type: string
+    description: 清理状态
+    enum:
+      - pending
+      - success
+      - failed
+      - skipped
+    default: pending
+    examples:
+      - success
+
+  cleanupError:
+    type: string
+    description: 清理失败原因（当 cleanupStatus 为 failed 时必填）
+    minLength: 1
+    examples:
+      - Foreign key constraint violation
+      - API endpoint returned 404
+
+  metadata:
+    type: object
+    description: 扩展元数据（原始响应、执行日志等）
+    additionalProperties: true
+    properties:
+      apiResponse:
+        type: object
+        description: API 响应数据
+        additionalProperties: true
+      executionTime:
+        type: integer
+        description: 执行时间（毫秒）
+        minimum: 0
+      retryCount:
+        type: integer
+        description: 重试次数
+        minimum: 0
+      errorLogs:
+        type: array
+        description: 错误日志
+        items:
+          type: string
+    examples:
+      - apiResponse:
+          orderId: ORD-20251230-001234
+          status: created
+          totalAmount: 3500
+        executionTime: 1234
+        retryCount: 0
+
+# 条件验证规则
+allOf:
+  # 当 cleanupStatus 为 failed 时，cleanupError 必填
+  - if:
+      properties:
+        cleanupStatus:
+          const: failed
+    then:
+      required:
+        - cleanupError
+
+  # 当 cleanedAt 存在时，必须晚于 createdAt
+  - if:
+      required:
+        - cleanedAt
+    then:
+      properties:
+        cleanedAt:
+          description: 必须晚于 createdAt
+
+# 验证规则（仅文档说明，运行时由 Zod 实现）
+validationRules:
+  - 时间一致性：cleanedAt 必须晚于 createdAt
+  - 状态一致性：cleanupStatus 为 failed 时，cleanupError 必填
+  - 引用有效性：testdataRef 必须对应有效的蓝图
+  - 环境匹配：environment 必须与蓝图的 environments 兼容
+  - 数据 ID 唯一性：同一 testRunId 内，dataId 不得重复（针对相同实体类型）
+
+examples:
+  # 成功清理的示例
+  - id: 550e8400-e29b-41d4-a716-446655440000
+    testdataRef: TD-ORDER-001
+    testRunId: run-20251230-140532
+    testId: order-creation.spec.ts:42
+    environment: staging
+    strategy: api
+    dataId: ORD-20251230-001234
+    createdAt: 2025-12-30T14:05:35.123Z
+    createdBy: e2e-testdata-planner
+    cleanedAt: 2025-12-30T14:06:10.456Z
+    cleanupStatus: success
+    cleanupError: null
+    metadata:
+      apiResponse:
+        orderId: ORD-20251230-001234
+        status: created
+        totalAmount: 3500
+      executionTime: 1234
+      retryCount: 0
+
+  # 清理失败的示例
+  - id: 660e8400-e29b-41d4-a716-446655440111
+    testdataRef: TD-USER-ADMIN
+    testRunId: run-20251230-140532
+    testId: user-admin.spec.ts:15
+    environment: staging
+    strategy: seed
+    dataId: user-admin-001
+    createdAt: 2025-12-30T14:05:36.789Z
+    createdBy: e2e-testdata-planner
+    cleanedAt: 2025-12-30T14:06:15.234Z
+    cleanupStatus: failed
+    cleanupError: Foreign key constraint violation - user has associated orders
+    metadata:
+      executionTime: 567
+      retryCount: 2
+      errorLogs:
+        - "Attempt 1: DELETE FROM users WHERE id='user-admin-001' failed"
+        - "Attempt 2: Cascade delete attempted but blocked by business logic"
+
+  # 待清理的示例（测试运行中）
+  - id: 770e8400-e29b-41d4-a716-446655440222
+    testdataRef: TD-STORE-DOWNTOWN
+    testRunId: run-20251230-150000
+    testId: store-operations.spec.ts:20
+    environment: local
+    strategy: db-script
+    dataId: store-downtown-001
+    createdAt: 2025-12-30T15:00:10.123Z
+    createdBy: e2e-testdata-planner
+    cleanupStatus: pending
+    metadata:
+      executionTime: 2345
+
+  # 跳过清理的示例（teardown=false）
+  - id: 880e8400-e29b-41d4-a716-446655440333
+    testdataRef: TD-SKU-BEVERAGE
+    testRunId: run-20251230-160000
+    testId: inventory.spec.ts:30
+    environment: staging
+    strategy: seed
+    dataId: null
+    createdAt: 2025-12-30T16:00:05.456Z
+    createdBy: e2e-testdata-planner
+    cleanupStatus: skipped
+    metadata:
+      note: Seed data is shared across tests, no cleanup needed

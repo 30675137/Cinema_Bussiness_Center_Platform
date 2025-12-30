@@ -1,0 +1,307 @@
+# DataSupplyStrategy Schema Definition
+# Zod-compatible YAML schema for data supply strategy validation
+# Feature: T004-e2e-testdata-planner
+# Version: 1.0.0
+
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://cinema-platform.example.com/schemas/data-supply-strategy.json
+
+title: DataSupplyStrategy
+description: 数据供给策略定义，指定如何为蓝图提供测试数据
+
+type: object
+required:
+  - type
+  - config
+  - errorHandling
+
+properties:
+  type:
+    type: string
+    description: 策略类型
+    enum:
+      - seed
+      - api
+      - db-script
+    examples:
+      - api
+
+  config:
+    type: object
+    description: 策略特定配置（根据 type 验证）
+    oneOf:
+      - $ref: '#/definitions/SeedConfig'
+      - $ref: '#/definitions/ApiConfig'
+      - $ref: '#/definitions/DbScriptConfig'
+
+  timeout:
+    type: integer
+    description: 超时时间（毫秒）
+    minimum: 1000
+    maximum: 60000
+    default: 30000
+    examples:
+      - 15000
+
+  retryPolicy:
+    $ref: '#/definitions/RetryPolicy'
+    description: 重试策略配置
+
+  errorHandling:
+    type: string
+    description: 错误处理策略
+    enum:
+      - fail-fast
+      - log-continue
+      - fallback
+    default: fail-fast
+    examples:
+      - fail-fast
+
+definitions:
+  # Seed 配置
+  SeedConfig:
+    type: object
+    required:
+      - seedFilePath
+      - format
+    properties:
+      seedFilePath:
+        type: string
+        description: 种子文件路径（相对于项目根目录）
+        pattern: ^testdata/seeds/.+\.(json|yaml|yml)$
+        examples:
+          - testdata/seeds/users.json
+          - testdata/seeds/stores.yaml
+
+      format:
+        type: string
+        description: 文件格式
+        enum:
+          - json
+          - yaml
+        examples:
+          - json
+
+      encoding:
+        type: string
+        description: 文件编码
+        default: utf-8
+        enum:
+          - utf-8
+          - utf-16
+          - ascii
+
+  # API 配置
+  ApiConfig:
+    type: object
+    required:
+      - apiEndpoint
+      - method
+      - authRequired
+    properties:
+      apiEndpoint:
+        type: string
+        description: API 端点路径
+        pattern: ^/
+        minLength: 1
+        examples:
+          - /api/test/users
+          - /api/test/orders
+
+      method:
+        type: string
+        description: HTTP 方法
+        enum:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        default: POST
+
+      baseUrl:
+        type: string
+        description: API 基础 URL（默认使用环境配置）
+        format: uri
+        examples:
+          - https://api.staging.example.com
+          - http://localhost:8080
+
+      authRequired:
+        type: boolean
+        description: 是否需要认证
+        default: true
+
+      authType:
+        type: string
+        description: 认证类型
+        enum:
+          - bearer
+          - api-key
+          - basic
+        default: bearer
+
+      headers:
+        type: object
+        description: 额外请求头
+        additionalProperties:
+          type: string
+        examples:
+          - Content-Type: application/json
+            X-Request-ID: test-12345
+
+      body:
+        type: object
+        description: 请求体模板（支持变量替换）
+        additionalProperties: true
+        examples:
+          - username: admin@test.com
+            password: Test123456!
+            role: admin
+
+      responseMapping:
+        type: object
+        description: 响应字段映射配置，格式 { "目标字段": "响应路径" }
+        additionalProperties:
+          type: string
+        examples:
+          - userId: data.id
+            token: data.accessToken
+            createdAt: data.timestamp
+
+  # DB-Script 配置
+  DbScriptConfig:
+    type: object
+    required:
+      - dbScriptPath
+      - transactional
+    properties:
+      dbScriptPath:
+        type: string
+        description: SQL 脚本文件路径
+        pattern: ^testdata/scripts/.+\.sql$
+        examples:
+          - testdata/scripts/seed-stores.sql
+          - testdata/scripts/setup-inventory.sql
+
+      database:
+        type: string
+        description: 目标数据库名称（默认使用主数据库）
+        minLength: 1
+        examples:
+          - main
+          - test_db
+
+      transactional:
+        type: boolean
+        description: 是否使用事务执行
+        default: true
+
+      outputMapping:
+        type: object
+        description: 脚本输出映射（用于提取插入的 ID）
+        additionalProperties:
+          type: string
+        examples:
+          - storeId: inserted_store_id
+            hallId: inserted_hall_id
+
+  # 重试策略
+  RetryPolicy:
+    type: object
+    required:
+      - maxRetries
+      - retryDelay
+    properties:
+      maxRetries:
+        type: integer
+        description: 最大重试次数
+        minimum: 0
+        maximum: 5
+        default: 3
+        examples:
+          - 3
+
+      retryDelay:
+        type: integer
+        description: 初始重试延迟（毫秒）
+        minimum: 100
+        maximum: 10000
+        default: 1000
+        examples:
+          - 1000
+
+      backoffMultiplier:
+        type: number
+        description: 指数退避倍数
+        minimum: 1
+        maximum: 5
+        default: 2
+        examples:
+          - 2
+
+      retryableErrors:
+        type: array
+        description: 可重试的错误代码列表（HTTP 状态码或错误代码）
+        items:
+          type: string
+        uniqueItems: true
+        default: ["500", "502", "503", "504", "ECONNRESET", "ETIMEDOUT"]
+        examples:
+          - ["500", "502", "503"]
+
+# 验证规则（仅文档说明，运行时由 Zod 实现）
+validationRules:
+  - 配置类型匹配：config 必须包含 type 类型要求的所有必填字段
+  - 文件路径有效性：seedFilePath 和 dbScriptPath 引用的文件必须存在
+  - 超时合理性：timeout 不得超过 Playwright 默认测试超时（30秒）
+  - 重试策略一致性：retryPolicy 仅在 type=api 时有效
+  - 响应映射正确性：responseMapping 的路径必须符合 JSONPath 格式
+
+examples:
+  # Seed 策略示例
+  - type: seed
+    config:
+      seedFilePath: testdata/seeds/users.json
+      format: json
+      encoding: utf-8
+    timeout: 5000
+    errorHandling: fail-fast
+
+  # API 策略示例
+  - type: api
+    config:
+      apiEndpoint: /api/test/orders
+      method: POST
+      authRequired: true
+      authType: bearer
+      headers:
+        Content-Type: application/json
+      body:
+        userId: "{{TD-USER-001.userId}}"
+        storeId: "{{TD-STORE-001.storeId}}"
+        items:
+          - skuId: SKU-001
+            quantity: 2
+      responseMapping:
+        orderId: data.id
+        status: data.status
+    timeout: 15000
+    retryPolicy:
+      maxRetries: 3
+      retryDelay: 1000
+      backoffMultiplier: 2
+      retryableErrors: ["500", "502", "503"]
+    errorHandling: fail-fast
+
+  # DB-Script 策略示例
+  - type: db-script
+    config:
+      dbScriptPath: testdata/scripts/seed-stores.sql
+      database: main
+      transactional: true
+      outputMapping:
+        storeId: inserted_store_id
+    timeout: 20000
+    errorHandling: fail-fast
