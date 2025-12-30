@@ -102,7 +102,12 @@ def parse_scenario_with_validation(filepath: str) -> Dict[str, Any]:
 
     # Validate spec_ref format: X###
     spec_ref = data['spec_ref']
-    if not isinstance(spec_ref, str) or len(spec_ref) < 4:
+    if not isinstance(spec_ref, str) or len(spec_ref) != 4:
+        raise YAMLParseError(
+            f"Invalid spec_ref format: {spec_ref}. Expected: X### (e.g., P005)"
+        )
+    # Check format: First char is letter, next 3 are digits
+    if not (spec_ref[0].isalpha() and spec_ref[1:].isdigit()):
         raise YAMLParseError(
             f"Invalid spec_ref format: {spec_ref}. Expected: X### (e.g., P005)"
         )

@@ -10,22 +10,21 @@ import { test, expect } from '@playwright/test';
 import { {{ page_object }} } from './pages/{{ page_object }}';
 {% endfor %}
 {% endif %}
-{% if testdata_refs %}
-import { loadTestData } from '@/testdata/loader';
+{% if testdata_imports %}
+{% for import_statement in testdata_imports %}
+{{ import_statement }}
+{% endfor %}
+{% endif %}
+
+{% if testdata_todos %}
+{% for todo in testdata_todos %}
+{{ todo }}
+{% endfor %}
 {% endif %}
 
 test.describe('{{ scenario.title }}', () => {
-  {% if testdata_refs %}
-  let testData: any;
-
-  test.beforeEach(async ({ page }) => {
-    {% if scenario.preconditions and scenario.preconditions.testdata_ref %}
-    testData = await loadTestData('{{ scenario.preconditions.testdata_ref }}');
-    await page.goto(testData.baseUrl);
-    {% else %}
-    // TODO: Add testdata loading and page navigation
-    {% endif %}
-  });
+  {% if beforeeach_code %}
+{{ beforeeach_code }}
   {% endif %}
 
   test('{{ scenario.scenario_id }}{% if scenario.description %} - {{ scenario.description }}{% endif %}', async ({ page }) => {

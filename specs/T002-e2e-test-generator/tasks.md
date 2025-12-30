@@ -61,8 +61,8 @@
 
 > **注意: 先编写这些测试，确保它们失败后再实现**
 
-- [ ] T015 [P] [US1] YAML 解析逻辑单元测试 .claude/skills/e2e-test-generator/tests/test_yaml_parser.py
-- [ ] T016 [P] [US1] Playwright 代码生成单元测试 .claude/skills/e2e-test-generator/tests/test_playwright_generator.py
+- [X] T015 [P] [US1] YAML 解析逻辑单元测试 .claude/skills/e2e-test-generator/tests/test_yaml_parser.py
+- [X] T016 [P] [US1] Playwright 代码生成单元测试 .claude/skills/e2e-test-generator/tests/test_playwright_generator.py
 - [ ] T017 [P] [US1] 端到端生成工作流集成测试 .claude/skills/e2e-test-generator/tests/test_integration_generate.py
 
 ### 用户故事 1 的实现
@@ -89,16 +89,16 @@
 
 ### 用户故事 2 的测试
 
-- [ ] T027 [P] [US2] testdata_ref 解析单元测试 .claude/skills/e2e-test-generator/tests/test_testdata_parser.py
-- [ ] T028 [P] [US2] beforeEach hook 生成单元测试 .claude/skills/e2e-test-generator/tests/test_beforeeach_generation.py
+- [X] T027 [P] [US2] testdata_ref 解析单元测试 .claude/skills/e2e-test-generator/tests/test_testdata_parser.py
+- [X] T028 [P] [US2] beforeEach hook 生成单元测试 .claude/skills/e2e-test-generator/tests/test_beforeeach_generation.py
 
 ### 用户故事 2 的实现
 
-- [ ] T029 [P] [US2] 创建 testdata 引用解析器 .claude/skills/e2e-test-generator/scripts/testdata_parser.py
-- [ ] T030 [US2] 在 generate_playwright.py 中实现 beforeEach hook 生成逻辑（依赖 T029）
-- [ ] T031 [US2] 添加 testdata import 语句生成（如 `import { loadTestData } from '@/testdata/loader'`）
-- [ ] T032 [US2] 为缺失的 testdata 引用添加 TODO 注释生成
-- [ ] T033 [US2] 将 testdata 加载集成到 Playwright 测试模板中
+- [X] T029 [P] [US2] 创建 testdata 引用解析器 .claude/skills/e2e-test-generator/scripts/testdata_parser.py
+- [X] T030 [US2] 在 generate_playwright.py 中实现 beforeEach hook 生成逻辑（依赖 T029）
+- [X] T031 [US2] 添加 testdata import 语句生成（如 `import { loadTestData } from '@/testdata/loader'`）
+- [X] T032 [US2] 为缺失的 testdata 引用添加 TODO 注释生成
+- [X] T033 [US2] 将 testdata 加载集成到 Playwright 测试模板中
 
 **检查点**: 测试数据加载逻辑现可为所有场景自动生成
 

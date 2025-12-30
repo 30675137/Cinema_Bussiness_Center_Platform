@@ -12,6 +12,7 @@ import schema_validator
 import config_loader
 import template_renderer
 import file_utils
+import testdata_parser
 
 
 class PlaywrightGenerationError(Exception):
@@ -149,13 +150,25 @@ def generate_playwright_test(scenario_filepath: str) -> str:
         )
 
         # Extract testdata references
-        testdata_refs = yaml_parser.extract_testdata_refs(scenario_data)
+        testdata_refs = testdata_parser.extract_testdata_refs_from_scenario(scenario_data)
+
+        # Generate testdata imports
+        testdata_imports = testdata_parser.generate_testdata_imports(testdata_refs)
+
+        # Generate beforeEach hook code
+        beforeeach_code = testdata_parser.generate_beforeeach_code(testdata_refs)
+
+        # Generate TODO comments for missing testdata modules
+        testdata_todos = testdata_parser.generate_testdata_todos(testdata_refs)
 
         # Prepare template context
         context = {
             'scenario': scenario_data,
             'page_objects': page_objects,
             'testdata_refs': testdata_refs,
+            'testdata_imports': testdata_imports,
+            'beforeeach_code': beforeeach_code,
+            'testdata_todos': testdata_todos,
             'source_file': scenario_filepath
         }
 
