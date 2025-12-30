@@ -87,10 +87,42 @@ Validate Playwright configuration correctness.
 
 **What this checks**:
 1. ✅ `playwright.config.ts` file exists
-2. ✅ TypeScript compiles without errors (`npx tsc --noEmit`)
-3. ✅ Playwright can load config (`npx playwright test --list`)
-4. ✅ Reporter output paths are unique
-5. ✅ Output directories exist and are writable
+2. ✅ Required fields present (`reporter`, `use.screenshot`, `use.video`, `use.trace`)
+3. ✅ TypeScript compiles without errors (`npx tsc --noEmit`)
+4. ✅ Playwright can load config (`npx playwright test --list`)
+5. ✅ Reporter output paths are unique
+6. ✅ Output directories exist and are writable
+
+**Examples**:
+```bash
+# Validate default config
+/e2e-report-configurator validate
+
+# Validate custom config path
+/e2e-report-configurator validate --config custom-playwright.config.ts
+```
+
+**Output format**:
+```
+✅ Playwright configuration validation passed
+
+All checks completed successfully:
+  ✓ Config structure
+  ✓ TypeScript compilation
+  ✓ Playwright runtime
+  ✓ Reporter paths uniqueness
+  ✓ Directory permissions
+```
+
+**Troubleshooting**:
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| Config file not found | `playwright.config.ts` missing | Run `npm init playwright@latest` |
+| TypeScript compilation errors | Invalid TypeScript syntax | Check config file for syntax errors |
+| Playwright runtime error | Invalid config structure | Verify reporter configuration format |
+| Duplicate output path | Same directory used twice | Use unique paths for each reporter |
+| Directory not writable | Permission issue | Check directory permissions with `ls -la` |
 
 ### `docs` Command
 
