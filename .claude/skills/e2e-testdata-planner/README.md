@@ -100,11 +100,17 @@ See `specs/T004-e2e-testdata-planner/tasks.md` for detailed task breakdown.
 - [x] T027: Refactoring (SKIPPED)
 - [x] T028-T030: US2 acceptance scenarios
 
-**Phase 5-9**: See tasks.md for full breakdown
+**Phase 5: User Story 3 - Generate Lifecycle Plans (P1)** ✅ Complete
+- [x] T031-T033: Dependency resolver (TDD Red-Green-Refactor)
+- [x] T034-T035: Lifecycle generator (TDD Red-Green)
+- [x] T036: Refactoring (SKIPPED)
+- [x] T037-T039: US3 acceptance scenarios
 
-**Test Results**: ✅ 122 tests passed (122 passed, 0 failed)
+**Phase 6-9**: See tasks.md for full breakdown
 
-Unit Tests (114):
+**Test Results**: ✅ 159 tests passed (159 passed, 0 failed)
+
+Unit Tests (129):
 - schemas.test.ts: 20 passed
 - file-utils.test.ts: 19 passed
 - error-handler.test.ts: 10 passed
@@ -112,8 +118,10 @@ Unit Tests (114):
 - validator.test.ts: 14 passed
 - strategy-selector.test.ts: 13 passed
 - seed-provider.test.ts: 18 passed
+- dependency-resolver.test.ts: 15 passed
+- lifecycle-generator.test.ts: 14 passed
 
-Integration Tests (15):
+Integration Tests (30):
 - us1-acceptance.test.ts: 7 passed
   - T019: Load and validate blueprint structure (2 tests)
   - T020: Reference testdata_ref in test scenarios (2 tests)
@@ -123,6 +131,10 @@ Integration Tests (15):
   - T029: API strategy - configuration validation (2 tests)
   - T030: DB-script strategy - configuration validation (2 tests)
   - Cross-strategy validation (1 test)
+- us3-acceptance.test.ts: 8 passed
+  - T037: Setup steps in dependency order (2 tests)
+  - T038: Reverse teardown sequence (2 tests)
+  - T039: Test fixture scope and configuration (4 tests)
 
 ## Testing
 
