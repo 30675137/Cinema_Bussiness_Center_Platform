@@ -89,14 +89,19 @@ See `specs/T004-e2e-testdata-planner/tasks.md` for detailed task breakdown.
 - [x] T012: Error handler (6 custom error classes) - 10 tests
 
 **Phase 3: User Story 1 - Define Testdata Blueprints (P1 MVP)** ⏳ In Progress
-- [ ] T013-T021: Blueprint loader, validator, and acceptance scenarios
+- [x] T013-T015: Blueprint loader and registry
+- [x] T016-T017: Blueprint validator (TDD Red-Green)
+- [ ] T018: Refactor validator (TDD Refactor)
+- [ ] T019-T021: Acceptance scenarios (integration tests)
 
 **Phase 4-9**: See tasks.md for full breakdown
 
-**Test Results**: ✅ 49 tests passed (49 passed, 0 failed)
+**Test Results**: ✅ 76 tests passed (76 passed, 0 failed)
 - schemas.test.ts: 20 passed
 - file-utils.test.ts: 19 passed
 - error-handler.test.ts: 10 passed
+- blueprint-loader.test.ts: 13 passed
+- validator.test.ts: 14 passed
 
 ## Testing
 
