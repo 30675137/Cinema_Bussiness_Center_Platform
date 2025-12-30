@@ -128,6 +128,17 @@ export const StepSchema = z.object({
 });
 export type Step = z.infer<typeof StepSchema>;
 
+// Dependency graph
+export interface DependencyNode {
+  id: string;
+  blueprint: TestdataBlueprint;
+}
+
+export interface DependencyGraph {
+  nodes: DependencyNode[];
+  edges: Map<string, string[]>; // nodeId -> array of dependency IDs
+}
+
 // Lifecycle plan
 export const LifecyclePlanSchema = z.object({
   testdataRef: z.string().regex(TestdataRefPattern),
