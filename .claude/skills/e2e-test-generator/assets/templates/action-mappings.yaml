@@ -1,6 +1,16 @@
 # @spec T002-e2e-test-generator
 # Action Mappings Configuration
 # Maps scenario action names to framework-specific code templates
+#
+# System Identifiers:
+#   - c-end: C端（用户端）- Taro H5/小程序 (http://localhost:10086)
+#   - b-end: B端（运营中台）- React Admin (http://localhost:3000)
+#   - api: 纯 API 调用（无 UI 交互）
+#
+# Cross-System Testing:
+#   - Actions with different 'system' values will trigger context switching
+#   - First occurrence of 'b-end' will create new page: adminPage = await context.newPage()
+#   - Subsequent 'b-end' actions will reuse the same adminPage
 
 # Authentication Actions
 login:

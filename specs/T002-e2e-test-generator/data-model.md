@@ -39,6 +39,7 @@ preconditions:
 
 steps:
   - action: string   # 操作名称
+    system: string   # 系统标识 (optional): c-end | b-end | api
     params: object   # 参数（可包含 testdata_ref）
     description: string  # 步骤描述 (optional)
     wait: number     # 等待时间（毫秒）(optional)
@@ -95,6 +96,57 @@ assertions:
     check: response_status_is
     params:
       expected: 200
+```
+
+### Cross-System Testing (跨系统测试)
+
+**New in v1.1.0**: 支持在单个场景中跨越多个系统（C端/B端）。
+
+**系统标识符**:
+- `c-end`: C端（用户端）- Taro H5/小程序 (http://localhost:10086)
+- `b-end`: B端（运营中台）- React Admin (http://localhost:3000)
+- `api`: 纯 API 调用（无 UI 交互）
+
+**生成规则**:
+1. 默认所有步骤在同一个 `page` 对象上执行
+2. 当首次遇到 `system: b-end` 时，生成 `const adminPage = await context.newPage()`
+3. 后续 `system: b-end` 步骤复用 `adminPage`
+4. 生成的代码自动插入系统切换注释（如 `// ====== B端操作 ======`）
+
+**Example** (跨系统场景):
+```yaml
+scenario_id: E2E-INVENTORY-002
+title: BOM库存预占与实扣流程
+steps:
+  # C端步骤
+  - action: login
+    system: c-end
+    description: 用户登录 H5
+  - action: create_order
+    system: c-end
+    description: 创建订单（触发预占）
+
+  # B端步骤
+  - action: click
+    system: b-end
+    params:
+      testdata_ref: bomTestData.confirm_production_btn
+    description: 吧台确认出品（触发实扣）
+```
+
+**生成的测试代码**:
+```typescript
+test('...', async ({ page, context }) => {
+  // ====== C端操作 ======
+  await page.goto('http://localhost:10086');
+  await loginPage.login(testData);
+  const orderId = await orderPage.createOrder(testData);
+
+  // ====== B端操作 ======
+  const adminPage = await context.newPage();
+  await adminPage.goto('http://localhost:3000');
+  await adminPage.click(testData.confirm_production_btn);
+});
 ```
 
 ---

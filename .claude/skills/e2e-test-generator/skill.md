@@ -246,6 +246,127 @@ test.describe('场景标题', () => {
 - ✅ 不修改 `AUTO-GENERATED` 区域的代码
 - ❌ 避免删除代码标记注释
 
+## Cross-System Testing (跨系统测试)
+
+**New in v1.1.0**: 支持在单个场景中跨越多个系统（C端/B端）。
+
+### 系统标识符
+
+在场景 YAML 的 `steps` 中使用 `system` 字段标识操作所属系统：
+
+- **`c-end`**: C端（用户端）- Taro H5/小程序 (http://localhost:10086)
+- **`b-end`**: B端（运营中台）- React Admin (http://localhost:3000)
+- **`api`**: 纯 API 调用（无 UI 交互）
+
+### 场景 YAML 示例
+
+```yaml
+scenario_id: E2E-INVENTORY-002
+title: BOM库存预占与实扣流程
+steps:
+  # C端步骤（用户下单）
+  - action: login
+    system: c-end
+    description: 用户登录 H5
+  - action: browse_product
+    system: c-end
+  - action: create_order
+    system: c-end
+    description: 创建订单（触发预占）
+
+  # B端步骤（吧台确认出品）
+  - action: click
+    system: b-end
+    params:
+      testdata_ref: bomTestData.confirm_production_btn
+    description: 吧台确认出品（触发实扣）
+```
+
+### 生成的测试代码
+
+生成器会自动：
+1. 检测 `system` 字段变化
+2. 在首次遇到 `b-end` 时创建新页面 `adminPage = await context.newPage()`
+3. 插入系统切换注释
+4. 使用正确的页面对象执行操作
+
+**生成示例**:
+```typescript
+test('E2E-INVENTORY-002', async ({ page, context }) => {
+  // ====== 第一部分：C端（H5/小程序） - 用户下单流程 ======
+  await page.goto('http://localhost:10086');
+  await loginPage.login(testData);
+  await productPage.browseProduct(testData.product);
+  const orderId = await orderPage.createOrder(testData);
+
+  // ====== 第二部分：B端（运营中台） - 吧台确认出品流程 ======
+  const adminPage = await context.newPage();
+  await adminPage.goto('http://localhost:3000');
+  await adminPage.click(testData.confirm_production_btn);
+
+  // 断言可以在两个页面上执行
+  await expect(page.locator('.order-status')).toHaveText('已出品');
+  await expect(adminPage.locator('.toast')).toContainText('出品成功');
+});
+```
+
+### 运行跨系统测试
+
+使用专用的 npm 脚本运行跨系统测试：
+
+```bash
+cd frontend
+
+# 运行所有跨系统测试（自动启动两个开发服务器）
+npm run test:e2e:cross-system
+
+# UI 模式运行
+npm run test:e2e:cross-system:ui
+
+# 运行特定场景
+CROSS_SYSTEM_TEST=1 npx playwright test ../scenarios/inventory/E2E-INVENTORY-002.spec.ts
+```
+
+### Playwright 配置
+
+跨系统测试需要启动两个开发服务器。配置已在 `playwright.config.ts` 中完成：
+
+```typescript
+webServer: process.env.CROSS_SYSTEM_TEST ? [
+  {
+    command: 'cd ../hall-reserve-taro && npm run dev:h5',
+    url: 'http://localhost:10086',  // C端
+  },
+  {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',  // B端
+  }
+] : undefined
+```
+
+### 测试数据结构
+
+跨系统测试数据应包含两个系统的配置：
+
+```typescript
+{
+  // C端配置
+  h5BaseUrl: 'http://localhost:10086',
+  userCredentials: { phone: '13800138000', verifyCode: '123456' },
+
+  // B端配置
+  adminBaseUrl: 'http://localhost:3000',
+  adminCredentials: { username: 'admin', password: 'admin123' },
+
+  // 共享数据
+  product: { id: 'whiskey-cola', name: '威士忌可乐鸡尾酒' }
+}
+```
+
+### 参考文档
+
+详细的跨系统测试指南请参考：`scenarios/CROSS_SYSTEM_TESTING.md`
+
 ## Input/Output
 
 ### Input
