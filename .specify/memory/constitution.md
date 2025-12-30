@@ -1,26 +1,31 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.9.0 → 1.10.0 → 1.11.0 -->
+<!-- Version change: 1.9.0 → 1.10.0 → 1.11.0 → 1.11.1 -->
 <!-- Modified principles:
   - 测试驱动开发 (Test-Driven Development) - 移除E2E测试强制要求,改为可选策略 (v1.10.0)
+  - Principle 8: Claude Code Skills 开发规范 - 新增 YAML Frontmatter 强制要求 (v1.11.1)
 -->
 <!-- Added sections:
   - Principle 8: Claude Code Skills 开发规范 (Claude Code Skills Development Standards) (v1.11.0)
+  - Principle 8.1: YAML Frontmatter 要求 (强制) (v1.11.1)
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (已更新测试驱动开发原则 + 新增 Principle 8)
+  ✅ .specify/memory/constitution.md (v1.11.1 - 新增 YAML frontmatter 强制要求)
   ✅ .claude/rules/02-test-driven-development.md (已更新R2.2测试框架说明,标注E2E测试为可选)
+  ✅ .claude/skills/e2e-test-generator/skill.md (已添加 YAML frontmatter)
   ⚠ .specify/templates/spec-template.md (User Scenarios & Testing章节说明需明确E2E测试为可选)
   ⚠ .specify/templates/plan-template.md (Constitution Check中保留测试覆盖率检查,但不强制E2E)
-  ⚠ .specify/templates/spec-template.md (T###类spec需包含skill.md/data-model.md/quickstart.md的文档要求)
+  ⚠ .specify/templates/spec-template.md (T###类spec需包含skill.md/data-model.md/quickstart.md的文档要求 + YAML frontmatter检查)
 -->
 <!-- Follow-up TODOs:
   1. ✅ 已完成: 更新 .claude/rules/02-test-driven-development.md 明确E2E测试为可选(Playwright非强制)
-  2. 在代码审查清单中调整测试覆盖率检查,区分必须覆盖(单元测试)和可选覆盖(E2E测试)
-  3. 更新CI/CD流水线配置,E2E测试失败不阻塞发布(可设置为警告)
-  4. 为团队提供E2E测试编写指南,说明在哪些场景下建议编写E2E测试(如关键业务流程、支付流程等)
-  5. 更新 spec-template.md,为 T### 类型的 spec 添加 Claude Code Skills 强制文档要求提示
-  6. 创建 Claude Code Skills 开发最佳实践文档,提供示例和模板
+  2. ✅ 已完成: 为 e2e-test-generator skill.md 添加 YAML frontmatter
+  3. 在代码审查清单中调整测试覆盖率检查,区分必须覆盖(单元测试)和可选覆盖(E2E测试)
+  4. 更新CI/CD流水线配置,E2E测试失败不阻塞发布(可设置为警告)
+  5. 为团队提供E2E测试编写指南,说明在哪些场景下建议编写E2E测试(如关键业务流程、支付流程等)
+  6. 更新 spec-template.md,为 T### 类型的 spec 添加 YAML frontmatter 检查要求
+  7. 审查所有现有 skills,确保都包含正确的 YAML frontmatter
+  8. 创建 Claude Code Skills 开发最佳实践文档,提供 YAML frontmatter 示例和模板
 -->
 
 # 影院商品管理中台宪法
@@ -228,22 +233,37 @@ Java 代码是否具备足够的注释可读性。
 
 **Skill 实现规范**:
 
-1. **命令调用格式**:
+1. **YAML Frontmatter 要求**(强制):
+   - 所有 skill.md 文件**必须**在开头包含 YAML frontmatter
+   - Frontmatter 格式:
+     ```yaml
+     ---
+     name: skill-name
+     description: Detailed description with trigger keywords
+     version: 1.0.0
+     ---
+     ```
+   - `name` 字段: skill 的唯一标识符(必需)
+   - `description` 字段: 详细功能说明,必须包含触发关键词(中英文)(必需)
+   - `version` 字段: 遵循语义化版本规范(必需)
+   - **基本原理**: YAML frontmatter 是 Claude Code 识别和加载 skill 的必要条件,缺少 frontmatter 会导致 skill 无法被系统识别和调用
+
+2. **命令调用格式**:
    - 统一使用 `/<skill-name>` 格式(如 `/scenario-author`, `/doc-writer`)
    - 支持参数传递(如 `/scenario-author create --spec P005`)
    - 必须提供清晰的帮助文档(`/<skill-name> --help`)
 
-2. **工作流定义**:
+3. **工作流定义**:
    - 必须在 skill.md 中明确定义对话流程或自动化流程
    - 对话式 skill 必须提供引导性问题和选项
    - 自动化 skill 必须提供详细的执行步骤说明
 
-3. **输出规范**:
+4. **输出规范**:
    - 生成的文件必须使用标准化命名(如 `E2E-MODULE-001.yaml`)
    - 必须提供执行结果摘要(成功/失败、生成文件列表)
    - 错误信息必须清晰说明问题和解决建议
 
-4. **资源文件组织**:
+5. **资源文件组织**:
    - 模板文件: `.claude/skills/<skill-name>/assets/templates/`
    - 参考文档: `.claude/skills/<skill-name>/references/`
    - 辅助脚本: `.claude/skills/<skill-name>/scripts/`(可选)
@@ -265,6 +285,7 @@ Java 代码是否具备足够的注释可读性。
    - 必须保留适用的规则检查(如功能分支绑定、代码归属标识、测试驱动开发)
 
 **禁止行为**:
+- ❌ 禁止 skill.md 文件缺少 YAML frontmatter(导致 skill 无法被识别)
 - ❌ 禁止创建 skill 而不编写完整的 spec 文档
 - ❌ 禁止 skill.md 与 spec.md 功能描述不一致
 - ❌ 禁止跳过 data-model.md 或 quickstart.md 文档
@@ -616,4 +637,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.11.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-29
+**版本**: 1.11.1 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-30

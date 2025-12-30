@@ -1,3 +1,9 @@
+---
+name: e2e-test-generator
+description: Generate Playwright E2E tests from YAML scenarios. Automatically converts scenario YAML files (created by test-scenario-author) into executable Playwright TypeScript test scripts with test data loading, page object imports, and custom code protection. Trigger keywords e2e test generator, playwright generator, test generation, 测试生成, E2E脚本生成, Playwright测试生成.
+version: 1.0.0
+---
+
 # e2e-test-generator
 
 **@spec T002-e2e-test-generator**

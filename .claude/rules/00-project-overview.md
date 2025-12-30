@@ -20,6 +20,7 @@
 | 07-backend-architecture | 后端架构规范 |
 | 08-api-standards | API 响应格式标准 |
 | 09-quality-standards | 质量标准（性能/安全/可访问性） |
+| 10-claude-code-skills | Claude Code Skills 开发规范 |
 
 ## 版本
-基于 constitution.md v1.4.0 生成 | 2025-12-21
+基于 constitution.md v1.11.1 生成 | 2025-12-30
