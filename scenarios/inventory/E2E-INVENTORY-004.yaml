@@ -1,0 +1,82 @@
+# E2E Scenario: 库存预警通知
+# Generated for e2e-admin testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-004
+spec_ref: P005
+title: 库存预警通知
+description: 验证库存低于安全库存时，系统自动发送预警通知
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+  deploy:
+    - saas
+  priority: p1
+  smoke: true
+
+preconditions:
+  role: store_manager
+
+steps:
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.manager_user
+    description: 门店经理登录系统
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /inventory/settings
+    description: 导航到库存设置页面
+
+  - action: set_safety_stock
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.safety_stock_config
+      threshold: 100
+    description: 设置安全库存阈值为 100
+
+  - action: simulate_inventory_decrease
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.product_sku
+      new_quantity: 80
+    description: 模拟库存降至 80（低于阈值）
+
+assertions:
+  - type: ui
+    check: notification_shown
+    params:
+      type: warning
+      message: "库存预警"
+    timeout: 5000
+
+  - type: api
+    check: notification_sent
+    params:
+      channel: email
+      recipient: inventoryTestData.manager_email
+      subject_contains: "库存预警"
+    timeout: 10000
+
+  - type: api
+    check: database_record_exists
+    params:
+      table: inventory_alerts
+      field: status
+      expected: "triggered"
+    timeout: 3000
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T10:15:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

@@ -1,7 +1,7 @@
 # Implementation Plan: E2E 场景创建工具 (test-scenario-author)
 
-**Branch**: `T001-e2e-scenario-author` | **Date**: 2025-12-30 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/T001-e2e-scenario-author/spec.md`
+**Branch**: `T005-e2e-scenario-author` | **Date**: 2025-12-30 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/T005-e2e-scenario-author/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
@@ -67,7 +67,7 @@
 
 ### 必须满足的宪法原则检查：
 
-- [x] **功能分支绑定**: 当前分支 `T001-e2e-scenario-author`,active_spec 指向 `specs/T001-e2e-scenario-author/spec.md` - ✅ 一致
+- [x] **功能分支绑定**: 当前分支 `T005-e2e-scenario-author`,active_spec 指向 `specs/T005-e2e-scenario-author/spec.md` - ✅ 一致
 - [x] **测试驱动开发**: Skill 核心脚本(parse_spec.py, generate_scenario.py, validate_scenario.py)必须先编写 pytest 单元测试 - ✅ 已在 tasks.md 中规划
 - [N/A] **组件化架构**: 不适用(非 UI 组件项目,是 CLI Skill)
 - [N/A] **前端技术栈分层**: 不适用(非前端项目,是 Python CLI 工具)
@@ -86,7 +86,7 @@
 ### Documentation (this feature)
 
 ```text
-specs/T001-e2e-scenario-author/
+specs/T005-e2e-scenario-author/
 ├── spec.md              # Feature specification (用户故事、验收场景)
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (技术方案研究)
@@ -164,7 +164,7 @@ scenarios/                       # 场景文件存储目录(Git 版本控制)
 
 无宪法违规 - 所有适用的宪法原则检查均已通过:
 
-✅ 功能分支绑定正确 (T001-e2e-scenario-author)
+✅ 功能分支绑定正确 (T005-e2e-scenario-author)
 ✅ 测试驱动开发已规划 (pytest 单元测试 + 集成测试)
 ✅ 代码质量工程化已规划 (PEP 8, pylint/flake8, 类型提示)
 ✅ Claude Code Skills 开发标准已遵循 (Principle 8)

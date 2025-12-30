@@ -1,7 +1,7 @@
 # 为什么需要独立的 testdata-manager skill？
 
 **Date**: 2025-12-30
-**Related**: T001-e2e-scenario-author, T002-e2e-test-generator, T003-testdata-manager
+**Related**: T005-e2e-scenario-author, T002-e2e-test-generator, T003-testdata-manager
 
 ---
 

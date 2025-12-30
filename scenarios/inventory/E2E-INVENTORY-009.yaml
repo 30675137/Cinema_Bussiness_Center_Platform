@@ -1,0 +1,113 @@
+# E2E Scenario: 库存调整后前端库存显示更新
+# Generated for e2e-admin User Story 2 testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-009
+spec_ref: P005
+title: 库存调整后前端库存显示更新
+description: 验证管理员在 B端调整库存后，C端用户看到的库存数量实时更新
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+    - h5
+  deploy:
+    - saas
+  priority: p1
+  smoke: true
+
+preconditions:
+  role: admin
+
+steps:
+  # B端操作：调整库存
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.admin_user
+    description: 管理员登录 B端系统（http://localhost:3000）
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /inventory/adjustment
+    description: 导航到库存调整页面
+
+  - action: adjust_inventory
+    system: b-end
+    params:
+      sku: inventoryTestData.product_sku_cola
+      adjustment_type: increase
+      quantity: 100
+      reason: "补货入库"
+    description: 增加库存 100 件
+
+  - action: submit
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.adjustment_form
+    description: 提交库存调整
+
+  # C端操作：验证库存显示
+  - action: login
+    system: c-end
+    params:
+      testdata_ref: inventoryTestData.normal_user
+    description: 普通用户登录 C端（http://localhost:10086）
+
+  - action: browse_product
+    system: c-end
+    params:
+      testdata_ref: inventoryTestData.product_sku_cola
+    description: 浏览刚调整库存的商品
+
+  - action: check_stock_display
+    system: c-end
+    params:
+      testdata_ref: inventoryTestData.product_sku_cola
+    description: 检查商品详情页的库存显示
+
+assertions:
+  - type: ui
+    check: element_visible
+    params:
+      system: b-end
+      selector: .adjustment-success
+      text: "库存调整成功"
+    timeout: 5000
+
+  - type: ui
+    check: element_text_equals
+    params:
+      system: c-end
+      selector: .stock-quantity
+      expected: "库存: 100+"
+    timeout: 5000
+
+  - type: api
+    check: database_field_equals
+    params:
+      table: inventory
+      field: on_hand
+      sku: inventoryTestData.product_sku_cola
+      expected: 100
+    timeout: 3000
+
+  - type: api
+    check: cache_invalidated
+    params:
+      cache_key: "inventory:product_sku_cola"
+    timeout: 2000
+    description: 验证 Redis 缓存已失效
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T12:15:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

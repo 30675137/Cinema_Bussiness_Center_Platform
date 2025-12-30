@@ -230,7 +230,7 @@ QA 工程师希望当场景 YAML 文件修改后,使用 `/e2e-test-generator upd
 
 ## Dependencies *(optional)*
 
-- **T001-e2e-scenario-author**: 依赖 T001 skill 生成的场景 YAML 文件作为输入
+- **T005-e2e-scenario-author**: 依赖 T001 skill 生成的场景 YAML 文件作为输入
 - **Testing Frameworks**: 依赖项目已配置至少一种测试框架（Playwright、Postman、REST Client、Jest/Vitest）
 - **Playwright Framework** (可选): 如需生成 Playwright 脚本，依赖 Playwright 测试框架已在项目中配置(package.json, playwright.config.ts)
 - **Postman** (可选): 如需生成 Postman collections，依赖 Postman 或 Newman CLI 可访问

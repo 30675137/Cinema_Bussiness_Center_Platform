@@ -10,7 +10,7 @@
 
 ## Overview
 
-**testdata-manager** 是一个 Claude Code Skill，用于设计、生成和管理 E2E 测试数据。它与 T001-e2e-scenario-author 和 T002-e2e-test-generator 协同工作，为测试场景提供结构化、可维护的测试数据。
+**testdata-manager** 是一个 Claude Code Skill，用于设计、生成和管理 E2E 测试数据。它与 T005-e2e-scenario-author 和 T002-e2e-test-generator 协同工作，为测试场景提供结构化、可维护的测试数据。
 
 ---
 

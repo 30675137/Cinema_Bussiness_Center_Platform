@@ -1,6 +1,6 @@
 # 功能规格：E2E 场景创建工具 (e2e-scenario-author)
 
-**功能分支**: `T001-e2e-scenario-author`
+**功能分支**: `T005-e2e-scenario-author`
 **创建日期**: 2025-12-29
 **状态**: 草稿
 **输入**: 用户描述："创建/维护场景规格资产（E2EScenarioSpec），支持方案 A（极简一行式）"

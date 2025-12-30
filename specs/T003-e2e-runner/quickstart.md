@@ -734,7 +734,7 @@ After mastering the basics:
 - **Data Model**: `specs/T003-e2e-runner/data-model.md`
 - **Skill Documentation**: `.claude/skills/e2e-runner/skill.md`
 - **Playwright Docs**: https://playwright.dev/docs/intro
-- **Test Scenario Author**: `specs/T001-e2e-scenario-author/quickstart.md`
+- **Test Scenario Author**: `specs/T005-e2e-scenario-author/quickstart.md`
 - **Test Generator**: `specs/T002-e2e-test-generator/quickstart.md`
 
 ---

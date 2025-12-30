@@ -1,6 +1,6 @@
 # Quickstart Guide: scenario-author Skill
 
-**Feature**: T001-e2e-scenario-author
+**Feature**: T005-e2e-scenario-author
 **Date**: 2025-12-29
 **Purpose**: 快速上手使用 `/scenario-author` skill 创建和管理 E2E 测试场景
 
@@ -464,9 +464,9 @@ assertions:
 ## Resources
 
 - **详细文档**: `.claude/skills/scenario-author/references/usage-guide.md`
-- **Schema 定义**: `specs/T001-e2e-scenario-author/contracts/scenario-schema.json`
+- **Schema 定义**: `specs/T005-e2e-scenario-author/contracts/scenario-schema.json`
 - **示例场景**: `.claude/skills/scenario-author/references/examples/`
-- **规格文档**: `specs/T001-e2e-scenario-author/spec.md`
+- **规格文档**: `specs/T005-e2e-scenario-author/spec.md`
 
 ---
 

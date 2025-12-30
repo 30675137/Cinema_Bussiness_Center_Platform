@@ -1,7 +1,7 @@
 # Research Findings: E2E Scenario Author Skill
 
 **Date**: 2025-12-29
-**Feature**: T001-e2e-scenario-author
+**Feature**: T005-e2e-scenario-author
 **Purpose**: Research technical approaches for implementing Claude Code skill to create, manage and validate E2E test scenarios
 
 ## 1. Claude Code Skill Structure Best Practices

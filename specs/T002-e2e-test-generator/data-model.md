@@ -14,7 +14,7 @@
 
 ### E2EScenarioSpec (输入 YAML)
 
-**Source**: 由 T001-e2e-scenario-author 生成
+**Source**: 由 T005-e2e-scenario-author 生成
 **Format**: YAML
 **Location**: `scenarios/<module>/<scenario_id>.yaml`
 

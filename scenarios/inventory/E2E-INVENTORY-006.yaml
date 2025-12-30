@@ -1,0 +1,85 @@
+# E2E Scenario: 库存盘点流程
+# Generated for e2e-admin testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-006
+spec_ref: P005
+title: 库存盘点流程
+description: 验证定期库存盘点功能，记录实际库存与系统库存的差异
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+  deploy:
+    - saas
+  priority: p2
+  smoke: false
+
+preconditions:
+  role: inventory_clerk
+
+steps:
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.clerk_user
+    description: 盘点员登录系统
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /inventory/stocktaking
+    description: 导航到库存盘点页面
+
+  - action: start_stocktaking
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.stocktaking_plan
+    description: 开始盘点任务
+
+  - action: record_actual_quantity
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.stocktaking_records
+    description: 录入实际盘点数量（与系统库存有差异）
+
+  - action: submit_stocktaking
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.stocktaking_plan
+    description: 提交盘点结果
+
+assertions:
+  - type: ui
+    check: element_visible
+    params:
+      selector: .stocktaking-result
+      text: "盘点完成"
+    timeout: 5000
+
+  - type: api
+    check: database_record_exists
+    params:
+      table: inventory_stocktaking
+      field: status
+      expected: "completed"
+    timeout: 3000
+
+  - type: api
+    check: variance_calculated
+    params:
+      testdata_ref: inventoryTestData.stocktaking_records
+      expected_variance: -5
+    timeout: 3000
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T10:45:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

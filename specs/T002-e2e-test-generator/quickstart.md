@@ -5,7 +5,7 @@
 
 ## 简介
 
-e2e-test-generator 是一个 Claude Code Skill，用于将 T001-e2e-scenario-author 生成的场景 YAML 文件自动转换为可执行的测试脚本。
+e2e-test-generator 是一个 Claude Code Skill，用于将 T005-e2e-scenario-author 生成的场景 YAML 文件自动转换为可执行的测试脚本。
 
 **支持的测试框架**:
 - **P1 (优先)**: Playwright (UI + API 测试)

@@ -1,6 +1,6 @@
 # Data Model: E2EScenarioSpec YAML Schema
 
-**Feature**: T001-e2e-scenario-author
+**Feature**: T005-e2e-scenario-author
 **Date**: 2025-12-29
 **Purpose**: Define the structure and validation rules for E2E test scenario YAML files
 

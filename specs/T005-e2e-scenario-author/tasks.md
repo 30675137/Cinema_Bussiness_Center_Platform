@@ -1,6 +1,6 @@
 # 任务清单：E2E 场景创作者 Skill
 
-**输入**: 来自 `/specs/T001-e2e-scenario-author/` 的设计文档
+**输入**: 来自 `/specs/T005-e2e-scenario-author/` 的设计文档
 **前置条件**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, contracts/ ✅ (scenario-schema.json)
 
 **测试**: 根据规格说明，测试是可选的。本 skill 专注于工具开发，因此通过实际 skill 执行进行实现测试。
@@ -17,7 +17,7 @@
 
 - **Skill 文件**: `.claude/skills/scenario-author/`
 - **生成的场景**: `scenarios/<module>/`
-- **规格文档**: `specs/T001-e2e-scenario-author/`
+- **规格文档**: `specs/T005-e2e-scenario-author/`
 
 ---
 
@@ -27,7 +27,7 @@
 
 - [X] T001 在 .claude/skills/test-scenario-author/ 创建 skill 目录结构
 - [X] T002 创建子目录：references/, assets/templates/, scripts/ 在 .claude/skills/test-scenario-author/ 下
-- [X] T003 [P] 复制 scenario-schema.json 从 specs/T001-e2e-scenario-author/contracts/ 到 .claude/skills/test-scenario-author/assets/templates/scenario-schema.json
+- [X] T003 [P] 复制 scenario-schema.json 从 specs/T005-e2e-scenario-author/contracts/ 到 .claude/skills/test-scenario-author/assets/templates/scenario-schema.json
 - [X] T004 [P] 安装 Python 依赖：PyYAML>=6.0, jsonschema>=4.17（在 scripts/requirements.txt 中记录）
 
 ---
@@ -160,7 +160,7 @@
 - [ ] T050 [P] 在所有 Python 脚本中使用 Python logging 模块添加全面日志记录 - 待实现
 - [X] T051 [P] 在 skill.md 中为所有命令参数添加输入验证（scenario_id 格式、spec_ref 格式）- 已在 create, validate 命令中包含验证逻辑
 - [X] T052 在 .claude/skills/test-scenario-author/README.md 创建全面的 skill 文档
-- [X] T053 在所有 skill 文件中添加 @spec T001-e2e-scenario-author 头部（skill.md、所有 Python 脚本、references）
+- [X] T053 在所有 skill 文件中添加 @spec T005-e2e-scenario-author 头部（skill.md、所有 Python 脚本、references）
 - [ ] T054 [P] 在 .claude/skills/test-scenario-author/scripts/tests/ 使用 pytest 为 Python 工具创建单元测试 - 待实现
 - [X] T055 在 skill.md 中为所有命令添加边缘情况处理（空 scenarios/、ID 冲突、格式错误的 YAML）- 已在 validate 命令和 id_generator.py 中实现
 - [X] T056 根据 scenario-schema.json 验证所有生成的示例 - 已实现 validate 命令

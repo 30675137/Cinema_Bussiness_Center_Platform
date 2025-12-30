@@ -1,0 +1,57 @@
+# @spec T001-e2e-orchestrator
+# Default configuration for E2E test orchestrator
+
+# Environment-specific baseURLs
+environments:
+  dev:
+    c-end: "http://localhost:10086"
+    b-end: "http://localhost:3000"
+  staging:
+    c-end: "https://staging-hall.cinema.com"
+    b-end: "https://staging-admin.cinema.com"
+  prod:
+    c-end: "https://hall.cinema.com"
+    b-end: "https://admin.cinema.com"
+
+# Default execution parameters
+execution:
+  workers: 1                # Parallel worker count (1-10)
+  retries: 0                # Retry count for flaky tests (0-3)
+  timeout: 30000            # Test timeout in milliseconds
+  project: "chromium"       # Browser project (fixed: chromium only)
+
+# Artifact capture strategies
+artifacts:
+  trace: "on-failure"       # on-failure | always | off
+  video: "on-failure"       # on-failure | always | off
+  screenshot: "on-failure"  # on-failure | always | off
+
+# Skill orchestration skip flags (default: all enabled)
+skip_flags:
+  scenario_validation: false
+  data_validation: false
+  generation: false
+  report_config: false
+  artifacts_config: false
+
+# Service management
+services:
+  c-end:
+    port: 10086
+    working_dir: "hall-reserve-taro"
+    start_command: "npm run dev:h5"
+    health_check_timeout: 10  # seconds
+  b-end:
+    port: 3000
+    working_dir: "frontend"
+    start_command: "npm run dev"
+    health_check_timeout: 10  # seconds
+
+# Scenario paths
+scenario_directories:
+  - "scenarios/"
+
+# Report output
+reports:
+  base_dir: "test-results"
+  create_symlink: true      # Create test-results/latest symlink

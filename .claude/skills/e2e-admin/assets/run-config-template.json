@@ -1,0 +1,32 @@
+{
+  "$schema": "../../specs/T001-e2e-orchestrator/contracts/orchestrator-config.schema.json",
+  "run_id": "20251230-143052-a3f8b921",
+  "environment": "dev",
+  "base_urls": {
+    "c-end": "http://localhost:10086",
+    "b-end": "http://localhost:3000"
+  },
+  "workers": 1,
+  "retries": 0,
+  "timeout": 30000,
+  "project": "chromium",
+  "selected_scenarios": [
+    {
+      "scenario_id": "E2E-INVENTORY-001",
+      "file_path": "scenarios/inventory/E2E-INVENTORY-001.yaml"
+    }
+  ],
+  "skip_flags": {
+    "scenario_validation": false,
+    "data_validation": false,
+    "generation": false,
+    "report_config": false,
+    "artifacts_config": false
+  },
+  "artifacts": {
+    "trace": "on-failure",
+    "video": "on-failure",
+    "screenshot": "on-failure"
+  },
+  "output_dir": "test-results/run-20251230-143052-a3f8b921"
+}

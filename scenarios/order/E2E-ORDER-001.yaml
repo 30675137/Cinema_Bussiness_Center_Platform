@@ -1,0 +1,128 @@
+# E2E Scenario: 跨系统订单流程（C端下单 + B端处理）
+# Generated for e2e-admin User Story 2 testing
+# Date: 2025-12-30
+
+scenario_id: E2E-ORDER-001
+spec_ref: O003
+title: 跨系统订单流程（C端下单 + B端处理）
+description: 验证完整的订单流程：用户在 C端下单，管理员在 B端处理订单
+
+tags:
+  module:
+    - order
+  channel:
+    - h5
+    - web
+  deploy:
+    - saas
+  priority: p1
+  smoke: true
+
+preconditions:
+  role: normal_user
+
+steps:
+  # C端操作
+  - action: login
+    system: c-end
+    params:
+      testdata_ref: orderTestData.normal_user
+    description: 用户在 C端登录（http://localhost:10086）
+
+  - action: browse_product
+    system: c-end
+    params:
+      testdata_ref: orderTestData.product_popcorn
+    description: 浏览商品（爆米花套餐）
+
+  - action: add_to_cart
+    system: c-end
+    params:
+      testdata_ref: orderTestData.product_popcorn
+      quantity: 2
+    description: 添加 2 份到购物车
+
+  - action: checkout
+    system: c-end
+    params:
+      testdata_ref: orderTestData.checkout_params
+    description: 提交订单
+
+  - action: pay
+    system: c-end
+    params:
+      payment_method: wechat
+    description: 微信支付
+
+  # B端操作
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: orderTestData.admin_user
+    description: 管理员在 B端登录（http://localhost:3000）
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /orders
+    description: 导航到订单管理页面
+
+  - action: search_order
+    system: b-end
+    params:
+      testdata_ref: orderTestData.order_number
+    description: 搜索刚创建的订单
+
+  - action: confirm_order
+    system: b-end
+    params:
+      testdata_ref: orderTestData.order_number
+    description: 确认订单（开始制作）
+
+  - action: complete_order
+    system: b-end
+    params:
+      testdata_ref: orderTestData.order_number
+    description: 完成订单（出品完成）
+
+assertions:
+  - type: ui
+    check: element_visible
+    params:
+      system: c-end
+      selector: .order-status
+      text: "已完成"
+    timeout: 5000
+
+  - type: ui
+    check: element_visible
+    params:
+      system: b-end
+      selector: .order-complete-badge
+    timeout: 5000
+
+  - type: api
+    check: database_field_equals
+    params:
+      table: orders
+      field: status
+      expected: "completed"
+    timeout: 3000
+
+  - type: api
+    check: database_field_equals
+    params:
+      table: orders
+      field: total_amount
+      expected: 70.00
+    timeout: 3000
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T12:00:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

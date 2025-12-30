@@ -1,0 +1,87 @@
+# E2E Scenario: 库存批次管理（先进先出）
+# Generated for e2e-admin testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-007
+spec_ref: P005
+title: 库存批次管理（先进先出）
+description: 验证库存批次先进先出（FIFO）策略，优先扣减最早批次
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+  deploy:
+    - saas
+  priority: p2
+  smoke: false
+
+preconditions:
+  role: store_clerk
+
+steps:
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.clerk_user
+    description: 店员登录系统
+
+  - action: create_batch
+    system: b-end
+    params:
+      sku: inventoryTestData.product_sku
+      batch_no: "BATCH-20251201"
+      quantity: 100
+      expiry_date: "2026-01-01"
+    description: 创建批次 1（2025-12-01 入库）
+
+  - action: create_batch
+    system: b-end
+    params:
+      sku: inventoryTestData.product_sku
+      batch_no: "BATCH-20251210"
+      quantity: 100
+      expiry_date: "2026-01-10"
+    description: 创建批次 2（2025-12-10 入库）
+
+  - action: create_order
+    system: c-end
+    params:
+      testdata_ref: inventoryTestData.order_data
+      quantity: 150
+    description: 用户下单购买 150 件商品
+
+assertions:
+  - type: api
+    check: batch_deducted
+    params:
+      batch_no: "BATCH-20251201"
+      expected_remaining: 0
+    timeout: 3000
+    description: 验证批次 1 已全部扣减
+
+  - type: api
+    check: batch_deducted
+    params:
+      batch_no: "BATCH-20251210"
+      expected_remaining: 50
+    timeout: 3000
+    description: 验证批次 2 剩余 50 件
+
+  - type: api
+    check: response_status_is
+    params:
+      endpoint: /api/inventory/batch
+      expected: 200
+    timeout: 3000
+
+artifacts:
+  trace: on-failure
+  video: off
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T11:00:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"
