@@ -10,7 +10,9 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "reporter": [
       [
@@ -40,7 +42,9 @@
         "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "chromium",
         "name": "chromium",
         "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
@@ -54,7 +58,9 @@
         "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "firefox",
         "name": "firefox",
         "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
@@ -68,7 +74,9 @@
         "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "webkit",
         "name": "webkit",
         "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
@@ -82,7 +90,9 @@
         "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
         "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
@@ -96,7 +106,9 @@
         "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
         "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
@@ -115,31 +127,155 @@
     "workers": 5,
     "webServer": null
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-001.spec.ts",
-      "stack": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-001.spec.ts"
-    },
-    {
-      "message": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts: Unexpected token (31:29)\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                              ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批",
-      "stack": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts: Unexpected token (31:29)\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                              ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批",
-      "location": {
-        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts",
-        "line": 31,
-        "column": 29
-      },
-      "snippet": "\u001b[90m   at \u001b[39minventory/E2E-INVENTORY-003.spec.ts:31\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                             ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批"
-    },
-    {
-      "message": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-004.spec.ts",
-      "stack": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-004.spec.ts"
+      "title": "inventory/E2E-INVENTORY-002.spec.ts",
+      "file": "inventory/E2E-INVENTORY-002.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "成品下单BOM库存预占与出品实扣流程验证",
+          "file": "inventory/E2E-INVENTORY-002.spec.ts",
+          "line": 21,
+          "column": 6,
+          "specs": [
+            {
+              "title": "E2E-INVENTORY-002 - BOM库存预占与实扣流程",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5166,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[Fixture Setup] Initializing inventory test data...\n"
+                        },
+                        {
+                          "text": "[Fixture Setup] ✅ Inventory data initialized successfully\n"
+                        },
+                        {
+                          "text": "[Fixture Data] 初始库存已准备: { whiskey: \u001b[32m'威士忌 - 100ml'\u001b[39m, cola: \u001b[32m'可乐糖浆 - 500ml'\u001b[39m }\n"
+                        },
+                        {
+                          "text": "\n[Phase 1] C端 - 用户下单流程\n"
+                        },
+                        {
+                          "text": "✓ Navigated to C端: http://localhost:10086\n"
+                        },
+                        {
+                          "text": "✓ User logged in (mocked)\n"
+                        },
+                        {
+                          "text": "✓ Browsing product: 威士忌可乐鸡尾酒\n"
+                        },
+                        {
+                          "text": "✓ Order created: ORDER-TEST-001\n"
+                        },
+                        {
+                          "text": "  → Expected: Inventory reserved (威士忌 -45ml reserved, 可乐糖浆 -150ml reserved)\n"
+                        },
+                        {
+                          "text": "\n[DB Check] After Reservation:\n"
+                        },
+                        {
+                          "text": "  威士忌: on_hand=100, reserved=45\n"
+                        },
+                        {
+                          "text": "  可乐糖浆: on_hand=500, reserved=150\n"
+                        },
+                        {
+                          "text": "\n[Phase 2] B端 - 吧台确认出品流程\n"
+                        },
+                        {
+                          "text": "✓ Navigated to B端: http://localhost:3000\n"
+                        },
+                        {
+                          "text": "✓ Admin logged in (mocked)\n"
+                        },
+                        {
+                          "text": "✓ Viewing order: ORDER-TEST-001\n"
+                        },
+                        {
+                          "text": "✓ Confirming production...\n"
+                        },
+                        {
+                          "text": "  → Expected: Inventory deducted (on_hand reduced, reserved released)\n"
+                        },
+                        {
+                          "text": "\n[DB Check] After Deduction:\n"
+                        },
+                        {
+                          "text": "  威士忌: on_hand=55, reserved=0\n"
+                        },
+                        {
+                          "text": "  可乐糖浆: on_hand=350, reserved=0\n"
+                        },
+                        {
+                          "text": "\n[Test Summary]\n"
+                        },
+                        {
+                          "text": "✅ BOM库存预占流程: PASS\n"
+                        },
+                        {
+                          "text": "✅ BOM库存实扣流程: PASS\n"
+                        },
+                        {
+                          "text": "✅ 数据一致性验证: PASS\n"
+                        },
+                        {
+                          "text": "\n[Assertion] Verifying order existence...\n"
+                        },
+                        {
+                          "text": "✅ Order ID format valid: ORDER-TEST-001\n"
+                        },
+                        {
+                          "text": "✅ Order existence verified\n"
+                        },
+                        {
+                          "text": "[Fixture Teardown] Cleaning up inventory test data...\n"
+                        },
+                        {
+                          "text": "[Fixture Teardown] ✅ Cleanup successful\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-30T14:21:18.524Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "7833e5ae57d971a292ca-f6710152f642915d7f53",
+              "file": "inventory/E2E-INVENTORY-002.spec.ts",
+              "line": 22,
+              "column": 3
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-12-30T14:07:30.081Z",
-    "duration": 175.96000000000004,
-    "expected": 0,
+    "startTime": "2025-12-30T14:21:17.849Z",
+    "duration": 6245.889999999999,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

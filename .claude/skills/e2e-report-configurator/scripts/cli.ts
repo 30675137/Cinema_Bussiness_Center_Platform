@@ -7,6 +7,8 @@
 import { setupCommand, validateCommand, docsCommand } from './index'
 import type { SkillCommandOptions } from './types'
 import type { DocsOptions } from './docs-generator'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
 /**
  * Parsed CLI arguments
@@ -216,8 +218,15 @@ For more information, visit: https://github.com/anthropics/claude-code
 `)
 }
 
-// Execute CLI if run directly
-if (require.main === module) {
+// Execute CLI if run directly (ES module compatible)
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// Check if this module is being run directly
+const isMainModule = process.argv[1] === __filename ||
+                     process.argv[1] === fileURLToPath(import.meta.url)
+
+if (isMainModule) {
   const args = process.argv.slice(2)
 
   if (args.includes('--help') || args.includes('-h')) {
