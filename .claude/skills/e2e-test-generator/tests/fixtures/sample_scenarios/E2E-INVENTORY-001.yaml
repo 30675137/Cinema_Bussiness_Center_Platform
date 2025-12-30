@@ -1,0 +1,68 @@
+# @spec T002-e2e-test-generator
+# Sample E2E Scenario for Testing: Inventory Adjustment Approval Flow
+
+scenario_id: E2E-INVENTORY-001
+spec_ref: P005
+title: 库存调整审批流程
+description: 测试管理员创建库存调整并审批的完整流程
+
+tags:
+  module: [inventory]
+  channel: [web]
+  deploy: [saas]
+  priority: p1
+  smoke: true
+
+preconditions:
+  role: admin
+  testdata_ref: inventoryTestData.scenario_001
+
+steps:
+  - action: login
+    description: 管理员登录
+  - action: navigate
+    params:
+      testdata_ref: inventoryTestData.adjustment_page
+    description: 导航到库存调整页面
+  - action: create_adjustment
+    params:
+      testdata_ref: inventoryTestData.adjustment_data
+    description: 创建库存调整
+  - action: approve_adjustment
+    params:
+      adjustmentId: "{{testdata_ref}}"
+    description: 审批调整
+  - action: wait
+    params:
+      duration: 1000
+    description: 等待1秒
+
+assertions:
+  - type: ui
+    check: element_visible
+    params:
+      selector: .success-message
+    timeout: 5000
+  - type: ui
+    check: toast_message_shown
+    params:
+      message: 操作成功
+  - type: api
+    check: response_status_is
+    params:
+      expected: 200
+  - type: api
+    check: response_field_equals
+    params:
+      field: data.status
+      expected: approved
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T10:00:00Z"
+  created_by: test-scenario-author
+  version: "1.0"

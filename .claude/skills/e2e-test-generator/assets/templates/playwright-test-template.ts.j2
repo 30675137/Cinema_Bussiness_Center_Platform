@@ -1,0 +1,55 @@
+{# @spec T002-e2e-test-generator #}
+{# Playwright Test Template - Jinja2 #}
+// @spec T002-e2e-test-generator
+// AUTO-GENERATED: Do not modify above this line
+// Generated from: {{ source_file }}
+
+import { test, expect } from '@playwright/test';
+{% if page_objects %}
+{% for page_object in page_objects|sort %}
+import { {{ page_object }} } from './pages/{{ page_object }}';
+{% endfor %}
+{% endif %}
+{% if testdata_refs %}
+import { loadTestData } from '@/testdata/loader';
+{% endif %}
+
+test.describe('{{ scenario.title }}', () => {
+  {% if testdata_refs %}
+  let testData: any;
+
+  test.beforeEach(async ({ page }) => {
+    {% if scenario.preconditions and scenario.preconditions.testdata_ref %}
+    testData = await loadTestData('{{ scenario.preconditions.testdata_ref }}');
+    await page.goto(testData.baseUrl);
+    {% else %}
+    // TODO: Add testdata loading and page navigation
+    {% endif %}
+  });
+  {% endif %}
+
+  test('{{ scenario.scenario_id }}{% if scenario.description %} - {{ scenario.description }}{% endif %}', async ({ page }) => {
+    {% if page_objects %}
+    // Initialize page objects
+    {% for page_object in page_objects|sort %}
+    const {{ page_object|lower|replace('page', 'Page') }} = new {{ page_object }}(page);
+    {% endfor %}
+    {% endif %}
+
+    // Steps
+    {% for step in scenario.steps %}
+    // Step {{ loop.index }}: {{ step.description or step.action }}
+    {{ step.generated_code }}
+    {% endfor %}
+
+    // Assertions
+    {% for assertion in scenario.assertions %}
+    // Assertion: {{ assertion.type }} - {{ assertion.check }}
+    {{ assertion.generated_code }}
+    {% endfor %}
+
+    // CUSTOM CODE START
+    // Add your custom test logic here
+    // CUSTOM CODE END
+  });
+});

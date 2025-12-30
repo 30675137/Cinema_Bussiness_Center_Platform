@@ -23,11 +23,11 @@
 
 **目的**: 项目初始化和 Skill 结构搭建
 
-- [ ] T001 创建 skill 目录结构 .claude/skills/e2e-test-generator/
-- [ ] T002 创建 skill.md 文档文件 .claude/skills/e2e-test-generator/skill.md
-- [ ] T003 [P] 创建 Python 虚拟环境和 requirements.txt，包含依赖（PyYAML 6.0+, Jinja2 3.0+, jsonschema, pytest）
-- [ ] T004 [P] 配置 pytest 设置文件 .claude/skills/e2e-test-generator/pytest.ini
-- [ ] T005 [P] 创建 .gitignore 文件用于 Python 构建产物（.pyc, __pycache__, .pytest_cache 等）
+- [X] T001 创建 skill 目录结构 .claude/skills/e2e-test-generator/
+- [X] T002 创建 skill.md 文档文件 .claude/skills/e2e-test-generator/skill.md
+- [X] T003 [P] 创建 Python 虚拟环境和 requirements.txt，包含依赖（PyYAML 6.0+, Jinja2 3.0+, jsonschema, pytest）
+- [X] T004 [P] 配置 pytest 设置文件 .claude/skills/e2e-test-generator/pytest.ini
+- [X] T005 [P] 创建 .gitignore 文件用于 Python 构建产物（.pyc, __pycache__, .pytest_cache 等）
 
 ---
 
@@ -37,15 +37,15 @@
 
 **⚠️ 关键**: 此阶段完成前，所有用户故事工作不能开始
 
-- [ ] T006 创建 YAML 解析模块 .claude/skills/e2e-test-generator/scripts/yaml_parser.py，使用 safe_load()
-- [ ] T007 [P] 创建 E2EScenarioSpec schema 验证器 .claude/skills/e2e-test-generator/scripts/schema_validator.py
-- [ ] T008 [P] 创建 action-mappings.yaml 配置模板 .claude/skills/e2e-test-generator/assets/templates/action-mappings.yaml，包含 10-15 个常用 actions
-- [ ] T009 [P] 创建 assertion-mappings.yaml 配置模板 .claude/skills/e2e-test-generator/assets/templates/assertion-mappings.yaml
-- [ ] T010 [P] 创建配置加载模块 .claude/skills/e2e-test-generator/scripts/config_loader.py，包含 jsonschema 验证
-- [ ] T011 创建 Jinja2 模板渲染器 .claude/skills/e2e-test-generator/scripts/template_renderer.py
-- [ ] T012 [P] 创建文件哈希工具 .claude/skills/e2e-test-generator/scripts/file_utils.py（SHA256 哈希）
-- [ ] T013 [P] 创建测试固件目录 .claude/skills/e2e-test-generator/tests/fixtures/sample_scenarios/
-- [ ] T014 [P] 创建示例场景 YAML 文件用于测试（E2E-INVENTORY-001.yaml, E2E-ORDER-001.yaml）
+- [X] T006 创建 YAML 解析模块 .claude/skills/e2e-test-generator/scripts/yaml_parser.py，使用 safe_load()
+- [X] T007 [P] 创建 E2EScenarioSpec schema 验证器 .claude/skills/e2e-test-generator/scripts/schema_validator.py
+- [X] T008 [P] 创建 action-mappings.yaml 配置模板 .claude/skills/e2e-test-generator/assets/templates/action-mappings.yaml，包含 10-15 个常用 actions
+- [X] T009 [P] 创建 assertion-mappings.yaml 配置模板 .claude/skills/e2e-test-generator/assets/templates/assertion-mappings.yaml
+- [X] T010 [P] 创建配置加载模块 .claude/skills/e2e-test-generator/scripts/config_loader.py，包含 jsonschema 验证
+- [X] T011 创建 Jinja2 模板渲染器 .claude/skills/e2e-test-generator/scripts/template_renderer.py
+- [X] T012 [P] 创建文件哈希工具 .claude/skills/e2e-test-generator/scripts/file_utils.py（SHA256 哈希）
+- [X] T013 [P] 创建测试固件目录 .claude/skills/e2e-test-generator/tests/fixtures/sample_scenarios/
+- [X] T014 [P] 创建示例场景 YAML 文件用于测试（E2E-INVENTORY-001.yaml, E2E-ORDER-001.yaml）
 
 **检查点**: 基础设施就绪 - 用户故事实现现可并行开始
 
@@ -67,15 +67,15 @@
 
 ### 用户故事 1 的实现
 
-- [ ] T018 [P] [US1] 创建 Playwright 测试模板 .claude/skills/e2e-test-generator/assets/templates/playwright-test-template.ts.j2
-- [ ] T019 [P] [US1] 创建常用 actions 的 action mapping 定义（login、navigate、click、input 等）在 action-mappings.yaml 中
-- [ ] T020 [P] [US1] 创建 assertion mapping 定义（element_visible、toast_message_shown、response_status_is 等）在 assertion-mappings.yaml 中
-- [ ] T021 [US1] 实现 Playwright 代码生成器 .claude/skills/e2e-test-generator/scripts/generate_playwright.py（依赖 T018, T019, T020）
-- [ ] T022 [US1] 实现步骤转换逻辑（action → Playwright 代码）在 generate_playwright.py 中
-- [ ] T023 [US1] 实现断言转换逻辑（assertion → expect() 代码）在 generate_playwright.py 中
-- [ ] T024 [US1] 添加 import 语句生成（页面对象和测试数据）
-- [ ] T025 [US1] 为所有生成的脚本添加 @spec T002-e2e-test-generator 归属标识
-- [ ] T026 [US1] 实现 `/e2e-test-generator generate <scenario-id>` CLI 命令处理器 .claude/skills/e2e-test-generator/scripts/cli.py
+- [X] T018 [P] [US1] 创建 Playwright 测试模板 .claude/skills/e2e-test-generator/assets/templates/playwright-test-template.ts.j2
+- [X] T019 [P] [US1] 创建常用 actions 的 action mapping 定义（login、navigate、click、input 等）在 action-mappings.yaml 中
+- [X] T020 [P] [US1] 创建 assertion mapping 定义（element_visible、toast_message_shown、response_status_is 等）在 assertion-mappings.yaml 中
+- [X] T021 [US1] 实现 Playwright 代码生成器 .claude/skills/e2e-test-generator/scripts/generate_playwright.py（依赖 T018, T019, T020）
+- [X] T022 [US1] 实现步骤转换逻辑（action → Playwright 代码）在 generate_playwright.py 中
+- [X] T023 [US1] 实现断言转换逻辑（assertion → expect() 代码）在 generate_playwright.py 中
+- [X] T024 [US1] 添加 import 语句生成（页面对象和测试数据）
+- [X] T025 [US1] 为所有生成的脚本添加 @spec T002-e2e-test-generator 归属标识
+- [X] T026 [US1] 实现 `/e2e-test-generator generate <scenario-id>` CLI 命令处理器 .claude/skills/e2e-test-generator/scripts/cli.py
 
 **检查点**: 此时用户故事 1 应完全可用 - 单个场景生成功能正常工作
 

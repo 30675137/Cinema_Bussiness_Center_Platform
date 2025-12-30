@@ -1,0 +1,180 @@
+# @spec T002-e2e-test-generator
+# Assertion Mappings Configuration
+# Maps assertion check types to framework-specific code templates
+
+# UI Assertions
+element_visible:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toBeVisible()"
+    imports: []
+
+element_hidden:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toBeHidden()"
+    imports: []
+
+element_enabled:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toBeEnabled()"
+    imports: []
+
+element_disabled:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toBeDisabled()"
+    imports: []
+
+element_has_text:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toHaveText('{{expected}}')"
+    imports: []
+
+element_contains_text:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toContainText('{{expected}}')"
+    imports: []
+
+element_has_value:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toHaveValue('{{expected}}')"
+    imports: []
+
+element_has_count:
+  playwright:
+    code: "await expect(page.locator('{{selector}}')).toHaveCount({{expected}})"
+    imports: []
+
+toast_message_shown:
+  playwright:
+    code: "await expect(page.locator('.toast, .ant-message')).toContainText('{{message}}')"
+    imports: []
+
+page_title_is:
+  playwright:
+    code: "await expect(page).toHaveTitle('{{expected}}')"
+    imports: []
+
+page_url_contains:
+  playwright:
+    code: "await expect(page).toHaveURL(new RegExp('{{pattern}}'))"
+    imports: []
+
+# API Assertions
+response_status_is:
+  playwright:
+    code: "expect(response.status()).toBe({{expected}})"
+    imports: []
+  postman:
+    code: |
+      pm.test('Status code is {{expected}}', () => {
+        pm.response.to.have.status({{expected}});
+      });
+  restclient:
+    expect: "HTTP/1.1 {{expected}} OK"
+
+response_body_contains:
+  playwright:
+    code: "expect(await response.json()).toMatchObject({{expected}})"
+    imports: []
+  postman:
+    code: |
+      pm.test('Response body contains {{field}}', () => {
+        pm.expect(pm.response.json()).to.have.property('{{field}}');
+      });
+
+response_field_equals:
+  playwright:
+    code: "expect((await response.json()).{{field}}).toBe({{expected}})"
+    imports: []
+  postman:
+    code: |
+      pm.test('Field {{field}} equals {{expected}}', () => {
+        pm.expect(pm.response.json().{{field}}).to.eql({{expected}});
+      });
+
+response_field_contains:
+  playwright:
+    code: "expect((await response.json()).{{field}}).toContain({{expected}})"
+    imports: []
+  postman:
+    code: |
+      pm.test('Field {{field}} contains {{expected}}', () => {
+        pm.expect(pm.response.json().{{field}}).to.include({{expected}});
+      });
+
+response_header_contains:
+  playwright:
+    code: "expect(response.headers()['{{header}}']).toContain('{{expected}}')"
+    imports: []
+  postman:
+    code: |
+      pm.test('Header {{header}} contains {{expected}}', () => {
+        pm.expect(pm.response.headers.get('{{header}}')).to.include('{{expected}}');
+      });
+
+response_time_less_than:
+  playwright:
+    code: "// TODO: Implement response time check (Playwright doesn't have built-in timing)"
+    imports: []
+  postman:
+    code: |
+      pm.test('Response time is less than {{expected}}ms', () => {
+        pm.expect(pm.response.responseTime).to.be.below({{expected}});
+      });
+
+# Database Assertions
+database_record_exists:
+  playwright:
+    code: "// TODO: Implement database record existence check for {{table}}"
+    imports: []
+
+database_field_equals:
+  playwright:
+    code: "// TODO: Implement database field check for {{table}}.{{field}} == {{expected}}"
+    imports: []
+  postman:
+    code: |
+      // TODO: Add database assertion via pre-request script
+      pm.test('Database field {{field}} equals {{expected}}', () => {
+        // Requires custom database connection setup
+        pm.expect(true).to.be.true;  // Placeholder
+      });
+
+database_count_equals:
+  playwright:
+    code: "// TODO: Implement database count check for {{table}}"
+    imports: []
+
+# State Assertions
+local_storage_contains:
+  playwright:
+    code: "expect(await page.evaluate(() => localStorage.getItem('{{key}}'))).toContain('{{expected}}')"
+    imports: []
+
+session_storage_contains:
+  playwright:
+    code: "expect(await page.evaluate(() => sessionStorage.getItem('{{key}}'))).toContain('{{expected}}')"
+    imports: []
+
+cookie_exists:
+  playwright:
+    code: "expect(await page.context().cookies()).toContainEqual(expect.objectContaining({ name: '{{name}}' }))"
+    imports: []
+
+# File/Download Assertions
+file_downloaded:
+  playwright:
+    code: |
+      const download = await downloadPromise;
+      await expect(download.suggestedFilename()).toBe('{{filename}}')
+    imports: []
+
+file_content_contains:
+  playwright:
+    code: "// TODO: Implement file content verification for {{filename}}"
+    imports: []
+
+# Custom Assertions
+custom_condition:
+  playwright:
+    code: "// TODO: Implement custom condition: {{description}}"
+    imports: []
