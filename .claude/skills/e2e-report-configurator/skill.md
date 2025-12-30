@@ -54,14 +54,26 @@ Configure Playwright reporters and create directory structure.
 
 **Examples**:
 ```bash
-# Minimal setup
+# Minimal setup (HTML only)
 /e2e-report-configurator setup
+
+# HTML + JSON reporters
+/e2e-report-configurator setup --format html,json
+
+# All formats (HTML + JSON + JUnit)
+/e2e-report-configurator setup --format html,json,junit
 
 # Multi-format with custom output
 /e2e-report-configurator setup --format html,json,junit --output test-reports
 
 # Always capture artifacts
 /e2e-report-configurator setup --artifacts always
+
+# Never capture artifacts
+/e2e-report-configurator setup --artifacts never
+
+# CI/CD optimized (HTML + JUnit, no videos)
+/e2e-report-configurator setup --format html,junit --artifacts on-failure
 ```
 
 ### `validate` Command
@@ -114,6 +126,56 @@ Before using this skill, ensure:
    ```bash
    git init
    ```
+
+## Multi-Format Reporter Support
+
+The skill supports three reporter formats that can be used in combination:
+
+### Supported Formats
+
+| Format | Type | Output | Use Case |
+|--------|------|--------|----------|
+| **HTML** | Mandatory | `reports/e2e/html/` | Human-readable reports, local debugging |
+| **JSON** | Optional | `reports/e2e/json/results.json` | Data analysis, custom dashboards, metrics |
+| **JUnit** | Optional | `reports/e2e/junit/results.xml` | CI/CD integration, test result visualization |
+
+### Format Combinations
+
+```bash
+# Single format (HTML only - minimum requirement)
+--format html
+
+# Two formats (HTML + JSON)
+--format html,json
+
+# Two formats (HTML + JUnit for CI/CD)
+--format html,junit
+
+# All formats (HTML + JSON + JUnit)
+--format html,json,junit
+```
+
+### Format-Specific Features
+
+**HTML Reporter**:
+- Interactive test results viewer
+- Screenshots and videos embedded
+- Trace viewer integration
+- Filter by test status
+- `open` option: 'always' | 'never' | 'on-failure'
+
+**JSON Reporter**:
+- Machine-readable test results
+- Programmatic analysis
+- Custom dashboard integration
+- Historical trending
+
+**JUnit Reporter**:
+- Standard XML format
+- Native CI/CD platform integration
+- GitHub Actions test reporter
+- GitLab CI test reports
+- Jenkins JUnit plugin
 
 ## Directory Structure
 
