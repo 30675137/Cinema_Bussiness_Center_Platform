@@ -1,0 +1,337 @@
+# TestdataBlueprint Schema Definition
+# Zod-compatible YAML schema for testdata blueprint validation
+# Feature: T004-e2e-testdata-planner
+# Version: 1.0.0
+
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://cinema-platform.example.com/schemas/testdata-blueprint.json
+
+title: TestdataBlueprint
+description: 测试数据蓝图定义，表示带有唯一 testdata_ref 的数据契约
+
+type: object
+required:
+  - id
+  - version
+  - description
+  - schema
+  - strategy
+  - strategyConfig
+  - scope
+  - teardown
+  - createdAt
+  - updatedAt
+
+properties:
+  id:
+    type: string
+    description: 唯一标识符，格式 TD-<ENTITY>-<ID>
+    pattern: ^TD-[A-Z]+-\d{3,}$
+    examples:
+      - TD-ORDER-001
+      - TD-USER-ADMIN
+      - TD-STORE-DOWNTOWN
+
+  version:
+    type: string
+    description: 语义化版本号
+    pattern: ^\d+\.\d+\.\d+$
+    examples:
+      - 1.0.0
+      - 2.1.3
+
+  description:
+    type: string
+    description: 蓝图用途说明
+    minLength: 10
+    maxLength: 500
+    examples:
+      - 标准饮品订单，包含用户、门店和商品信息
+
+  schema:
+    type: object
+    description: Zod-compatible 数据模式定义（JSON Schema Draft 7）
+    additionalProperties: true
+    required:
+      - type
+      - properties
+    properties:
+      type:
+        type: string
+        enum: [object, array]
+      properties:
+        type: object
+        description: 字段定义
+        additionalProperties: true
+      required:
+        type: array
+        description: 必填字段列表
+        items:
+          type: string
+      additionalProperties:
+        type: boolean
+
+  dependencies:
+    type: array
+    description: 依赖的其他 testdata_ref 列表
+    items:
+      type: string
+      pattern: ^TD-[A-Z]+-\d{3,}$
+    uniqueItems: true
+    maxItems: 20
+    default: []
+    examples:
+      - [TD-USER-001, TD-STORE-001]
+
+  strategy:
+    type: string
+    description: 数据供给策略类型
+    enum:
+      - seed
+      - api
+      - db-script
+    examples:
+      - api
+
+  strategyConfig:
+    type: object
+    description: 策略特定配置（根据 strategy 类型验证）
+    oneOf:
+      - $ref: '#/definitions/SeedStrategyConfig'
+      - $ref: '#/definitions/ApiStrategyConfig'
+      - $ref: '#/definitions/DbScriptStrategyConfig'
+
+  environments:
+    type: array
+    description: 适用环境列表，为空表示所有环境
+    items:
+      type: string
+      enum:
+        - ci
+        - staging
+        - production
+        - local
+    uniqueItems: true
+    default: []
+    examples:
+      - [staging, production]
+
+  scope:
+    type: string
+    description: Playwright fixture 作用域
+    enum:
+      - test
+      - worker
+      - global
+    default: test
+    examples:
+      - test
+
+  teardown:
+    type: boolean
+    description: 是否在测试后清理数据
+    default: true
+
+  createdAt:
+    type: string
+    description: 蓝图创建时间（ISO 8601）
+    format: date-time
+    examples:
+      - 2025-12-30T10:00:00Z
+
+  updatedAt:
+    type: string
+    description: 蓝图最后更新时间（ISO 8601）
+    format: date-time
+    examples:
+      - 2025-12-30T10:00:00Z
+
+  metadata:
+    type: object
+    description: 扩展元数据（标签、作者等）
+    additionalProperties: true
+    properties:
+      tags:
+        type: array
+        items:
+          type: string
+      author:
+        type: string
+      priority:
+        type: string
+        enum: [high, medium, low]
+    examples:
+      - tags: [order, beverage]
+        author: test-team
+
+definitions:
+  # Seed 策略配置
+  SeedStrategyConfig:
+    type: object
+    required:
+      - seedFilePath
+      - format
+    properties:
+      seedFilePath:
+        type: string
+        description: 种子文件路径（相对于项目根目录）
+        pattern: ^testdata/seeds/.+\.(json|yaml|yml)$
+        examples:
+          - testdata/seeds/users.json
+      format:
+        type: string
+        description: 文件格式
+        enum: [json, yaml]
+      encoding:
+        type: string
+        description: 文件编码
+        default: utf-8
+        examples:
+          - utf-8
+
+  # API 策略配置
+  ApiStrategyConfig:
+    type: object
+    required:
+      - apiEndpoint
+      - method
+      - authRequired
+    properties:
+      apiEndpoint:
+        type: string
+        description: API 端点路径
+        pattern: ^/
+        examples:
+          - /api/test/orders
+      method:
+        type: string
+        description: HTTP 方法
+        enum: [GET, POST, PUT, PATCH, DELETE]
+        default: POST
+      baseUrl:
+        type: string
+        description: API 基础 URL（默认使用环境配置）
+        format: uri
+        examples:
+          - https://api.staging.example.com
+      authRequired:
+        type: boolean
+        description: 是否需要认证
+        default: true
+      authType:
+        type: string
+        description: 认证类型
+        enum: [bearer, api-key, basic]
+        default: bearer
+      headers:
+        type: object
+        description: 额外请求头
+        additionalProperties:
+          type: string
+        examples:
+          - Content-Type: application/json
+      body:
+        type: object
+        description: 请求体模板（支持变量替换）
+        additionalProperties: true
+      responseMapping:
+        type: object
+        description: 响应字段映射配置
+        additionalProperties:
+          type: string
+        examples:
+          - userId: data.id
+            token: data.accessToken
+
+  # DB-Script 策略配置
+  DbScriptStrategyConfig:
+    type: object
+    required:
+      - dbScriptPath
+      - transactional
+    properties:
+      dbScriptPath:
+        type: string
+        description: SQL 脚本文件路径
+        pattern: ^testdata/scripts/.+\.sql$
+        examples:
+          - testdata/scripts/seed-stores.sql
+      database:
+        type: string
+        description: 目标数据库名称（默认使用主数据库）
+        examples:
+          - main
+      transactional:
+        type: boolean
+        description: 是否使用事务执行
+        default: true
+      outputMapping:
+        type: object
+        description: 脚本输出映射（用于提取插入的 ID）
+        additionalProperties:
+          type: string
+        examples:
+          - storeId: inserted_store_id
+
+# 验证规则（仅文档说明，运行时由 Zod 实现）
+validationRules:
+  - 依赖完整性：所有 dependencies 中引用的 testdata_ref 必须在蓝图目录中存在
+  - 循环依赖检测：依赖图中不得存在循环引用
+  - 依赖深度限制：依赖链深度不超过 10 层
+  - 环境一致性：依赖的蓝图必须支持当前环境
+  - 模式有效性：schema 字段必须是合法的 JSON Schema 对象
+  - 策略配置匹配：strategyConfig 必须包含 strategy 类型要求的所有必填字段
+
+examples:
+  - id: TD-ORDER-001
+    version: 1.0.0
+    description: 标准饮品订单，包含用户、门店和商品信息
+    schema:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: 订单唯一标识符
+        userId:
+          type: string
+          description: 下单用户 ID
+        storeId:
+          type: string
+          description: 门店 ID
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              skuId: { type: string }
+              quantity: { type: number }
+        totalAmount:
+          type: number
+          description: 订单总金额（分）
+      required: [orderId, userId, storeId, items, totalAmount]
+    dependencies:
+      - TD-USER-001
+      - TD-STORE-001
+    strategy: api
+    strategyConfig:
+      apiEndpoint: /api/test/orders
+      method: POST
+      authRequired: true
+      headers:
+        Content-Type: application/json
+      body:
+        userId: "{{TD-USER-001.userId}}"
+        storeId: "{{TD-STORE-001.storeId}}"
+        items:
+          - skuId: SKU-001
+            quantity: 2
+      responseMapping:
+        orderId: data.id
+    environments: [staging, production]
+    scope: test
+    teardown: true
+    createdAt: 2025-12-30T10:00:00Z
+    updatedAt: 2025-12-30T10:00:00Z
+    metadata:
+      tags: [order, beverage]
+      author: test-team
