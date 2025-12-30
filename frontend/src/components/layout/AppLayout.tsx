@@ -88,7 +88,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/mdm-pim/brands',
-          label: 'P001-品牌管理',
+          label: 'B001-品牌管理',
         },
         {
           key: '/mdm-pim/attribute',
@@ -260,15 +260,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       children: [
         {
           key: '/inventory/query',
-          label: 'P003-库存查询',
+          label: 'I003-库存查询',
         },
         {
           key: '/inventory/ledger',
-          label: 'P004-库存台账查看',
+          label: 'I004-库存台账查看',
         },
         {
           key: '/inventory/approvals',
-          label: 'P004-库存调整审批',
+          label: 'I005-库存调整审批',
         },
         
         {

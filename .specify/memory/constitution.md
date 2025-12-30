@@ -1,31 +1,25 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.9.0 → 1.10.0 → 1.11.0 → 1.11.1 -->
+<!-- Version change: 1.12.0 → 1.13.0 -->
 <!-- Modified principles:
-  - 测试驱动开发 (Test-Driven Development) - 移除E2E测试强制要求,改为可选策略 (v1.10.0)
-  - Principle 8: Claude Code Skills 开发规范 - 新增 YAML Frontmatter 强制要求 (v1.11.1)
+  - 一、功能分支绑定 (Feature Branch Binding) - 强化技术基础设施模块(T, F)的编码优先级 (v1.13.0)
 -->
 <!-- Added sections:
-  - Principle 8: Claude Code Skills 开发规范 (Claude Code Skills Development Standards) (v1.11.0)
-  - Principle 8.1: YAML Frontmatter 要求 (强制) (v1.11.1)
+  - 技术基础设施模块强制编码要求 (v1.13.0)
+  - 模块选择优先级规则 (业务功能优先,技术设施同样强制) (v1.13.0)
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (v1.11.1 - 新增 YAML frontmatter 强制要求)
-  ✅ .claude/rules/02-test-driven-development.md (已更新R2.2测试框架说明,标注E2E测试为可选)
-  ✅ .claude/skills/e2e-test-generator/skill.md (已添加 YAML frontmatter)
-  ⚠ .specify/templates/spec-template.md (User Scenarios & Testing章节说明需明确E2E测试为可选)
-  ⚠ .specify/templates/plan-template.md (Constitution Check中保留测试覆盖率检查,但不强制E2E)
-  ⚠ .specify/templates/spec-template.md (T###类spec需包含skill.md/data-model.md/quickstart.md的文档要求 + YAML frontmatter检查)
+  ✅ .specify/memory/constitution.md (v1.13.0 - 强化技术模块编码规则)
+  ✅ .claude/rules/01-branch-spec-binding.md (已更新完整的16模块映射表)
+  ✅ .claude/rules/MODULE_PREFIXES.md (已创建快速参考文档)
+  ✅ frontend/src/components/layout/AppLayout.tsx (已修正错误的模块前缀: P→I库存, P→B品牌)
+  ⚠ .specify/templates/spec-template.md (需更新模块选择优先级说明)
 -->
 <!-- Follow-up TODOs:
-  1. ✅ 已完成: 更新 .claude/rules/02-test-driven-development.md 明确E2E测试为可选(Playwright非强制)
-  2. ✅ 已完成: 为 e2e-test-generator skill.md 添加 YAML frontmatter
-  3. 在代码审查清单中调整测试覆盖率检查,区分必须覆盖(单元测试)和可选覆盖(E2E测试)
-  4. 更新CI/CD流水线配置,E2E测试失败不阻塞发布(可设置为警告)
-  5. 为团队提供E2E测试编写指南,说明在哪些场景下建议编写E2E测试(如关键业务流程、支付流程等)
-  6. 更新 spec-template.md,为 T### 类型的 spec 添加 YAML frontmatter 检查要求
-  7. 审查所有现有 skills,确保都包含正确的 YAML frontmatter
-  8. 创建 Claude Code Skills 开发最佳实践文档,提供 YAML frontmatter 示例和模板
+  1. ✅ 更新 AppLayout.tsx 菜单配置中的错误模块前缀 (已完成: I003, I004, I005, B001)
+  2. 检查现有代码中 @spec 标识的模块前缀是否正确
+  3. 更新 spec-template.md 添加模块选择优先级规则
+  4. 在代码审查清单中强调技术基础设施模块(T, F)的编码强制性
 -->
 
 # 影院商品管理中台宪法
@@ -37,26 +31,95 @@
 每个功能开发必须严格绑定到唯一的规格标识符(specId)。分支命名采用 `feat/<specId>-<slug>` 格式,其中 specId 由**模块字母+三位数字**组成(如 S001、P012、A005)。规格文档存放于 `specs/<specId>-<slug>/spec.md`。系统通过 `.specify/active_spec.txt` 维护当前激活规格的引用。当前 git 分支名中的 specId 必须等于 active_spec 指向路径中的 specId,AI 只允许在"当前分支 + active_spec"范围内修改内容。任何不匹配必须先修正绑定(改分支名或 active_spec),再继续实现。
 
 **规格编号格式**: `X###-<slug>`,其中:
-- `X`: 单个大写字母,表示功能所属的业务模块(见下方模块映射表)
+- `X`: 单个大写字母,表示功能所属的模块(见下方模块映射表)
 - `###`: 三位数字,在模块内递增编号(001-999)
 - `<slug>`: 功能简短描述,使用小写字母和连字符,2-4个单词
 
-**模块字母映射**:
-- **S**: 门店/影厅管理 (Store/Hall Management)
-- **P**: 商品/库存管理 (Product/Inventory Management)
-- **B**: 品牌/分类管理 (Brand/Category Management)
-- **A**: 活动/场景包管理 (Activity/Scenario Package Management)
-- **U**: 用户/预订管理 (User/Reservation Management)
-- **O**: 订单管理 (Order Management - 商品订单)
-- **T**: 工具/基础设施 (Tool/Infrastructure)
-- **F**: 前端基础 (Frontend Infrastructure)
+**模块选择优先级原则**:
+1. **业务功能优先**: 如果开发的是业务功能(如库存管理、订单处理、门店配置),必须使用对应的业务模块字母(A, B, C, D, E, I, M, N, O, P, R, S, U, Y)
+2. **技术基础设施同样强制**: 如果开发的是技术基础设施(如 Claude Code skills、脚本工具、UI 组件库、技术优化),**必须**使用技术模块字母(T, F)
+3. **禁止混用**: 不得将业务功能编码为技术模块,也不得将技术基础设施编码为业务模块
 
-**示例**:
-- `S001-store-crud` - 门店CRUD功能
-- `P012-inventory-management` - 库存管理
-- `A005-scenario-package-tabs` - 场景包多标签页编辑
+**模块字母映射** (完整版):
 
-**基本原理**: 确保每个功能都有明确的规格定义和唯一的开发分支,通过模块字母前缀清晰区分功能所属的业务域,避免功能冲突和开发混乱,保证代码变更的可追溯性和规格的一致性。模块化编号便于快速识别功能归属,支持按模块并行开发和独立演进。
+#### 业务功能模块
+
+| 字母 | 模块名称 | 英文全称 | 适用范围 | 示例 |
+|------|---------|---------|---------|------|
+| **A** | 活动/场景包管理 | Activity/Scenario Package Management | 场景包、套餐、活动配置 | A005-scenario-package |
+| **B** | 品牌/分类/BOM管理 | Brand/Category/BOM Management | 品牌、类目、物料配方 | B001-brand-management |
+| **C** | 配置/基础设置 | Config/Settings | 组织、字典、参数配置 | C001-organization-config |
+| **D** | 工作台/首页 | Dashboard | 首页、工作台、概览 | D001-dashboard-overview |
+| **E** | 报表/数据分析 | rEport/Analytics | 运营报表、指标看板 | E001-sales-report |
+| **I** | 库存管理 | Inventory Management | 库存查询、调整、盘点 | I003-inventory-query |
+| **M** | 物料/BOM管理 | Materials/BOM Management | 原料库、配方、成本 | M001-material-master |
+| **N** | 采购/入库管理 | iNbound/Procurement | 采购订单、收货入库 | N001-purchase-order |
+| **O** | 订单管理 | Order Management | 商品订单、饮品订单 | O003-beverage-order |
+| **P** | 商品管理 | Product Management | SPU/SKU、商品主数据 | P001-spu-management |
+| **R** | 价格体系管理 | pRicing Management | 价目表、价格规则 | R001-price-list |
+| **S** | 门店/影厅/档期管理 | Store/Hall/Schedule Management | 门店、影厅、排期 | S014-store-management |
+| **U** | 用户/预订管理 | User/Reservation Management | 用户、预约、核销 | U001-reservation-orders |
+| **Y** | 系统管理 | sYstem Management | 用户、权限、审计日志 | Y001-user-management |
+
+#### 技术基础设施模块 (强制编码)
+
+| 字母 | 模块名称 | 英文全称 | 适用范围 | 示例 |
+|------|---------|---------|---------|------|
+| **T** | 工具/基础设施 | Tool/Infrastructure | **Claude Code skills**、E2E 测试工具、脚本开发、技术优化、自动化工具 | T002-e2e-test-generator, T005-test-scenario-author |
+| **F** | 前端基础 | Frontend Infrastructure | UI 组件库、布局系统、样式框架、前端工程化工具 | F001-ui-components, F002-design-system |
+
+**技术基础设施模块编码要求**:
+- **T 模块 (Tool/Infrastructure)**: 所有 Claude Code skills 开发、脚本编写、技术优化项目**必须**使用 `T###` 编码
+- **F 模块 (Frontend Infrastructure)**: 所有前端基础设施开发(UI 库、设计系统、前端工具)**必须**使用 `F###` 编码
+- **强制性**: 技术基础设施模块的编码要求与业务功能模块同等强制,不得省略或使用其他编码方式
+
+**模块选择决策树**:
+
+1. **首先判断开发类型**:
+   - 是否为 **Claude Code skill** 开发? → 使用 `T###` (Tool/Infrastructure)
+   - 是否为 **脚本工具、技术优化、自动化工具**? → 使用 `T###` (Tool/Infrastructure)
+   - 是否为 **前端基础设施**(UI 组件库、设计系统、工程化工具)? → 使用 `F###` (Frontend Infrastructure)
+   - 是否为 **业务功能**? → 继续下一步
+
+2. **业务功能模块选择**:
+   - 库存相关 → `I###` (Inventory)
+   - 商品管理 → `P###` (Product)
+   - 品牌/分类 → `B###` (Brand)
+   - 门店/影厅 → `S###` (Store)
+   - 订单管理 → `O###` (Order)
+   - 用户/预订 → `U###` (User)
+   - 场景包/活动 → `A###` (Activity)
+   - [其他业务模块参照映射表]
+
+3. **避免冲突**:
+   - ✅ 正确: 库存功能使用 `I###` (Inventory),商品功能使用 `P###` (Product)
+   - ✅ 正确: Claude Code skill 使用 `T002-e2e-test-generator`
+   - ❌ 错误: 库存功能使用 `P###` (会与商品管理混淆)
+   - ❌ 错误: skill 开发不使用 `T###` 编码
+
+4. **编号分配**: 同一模块内编号递增(如 I001, I002, I003; T001, T002, T003)
+
+5. **跨模块功能**: 选择主要业务领域的模块前缀
+
+**编码示例**:
+
+业务功能模块:
+- `S001-store-crud` - 门店 CRUD 功能 (Store 模块)
+- `I003-inventory-query` - 库存查询 (Inventory 模块)
+- `P001-spu-management` - SPU 管理 (Product 模块)
+- `B001-brand-management` - 品牌管理 (Brand 模块)
+- `A005-scenario-package-tabs` - 场景包多标签页编辑 (Activity 模块)
+- `O003-beverage-order` - 饮品订单管理 (Order 模块)
+
+技术基础设施模块:
+- `T001-e2e-scenario-author` - E2E 测试场景生成 skill (Tool 模块)
+- `T002-e2e-test-generator` - E2E 测试脚本生成器 (Tool 模块)
+- `T005-test-scenario-author` - 测试场景编写工具 (Tool 模块)
+- `T006-e2e-report-configurator` - E2E 报告配置器 (Tool 模块)
+- `F001-ui-components` - UI 组件库开发 (Frontend 模块)
+- `F002-design-system` - 设计系统实现 (Frontend 模块)
+
+**基本原理**: 确保每个功能都有明确的规格定义和唯一的开发分支,通过模块字母前缀清晰区分功能所属的业务域或技术领域,避免功能冲突和开发混乱,保证代码变更的可追溯性和规格的一致性。模块化编号便于快速识别功能归属,支持按模块并行开发和独立演进。扩展的16个模块字母覆盖了系统的全部业务领域(14个)和技术基础设施(2个),消除了模块归属的歧义性,为大型项目的长期演进提供了清晰的组织结构。**技术基础设施模块(T, F)与业务功能模块享有同等的编码强制性**,确保技术工具、Claude Code skills、前端基础设施开发同样具备完整的规格文档和可追溯性。
 
 ### 二、代码归属标识 (Code Attribution Marking)
 
@@ -71,7 +134,7 @@
    - 注释必须放在文件开头(license 头之后,import 语句之前)
 
 2. **标识内容**:
-   - 必须包含完整的 specId(如 `P003-inventory-query`)
+   - 必须包含完整的 specId(如 `I003-inventory-query`)
    - 可选:添加简短的功能描述
    - 可选:添加相关规格文档路径
 
@@ -79,9 +142,9 @@
 
 ```typescript
 /**
- * @spec P003-inventory-query
+ * @spec I003-inventory-query
  * 库存查询功能 - 商品库存列表组件
- * Spec: specs/P003-inventory-query/spec.md
+ * Spec: specs/I003-inventory-query/spec.md
  */
 import React from 'react';
 // ... rest of the code
@@ -100,7 +163,7 @@ public class StoreAssociationService {
 ```
 
 4. **共享代码处理**:
-   - 对于被多个 spec 共享的工具类/组件,可标识多个 spec:`@spec P003,P004`
+   - 对于被多个 spec 共享的工具类/组件,可标识多个 spec:`@spec I003,I004`
    - 对于基础设施代码(不属于特定功能),使用 `@spec T###` 或 `@spec F###`
    - 对于第三方依赖和框架代码,无需添加标识
 
@@ -483,7 +546,7 @@ Java 代码是否具备足够的注释可读性。
 
 **文档位置**:
 - 路径格式:`specs/<specId>-<slug>/business-clarification.md`
-- 示例:`specs/P004-inventory-adjustment/business-clarification.md`
+- 示例:`specs/I004-inventory-adjustment/business-clarification.md`
 
 **文档内容要求**:
 
@@ -512,73 +575,6 @@ Java 代码是否具备足够的注释可读性。
    - 说明业务操作的限制和约束条件
    - 示例:审批阈值的配置方式、权限角色的划分
 
-**文档格式示例**:
-
-```markdown
-# 业务概念澄清：库存调整管理 (P004-inventory-adjustment)
-
-## 业务术语定义
-
-### 盘盈 (Surplus)
-**定义**: 实际库存数量多于系统记录数量的情况
-**使用场景**: 定期盘点发现实际库存超出系统记录
-**示例**: 系统记录50件,实际盘点60件,差额10件为盘盈
-
-### 盘亏 (Shortage)
-**定义**: 实际库存数量少于系统记录数量的情况
-**使用场景**: 定期盘点发现实际库存少于系统记录
-**示例**: 系统记录50件,实际盘点40件,差额10件为盘亏
-
-### 报损 (Damage)
-**定义**: 因货物损坏、过期等原因导致的库存减少
-**使用场景**: 货物质量问题、保质期过期、意外损坏
-**区别**: 报损与盘亏的区别在于原因明确且不可避免
-
-## 业务规则澄清
-
-### 审批阈值规则
-**规则定义**: 调整金额 = 调整数量 × SKU单价 ≥ 1000元时触发审批
-**计算方法**: 取调整数量的绝对值进行计算
-**边界情况**: 金额刚好等于1000元时,触发审批流程
-
-### 审批权限规则
-**角色定义**:
-- 库存管理员: 可录入调整、撤回待审批调整
-- 运营总监: 可审批通过/拒绝调整
-- 系统管理员: 拥有所有权限
-
-## 业务流程说明
-
-### 库存调整审批流程
-1. 库存管理员录入调整信息
-2. 系统计算调整金额
-3. 如果金额 >= 1000元,进入待审批状态;否则立即生效
-4. 运营总监审批通过后,更新库存并生成流水
-5. 审批拒绝后,库存不变,记录拒绝原因
-
-## 边界情况与例外
-
-### 调整后库存为负
-**处理策略**: 系统拒绝提交,提示"调整后库存不能为负数"
-**示例**: 当前库存10件,盘亏调整15件,系统阻止提交
-
-### 并发调整
-**处理策略**: 使用乐观锁机制,后提交者收到"已被他人修改"提示
-**建议**: 刷新后重新录入调整
-
-## 业务假设与约束
-
-### 假设
-- SKU单价数据已存在于SKU主数据中
-- 审批阈值当前版本为固定值1000元
-- 审批流程为单级审批(仅运营总监)
-
-### 约束
-- 调整数量必须为正整数
-- 调整原因为必填字段
-- 待审批状态的调整仅允许申请人撤回
-```
-
 **强制要求**:
 - 所有新创建的 spec 必须包含 `business-clarification.md` 文档
 - 文档内容必须在功能开发前完成,并在规格评审中审核
@@ -595,7 +591,7 @@ Java 代码是否具备足够的注释可读性。
 
 ### 分支管理策略 (Branch Management Strategy)
 
-采用功能分支开发模式,每个功能对应独立的开发分支。分支命名严格遵循 `feat/<specId>-<slug>` 格式,其中 specId 使用新的**模块字母+三位数字**格式(如 S001、P012)。开发完成后通过 Pull Request 进行代码审查,审查通过后合并到主分支。禁止直接在主分支进行开发,确保代码质量和变更的可追溯性。
+采用功能分支开发模式,每个功能对应独立的开发分支。分支命名严格遵循 `feat/<specId>-<slug>` 格式,其中 specId 使用新的**模块字母+三位数字**格式(如 S001、P012、I003)。开发完成后通过 Pull Request 进行代码审查,审查通过后合并到主分支。禁止直接在主分支进行开发,确保代码质量和变更的可追溯性。
 
 ### 持续集成与质量门禁 (Continuous Integration & Quality Gates)
 
@@ -637,4 +633,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.11.1 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-30
+**版本**: 1.13.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31

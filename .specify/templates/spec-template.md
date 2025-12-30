@@ -8,10 +8,25 @@
 <!--
   规格编号格式说明 (Spec ID Format):
   X### 其中:
-  - X: 模块字母 (S=门店/影厅, P=商品/库存, B=品牌/分类, A=活动/场景包, U=用户/预订, T=工具/基础设施, F=前端基础)
+  - X: 模块字母 (见下方完整映射表)
   - ###: 模块内递增的三位数字 (001-999)
 
-  示例: S001-store-crud, P012-inventory-management, A005-scenario-package-tabs
+  模块选择优先级:
+  1. 业务功能优先: 库存→I, 商品→P, 品牌→B, 门店→S, 订单→O, 用户→U, 场景包→A, 等
+  2. 技术基础设施同样强制: Claude Code skills/脚本工具→T, 前端基础设施→F
+  3. 禁止混用: 业务功能不得使用技术模块编码,技术设施不得使用业务模块编码
+
+  完整模块映射表:
+  - 业务功能模块 (14个): A, B, C, D, E, I, M, N, O, P, R, S, U, Y
+    - A=活动/场景包, B=品牌/分类, C=配置, D=工作台, E=报表, I=库存, M=物料/BOM
+    - N=采购/入库, O=订单, P=商品, R=价格, S=门店/影厅, U=用户/预订, Y=系统管理
+  - 技术基础设施模块 (2个): T, F
+    - T=工具/基础设施 (Claude Code skills、脚本、技术优化)
+    - F=前端基础 (UI组件库、设计系统、工程化工具)
+
+  示例:
+  - 业务功能: S001-store-crud, I003-inventory-query, P001-spu-management
+  - 技术基础设施: T002-e2e-test-generator, F001-ui-components
 -->
 
 ## User Scenarios & Testing *(mandatory)*
