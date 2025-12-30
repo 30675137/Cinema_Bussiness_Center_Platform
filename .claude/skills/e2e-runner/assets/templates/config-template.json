@@ -1,0 +1,40 @@
+{
+  "$schema": "../../contracts/E2ERunConfig.schema.json",
+
+  "_comment_env_profile": "Environment identifier (lowercase alphanumeric with hyphens)",
+  "env_profile": "saas-staging",
+
+  "_comment_baseURL": "Base URL for the target environment (must start with http:// or https://)",
+  "baseURL": "https://staging.example.com",
+
+  "_comment_credentials_ref": "(Optional) Path to credentials JSON file for secure authentication",
+  "credentials_ref": "credentials/saas-staging.json",
+
+  "_comment_retries": "(Optional) Number of times to retry failed tests (0-5, default: 0)",
+  "retries": 2,
+
+  "_comment_workers": "(Optional) Number of parallel workers (default: CPU cores)",
+  "workers": 4,
+
+  "_comment_timeout": "(Optional) Test timeout in milliseconds (min: 1000, default: 30000)",
+  "timeout": 30000,
+
+  "_comment_report_output_dir": "Directory path for test reports (must be unique per run)",
+  "report_output_dir": "./reports/run-2025-12-30-14-00",
+
+  "_comment_testMatch": "(Optional) Test file pattern (default: 'scenarios/**/*.spec.ts')",
+  "testMatch": "scenarios/**/*.spec.ts",
+
+  "_comment_projects": "(Optional) Playwright projects for multi-browser testing (Chrome-only in MVP)",
+  "projects": [
+    {
+      "name": "chromium",
+      "use": {
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        }
+      }
+    }
+  ]
+}

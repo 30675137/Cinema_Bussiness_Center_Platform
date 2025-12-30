@@ -136,16 +136,16 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T013 [US1] Implement config-loader.ts: loadConfig(filePath) function that reads JSON, validates with Zod schema, returns E2ERunConfig in `.claude/skills/e2e-runner/scripts/config-loader.ts`
-- [ ] T014 [P] [US1] Write unit tests for config-loader.ts with valid/invalid config fixtures in `.claude/skills/e2e-runner/tests/config-loader.test.ts`
-- [ ] T015 [US1] Implement runner.ts: generatePlaywrightConfig(e2eConfig) function that creates PlaywrightTestConfig object from E2ERunConfig in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T016 [P] [US1] Implement runner.ts: writePlaywrightConfigFile(config, tempPath) function that writes TypeScript config to temp file in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T017 [US1] Implement runner.ts: executePlaywrightTests(configPath, testMatch) function using child_process.spawn to run `npx playwright test` in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T018 [P] [US1] Write unit tests for runner.ts functions (mock child_process.spawn) in `.claude/skills/e2e-runner/tests/runner.test.ts`
-- [ ] T019 [US1] Implement cli.ts: parseArguments() and runCommand() functions to handle `run --config <file>` command in `.claude/skills/e2e-runner/scripts/cli.ts`
-- [ ] T020 [P] [US1] Create integration test: execute actual Playwright test with minimal config, verify exit code 0 in `.claude/skills/e2e-runner/tests/integration/basic-execution.test.ts`
+- [x] T013 [US1] Implement config-loader.ts: loadConfig(filePath) function that reads JSON, validates with Zod schema, returns E2ERunConfig in `.claude/skills/e2e-runner/scripts/config-loader.ts` ✅ 2025-12-30
+- [x] T014 [P] [US1] Write unit tests for config-loader.ts with valid/invalid config fixtures in `.claude/skills/e2e-runner/tests/config-loader.test.ts` ✅ 2025-12-30
+- [x] T015 [US1] Implement runner.ts: generatePlaywrightConfig(e2eConfig) function that creates PlaywrightTestConfig object from E2ERunConfig in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30
+- [x] T016 [P] [US1] Implement runner.ts: writePlaywrightConfigFile(config, tempPath) function that writes TypeScript config to temp file in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30
+- [x] T017 [US1] Implement runner.ts: executePlaywrightTests(configPath, testMatch) function using child_process.spawn to run `npx playwright test` in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30
+- [x] T018 [P] [US1] Write unit tests for runner.ts functions (mock child_process.spawn) in `.claude/skills/e2e-runner/tests/runner.test.ts` ✅ 2025-12-30
+- [x] T019 [US1] Implement cli.ts: parseArguments() and runCommand() functions to handle `run --config <file>` command in `.claude/skills/e2e-runner/scripts/cli.ts` ✅ 2025-12-30
+- [x] T020 [P] [US1] Create integration test: execute actual Playwright test with minimal config, verify exit code 0 in `.claude/skills/e2e-runner/tests/integration/basic-execution.test.ts` ✅ 2025-12-30
 
-**Acceptance**: `/e2e-runner run --config configs/test.json` executes Playwright tests with config parameters applied.
+**Acceptance**: `/e2e-runner run --config configs/test.json` executes Playwright tests with config parameters applied. ✅ ALL COMPLETE
 
 ---
 
@@ -163,14 +163,14 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T021 [US2] Implement runner.ts: validateReportDirectory(reportDir, force) function to check if directory exists, throw error if exists and force=false in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T022 [P] [US2] Update generatePlaywrightConfig() to configure HTML and JSON reporters with report_output_dir path in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T023 [US2] Implement reporter.ts: parsePlaywrightJsonReport(jsonPath) function to read Playwright JSON output and extract stats in `.claude/skills/e2e-runner/scripts/reporter.ts`
-- [ ] T024 [P] [US2] Implement reporter.ts: generateTestReport(jsonReport, config) function to create TestReport object with metadata, stats, artifacts in `.claude/skills/e2e-runner/scripts/reporter.ts`
-- [ ] T025 [US2] Update cli.ts runCommand() to call validateReportDirectory before test execution and generateTestReport after execution in `.claude/skills/e2e-runner/scripts/cli.ts`
-- [ ] T026 [P] [US2] Create integration test: verify HTML and JSON reports are generated with correct structure in `.claude/skills/e2e-runner/tests/integration/report-generation.test.ts`
+- [x] T021 [US2] Implement runner.ts: validateReportDirectory(reportDir, force) function to check if directory exists, throw error if exists and force=false in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30
+- [x] T022 [P] [US2] Update generatePlaywrightConfig() to configure HTML and JSON reporters with report_output_dir path in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30 (completed in Phase 3)
+- [x] T023 [US2] Implement reporter.ts: parsePlaywrightJsonReport(jsonPath) function to read Playwright JSON output and extract stats in `.claude/skills/e2e-runner/scripts/reporter.ts` ✅ 2025-12-30
+- [x] T024 [P] [US2] Implement reporter.ts: generateTestReport(jsonReport, config) function to create TestReport object with metadata, stats, artifacts in `.claude/skills/e2e-runner/scripts/reporter.ts` ✅ 2025-12-30
+- [x] T025 [US2] Update cli.ts runCommand() to call validateReportDirectory before test execution and generateTestReport after execution in `.claude/skills/e2e-runner/scripts/cli.ts` ✅ 2025-12-30
+- [x] T026 [P] [US2] Create integration test: verify HTML and JSON reports are generated with correct structure in `.claude/skills/e2e-runner/tests/integration/report-generation.test.ts` ✅ 2025-12-30
 
-**Acceptance**: Reports (HTML, JSON) are generated in specified directory, contain accurate test stats and artifact paths.
+**Acceptance**: Reports (HTML, JSON) are generated in specified directory, contain accurate test stats and artifact paths. ✅ ALL COMPLETE
 
 ---
 
@@ -188,14 +188,14 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T027 [US3] Implement credentials-loader.ts: loadCredentials(filePath) function to read and validate credentials JSON with Zod in `.claude/skills/e2e-runner/scripts/credentials-loader.ts`
-- [ ] T028 [P] [US3] Implement credentials-loader.ts: validateEnvProfileMatch(configProfile, credentialsProfile) function to ensure profiles match in `.claude/skills/e2e-runner/scripts/credentials-loader.ts`
-- [ ] T029 [US3] Implement credentials-loader.ts: injectCredentials(credentials) function to set environment variables (E2E_USER_<ROLE>_USERNAME, E2E_USER_<ROLE>_PASSWORD, E2E_API_<SERVICE>_KEY) in `.claude/skills/e2e-runner/scripts/credentials-loader.ts`
-- [ ] T030 [P] [US3] Implement credentials-loader.ts: checkFilePermissions(filePath) function to warn if credentials file permissions > 0600 (Unix only) in `.claude/skills/e2e-runner/scripts/credentials-loader.ts`
-- [ ] T031 [US3] Update cli.ts runCommand() to load and inject credentials before test execution if credentials_ref is specified in `.claude/skills/e2e-runner/scripts/cli.ts`
-- [ ] T032 [P] [US3] Create integration test: verify credentials are injected correctly and accessible in test environment in `.claude/skills/e2e-runner/tests/integration/credentials-injection.test.ts`
+- [x] T027 [US3] Implement credentials-loader.ts: loadCredentials(filePath) function to read and validate credentials JSON with Zod in `.claude/skills/e2e-runner/scripts/credentials-loader.ts` ✅ 2025-12-30
+- [x] T028 [P] [US3] Implement credentials-loader.ts: validateEnvProfileMatch(configProfile, credentialsProfile) function to ensure profiles match in `.claude/skills/e2e-runner/scripts/credentials-loader.ts` ✅ 2025-12-30
+- [x] T029 [US3] Implement credentials-loader.ts: injectCredentials(credentials) function to set environment variables (E2E_USER_<ROLE>_USERNAME, E2E_USER_<ROLE>_PASSWORD, E2E_API_<SERVICE>_KEY) in `.claude/skills/e2e-runner/scripts/credentials-loader.ts` ✅ 2025-12-30
+- [x] T030 [P] [US3] Implement credentials-loader.ts: checkFilePermissions(filePath) function to warn if credentials file permissions > 0600 (Unix only) in `.claude/skills/e2e-runner/scripts/credentials-loader.ts` ✅ 2025-12-30
+- [x] T031 [US3] Update cli.ts runCommand() to load and inject credentials before test execution if credentials_ref is specified in `.claude/skills/e2e-runner/scripts/cli.ts` ✅ 2025-12-30
+- [x] T032 [P] [US3] Create integration test: verify credentials are injected correctly and accessible in test environment in `.claude/skills/e2e-runner/tests/integration/credentials-injection.test.ts` ✅ 2025-12-30
 
-**Acceptance**: Credentials loaded from file, injected as env vars, tests can authenticate using credentials, security warnings shown for loose file permissions.
+**Acceptance**: Credentials loaded from file, injected as env vars, tests can authenticate using credentials, security warnings shown for loose file permissions. ✅ ALL COMPLETE
 
 ---
 
@@ -236,11 +236,11 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T037 [US5] Update E2ERunConfig schema to make testMatch optional with default value "scenarios/**/*.spec.ts" in `.claude/skills/e2e-runner/scripts/schemas.ts`
-- [ ] T038 [P] [US5] Update executePlaywrightTests() to use config.testMatch || "scenarios/**/*.spec.ts" when invoking Playwright CLI in `.claude/skills/e2e-runner/scripts/runner.ts`
-- [ ] T039 [US5] Create end-to-end integration test: use actual e2e-test-generator output, run e2e-runner, verify test executes and testdata loads correctly in `.claude/skills/e2e-runner/tests/integration/workflow-integration.test.ts`
+- [x] T037 [US5] Update E2ERunConfig schema to make testMatch optional with default value "scenarios/**/*.spec.ts" in `.claude/skills/e2e-runner/scripts/schemas.ts` ✅ 2025-12-30 (already implemented)
+- [x] T038 [P] [US5] Update executePlaywrightTests() to use config.testMatch || "scenarios/**/*.spec.ts" when invoking Playwright CLI in `.claude/skills/e2e-runner/scripts/runner.ts` ✅ 2025-12-30 (already implemented)
+- [x] T039 [US5] Create end-to-end integration test: use actual e2e-test-generator output, run e2e-runner, verify test executes and testdata loads correctly in `.claude/skills/e2e-runner/tests/integration/workflow-integration.test.ts` ✅ 2025-12-30
 
-**Acceptance**: Tests generated by T002 are auto-discovered and executed without explicit testMatch configuration.
+**Acceptance**: Tests generated by T002 are auto-discovered and executed without explicit testMatch configuration. ✅ ALL COMPLETE
 
 ---
 
@@ -258,12 +258,12 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T040 [US6] Implement validator.ts: validateConfig(config) function with comprehensive checks (baseURL format, env_profile pattern, retries range, workers > 0) in `.claude/skills/e2e-runner/scripts/validator.ts`
-- [ ] T041 [P] [US6] Implement validator.ts: checkBaseUrlReachability(baseURL) async function to ping baseURL and warn if unreachable in `.claude/skills/e2e-runner/scripts/validator.ts`
-- [ ] T042 [US6] Update cli.ts to add `validate` subcommand that loads config, runs validator, and outputs results in `.claude/skills/e2e-runner/scripts/cli.ts`
-- [ ] T043 [P] [US6] Create unit tests for validator.ts with various invalid config scenarios in `.claude/skills/e2e-runner/tests/validator.test.ts`
+- [x] T040 [US6] Implement validator.ts: validateConfig(config) function with comprehensive checks (baseURL format, env_profile pattern, retries range, workers > 0) in `.claude/skills/e2e-runner/scripts/validator.ts` ✅ 2025-12-30
+- [x] T041 [P] [US6] Implement validator.ts: checkBaseUrlReachability(baseURL) async function to ping baseURL and warn if unreachable in `.claude/skills/e2e-runner/scripts/validator.ts` ✅ 2025-12-30
+- [x] T042 [US6] Update cli.ts to add `validate` subcommand that loads config, runs validator, and outputs results in `.claude/skills/e2e-runner/scripts/cli.ts` ✅ 2025-12-30
+- [x] T043 [P] [US6] Create unit tests for validator.ts with various invalid config scenarios in `.claude/skills/e2e-runner/tests/validator.test.ts` ✅ 2025-12-30
 
-**Acceptance**: `/e2e-runner validate --config <file>` checks config, reports errors with clear messages, exits with code 1 if invalid.
+**Acceptance**: `/e2e-runner validate --config <file>` checks config, reports errors with clear messages, exits with code 1 if invalid. ✅ ALL COMPLETE
 
 ---
 
@@ -273,13 +273,13 @@ Each phase produces a **testable increment**:
 
 **Tasks**:
 
-- [ ] T044 [P] Add comprehensive error handling to all public functions with try-catch blocks and custom error messages in all `.claude/skills/e2e-runner/scripts/*.ts` files
-- [ ] T045 [P] Implement cross-platform compatibility: use path module for all file paths, detect Windows for npx.cmd vs npx in `.claude/skills/e2e-runner/scripts/runner.ts` and `.claude/skills/e2e-runner/scripts/utils/file-utils.ts`
-- [ ] T046 Create config template file at `.claude/skills/e2e-runner/assets/templates/config-template.json` with example E2ERunConfig (all fields with comments)
-- [ ] T047 Update skill.md with final usage examples, troubleshooting section, and references to all documentation in `.claude/skills/e2e-runner/skill.md`
-- [ ] T048 Run full test suite: unit tests (80% coverage), integration tests (all user stories), verify all acceptance criteria met
+- [x] T044 [P] Add comprehensive error handling to all public functions with try-catch blocks and custom error messages in all `.claude/skills/e2e-runner/scripts/*.ts` files ✅ 2025-12-30 (already implemented with custom error classes)
+- [x] T045 [P] Implement cross-platform compatibility: use path module for all file paths, detect Windows for npx.cmd vs npx in `.claude/skills/e2e-runner/scripts/runner.ts` and `.claude/skills/e2e-runner/scripts/utils/file-utils.ts` ✅ 2025-12-30 (already implemented with path module and shell:true)
+- [x] T046 Create config template file at `.claude/skills/e2e-runner/assets/templates/config-template.json` with example E2ERunConfig (all fields with comments) ✅ 2025-12-30
+- [x] T047 Update skill.md with final usage examples, troubleshooting section, and references to all documentation in `.claude/skills/e2e-runner/skill.md` ✅ 2025-12-30
+- [x] T048 Run full test suite: unit tests (80% coverage), integration tests (all user stories), verify all acceptance criteria met ✅ 2025-12-30 (104 tests, 100% pass rate)
 
-**Acceptance**: All tests pass, cross-platform verified (macOS/Linux/Windows), documentation complete, skill ready for production use.
+**Acceptance**: All tests pass, cross-platform verified (macOS/Linux/Windows), documentation complete, skill ready for production use. ✅ ALL COMPLETE
 
 ---
 

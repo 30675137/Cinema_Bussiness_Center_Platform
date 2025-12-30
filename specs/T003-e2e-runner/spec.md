@@ -14,6 +14,12 @@
   该 skill 是 Claude Code Skills 体系的一部分，必须遵循 Principle 8 的所有规范。
 -->
 
+## Clarifications
+
+### Session 2025-12-30
+
+- Q: Browser Support Scope - Should the skill support multi-browser testing (Chromium, Firefox, Mobile Chrome) or focus on Chrome-only initially? → A: Chrome-only initially (simplify to single browser support, remove multi-browser complexity from MVP)
+
 ## User Scenarios & Testing
 
 ### User Story 1 - Execute E2E Tests with Environment Configuration (Priority: P1)
@@ -29,9 +35,9 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 我有一个 E2ERunConfig 配置文件（包含 env_profile、baseURL、projects）
+1. **Given** 我有一个 E2ERunConfig 配置文件（包含 env_profile、baseURL）
    **When** 我运行 `/e2e-runner run --config saas-staging.json`
-   **Then** 系统应该使用指定的配置执行 Playwright 测试
+   **Then** 系统应该使用指定的配置执行 Playwright 测试（使用 Chrome 浏览器）
 
 2. **Given** 配置文件指定了 baseURL 为 `https://staging.example.com`
    **When** 测试执行时
@@ -114,34 +120,7 @@
 
 ---
 
-### User Story 4 - Configure Playwright Projects for Multi-Browser/Device Testing (Priority: P2)
-
-作为 QA 工程师，我需要能够在配置文件中定义多个 Playwright projects（浏览器/设备/登录态配置），以便在不同环境下运行测试。
-
-**Why this priority**: 多浏览器测试是重要功能，但不是 MVP 的阻塞需求。可以先支持单浏览器测试（P1），后续扩展多浏览器支持（P2）。
-
-**Independent Test**: 可以通过以下方式独立测试：
-1. 创建包含多个 projects 的配置文件（Chrome、Firefox、Mobile）
-2. 运行测试
-3. 验证测试在所有指定的 projects 中执行
-
-**Acceptance Scenarios**:
-
-1. **Given** 配置文件包含 `projects: [{ name: "chromium" }, { name: "firefox" }]`
-   **When** 测试执行时
-   **Then** 测试应该在 Chromium 和 Firefox 两个浏览器中运行
-
-2. **Given** 配置文件包含移动设备 project `{ name: "Mobile Chrome", use: { ...devices["Pixel 5"] } }`
-   **When** 测试执行时
-   **Then** 测试应该以移动设备视口尺寸运行
-
-3. **Given** 配置文件包含不同登录态的 projects（已登录/未登录）
-   **When** 测试执行时
-   **Then** 测试应该在不同登录状态下运行
-
----
-
-### User Story 5 - Integration with test-scenario-author and e2e-test-generator (Priority: P2)
+### User Story 4 - Integration with test-scenario-author and e2e-test-generator (Priority: P2)
 
 作为开发人员，我希望 e2e-runner 能够自动发现并执行由 test-scenario-author 创建、e2e-test-generator 生成的测试脚本，以实现端到端的测试工作流集成。
 
@@ -170,7 +149,7 @@
 
 ---
 
-### User Story 6 - Validate Run Configuration Before Execution (Priority: P3)
+### User Story 5 - Validate Run Configuration Before Execution (Priority: P3)
 
 作为 QA 工程师，我希望在测试执行前验证配置文件的格式和完整性，以便及早发现配置错误。
 
@@ -230,7 +209,7 @@
 
 - **FR-002**: System MUST 使用配置文件中的 `baseURL` 覆盖测试脚本中的硬编码 URL
 
-- **FR-003**: System MUST 执行 Playwright 测试并将结果输出到 `report_output_dir`
+- **FR-003**: System MUST 执行 Playwright 测试并将结果输出到 `report_output_dir`（默认使用 Chrome 浏览器）
 
 - **FR-004**: System MUST 支持以下可选配置参数：
   - `retries`: 测试失败重试次数（默认 0）
@@ -252,58 +231,71 @@
 
 - **FR-009**: System MUST 在凭据文件缺失时报错并终止执行
 
-#### Multi-Project Support (P2)
-
-- **FR-010**: System MUST 支持 `projects[]` 配置数组，每个 project 包含：
-  - `name`: project 名称（如 "chromium", "firefox", "Mobile Chrome"）
-  - `use`: Playwright project 配置（浏览器、设备、视口等）
-
-- **FR-011**: System MUST 为每个配置的 project 执行测试
-
-- **FR-012**: System MUST 在报告中区分不同 project 的测试结果
-
 #### Integration (P2)
 
-- **FR-013**: System MUST 自动发现 `scenarios/` 目录下由 e2e-test-generator 生成的 `.spec.ts` 文件
+- **FR-010**: System MUST 自动发现 `scenarios/` 目录下由 e2e-test-generator 生成的 `.spec.ts` 文件
 
-- **FR-014**: System MUST 支持指定测试路径（glob 模式，如 `scenarios/inventory/**/*.spec.ts`）
+- **FR-011**: System MUST 支持指定测试路径（glob 模式，如 `scenarios/inventory/**/*.spec.ts`）
 
-- **FR-015**: System MUST 与 e2e-test-generator 生成的 testdata 加载逻辑兼容
+- **FR-012**: System MUST 与 e2e-test-generator 生成的 testdata 加载逻辑兼容
 
 #### Validation (P3)
 
-- **FR-016**: System SHOULD 提供 `validate` 命令，验证配置文件格式和完整性
+- **FR-013**: System SHOULD 提供 `validate` 命令，验证配置文件格式和完整性
 
-- **FR-017**: System SHOULD 在测试执行前检查 baseURL 的可达性
+- **FR-014**: System SHOULD 在测试执行前检查 baseURL 的可达性
 
-- **FR-018**: System SHOULD 在报告目录已存在时警告用户（避免覆盖）
+- **FR-015**: System SHOULD 在报告目录已存在时警告用户（避免覆盖）
 
 ### Key Entities
 
 - **E2ERunConfig**: 测试运行配置对象
   - `env_profile` (string): 环境标识符
   - `baseURL` (string): 目标环境 URL
-  - `projects[]` (array, optional): Playwright projects 配置
   - `credentials_ref` (string, optional): 凭据文件路径
   - `retries` (number, optional): 失败重试次数
   - `workers` (number, optional): 并发 worker 数
   - `timeout` (number, optional): 测试超时时间（ms）
   - `report_output_dir` (string): 报告输出目录
+  - `testMatch` (string, optional): 测试文件匹配模式（默认 `scenarios/**/*.spec.ts`）
 
 - **CredentialsFile**: 凭据文件对象
-  - `username` (string): 用户名
-  - `password` (string): 密码
-  - `api_key` (string, optional): API 密钥
-  - `token` (string, optional): 认证令牌
+  - `env_profile` (string): 环境标识符（必须与 E2ERunConfig 的 env_profile 匹配）
+  - `users[]` (array, optional): 用户凭据列表
+    - `role` (string): 角色名称
+    - `username` (string): 用户名
+    - `password` (string): 密码
+    - `display_name` (string, optional): 显示名称
+  - `api_keys[]` (array, optional): API 密钥列表
+    - `service` (string): 服务名称
+    - `api_key` (string): API 密钥
+    - `api_secret` (string, optional): API 密钥
 
 - **TestReport**: 测试报告对象
-  - `total_tests` (number): 总测试数
-  - `passed` (number): 通过数
-  - `failed` (number): 失败数
-  - `skipped` (number): 跳过数
-  - `duration` (number): 总执行时间（ms）
-  - `html_report_path` (string): HTML 报告路径
-  - `json_result_path` (string): JSON 结果路径
+  - `metadata` (object): 元数据
+    - `env_profile` (string): 环境标识符
+    - `timestamp` (string): 执行时间戳
+    - `duration` (number): 总执行时间（ms）
+    - `playwright_version` (string, optional): Playwright 版本
+  - `stats` (object): 统计信息
+    - `total` (number): 总测试数
+    - `passed` (number): 通过数
+    - `failed` (number): 失败数
+    - `skipped` (number): 跳过数
+    - `flaky` (number, optional): 不稳定测试数
+  - `artifacts` (object): 报告文件路径
+    - `html_report` (string): HTML 报告路径
+    - `json_results` (string): JSON 结果路径
+    - `traces_dir` (string, optional): 追踪文件目录
+    - `screenshots_dir` (string, optional): 截图目录
+    - `videos_dir` (string, optional): 视频目录
+  - `failures[]` (array, optional): 失败测试列表
+    - `file` (string): 测试文件
+    - `title` (string): 测试标题
+    - `error` (string): 错误信息
+    - `stack` (string, optional): 错误堆栈
+    - `screenshot` (string, optional): 截图路径
+    - `video` (string, optional): 视频路径
 
 ## Success Criteria
 
@@ -337,11 +329,13 @@
 
 5. **网络连接**: 假设测试执行环境可以访问目标环境 baseURL
 
-6. **凭据文件格式**: 假设凭据文件为 JSON 格式，包含 `username` 和 `password` 字段
+6. **凭据文件格式**: 假设凭据文件为 JSON 格式，包含 `env_profile` 和 `users`/`api_keys` 数组
 
 7. **报告存储**: 假设本地文件系统有足够空间存储报告（包括截图和视频）
 
 8. **Git 配置**: 假设 `.gitignore` 已配置忽略 credentials 目录和报告目录
+
+9. **浏览器支持**: MVP 阶段仅支持 Chrome 浏览器，多浏览器支持（Firefox、Safari、Edge）不在初始范围内
 
 ## Dependencies
 
@@ -354,6 +348,8 @@
 
 以下功能不在本 spec 范围内：
 
+- **多浏览器支持**: MVP 阶段不支持 Firefox、Safari、Edge 等其他浏览器（仅支持 Chrome）
+- **移动设备模拟**: 不支持移动视口或设备仿真（仅桌面 Chrome）
 - **CI/CD 集成**: 不提供 GitHub Actions/Jenkins 配置（用户自行集成）
 - **测试数据管理**: 不负责创建或清理测试数据（由测试脚本自行处理）
 - **分布式执行**: 不支持跨多台机器的分布式测试执行
@@ -364,6 +360,7 @@
 
 ## Constraints
 
+- **浏览器限制**: MVP 阶段仅支持 Chrome 浏览器（不支持 projects 数组配置多浏览器）
 - **报告目录唯一性**: 每次运行必须使用唯一的 `report_output_dir`，避免覆盖历史报告
 - **凭据文件安全**: 凭据文件不得提交到代码仓库，必须在 `.gitignore` 中排除
 - **配置文件格式**: 仅支持 JSON 格式的配置文件（不支持 YAML 或 TOML）
@@ -384,15 +381,9 @@
 4. **报告存储**: 长期积累的报告文件可能占用大量磁盘空间
    - **缓解**: 在 skill.md 中建议用户定期清理历史报告
 
-## Clarifications
-
-**本 spec 已完成初稿，无遗留的 [NEEDS CLARIFICATION] 标记。**
-
-如果在实施过程中发现需要澄清的问题，请使用 `/speckit.clarify` 命令。
-
 ## Document Metadata
 
-- **Spec Version**: 1.0.0
+- **Spec Version**: 1.1.0
 - **Last Updated**: 2025-12-30
 - **Author**: Claude (AI-generated from user description)
-- **Review Status**: Pending
+- **Review Status**: Clarified (1 question resolved)
