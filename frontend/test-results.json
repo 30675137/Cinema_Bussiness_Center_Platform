@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/playwright.config.ts",
-    "rootDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+    "configFile": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/playwright.config.ts",
+    "rootDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -37,13 +37,13 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -51,13 +51,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -65,13 +65,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -79,13 +79,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -93,13 +93,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "Mobile Safari",
         "name": "Mobile Safari",
-        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -112,35 +112,19 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.57.0",
-    "workers": 5,
+    "workers": 6,
     "webServer": null
   },
   "suites": [],
   "errors": [
     {
-      "message": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-trace.spec.ts: Unexpected token, expected \",\" (159:53)\n\n  157 |\n  158 |     // 切换到交易历史标签\n> 159 |     await page.click('[data-testid=\"tab-transactions']');\n      |                                                      ^\n  160 |\n  161 |     // 测试日期范围筛选\n  162 |     const dateFilter = page.locator('[data-testid=\"date-range-filter\"]');",
-      "stack": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-trace.spec.ts: Unexpected token, expected \",\" (159:53)\n\n  157 |\n  158 |     // 切换到交易历史标签\n> 159 |     await page.click('[data-testid=\"tab-transactions']');\n      |                                                      ^\n  160 |\n  161 |     // 测试日期范围筛选\n  162 |     const dateFilter = page.locator('[data-testid=\"date-range-filter\"]');",
-      "location": {
-        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/inventory-trace.spec.ts",
-        "line": 159,
-        "column": 53
-      },
-      "snippet": "\u001b[90m   at \u001b[39minventory-trace.spec.ts:159\n\n  157 |\n  158 |     // 切换到交易历史标签\n> 159 |     await page.click('[data-testid=\"tab-transactions']');\n      |                                                     ^\n  160 |\n  161 |     // 测试日期范围筛选\n  162 |     const dateFilter = page.locator('[data-testid=\"date-range-filter\"]');"
-    },
-    {
-      "message": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/store-reservation-settings.spec.ts: Unexpected reserved word 'await'. (17:6)\n\n  15 |     await page.waitForSelector('[data-testid=\"store-reservation-settings-page\"]', { timeout: 10000 }).catch(() => {\n  16 |       // If testid doesn't exist, wait for the title instead\n> 17 |       await page.waitForSelector('h2:has-text(\"门店预约设置\")', { timeout: 10000 });\n     |       ^\n  18 |     });\n  19 |   });\n  20 |",
-      "stack": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/store-reservation-settings.spec.ts: Unexpected reserved word 'await'. (17:6)\n\n  15 |     await page.waitForSelector('[data-testid=\"store-reservation-settings-page\"]', { timeout: 10000 }).catch(() => {\n  16 |       // If testid doesn't exist, wait for the title instead\n> 17 |       await page.waitForSelector('h2:has-text(\"门店预约设置\")', { timeout: 10000 });\n     |       ^\n  18 |     });\n  19 |   });\n  20 |",
-      "location": {
-        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/tests/e2e/store-reservation-settings.spec.ts",
-        "line": 17,
-        "column": 6
-      },
-      "snippet": "\u001b[90m   at \u001b[39mstore-reservation-settings.spec.ts:17\n\n  15 |     await page.waitForSelector('[data-testid=\"store-reservation-settings-page\"]', { timeout: 10000 }).catch(() => {\n  16 |       // If testid doesn't exist, wait for the title instead\n> 17 |       await page.waitForSelector('h2:has-text(\"门店预约设置\")', { timeout: 10000 });\n     |      ^\n  18 |     });\n  19 |   });\n  20 |"
+      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
+      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
     }
   ],
   "stats": {
-    "startTime": "2025-12-22T01:55:31.186Z",
-    "duration": 441.276,
+    "startTime": "2025-12-30T05:47:21.901Z",
+    "duration": 7.448000000000036,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,
