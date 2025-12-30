@@ -1,0 +1,362 @@
+# LifecyclePlan Schema Definition
+# Zod-compatible YAML schema for lifecycle plan validation
+# Feature: T004-e2e-testdata-planner
+# Version: 1.0.0
+
+$schema: http://json-schema.org/draft-07/schema#
+$id: https://cinema-platform.example.com/schemas/lifecycle-plan.json
+
+title: LifecyclePlan
+description: 测试数据生命周期计划，定义 setup 和 teardown 执行序列
+
+type: object
+required:
+  - blueprintId
+  - setupSteps
+  - teardownSteps
+  - scope
+  - executionOrder
+  - generatedAt
+  - status
+
+properties:
+  blueprintId:
+    type: string
+    description: 关联的蓝图 ID
+    pattern: ^TD-[A-Z]+-\d{3,}$
+    examples:
+      - TD-ORDER-001
+      - TD-USER-ADMIN
+
+  setupSteps:
+    type: array
+    description: Setup 步骤序列（按依赖顺序）
+    minItems: 1
+    items:
+      $ref: '#/definitions/Step'
+
+  teardownSteps:
+    type: array
+    description: Teardown 步骤序列（反向顺序）
+    items:
+      $ref: '#/definitions/Step'
+    default: []
+
+  scope:
+    type: string
+    description: Fixture 作用域
+    enum:
+      - test
+      - worker
+      - global
+    examples:
+      - test
+
+  executionOrder:
+    type: integer
+    description: 执行顺序（用于多蓝图排序，基于依赖深度计算）
+    minimum: 0
+    examples:
+      - 0
+      - 2
+      - 5
+
+  estimatedDuration:
+    type: integer
+    description: 预估执行时间（毫秒），基于历史数据或策略超时总和
+    minimum: 0
+    examples:
+      - 55000
+
+  generatedAt:
+    type: string
+    description: 计划生成时间（ISO 8601）
+    format: date-time
+    examples:
+      - 2025-12-30T10:05:00Z
+
+  status:
+    type: string
+    description: 计划状态
+    enum:
+      - draft
+      - validated
+      - ready
+      - failed
+    default: draft
+    examples:
+      - ready
+
+definitions:
+  Step:
+    type: object
+    required:
+      - stepId
+      - action
+      - testdataRef
+      - strategy
+      - parameters
+      - optional
+    properties:
+      stepId:
+        type: string
+        description: 步骤唯一标识符
+        pattern: ^step-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$
+        examples:
+          - step-001-user
+          - step-002-store
+          - step-a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+      action:
+        type: string
+        description: 操作类型
+        enum:
+          - load-seed
+          - call-api
+          - execute-sql
+          - validate-data
+          - cleanup-data
+        examples:
+          - call-api
+
+      testdataRef:
+        type: string
+        description: 关联的测试数据引用
+        pattern: ^TD-[A-Z]+-\d{3,}$
+        examples:
+          - TD-ORDER-001
+
+      strategy:
+        type: string
+        description: 使用的供给策略
+        enum:
+          - seed
+          - api
+          - db-script
+        examples:
+          - api
+
+      parameters:
+        type: object
+        description: 步骤参数（根据 action 类型不同）
+        additionalProperties: true
+        oneOf:
+          - $ref: '#/definitions/LoadSeedParameters'
+          - $ref: '#/definitions/CallApiParameters'
+          - $ref: '#/definitions/ExecuteSqlParameters'
+          - $ref: '#/definitions/ValidateDataParameters'
+          - $ref: '#/definitions/CleanupDataParameters'
+
+      dependsOn:
+        type: array
+        description: 依赖的前序步骤 ID
+        items:
+          type: string
+          pattern: ^step-.+$
+        uniqueItems: true
+        default: []
+        examples:
+          - [step-001-user, step-002-store]
+
+      timeout:
+        type: integer
+        description: 步骤超时（毫秒），继承自策略配置
+        minimum: 1000
+        maximum: 60000
+        examples:
+          - 15000
+
+      optional:
+        type: boolean
+        description: 是否为可选步骤（失败不中断）
+        default: false
+
+  # Load Seed 参数
+  LoadSeedParameters:
+    type: object
+    required:
+      - filePath
+      - format
+    properties:
+      filePath:
+        type: string
+        description: 种子文件路径
+        examples:
+          - testdata/seeds/users.json
+      format:
+        type: string
+        enum: [json, yaml]
+      encoding:
+        type: string
+        default: utf-8
+
+  # Call API 参数
+  CallApiParameters:
+    type: object
+    required:
+      - endpoint
+      - method
+    properties:
+      endpoint:
+        type: string
+        description: API 端点路径
+        pattern: ^/
+        examples:
+          - /api/test/orders
+      method:
+        type: string
+        enum: [GET, POST, PUT, PATCH, DELETE]
+        default: POST
+      headers:
+        type: object
+        additionalProperties:
+          type: string
+      body:
+        type: object
+        additionalProperties: true
+        description: 请求体，支持变量替换 {{stepId.field}}
+      authRequired:
+        type: boolean
+        default: true
+
+  # Execute SQL 参数
+  ExecuteSqlParameters:
+    type: object
+    required:
+      - scriptPath
+    properties:
+      scriptPath:
+        type: string
+        description: SQL 脚本路径
+        pattern: ^testdata/scripts/.+\.sql$
+        examples:
+          - testdata/scripts/seed-stores.sql
+      database:
+        type: string
+        default: main
+      transactional:
+        type: boolean
+        default: true
+
+  # Validate Data 参数
+  ValidateDataParameters:
+    type: object
+    required:
+      - validationType
+    properties:
+      validationType:
+        type: string
+        enum: [schema, existence, count]
+      schema:
+        type: object
+        description: 用于 schema 验证的 JSON Schema
+      query:
+        type: object
+        description: 用于 existence/count 验证的查询条件
+
+  # Cleanup Data 参数
+  CleanupDataParameters:
+    type: object
+    required:
+      - cleanupMethod
+    properties:
+      cleanupMethod:
+        type: string
+        enum: [api-delete, db-delete, truncate]
+      endpoint:
+        type: string
+        description: API 删除端点（cleanupMethod=api-delete 时）
+        pattern: ^/
+      table:
+        type: string
+        description: 数据库表名（cleanupMethod=db-delete/truncate 时）
+      whereClause:
+        type: string
+        description: WHERE 条件（cleanupMethod=db-delete 时）
+      cascade:
+        type: boolean
+        description: 是否级联删除
+        default: false
+
+# 验证规则（仅文档说明，运行时由 Zod 实现）
+validationRules:
+  - 步骤依赖有效性：所有 dependsOn 引用的步骤 ID 必须在 setupSteps 中存在
+  - 无循环步骤依赖：步骤依赖图中不得存在循环
+  - Teardown 顺序正确性：teardownSteps 必须是 setupSteps 的反向拓扑排序
+  - 执行顺序一致性：executionOrder 必须反映依赖深度（依赖少的先执行）
+  - 作用域一致性：计划的 scope 必须与关联蓝图的 scope 一致
+  - 超时合理性：所有步骤超时总和不得超过 Playwright 默认测试超时（30秒）
+
+examples:
+  - blueprintId: TD-ORDER-001
+    setupSteps:
+      - stepId: step-001-user
+        action: call-api
+        testdataRef: TD-USER-001
+        strategy: api
+        parameters:
+          endpoint: /api/test/users
+          method: POST
+          body:
+            username: testuser@example.com
+            role: customer
+        dependsOn: []
+        timeout: 15000
+        optional: false
+
+      - stepId: step-002-store
+        action: load-seed
+        testdataRef: TD-STORE-001
+        strategy: seed
+        parameters:
+          filePath: testdata/seeds/stores.json
+          format: json
+        dependsOn: []
+        timeout: 5000
+        optional: false
+
+      - stepId: step-003-order
+        action: call-api
+        testdataRef: TD-ORDER-001
+        strategy: api
+        parameters:
+          endpoint: /api/test/orders
+          method: POST
+          body:
+            userId: "{{step-001-user.userId}}"
+            storeId: "{{step-002-store.storeId}}"
+            items:
+              - skuId: SKU-001
+                quantity: 2
+        dependsOn: [step-001-user, step-002-store]
+        timeout: 15000
+        optional: false
+
+    teardownSteps:
+      - stepId: teardown-001-order
+        action: cleanup-data
+        testdataRef: TD-ORDER-001
+        strategy: api
+        parameters:
+          cleanupMethod: api-delete
+          endpoint: /api/test/orders/{{step-003-order.orderId}}
+        dependsOn: []
+        timeout: 10000
+        optional: true
+
+      - stepId: teardown-002-user
+        action: cleanup-data
+        testdataRef: TD-USER-001
+        strategy: api
+        parameters:
+          cleanupMethod: api-delete
+          endpoint: /api/test/users/{{step-001-user.userId}}
+        dependsOn: [teardown-001-order]
+        timeout: 10000
+        optional: true
+
+    scope: test
+    executionOrder: 2
+    estimatedDuration: 55000
+    generatedAt: 2025-12-30T10:05:00Z
+    status: ready
