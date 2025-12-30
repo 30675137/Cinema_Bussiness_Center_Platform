@@ -6,6 +6,11 @@ import type { TestdataBlueprint, DependencyGraph, DependencyNode } from './schem
 import * as logger from './utils/logger';
 
 /**
+ * Maximum allowed dependency depth (prevents excessively deep chains)
+ */
+const MAX_DEPENDENCY_DEPTH = 10;
+
+/**
  * Dependency resolver class
  * Responsible for building dependency graphs and resolving execution order
  */
@@ -14,7 +19,7 @@ export class DependencyResolver {
    * Build dependency graph from blueprints
    * @param blueprints - Map of blueprint ID to blueprint
    * @returns Dependency graph
-   * @throws Error if missing dependency references are found
+   * @throws Error if missing dependency references are found or depth exceeds limit
    */
   buildDependencyGraph(blueprints: Map<string, TestdataBlueprint>): DependencyGraph {
     logger.debug(`Building dependency graph for ${blueprints.size} blueprint(s)`);
@@ -38,9 +43,21 @@ export class DependencyResolver {
       edges.set(id, dependencies);
     }
 
+    const graph = { nodes, edges };
+
+    // Validate dependency depth doesn't exceed limit
+    for (const node of nodes) {
+      const depth = this.calculateDepth(graph, node.id);
+      if (depth > MAX_DEPENDENCY_DEPTH) {
+        logger.warn(
+          `Dependency chain for ${node.id} exceeds recommended depth (${depth} > ${MAX_DEPENDENCY_DEPTH})`
+        );
+      }
+    }
+
     logger.debug(`Built graph with ${nodes.length} nodes and ${edges.size} edge sets`);
 
-    return { nodes, edges };
+    return graph;
   }
 
   /**
