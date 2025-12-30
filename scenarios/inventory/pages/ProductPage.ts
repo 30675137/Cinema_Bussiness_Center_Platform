@@ -29,12 +29,40 @@ export class ProductPage {
    * @param productData - Product data object containing product information
    */
   async browseProduct(productData: any): Promise<void> {
-    // TODO: Implement product browsing logic
-    // Example:
-    // await this.productList.waitFor();
-    // await this.productCard.filter({ hasText: productData.name }).click();
-    // await this.productDetail.waitFor();
-    throw new Error('ProductPage.browseProduct() method not implemented');
+    // Navigate to beverage menu if not already there
+    const currentUrl = this.page.url();
+
+    if (currentUrl.includes('localhost:10086')) {
+      // C-end Taro H5 - Navigate to beverage menu page
+      if (!currentUrl.includes('/pages/beverage/menu')) {
+        await this.page.goto('http://localhost:10086/pages/beverage/menu/index');
+        await this.page.waitForLoadState('networkidle');
+      }
+
+      // Wait for beverage list to load
+      await this.page.waitForSelector('.beverage-menu__grid', { timeout: 10000 });
+
+      // Find and click the product card by name
+      const productName = productData.name || productData.beverageName;
+      const productCard = this.page.locator(`.beverage-card:has-text("${productName}")`).first();
+
+      await productCard.waitFor({ state: 'visible', timeout: 5000 });
+      await productCard.click();
+
+      // Wait for navigation to detail page
+      await this.page.waitForURL(/.*\/pages\/beverage\/detail/);
+      await this.page.waitForLoadState('networkidle');
+
+      // Wait for product detail to fully load
+      await this.page.waitForSelector('.beverage-detail', { timeout: 5000 });
+
+    } else {
+      // B-end or other platforms - generic product browsing
+      await this.productList.waitFor({ timeout: 10000 });
+      const productName = productData.name || productData.beverageName;
+      await this.productCard.filter({ hasText: productName }).first().click();
+      await this.productDetail.waitFor({ timeout: 5000 });
+    }
   }
 
   /**

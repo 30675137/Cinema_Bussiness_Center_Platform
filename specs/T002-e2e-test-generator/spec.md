@@ -30,19 +30,21 @@ QA 工程师希望使用 `/e2e-test-generator` skill 将 T001 skill 创建的场
 
 ---
 
-### User Story 2 - 生成测试数据加载逻辑 (Priority: P1)
+### User Story 2 - 集成 e2e-testdata-planner 生成的 Fixtures (Priority: P1)
 
-QA 工程师希望 `/e2e-test-generator` skill 能自动生成测试数据加载逻辑,根据场景的 testdata_ref 引用,在测试脚本的 beforeEach hook 中插入数据准备代码,确保测试运行时能正确加载所需数据。
+QA 工程师希望 `/e2e-test-generator` skill 能自动集成 T004-e2e-testdata-planner 生成的 Playwright fixtures,根据场景的 testdata_ref 引用,自动导入对应的 fixture 模块,并在测试函数签名中声明 fixture 参数,实现测试数据的自动 setup/teardown 生命周期管理。
 
-**Why this priority**: 测试数据是测试的基础,没有数据加载逻辑,测试无法运行。自动生成数据加载代码避免 QA 工程师反复编写相同的数据准备逻辑,减少 50% 的测试准备工作量。
+**Why this priority**: 测试数据生命周期管理是 E2E 测试的核心基础设施。通过集成 T004 fixtures,测试脚本可以自动获得数据库初始化（setup）、数据清理（teardown）、依赖管理等能力,无需手动编写数据准备代码。这确保测试可重复运行、测试间隔离,减少 70% 的数据管理工作量。
 
-**Independent Test**: 可以通过准备一个引用 `bomTestData.scenario_001` 的场景,验证生成的测试脚本包含 `beforeEach` hook,其中调用数据加载函数如 `await loadTestData('bomTestData.scenario_001')`,且数据在 test case 中可访问。
+**Independent Test**: 可以通过准备一个引用 `testdata_ref: TD-INVENTORY-BOM-WHISKEY-COLA` 的场景,验证生成的测试脚本：(1) 导入 T004 生成的 fixture 模块（`import { test } from '../../tests/fixtures/testdata/testdata-TD-INVENTORY-BOM-WHISKEY-COLA.fixture'`）；(2) 测试函数签名包含 fixture 参数（`async ({ page, TD_INVENTORY_BOM_WHISKEY_COLA }) => {...}`）；(3) 测试内使用 fixture 数据（如 `TD_INVENTORY_BOM_WHISKEY_COLA.whiskeySkuId`）。
 
 **Acceptance Scenarios**:
 
-1. **Given** 场景的 preconditions 包含 `testdata_ref: bomTestData.scenario_001`,**When** 生成测试脚本时,**Then** 脚本的 beforeEach hook 包含数据加载代码,如 `const testData = await loadTestData('bomTestData.scenario_001')`
-2. **Given** 场景的多个 steps 引用不同 testdata_ref,**When** 生成脚本时,**Then** beforeEach hook 加载所有引用的测试数据,并在 test case 中可通过变量访问
-3. **Given** testdata_ref 引用不存在的测试数据,**When** 生成脚本时,**Then** 脚本包含 TODO 注释提示 QA 工程师补充测试数据定义
+1. **Given** 场景的 preconditions 包含 `testdata_ref: TD-INVENTORY-BOM-WHISKEY-COLA`,**When** 生成测试脚本时,**Then** 脚本顶部包含 fixture 导入语句 `import { test } from '../../tests/fixtures/testdata/testdata-TD-INVENTORY-BOM-WHISKEY-COLA.fixture'`,并且测试函数签名为 `test('...', async ({ page, TD_INVENTORY_BOM_WHISKEY_COLA }) => {...})`
+2. **Given** 场景引用的 testdata_ref 对应的 testdata blueprint 存在（T004 已创建）,**When** 生成脚本时,**Then** 脚本使用 fixture 提供的数据字段（如 `TD_INVENTORY_BOM_WHISKEY_COLA.whiskeySkuId`）而非硬编码值
+3. **Given** 场景引用的 testdata_ref 对应的 testdata blueprint 不存在,**When** 生成脚本时,**Then** 脚本包含 TODO 注释提示 QA 工程师使用 `/testdata-planner create` 创建蓝图,并生成临时的 `loadTestData()` 调用作为降级方案
+4. **Given** 场景包含多个 testdata_ref 引用（如 preconditions 引用 TD-USER-001,steps 引用 TD-PRODUCT-002）,**When** 生成脚本时,**Then** 导入所有相关 fixtures 并在测试签名中声明所有 fixture 参数
+5. **Given** 场景使用 db-script 策略的 testdata blueprint,**When** 运行测试时,**Then** fixture 自动执行 SQL 脚本进行 setup（插入初始数据）和 teardown（清理测试数据）,确保测试可重复运行
 
 ---
 
@@ -167,12 +169,14 @@ QA 工程师希望当场景 YAML 文件修改后,使用 `/e2e-test-generator upd
 - **FR-022**: Skill 必须将 api/database_field_equals 断言转换为 API 请求和字段验证代码
 - **FR-023**: Skill 必须将未识别的 assertion 转换为 TODO 注释
 
-#### 测试数据加载
+#### 测试数据集成（T004 Fixtures）
 
-- **FR-024**: Skill 必须在 beforeEach hook 中生成测试数据加载代码,基于 testdata_ref 引用
-- **FR-025**: Skill 必须生成 `import { testDataModule } from '@/testdata/module'` 导入语句
-- **FR-026**: Skill 必须生成 `const testData = await loadTestData(testDataRef)` 加载逻辑
-- **FR-027**: 如果 testdata_ref 引用不存在,Skill 必须在生成的脚本中添加 TODO 注释
+- **FR-024**: Skill 必须检测场景的 testdata_ref 是否为 testdata blueprint ID（格式：TD-<ENTITY>-<ID>）,如果是,则集成 T004 生成的 fixture；如果不是（如旧式 `bomTestData.scenario_001`）,则降级为传统 loadTestData() 调用
+- **FR-025**: Skill 必须生成 fixture 导入语句,格式为 `import { test } from '<相对路径>/tests/fixtures/testdata/testdata-<BLUEPRINT_ID>.fixture'`,并替换测试脚本中的 `import { test } from '@playwright/test'`
+- **FR-026**: Skill 必须在测试函数签名中添加 fixture 参数,格式为 `test('...', async ({ page, <BLUEPRINT_ID> }) => {...})`,其中 `<BLUEPRINT_ID>` 为去除连字符的 ID（如 TD-INVENTORY-BOM-WHISKEY-COLA → TD_INVENTORY_BOM_WHISKEY_COLA）
+- **FR-027**: 如果 testdata_ref 对应的 fixture 文件不存在（路径 `tests/fixtures/testdata/testdata-<BLUEPRINT_ID>.fixture.ts`）,Skill 必须在生成的脚本中添加 TODO 注释,提示使用 `/testdata-planner create` 创建蓝图并生成 fixture
+- **FR-027a**: Skill 必须支持多个 testdata_ref 引用（从 preconditions、steps.params 等字段提取）,生成多个 fixture 导入和参数声明
+- **FR-027b**: Skill 必须在测试脚本中使用 fixture 提供的数据字段（如 `TD_INVENTORY_BOM_WHISKEY_COLA.whiskeySkuId`）替代硬编码的 testdata 引用
 
 #### 页面对象生成
 
@@ -230,11 +234,12 @@ QA 工程师希望当场景 YAML 文件修改后,使用 `/e2e-test-generator upd
 
 ## Dependencies *(optional)*
 
-- **T005-e2e-scenario-author**: 依赖 T001 skill 生成的场景 YAML 文件作为输入
+- **T001-e2e-scenario-author**: 依赖 T001 skill 生成的场景 YAML 文件作为输入
+- **T004-e2e-testdata-planner** (强依赖): 依赖 T004 skill 生成的 Playwright fixtures 提供测试数据生命周期管理（setup/teardown）。当场景引用 testdata blueprint ID（格式：TD-<ENTITY>-<ID>）时，必须使用 T004 生成的 fixture 文件（路径：`tests/fixtures/testdata/testdata-<BLUEPRINT_ID>.fixture.ts`）。
 - **Testing Frameworks**: 依赖项目已配置至少一种测试框架（Playwright、Postman、REST Client、Jest/Vitest）
 - **Playwright Framework** (可选): 如需生成 Playwright 脚本，依赖 Playwright 测试框架已在项目中配置(package.json, playwright.config.ts)
 - **Postman** (可选): 如需生成 Postman collections，依赖 Postman 或 Newman CLI 可访问
-- **Test Data Management**: 依赖项目存在测试数据管理机制,testdata_ref 引用的数据可访问
+- **Test Data Management**: 依赖项目存在测试数据管理机制,testdata_ref 引用的数据可访问（通过 T004 fixtures 或传统 loadTestData() 函数）
 
 ## Assumptions *(optional)*
 

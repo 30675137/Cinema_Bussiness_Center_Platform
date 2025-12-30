@@ -259,7 +259,41 @@ database_field_equals:
 **Location**: `scenarios/<module>/<scenario_id>.spec.ts`
 **Purpose**: 可执行的 Playwright 测试脚本
 
-**Structure**:
+**Structure** (使用 T004 Fixtures):
+
+```typescript
+// AUTO-GENERATED: Do not modify above this line
+// @spec T002-e2e-test-generator
+// Generated from: scenarios/<module>/<scenario_id>.yaml
+
+// Import T004-generated fixture (replaces import { test } from '@playwright/test')
+import { test } from '../../tests/fixtures/testdata/testdata-<BLUEPRINT_ID>.fixture';
+import { expect } from '@playwright/test';
+import { <PageObject> } from './pages/<PageObject>';
+
+test.describe('<scenario.title>', () => {
+  // Fixture parameter in test signature (e.g., TD_INVENTORY_BOM_WHISKEY_COLA)
+  test('<scenario.scenario_id>', async ({ page, <BLUEPRINT_ID_UNDERSCORE> }) => {
+    const loginPage = new LoginPage(page);
+    const productPage = new ProductPage(page);
+
+    // Use fixture data (auto-setup/teardown managed by T004)
+    // Example: <BLUEPRINT_ID_UNDERSCORE>.whiskeySkuId
+
+    // Steps
+    <generated_step_code>
+
+    // Assertions
+    <generated_assertion_code>
+
+    // CUSTOM CODE START
+    // Add your custom test logic here
+    // CUSTOM CODE END
+  });
+});
+```
+
+**Structure** (降级模式 - 不使用 Fixtures):
 
 ```typescript
 // AUTO-GENERATED: Do not modify above this line
@@ -298,6 +332,11 @@ test.describe('<scenario.title>', () => {
 **Code Markers**:
 - `// AUTO-GENERATED: Do not modify above this line` - 自动生成区域开始标记
 - `// CUSTOM CODE START ... // CUSTOM CODE END` - 手动代码保护区域
+
+**Fixture Integration Rules**:
+- 如果 `testdata_ref` 格式为 `TD-<ENTITY>-<ID>` → 使用 T004 fixture 模式
+- 如果 `testdata_ref` 格式为其他（如 `bomTestData.scenario_001`）→ 使用降级模式（loadTestData）
+- Fixture 参数命名：将连字符替换为下划线（`TD-INVENTORY-BOM-WHISKEY-COLA` → `TD_INVENTORY_BOM_WHISKEY_COLA`）
 
 ---
 

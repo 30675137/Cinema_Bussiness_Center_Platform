@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/playwright.config.ts",
-    "rootDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+    "configFile": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/playwright.config.ts",
+    "rootDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -37,13 +37,13 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -51,13 +51,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -65,13 +65,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -79,13 +79,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -93,13 +93,13 @@
         "timeout": 30000
       },
       {
-        "outputDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/test-results",
+        "outputDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/frontend/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "Mobile Safari",
         "name": "Mobile Safari",
-        "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
+        "testDir": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -112,19 +112,33 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.57.0",
-    "workers": 6,
+    "workers": 5,
     "webServer": null
   },
   "suites": [],
   "errors": [
     {
-      "message": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments.",
-      "stack": "Error: No tests found.\nMake sure that arguments are regular expressions matching test files.\nYou may need to escape symbols like \"$\" or \"*\" and quote the arguments."
+      "message": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-001.spec.ts",
+      "stack": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-001.spec.ts"
+    },
+    {
+      "message": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts: Unexpected token (31:29)\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                              ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批",
+      "stack": "SyntaxError: /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts: Unexpected token (31:29)\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                              ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批",
+      "location": {
+        "file": "/Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-003.spec.ts",
+        "line": 31,
+        "column": 29
+      },
+      "snippet": "\u001b[90m   at \u001b[39minventory/E2E-INVENTORY-003.spec.ts:31\n\n  29 |     await loginPage.login(testData)\n  30 |     // Step 2: 导航到库存调整页面\n> 31 |     await page.goto(testData.)\n     |                             ^\n  32 |     // Step 3: 创建库存调整单（盘盈 +50）\n  33 |     await inventoryPage.createAdjustment(testData.inventoryTestData.adjustment_data)\n  34 |     // Step 4: 提交审批"
+    },
+    {
+      "message": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-004.spec.ts",
+      "stack": "Error: Cannot find package '@playwright/test' imported from /Users/lining/qoder/Cinema_Bussiness_Center_Platform/scenarios/inventory/E2E-INVENTORY-004.spec.ts"
     }
   ],
   "stats": {
-    "startTime": "2025-12-30T05:47:21.901Z",
-    "duration": 7.448000000000036,
+    "startTime": "2025-12-30T14:07:30.081Z",
+    "duration": 175.96000000000004,
     "expected": 0,
     "skipped": 0,
     "unexpected": 0,

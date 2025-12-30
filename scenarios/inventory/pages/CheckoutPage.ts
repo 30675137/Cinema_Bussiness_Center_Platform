@@ -28,11 +28,39 @@ export class CheckoutPage {
    * Proceed to checkout
    */
   async proceed(): Promise<void> {
-    // TODO: Implement checkout logic
-    // Example:
-    // await this.checkoutButton.click();
-    // await this.orderSummary.waitFor();
-    throw new Error('CheckoutPage.proceed() method not implemented');
+    const currentUrl = this.page.url();
+
+    if (currentUrl.includes('localhost:10086')) {
+      // C-end Taro H5 - Navigate from menu to cart to checkout
+      // Step 1: Navigate to cart page if not already there
+      if (!currentUrl.includes('/pages/order/cart')) {
+        // Click cart icon to go to cart page
+        const cartIcon = this.page.locator('.cart-icon, .cart-button').first();
+        await cartIcon.click();
+        await this.page.waitForURL(/.*\/pages\/order\/cart/);
+        await this.page.waitForLoadState('networkidle');
+      }
+
+      // Wait for cart page to load
+      await this.page.waitForSelector('.order-cart', { timeout: 5000 });
+
+      // Step 2: Click "去结算" / "Checkout" button
+      const checkoutBtn = this.page.locator('button:has-text("去结算"), .order-cart__checkout-btn').first();
+      await checkoutBtn.waitFor({ state: 'visible', timeout: 5000 });
+      await checkoutBtn.click();
+
+      // Step 3: Wait for navigation to order confirm page
+      await this.page.waitForURL(/.*\/pages\/order\/confirm/);
+      await this.page.waitForLoadState('networkidle');
+
+      // Wait for order confirm page to fully load
+      await this.page.waitForSelector('.order-confirm', { timeout: 5000 });
+
+    } else {
+      // B-end or generic flow
+      await this.checkoutButton.click();
+      await this.orderSummary.waitFor({ timeout: 5000 });
+    }
   }
 
   /**

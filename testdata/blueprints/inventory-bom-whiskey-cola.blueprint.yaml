@@ -1,0 +1,56 @@
+# @spec T004-e2e-testdata-planner
+# Testdata Blueprint for BOM Inventory Testing
+# 用于 E2E-INVENTORY-002 场景的库存初始化数据
+
+id: TD-INVENTORY-BOM-WHISKEY-COLA
+description: "BOM库存测试初始数据 - 威士忌和可乐糖浆初始库存"
+version: "1.0.0"
+
+strategy:
+  type: db-script
+  dbScriptPath: testdata/scripts/seed-inventory-bom-whiskey-cola.sql
+  transactional: true
+  # 数据库脚本执行后的响应映射（从数据库查询结果映射到 fixture 数据字段）
+  responseMapping:
+    whiskeySkuId: "550e8400-e29b-41d4-a716-446655440001"
+    whiskeySkuName: "威士忌"
+    whiskeyInitialOnHand: 100
+    whiskeyInitialReserved: 0
+    whiskeyUnit: "ml"
+    colaSkuId: "550e8400-e29b-41d4-a716-446655440002"
+    colaSkuName: "可乐糖浆"
+    colaInitialOnHand: 500
+    colaInitialReserved: 0
+    colaUnit: "ml"
+    storeId: 1
+    productId: "550e8400-e29b-41d4-a716-446655440021"
+    productName: "威士忌可乐鸡尾酒"
+    # BOM 配方数据
+    whiskey_bom_quantity: 45
+    cola_bom_quantity: 150
+
+dependencies: []
+
+scope: test  # 每个测试执行一次 setup/teardown
+
+teardown: true  # 测试结束后清理数据
+
+timeout: 30000  # SQL 脚本执行超时时间（毫秒）
+
+environments: [ci, staging, production, local]  # 适用于所有环境
+
+metadata:
+  created_at: "2025-12-30T12:00:00Z"
+  created_by: "claude-code"
+  related_scenarios:
+    - E2E-INVENTORY-002
+  notes: |
+    此蓝图为 BOM 库存扣减测试提供初始数据：
+    - 威士忌：初始现存 100ml，预占 0ml
+    - 可乐糖浆：初始现存 500ml，预占 0ml
+    - 成品SKU：威士忌可乐鸡尾酒（需威士忌 45ml + 可乐糖浆 150ml）
+
+    测试流程：
+    1. Setup: 插入初始库存数据
+    2. Test: 下单触发预占 → 出品触发实扣
+    3. Teardown: 清理所有测试数据（库存记录 + 事务记录）
