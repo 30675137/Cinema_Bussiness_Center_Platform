@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cinema-platform/schemas/e2e-runner/E2ERunConfig.schema.json",
+  "title": "E2ERunConfig",
+  "description": "Configuration for E2E test execution with Playwright",
+  "type": "object",
+  "required": ["env_profile", "baseURL", "report_output_dir"],
+  "properties": {
+    "env_profile": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Environment identifier (lowercase alphanumeric with hyphens)",
+      "examples": ["saas-staging", "onprem-uat", "production"]
+    },
+    "baseURL": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://",
+      "description": "Base URL of the target environment (HTTP or HTTPS)",
+      "examples": ["https://staging.cinema.com", "https://uat.cinema-onprem.com"]
+    },
+    "projects": {
+      "type": "array",
+      "description": "Playwright projects configuration for multi-browser/device testing",
+      "items": {
+        "$ref": "#/definitions/PlaywrightProject"
+      },
+      "examples": [[
+        {
+          "name": "chromium",
+          "use": { "browserName": "chromium" }
+        },
+        {
+          "name": "Mobile Chrome",
+          "use": {
+            "browserName": "chromium",
+            "viewport": { "width": 375, "height": 667 },
+            "isMobile": true
+          }
+        }
+      ]]
+    },
+    "credentials_ref": {
+      "type": "string",
+      "description": "Path to credentials file (relative or absolute)",
+      "examples": ["credentials/saas-staging.json", "../secrets/uat-creds.json"]
+    },
+    "retries": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5,
+      "default": 0,
+      "description": "Number of retries for failed tests"
+    },
+    "workers": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of parallel workers (default: CPU cores)"
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 1000,
+      "default": 30000,
+      "description": "Test timeout in milliseconds"
+    },
+    "report_output_dir": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Output directory for test reports (must be unique)",
+      "examples": ["./reports/run-2025-12-30-14-30", "./test-results/staging-run-001"]
+    },
+    "testMatch": {
+      "type": "string",
+      "default": "scenarios/**/*.spec.ts",
+      "description": "Glob pattern for test files",
+      "examples": ["scenarios/**/*.spec.ts", "scenarios/inventory/**/*.spec.ts"]
+    }
+  },
+  "definitions": {
+    "PlaywrightProject": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Project name (e.g., 'chromium', 'firefox', 'Mobile Chrome')",
+          "examples": ["chromium", "firefox", "Mobile Chrome", "Desktop Safari"]
+        },
+        "use": {
+          "type": "object",
+          "description": "Playwright project configuration options",
+          "properties": {
+            "browserName": {
+              "type": "string",
+              "enum": ["chromium", "firefox", "webkit"],
+              "description": "Browser to use for this project"
+            },
+            "viewport": {
+              "type": "object",
+              "description": "Viewport size for this project",
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["width", "height"]
+            },
+            "isMobile": {
+              "type": "boolean",
+              "description": "Whether to emulate mobile device"
+            },
+            "userAgent": {
+              "type": "string",
+              "description": "Custom user agent string"
+            },
+            "storageState": {
+              "type": "string",
+              "description": "Path to storage state file for authentication"
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
