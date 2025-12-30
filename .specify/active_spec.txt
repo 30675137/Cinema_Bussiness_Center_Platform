@@ -1,1 +1,1 @@
-specs/T005-e2e-report-configurator/spec.md
+specs/T006-e2e-report-configurator/spec.md

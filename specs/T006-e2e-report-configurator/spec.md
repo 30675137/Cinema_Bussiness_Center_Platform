@@ -1,6 +1,6 @@
 # Feature Specification: E2E 报告配置器 (e2e-report-configurator)
 
-**Feature Branch**: `T005-e2e-report-configurator`
+**Feature Branch**: `T006-e2e-report-configurator`
 **Created**: 2025-12-30
 **Status**: Draft
 **Input**: User description: "E2E 报告配置器 - HTML报告必选，可选JSON/JUnit格式，规范化输出目录"

@@ -1,6 +1,6 @@
 # Research Report: E2E Report Configurator Implementation
 
-**Spec**: T005-e2e-report-configurator | **Date**: 2025-12-30 | **Status**: ✅ Complete
+**Spec**: T006-e2e-report-configurator | **Date**: 2025-12-30 | **Status**: ✅ Complete
 
 ## Executive Summary
 
@@ -69,7 +69,7 @@ reporter: [
 **Three-layer safety approach**:
 
 ```typescript
-/** @spec T005-e2e-report-configurator */
+/** @spec T006-e2e-report-configurator */
 
 // Layer 1: Pre-flight validation
 function validateConfigFile(filePath: string): void {
@@ -191,7 +191,7 @@ reports/e2e/
 **Configuration generation template**:
 
 ```typescript
-/** @spec T005-e2e-report-configurator */
+/** @spec T006-e2e-report-configurator */
 export function generateReporterConfig(
   formats: ReporterFormat[],
   basePath: string = 'reports/e2e'
@@ -319,7 +319,7 @@ fs.mkdirSync('/tmp/existing-dir', { recursive: true })
 **Safe directory creation pattern**:
 
 ```typescript
-/** @spec T005-e2e-report-configurator */
+/** @spec T006-e2e-report-configurator */
 export function createReportDirectories(basePath: string = 'reports/e2e'): void {
   const dirs = [
     `${basePath}/html`,
@@ -420,7 +420,7 @@ const ERROR_MESSAGES = {
 
 ```bash
 #!/bin/bash
-# @spec T005-e2e-report-configurator
+# @spec T006-e2e-report-configurator
 
 GITIGNORE_FILE=".gitignore"
 PATTERN="reports/"
@@ -531,7 +531,7 @@ $ npx playwright test --list
 **Validation sequence**:
 
 ```typescript
-/** @spec T005-e2e-report-configurator */
+/** @spec T006-e2e-report-configurator */
 export function validatePlaywrightConfig(configPath: string): ValidationResult {
   const checks: ValidationCheck[] = [];
 
@@ -666,7 +666,7 @@ export function validatePlaywrightConfig(configPath: string): ValidationResult {
 #### GitHub Actions Example
 
 ```yaml
-# @spec T005-e2e-report-configurator
+# @spec T006-e2e-report-configurator
 # Playwright E2E Tests with Report Upload
 
 name: E2E Tests
@@ -740,7 +740,7 @@ jobs:
 #### GitLab CI Example
 
 ```yaml
-# @spec T005-e2e-report-configurator
+# @spec T006-e2e-report-configurator
 # .gitlab-ci.yml
 
 stages:
@@ -773,7 +773,7 @@ e2e-tests:
 #### Jenkins Example
 
 ```groovy
-// @spec T005-e2e-report-configurator
+// @spec T006-e2e-report-configurator
 // Jenkinsfile (Declarative Pipeline)
 
 pipeline {
