@@ -1,0 +1,172 @@
+# @spec O004-beverage-sku-reuse
+# E2E Test Scenario: 运营人员通过SKU管理界面配置饮品成品
+# User Story 1 - Priority: P1
+
+scenario_id: E2E-PRODUCT-002
+spec_ref: O004
+title: 运营人员在SKU管理界面创建饮品成品SKU并验证小程序同步
+description: |
+  验证运营人员能够在SKU管理界面创建finished_product类型的饮品SKU（分类为饮品），
+  并确保该SKU自动出现在小程序饮品模块的可选列表中。
+
+tags:
+  module: [product, beverage]
+  channel: [web]
+  deploy: [saas]
+  priority: p1
+  smoke: true
+  user_story: [US1]
+
+preconditions:
+  role: admin
+  testdata_ref: TD-SKU-BEVERAGE-001
+  description: |
+    - 系统中已存在"饮品"分类（category_id: CAT-BEVERAGE）
+    - 系统中已存在子分类"鸡尾酒"（category_id: CAT-COCKTAIL）
+    - 管理员账号已登录B端系统
+    - 测试数据将通过 e2e-testdata-planner 生成的 fixtures 准备
+
+steps:
+  # Step 1: 管理员登录B端系统
+  - action: login
+    system: b-end
+    description: 运营人员使用管理员账号登录B端系统
+    params:
+      testdata_ref: TD-SKU-BEVERAGE-001.adminCredentials
+
+  # Step 2: 导航到SKU管理页面
+  - action: navigate
+    system: b-end
+    description: 导航到商品管理 > SKU管理列表页面
+    params:
+      url: '/products/sku'
+
+  # Step 3: 点击新增SKU按钮
+  - action: click
+    system: b-end
+    description: 点击"新增SKU"按钮
+    params:
+      selector: '[data-testid="add-sku-button"]'
+
+  # Step 4: 填写SKU基本信息
+  - action: fill_form
+    system: b-end
+    description: 填写SKU基本信息表单
+    params:
+      fields:
+        - name: skuCode
+          value: 'FIN-MOJITO-001'
+          testdata_ref: TD-SKU-BEVERAGE-001.skuCode
+        - name: skuName
+          value: '薄荷威士忌鸡尾酒'
+          testdata_ref: TD-SKU-BEVERAGE-001.skuName
+        - name: skuType
+          value: 'finished_product'
+          selector: '[data-testid="sku-type-select"]'
+        - name: category
+          value: '饮品 > 鸡尾酒'
+          testdata_ref: TD-SKU-BEVERAGE-001.categoryPath
+        - name: price
+          value: '3500'
+          testdata_ref: TD-SKU-BEVERAGE-001.price
+        - name: unit
+          value: '份'
+          testdata_ref: TD-SKU-BEVERAGE-001.unit
+
+  # Step 5: 保存SKU
+  - action: click
+    system: b-end
+    description: 点击"保存"按钮提交表单
+    params:
+      selector: '[data-testid="save-sku-button"]'
+
+  # Step 6: 等待保存成功
+  - action: wait_for_load
+    system: b-end
+    description: 等待保存成功提示（≤2秒）
+    params:
+      timeout: 2000
+
+assertions:
+  # Assertion 1: 保存成功提示
+  - type: ui
+    check: toast_message_shown
+    description: 应显示"SKU创建成功"提示消息
+    params:
+      expected: 'SKU创建成功'
+
+  # Assertion 2: SKU出现在列表中
+  - type: ui
+    check: element_visible
+    description: SKU列表中应显示新创建的饮品SKU
+    params:
+      selector: 'tr:has-text("FIN-MOJITO-001")'
+
+  # Assertion 3: SKU类型显示为"成品"
+  - type: ui
+    check: element_text_contains
+    description: SKU类型应显示为"成品"
+    params:
+      selector: 'tr:has-text("FIN-MOJITO-001") td:nth-child(3)'
+      expected: '成品'
+
+  # Assertion 4: SKU分类显示正确
+  - type: ui
+    check: element_text_contains
+    description: SKU分类应显示"饮品 > 鸡尾酒"
+    params:
+      selector: 'tr:has-text("FIN-MOJITO-001") td:nth-child(4)'
+      expected: '鸡尾酒'
+
+  # Assertion 5: API响应成功
+  - type: api
+    check: response_status_is
+    description: SKU创建API应返回201状态码
+    params:
+      endpoint: '/api/skus'
+      method: 'POST'
+      expected: 201
+
+  # Assertion 6: 数据库验证
+  - type: api
+    check: response_body_contains
+    description: API响应应包含新创建的SKU编码
+    params:
+      endpoint: '/api/skus?skuCode=FIN-MOJITO-001'
+      method: 'GET'
+      expected_field: 'data[0].skuCode'
+      expected_value: 'FIN-MOJITO-001'
+
+edge_cases:
+  # Edge Case 1: 重复SKU编码
+  - scenario: 尝试创建重复的SKU编码
+    testdata_ref: TD-SKU-BEVERAGE-001.duplicateSkuCode
+    expected_behavior: 页面应显示"SKU编码已存在"错误提示，阻止保存
+
+  # Edge Case 2: 必填字段缺失
+  - scenario: 必填字段（如SKU名称）为空
+    testdata_ref: TD-SKU-BEVERAGE-001.emptySkuName
+    expected_behavior: 页面应显示"SKU名称不能为空"验证错误，保存按钮禁用
+
+  # Edge Case 3: 分类未选择
+  - scenario: 未选择饮品分类
+    testdata_ref: TD-SKU-BEVERAGE-001.noCategorySelected
+    expected_behavior: 页面应显示"请选择分类"验证错误
+
+success_criteria:
+  - SKU在2秒内成功保存
+  - SKU立即出现在列表中，无需刷新页面
+  - SKU类型为"finished_product"
+  - SKU分类为"饮品"子类（如鸡尾酒、果汁等）
+  - API返回正确的201状态码
+
+test_data_requirements:
+  - SKU编码: FIN-MOJITO-001
+  - SKU名称: 薄荷威士忌鸡尾酒
+  - SKU类型: finished_product（成品）
+  - 分类路径: 饮品 > 鸡尾酒
+  - 价格: 3500（单位：分）
+  - 主库存单位: 份
+  - 状态: enabled（启用）
+  - 管理员账号: admin / admin123
+  - 测试数据蓝图: TD-SKU-BEVERAGE-001（通过 e2e-testdata-planner 生成）

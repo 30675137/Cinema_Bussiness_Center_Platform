@@ -1,0 +1,40 @@
+# @spec O004-beverage-sku-reuse
+# Test Data Blueprint: 饮品成品SKU测试数据
+# Generated for E2E-PRODUCT-002 scenario
+
+id: TD-SKU-BEVERAGE-001
+description: "finished_product类型的饮品SKU（薄荷威士忌鸡尾酒）用于测试SKU管理界面创建流程"
+version: "1.0.0"
+
+strategy:
+  type: seed
+  seedFilePath: testdata/seeds/beverage-skus.json
+  seedKey: "mojito-cocktail"
+  description: "使用静态种子文件提供测试数据，快速且无需后端服务依赖"
+
+scope: test  # 每个测试独立创建和清理
+teardown: false  # seed 策略不需要 teardown（数据是静态的）
+timeout: 5000
+
+# 环境配置（可选）
+environments: [local, ci, staging]
+
+# 依赖（可选）
+dependencies: []
+
+# 响应映射 - 从种子文件加载后映射到 fixture 数据结构
+responseMapping:
+  skuCode: "code"
+  skuName: "name"
+  skuType: "type"
+  categoryPath: "category"
+  price: "price"
+  unit: "unit"
+  adminCredentials: "admin_credentials"
+
+metadata:
+  spec_ref: O004
+  user_story: US1
+  priority: p1
+  created_at: "2025-12-31T12:00:00Z"
+  created_by: "e2e-testdata-planner"

@@ -1,0 +1,1196 @@
+# @spec O004-beverage-sku-reuse
+# OpenAPI 3.0 Specification for SKU Management API
+
+openapi: 3.0.3
+info:
+  title: SKU Management API
+  description: |
+    REST API for managing SKU (Stock Keeping Unit) entities, including finished products, packaging materials, and raw materials.
+
+    **Key Features**:
+    - CRUD operations for SKU entities
+    - Type-based filtering (finished_product, packaging, raw_material)
+    - Category-based filtering
+    - Search by SKU code or name
+    - BOM (Bill of Materials) management
+
+    **Authentication**: All endpoints require JWT authentication via `Authorization: Bearer <token>` header.
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+    email: dev@cinema-platform.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://staging.cinema-platform.com
+    description: Staging environment
+  - url: https://api.cinema-platform.com
+    description: Production environment
+
+tags:
+  - name: SKU
+    description: SKU (Stock Keeping Unit) management endpoints
+  - name: Category
+    description: Product category management endpoints
+  - name: BOM
+    description: Bill of Materials (BOM) management endpoints
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/skus:
+    get:
+      summary: List SKUs with filtering and pagination
+      description: |
+        Retrieve a paginated list of SKUs with optional filtering by type, category, and keyword search.
+
+        **Key Use Cases**:
+        - FR-006: Filter SKUs by type=finished_product for BOM configuration
+        - FR-007: Display only finished_product SKUs in SKU selector
+        - General SKU list display in management interface
+      operationId: listSkus
+      tags:
+        - SKU
+      parameters:
+        - name: type
+          in: query
+          description: |
+            Filter by SKU type. Valid values: finished_product, packaging, raw_material.
+
+            **Example**: `?type=finished_product` returns only finished product SKUs (used in FR-006/FR-007).
+          required: false
+          schema:
+            type: string
+            enum:
+              - finished_product
+              - packaging
+              - raw_material
+          example: finished_product
+
+        - name: category
+          in: query
+          description: Filter by category ID (UUID format)
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        - name: keyword
+          in: query
+          description: Search by SKU code or name (case-insensitive partial match)
+          required: false
+          schema:
+            type: string
+          example: "威士忌"
+
+        - name: status
+          in: query
+          description: Filter by SKU status
+          required: false
+          schema:
+            type: string
+            enum:
+              - enabled
+              - disabled
+              - draft
+          example: enabled
+
+        - name: page
+          in: query
+          description: Page number (1-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+
+      responses:
+        '200':
+          description: SKU list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SKU'
+                  total:
+                    type: integer
+                    description: Total number of SKUs matching the filter
+                    example: 100
+                  page:
+                    type: integer
+                    description: Current page number
+                    example: 1
+                  pageSize:
+                    type: integer
+                    description: Number of items per page
+                    example: 20
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+              examples:
+                finished_product_filter:
+                  summary: Filter by finished_product type
+                  value:
+                    success: true
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        skuCode: "FIN-MOJITO-001"
+                        skuName: "薄荷威士忌鸡尾酒"
+                        skuType: "finished_product"
+                        categoryId: "550e8400-e29b-41d4-a716-446655440001"
+                        price: 3500
+                        unit: "份"
+                        status: "enabled"
+                        createdAt: "2025-12-31T10:00:00Z"
+                        updatedAt: "2025-12-31T10:00:00Z"
+                    total: 50
+                    page: 1
+                    pageSize: 20
+                    timestamp: "2025-12-31T10:00:00Z"
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new SKU
+      description: |
+        Create a new SKU entity with all required fields.
+
+        **Validation Rules**:
+        - `skuCode` must be unique and follow format: FIN-{NAME}-{SEQUENCE} / PKG-{NAME}-{SEQUENCE} / RAW-{NAME}-{SEQUENCE}
+        - `skuName` length: 1-100 characters
+        - `price` must be > 0 (unit: cents)
+        - `skuType` must be one of: finished_product, packaging, raw_material
+        - `categoryId` must reference an existing category
+      operationId: createSku
+      tags:
+        - SKU
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSKURequest'
+            examples:
+              create_finished_product:
+                summary: Create finished product SKU
+                value:
+                  skuCode: "FIN-MOJITO-001"
+                  skuName: "薄荷威士忌鸡尾酒"
+                  skuType: "finished_product"
+                  categoryId: "550e8400-e29b-41d4-a716-446655440001"
+                  price: 3500
+                  unit: "份"
+                  status: "enabled"
+                  imageUrl: "https://cdn.cinema-platform.com/images/mojito.jpg"
+                  description: "经典鸡尾酒，融合威士忌与薄荷的清爽口感"
+
+      responses:
+        '201':
+          description: SKU created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKU'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '400':
+          description: Validation error or duplicate SKU code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicate_code:
+                  summary: Duplicate SKU code
+                  value:
+                    success: false
+                    error: "SKU_DUP_001"
+                    message: "SKU编码已存在"
+                    details:
+                      skuCode: "FIN-MOJITO-001"
+                    timestamp: "2025-12-31T10:00:00Z"
+                invalid_price:
+                  summary: Invalid price
+                  value:
+                    success: false
+                    error: "SKU_VAL_001"
+                    message: "价格必须大于0"
+                    details:
+                      field: "price"
+                      value: -100
+                    timestamp: "2025-12-31T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/skus/{id}:
+    get:
+      summary: Get SKU by ID
+      description: Retrieve detailed information about a specific SKU by its UUID
+      operationId: getSkuById
+      tags:
+        - SKU
+      parameters:
+        - name: id
+          in: path
+          description: SKU UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+      responses:
+        '200':
+          description: SKU retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKU'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '404':
+          description: SKU not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "SKU_NTF_001"
+                message: "SKU不存在"
+                details:
+                  skuId: "550e8400-e29b-41d4-a716-446655440000"
+                timestamp: "2025-12-31T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update SKU
+      description: |
+        Update an existing SKU entity. Partial updates are supported (only provided fields will be updated).
+
+        **Validation Rules**:
+        - Cannot change `skuCode` (immutable after creation)
+        - Cannot change `skuType` if SKU is referenced by BOMs
+        - All other validation rules same as creation
+      operationId: updateSku
+      tags:
+        - SKU
+      parameters:
+        - name: id
+          in: path
+          description: SKU UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSKURequest'
+            examples:
+              update_price:
+                summary: Update price only
+                value:
+                  price: 3800
+              update_status:
+                summary: Disable SKU
+                value:
+                  status: "disabled"
+
+      responses:
+        '200':
+          description: SKU updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/SKU'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete SKU
+      description: |
+        Delete a SKU entity. Cannot delete if SKU is referenced by BOMs.
+
+        **Pre-deletion Checks**:
+        - Check if SKU is referenced in `boms.component_sku_id` or `boms.finished_product_sku_id`
+        - If referenced, return 409 Conflict error
+      operationId: deleteSku
+      tags:
+        - SKU
+      parameters:
+        - name: id
+          in: path
+          description: SKU UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+      responses:
+        '204':
+          description: SKU deleted successfully (no content)
+
+        '409':
+          description: SKU is referenced by BOMs and cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "SKU_REF_001"
+                message: "SKU被配方引用，无法删除"
+                details:
+                  skuId: "550e8400-e29b-41d4-a716-446655440000"
+                  referencedByBomCount: 5
+                timestamp: "2025-12-31T10:00:00Z"
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/categories:
+    get:
+      summary: List categories
+      description: |
+        Retrieve all categories with hierarchical structure support.
+
+        **Query Options**:
+        - No filters: Return all categories (flat list)
+        - `?parentId=null`: Return only top-level categories
+        - `?parentId={uuid}`: Return child categories of specified parent
+      operationId: listCategories
+      tags:
+        - Category
+      parameters:
+        - name: parentId
+          in: query
+          description: |
+            Filter by parent category ID. Use "null" to get top-level categories.
+          required: false
+          schema:
+            type: string
+          example: "null"
+
+        - name: status
+          in: query
+          description: Filter by category status
+          required: false
+          schema:
+            type: string
+            enum:
+              - enabled
+              - disabled
+          example: enabled
+
+      responses:
+        '200':
+          description: Category list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+              examples:
+                top_level_categories:
+                  summary: Top-level categories
+                  value:
+                    success: true
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440001"
+                        categoryName: "饮品"
+                        parentId: null
+                        level: 1
+                        sortOrder: 1
+                        status: "enabled"
+                        createdAt: "2025-12-31T10:00:00Z"
+                        updatedAt: "2025-12-31T10:00:00Z"
+                      - id: "550e8400-e29b-41d4-a716-446655440002"
+                        categoryName: "包材"
+                        parentId: null
+                        level: 1
+                        sortOrder: 2
+                        status: "enabled"
+                        createdAt: "2025-12-31T10:00:00Z"
+                        updatedAt: "2025-12-31T10:00:00Z"
+                    timestamp: "2025-12-31T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/boms:
+    get:
+      summary: List BOM entries
+      description: |
+        Retrieve BOM (Bill of Materials) entries with filtering by finished product SKU.
+
+        **Use Case**: Get all components (raw materials + packaging) for a specific finished product SKU.
+      operationId: listBoms
+      tags:
+        - BOM
+      parameters:
+        - name: finishedProductSkuId
+          in: query
+          description: Filter by finished product SKU ID (UUID)
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+      responses:
+        '200':
+          description: BOM list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BOM'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create BOM entry
+      description: |
+        Create a new BOM (Bill of Materials) entry linking a finished product SKU to a component SKU.
+
+        **Validation Rules**:
+        - `finishedProductSkuId` must reference a SKU with type=finished_product (FR-006 constraint)
+        - `componentSkuId` must reference a SKU with type IN (raw_material, packaging)
+        - `componentSkuId` cannot equal `finishedProductSkuId` (prevent circular reference)
+        - `quantity` must be > 0
+        - `unit` must match `component_sku.unit`
+        - Same `(finishedProductSkuId, componentSkuId)` pair cannot be duplicated
+      operationId: createBom
+      tags:
+        - BOM
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBOMRequest'
+            examples:
+              add_raw_material:
+                summary: Add raw material to finished product
+                value:
+                  finishedProductSkuId: "550e8400-e29b-41d4-a716-446655440000"
+                  componentSkuId: "550e8400-e29b-41d4-a716-446655440010"
+                  quantity: 30.0
+                  unit: "毫升"
+                  sortOrder: 1
+                  isOptional: false
+
+      responses:
+        '201':
+          description: BOM entry created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/BOM'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_finished_product_type:
+                  summary: Finished product SKU is not of type finished_product
+                  value:
+                    success: false
+                    error: "BOM_VAL_001"
+                    message: "BOM只能关联finished_product类型的SKU"
+                    details:
+                      finishedProductSkuId: "550e8400-e29b-41d4-a716-446655440000"
+                      actualSkuType: "packaging"
+                    timestamp: "2025-12-31T10:00:00Z"
+                duplicate_component:
+                  summary: Component already exists in BOM
+                  value:
+                    success: false
+                    error: "BOM_DUP_001"
+                    message: "该组件已存在于配方中"
+                    details:
+                      finishedProductSkuId: "550e8400-e29b-41d4-a716-446655440000"
+                      componentSkuId: "550e8400-e29b-41d4-a716-446655440010"
+                    timestamp: "2025-12-31T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/boms/{id}:
+    put:
+      summary: Update BOM entry
+      description: Update quantity, unit, or sort order of an existing BOM entry
+      operationId: updateBom
+      tags:
+        - BOM
+      parameters:
+        - name: id
+          in: path
+          description: BOM entry UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440020"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBOMRequest'
+
+      responses:
+        '200':
+          description: BOM entry updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/BOM'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-12-31T10:00:00Z"
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: Delete BOM entry
+      description: Remove a component from a finished product's BOM
+      operationId: deleteBom
+      tags:
+        - BOM
+      parameters:
+        - name: id
+          in: path
+          description: BOM entry UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440020"
+
+      responses:
+        '204':
+          description: BOM entry deleted successfully (no content)
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/auth/login
+
+  schemas:
+    SKU:
+      type: object
+      required:
+        - id
+        - skuCode
+        - skuName
+        - skuType
+        - categoryId
+        - price
+        - unit
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: SKU唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        skuCode:
+          type: string
+          maxLength: 50
+          description: |
+            SKU编码，格式要求：
+            - finished_product: FIN-{NAME}-{SEQUENCE}
+            - packaging: PKG-{NAME}-{SEQUENCE}
+            - raw_material: RAW-{NAME}-{SEQUENCE}
+          example: "FIN-MOJITO-001"
+        skuName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: SKU名称
+          example: "薄荷威士忌鸡尾酒"
+        skuType:
+          type: string
+          enum:
+            - finished_product
+            - packaging
+            - raw_material
+          description: SKU类型
+          example: "finished_product"
+        categoryId:
+          type: string
+          format: uuid
+          description: 所属分类ID
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        price:
+          type: integer
+          format: int64
+          minimum: 1
+          description: 价格（单位：分，如 3500 = 35.00元）
+          example: 3500
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: 计量单位（如 份、个、毫升、克）
+          example: "份"
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+            - draft
+          description: SKU状态
+          example: "enabled"
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 商品图片URL（可选）
+          example: "https://cdn.cinema-platform.com/images/mojito.jpg"
+        description:
+          type: string
+          nullable: true
+          description: 商品描述（可选）
+          example: "经典鸡尾酒，融合威士忌与薄荷的清爽口感"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-12-31T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-31T10:00:00Z"
+        createdBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: 创建人ID
+          example: "550e8400-e29b-41d4-a716-446655440099"
+        updatedBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: 更新人ID
+          example: "550e8400-e29b-41d4-a716-446655440099"
+
+    CreateSKURequest:
+      type: object
+      required:
+        - skuCode
+        - skuName
+        - skuType
+        - categoryId
+        - price
+        - unit
+      properties:
+        skuCode:
+          type: string
+          maxLength: 50
+          example: "FIN-MOJITO-001"
+        skuName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "薄荷威士忌鸡尾酒"
+        skuType:
+          type: string
+          enum:
+            - finished_product
+            - packaging
+            - raw_material
+          example: "finished_product"
+        categoryId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        price:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 3500
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: "份"
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+            - draft
+          default: enabled
+          example: "enabled"
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://cdn.cinema-platform.com/images/mojito.jpg"
+        description:
+          type: string
+          nullable: true
+          example: "经典鸡尾酒，融合威士忌与薄荷的清爽口感"
+
+    UpdateSKURequest:
+      type: object
+      properties:
+        skuName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "薄荷威士忌鸡尾酒（升级版）"
+        categoryId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        price:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 3800
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: "份"
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+            - draft
+          example: "disabled"
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://cdn.cinema-platform.com/images/mojito-v2.jpg"
+        description:
+          type: string
+          nullable: true
+          example: "经典鸡尾酒，升级配方"
+
+    Category:
+      type: object
+      required:
+        - id
+        - categoryName
+        - level
+        - sortOrder
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 分类唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        categoryName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 分类名称
+          example: "鸡尾酒"
+        parentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 父分类ID（NULL表示顶级分类）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        level:
+          type: integer
+          minimum: 1
+          description: 层级（1=顶级，2=二级，依此类推）
+          example: 2
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 1
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+          description: 分类状态
+          example: "enabled"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-12-31T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-31T10:00:00Z"
+
+    BOM:
+      type: object
+      required:
+        - id
+        - finishedProductSkuId
+        - componentSkuId
+        - quantity
+        - unit
+        - sortOrder
+        - isOptional
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: BOM唯一标识符
+          example: "550e8400-e29b-41d4-a716-446655440020"
+        finishedProductSkuId:
+          type: string
+          format: uuid
+          description: 成品SKU ID（必须是 sku_type=finished_product）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        componentSkuId:
+          type: string
+          format: uuid
+          description: 组成部分SKU ID（可以是 raw_material 或 packaging）
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        quantity:
+          type: number
+          format: double
+          minimum: 0.001
+          description: 用量（如 30.000 毫升威士忌）
+          example: 30.0
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: 单位（必须与 component_sku.unit 一致）
+          example: "毫升"
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 1
+        isOptional:
+          type: boolean
+          description: 是否可选组件（如可选加料）
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-12-31T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-31T10:00:00Z"
+
+    CreateBOMRequest:
+      type: object
+      required:
+        - finishedProductSkuId
+        - componentSkuId
+        - quantity
+        - unit
+      properties:
+        finishedProductSkuId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        componentSkuId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        quantity:
+          type: number
+          format: double
+          minimum: 0.001
+          example: 30.0
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: "毫升"
+        sortOrder:
+          type: integer
+          default: 0
+          example: 1
+        isOptional:
+          type: boolean
+          default: false
+          example: false
+
+    UpdateBOMRequest:
+      type: object
+      properties:
+        quantity:
+          type: number
+          format: double
+          minimum: 0.001
+          example: 35.0
+        unit:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: "毫升"
+        sortOrder:
+          type: integer
+          example: 2
+        isOptional:
+          type: boolean
+          example: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: |
+            标准化错误编号，格式：<模块前缀>_<类别>_<序号>
+
+            **模块前缀**:
+            - SKU: SKU management
+            - BOM: BOM management
+            - CAT: Category management
+
+            **类别**:
+            - VAL: Validation error
+            - NTF: Not found
+            - DUP: Duplicate/conflict
+            - REF: Reference constraint
+          example: "SKU_NTF_001"
+        message:
+          type: string
+          description: 错误描述信息
+          example: "SKU不存在"
+        details:
+          type: object
+          nullable: true
+          description: 错误详情（可选，包含上下文信息）
+          additionalProperties: true
+          example:
+            skuId: "550e8400-e29b-41d4-a716-446655440000"
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误发生时间
+          example: "2025-12-31T10:00:00Z"
+
+  responses:
+    BadRequest:
+      description: Bad request - validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "SKU_VAL_001"
+            message: "请求参数验证失败"
+            details:
+              field: "skuCode"
+              message: "SKU编码格式不正确"
+            timestamp: "2025-12-31T10:00:00Z"
+
+    Unauthorized:
+      description: Unauthorized - missing or invalid JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "AUT_UNA_001"
+            message: "未认证或Token无效"
+            details: null
+            timestamp: "2025-12-31T10:00:00Z"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "SKU_NTF_001"
+            message: "SKU不存在"
+            details:
+              skuId: "550e8400-e29b-41d4-a716-446655440000"
+            timestamp: "2025-12-31T10:00:00Z"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "SYS_INT_001"
+            message: "服务器内部错误"
+            details: null
+            timestamp: "2025-12-31T10:00:00Z"

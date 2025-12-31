@@ -1,0 +1,38 @@
+# @spec O004-beverage-sku-reuse
+# Test Data Blueprint: BOM配方SKU选择器过滤测试数据
+# Generated for E2E-PRODUCT-003 scenario
+
+id: TD-BOM-COCKTAIL-001
+description: "包含多种SKU类型（finished_product, packaging, raw_material）用于测试SKU选择器过滤功能"
+version: "1.0.0"
+
+strategy:
+  type: seed
+  seedFilePath: testdata/seeds/bom-filter-skus.json
+  seedKey: "bom-filter-test"
+  description: "使用静态种子文件提供finished_product、packaging、raw_material三种类型的SKU数据"
+
+scope: test  # 每个测试独立创建和清理
+teardown: false  # seed 策略不需要 teardown
+timeout: 5000
+
+# 环境配置（可选）
+environments: [local, ci, staging]
+
+# 依赖（可选）
+dependencies: []
+
+# 响应映射
+responseMapping:
+  expectedSkuCount: "expected_sku_count"
+  finishedProductSkus: "finished_product_skus"
+  packagingSkus: "packaging_skus"
+  rawMaterialSkus: "raw_material_skus"
+  adminCredentials: "admin_credentials"
+
+metadata:
+  spec_ref: O004
+  user_story: US2
+  priority: p2
+  created_at: "2025-12-31T12:00:00Z"
+  created_by: "e2e-testdata-planner"
