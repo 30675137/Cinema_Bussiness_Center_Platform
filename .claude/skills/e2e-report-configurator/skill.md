@@ -315,14 +315,44 @@ After running `setup --format html,json,junit`, you'll have:
 │       ├── html/               # HTML reports
 │       ├── json/               # JSON reports
 │       ├── junit/              # JUnit XML reports
-│       └── artifacts/          # Test artifacts
-│           ├── screenshots/
-│           ├── videos/
-│           └── traces/
+│       ├── artifacts/          # Test artifacts
+│       │   ├── screenshots/
+│       │   ├── videos/
+│       │   └── traces/
+│       └── e2e-portal/         # T007: Report aggregation portal
+│           ├── index.html      # Portal UI
+│           └── reports.json    # Report index
 ├── .gitignore                  # Updated with reports/ entry
 └── docs/
     └── e2e-reports.md          # Generated documentation
 ```
+
+### Run-Based Report Structure (T007 Enhancement)
+
+When using e2e-admin orchestrator, each test run generates an isolated report directory:
+
+```
+reports/e2e/
+├── e2e-portal/                         # Aggregation portal
+│   ├── index.html
+│   └── reports.json
+├── run-20251231-143052-a3f8b921/       # Individual run report
+│   ├── index.html                       # Playwright HTML report
+│   ├── summary.json                     # Run summary
+│   ├── config.json                      # Run configuration snapshot
+│   └── artifacts/
+│       ├── E2E-INVENTORY-001/
+│       │   ├── trace.zip
+│       │   └── screenshot.png
+│       └── E2E-INVENTORY-002/
+│           └── video.webm
+└── run-20251231-150000-b4e9c012/       # Another run
+    └── ...
+```
+
+**Run ID Format**: `YYYYMMDD-HHMMSS-<8-char-hash>`
+
+**Report Retention**: Last 30 runs are kept in `reports.json` index.
 
 ## Architecture
 

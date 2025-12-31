@@ -1,6 +1,6 @@
 # E2E Test Scenarios
 
-**@spec T002-e2e-test-generator, T004-e2e-testdata-planner**
+**@spec T002-e2e-test-generator, T004-e2e-testdata-planner, T007-e2e-test-management**
 
 This directory contains E2E test scenarios generated from YAML specifications.
 
@@ -12,7 +12,13 @@ scenarios/
 ├── package.json                       # ES module configuration
 ├── node_modules/                      # Symlink to frontend/node_modules
 ├── test-base.ts                       # Shared Playwright test export
+├── order/                             # Order module scenarios
+│   ├── E2E-ORDER-001.yaml            # Scenario YAML definition
+│   ├── E2E-ORDER-001.spec.ts         # Generated Playwright test
+│   └── docs/                         # Generated Markdown docs (T007)
+│       └── E2E-ORDER-001.md          # Human-readable scenario doc
 └── inventory/                         # Inventory module scenarios
+    ├── E2E-INVENTORY-001.yaml        # Scenario YAML definition
     ├── E2E-INVENTORY-001.spec.ts     # BOM 库存扣减测试
     ├── E2E-INVENTORY-002.spec.ts     # BOM库存预占与实扣流程 (with fixture)
     ├── E2E-INVENTORY-003.spec.ts     # 库存调整审批流程
@@ -21,8 +27,30 @@ scenarios/
     ├── E2E-INVENTORY-006.spec.ts     # 库存盘点流程
     ├── E2E-INVENTORY-007.spec.ts     # 库存批次管理（FIFO）
     ├── E2E-INVENTORY-008.spec.ts     # 库存导出报表
-    └── E2E-INVENTORY-009.spec.ts     # B端调整后C端实时更新
+    ├── E2E-INVENTORY-009.spec.ts     # B端调整后C端实时更新
+    └── docs/                         # Generated Markdown docs (T007)
+        └── E2E-INVENTORY-XXX.md      # Human-readable scenario docs
 ```
+
+## Generated Documentation (T007 Enhancement)
+
+The `docs/` subdirectory in each module contains auto-generated Markdown files:
+
+- **Source**: YAML scenario files
+- **Generator**: `/e2e scenario generate-doc`
+- **Content**: Human-readable step descriptions only
+- **Excludes**: CSS selectors, locators, technical assertions
+
+**Commands**:
+```bash
+# Generate doc for single scenario
+/e2e scenario generate-doc E2E-ORDER-001
+
+# Batch generate for module
+/e2e scenario generate-doc --module order
+```
+
+**Important**: Do NOT edit files in `docs/` directly. They are overwritten during generation.
 
 ## Infrastructure Setup
 
