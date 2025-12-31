@@ -10,7 +10,12 @@
 
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { skuCreateSchema, skuEditSchema, type SkuCreateFormData, type SkuEditFormData } from '../schemas/skuSchema';
+import {
+  skuCreateSchema,
+  skuEditSchema,
+  type SkuCreateFormData,
+  type SkuEditFormData,
+} from '../schemas/skuSchema';
 import type { SKU } from '@/types/sku';
 
 /**
@@ -91,9 +96,7 @@ export function useSkuCreateForm(
  * });
  * ```
  */
-export function useSkuEditForm(
-  sku?: SKU
-): UseFormReturn<SkuEditFormData> {
+export function useSkuEditForm(sku?: SKU): UseFormReturn<SkuEditFormData> {
   return useForm<SkuEditFormData>({
     resolver: zodResolver(skuEditSchema),
     defaultValues: sku

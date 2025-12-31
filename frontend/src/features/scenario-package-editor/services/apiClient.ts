@@ -70,9 +70,11 @@ const API_PATHS = {
   addOnItems: '/addon-items',
   packageAddons: (id: string) => `/scenario-packages/${id}/addons`,
   timeSlotTemplates: (id: string) => `/scenario-packages/${id}/time-slot-templates`,
-  timeSlotTemplate: (packageId: string, templateId: string) => `/scenario-packages/${packageId}/time-slot-templates/${templateId}`,
+  timeSlotTemplate: (packageId: string, templateId: string) =>
+    `/scenario-packages/${packageId}/time-slot-templates/${templateId}`,
   timeSlotOverrides: (id: string) => `/scenario-packages/${id}/time-slot-overrides`,
-  timeSlotOverride: (packageId: string, overrideId: string) => `/scenario-packages/${packageId}/time-slot-overrides/${overrideId}`,
+  timeSlotOverride: (packageId: string, overrideId: string) =>
+    `/scenario-packages/${packageId}/time-slot-overrides/${overrideId}`,
   publishSettings: (id: string) => `/scenario-packages/${id}/publish-settings`,
   publish: (id: string) => `/scenario-packages/${id}/publish`,
   archive: (id: string) => `/scenario-packages/${id}/archive`,
@@ -142,18 +144,18 @@ export const scenarioPackageApi = {
    * 适配后端实际返回的数据格式
    */
   async getPackageDetail(packageId: string): Promise<ScenarioPackageFullData> {
-    const response = await apiClient.get<ApiResponse<BackendScenarioPackageData | ScenarioPackageFullData>>(
-      API_PATHS.package(packageId)
-    );
-    
+    const response = await apiClient.get<
+      ApiResponse<BackendScenarioPackageData | ScenarioPackageFullData>
+    >(API_PATHS.package(packageId));
+
     const responseData = response.data.data;
-    
+
     // 检查是否是后端新格式（直接返回场景包数据，而不是包裹在 package 字段中）
     if ('package' in responseData) {
       // MSW mock 格式或匹配的后端格式
       return responseData as ScenarioPackageFullData;
     }
-    
+
     // 后端实际格式：直接返回场景包数据
     const backendData = responseData as BackendScenarioPackageData;
     return {
@@ -182,9 +184,7 @@ export const scenarioPackageApi = {
    * 获取套餐列表
    */
   async getPackageTiers(packageId: string): Promise<PackageTier[]> {
-    const response = await apiClient.get<ListResponse<PackageTier>>(
-      API_PATHS.tiers(packageId)
-    );
+    const response = await apiClient.get<ListResponse<PackageTier>>(API_PATHS.tiers(packageId));
     return response.data.data;
   },
 
@@ -266,7 +266,10 @@ export const scenarioPackageApi = {
   /**
    * 创建时段模板
    */
-  async createTimeSlotTemplate(packageId: string, data: CreateTimeSlotTemplateRequest): Promise<TimeSlotTemplate> {
+  async createTimeSlotTemplate(
+    packageId: string,
+    data: CreateTimeSlotTemplateRequest
+  ): Promise<TimeSlotTemplate> {
     const response = await apiClient.post<ApiResponse<TimeSlotTemplate>>(
       API_PATHS.timeSlotTemplates(packageId),
       data
@@ -312,7 +315,7 @@ export const scenarioPackageApi = {
     const params: Record<string, string> = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
-    
+
     const response = await apiClient.get<ApiResponse<TimeSlotOverride[]>>(
       API_PATHS.timeSlotOverrides(packageId),
       { params }
@@ -323,7 +326,10 @@ export const scenarioPackageApi = {
   /**
    * 创建时段覆盖
    */
-  async createTimeSlotOverride(packageId: string, data: CreateTimeSlotOverrideRequest): Promise<TimeSlotOverride> {
+  async createTimeSlotOverride(
+    packageId: string,
+    data: CreateTimeSlotOverrideRequest
+  ): Promise<TimeSlotOverride> {
     const response = await apiClient.post<ApiResponse<TimeSlotOverride>>(
       API_PATHS.timeSlotOverrides(packageId),
       data
@@ -358,7 +364,10 @@ export const scenarioPackageApi = {
   /**
    * 更新发布设置
    */
-  async updatePublishSettings(packageId: string, data: UpdatePublishSettingsRequest): Promise<ScenarioPackage> {
+  async updatePublishSettings(
+    packageId: string,
+    data: UpdatePublishSettingsRequest
+  ): Promise<ScenarioPackage> {
     const response = await apiClient.put<ApiResponse<ScenarioPackage>>(
       API_PATHS.publishSettings(packageId),
       data

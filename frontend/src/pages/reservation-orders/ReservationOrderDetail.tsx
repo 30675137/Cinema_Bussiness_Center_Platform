@@ -4,7 +4,7 @@
  * B端预约单管理详情页面
  */
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react';
 import {
   Card,
   Button,
@@ -18,71 +18,68 @@ import {
   Divider,
   Row,
   Col,
-} from 'antd'
+} from 'antd';
 import {
   ArrowLeftOutlined,
   CheckOutlined,
   CloseOutlined,
   EditOutlined,
   ClockCircleOutlined,
-} from '@ant-design/icons'
-import { useNavigate, useParams } from 'react-router-dom'
-import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
+} from '@ant-design/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { ColumnsType } from 'antd/es/table';
+import dayjs from 'dayjs';
 
-import { useReservationDetail } from './hooks/useReservationDetail'
-import OrderStatusBadge, { canConfirm, canCancel } from './components/OrderStatusBadge'
-import ConfirmOrderModal from './components/ConfirmOrderModal'
-import CancelOrderModal from './components/CancelOrderModal'
-import type {
-  ReservationItem,
-  OperationLog,
-} from './types/reservation-order.types'
-import { OPERATION_TYPE_CONFIG } from './types/reservation-order.types'
+import { useReservationDetail } from './hooks/useReservationDetail';
+import OrderStatusBadge, { canConfirm, canCancel } from './components/OrderStatusBadge';
+import ConfirmOrderModal from './components/ConfirmOrderModal';
+import CancelOrderModal from './components/CancelOrderModal';
+import type { ReservationItem, OperationLog } from './types/reservation-order.types';
+import { OPERATION_TYPE_CONFIG } from './types/reservation-order.types';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 /**
  * 预约单详情页
  */
 const ReservationOrderDetail: React.FC = () => {
-  const navigate = useNavigate()
-  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
 
   // 获取详情数据
-  const { data: order, isLoading, error, refetch } = useReservationDetail(id)
+  const { data: order, isLoading, error, refetch } = useReservationDetail(id);
 
   // 对话框状态
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
-  const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
 
   /**
    * 返回列表
    */
   const handleBack = useCallback(() => {
-    navigate('/reservation-orders')
-  }, [navigate])
+    navigate('/reservation-orders');
+  }, [navigate]);
 
   /**
    * 刷新详情
    */
   const handleRefresh = useCallback(() => {
-    refetch()
-  }, [refetch])
+    refetch();
+  }, [refetch]);
 
   /**
    * 打开确认对话框
    */
   const handleOpenConfirm = useCallback(() => {
-    setConfirmModalOpen(true)
-  }, [])
+    setConfirmModalOpen(true);
+  }, []);
 
   /**
    * 打开取消对话框
    */
   const handleOpenCancel = useCallback(() => {
-    setCancelModalOpen(true)
-  }, [])
+    setCancelModalOpen(true);
+  }, []);
 
   /**
    * 加购项表格列
@@ -118,7 +115,7 @@ const ReservationOrderDetail: React.FC = () => {
       align: 'right' as const,
       render: (price: number) => `¥${price?.toFixed(2) || '0.00'}`,
     },
-  ]
+  ];
 
   // 加载中
   if (isLoading) {
@@ -126,7 +123,7 @@ const ReservationOrderDetail: React.FC = () => {
       <div style={{ padding: 24, textAlign: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
-    )
+    );
   }
 
   // 错误
@@ -144,13 +141,20 @@ const ReservationOrderDetail: React.FC = () => {
           </Empty>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
     <div style={{ padding: 24 }}>
       {/* 页面头部 */}
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: 24,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
           <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
             返回列表
@@ -163,20 +167,12 @@ const ReservationOrderDetail: React.FC = () => {
         {/* 操作按钮 */}
         <Space>
           {canConfirm(order.status) && (
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={handleOpenConfirm}
-            >
+            <Button type="primary" icon={<CheckOutlined />} onClick={handleOpenConfirm}>
               确认预约
             </Button>
           )}
           {canCancel(order.status) && (
-            <Button
-              danger
-              icon={<CloseOutlined />}
-              onClick={handleOpenCancel}
-            >
+            <Button danger icon={<CloseOutlined />} onClick={handleOpenCancel}>
               取消预约
             </Button>
           )}
@@ -190,20 +186,18 @@ const ReservationOrderDetail: React.FC = () => {
           <Card title="基本信息" style={{ marginBottom: 24 }}>
             <Descriptions column={{ xs: 1, sm: 2 }}>
               <Descriptions.Item label="预约单号">
-                <Text strong copyable>{order.orderNumber}</Text>
+                <Text strong copyable>
+                  {order.orderNumber}
+                </Text>
               </Descriptions.Item>
               <Descriptions.Item label="状态">
                 <OrderStatusBadge status={order.status} />
               </Descriptions.Item>
               <Descriptions.Item label="创建时间">
-                {order.createdAt
-                  ? dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                  : '-'}
+                {order.createdAt ? dayjs(order.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="更新时间">
-                {order.updatedAt
-                  ? dayjs(order.updatedAt).format('YYYY-MM-DD HH:mm:ss')
-                  : '-'}
+                {order.updatedAt ? dayjs(order.updatedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="是否需要支付">
                 {order.requiresPayment ? '是' : '否'}
@@ -219,15 +213,9 @@ const ReservationOrderDetail: React.FC = () => {
           {/* 场景包信息卡片 */}
           <Card title="预约信息" style={{ marginBottom: 24 }}>
             <Descriptions column={{ xs: 1, sm: 2 }}>
-              <Descriptions.Item label="场景包">
-                {order.scenarioPackageName}
-              </Descriptions.Item>
-              <Descriptions.Item label="套餐">
-                {order.packageTierName}
-              </Descriptions.Item>
-              <Descriptions.Item label="预订日期">
-                {order.reservationDate}
-              </Descriptions.Item>
+              <Descriptions.Item label="场景包">{order.scenarioPackageName}</Descriptions.Item>
+              <Descriptions.Item label="套餐">{order.packageTierName}</Descriptions.Item>
+              <Descriptions.Item label="预订日期">{order.reservationDate}</Descriptions.Item>
               <Descriptions.Item label="预订时段">
                 {order.reservationTime} - {order.reservationEndTime}
               </Descriptions.Item>
@@ -251,9 +239,7 @@ const ReservationOrderDetail: React.FC = () => {
           {/* 联系人信息卡片 */}
           <Card title="联系人信息" style={{ marginBottom: 24 }}>
             <Descriptions column={{ xs: 1, sm: 2 }}>
-              <Descriptions.Item label="联系人姓名">
-                {order.contactName}
-              </Descriptions.Item>
+              <Descriptions.Item label="联系人姓名">{order.contactName}</Descriptions.Item>
               <Descriptions.Item label="联系人手机">
                 <Text copyable>{order.contactPhone}</Text>
               </Descriptions.Item>
@@ -268,13 +254,9 @@ const ReservationOrderDetail: React.FC = () => {
             <Card title="取消信息" style={{ marginBottom: 24 }}>
               <Descriptions column={1}>
                 <Descriptions.Item label="取消时间">
-                  {order.cancelledAt
-                    ? dayjs(order.cancelledAt).format('YYYY-MM-DD HH:mm:ss')
-                    : '-'}
+                  {order.cancelledAt ? dayjs(order.cancelledAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
                 </Descriptions.Item>
-                <Descriptions.Item label="取消原因">
-                  {order.cancelReason}
-                </Descriptions.Item>
+                <Descriptions.Item label="取消原因">{order.cancelReason}</Descriptions.Item>
               </Descriptions>
             </Card>
           )}
@@ -292,15 +274,12 @@ const ReservationOrderDetail: React.FC = () => {
                   >
                     <div>
                       <Text strong>
-                        {OPERATION_TYPE_CONFIG[log.operationType]?.label ||
-                          log.operationType}
+                        {OPERATION_TYPE_CONFIG[log.operationType]?.label || log.operationType}
                       </Text>
                     </div>
                     <div>
                       <Text type="secondary" style={{ fontSize: 12 }}>
-                        {log.operatedAt
-                          ? dayjs(log.operatedAt).format('YYYY-MM-DD HH:mm:ss')
-                          : '-'}
+                        {log.operatedAt ? dayjs(log.operatedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
                       </Text>
                     </div>
                     {log.operatorName && (
@@ -319,10 +298,7 @@ const ReservationOrderDetail: React.FC = () => {
                 ))}
               </Timeline>
             ) : (
-              <Empty
-                description="暂无操作日志"
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
+              <Empty description="暂无操作日志" image={Empty.PRESENTED_IMAGE_SIMPLE} />
             )}
           </Card>
         </Col>
@@ -344,7 +320,7 @@ const ReservationOrderDetail: React.FC = () => {
         onSuccess={handleRefresh}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ReservationOrderDetail
+export default ReservationOrderDetail;

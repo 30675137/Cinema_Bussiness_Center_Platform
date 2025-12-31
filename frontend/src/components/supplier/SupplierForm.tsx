@@ -16,16 +16,21 @@ import {
   Tag,
   Upload,
   Modal,
-  message
+  message,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { PlusOutlined, DeleteOutlined, UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import {
-  PlusOutlined,
-  DeleteOutlined,
-  UploadOutlined,
-  InboxOutlined
-} from '@ant-design/icons';
-import { Supplier, SupplierStatus, SupplierLevel, SupplierType, ContactInfo, BankAccount, SupplierQualification, CreateSupplierParams, UpdateSupplierParams } from '@/types/supplier';
+  Supplier,
+  SupplierStatus,
+  SupplierLevel,
+  SupplierType,
+  ContactInfo,
+  BankAccount,
+  SupplierQualification,
+  CreateSupplierParams,
+  UpdateSupplierParams,
+} from '@/types/supplier';
 import { generateId } from '@/utils/helpers';
 
 const { Option } = Select;
@@ -44,12 +49,14 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm();
   const [contacts, setContacts] = useState<ContactInfo[]>(initialData?.contacts || []);
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>(initialData?.bankAccounts || []);
-  const [qualifications, setQualifications] = useState<SupplierQualification[]>(initialData?.qualifications || []);
+  const [qualifications, setQualifications] = useState<SupplierQualification[]>(
+    initialData?.qualifications || []
+  );
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -73,7 +80,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         cooperationEndDate: initialData.cooperationEndDate,
         creditLimit: initialData.creditLimit,
         paymentTerms: initialData.paymentTerms,
-        remarks: initialData.remarks
+        remarks: initialData.remarks,
       });
     }
   }, [initialData, mode, form]);
@@ -84,7 +91,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     { value: SupplierStatus.SUSPENDED, label: '暂停合作', color: 'orange' },
     { value: SupplierStatus.TERMINATED, label: '终止合作', color: 'red' },
     { value: SupplierStatus.PENDING_APPROVAL, label: '待审批', color: 'blue' },
-    { value: SupplierStatus.UNDER_REVIEW, label: '复核中', color: 'purple' }
+    { value: SupplierStatus.UNDER_REVIEW, label: '复核中', color: 'purple' },
   ];
 
   // 供应商等级选项
@@ -92,7 +99,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     { value: SupplierLevel.STRATEGIC, label: '战略供应商', icon: '⭐⭐⭐' },
     { value: SupplierLevel.PREFERRED, label: '优选供应商', icon: '⭐⭐' },
     { value: SupplierLevel.STANDARD, label: '标准供应商', icon: '⭐' },
-    { value: SupplierLevel.TRIAL, label: '试用供应商', icon: '📋' }
+    { value: SupplierLevel.TRIAL, label: '试用供应商', icon: '📋' },
   ];
 
   // 供应商类型选项
@@ -101,7 +108,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     { value: SupplierType.WHOLESALER, label: '批发商' },
     { value: SupplierType.DISTRIBUTOR, label: '经销商' },
     { value: SupplierType.SERVICE_PROVIDER, label: '服务提供商' },
-    { value: SupplierType.OTHER, label: '其他' }
+    { value: SupplierType.OTHER, label: '其他' },
   ];
 
   // 供应品类选项
@@ -113,7 +120,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
     '办公用品',
     '电子设备',
     '服装纺织',
-    '其他用品'
+    '其他用品',
   ];
 
   // 添加联系人
@@ -124,7 +131,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       phone: '',
       position: '',
       email: '',
-      isPrimary: contacts.length === 0
+      isPrimary: contacts.length === 0,
     };
     setContacts([...contacts, newContact]);
   };
@@ -135,8 +142,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       title: '确认删除',
       content: '确定要删除该联系人吗？',
       onOk: () => {
-        setContacts(contacts.filter(contact => contact.id !== id));
-      }
+        setContacts(contacts.filter((contact) => contact.id !== id));
+      },
     });
   };
 
@@ -148,21 +155,25 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       render: (text, record) => (
         <div>
           {text}
-          {record.isPrimary && <Tag color="blue" size="small" className="ml-2">主要</Tag>}
+          {record.isPrimary && (
+            <Tag color="blue" size="small" className="ml-2">
+              主要
+            </Tag>
+          )}
         </div>
-      )
+      ),
     },
     {
       title: '职位',
-      dataIndex: 'position'
+      dataIndex: 'position',
     },
     {
       title: '手机',
-      dataIndex: 'phone'
+      dataIndex: 'phone',
     },
     {
       title: '邮箱',
-      dataIndex: 'email'
+      dataIndex: 'email',
     },
     {
       title: '操作',
@@ -175,8 +186,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           icon={<DeleteOutlined />}
           onClick={() => handleDeleteContact(record.id)}
         />
-      )
-    }
+      ),
+    },
   ];
 
   // 添加银行账户
@@ -186,7 +197,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       bankName: '',
       accountName: '',
       accountNumber: '',
-      isDefault: bankAccounts.length === 0
+      isDefault: bankAccounts.length === 0,
     };
     setBankAccounts([...bankAccounts, newAccount]);
   };
@@ -197,8 +208,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       title: '确认删除',
       content: '确定要删除该银行账户吗？',
       onOk: () => {
-        setBankAccounts(bankAccounts.filter(account => account.id !== id));
-      }
+        setBankAccounts(bankAccounts.filter((account) => account.id !== id));
+      },
     });
   };
 
@@ -206,22 +217,20 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   const bankAccountColumns: ColumnsType<BankAccount> = [
     {
       title: '开户行',
-      dataIndex: 'bankName'
+      dataIndex: 'bankName',
     },
     {
       title: '账户名称',
-      dataIndex: 'accountName'
+      dataIndex: 'accountName',
     },
     {
       title: '账号',
-      dataIndex: 'accountNumber'
+      dataIndex: 'accountNumber',
     },
     {
       title: '默认',
       dataIndex: 'isDefault',
-      render: (isDefault) => (
-        isDefault ? <Tag color="green">默认</Tag> : '-'
-      )
+      render: (isDefault) => (isDefault ? <Tag color="green">默认</Tag> : '-'),
     },
     {
       title: '操作',
@@ -234,8 +243,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           icon={<DeleteOutlined />}
           onClick={() => handleDeleteBankAccount(record.id)}
         />
-      )
-    }
+      ),
+    },
   ];
 
   // 添加资质证书
@@ -248,7 +257,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       issuingAuthority: '',
       issueDate: '',
       expireDate: '',
-      status: 'valid'
+      status: 'valid',
     };
     setQualifications([...qualifications, newQualification]);
   };
@@ -259,8 +268,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
       title: '确认删除',
       content: '确定要删除该资质证书吗？',
       onOk: () => {
-        setQualifications(qualifications.filter(qualification => qualification.id !== id));
-      }
+        setQualifications(qualifications.filter((qualification) => qualification.id !== id));
+      },
     });
   };
 
@@ -268,23 +277,23 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
   const qualificationColumns: ColumnsType<SupplierQualification> = [
     {
       title: '资质类型',
-      dataIndex: 'qualificationType'
+      dataIndex: 'qualificationType',
     },
     {
       title: '证书名称',
-      dataIndex: 'qualificationName'
+      dataIndex: 'qualificationName',
     },
     {
       title: '证书编号',
-      dataIndex: 'certificateNumber'
+      dataIndex: 'certificateNumber',
     },
     {
       title: '发证机关',
-      dataIndex: 'issuingAuthority'
+      dataIndex: 'issuingAuthority',
     },
     {
       title: '有效期至',
-      dataIndex: 'expireDate'
+      dataIndex: 'expireDate',
     },
     {
       title: '状态',
@@ -293,7 +302,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         <Tag color={status === 'valid' ? 'green' : status === 'expired' ? 'red' : 'blue'}>
           {status === 'valid' ? '有效' : status === 'expired' ? '已过期' : '待验证'}
         </Tag>
-      )
+      ),
     },
     {
       title: '操作',
@@ -306,8 +315,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           icon={<DeleteOutlined />}
           onClick={() => handleDeleteQualification(record.id)}
         />
-      )
-    }
+      ),
+    },
   ];
 
   // 处理文件上传
@@ -333,7 +342,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         ...values,
         contacts,
         bankAccounts,
-        qualifications
+        qualifications,
       };
       onSubmit(formData);
     } catch (error) {
@@ -347,9 +356,13 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={initialData ? {
-          status: initialData.status
-        } : { status: SupplierStatus.PENDING_APPROVAL }}
+        initialValues={
+          initialData
+            ? {
+                status: initialData.status,
+              }
+            : { status: SupplierStatus.PENDING_APPROVAL }
+        }
       >
         {/* 基本信息 */}
         <Card title="基本信息" className="mb-4">
@@ -364,10 +377,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="供应商简称"
-                name="shortName"
-              >
+              <Form.Item label="供应商简称" name="shortName">
                 <Input placeholder="请输入供应商简称" />
               </Form.Item>
             </Col>
@@ -378,7 +388,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
                 rules={[{ required: true, message: '请选择供应商类型' }]}
               >
                 <Select placeholder="请选择供应商类型">
-                  {typeOptions.map(option => (
+                  {typeOptions.map((option) => (
                     <Option key={option.value} value={option.value}>
                       {option.label}
                     </Option>
@@ -393,7 +403,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
                 rules={[{ required: true, message: '请选择供应商等级' }]}
               >
                 <Select placeholder="请选择供应商等级">
-                  {levelOptions.map(option => (
+                  {levelOptions.map((option) => (
                     <Option key={option.value} value={option.value}>
                       {option.icon} {option.label}
                     </Option>
@@ -402,18 +412,12 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="统一社会信用代码"
-                name="creditCode"
-              >
+              <Form.Item label="统一社会信用代码" name="creditCode">
                 <Input placeholder="请输入统一社会信用代码" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="法定代表人"
-                name="legalRepresentative"
-              >
+              <Form.Item label="法定代表人" name="legalRepresentative">
                 <Input placeholder="请输入法定代表人" />
               </Form.Item>
             </Col>
@@ -427,10 +431,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                label="邮政编码"
-                name="postalCode"
-              >
+              <Form.Item label="邮政编码" name="postalCode">
                 <Input placeholder="请输入邮政编码" />
               </Form.Item>
             </Col>
@@ -444,10 +445,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                label="公司传真"
-                name="fax"
-              >
+              <Form.Item label="公司传真" name="fax">
                 <Input placeholder="请输入公司传真" />
               </Form.Item>
             </Col>
@@ -461,10 +459,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="公司网站"
-                name="website"
-              >
+              <Form.Item label="公司网站" name="website">
                 <Input placeholder="请输入公司网站" />
               </Form.Item>
             </Col>
@@ -483,61 +478,40 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
                 <Select
                   mode="multiple"
                   placeholder="请选择供应品类"
-                  options={categoryOptions.map(category => ({
+                  options={categoryOptions.map((category) => ({
                     label: category,
-                    value: category
+                    value: category,
                   }))}
                 />
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item
-                label="主营产品"
-                name="mainProducts"
-              >
-                <TextArea
-                  rows={3}
-                  placeholder="请输入主营产品，多个产品用逗号分隔"
-                />
+              <Form.Item label="主营产品" name="mainProducts">
+                <TextArea rows={3} placeholder="请输入主营产品，多个产品用逗号分隔" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="合作开始日期"
-                name="cooperationStartDate"
-              >
+              <Form.Item label="合作开始日期" name="cooperationStartDate">
                 <Input type="date" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="合作结束日期"
-                name="cooperationEndDate"
-              >
+              <Form.Item label="合作结束日期" name="cooperationEndDate">
                 <Input type="date" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="信用额度"
-                name="creditLimit"
-              >
+              <Form.Item label="信用额度" name="creditLimit">
                 <Input type="number" placeholder="请输入信用额度" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="付款条件"
-                name="paymentTerms"
-              >
+              <Form.Item label="付款条件" name="paymentTerms">
                 <Input placeholder="请输入付款条件" />
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item
-                label="备注"
-                name="remarks"
-              >
+              <Form.Item label="备注" name="remarks">
                 <TextArea rows={3} placeholder="请输入备注信息" />
               </Form.Item>
             </Col>
@@ -549,11 +523,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           title="联系人信息"
           className="mb-4"
           extra={
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddContact}
-            >
+            <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddContact}>
               添加联系人
             </Button>
           }
@@ -572,11 +542,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           title="银行账户信息"
           className="mb-4"
           extra={
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddBankAccount}
-            >
+            <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddBankAccount}>
               添加银行账户
             </Button>
           }
@@ -595,11 +561,7 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
           title="资质证书"
           className="mb-4"
           extra={
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddQualification}
-            >
+            <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddQualification}>
               添加资质证书
             </Button>
           }
@@ -616,14 +578,8 @@ const SupplierForm: React.FC<SupplierFormProps> = ({
         {/* 操作按钮 */}
         <div style={{ textAlign: 'right', marginTop: '24px' }}>
           <Space>
-            <Button onClick={onCancel}>
-              取消
-            </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-            >
+            <Button onClick={onCancel}>取消</Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
               {mode === 'create' ? '创建供应商' : '保存修改'}
             </Button>
           </Space>

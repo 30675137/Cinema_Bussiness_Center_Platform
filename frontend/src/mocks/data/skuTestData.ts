@@ -20,7 +20,7 @@ export const rawMaterials: SKU[] = [
     name: '威士忌',
     skuType: 'raw_material' as SkuType,
     storeScope: [], // 全门店可用
-    standardCost: 50.00, // 50元/瓶
+    standardCost: 50.0, // 50元/瓶
     wasteRate: 0,
     spuId: 'spu-whisky',
     spuName: '威士忌',
@@ -41,7 +41,7 @@ export const rawMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440002',
@@ -49,7 +49,7 @@ export const rawMaterials: SKU[] = [
     name: '可乐糖浆',
     skuType: 'raw_material' as SkuType,
     storeScope: [],
-    standardCost: 30.00, // 30元/瓶
+    standardCost: 30.0, // 30元/瓶
     wasteRate: 0,
     spuId: 'spu-cola-syrup',
     spuName: '可乐糖浆',
@@ -70,7 +70,7 @@ export const rawMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440003',
@@ -78,7 +78,7 @@ export const rawMaterials: SKU[] = [
     name: '薄荷叶',
     skuType: 'raw_material' as SkuType,
     storeScope: [],
-    standardCost: 5.00, // 5元/袋
+    standardCost: 5.0, // 5元/袋
     wasteRate: 0,
     spuId: 'spu-mint',
     spuName: '薄荷叶',
@@ -99,7 +99,7 @@ export const rawMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440004',
@@ -107,7 +107,7 @@ export const rawMaterials: SKU[] = [
     name: '玉米粒',
     skuType: 'raw_material' as SkuType,
     storeScope: [],
-    standardCost: 15.00, // 15元/kg
+    standardCost: 15.0, // 15元/kg
     wasteRate: 0,
     spuId: 'spu-corn',
     spuName: '玉米粒',
@@ -128,7 +128,7 @@ export const rawMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440005',
@@ -136,7 +136,7 @@ export const rawMaterials: SKU[] = [
     name: '黄油',
     skuType: 'raw_material' as SkuType,
     storeScope: [],
-    standardCost: 25.00, // 25元/块
+    standardCost: 25.0, // 25元/块
     wasteRate: 0,
     spuId: 'spu-butter',
     spuName: '黄油',
@@ -157,8 +157,8 @@ export const rawMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
-  }
+    updatedByName: '系统',
+  },
 ];
 
 // ==================== 包材 SKU (5个) ====================
@@ -170,7 +170,7 @@ export const packagingMaterials: SKU[] = [
     name: '玻璃杯',
     skuType: 'packaging' as SkuType,
     storeScope: [],
-    standardCost: 8.00, // 8元/个
+    standardCost: 8.0, // 8元/个
     wasteRate: 0,
     spuId: 'spu-glass-cup',
     spuName: '玻璃杯',
@@ -191,7 +191,7 @@ export const packagingMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440012',
@@ -199,7 +199,7 @@ export const packagingMaterials: SKU[] = [
     name: '纸杯',
     skuType: 'packaging' as SkuType,
     storeScope: [],
-    standardCost: 0.50, // 0.5元/个
+    standardCost: 0.5, // 0.5元/个
     wasteRate: 0,
     spuId: 'spu-paper-cup',
     spuName: '纸杯',
@@ -220,7 +220,7 @@ export const packagingMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440013',
@@ -228,7 +228,7 @@ export const packagingMaterials: SKU[] = [
     name: '吸管',
     skuType: 'packaging' as SkuType,
     storeScope: [],
-    standardCost: 0.10, // 0.1元/根
+    standardCost: 0.1, // 0.1元/根
     wasteRate: 0,
     spuId: 'spu-straw',
     spuName: '吸管',
@@ -249,7 +249,7 @@ export const packagingMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440014',
@@ -257,7 +257,7 @@ export const packagingMaterials: SKU[] = [
     name: '爆米花桶(大)',
     skuType: 'packaging' as SkuType,
     storeScope: [],
-    standardCost: 1.50, // 1.5元/个
+    standardCost: 1.5, // 1.5元/个
     wasteRate: 0,
     spuId: 'spu-popcorn-bucket-large',
     spuName: '爆米花桶(大)',
@@ -278,7 +278,7 @@ export const packagingMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440015',
@@ -286,7 +286,7 @@ export const packagingMaterials: SKU[] = [
     name: '爆米花袋(小)',
     skuType: 'packaging' as SkuType,
     storeScope: [],
-    standardCost: 0.80, // 0.8元/个
+    standardCost: 0.8, // 0.8元/个
     wasteRate: 0,
     spuId: 'spu-popcorn-bag-small',
     spuName: '爆米花袋(小)',
@@ -307,8 +307,8 @@ export const packagingMaterials: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
-  }
+    updatedByName: '系统',
+  },
 ];
 
 // ==================== 成品 SKU (8个) ====================
@@ -341,7 +341,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440022',
@@ -370,7 +370,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440023',
@@ -399,7 +399,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440024',
@@ -407,7 +407,7 @@ export const finishedProducts: SKU[] = [
     name: '听装可乐',
     skuType: 'finished_product' as SkuType,
     storeScope: [],
-    standardCost: 3.50, // 直接包装，无BOM
+    standardCost: 3.5, // 直接包装，无BOM
     wasteRate: 0,
     spuId: 'spu-canned-cola',
     spuName: '听装可乐',
@@ -428,7 +428,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440025',
@@ -436,7 +436,7 @@ export const finishedProducts: SKU[] = [
     name: '瓶装啤酒',
     skuType: 'finished_product' as SkuType,
     storeScope: [],
-    standardCost: 8.00, // 直接包装，无BOM
+    standardCost: 8.0, // 直接包装，无BOM
     wasteRate: 0,
     spuId: 'spu-bottled-beer',
     spuName: '瓶装啤酒',
@@ -457,7 +457,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440026',
@@ -465,7 +465,7 @@ export const finishedProducts: SKU[] = [
     name: '奶油爆米花(大)',
     skuType: 'finished_product' as SkuType,
     storeScope: [],
-    standardCost: 7.40, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
+    standardCost: 7.4, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
     wasteRate: 5.0,
     spuId: 'spu-butter-popcorn-large',
     spuName: '奶油爆米花(大)',
@@ -486,7 +486,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440027',
@@ -494,7 +494,7 @@ export const finishedProducts: SKU[] = [
     name: '黄油爆米花(大)',
     skuType: 'finished_product' as SkuType,
     storeScope: [],
-    standardCost: 7.40, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
+    standardCost: 7.4, // (100g*0.015 + 20g*0.05 + 1.5) * 1.05
     wasteRate: 5.0,
     spuId: 'spu-butter-popcorn-large-2',
     spuName: '黄油爆米花(大)',
@@ -515,7 +515,7 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440028',
@@ -523,7 +523,7 @@ export const finishedProducts: SKU[] = [
     name: '焦糖爆米花(小)',
     skuType: 'finished_product' as SkuType,
     storeScope: [],
-    standardCost: 4.20, // (50g*0.015 + 10g*0.05 + 0.8) * 1.05
+    standardCost: 4.2, // (50g*0.015 + 10g*0.05 + 0.8) * 1.05
     wasteRate: 5.0,
     spuId: 'spu-caramel-popcorn-small',
     spuName: '焦糖爆米花(小)',
@@ -544,8 +544,8 @@ export const finishedProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
-  }
+    updatedByName: '系统',
+  },
 ];
 
 // ==================== 套餐 SKU (3个) ====================
@@ -557,7 +557,7 @@ export const comboProducts: SKU[] = [
     name: '经典观影套餐',
     skuType: 'combo' as SkuType,
     storeScope: [],
-    standardCost: 11.20, // 奶油爆米花(大) 7.40 + 听装可乐 3.50 = 10.90, 向上取整
+    standardCost: 11.2, // 奶油爆米花(大) 7.40 + 听装可乐 3.50 = 10.90, 向上取整
     wasteRate: 0,
     spuId: 'spu-classic-combo',
     spuName: '经典观影套餐',
@@ -578,7 +578,7 @@ export const comboProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440032',
@@ -607,7 +607,7 @@ export const comboProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
+    updatedByName: '系统',
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440033',
@@ -636,8 +636,8 @@ export const comboProducts: SKU[] = [
     createdBy: 'system',
     createdByName: '系统',
     updatedBy: 'system',
-    updatedByName: '系统'
-  }
+    updatedByName: '系统',
+  },
 ];
 
 // ==================== BOM 配置 (成品SKU的配方) ====================
@@ -655,7 +655,7 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       totalCost: 3.57,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-001-02',
@@ -664,10 +664,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 200,
       unit: 'ml',
       unitCost: 0.015, // 30元/2000ml = 0.015元/ml
-      totalCost: 3.00,
+      totalCost: 3.0,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-001-03',
@@ -675,11 +675,11 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440011', // 玻璃杯
       quantity: 1,
       unit: '个',
-      unitCost: 8.00,
-      totalCost: 8.00,
+      unitCost: 8.0,
+      totalCost: 8.0,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-001-04',
@@ -687,12 +687,12 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
       quantity: 1,
       unit: '根',
-      unitCost: 0.10,
-      totalCost: 0.10,
+      unitCost: 0.1,
+      totalCost: 0.1,
       isOptional: false,
       sortOrder: 4,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 薄荷威士忌的BOM
@@ -707,7 +707,7 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       totalCost: 3.57,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-002-02',
@@ -715,11 +715,11 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440003', // 薄荷叶
       quantity: 3,
       unit: 'g',
-      unitCost: 0.10, // 5元/50g = 0.1元/g
-      totalCost: 0.30,
+      unitCost: 0.1, // 5元/50g = 0.1元/g
+      totalCost: 0.3,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-002-03',
@@ -727,11 +727,11 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440011', // 玻璃杯
       quantity: 1,
       unit: '个',
-      unitCost: 8.00,
-      totalCost: 8.00,
+      unitCost: 8.0,
+      totalCost: 8.0,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-002-04',
@@ -739,12 +739,12 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
       quantity: 1,
       unit: '根',
-      unitCost: 0.10,
-      totalCost: 0.10,
+      unitCost: 0.1,
+      totalCost: 0.1,
       isOptional: false,
       sortOrder: 4,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 冰镇可乐的BOM
@@ -756,10 +756,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 300,
       unit: 'ml',
       unitCost: 0.015,
-      totalCost: 4.50,
+      totalCost: 4.5,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-003-02',
@@ -767,11 +767,11 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440012', // 纸杯
       quantity: 1,
       unit: '个',
-      unitCost: 0.50,
-      totalCost: 0.50,
+      unitCost: 0.5,
+      totalCost: 0.5,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-003-03',
@@ -779,12 +779,12 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
       quantity: 1,
       unit: '根',
-      unitCost: 0.10,
-      totalCost: 0.10,
+      unitCost: 0.1,
+      totalCost: 0.1,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 奶油爆米花(大)的BOM
@@ -796,10 +796,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 100,
       unit: 'g',
       unitCost: 0.015, // 15元/1000g
-      totalCost: 1.50,
+      totalCost: 1.5,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-006-02',
@@ -808,10 +808,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 20,
       unit: 'g',
       unitCost: 0.05, // 25元/500g
-      totalCost: 1.00,
+      totalCost: 1.0,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-006-03',
@@ -819,12 +819,12 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440014', // 爆米花桶(大)
       quantity: 1,
       unit: '个',
-      unitCost: 1.50,
-      totalCost: 1.50,
+      unitCost: 1.5,
+      totalCost: 1.5,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 黄油爆米花(大)的BOM (与奶油爆米花相同配方)
@@ -836,10 +836,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 100,
       unit: 'g',
       unitCost: 0.015,
-      totalCost: 1.50,
+      totalCost: 1.5,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-007-02',
@@ -848,10 +848,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 20,
       unit: 'g',
       unitCost: 0.05,
-      totalCost: 1.00,
+      totalCost: 1.0,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-007-03',
@@ -859,12 +859,12 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440014', // 爆米花桶(大)
       quantity: 1,
       unit: '个',
-      unitCost: 1.50,
-      totalCost: 1.50,
+      unitCost: 1.5,
+      totalCost: 1.5,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 焦糖爆米花(小)的BOM
@@ -879,7 +879,7 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       totalCost: 0.75,
       isOptional: false,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-008-02',
@@ -888,10 +888,10 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       quantity: 10,
       unit: 'g',
       unitCost: 0.05,
-      totalCost: 0.50,
+      totalCost: 0.5,
       isOptional: false,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'bom-008-03',
@@ -899,13 +899,13 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       componentId: '550e8400-e29b-41d4-a716-446655440015', // 爆米花袋(小)
       quantity: 1,
       unit: '个',
-      unitCost: 0.80,
-      totalCost: 0.80,
+      unitCost: 0.8,
+      totalCost: 0.8,
       isOptional: false,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
-  ]
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+  ],
 };
 
 // ==================== 套餐子项配置 ====================
@@ -919,10 +919,10 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       subItemId: '550e8400-e29b-41d4-a716-446655440026', // 奶油爆米花(大)
       quantity: 1,
       unit: '桶',
-      unitCost: 7.40,
-      totalCost: 7.40,
+      unitCost: 7.4,
+      totalCost: 7.4,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'combo-001-02',
@@ -930,11 +930,11 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       subItemId: '550e8400-e29b-41d4-a716-446655440024', // 听装可乐
       quantity: 1,
       unit: '听',
-      unitCost: 3.50,
-      totalCost: 3.50,
+      unitCost: 3.5,
+      totalCost: 3.5,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 豪华观影套餐
@@ -948,7 +948,7 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       unitCost: 29.93,
       totalCost: 29.93,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'combo-002-02',
@@ -956,10 +956,10 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       subItemId: '550e8400-e29b-41d4-a716-446655440026', // 奶油爆米花(大)
       quantity: 1,
       unit: '桶',
-      unitCost: 7.40,
-      totalCost: 7.40,
+      unitCost: 7.4,
+      totalCost: 7.4,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'combo-002-03',
@@ -967,11 +967,11 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       subItemId: '550e8400-e29b-41d4-a716-446655440025', // 瓶装啤酒
       quantity: 1,
       unit: '瓶',
-      unitCost: 8.00,
-      totalCost: 8.00,
+      unitCost: 8.0,
+      totalCost: 8.0,
       sortOrder: 3,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
+      createdAt: '2025-12-24T10:00:00Z',
+    },
   ],
 
   // 情侣畅饮套餐
@@ -985,7 +985,7 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       unitCost: 29.93,
       totalCost: 59.86,
       sortOrder: 1,
-      createdAt: '2025-12-24T10:00:00Z'
+      createdAt: '2025-12-24T10:00:00Z',
     },
     {
       id: 'combo-003-02',
@@ -996,9 +996,9 @@ export const comboConfigurations: Record<string, ComboItem[]> = {
       unitCost: 26.78,
       totalCost: 26.78,
       sortOrder: 2,
-      createdAt: '2025-12-24T10:00:00Z'
-    }
-  ]
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+  ],
 };
 
 // ==================== 导出所有测试数据 ====================
@@ -1007,7 +1007,7 @@ export const allTestSkus: SKU[] = [
   ...rawMaterials,
   ...packagingMaterials,
   ...finishedProducts,
-  ...comboProducts
+  ...comboProducts,
 ];
 
 export const testDataSummary = {
@@ -1017,7 +1017,7 @@ export const testDataSummary = {
   finishedProducts: finishedProducts.length,
   combos: comboProducts.length,
   bomConfigurations: Object.keys(bomConfigurations).length,
-  comboConfigurations: Object.keys(comboConfigurations).length
+  comboConfigurations: Object.keys(comboConfigurations).length,
 };
 
 console.log('SKU测试数据加载完成:', testDataSummary);

@@ -83,17 +83,13 @@ export const ActivityTypeTable: React.FC<ActivityTypeTableProps> = ({
       render: (_: any, record: ActivityType) => (
         <Space size="small">
           {onEdit && (
-            <Button
-              type="link"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)}
-            >
+            <Button type="link" size="small" icon={<EditOutlined />} onClick={() => onEdit(record)}>
               编辑
             </Button>
           )}
-          {onToggleStatus && record.status !== ActivityTypeStatus.DELETED && (
-            record.status === ActivityTypeStatus.ENABLED ? (
+          {onToggleStatus &&
+            record.status !== ActivityTypeStatus.DELETED &&
+            (record.status === ActivityTypeStatus.ENABLED ? (
               <Popconfirm
                 title="确定要停用此活动类型吗？"
                 description="停用后小程序端将不再显示此类型"
@@ -113,8 +109,7 @@ export const ActivityTypeTable: React.FC<ActivityTypeTableProps> = ({
               >
                 启用
               </Button>
-            )
-          )}
+            ))}
           {onDelete && record.status !== ActivityTypeStatus.DELETED && (
             <Popconfirm
               title="确定要删除此活动类型吗？"
@@ -123,12 +118,7 @@ export const ActivityTypeTable: React.FC<ActivityTypeTableProps> = ({
               okText="确定"
               cancelText="取消"
             >
-              <Button
-                type="link"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-              >
+              <Button type="link" size="small" danger icon={<DeleteOutlined />}>
                 删除
               </Button>
             </Popconfirm>
@@ -152,4 +142,3 @@ export const ActivityTypeTable: React.FC<ActivityTypeTableProps> = ({
     />
   );
 };
-

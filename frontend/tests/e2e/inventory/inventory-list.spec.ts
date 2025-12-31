@@ -20,7 +20,9 @@ test.describe('门店SKU库存查询 - 用户故事1: 查看门店库存列表',
     await expect(table).toBeVisible();
   });
 
-  test('US1-2: 表格显示7列数据 (SKU编码、名称、现存/可用/预占数量、状态、单位)', async ({ page }) => {
+  test('US1-2: 表格显示7列数据 (SKU编码、名称、现存/可用/预占数量、状态、单位)', async ({
+    page,
+  }) => {
     // Given 用户在库存查询页面
     // When 查看表格列
     // Then 应该显示7列
@@ -29,15 +31,7 @@ test.describe('门店SKU库存查询 - 用户故事1: 查看门店库存列表',
     await expect(table).toBeVisible();
 
     // 验证列头
-    const columns = [
-      'SKU编码',
-      'SKU名称',
-      '现存数量',
-      '可用数量',
-      '预占数量',
-      '库存状态',
-      '单位'
-    ];
+    const columns = ['SKU编码', 'SKU名称', '现存数量', '可用数量', '预占数量', '库存状态', '单位'];
 
     for (const columnName of columns) {
       const header = page.locator('th').filter({ hasText: columnName });
@@ -123,7 +117,7 @@ test.describe('门店SKU库存查询 - 用户故事1: 查看门店库存列表',
 
         // 验证表格已更新
         const rows = page.locator('.ant-table-tbody tr.ant-table-row');
-        if (await rows.count() > 0) {
+        if ((await rows.count()) > 0) {
           await expect(rows.first()).toBeVisible();
         }
       }

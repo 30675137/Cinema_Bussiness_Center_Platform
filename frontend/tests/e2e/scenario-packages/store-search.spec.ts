@@ -303,7 +303,7 @@ test.describe('门店搜索功能 (T026)', () => {
     // 现在搜索应该已经生效
     const filteredTags = getStoreTags(page);
     const count = await filteredTags.count();
-    
+
     // 验证搜索功能正常工作（无论结果如何）
     expect(count).toBeGreaterThanOrEqual(0);
   });

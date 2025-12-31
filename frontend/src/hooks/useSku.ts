@@ -7,14 +7,7 @@ import { message } from 'antd';
 import { skuKeys, createQueryOptions, createMutationOptions } from '@/services';
 import { skuService } from '@/services/skuService';
 import { showError, showSuccess, getFriendlyErrorMessage } from '@/utils/errorHandler';
-import type {
-  SKU,
-  SkuQueryParams,
-  SkuListResponse,
-  SkuFormData,
-  SPU,
-  Unit,
-} from '@/types/sku';
+import type { SKU, SkuQueryParams, SkuListResponse, SkuFormData, SPU, Unit } from '@/types/sku';
 import { SkuStatus } from '@/types/sku';
 
 /**
@@ -25,19 +18,22 @@ export const useSkuListQuery = (params: SkuQueryParams, enabled: boolean = true)
   if (!params || typeof params !== 'object') {
     params = { page: 1, pageSize: 20 };
   }
-  
+
   // 从 params 中提取 filters（排除分页和排序参数）
   const { page, pageSize, sortField, sortOrder, ...filters } = params;
-  
+
   // 清理 filters，移除 undefined 和 null
-  const cleanFilters = Object.keys(filters).reduce((result, key) => {
-    const value = filters[key as keyof typeof filters];
-    if (value !== undefined && value !== null && value !== '') {
-      result[key] = value;
-    }
-    return result;
-  }, {} as Record<string, any>);
-  
+  const cleanFilters = Object.keys(filters).reduce(
+    (result, key) => {
+      const value = filters[key as keyof typeof filters];
+      if (value !== undefined && value !== null && value !== '') {
+        result[key] = value;
+      }
+      return result;
+    },
+    {} as Record<string, any>
+  );
+
   return useQuery({
     queryKey: skuKeys.skusPaginated(page || 1, pageSize || 20, cleanFilters),
     queryFn: async (): Promise<SkuListResponse> => {
@@ -75,10 +71,10 @@ export const useCreateSkuMutation = () => {
     },
     onSuccess: (data) => {
       showSuccess('SKU创建成功');
-      
+
       // 更新SKU列表缓存
       queryClient.invalidateQueries({ queryKey: skuKeys.skus() });
-      
+
       // 预取新创建的SKU详情
       queryClient.prefetchQuery({
         queryKey: skuKeys.sku(data.id),
@@ -103,10 +99,10 @@ export const useUpdateSkuMutation = () => {
     },
     onSuccess: (data) => {
       showSuccess('SKU更新成功');
-      
+
       // 更新SKU详情缓存
       queryClient.setQueryData(skuKeys.sku(data.id), data);
-      
+
       // 更新SKU列表缓存
       queryClient.invalidateQueries({ queryKey: skuKeys.skus() });
     },
@@ -129,10 +125,10 @@ export const useToggleSkuStatusMutation = () => {
     onSuccess: (data) => {
       const statusText = data.status === SkuStatus.ENABLED ? '启用' : '停用';
       showSuccess(`SKU已${statusText}`);
-      
+
       // 更新SKU详情缓存
       queryClient.setQueryData(skuKeys.sku(data.id), data);
-      
+
       // 更新SKU列表缓存
       queryClient.invalidateQueries({ queryKey: skuKeys.skus() });
     },
@@ -205,8 +201,8 @@ export const useIngredientsQuery = (enabled: boolean = true) => {
       const response = await skuService.getSkus({ page: 1, pageSize: 1000 });
       const allSkus = response.items || [];
       // 过滤出原料和包材类型
-      return allSkus.filter((sku: SKU) => 
-        sku.skuType === 'raw_material' || sku.skuType === 'packaging'
+      return allSkus.filter(
+        (sku: SKU) => sku.skuType === 'raw_material' || sku.skuType === 'packaging'
       );
     },
     enabled,
@@ -227,9 +223,7 @@ export const useComboItemsQuery = (enabled: boolean = true) => {
       const response = await skuService.getSkus({ page: 1, pageSize: 1000 });
       const allSkus = response.items || [];
       // 套餐子项只能选择成品类型
-      return allSkus.filter((sku: SKU) => 
-        sku.skuType === 'finished_product'
-      );
+      return allSkus.filter((sku: SKU) => sku.skuType === 'finished_product');
     },
     enabled,
     staleTime: 5 * 60 * 1000, // 5分钟
@@ -262,4 +256,3 @@ export const useCheckBarcodeMutation = () => {
     },
   });
 };
-

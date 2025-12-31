@@ -24,7 +24,7 @@ export const LanguageDropdown: React.FC<LanguageSelectorProps> = ({
   className,
   size = 'middle',
   showText = false,
-  style
+  style,
 }) => {
   const { currentLanguage, supportedLanguages, changeLanguage } = useLanguageSelector();
 
@@ -36,10 +36,10 @@ export const LanguageDropdown: React.FC<LanguageSelectorProps> = ({
         <Text>{lang.nativeName}</Text>
       </Space>
     ),
-    onClick: () => changeLanguage(lang.code)
+    onClick: () => changeLanguage(lang.code),
   }));
 
-  const currentLangConfig = supportedLanguages.find(lang => lang.code === currentLanguage);
+  const currentLangConfig = supportedLanguages.find((lang) => lang.code === currentLanguage);
 
   return (
     <Select
@@ -49,17 +49,17 @@ export const LanguageDropdown: React.FC<LanguageSelectorProps> = ({
       onChange={changeLanguage}
       style={{
         minWidth: showText ? 120 : 80,
-        ...style
+        ...style,
       }}
       placeholder="选择语言"
-      options={supportedLanguages.map(lang => ({
+      options={supportedLanguages.map((lang) => ({
         value: lang.code,
         label: (
           <Space>
             <span>{lang.flag}</span>
             {showText && <span>{lang.nativeName}</span>}
           </Space>
-        )
+        ),
       }))}
       suffixIcon={<GlobalOutlined />}
     />
@@ -69,13 +69,10 @@ export const LanguageDropdown: React.FC<LanguageSelectorProps> = ({
 /**
  * 简单的语言切换按钮
  */
-export const LanguageToggle: React.FC<LanguageSelectorProps> = ({
-  className,
-  style
-}) => {
+export const LanguageToggle: React.FC<LanguageSelectorProps> = ({ className, style }) => {
   const { currentLanguage, supportedLanguages, nextLanguage } = useLanguageSelector();
 
-  const currentLangConfig = supportedLanguages.find(lang => lang.code === currentLanguage);
+  const currentLangConfig = supportedLanguages.find((lang) => lang.code === currentLanguage);
 
   const handleToggle = () => {
     nextLanguage();
@@ -91,7 +88,7 @@ export const LanguageToggle: React.FC<LanguageSelectorProps> = ({
         padding: '4px 8px',
         borderRadius: '4px',
         transition: 'all 0.3s',
-        ...style
+        ...style,
       }}
       onClick={handleToggle}
       title={`切换语言 (当前: ${currentLangConfig?.nativeName})`}
@@ -107,10 +104,7 @@ export const LanguageToggle: React.FC<LanguageSelectorProps> = ({
 /**
  * 完整的语言选择器组件
  */
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
-  className,
-  style
-}) => {
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ className, style }) => {
   return (
     <div className={className} style={style}>
       <LanguageDropdown showText={false} />
@@ -121,10 +115,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 /**
  * 带文字的语言选择器
  */
-export const LanguageSelectorWithText: React.FC<LanguageSelectorProps> = ({
-  className,
-  style
-}) => {
+export const LanguageSelectorWithText: React.FC<LanguageSelectorProps> = ({ className, style }) => {
   return (
     <div className={className} style={style}>
       <LanguageDropdown showText={true} />

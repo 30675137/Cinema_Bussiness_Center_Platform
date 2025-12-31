@@ -46,10 +46,7 @@ interface DictionaryTypesQueryResult {
  */
 export function useDictionaryTypesQuery(
   params?: DictionaryTypeListParams,
-  options?: Omit<
-    UseQueryOptions<DictionaryTypesQueryResult, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<DictionaryTypesQueryResult, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<DictionaryTypesQueryResult, Error>({
     queryKey: dictionaryKeys.typesList(params),
@@ -70,10 +67,7 @@ export function useDictionaryTypesQuery(
  */
 export function useDictionaryTypeQuery(
   id: string | undefined,
-  options?: Omit<
-    UseQueryOptions<DictionaryType, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<DictionaryType, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<DictionaryType, Error>({
     queryKey: dictionaryKeys.typeDetail(id || ''),
@@ -103,10 +97,7 @@ export function useDictionaryTypeQuery(
 export function useDictionaryItemsQuery(
   typeId: string | undefined,
   params?: Omit<DictionaryItemListParams, 'typeId'>,
-  options?: Omit<
-    UseQueryOptions<DictionaryItem[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<DictionaryItem[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<DictionaryItem[], Error>({
     queryKey: dictionaryKeys.items(typeId || ''),
@@ -133,14 +124,7 @@ export function useDictionaryItemsQuery(
  */
 export function useActiveDictionaryItemsQuery(
   typeId: string | undefined,
-  options?: Omit<
-    UseQueryOptions<DictionaryItem[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<DictionaryItem[], Error>, 'queryKey' | 'queryFn'>
 ) {
-  return useDictionaryItemsQuery(
-    typeId,
-    { status: 'active' },
-    options
-  );
+  return useDictionaryItemsQuery(typeId, { status: 'active' }, options);
 }

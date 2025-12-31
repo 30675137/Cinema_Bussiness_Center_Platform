@@ -36,11 +36,15 @@ const StoreReservationSettingsPage = lazy(() => import('@/pages/store-reservatio
 const ScenarioPackageList = lazy(() => import('@/pages/scenario-packages/list'));
 const ScenarioPackageCreate = lazy(() => import('@/pages/scenario-packages/create'));
 // 新的多标签页编辑器
-const ScenarioPackageEdit = lazy(() => import('@/features/scenario-package-editor/ScenarioPackageEditorPage'));
+const ScenarioPackageEdit = lazy(
+  () => import('@/features/scenario-package-editor/ScenarioPackageEditorPage')
+);
 const ScenarioPackagePreview = lazy(() => import('@/pages/scenario-packages/preview'));
 // 预约单管理页面
 const ReservationOrderList = lazy(() => import('@/pages/reservation-orders/ReservationOrderList'));
-const ReservationOrderDetail = lazy(() => import('@/pages/reservation-orders/ReservationOrderDetail'));
+const ReservationOrderDetail = lazy(
+  () => import('@/pages/reservation-orders/ReservationOrderDetail')
+);
 // 商品订单管理页面 (O001-product-order-list)
 const OrderListPage = lazy(() => import('@/pages/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/orders/OrderDetailPage'));

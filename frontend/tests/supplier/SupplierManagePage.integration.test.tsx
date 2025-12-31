@@ -15,7 +15,9 @@ vi.mock('@/stores/userStore');
 
 // Mock components
 vi.mock('@/components/layout/AppLayout', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div data-testid="app-layout">{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="app-layout">{children}</div>
+  ),
 }));
 
 // Mock react-router-dom
@@ -43,21 +45,23 @@ vi.mock('@/utils/formatters', () => ({
 }));
 
 // 创建测试用的 QueryClient
-const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: { retry: false },
-    mutations: { retry: false },
-  },
-});
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
 
 // 渲染组件的包装函数
-const renderWithProviders = (ui: React.ReactElement, initialEntries: string[] = ['/procurement/supplier']) => {
+const renderWithProviders = (
+  ui: React.ReactElement,
+  initialEntries: string[] = ['/procurement/supplier']
+) => {
   const testQueryClient = createTestQueryClient();
   return render(
     <QueryClientProvider client={testQueryClient}>
-      <MemoryRouter initialEntries={initialEntries}>
-        {ui}
-      </MemoryRouter>
+      <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>
     </QueryClientProvider>
   );
 };
@@ -80,7 +84,15 @@ describe('SupplierManagePage Integration', () => {
           type: 'manufacturer',
           level: 'strategic',
           status: 'active',
-          contacts: [{ name: '张三', phone: '13800138000', position: '经理', email: 'zhangsan@example.com', isPrimary: true }],
+          contacts: [
+            {
+              name: '张三',
+              phone: '13800138000',
+              position: '经理',
+              email: 'zhangsan@example.com',
+              isPrimary: true,
+            },
+          ],
           phone: '010-12345678',
           email: 'supplier@example.com',
           productCategories: ['食品原料'],
@@ -96,7 +108,15 @@ describe('SupplierManagePage Integration', () => {
           type: 'wholesaler',
           level: 'preferred',
           status: 'suspended',
-          contacts: [{ name: '李四', phone: '13900139000', position: '主管', email: 'lisi@example.com', isPrimary: true }],
+          contacts: [
+            {
+              name: '李四',
+              phone: '13900139000',
+              position: '主管',
+              email: 'lisi@example.com',
+              isPrimary: true,
+            },
+          ],
           phone: '010-87654321',
           email: 'supplier2@example.com',
           productCategories: ['包装材料'],
@@ -252,9 +272,9 @@ describe('SupplierManagePage Integration', () => {
       });
 
       // 查找并点击查看按钮
-      const viewButtons = screen.getAllByRole('button').filter(button =>
-        button.textContent?.includes('查看')
-      );
+      const viewButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.textContent?.includes('查看'));
 
       if (viewButtons.length > 0) {
         fireEvent.click(viewButtons[0]);
@@ -270,9 +290,9 @@ describe('SupplierManagePage Integration', () => {
       });
 
       // 查找并点击编辑按钮
-      const editButtons = screen.getAllByRole('button').filter(button =>
-        button.textContent?.includes('编辑')
-      );
+      const editButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.textContent?.includes('编辑'));
 
       if (editButtons.length > 0) {
         fireEvent.click(editButtons[0]);
@@ -292,9 +312,9 @@ describe('SupplierManagePage Integration', () => {
       window.confirm = vi.fn(() => true);
 
       // 查找并点击删除按钮
-      const deleteButtons = screen.getAllByRole('button').filter(button =>
-        button.textContent?.includes('删除')
-      );
+      const deleteButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.textContent?.includes('删除'));
 
       if (deleteButtons.length > 0) {
         fireEvent.click(deleteButtons[0]);

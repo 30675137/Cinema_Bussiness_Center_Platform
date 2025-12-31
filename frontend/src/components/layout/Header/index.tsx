@@ -120,7 +120,7 @@ function HeaderComponent({
           'custom-header flex items-center justify-between px-4 shadow-sm',
           theme === 'dark' && 'custom-header-dark',
           className
-        )
+        ),
       }}
       styles={{
         root: {
@@ -133,7 +133,7 @@ function HeaderComponent({
           zIndex: 1000,
           transition: 'left 0.2s, background-color 0.3s',
           ...style,
-        }
+        },
       }}
     >
       {/* 左侧区域 */}
@@ -153,18 +153,14 @@ function HeaderComponent({
             }
             onClick={isMobile ? onMobileMenuClick : onSidebarToggle}
             classNames={{
-              root: 'mr-4'
+              root: 'mr-4',
             }}
           />
         )}
 
         {/* Logo和标题 */}
         <div className="flex items-center">
-          {logo && (
-            <div className="mr-3 flex items-center">
-              {logo}
-            </div>
-          )}
+          {logo && <div className="mr-3 flex items-center">{logo}</div>}
           <Text strong className={cn('text-lg', theme === 'dark' && 'text-white')}>
             {title}
           </Text>
@@ -174,49 +170,48 @@ function HeaderComponent({
       {/* 右侧区域 */}
       <div className="flex items-center">
         {/* 额外内容 */}
-        {extra && (
-          <div className="mr-4">
-            {extra}
-          </div>
-        )}
+        {extra && <div className="mr-4">{extra}</div>}
 
         {/* 用户信息 */}
         {user && (
           <Dropdown
             menu={{
-        items: finalUserMenuItems.map(item =>
-          item.type === 'divider'
-            ? { type: 'divider' as const }
-            : { ...item, type: 'item' as const }
-        )
-      }}
+              items: finalUserMenuItems.map((item) =>
+                item.type === 'divider'
+                  ? { type: 'divider' as const }
+                  : { ...item, type: 'item' as const }
+              ),
+            }}
             placement="bottomRight"
             arrow
           >
-            <div className={cn(
-              'flex items-center cursor-pointer px-3 py-2 rounded transition-colors',
-              theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-            )}>
+            <div
+              className={cn(
+                'flex items-center cursor-pointer px-3 py-2 rounded transition-colors',
+                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+              )}
+            >
               <Avatar
                 size="small"
                 src={user.avatar}
                 icon={<UserOutlined />}
                 classNames={{
-                  root: 'mr-2'
+                  root: 'mr-2',
                 }}
               />
               <div className="hidden sm:block">
-                <div className={cn(
-                  'text-sm font-medium',
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                )}>
+                <div
+                  className={cn(
+                    'text-sm font-medium',
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  )}
+                >
                   {user.username}
                 </div>
                 {user.role && (
-                  <div className={cn(
-                    'text-xs',
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                  )}>
+                  <div
+                    className={cn('text-xs', theme === 'dark' ? 'text-gray-400' : 'text-gray-500')}
+                  >
                     {user.role}
                   </div>
                 )}

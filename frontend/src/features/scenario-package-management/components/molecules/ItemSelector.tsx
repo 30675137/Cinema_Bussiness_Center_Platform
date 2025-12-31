@@ -81,11 +81,7 @@ export const ItemSelector: React.FC<ItemSelectorProps> = ({
 
   const handleQuantityChange = (itemId: string, quantity: number | null) => {
     if (quantity === null || quantity < 1) return;
-    onChange?.(
-      value.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
+    onChange?.(value.map((item) => (item.id === itemId ? { ...item, quantity } : item)));
   };
 
   const totalPrice = value.reduce((sum, item) => sum + item.itemPriceSnapshot * item.quantity, 0);
@@ -153,13 +149,7 @@ export const ItemSelector: React.FC<ItemSelectorProps> = ({
           onConfirm={() => handleRemove(record.id)}
           disabled={disabled}
         >
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            disabled={disabled}
-          />
+          <Button type="text" danger size="small" icon={<DeleteOutlined />} disabled={disabled} />
         </Popconfirm>
       ),
     },
@@ -178,7 +168,10 @@ export const ItemSelector: React.FC<ItemSelectorProps> = ({
         <Space>
           {value.length > 0 && (
             <Text type="secondary">
-              合计：<Text strong style={{ color: '#1890ff' }}>¥{totalPrice.toFixed(2)}</Text>
+              合计：
+              <Text strong style={{ color: '#1890ff' }}>
+                ¥{totalPrice.toFixed(2)}
+              </Text>
             </Text>
           )}
           <Button

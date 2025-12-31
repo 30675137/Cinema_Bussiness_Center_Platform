@@ -45,7 +45,7 @@ describe('InventoryForm', () => {
     minStock: 20,
     maxStock: 500,
     safeStock: 30,
-    averageCost: 15.50,
+    averageCost: 15.5,
     totalValue: 1550,
     status: InventoryStatus.IN_STOCK,
     lastInboundDate: '2024-01-01',
@@ -235,7 +235,7 @@ describe('InventoryForm', () => {
       renderComponent({
         editingRecord: mockEditingRecord,
         onSuccess: mockOnSuccess,
-        onCancel: mockOnCancel
+        onCancel: mockOnCancel,
       });
 
       // 修改表单字段
@@ -281,7 +281,7 @@ describe('InventoryForm', () => {
       renderComponent({
         editingRecord: mockEditingRecord,
         onSuccess: mockOnSuccess,
-        onCancel: mockOnCancel
+        onCancel: mockOnCancel,
       });
 
       const submitButton = screen.getByText('更新');
@@ -575,7 +575,7 @@ describe('InventoryForm', () => {
       renderComponent({
         editingRecord: mockEditingRecord,
         onSuccess: mockOnSuccess,
-        onCancel: mockOnCancel
+        onCancel: mockOnCancel,
       });
 
       const submitButton = screen.getByText('更新');

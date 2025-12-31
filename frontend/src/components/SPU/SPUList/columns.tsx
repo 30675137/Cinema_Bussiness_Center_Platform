@@ -1,12 +1,7 @@
 import React from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import { Tag, Button, Space, Tooltip } from 'antd';
-import {
-  EditOutlined,
-  EyeOutlined,
-  CopyOutlined,
-  DeleteOutlined
-} from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, CopyOutlined, DeleteOutlined } from '@ant-design/icons';
 import { SPUItem } from '../../../types/spu';
 import { CategoryItem } from '../../../types/category';
 import { BrandItem } from '../../../types/brand';
@@ -15,7 +10,7 @@ import { BrandItem } from '../../../types/brand';
 const statusConfig = {
   active: { text: '启用', color: 'success' },
   inactive: { text: '停用', color: 'error' },
-  draft: { text: '草稿', color: 'default' }
+  draft: { text: '草稿', color: 'default' },
 };
 
 // 操作按钮配置
@@ -32,17 +27,17 @@ export const SPUColumnsGenerator = ({
   onView,
   onCopy,
   categories,
-  brands
+  brands,
 }: SPUColumnsGeneratorProps) => {
   // 获取品牌名称
   const getBrandName = (brandId: string) => {
-    const brand = brands.find(b => b.id === brandId);
+    const brand = brands.find((b) => b.id === brandId);
     return brand?.name || brandId;
   };
 
   // 获取分类名称
   const getCategoryName = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
+    const category = categories.find((c) => c.id === categoryId);
     return category?.name || categoryId;
   };
 
@@ -72,7 +67,7 @@ export const SPUColumnsGenerator = ({
         <Tooltip title={text}>
           <span className="font-mono text-sm">{text}</span>
         </Tooltip>
-      )
+      ),
     },
     // SPU名称
     {
@@ -87,11 +82,9 @@ export const SPUColumnsGenerator = ({
       render: (text: string, record: SPUItem) => (
         <div>
           <div className="font-medium text-gray-900">{text}</div>
-          {record.shortName && (
-            <div className="text-xs text-gray-500 mt-1">{record.shortName}</div>
-          )}
+          {record.shortName && <div className="text-xs text-gray-500 mt-1">{record.shortName}</div>}
         </div>
-      )
+      ),
     },
     // 品牌 - 直接使用SPU数据中的brandName字段
     {
@@ -99,14 +92,14 @@ export const SPUColumnsGenerator = ({
       dataIndex: 'brandName',
       key: 'brandId',
       width: 120,
-      filters: brands.map(brand => ({
+      filters: brands.map((brand) => ({
         text: brand.name,
         value: brand.id,
       })),
       onFilter: (value: string, record: SPUItem) => record.brandId === value,
       render: (brandName: string, record: SPUItem) => (
         <span className="text-sm">{brandName || record.brandId || '-'}</span>
-      )
+      ),
     },
     // 分类 - 直接使用SPU数据中的categoryName字段
     {
@@ -114,7 +107,7 @@ export const SPUColumnsGenerator = ({
       dataIndex: 'categoryName',
       key: 'categoryId',
       width: 150,
-      filters: categories.map(category => ({
+      filters: categories.map((category) => ({
         text: category.name,
         value: category.id,
       })),
@@ -126,13 +119,11 @@ export const SPUColumnsGenerator = ({
           <div>
             <div className="text-sm">{categoryName || record.categoryId || '-'}</div>
             {categoryPath.length > 1 && (
-              <div className="text-xs text-gray-500">
-                {categoryPath.slice(0, -1).join(' > ')}
-              </div>
+              <div className="text-xs text-gray-500">{categoryPath.slice(0, -1).join(' > ')}</div>
             )}
           </div>
         );
-      }
+      },
     },
     // 规格
     {
@@ -141,7 +132,7 @@ export const SPUColumnsGenerator = ({
       width: 150,
       render: (_, record: SPUItem) => {
         const specs = record.specifications || [];
-        const primarySpec = specs.find(s => s.name === '容量' || s.name === '重量');
+        const primarySpec = specs.find((s) => s.name === '容量' || s.name === '重量');
 
         if (primarySpec) {
           return (
@@ -153,13 +144,13 @@ export const SPUColumnsGenerator = ({
         }
 
         return specs.length > 0 ? (
-          <Tooltip title={specs.map(s => `${s.name}: ${s.value}`).join(', ')}>
+          <Tooltip title={specs.map((s) => `${s.name}: ${s.value}`).join(', ')}>
             <span className="text-sm text-gray-600">{specs[0].value}</span>
           </Tooltip>
         ) : (
           <span className="text-gray-400 text-xs">-</span>
         );
-      }
+      },
     },
     // 状态
     {
@@ -174,12 +165,8 @@ export const SPUColumnsGenerator = ({
       onFilter: (value: string, record: SPUItem) => record.status === value,
       render: (status: string) => {
         const config = statusConfig[status as keyof typeof statusConfig];
-        return (
-          <Tag color={config.color}>
-            {config.text}
-          </Tag>
-        );
-      }
+        return <Tag color={config.color}>{config.text}</Tag>;
+      },
     },
     // 标签
     {
@@ -194,7 +181,7 @@ export const SPUColumnsGenerator = ({
 
         return (
           <div className="flex flex-wrap gap-1">
-            {tags.slice(0, 2).map(tag => (
+            {tags.slice(0, 2).map((tag) => (
               <Tag key={tag} size="small" color="blue">
                 {tag}
               </Tag>
@@ -206,7 +193,7 @@ export const SPUColumnsGenerator = ({
             )}
           </div>
         );
-      }
+      },
     },
     // SKU数量
     {
@@ -215,9 +202,7 @@ export const SPUColumnsGenerator = ({
       key: 'skuCount',
       width: 90,
       sorter: true,
-      render: (count: number) => (
-        <span className="text-sm font-medium">{count || 0}</span>
-      )
+      render: (count: number) => <span className="text-sm font-medium">{count || 0}</span>,
     },
     // 创建信息
     {
@@ -227,11 +212,9 @@ export const SPUColumnsGenerator = ({
       render: (_, record: SPUItem) => (
         <div className="text-xs">
           <div className="text-gray-600">{record.createdBy || '-'}</div>
-          <div className="text-gray-400">
-            {formatDateTime(record.createdAt)}
-          </div>
+          <div className="text-gray-400">{formatDateTime(record.createdAt)}</div>
         </div>
-      )
+      ),
     },
     // 更新时间
     {
@@ -241,10 +224,8 @@ export const SPUColumnsGenerator = ({
       width: 140,
       sorter: true,
       render: (updatedAt: string) => (
-        <span className="text-xs text-gray-600">
-          {formatDateTime(updatedAt)}
-        </span>
-      )
+        <span className="text-xs text-gray-600">{formatDateTime(updatedAt)}</span>
+      ),
     },
     // 操作列
     {
@@ -281,8 +262,8 @@ export const SPUColumnsGenerator = ({
             />
           </Tooltip>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return columns;

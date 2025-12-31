@@ -2,28 +2,28 @@ import { z } from 'zod';
 
 // 审核状态枚举
 export enum AuditStatus {
-  PENDING = 'pending',     // 待审核
-  APPROVED = 'approved',   // 已批准
-  REJECTED = 'rejected',   // 已驳回
-  CANCELLED = 'cancelled'  // 已取消
+  PENDING = 'pending', // 待审核
+  APPROVED = 'approved', // 已批准
+  REJECTED = 'rejected', // 已驳回
+  CANCELLED = 'cancelled', // 已取消
 }
 
 // 审核类型枚举
 export enum AuditType {
-  PRODUCT_CREATE = 'product_create',    // 商品创建
-  PRODUCT_UPDATE = 'product_update',    // 商品更新
-  PRODUCT_DELETE = 'product_delete',    // 商品删除
-  PRICE_CHANGE = 'price_change',        // 价格变更
-  SPEC_CHANGE = 'spec_change',          // 规格变更
-  CONTENT_UPDATE = 'content_update',    // 内容更新
-  BATCH_OPERATION = 'batch_operation'   // 批量操作
+  PRODUCT_CREATE = 'product_create', // 商品创建
+  PRODUCT_UPDATE = 'product_update', // 商品更新
+  PRODUCT_DELETE = 'product_delete', // 商品删除
+  PRICE_CHANGE = 'price_change', // 价格变更
+  SPEC_CHANGE = 'spec_change', // 规格变更
+  CONTENT_UPDATE = 'content_update', // 内容更新
+  BATCH_OPERATION = 'batch_operation', // 批量操作
 }
 
 // 变更类型枚举
 export enum ChangeType {
-  CREATE = 'create',       // 新增
-  UPDATE = 'update',       // 更新
-  DELETE = 'delete'        // 删除
+  CREATE = 'create', // 新增
+  UPDATE = 'update', // 更新
+  DELETE = 'delete', // 删除
 }
 
 // 实体类型枚举（保持向后兼容）
@@ -31,7 +31,7 @@ export enum AuditEntityType {
   PRODUCT = 'product',
   PRICE_CONFIG = 'price_config',
   STORE = 'store',
-  USER = 'user'
+  USER = 'user',
 }
 
 // 审核操作枚举（保持向后兼容）
@@ -40,18 +40,18 @@ export enum AuditOperation {
   UPDATE = 'update',
   DELETE = 'delete',
   ACTIVATE = 'activate',
-  DEACTIVATE = 'deactivate'
+  DEACTIVATE = 'deactivate',
 }
 
 // 字段变更记录
 export interface FieldChange {
-  fieldName: string;           // 字段名称
-  fieldLabel: string;          // 字段显示名称
-  changeType: ChangeType;      // 变更类型
-  oldValue?: any;              // 旧值
-  newValue?: any;              // 新值
-  isKeyField: boolean;         // 是否关键字段
-  category: string;            // 字段分类 (basic, spec, content, price等)
+  fieldName: string; // 字段名称
+  fieldLabel: string; // 字段显示名称
+  changeType: ChangeType; // 变更类型
+  oldValue?: any; // 旧值
+  newValue?: any; // 新值
+  isKeyField: boolean; // 是否关键字段
+  category: string; // 字段分类 (basic, spec, content, price等)
 }
 
 // 审核项目
@@ -233,25 +233,29 @@ export const AuditRecordSchema = z.object({
   reviewedAt: z.string().optional(),
   reviewComment: z.string().max(1000, '审核意见不能超过1000字符').optional(),
   rejectionReason: z.string().max(1000, '驳回原因不能超过1000字符').optional(),
-  items: z.array(z.object({
-    id: z.string(),
-    auditId: z.string(),
-    entityType: z.enum(['product', 'price', 'spec', 'content']),
-    entityId: z.string(),
-    entityName: z.string(),
-    entityCode: z.string().optional(),
-    changes: z.array(z.object({
-      fieldName: z.string(),
-      fieldLabel: z.string(),
-      changeType: z.nativeEnum(ChangeType),
-      oldValue: z.any().optional(),
-      newValue: z.any().optional(),
-      isKeyField: z.boolean(),
-      category: z.string()
-    })),
-    changeCount: z.number().min(0),
-    keyFieldChanges: z.number().min(0)
-  })),
+  items: z.array(
+    z.object({
+      id: z.string(),
+      auditId: z.string(),
+      entityType: z.enum(['product', 'price', 'spec', 'content']),
+      entityId: z.string(),
+      entityName: z.string(),
+      entityCode: z.string().optional(),
+      changes: z.array(
+        z.object({
+          fieldName: z.string(),
+          fieldLabel: z.string(),
+          changeType: z.nativeEnum(ChangeType),
+          oldValue: z.any().optional(),
+          newValue: z.any().optional(),
+          isKeyField: z.boolean(),
+          category: z.string(),
+        })
+      ),
+      changeCount: z.number().min(0),
+      keyFieldChanges: z.number().min(0),
+    })
+  ),
   totalItems: z.number().min(0),
   keyFieldChanges: z.number().min(0),
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
@@ -259,7 +263,7 @@ export const AuditRecordSchema = z.object({
   tags: z.array(z.string()),
   metadata: z.record(z.any()),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 
 export const AuditFormDataSchema = z.object({
@@ -270,7 +274,7 @@ export const AuditFormDataSchema = z.object({
   dueDate: z.string().optional(),
   reviewerId: z.string().optional(),
   tags: z.array(z.string()),
-  itemIds: z.array(z.string()).min(1, '至少选择一个审核项目')
+  itemIds: z.array(z.string()).min(1, '至少选择一个审核项目'),
 });
 
 export const AuditActionRequestSchema = z.object({
@@ -279,20 +283,29 @@ export const AuditActionRequestSchema = z.object({
   comment: z.string().max(1000, '备注不能超过1000字符').optional(),
   rejectionReason: z.string().max(1000, '驳回原因不能超过1000字符').optional(),
   newReviewerId: z.string().optional(),
-  itemIds: z.array(z.string()).optional()
+  itemIds: z.array(z.string()).optional(),
 });
 
 export const BatchAuditRequestSchema = z.object({
   auditIds: z.array(z.string()).min(1, '至少选择一个审核记录'),
   action: z.enum(['approve', 'reject']),
   comment: z.string().max(1000, '备注不能超过1000字符').optional(),
-  rejectionReason: z.string().max(1000, '驳回原因不能超过1000字符').optional()
+  rejectionReason: z.string().max(1000, '驳回原因不能超过1000字符').optional(),
 });
 
 // 类型导出
-export type CreateAuditRequest = Omit<AuditRecord,
-  'id' | 'status' | 'reviewerId' | 'reviewerName' | 'reviewerRole' |
-  'reviewedAt' | 'reviewComment' | 'rejectionReason' | 'createdAt' | 'updatedAt'
+export type CreateAuditRequest = Omit<
+  AuditRecord,
+  | 'id'
+  | 'status'
+  | 'reviewerId'
+  | 'reviewerName'
+  | 'reviewerRole'
+  | 'reviewedAt'
+  | 'reviewComment'
+  | 'rejectionReason'
+  | 'createdAt'
+  | 'updatedAt'
 >;
 
 export type UpdateAuditRequest = Partial<CreateAuditRequest>;
@@ -305,25 +318,25 @@ export const AUDIT_TYPE_OPTIONS = [
   { value: AuditType.PRICE_CHANGE, label: '价格变更', color: 'orange' },
   { value: AuditType.SPEC_CHANGE, label: '规格变更', color: 'purple' },
   { value: AuditType.CONTENT_UPDATE, label: '内容更新', color: 'cyan' },
-  { value: AuditType.BATCH_OPERATION, label: '批量操作', color: 'magenta' }
+  { value: AuditType.BATCH_OPERATION, label: '批量操作', color: 'magenta' },
 ];
 
 export const AUDIT_STATUS_OPTIONS = [
   { value: AuditStatus.PENDING, label: '待审核', color: 'orange' },
   { value: AuditStatus.APPROVED, label: '已批准', color: 'green' },
   { value: AuditStatus.REJECTED, label: '已驳回', color: 'red' },
-  { value: AuditStatus.CANCELLED, label: '已取消', color: 'gray' }
+  { value: AuditStatus.CANCELLED, label: '已取消', color: 'gray' },
 ];
 
 export const PRIORITY_OPTIONS = [
   { value: 'low', label: '低', color: 'gray' },
   { value: 'medium', label: '中', color: 'blue' },
   { value: 'high', label: '高', color: 'orange' },
-  { value: 'urgent', label: '紧急', color: 'red' }
+  { value: 'urgent', label: '紧急', color: 'red' },
 ];
 
 export const CHANGE_TYPE_OPTIONS = [
   { value: ChangeType.CREATE, label: '新增', color: 'green' },
   { value: ChangeType.UPDATE, label: '更新', color: 'blue' },
-  { value: ChangeType.DELETE, label: '删除', color: 'red' }
+  { value: ChangeType.DELETE, label: '删除', color: 'red' },
 ];

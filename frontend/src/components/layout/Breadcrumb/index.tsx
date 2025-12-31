@@ -36,7 +36,7 @@ const Breadcrumb: React.FC = () => {
       ),
       onClick: () => handleBreadcrumbClick('/'),
     },
-    ...breadcrumbs.map(item => ({
+    ...breadcrumbs.map((item) => ({
       title: item.current ? (
         <span className="breadcrumb-item breadcrumb-current">{item.title}</span>
       ) : (

@@ -29,7 +29,7 @@ interface UnsavedChangesAlertProps {
 
 /**
  * 未保存修改警告弹窗
- * 
+ *
  * @example
  * <UnsavedChangesAlert
  *   open={showLeaveConfirm}
@@ -74,10 +74,7 @@ const UnsavedChangesAlert: React.FC<UnsavedChangesAlertProps> = ({
         <Space>
           <CancelBtn />
           {onSave && (
-            <a
-              onClick={onConfirm}
-              style={{ marginRight: 8 }}
-            >
+            <a onClick={onConfirm} style={{ marginRight: 8 }}>
               不保存，直接离开
             </a>
           )}

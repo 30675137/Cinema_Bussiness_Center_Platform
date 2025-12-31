@@ -672,14 +672,387 @@ curl -X POST http://localhost:8080/api/boms \
 
 1. Check migration script logs: `./mvnw flyway:info`
 2. Manually run migration: `./mvnw flyway:migrate`
-3. Verify `beverage_config` table has data:
+3. Verify `beverages` table has data:
    ```sql
-   SELECT COUNT(*) FROM beverage_config;
+   SELECT COUNT(*) FROM beverages;
    ```
 4. Check migration script idempotency (should be safe to re-run):
    ```sql
    SELECT COUNT(*) FROM beverage_sku_mapping;
    ```
+5. Run **SQL validation queries** (see Step 11 below) to diagnose migration issues
+
+---
+
+## Step 11: SQL Validation Queries (Post-Migration Verification)
+
+**Purpose**: Verify that the `beverages` → `skus` data migration (V064) completed successfully and identify any issues that need manual intervention.
+
+**When to run**: After running `./mvnw flyway:migrate` that includes migration V064.
+
+**Success Criteria**: Migration success rate ≥95%
+
+---
+
+### Query 1: Check Migration Success Rate
+
+**Purpose**: Calculate the percentage of beverages successfully migrated to `skus` table.
+
+```sql
+-- Query 1: Migration Success Rate
+SELECT
+    COUNT(*) AS total_beverages,
+    (SELECT COUNT(*) FROM beverage_sku_mapping) AS migrated_count,
+    ROUND(
+        (SELECT COUNT(*) FROM beverage_sku_mapping)::numeric / COUNT(*)::numeric * 100,
+        2
+    ) AS success_rate_percent
+FROM beverages;
+```
+
+**Expected Result**:
+```
+ total_beverages | migrated_count | success_rate_percent
+-----------------|----------------|---------------------
+              50 |             48 |                96.00
+```
+
+**Interpretation**:
+- ✅ **success_rate_percent ≥ 95%**: Migration successful
+- ⚠️ **success_rate_percent < 95%**: Review unmigrated beverages (see Query 2)
+
+---
+
+### Query 2: Find Unmigrated Beverages
+
+**Purpose**: Identify beverages that were NOT migrated to `skus` table.
+
+```sql
+-- Query 2: Unmigrated Beverages
+SELECT
+    b.id,
+    b.name,
+    b.category,
+    b.status,
+    b.created_at
+FROM beverages b
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM beverage_sku_mapping bsm
+    WHERE bsm.old_beverage_id = b.id
+)
+ORDER BY b.created_at DESC;
+```
+
+**Expected Result**:
+```
+ id                                   | name         | category | status  | created_at
+--------------------------------------|--------------|----------|---------|--------------------
+ 550e8400-e29b-41d4-a716-446655440099 | 测试饮品Draft | COFFEE   | INACTIVE| 2025-12-30 15:00:00
+```
+
+**Interpretation**:
+- ✅ **Empty result**: All beverages migrated
+- ⚠️ **Non-empty result**: Review unmigrated beverages:
+  - Check if they have `NULL` or invalid `category` values
+  - Check if `name` field is empty or contains special characters causing `code` generation failure
+  - Manually migrate if needed (see Manual Migration section below)
+
+**Common Causes for Migration Failure**:
+1. **NULL category**: Migration script cannot map to `categories.id`
+2. **Empty name**: `code` generation (CONCAT) fails
+3. **Duplicate name**: ON CONFLICT DO NOTHING skips duplicate `code`
+
+---
+
+### Query 3: Verify All Migrated SKUs Are `finished_product` Type
+
+**Purpose**: Ensure the migration script correctly set `sku_type = 'finished_product'` for all migrated beverages.
+
+```sql
+-- Query 3: Migrated SKU Type Distribution
+SELECT
+    sku_type,
+    COUNT(*) AS count
+FROM skus
+WHERE id IN (
+    SELECT new_sku_id FROM beverage_sku_mapping
+)
+GROUP BY sku_type;
+```
+
+**Expected Result**:
+```
+ sku_type         | count
+------------------|-------
+ finished_product |    48
+```
+
+**Interpretation**:
+- ✅ **Only `finished_product` type**: Migration successful
+- ❌ **Other types present**: Migration script error (should NOT happen with V064 migration script)
+
+---
+
+### Query 4: Check for NULL `category_id` (Needs Manual Fix)
+
+**Purpose**: Identify migrated SKUs with `NULL` category_id, which need manual category assignment.
+
+```sql
+-- Query 4: Migrated SKUs with NULL category_id
+SELECT
+    s.id,
+    s.code,
+    s.name,
+    s.category_id,
+    b.category AS original_category
+FROM skus s
+JOIN beverage_sku_mapping bsm ON s.id = bsm.new_sku_id
+JOIN beverages b ON b.id = bsm.old_beverage_id
+WHERE s.category_id IS NULL
+ORDER BY s.created_at DESC;
+```
+
+**Expected Result**:
+```
+ id                                   | code              | name         | category_id | original_category
+--------------------------------------|-------------------|--------------|-------------|------------------
+ 550e8400-e29b-41d4-a716-446655440100 | FIN-TEST-DRINK-001| 测试饮品     | NULL        | CUSTOM_CATEGORY
+```
+
+**Interpretation**:
+- ✅ **Empty result**: All categories mapped correctly
+- ⚠️ **Non-empty result**: Manual category assignment required (see Manual Fix section below)
+
+**Common Causes**:
+- `original_category` value not found in `categories` table
+- Migration script's CASE mapping missing new category types
+
+---
+
+### Query 5: Check Migrated SKU Count per Category
+
+**Purpose**: Verify category distribution of migrated SKUs.
+
+```sql
+-- Query 5: Migrated SKU Count by Category
+SELECT
+    c.name AS category_name,
+    COUNT(s.id) AS sku_count
+FROM skus s
+JOIN beverage_sku_mapping bsm ON s.id = bsm.new_sku_id
+LEFT JOIN categories c ON s.category_id = c.id
+GROUP BY c.name
+ORDER BY sku_count DESC;
+```
+
+**Expected Result**:
+```
+ category_name | sku_count
+---------------|----------
+ 咖啡          |        15
+ 茶饮          |        12
+ 果汁          |         8
+ 鸡尾酒        |         7
+ 奶茶          |         4
+ 其他          |         2
+ NULL          |         0
+```
+
+**Interpretation**:
+- ✅ **No NULL category_name**: All SKUs have valid categories
+- ⚠️ **NULL category_name present**: Run Query 4 to identify and fix
+
+---
+
+### Query 6: Verify Mapping Table Integrity
+
+**Purpose**: Check that all mapping records reference valid SKUs.
+
+```sql
+-- Query 6: Mapping Table Integrity Check
+SELECT
+    COUNT(*) AS total_mappings,
+    COUNT(DISTINCT old_beverage_id) AS unique_old_ids,
+    COUNT(DISTINCT new_sku_id) AS unique_new_ids,
+    COUNT(*) - COUNT(DISTINCT old_beverage_id) AS duplicate_old_ids,
+    COUNT(*) - COUNT(DISTINCT new_sku_id) AS duplicate_new_ids
+FROM beverage_sku_mapping
+WHERE migration_script_version = 'V064';
+```
+
+**Expected Result**:
+```
+ total_mappings | unique_old_ids | unique_new_ids | duplicate_old_ids | duplicate_new_ids
+----------------|----------------|----------------|-------------------|------------------
+             48 |             48 |             48 |                 0 |                 0
+```
+
+**Interpretation**:
+- ✅ **duplicate_old_ids = 0 AND duplicate_new_ids = 0**: Mapping is 1:1 (correct)
+- ❌ **duplicate_old_ids > 0 OR duplicate_new_ids > 0**: Data integrity issue
+
+---
+
+### Query 7: Check Migration Timestamps
+
+**Purpose**: Verify all mappings were created by the same migration run.
+
+```sql
+-- Query 7: Migration Timestamps
+SELECT
+    migration_script_version,
+    MIN(migrated_at) AS first_migration,
+    MAX(migrated_at) AS last_migration,
+    MAX(migrated_at) - MIN(migrated_at) AS duration,
+    COUNT(*) AS total_records
+FROM beverage_sku_mapping
+GROUP BY migration_script_version
+ORDER BY first_migration DESC;
+```
+
+**Expected Result**:
+```
+ migration_script_version | first_migration       | last_migration        | duration  | total_records
+--------------------------|----------------------|----------------------|-----------|---------------
+ V064                     | 2025-12-31 10:00:00  | 2025-12-31 10:00:05  | 00:00:05  |            48
+```
+
+**Interpretation**:
+- ✅ **duration < 1 minute**: Migration completed quickly (good)
+- ⚠️ **duration > 5 minutes**: Large dataset or performance issue
+
+---
+
+### Query 8: Verify SKU Code Format
+
+**Purpose**: Ensure all migrated SKUs have correctly formatted codes (`FIN-<NAME>-<SEQUENCE>`).
+
+```sql
+-- Query 8: SKU Code Format Validation
+SELECT
+    s.code,
+    s.name,
+    CASE
+        WHEN s.code ~ '^FIN-[A-Z0-9-]+-[0-9]{3}$' THEN 'VALID'
+        ELSE 'INVALID'
+    END AS code_format
+FROM skus s
+JOIN beverage_sku_mapping bsm ON s.id = bsm.new_sku_id
+WHERE s.code !~ '^FIN-[A-Z0-9-]+-[0-9]{3}$'
+ORDER BY s.created_at DESC;
+```
+
+**Expected Result**:
+```
+ code | name | code_format
+------|------|-------------
+(empty result)
+```
+
+**Interpretation**:
+- ✅ **Empty result**: All codes correctly formatted
+- ❌ **Non-empty result**: Code generation logic failed for some beverages
+
+---
+
+## Manual Fix: Assign NULL Categories
+
+If Query 4 returns SKUs with `NULL` category_id, manually assign categories:
+
+```sql
+-- Find the correct category ID
+SELECT id, name FROM categories WHERE name = '鸡尾酒';
+
+-- Update SKU with correct category_id
+UPDATE skus
+SET category_id = '550e8400-e29b-41d4-a716-446655440001'  -- Replace with actual category ID
+WHERE id = '550e8400-e29b-41d4-a716-446655440100';  -- Replace with SKU ID from Query 4
+
+-- Verify update
+SELECT code, name, category_id FROM skus WHERE id = '550e8400-e29b-41d4-a716-446655440100';
+```
+
+---
+
+## Manual Migration: Unmigrated Beverages
+
+If Query 2 returns unmigrated beverages, manually migrate them:
+
+```sql
+-- Example: Manually migrate a single beverage
+WITH new_sku AS (
+    INSERT INTO skus (
+        id, code, name, sku_type, category_id, description, unit,
+        standard_cost, standard_price, status, sort_order,
+        created_at, updated_at, created_by, updated_by
+    )
+    VALUES (
+        gen_random_uuid(),
+        'FIN-MANUAL-001',  -- Manually assign unique code
+        '手动迁移饮品',
+        'finished_product',
+        (SELECT id FROM categories WHERE name = '其他' LIMIT 1),
+        '手动迁移的饮品',
+        '份',
+        2500,
+        2500,
+        'enabled',
+        100,
+        NOW(),
+        NOW(),
+        'migration-script',
+        'migration-script'
+    )
+    RETURNING id
+)
+INSERT INTO beverage_sku_mapping (old_beverage_id, new_sku_id, migrated_at, migration_script_version, status)
+SELECT
+    '550e8400-e29b-41d4-a716-446655440099',  -- Replace with old beverage ID from Query 2
+    id,
+    NOW(),
+    'V064-MANUAL',
+    'active'
+FROM new_sku;
+```
+
+---
+
+## Rollback: Undo Migration (V065)
+
+If migration needs to be rolled back, run migration V065:
+
+```bash
+# Rollback migration
+./mvnw flyway:migrate  # Automatically applies V065 if V064 was applied
+
+# Verify rollback
+./mvnw flyway:info
+```
+
+**Rollback script (V065) does the following**:
+1. Deletes all SKUs created by migration V064 (identified via `beverage_sku_mapping`)
+2. Clears `beverage_sku_mapping` table
+3. Restores `beverages` table comment to "ACTIVE - migration rolled back"
+
+**Verify rollback**:
+```sql
+-- Should return 0 (all migrated SKUs deleted)
+SELECT COUNT(*) AS remaining_migrated_skus
+FROM skus s
+WHERE EXISTS (
+    SELECT 1 FROM beverage_sku_mapping bsm WHERE bsm.new_sku_id = s.id
+);
+
+-- Should return 0 (mapping table cleared for V064)
+SELECT COUNT(*) AS remaining_mappings
+FROM beverage_sku_mapping
+WHERE migration_script_version = 'V064';
+
+-- Should return original count (beverages table intact)
+SELECT COUNT(*) AS total_beverages
+FROM beverages;
+```
 
 ---
 

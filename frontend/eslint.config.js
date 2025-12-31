@@ -8,19 +8,15 @@ import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
   { ignores: ['dist', 'node_modules', '*.config.js', 'public'] },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintConfigPrettier,
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-      eslintConfigPrettier,
-    ],
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,

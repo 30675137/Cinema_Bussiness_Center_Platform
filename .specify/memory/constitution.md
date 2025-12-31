@@ -1,22 +1,21 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.13.0 → 1.14.0 -->
+<!-- Version change: 1.14.0 → 1.14.1 -->
 <!-- Modified principles:
-  - 十、认证与权限要求分层 (Authentication & Authorization Layering) - 新增 (v1.14.0)
-  - 安全标准 (Security Standards) - 澄清B端与C端的认证权限要求差异 (v1.14.0)
+  - 七、代码质量与工程化 (Code Quality & Engineering Excellence) - 明确要求使用 Java 17,禁止使用其他版本 (v1.14.1)
 -->
-<!-- Added sections:
-  - 十、认证与权限要求分层 (Authentication & Authorization Layering) - B端开发暂不考虑认证与权限,C端按实际需求进行 (v1.14.0)
--->
+<!-- Added sections: None -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (v1.14.0 - 澄清B端与C端的认证权限要求)
-  ✅ .specify/templates/plan-template.md (需更新Constitution Check中的安全标准检查项)
-  ⚠ .specify/templates/spec-template.md (需在安全需求部分注明B端与C端的差异)
+  ✅ .specify/memory/constitution.md (v1.14.1 - 强制要求 Java 17)
+  ⚠ backend/pom.xml (需验证 Java 17 配置)
+  ⚠ backend/.mvn/jvm.config (需创建文件锁定 Java 17)
+  ⚠ .claude/rules/07-backend-architecture.md (需更新 Java 版本要求)
 -->
 <!-- Follow-up TODOs:
-  1. 更新 plan-template.md 中的"安全标准"检查项,明确B端与C端的差异
-  2. 在代码审查清单中强调B端功能不需要实现认证授权逻辑
-  3. 确保C端功能规格明确说明认证授权需求
+  1. 验证 backend/pom.xml 中 <java.version> 为 17
+  2. 创建 backend/.mvn/jvm.config 文件指定 JAVA_HOME
+  3. 更新 .claude/rules/07-backend-architecture.md 中的 Java 版本要求
+  4. 在 CI/CD 流水线中强制验证 Java 17
 -->
 
 # 影院商品管理中台宪法
@@ -248,17 +247,21 @@ public class StoreAssociationService {
 
 遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保前端类型安全,
 ESLint + Prettier 确保代码风格一致性,Husky + lint-staged 确保提交质量。
-后端必须使用现代 Java 版本与 Spring Boot 框架,并遵循一致的编码规范、
-日志规范和异常处理规范。所有 Java 代码在关键领域类、公共方法以及复杂业
-务分支处必须编写**清晰、准确且有意义的注释**,说明领域含义、边界条件以及
-与 Supabase 或外部系统交互的意图,禁止堆砌无信息量的"废话注释"。所有代码
-必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范(Conventional
-Commits),使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、
-性能考虑、测试覆盖、安全考虑、代码归属标识(`@spec`)的完整性以及关键
-Java 代码是否具备足够的注释可读性。
+后端必须使用 **Java 17** 与 Spring Boot 3.x 框架,并遵循一致的编码规范、
+日志规范和异常处理规范。项目必须配置使用 Java 17 进行编译和运行,禁止
+使用其他 Java 版本(如 Java 21、Java 23)以确保环境一致性和依赖兼容性。
+所有 Java 代码在关键领域类、公共方法以及复杂业务分支处必须编写**清晰、
+准确且有意义的注释**,说明领域含义、边界条件以及与 Supabase 或外部系统
+交互的意图,禁止堆砌无信息量的"废话注释"。所有代码必须通过静态分析、
+单元测试和集成测试。遵循 Git 提交规范(Conventional Commits),使用语义化
+版本控制。代码审查必须检查功能实现、边界情况处理、性能考虑、测试覆盖、
+安全考虑、代码归属标识(`@spec`)的完整性以及关键 Java 代码是否具备足够
+的注释可读性。
 
 **基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期
-可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。
+可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。统一使用
+Java 17 避免不同 Java 版本之间的兼容性问题、SSL/TLS 协议差异和运行时
+行为不一致,确保开发、测试和生产环境的一致性。
 
 ### 八、Claude Code Skills 开发规范 (Claude Code Skills Development Standards)
 
@@ -722,4 +725,4 @@ export async function fetchUserReservations(userId: string) {
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.14.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31
+**版本**: 1.14.1 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31

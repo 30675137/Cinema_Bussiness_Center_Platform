@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整 API 服务
- * 
+ *
  * 提供库存调整创建、查询、撤回等接口。
  */
 
@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
 
 /**
  * 获取调整原因字典
- * 
+ *
  * @returns 原因列表响应
  */
 export async function listAdjustmentReasons(): Promise<ReasonListResponse> {
@@ -66,20 +66,18 @@ export async function listAdjustmentReasons(): Promise<ReasonListResponse> {
 
 /**
  * 创建库存调整
- * 
+ *
  * @param data 调整数据
  * @returns 调整记录响应
  */
-export async function createAdjustment(
-  data: CreateAdjustmentRequest
-): Promise<AdjustmentResponse> {
+export async function createAdjustment(data: CreateAdjustmentRequest): Promise<AdjustmentResponse> {
   const response = await apiClient.post<AdjustmentResponse>('/adjustments', data);
   return response.data;
 }
 
 /**
  * 查询调整列表
- * 
+ *
  * @param params 查询参数
  * @returns 调整列表响应
  */
@@ -122,26 +120,22 @@ export async function listAdjustments(
 
 /**
  * 获取调整详情
- * 
+ *
  * @param id 调整记录ID
  * @returns 调整详情响应
  */
-export async function getAdjustment(
-  id: string
-): Promise<AdjustmentDetailResponse> {
+export async function getAdjustment(id: string): Promise<AdjustmentDetailResponse> {
   const response = await apiClient.get<AdjustmentDetailResponse>(`/adjustments/${id}`);
   return response.data;
 }
 
 /**
  * 撤回调整申请
- * 
+ *
  * @param id 调整记录ID
  * @returns 调整记录响应
  */
-export async function withdrawAdjustment(
-  id: string
-): Promise<AdjustmentResponse> {
+export async function withdrawAdjustment(id: string): Promise<AdjustmentResponse> {
   const response = await apiClient.post<AdjustmentResponse>(`/adjustments/${id}/withdraw`);
   return response.data;
 }
@@ -150,7 +144,7 @@ export async function withdrawAdjustment(
 
 /**
  * 更新安全库存阈值
- * 
+ *
  * @param inventoryId 库存记录ID
  * @param data 更新数据
  * @returns 更新后的库存信息

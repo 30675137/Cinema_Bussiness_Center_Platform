@@ -1,14 +1,14 @@
-import React from 'react'
-import { Layout, Button, Avatar, Dropdown, Space, Typography } from 'antd'
-import { UserOutlined, BellOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons'
-import type { MenuProps } from 'antd'
+import React from 'react';
+import { Layout, Button, Avatar, Dropdown, Space, Typography } from 'antd';
+import { UserOutlined, BellOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
 
-const { Header: AntHeader } = Layout
-const { Text } = Typography
+const { Header: AntHeader } = Layout;
+const { Text } = Typography;
 
 interface HeaderProps {
-  collapsed?: boolean
-  onToggle?: () => void
+  collapsed?: boolean;
+  onToggle?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
@@ -32,21 +32,21 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
       label: '退出登录',
       danger: true,
     },
-  ]
+  ];
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     switch (key) {
       case 'profile':
-        console.log('Navigate to profile')
-        break
+        console.log('Navigate to profile');
+        break;
       case 'settings':
-        console.log('Navigate to settings')
-        break
+        console.log('Navigate to settings');
+        break;
       case 'logout':
-        console.log('Handle logout')
-        break
+        console.log('Handle logout');
+        break;
     }
-  }
+  };
 
   return (
     <AntHeader
@@ -80,28 +80,20 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
       </div>
 
       <Space size="large">
-        <Button
-          type="text"
-          icon={<BellOutlined />}
-          style={{ fontSize: '16px' }}
-        />
+        <Button type="text" icon={<BellOutlined />} style={{ fontSize: '16px' }} />
         <Dropdown
           menu={{ items: userMenuItems, onClick: handleMenuClick }}
           placement="bottomRight"
           arrow
         >
           <Space style={{ cursor: 'pointer' }}>
-            <Avatar
-              size="small"
-              icon={<UserOutlined />}
-              style={{ backgroundColor: '#1890ff' }}
-            />
+            <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
             <Text>管理员</Text>
           </Space>
         </Dropdown>
       </Space>
     </AntHeader>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

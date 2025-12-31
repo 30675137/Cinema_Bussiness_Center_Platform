@@ -20,14 +20,14 @@ import {
   Divider,
   Tag,
   Alert,
-  Select
+  Select,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, UseFormSetValue, UseFormGetValues } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
@@ -106,7 +106,7 @@ export const BomConfiguration = <T extends Record<string, any>>({
   wasteRateFieldPath,
   labels = {},
   readOnly = false,
-  onCostChange
+  onCostChange,
 }: BomConfigurationProps<T>) => {
   const [editingComponent, setEditingComponent] = useState<BomComponent | null>(null);
   const [componentFormVisible, setComponentFormVisible] = useState(false);
@@ -118,10 +118,10 @@ export const BomConfiguration = <T extends Record<string, any>>({
     fields: componentFields,
     append: appendComponent,
     remove: removeComponent,
-    update: updateComponent
+    update: updateComponent,
   } = useFieldArray({
     control,
-    name: fieldPath as any
+    name: fieldPath as any,
   });
 
   // 计算总成本
@@ -149,7 +149,7 @@ export const BomConfiguration = <T extends Record<string, any>>({
       unitCost: 0,
       totalCost: 0,
       isOptional: false,
-      sortOrder: componentFields.length
+      sortOrder: componentFields.length,
     };
     setEditingComponent(newComponent);
     setComponentFormVisible(true);
@@ -165,7 +165,9 @@ export const BomConfiguration = <T extends Record<string, any>>({
   const handleSaveComponent = (component: BomComponent) => {
     component.totalCost = (component.unitCost || 0) * component.quantity;
 
-    const existingIndex = componentFields.findIndex(field => (field as BomComponent).id === component.id);
+    const existingIndex = componentFields.findIndex(
+      (field) => (field as BomComponent).id === component.id
+    );
 
     if (existingIndex !== -1) {
       // 更新现有组件
@@ -197,7 +199,7 @@ export const BomConfiguration = <T extends Record<string, any>>({
           <span>{text || record.componentId || '-'}</span>
           {record.isOptional && <Tag color="orange">可选</Tag>}
         </Space>
-      )
+      ),
     },
     {
       title: '数量',
@@ -205,26 +207,24 @@ export const BomConfiguration = <T extends Record<string, any>>({
       key: 'quantity',
       width: 120,
       render: (quantity: number, record: BomComponent) => (
-        <Text>{quantity} {record.unit}</Text>
-      )
+        <Text>
+          {quantity} {record.unit}
+        </Text>
+      ),
     },
     {
       title: '单位成本',
       dataIndex: 'unitCost',
       key: 'unitCost',
       width: 120,
-      render: (cost: number) => (
-        <Text>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '总成本',
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: 120,
-      render: (cost: number) => (
-        <Text strong>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text strong>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '操作',
@@ -246,17 +246,11 @@ export const BomConfiguration = <T extends Record<string, any>>({
             cancelText="取消"
             disabled={readOnly}
           >
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              disabled={readOnly}
-            />
+            <Button type="text" size="small" danger icon={<DeleteOutlined />} disabled={readOnly} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -278,7 +272,9 @@ export const BomConfiguration = <T extends Record<string, any>>({
               <Col span={12}>
                 <Form.Item
                   label="损耗率(%)"
-                  validateStatus={errors[wasteRateFieldPath as keyof typeof errors] ? 'error' : undefined}
+                  validateStatus={
+                    errors[wasteRateFieldPath as keyof typeof errors] ? 'error' : undefined
+                  }
                   help={errors[wasteRateFieldPath as keyof typeof errors]?.message as string}
                   extra="成品成本 = BOM总成本 × (1 + 损耗率%)"
                 >
@@ -313,11 +309,7 @@ export const BomConfiguration = <T extends Record<string, any>>({
               {componentLabel}清单
             </Title>
             {!readOnly && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddComponent}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddComponent}>
                 添加{componentLabel}
               </Button>
             )}
@@ -418,13 +410,13 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
   availableComponents,
   componentLabel,
   onSave,
-  onCancel
+  onCancel,
 }) => {
   const [formComponent, setFormComponent] = useState<BomComponent>(component);
 
   // 选择组件
   const handleComponentSelect = (componentId: string) => {
-    const selected = availableComponents.find(c => c.id === componentId);
+    const selected = availableComponents.find((c) => c.id === componentId);
     if (selected) {
       setFormComponent({
         ...formComponent,
@@ -432,7 +424,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
         componentName: selected.name,
         unit: selected.unit,
         unitCost: selected.cost,
-        totalCost: selected.cost * formComponent.quantity
+        totalCost: selected.cost * formComponent.quantity,
       });
     }
   };
@@ -444,7 +436,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
     setFormComponent({
       ...formComponent,
       quantity: qty,
-      totalCost
+      totalCost,
     });
   };
 
@@ -455,7 +447,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
     setFormComponent({
       ...formComponent,
       unitCost: cost,
-      totalCost
+      totalCost,
     });
   };
 
@@ -488,7 +480,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
                 option?.children?.toString().toLowerCase().includes(input.toLowerCase()) || false
               }
             >
-              {availableComponents.map(comp => (
+              {availableComponents.map((comp) => (
                 <Option key={comp.id} value={comp.id}>
                   {comp.name} (¥{comp.cost.toFixed(2)}/{comp.unit})
                 </Option>
@@ -547,10 +539,12 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
           <Form.Item label="是否可选">
             <Select
               value={formComponent.isOptional ? 'optional' : 'required'}
-              onChange={(value) => setFormComponent({
-                ...formComponent,
-                isOptional: value === 'optional'
-              })}
+              onChange={(value) =>
+                setFormComponent({
+                  ...formComponent,
+                  isOptional: value === 'optional',
+                })
+              }
             >
               <Option value="required">必需</Option>
               <Option value="optional">可选</Option>
@@ -564,10 +558,12 @@ const ComponentForm: React.FC<ComponentFormProps> = ({
               placeholder="0"
               min={0}
               value={formComponent.sortOrder}
-              onChange={(value) => setFormComponent({
-                ...formComponent,
-                sortOrder: value || 0
-              })}
+              onChange={(value) =>
+                setFormComponent({
+                  ...formComponent,
+                  sortOrder: value || 0,
+                })
+              }
             />
           </Form.Item>
         </Col>

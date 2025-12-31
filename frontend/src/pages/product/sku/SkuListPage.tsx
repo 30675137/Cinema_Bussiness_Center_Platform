@@ -11,10 +11,7 @@ import { SkuTable } from '@/components/sku/SkuTable';
 import { SkuSimpleForm } from '@/components/sku/SkuSimpleForm';
 import { SkuDetail } from '@/components/sku/SkuDetail';
 import { useSkuStore } from '@/stores/skuStore';
-import {
-  useSkuListQuery,
-  useToggleSkuStatusMutation,
-} from '@/hooks/useSku';
+import { useSkuListQuery, useToggleSkuStatusMutation } from '@/hooks/useSku';
 import type { SKU, SkuQueryParams } from '@/types/sku';
 import { SkuStatus } from '@/types/sku';
 import { useNavigate } from 'react-router-dom';
@@ -25,12 +22,12 @@ import { useNavigate } from 'react-router-dom';
 const SkuListPage: React.FC = () => {
   const navigate = useNavigate();
   const store = useSkuStore();
-  
+
   // 简化表单状态
   const [simpleFormOpen, setSimpleFormOpen] = useState(false);
   const [simpleFormMode, setSimpleFormMode] = useState<'create' | 'edit'>('create');
   const [simpleFormSkuId, setSimpleFormSkuId] = useState<string | undefined>(undefined);
-  
+
   // 安全地获取 store 值，确保不为 undefined
   const filters = store.filters || { status: 'all' };
   const pagination = store.pagination || { page: 1, pageSize: 20 };
@@ -175,26 +172,24 @@ const SkuListPage: React.FC = () => {
       >
         {/* 筛选器 */}
         <div style={{ marginBottom: 16 }}>
-          <SkuFilters
-            onFilter={handleFilter}
-            onReset={handleReset}
-            loading={isLoading}
-          />
+          <SkuFilters onFilter={handleFilter} onReset={handleReset} loading={isLoading} />
         </div>
 
         {/* 错误提示 */}
         {listError && (
           <Alert
             message="加载失败"
-            description={listError instanceof Error ? listError.message : '获取SKU列表失败，请稍后重试'}
+            description={
+              listError instanceof Error ? listError.message : '获取SKU列表失败，请稍后重试'
+            }
             type="error"
             showIcon
             closable
             data-testid="sku-list-error"
             action={
-              <Button 
-                size="small" 
-                icon={<ReloadOutlined />} 
+              <Button
+                size="small"
+                icon={<ReloadOutlined />}
                 onClick={() => refetch()}
                 data-testid="sku-list-retry-button"
               >
@@ -206,7 +201,9 @@ const SkuListPage: React.FC = () => {
         )}
 
         {/* 空状态和表格 */}
-        {!listError && !isLoading && (!skuListResponse?.items || skuListResponse.items.length === 0) ? (
+        {!listError &&
+        !isLoading &&
+        (!skuListResponse?.items || skuListResponse.items.length === 0) ? (
           <Empty
             description={
               <span>
@@ -219,9 +216,9 @@ const SkuListPage: React.FC = () => {
             data-testid="sku-list-empty"
           >
             {Object.keys(filters || {}).length === 0 && (
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />} 
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
                 onClick={handleCreate}
                 data-testid="sku-empty-create-button"
               >
@@ -268,4 +265,3 @@ const SkuListPage: React.FC = () => {
 };
 
 export default SkuListPage;
-

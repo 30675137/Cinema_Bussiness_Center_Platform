@@ -1,20 +1,16 @@
 /**
  * P004-inventory-adjustment: 审批相关 Hooks
- * 
+ *
  * 提供审批列表查询、审批操作等功能。
  * 实现 T048 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
 import axios from 'axios';
-import type {
-  InventoryAdjustment,
-  AdjustmentStatus,
-  ApprovalRequest,
-} from '../types/adjustment';
+import type { InventoryAdjustment, AdjustmentStatus, ApprovalRequest } from '../types/adjustment';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
@@ -76,13 +72,16 @@ export const approvalKeys = {
   pending: () => [...approvalKeys.all, 'pending'] as const,
   pendingList: (params: PendingApprovalsParams) => [...approvalKeys.pending(), params] as const,
   adjustments: () => [...approvalKeys.all, 'adjustments'] as const,
-  adjustmentsList: (params: AdjustmentsQueryParams) => [...approvalKeys.adjustments(), params] as const,
+  adjustmentsList: (params: AdjustmentsQueryParams) =>
+    [...approvalKeys.adjustments(), params] as const,
 };
 
 /**
  * 获取待审批列表
  */
-async function fetchPendingApprovals(params: PendingApprovalsParams): Promise<PendingApprovalsResponse> {
+async function fetchPendingApprovals(
+  params: PendingApprovalsParams
+): Promise<PendingApprovalsResponse> {
   const searchParams = new URLSearchParams();
   searchParams.set('status', 'pending_approval');
   if (params.page) searchParams.set('page', String(params.page));
@@ -138,7 +137,7 @@ async function withdrawAdjustment(adjustmentId: string): Promise<ApprovalActionR
 
 /**
  * 待审批列表 Hook
- * 
+ *
  * @param params 查询参数
  * @param enabled 是否启用查询
  */
@@ -153,7 +152,7 @@ export function usePendingApprovals(params: PendingApprovalsParams = {}, enabled
 
 /**
  * 调整记录列表 Hook（支持状态筛选）
- * 
+ *
  * @param params 查询参数，包含 status 筛选
  * @param enabled 是否启用查询
  */
@@ -184,7 +183,7 @@ export function useProcessApproval(options: UseProcessApprovalOptions = {}) {
     mutationFn: async ({
       adjustmentId,
       action,
-      comments
+      comments,
     }: {
       adjustmentId: string;
       action: 'approve' | 'reject';

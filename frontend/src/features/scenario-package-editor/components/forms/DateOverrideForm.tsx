@@ -42,7 +42,7 @@ export interface DateOverrideFormValues {
   date: string; // YYYY-MM-DD 格式
   overrideType: OverrideType;
   startTime?: string; // HH:mm 格式
-  endTime?: string;   // HH:mm 格式
+  endTime?: string; // HH:mm 格式
   capacity?: number;
   reason?: string;
 }
@@ -65,10 +65,10 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
     capacity?: number;
     reason?: string;
   }>();
-  
+
   const isEdit = !!initialData;
   const overrideType = Form.useWatch('overrideType', form);
-  
+
   // 初始化表单数据
   useEffect(() => {
     if (visible) {
@@ -77,10 +77,10 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
         form.setFieldsValue({
           date: dayjs(initialData.date),
           overrideType: initialData.overrideType as OverrideType,
-          timeRange: initialData.startTime && initialData.endTime ? [
-            dayjs(initialData.startTime, 'HH:mm'),
-            dayjs(initialData.endTime, 'HH:mm'),
-          ] : undefined,
+          timeRange:
+            initialData.startTime && initialData.endTime
+              ? [dayjs(initialData.startTime, 'HH:mm'), dayjs(initialData.endTime, 'HH:mm')]
+              : undefined,
           capacity: initialData.capacity,
           reason: initialData.reason,
         });
@@ -96,12 +96,12 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
       }
     }
   }, [visible, initialData, defaultDate, form]);
-  
+
   // 提交表单
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      
+
       // 对于 ADD 和 MODIFY 类型，验证时间范围
       if (values.overrideType !== 'CANCEL') {
         if (!values.timeRange || values.timeRange.length !== 2) {
@@ -114,20 +114,22 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
           return;
         }
       }
-      
+
       const formValues: DateOverrideFormValues = {
         date: values.date.format('YYYY-MM-DD'),
         overrideType: values.overrideType,
-        startTime: values.overrideType !== 'CANCEL' && values.timeRange 
-          ? values.timeRange[0].format('HH:mm') 
-          : undefined,
-        endTime: values.overrideType !== 'CANCEL' && values.timeRange 
-          ? values.timeRange[1].format('HH:mm') 
-          : undefined,
+        startTime:
+          values.overrideType !== 'CANCEL' && values.timeRange
+            ? values.timeRange[0].format('HH:mm')
+            : undefined,
+        endTime:
+          values.overrideType !== 'CANCEL' && values.timeRange
+            ? values.timeRange[1].format('HH:mm')
+            : undefined,
         capacity: values.overrideType !== 'CANCEL' ? values.capacity : undefined,
         reason: values.reason,
       };
-      
+
       await onSubmit(formValues);
       form.resetFields();
       onClose();
@@ -135,18 +137,18 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
       console.error('表单验证失败:', error);
     }
   };
-  
+
   // 关闭弹窗
   const handleClose = () => {
     form.resetFields();
     onClose();
   };
-  
+
   // 禁用过去的日期
   const disabledDate = (current: Dayjs) => {
     return current && current.isBefore(dayjs(), 'day');
   };
-  
+
   return (
     <Modal
       title={isEdit ? '编辑日期覆盖' : '添加日期覆盖'}
@@ -164,17 +166,9 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
         showIcon
         style={{ marginBottom: 16 }}
       />
-      
-      <Form
-        form={form}
-        layout="vertical"
-        requiredMark="optional"
-      >
-        <Form.Item
-          name="date"
-          label="日期"
-          rules={[{ required: true, message: '请选择日期' }]}
-        >
+
+      <Form form={form} layout="vertical" requiredMark="optional">
+        <Form.Item name="date" label="日期" rules={[{ required: true, message: '请选择日期' }]}>
           <DatePicker
             style={{ width: '100%' }}
             disabledDate={disabledDate}
@@ -183,7 +177,7 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
             disabled={isEdit}
           />
         </Form.Item>
-        
+
         <Form.Item
           name="overrideType"
           label="覆盖类型"
@@ -195,7 +189,7 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
             <Radio.Button value="CANCEL">取消时段</Radio.Button>
           </Radio.Group>
         </Form.Item>
-        
+
         {overrideType !== 'CANCEL' && (
           <>
             <Form.Item
@@ -210,22 +204,13 @@ export const DateOverrideForm: React.FC<DateOverrideFormProps> = ({
                 placeholder={['开始时间', '结束时间']}
               />
             </Form.Item>
-            
-            <Form.Item
-              name="capacity"
-              label="可预约容量"
-              tooltip="该时段最多可接受的预约数量"
-            >
-              <InputNumber
-                min={1}
-                max={100}
-                placeholder="不限制请留空"
-                style={{ width: '100%' }}
-              />
+
+            <Form.Item name="capacity" label="可预约容量" tooltip="该时段最多可接受的预约数量">
+              <InputNumber min={1} max={100} placeholder="不限制请留空" style={{ width: '100%' }} />
             </Form.Item>
           </>
         )}
-        
+
         <Form.Item
           name="reason"
           label="备注说明"

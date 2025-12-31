@@ -165,7 +165,9 @@ export class ProductPage extends BasePage {
   // 批量选择商品
   async selectProducts(skus: string[]) {
     for (const sku of skus) {
-      const checkbox = this.page.locator(`[data-testid="product-row"]:has-text("${sku}") [data-testid="select-checkbox"]`);
+      const checkbox = this.page.locator(
+        `[data-testid="product-row"]:has-text("${sku}") [data-testid="select-checkbox"]`
+      );
       await checkbox.check();
     }
   }

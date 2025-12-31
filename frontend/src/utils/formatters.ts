@@ -179,7 +179,10 @@ export const formatDiscount = (discount: number): string => {
 /**
  * 格式化状态
  */
-export const formatStatus = (status: string | number, statusMap: Record<string | number, string>): string => {
+export const formatStatus = (
+  status: string | number,
+  statusMap: Record<string | number, string>
+): string => {
   return statusMap[status] || String(status);
 };
 
@@ -298,7 +301,7 @@ export const formatRatio = (numerator: number, denominator: number, precision = 
     return '0:0';
   }
 
-  const gcd = (a: number, b: number): number => b === 0 ? a : gcd(b, a % b);
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
   const divisor = gcd(numerator, denominator);
 
   const simplifiedNumerator = Math.floor(numerator / divisor);

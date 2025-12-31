@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Card,
   Table,
@@ -10,102 +10,108 @@ import {
   Tooltip,
   Popconfirm,
   message,
-  Empty
-} from 'antd'
+  Empty,
+} from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SettingOutlined } from '@ant-design/icons';
+import type { CategoryAttribute } from '@/types/category';
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SettingOutlined
-} from '@ant-design/icons'
-import type { CategoryAttribute } from '@/types/category'
-import { useAttributeTemplateQuery, useAddAttributeMutation, useUpdateAttributeMutation, useDeleteAttributeMutation } from '@/hooks/api/useAttributeTemplateQuery'
-import AttributeForm from '@/components/Attribute/AttributeForm'
+  useAttributeTemplateQuery,
+  useAddAttributeMutation,
+  useUpdateAttributeMutation,
+  useDeleteAttributeMutation,
+} from '@/hooks/api/useAttributeTemplateQuery';
+import AttributeForm from '@/components/Attribute/AttributeForm';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 interface AttributeTemplatePanelProps {
-  categoryId: string | null
-  categoryName?: string
+  categoryId: string | null;
+  categoryName?: string;
 }
 
 const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
   categoryId,
-  categoryName
+  categoryName,
 }) => {
-  const [formModalVisible, setFormModalVisible] = useState(false)
-  const [editingAttribute, setEditingAttribute] = useState<CategoryAttribute | undefined>()
-  const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
+  const [formModalVisible, setFormModalVisible] = useState(false);
+  const [editingAttribute, setEditingAttribute] = useState<CategoryAttribute | undefined>();
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
 
-  const { data: template, isLoading, refetch } = useAttributeTemplateQuery(categoryId, !!categoryId)
-  const addMutation = useAddAttributeMutation()
-  const updateMutation = useUpdateAttributeMutation()
-  const deleteMutation = useDeleteAttributeMutation()
+  const {
+    data: template,
+    isLoading,
+    refetch,
+  } = useAttributeTemplateQuery(categoryId, !!categoryId);
+  const addMutation = useAddAttributeMutation();
+  const updateMutation = useUpdateAttributeMutation();
+  const deleteMutation = useDeleteAttributeMutation();
 
   // 处理新增属性
   const handleAddAttribute = () => {
-    setFormMode('create')
-    setEditingAttribute(undefined)
-    setFormModalVisible(true)
-  }
+    setFormMode('create');
+    setEditingAttribute(undefined);
+    setFormModalVisible(true);
+  };
 
   // 处理编辑属性
   const handleEditAttribute = (attribute: CategoryAttribute) => {
-    setFormMode('edit')
-    setEditingAttribute(attribute)
-    setFormModalVisible(true)
-  }
+    setFormMode('edit');
+    setEditingAttribute(attribute);
+    setFormModalVisible(true);
+  };
 
   // 处理删除属性
   const handleDeleteAttribute = async (attributeId: string) => {
-    if (!categoryId) return
+    if (!categoryId) return;
 
     try {
-      await deleteMutation.mutateAsync({ categoryId, attributeId })
-      refetch()
+      await deleteMutation.mutateAsync({ categoryId, attributeId });
+      refetch();
     } catch (error) {
-      console.error('Delete attribute error:', error)
+      console.error('Delete attribute error:', error);
     }
-  }
+  };
 
   // 处理表单提交
-  const handleFormSubmit = async (values: Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>) => {
-    if (!categoryId) return
+  const handleFormSubmit = async (
+    values: Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>
+  ) => {
+    if (!categoryId) return;
 
     try {
       if (formMode === 'create') {
-        await addMutation.mutateAsync({ categoryId, attribute: values })
+        await addMutation.mutateAsync({ categoryId, attribute: values });
       } else if (editingAttribute) {
         await updateMutation.mutateAsync({
           categoryId,
           attributeId: editingAttribute.id,
-          attribute: values
-        })
+          attribute: values,
+        });
       }
-      setFormModalVisible(false)
-      setEditingAttribute(undefined)
-      refetch()
+      setFormModalVisible(false);
+      setEditingAttribute(undefined);
+      refetch();
     } catch (error) {
-      console.error('Save attribute error:', error)
+      console.error('Save attribute error:', error);
     }
-  }
+  };
 
   // 处理取消表单
   const handleFormCancel = () => {
-    setFormModalVisible(false)
-    setEditingAttribute(undefined)
-  }
+    setFormModalVisible(false);
+    setEditingAttribute(undefined);
+  };
 
   // 格式化属性类型显示
   const formatAttributeType = (type: string): string => {
     const typeMap: Record<string, string> = {
-      'text': '文本',
-      'number': '数字',
+      text: '文本',
+      number: '数字',
       'single-select': '单选',
       'multi-select': '多选',
-    }
-    return typeMap[type] || type
-  }
+    };
+    return typeMap[type] || type;
+  };
 
   // 表格列定义
   const columns = [
@@ -129,9 +135,7 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
       dataIndex: 'type',
       key: 'type',
       width: 100,
-      render: (type: string) => (
-        <Tag color="blue">{formatAttributeType(type)}</Tag>
-      ),
+      render: (type: string) => <Tag color="blue">{formatAttributeType(type)}</Tag>,
     },
     {
       title: '是否必填',
@@ -139,9 +143,7 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
       key: 'required',
       width: 100,
       render: (required: boolean) => (
-        <Tag color={required ? 'red' : 'default'}>
-          {required ? '必填' : '可选'}
-        </Tag>
+        <Tag color={required ? 'red' : 'default'}>{required ? '必填' : '可选'}</Tag>
       ),
     },
     {
@@ -150,7 +152,7 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
       key: 'optionalValues',
       render: (values: string[] | undefined) => {
         if (!values || values.length === 0) {
-          return <Text type="secondary">-</Text>
+          return <Text type="secondary">-</Text>;
         }
         return (
           <Space size={[4, 4]} wrap>
@@ -159,11 +161,9 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
                 {value}
               </Tag>
             ))}
-            {values.length > 3 && (
-              <Tag>+{values.length - 3}</Tag>
-            )}
+            {values.length > 3 && <Tag>+{values.length - 3}</Tag>}
           </Space>
-        )
+        );
       },
     },
     {
@@ -208,18 +208,18 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
         </Space>
       ),
     },
-  ]
+  ];
 
   if (!categoryId) {
     return (
       <Card>
         <Empty description="请选择一个类目查看属性模板" />
       </Card>
-    )
+    );
   }
 
-  const attributes = template?.attributes || []
-  const hasTemplate = !!template
+  const attributes = template?.attributes || [];
+  const hasTemplate = !!template;
 
   return (
     <>
@@ -254,15 +254,8 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
             <Text type="secondary">加载中...</Text>
           </div>
         ) : !hasTemplate && attributes.length === 0 ? (
-          <Empty
-            description="该类目尚未配置属性模板"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          >
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddAttribute}
-            >
+          <Empty description="该类目尚未配置属性模板" image={Empty.PRESENTED_IMAGE_SIMPLE}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddAttribute}>
               创建第一个属性
             </Button>
           </Empty>
@@ -274,7 +267,7 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
             pagination={false}
             size="small"
             locale={{
-              emptyText: '暂无属性，点击"新增属性"添加'
+              emptyText: '暂无属性，点击"新增属性"添加',
             }}
           />
         )}
@@ -298,10 +291,7 @@ const AttributeTemplatePanel: React.FC<AttributeTemplatePanelProps> = ({
         />
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default AttributeTemplatePanel
-
-
-
+export default AttributeTemplatePanel;

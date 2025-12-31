@@ -12,17 +12,17 @@
 
 ```typescript
 // ✅ 正确的命名方式
-const userName = 'john_doe';           // camelCase，语义明确
-const productList: Product[] = [];     // 类型注解，复数形式
-const isLoading = false;               // 布尔值使用is/has/can前缀
-const handleSubmit = () => {};          // 函数使用动词开头
+const userName = 'john_doe'; // camelCase，语义明确
+const productList: Product[] = []; // 类型注解，复数形式
+const isLoading = false; // 布尔值使用is/has/can前缀
+const handleSubmit = () => {}; // 函数使用动词开头
 const API_BASE_URL = 'https://api.example.com'; // 常量使用UPPER_SNAKE_CASE
 
 // ❌ 错误的命名方式
-const user_name = 'john_doe';          // 应该使用camelCase
-const list = [];                       // 命名不够语义化
-const flag = false;                    // 布尔值命名不够明确
-const data = {};                       // 过于通用，不够具体
+const user_name = 'john_doe'; // 应该使用camelCase
+const list = []; // 命名不够语义化
+const flag = false; // 布尔值命名不够明确
+const data = {}; // 过于通用，不够具体
 ```
 
 #### 类型定义
@@ -52,8 +52,9 @@ interface ApiResponse<T> {
 }
 
 // ❌ 错误的类型定义
-interface user {                       // 接口名应该使用PascalCase
-  id: any;                            // 避免使用any类型
+interface user {
+  // 接口名应该使用PascalCase
+  id: any; // 避免使用any类型
   name: string;
   email: string;
 }
@@ -72,16 +73,14 @@ const getProductById = async (id: string): Promise<Product> => {
 // 使用函数重载处理不同参数
 function createUser(userData: CreateUserRequest): Promise<User>;
 function createUser(userData: CreateUserRequest, options: CreateUserOptions): Promise<User>;
-function createUser(
-  userData: CreateUserRequest,
-  options?: CreateUserOptions
-): Promise<User> {
+function createUser(userData: CreateUserRequest, options?: CreateUserOptions): Promise<User> {
   return userService.create(userData, options);
 }
 
 // ❌ 错误的函数定义
-function getProduct(id) {              // 缺少参数类型和返回类型
-  return api.get('/products/' + id);   // 应该使用模板字符串
+function getProduct(id) {
+  // 缺少参数类型和返回类型
+  return api.get('/products/' + id); // 应该使用模板字符串
 }
 ```
 
@@ -230,9 +229,7 @@ interface UseProductListReturn {
   loadMore: () => Promise<void>;
 }
 
-export const useProductList = (
-  options: UseProductListOptions = {}
-): UseProductListReturn => {
+export const useProductList = (options: UseProductListOptions = {}): UseProductListReturn => {
   const { params = {}, immediate = true } = options;
 
   // 状态定义
@@ -243,30 +240,33 @@ export const useProductList = (
   const [page, setPage] = useState(1);
 
   // 获取数据函数
-  const fetchProducts = useCallback(async (pageNum: number = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchProducts = useCallback(
+    async (pageNum: number = 1) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const response = await productService.getProducts({
-        ...params,
-        page: pageNum,
-      });
+        const response = await productService.getProducts({
+          ...params,
+          page: pageNum,
+        });
 
-      if (pageNum === 1) {
-        setProducts(response.data);
-      } else {
-        setProducts(prev => [...prev, ...response.data]);
+        if (pageNum === 1) {
+          setProducts(response.data);
+        } else {
+          setProducts((prev) => [...prev, ...response.data]);
+        }
+
+        setTotal(response.pagination.total);
+        setPage(pageNum);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '获取商品列表失败');
+      } finally {
+        setLoading(false);
       }
-
-      setTotal(response.pagination.total);
-      setPage(pageNum);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '获取商品列表失败');
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
+    },
+    [params]
+  );
 
   // 重新获取
   const refetch = useCallback(async () => {
@@ -510,7 +510,7 @@ const StyledButton = styled.button<StyledButtonProps>`
   transition: all 0.2s ease;
 
   /* Size variants */
-  ${props => {
+  ${(props) => {
     switch (props.size) {
       case 'small':
         return `
@@ -531,7 +531,7 @@ const StyledButton = styled.button<StyledButtonProps>`
   }}
 
   /* Color variants */
-  ${props => {
+  ${(props) => {
     switch (props.variant) {
       case 'secondary':
         return `
@@ -849,8 +849,7 @@ export const useProducts = (params?: ProductQueryParams) => {
 export const useInfiniteProducts = (params?: ProductQueryParams) => {
   return useInfiniteQuery({
     queryKey: ['infinite-products', params],
-    queryFn: ({ pageParam = 1 }) =>
-      productService.getProducts({ ...params, page: pageParam }),
+    queryFn: ({ pageParam = 1 }) => productService.getProducts({ ...params, page: pageParam }),
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.pagination.hasNext) {
         return lastPage.pagination.current + 1;

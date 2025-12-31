@@ -1,6 +1,6 @@
 /**
  * Integration tests for dictionary type CRUD operations via MSW
- * 
+ *
  * Tests the full flow from API calls through service layer
  */
 
@@ -9,7 +9,10 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { attributeService } from '../services/attributeService';
-import type { DictionaryType, CreateDictionaryTypeRequest } from '@/features/attribute-dictionary/types';
+import type {
+  DictionaryType,
+  CreateDictionaryTypeRequest,
+} from '@/features/attribute-dictionary/types';
 
 // Create a test query client
 const createTestQueryClient = () => {
@@ -33,7 +36,7 @@ describe('Dictionary Type Integration Tests', () => {
   describe('GET /dictionary-types', () => {
     it('should fetch dictionary types list', async () => {
       const response = await attributeService.getDictionaryTypes();
-      
+
       expect(response.success).toBe(true);
       if (response.success) {
         expect(Array.isArray(response.data.data)).toBe(true);
@@ -101,7 +104,7 @@ describe('Dictionary Type Integration Tests', () => {
       };
 
       const response = await attributeService.createDictionaryType(newType);
-      
+
       expect(response.success).toBe(true);
       if (response.success) {
         expect(response.data.code).toBe(newType.code);
@@ -220,5 +223,3 @@ describe('Dictionary Type Integration Tests', () => {
     });
   });
 });
-
-

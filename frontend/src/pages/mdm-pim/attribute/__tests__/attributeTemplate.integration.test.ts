@@ -20,7 +20,7 @@ describe('Attribute Template Integration Tests', () => {
   describe('GET /attribute-templates', () => {
     it('should fetch attribute templates list', async () => {
       const response = await attributeService.getAttributeTemplates();
-      
+
       expect(response.success).toBe(true);
       if (response.success) {
         expect(Array.isArray(response.data.data)).toBe(true);
@@ -74,7 +74,7 @@ describe('Attribute Template Integration Tests', () => {
       };
 
       const response = await attributeService.createAttributeTemplate(newTemplate);
-      
+
       expect(response.success).toBe(true);
       if (response.success) {
         expect(response.data.categoryId).toBe(newTemplate.categoryId);
@@ -135,5 +135,3 @@ describe('Attribute Template Integration Tests', () => {
     });
   });
 });
-
-

@@ -13,7 +13,7 @@ const { Option } = Select;
 const BrandSearchForm: React.FC<BrandSearchFormProps> = ({
   onSearch,
   onReset,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm();
 
@@ -43,19 +43,10 @@ const BrandSearchForm: React.FC<BrandSearchFormProps> = ({
 
   return (
     <div className="brand-search-form" data-testid="brand-search-form">
-      <Form
-        form={form}
-        onFinish={handleSearch}
-        layout="vertical"
-        className="search-form-content"
-      >
+      <Form form={form} onFinish={handleSearch} layout="vertical" className="search-form-content">
         <Row gutter={[16, 0]}>
           <Col xs={24} sm={24} md={8} lg={6}>
-            <Form.Item
-              name="keyword"
-              label="关键词"
-              className="search-keyword-item"
-            >
+            <Form.Item name="keyword" label="关键词" className="search-keyword-item">
               <Input
                 placeholder="输入品牌名称 / 英文名 / 编码"
                 allowClear
@@ -66,16 +57,8 @@ const BrandSearchForm: React.FC<BrandSearchFormProps> = ({
           </Col>
 
           <Col xs={24} sm={12} md={6} lg={4}>
-            <Form.Item
-              name="brandType"
-              label="品牌类型"
-              className="search-type-item"
-            >
-              <Select
-                placeholder="请选择"
-                allowClear
-                data-testid="brand-type-select"
-              >
+            <Form.Item name="brandType" label="品牌类型" className="search-type-item">
+              <Select placeholder="请选择" allowClear data-testid="brand-type-select">
                 {Object.entries(BRAND_CONSTANTS.TYPE_LABELS).map(([value, label]) => (
                   <Option key={value} value={value}>
                     {label}
@@ -86,16 +69,8 @@ const BrandSearchForm: React.FC<BrandSearchFormProps> = ({
           </Col>
 
           <Col xs={24} sm={12} md={6} lg={4}>
-            <Form.Item
-              name="status"
-              label="状态"
-              className="search-status-item"
-            >
-              <Select
-                placeholder="请选择"
-                allowClear
-                data-testid="brand-status-select"
-              >
+            <Form.Item name="status" label="状态" className="search-status-item">
+              <Select placeholder="请选择" allowClear data-testid="brand-status-select">
                 {Object.entries(BRAND_CONSTANTS.STATUS_COLORS).map(([value, config]) => (
                   <Option key={value} value={value}>
                     {config.text}
@@ -117,11 +92,7 @@ const BrandSearchForm: React.FC<BrandSearchFormProps> = ({
                 >
                   查询
                 </Button>
-                <Button
-                  icon={<ReloadOutlined />}
-                  onClick={handleReset}
-                  data-testid="reset-button"
-                >
+                <Button icon={<ReloadOutlined />} onClick={handleReset} data-testid="reset-button">
                   重置
                 </Button>
               </Space>

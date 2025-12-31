@@ -47,9 +47,9 @@ const createTestData = (): InventoryTestData => {
       inTransitQuantity: 10,
       safetyStock: 50,
       stockStatus: 'normal',
-      costPrice: 8.50,
-      sellingPrice: 25.00,
-      totalValue: 3750.00,
+      costPrice: 8.5,
+      sellingPrice: 25.0,
+      totalValue: 3750.0,
       lastUpdated: '2024-01-15T10:30:00Z',
       createdAt: '2024-01-01T00:00:00Z',
     },
@@ -67,9 +67,9 @@ const createTestData = (): InventoryTestData => {
       inTransitQuantity: 0,
       safetyStock: 100,
       stockStatus: 'normal',
-      costPrice: 2.00,
-      sellingPrice: 8.00,
-      totalValue: 1600.00,
+      costPrice: 2.0,
+      sellingPrice: 8.0,
+      totalValue: 1600.0,
       lastUpdated: '2024-01-15T11:00:00Z',
       createdAt: '2024-01-02T00:00:00Z',
     },
@@ -87,9 +87,9 @@ const createTestData = (): InventoryTestData => {
       inTransitQuantity: 5,
       safetyStock: 30,
       stockStatus: 'low',
-      costPrice: 15.00,
-      sellingPrice: 30.00,
-      totalValue: 1350.00,
+      costPrice: 15.0,
+      sellingPrice: 30.0,
+      totalValue: 1350.0,
       lastUpdated: '2024-01-15T09:45:00Z',
       createdAt: '2024-01-03T00:00:00Z',
     },
@@ -107,9 +107,9 @@ const createTestData = (): InventoryTestData => {
       inTransitQuantity: 20,
       safetyStock: 10,
       stockStatus: 'out_of_stock',
-      costPrice: 25.00,
-      sellingPrice: 89.00,
-      totalValue: 0.00,
+      costPrice: 25.0,
+      sellingPrice: 89.0,
+      totalValue: 0.0,
       lastUpdated: '2024-01-15T12:00:00Z',
       createdAt: '2024-01-04T00:00:00Z',
     },
@@ -383,7 +383,9 @@ export class InventoryPage {
   }
 
   async expectCellToContainText(rowIndex: number, columnIndex: number, text: string) {
-    const cell = this.inventoryTable.locator(`tbody tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`);
+    const cell = this.inventoryTable.locator(
+      `tbody tr:nth-child(${rowIndex}) td:nth-child(${columnIndex})`
+    );
     await expect(cell).toContainText(text);
   }
 }

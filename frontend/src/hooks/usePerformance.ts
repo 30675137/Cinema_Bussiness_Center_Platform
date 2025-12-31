@@ -58,7 +58,7 @@ export const usePerformance = (config: PerformanceMonitorConfig = {}) => {
     logRerenders = false,
     trackMemory = false,
     componentName = 'Component',
-    onPerformanceWarning
+    onPerformanceWarning,
   } = config;
 
   const renderCountRef = useRef(0);
@@ -93,9 +93,8 @@ export const usePerformance = (config: PerformanceMonitorConfig = {}) => {
     const renderTimes = renderTimesRef.current;
     const renderCount = renderCountRef.current;
 
-    const averageRenderTime = renderCount > 0
-      ? renderTimes.reduce((sum, time) => sum + time, 0) / renderCount
-      : 0;
+    const averageRenderTime =
+      renderCount > 0 ? renderTimes.reduce((sum, time) => sum + time, 0) / renderCount : 0;
 
     const newMetrics: PerformanceMetrics = {
       renderCount,
@@ -117,52 +116,61 @@ export const usePerformance = (config: PerformanceMonitorConfig = {}) => {
     if (logRerenders) {
       console.log(
         `[Performance] ${componentName} render #${renderCount} - ` +
-        `${newMetrics.lastRenderTime.toFixed(2)}ms (avg: ${averageRenderTime.toFixed(2)}ms)`,
+          `${newMetrics.lastRenderTime.toFixed(2)}ms (avg: ${averageRenderTime.toFixed(2)}ms)`,
         { metrics: newMetrics }
       );
     }
   }, [componentName, renderThreshold, logRerenders, onPerformanceWarning, getMemoryUsage]);
 
   // 开始性能测量
-  const startMeasure = useCallback((measureName?: string) => {
-    const name = measureName || 'render';
-    if (enabled) {
-      activeMeasuresRef.current[name] = performance.now();
-    }
-  }, [enabled]);
+  const startMeasure = useCallback(
+    (measureName?: string) => {
+      const name = measureName || 'render';
+      if (enabled) {
+        activeMeasuresRef.current[name] = performance.now();
+      }
+    },
+    [enabled]
+  );
 
   // 结束性能测量
-  const endMeasure = useCallback((measureName?: string) => {
-    const name = measureName || 'render';
-    const startTime = activeMeasuresRef.current[name];
+  const endMeasure = useCallback(
+    (measureName?: string) => {
+      const name = measureName || 'render';
+      const startTime = activeMeasuresRef.current[name];
 
-    if (enabled && startTime) {
-      const duration = performance.now() - startTime;
-      delete activeMeasuresRef.current[name];
+      if (enabled && startTime) {
+        const duration = performance.now() - startTime;
+        delete activeMeasuresRef.current[name];
 
-      if (name === 'render') {
-        renderCountRef.current += 1;
-        renderTimesRef.current.push(duration);
-        totalRenderTimeRef.current += duration;
-        maxRenderTimeRef.current = Math.max(maxRenderTimeRef.current, duration);
-        updateMetrics();
+        if (name === 'render') {
+          renderCountRef.current += 1;
+          renderTimesRef.current.push(duration);
+          totalRenderTimeRef.current += duration;
+          maxRenderTimeRef.current = Math.max(maxRenderTimeRef.current, duration);
+          updateMetrics();
+        }
+
+        return duration;
       }
-
-      return duration;
-    }
-    return 0;
-  }, [enabled, updateMetrics]);
+      return 0;
+    },
+    [enabled, updateMetrics]
+  );
 
   // 记录自定义指标
-  const recordCustomMetric = useCallback((name: string, value: number) => {
-    if (enabled) {
-      customMetricsRef.current[name] = value;
+  const recordCustomMetric = useCallback(
+    (name: string, value: number) => {
+      if (enabled) {
+        customMetricsRef.current[name] = value;
 
-      if (logRerenders) {
-        console.log(`[Performance] ${componentName} ${name}: ${value}`);
+        if (logRerenders) {
+          console.log(`[Performance] ${componentName} ${name}: ${value}`);
+        }
       }
-    }
-  }, [enabled, componentName, logRerenders]);
+    },
+    [enabled, componentName, logRerenders]
+  );
 
   // 获取自定义指标
   const getCustomMetric = useCallback((name: string) => {
@@ -222,27 +230,33 @@ export const usePerformance = (config: PerformanceMonitorConfig = {}) => {
 /**
  * 组合性能监控Hook，用于同时监控多个组件
  */
-export const useCombinedPerformance = (configs: Array<{ config: PerformanceMonitorConfig; key: string }>) => {
+export const useCombinedPerformance = (
+  configs: Array<{ config: PerformanceMonitorConfig; key: string }>
+) => {
   const results = configs.map(({ config, key }) => ({
     key,
     ...usePerformance({ ...config, componentName: config.componentName || key }),
   }));
 
-  const combinedMetrics = Object.fromEntries(
-    results.map(({ key, metrics }) => [key, metrics])
-  );
+  const combinedMetrics = Object.fromEntries(results.map(({ key, metrics }) => [key, metrics]));
 
   const getAllMetrics = useCallback(() => combinedMetrics, [combinedMetrics]);
 
-  const startMeasure = useCallback((key: string, measureName?: string) => {
-    const hook = results.find(r => r.key === key);
-    return hook?.startMeasure(measureName);
-  }, [results]);
+  const startMeasure = useCallback(
+    (key: string, measureName?: string) => {
+      const hook = results.find((r) => r.key === key);
+      return hook?.startMeasure(measureName);
+    },
+    [results]
+  );
 
-  const endMeasure = useCallback((key: string, measureName?: string) => {
-    const hook = results.find(r => r.key === key);
-    return hook?.endMeasure(measureName);
-  }, [results]);
+  const endMeasure = useCallback(
+    (key: string, measureName?: string) => {
+      const hook = results.find((r) => r.key === key);
+      return hook?.endMeasure(measureName);
+    },
+    [results]
+  );
 
   return {
     metrics: combinedMetrics,
@@ -274,7 +288,7 @@ export const usePerformanceAnalysis = (config: PerformanceMonitorConfig = {}) =>
     const { lastRenderTime, averageRenderTime, maxRenderTime } = performance.metrics;
 
     // 更新趋势数据
-    setAnalysis(prev => {
+    setAnalysis((prev) => {
       const newTrend = [...prev.renderTrend, lastRenderTime].slice(-10);
 
       // 性能等级评估

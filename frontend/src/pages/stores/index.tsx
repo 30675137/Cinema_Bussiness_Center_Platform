@@ -55,7 +55,9 @@ const StoresPage: React.FC = () => {
 
   // 016-store-reservation-settings: State for reservation settings modal
   const [reservationModalOpen, setReservationModalOpen] = useState(false);
-  const [selectedStoreForReservation, setSelectedStoreForReservation] = useState<Store | null>(null);
+  const [selectedStoreForReservation, setSelectedStoreForReservation] = useState<Store | null>(
+    null
+  );
 
   // State for pagination (frontend pagination)
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,7 +72,8 @@ const StoresPage: React.FC = () => {
   const storeIds = useMemo(() => stores.map((store) => store.id), [stores]);
 
   // 016-store-reservation-settings: 获取所有门店的预约设置
-  const { data: allReservationSettings = [], isLoading: settingsLoading } = useAllStoresReservationSettings(storeIds);
+  const { data: allReservationSettings = [], isLoading: settingsLoading } =
+    useAllStoresReservationSettings(storeIds);
 
   // 综合加载状态
   const isLoading = storesLoading || settingsLoading;
@@ -91,9 +94,7 @@ const StoresPage: React.FC = () => {
       return stores;
     }
     const lowerSearchName = searchName.toLowerCase();
-    return stores.filter((store: Store) =>
-      store.name.toLowerCase().includes(lowerSearchName)
-    );
+    return stores.filter((store: Store) => store.name.toLowerCase().includes(lowerSearchName));
   }, [stores, searchName]);
 
   // Apply frontend pagination
@@ -192,7 +193,15 @@ const StoresPage: React.FC = () => {
   return (
     <div className="stores-page-container">
       {/* Page Header */}
-      <div className="stores-page-header" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        className="stores-page-header"
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Title level={2} style={{ margin: 0 }}>
           <Space>
             <ShopOutlined />
@@ -200,11 +209,7 @@ const StoresPage: React.FC = () => {
           </Space>
         </Title>
         {/* 022-store-crud: 新建门店按钮 */}
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleOpenCreateModal}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleOpenCreateModal}>
           新建门店
         </Button>
       </div>
@@ -212,15 +217,8 @@ const StoresPage: React.FC = () => {
       {/* Search and Filter Section */}
       <Card style={{ marginBottom: 16 }}>
         <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <StoreSearch
-            onSearch={handleSearch}
-            onReset={handleReset}
-            loading={isLoading}
-          />
-          <StatusFilter
-            value={statusFilter}
-            onChange={handleStatusChange}
-          />
+          <StoreSearch onSearch={handleSearch} onReset={handleReset} loading={isLoading} />
+          <StatusFilter value={statusFilter} onChange={handleStatusChange} />
         </Space>
       </Card>
 
@@ -243,17 +241,10 @@ const StoresPage: React.FC = () => {
       </Card>
 
       {/* 022-store-crud: Create Modal */}
-      <CreateStoreModal
-        open={createModalOpen}
-        onClose={handleCloseCreateModal}
-      />
+      <CreateStoreModal open={createModalOpen} onClose={handleCloseCreateModal} />
 
       {/* 020-store-address: Edit Modal */}
-      <StoreEditModal
-        open={editModalOpen}
-        store={editingStore}
-        onClose={handleCloseEditModal}
-      />
+      <StoreEditModal open={editModalOpen} store={editingStore} onClose={handleCloseEditModal} />
 
       {/* 022-store-crud: Full Edit Modal */}
       <EditStoreModal

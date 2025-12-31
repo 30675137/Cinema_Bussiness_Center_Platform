@@ -13,14 +13,10 @@ import {
   message,
   Card,
   Tooltip,
-  TreeSelect
+  TreeSelect,
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import {
-  UploadOutlined,
-  DeleteOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons';
+import { UploadOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Product, ProductStatus, MaterialType } from '../../types/product';
 import { useCategories } from '../../hooks/useCategories';
 import { useBrands } from '../../hooks/useBrands';
@@ -45,7 +41,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   mode,
   onSubmit,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm();
   const [imageList, setImageList] = useState<UploadFile[]>([]);
@@ -108,7 +104,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   // 处理删除图片
   const handleRemoveImage = (file: UploadFile) => {
-    const newImageList = imageList.filter(item => item.uid !== file.uid);
+    const newImageList = imageList.filter((item) => item.uid !== file.uid);
     setImageList(newImageList);
     setHasChanges(true);
   };
@@ -123,8 +119,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         ...values,
         content: {
           ...product?.content,
-          images: imageList.map(file => file.url || file.response?.url).filter(Boolean),
-        }
+          images: imageList.map((file) => file.url || file.response?.url).filter(Boolean),
+        },
       };
 
       await onSubmit(formData);
@@ -146,7 +142,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   // 处理类目变化
   const handleCategoryChange = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
+    const category = categories.find((cat) => cat.id === categoryId);
     if (category) {
       // 根据类目自动设置物料类型
       if (category.allowedMaterialTypes.length === 1) {
@@ -182,7 +178,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               label="商品名称"
               rules={[
                 { required: true, message: '请输入商品名称' },
-                { max: 100, message: '商品名称不能超过100个字符' }
+                { max: 100, message: '商品名称不能超过100个字符' },
               ]}
             >
               <Input placeholder="请输入商品名称" />
@@ -194,7 +190,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               label="SKU编码"
               rules={[
                 { required: true, message: '请输入SKU编码' },
-                { pattern: /^[A-Za-z0-9_-]+$/, message: 'SKU只能包含字母、数字、下划线和横线' }
+                { pattern: /^[A-Za-z0-9_-]+$/, message: 'SKU只能包含字母、数字、下划线和横线' },
               ]}
             >
               <Input placeholder="系统将自动生成" disabled={mode === 'edit'} />
@@ -211,13 +207,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
             >
               <TreeSelect
                 placeholder="请选择商品类目"
-                treeData={categories.map(cat => ({
+                treeData={categories.map((cat) => ({
                   value: cat.id,
                   title: cat.name,
-                  children: cat.children?.map(child => ({
+                  children: cat.children?.map((child) => ({
                     value: child.id,
-                    title: child.name
-                  }))
+                    title: child.name,
+                  })),
                 }))}
                 loading={categoriesLoading}
                 onChange={handleCategoryChange}
@@ -244,10 +240,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
-              name="brandId"
-              label="品牌"
-            >
+            <Form.Item name="brandId" label="品牌">
               <Select
                 placeholder="请选择品牌"
                 allowClear
@@ -257,7 +250,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
                 }
               >
-                {brands.map(brand => (
+                {brands.map((brand) => (
                   <Option key={brand.id} value={brand.id}>
                     {brand.name}
                   </Option>
@@ -279,7 +272,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                   (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
                 }
               >
-                {units.map(unit => (
+                {units.map((unit) => (
                   <Option key={unit.id} value={unit.id}>
                     {unit.name}
                   </Option>
@@ -291,24 +284,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
-              name="barcode"
-              label="条码"
-            >
+            <Form.Item name="barcode" label="条码">
               <Input placeholder="请输入或扫描条码" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              name="description"
-              label="商品描述"
-            >
-              <TextArea
-                rows={2}
-                placeholder="请输入商品描述"
-                maxLength={500}
-                showCount
-              />
+            <Form.Item name="description" label="商品描述">
+              <TextArea rows={2} placeholder="请输入商品描述" maxLength={500} showCount />
             </Form.Item>
           </Col>
         </Row>
@@ -323,7 +305,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               label="基础价 (元)"
               rules={[
                 { required: true, message: '请输入基础价' },
-                { type: 'number', min: 0, message: '价格不能为负数' }
+                { type: 'number', min: 0, message: '价格不能为负数' },
               ]}
             >
               <InputNumber
@@ -340,9 +322,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Form.Item
               name="costPrice"
               label="成本价 (元)"
-              rules={[
-                { type: 'number', min: 0, message: '价格不能为负数' }
-              ]}
+              rules={[{ type: 'number', min: 0, message: '价格不能为负数' }]}
             >
               <InputNumber
                 style={{ width: '100%' }}
@@ -360,15 +340,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
               label="当前库存"
               rules={[
                 { required: true, message: '请输入当前库存' },
-                { type: 'number', min: 0, message: '库存不能为负数' }
+                { type: 'number', min: 0, message: '库存不能为负数' },
               ]}
             >
-              <InputNumber
-                style={{ width: '100%' }}
-                placeholder="0"
-                min={0}
-                precision={0}
-              />
+              <InputNumber style={{ width: '100%' }} placeholder="0" min={0} precision={0} />
             </Form.Item>
           </Col>
         </Row>
@@ -378,17 +353,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Form.Item
               name="safetyStock"
               label="安全库存"
-              rules={[
-                { type: 'number', min: 0, message: '安全库存不能为负数' }
-              ]}
+              rules={[{ type: 'number', min: 0, message: '安全库存不能为负数' }]}
               tooltip="库存低于此数值时将显示预警"
             >
-              <InputNumber
-                style={{ width: '100%' }}
-                placeholder="0"
-                min={0}
-                precision={0}
-              />
+              <InputNumber style={{ width: '100%' }} placeholder="0" min={0} precision={0} />
             </Form.Item>
           </Col>
         </Row>
@@ -447,9 +415,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </>
           )}
 
-          <Button onClick={handleCancel}>
-            {isViewMode ? '关闭' : '取消'}
-          </Button>
+          <Button onClick={handleCancel}>{isViewMode ? '关闭' : '取消'}</Button>
         </Space>
       </div>
     </Form>

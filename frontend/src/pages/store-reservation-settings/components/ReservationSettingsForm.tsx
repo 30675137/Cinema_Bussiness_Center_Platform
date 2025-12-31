@@ -3,13 +3,24 @@
  *
  * Form component for editing store reservation settings.
  * Uses React Hook Form with Zod validation.
- * 
+ *
  * @feature 016-store-reservation-settings
  * @updated 添加时间段配置支持
  */
 
 import React, { useEffect } from 'react';
-import { Form, Switch, InputNumber, Button, Space, message, Divider, Radio, Typography, Alert } from 'antd';
+import {
+  Form,
+  Switch,
+  InputNumber,
+  Button,
+  Space,
+  message,
+  Divider,
+  Radio,
+  Typography,
+  Alert,
+} from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reservationSettingsSchema } from '../types/reservation-settings.schema';
@@ -151,7 +162,10 @@ const ReservationSettingsForm: React.FC<ReservationSettingsFormProps> = ({
       <Form.Item
         label="可预约天数"
         required={isReservationEnabled}
-        help={errors.maxReservationDays?.message || (isReservationEnabled ? '设置允许预约未来多少天（1-365天）' : '未开放预约时无需设置')}
+        help={
+          errors.maxReservationDays?.message ||
+          (isReservationEnabled ? '设置允许预约未来多少天（1-365天）' : '未开放预约时无需设置')
+        }
         validateStatus={errors.maxReservationDays ? 'error' : ''}
       >
         <Controller
@@ -299,7 +313,10 @@ const ReservationSettingsForm: React.FC<ReservationSettingsFormProps> = ({
                 />
               </Form.Item>
 
-              <Text type="secondary" style={{ display: 'block', textAlign: 'center', margin: '8px 0' }}>
+              <Text
+                type="secondary"
+                style={{ display: 'block', textAlign: 'center', margin: '8px 0' }}
+              >
                 或
               </Text>
 
@@ -343,11 +360,7 @@ const ReservationSettingsForm: React.FC<ReservationSettingsFormProps> = ({
           <Button onClick={onCancel} disabled={isSubmitting || loading}>
             取消
           </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={isSubmitting || loading}
-          >
+          <Button type="primary" htmlType="submit" loading={isSubmitting || loading}>
             保存
           </Button>
         </Space>

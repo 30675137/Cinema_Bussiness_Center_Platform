@@ -87,7 +87,7 @@ describe('StoreSelector Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseStores.mockReturnValue({
-      data: mockStores.filter(s => s.status === 'active'),
+      data: mockStores.filter((s) => s.status === 'active'),
       isLoading: false,
       isError: false,
       error: null,

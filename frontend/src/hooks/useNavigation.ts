@@ -12,16 +12,11 @@ import {
   FunctionalArea,
   MenuLevel,
   MenuHierarchy,
-  MenuGroup
+  MenuGroup,
 } from '@/types/navigation';
 import { useNavigationStore } from '@/stores/navigationStore';
 import { useUserStore } from '@/stores/userStore';
-import {
-  findMenuById,
-  buildMenuPath,
-  searchMenus,
-  flattenMenuItems
-} from '@/utils/navigation';
+import { findMenuById, buildMenuPath, searchMenus, flattenMenuItems } from '@/utils/navigation';
 import { menuService } from '@/services/menuService';
 import { logNavigationAction } from '@/services/navigationLogService';
 
@@ -120,7 +115,7 @@ export const useNavigation = (): UseNavigationReturn => {
     addRecentMenu: addRecentInStore,
     setLoading,
     setError,
-    clearError
+    clearError,
   } = useNavigationStore();
 
   const { user } = useUserStore();
@@ -153,7 +148,7 @@ export const useNavigation = (): UseNavigationReturn => {
           userId: user.id,
           action: NavigationAction.PAGE_VIEW,
           menuId: null,
-          metadata: { action: 'refresh_menus' }
+          metadata: { action: 'refresh_menus' },
         });
       }
     } catch (err) {
@@ -166,84 +161,98 @@ export const useNavigation = (): UseNavigationReturn => {
   }, [setLoading, setMenus, setError, clearError, user]);
 
   // 导航到指定菜单
-  const navigateToMenu = useCallback(async (menuId: string) => {
-    try {
-      const menu = findMenuById(menus, menuId);
-      if (!menu) {
-        message.warning('未找到指定菜单');
-        return;
-      }
+  const navigateToMenu = useCallback(
+    async (menuId: string) => {
+      try {
+        const menu = findMenuById(menus, menuId);
+        if (!menu) {
+          message.warning('未找到指定菜单');
+          return;
+        }
 
-      if (!menu.isActive || !menu.isVisible) {
-        message.warning('该菜单不可用');
-        return;
-      }
+        if (!menu.isActive || !menu.isVisible) {
+          message.warning('该菜单不可用');
+          return;
+        }
 
-      // 构建导航路径
-      const path = menu.path || buildMenuPath(menus, menu);
+        // 构建导航路径
+        const path = menu.path || buildMenuPath(menus, menu);
 
-      // 更新状态
-      setActiveMenuInStore(menuId);
+        // 更新状态
+        setActiveMenuInStore(menuId);
 
-      // 展开父菜单
-      const menuPath = getMenuPath(menuId);
-      menuPath.slice(0, -1).forEach(parentId => {
-        expandInStore(parentId);
-      });
-
-      // 添加到最近访问
-      addRecentInStore(menuId);
-
-      // 执行路由跳转
-      if (path && path !== window.location.pathname) {
-        navigate(path);
-      }
-
-      // 记录导航日志
-      if (user) {
-        await logNavigationAction({
-          userId: user.id,
-          action: NavigationAction.MENU_CLICK,
-          menuId,
-          metadata: { path, menuName: menu.name }
+        // 展开父菜单
+        const menuPath = getMenuPath(menuId);
+        menuPath.slice(0, -1).forEach((parentId) => {
+          expandInStore(parentId);
         });
-      }
 
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '导航失败';
-      message.error(errorMessage);
+        // 添加到最近访问
+        addRecentInStore(menuId);
 
-      // 记录错误日志
-      if (user) {
-        await logNavigationAction({
-          userId: user.id,
-          action: NavigationAction.MENU_CLICK,
-          menuId,
-          metadata: { error: errorMessage }
-        });
+        // 执行路由跳转
+        if (path && path !== window.location.pathname) {
+          navigate(path);
+        }
+
+        // 记录导航日志
+        if (user) {
+          await logNavigationAction({
+            userId: user.id,
+            action: NavigationAction.MENU_CLICK,
+            menuId,
+            metadata: { path, menuName: menu.name },
+          });
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : '导航失败';
+        message.error(errorMessage);
+
+        // 记录错误日志
+        if (user) {
+          await logNavigationAction({
+            userId: user.id,
+            action: NavigationAction.MENU_CLICK,
+            menuId,
+            metadata: { error: errorMessage },
+          });
+        }
       }
-    }
-  }, [menus, setActiveMenuInStore, expandInStore, addRecentInStore, navigate, user]);
+    },
+    [menus, setActiveMenuInStore, expandInStore, addRecentInStore, navigate, user]
+  );
 
   // 切换菜单展开状态
-  const toggleMenuExpansion = useCallback((menuId: string) => {
-    toggleExpansionInStore(menuId);
-  }, [toggleExpansionInStore]);
+  const toggleMenuExpansion = useCallback(
+    (menuId: string) => {
+      toggleExpansionInStore(menuId);
+    },
+    [toggleExpansionInStore]
+  );
 
   // 展开菜单
-  const expandMenu = useCallback((menuId: string) => {
-    expandInStore(menuId);
-  }, [expandInStore]);
+  const expandMenu = useCallback(
+    (menuId: string) => {
+      expandInStore(menuId);
+    },
+    [expandInStore]
+  );
 
   // 收起菜单
-  const collapseMenu = useCallback((menuId: string) => {
-    collapseInStore(menuId);
-  }, [collapseInStore]);
+  const collapseMenu = useCallback(
+    (menuId: string) => {
+      collapseInStore(menuId);
+    },
+    [collapseInStore]
+  );
 
   // 设置当前活动菜单
-  const setActiveMenu = useCallback((menuId: string | null) => {
-    setActiveMenuInStore(menuId);
-  }, [setActiveMenuInStore]);
+  const setActiveMenu = useCallback(
+    (menuId: string | null) => {
+      setActiveMenuInStore(menuId);
+    },
+    [setActiveMenuInStore]
+  );
 
   // 切换侧边栏状态
   const toggleSidebar = useCallback(() => {
@@ -251,159 +260,205 @@ export const useNavigation = (): UseNavigationReturn => {
   }, [sidebarCollapsed, setSidebarInStore]);
 
   // 设置侧边栏状态
-  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
-    setSidebarInStore(collapsed);
-  }, [setSidebarInStore]);
+  const setSidebarCollapsed = useCallback(
+    (collapsed: boolean) => {
+      setSidebarInStore(collapsed);
+    },
+    [setSidebarInStore]
+  );
 
   // 设置搜索查询
-  const setSearchQuery = useCallback((query: string) => {
-    setSearchQueryInStore(query);
-  }, [setSearchQueryInStore]);
+  const setSearchQuery = useCallback(
+    (query: string) => {
+      setSearchQueryInStore(query);
+    },
+    [setSearchQueryInStore]
+  );
 
   // 检查是否为收藏菜单
-  const isFavorite = useCallback((menuId: string) => {
-    return favoriteMenus.includes(menuId);
-  }, [favoriteMenus]);
+  const isFavorite = useCallback(
+    (menuId: string) => {
+      return favoriteMenus.includes(menuId);
+    },
+    [favoriteMenus]
+  );
 
   // 切换收藏状态
-  const toggleFavorite = useCallback(async (menuId: string) => {
-    try {
-      toggleFavoriteInStore(menuId);
+  const toggleFavorite = useCallback(
+    async (menuId: string) => {
+      try {
+        toggleFavoriteInStore(menuId);
 
-      // 记录收藏操作日志
-      if (user) {
-        await logNavigationAction({
-          userId: user.id,
-          action: NavigationAction.FAVORITE_CLICK,
-          menuId,
-          metadata: { isFavorite: !isFavorite(menuId) }
-        });
+        // 记录收藏操作日志
+        if (user) {
+          await logNavigationAction({
+            userId: user.id,
+            action: NavigationAction.FAVORITE_CLICK,
+            menuId,
+            metadata: { isFavorite: !isFavorite(menuId) },
+          });
+        }
+      } catch (err) {
+        message.error('操作收藏失败');
       }
-    } catch (err) {
-      message.error('操作收藏失败');
-    }
-  }, [toggleFavoriteInStore, user, isFavorite]);
+    },
+    [toggleFavoriteInStore, user, isFavorite]
+  );
 
   // 添加到最近访问
-  const addToRecent = useCallback((menuId: string) => {
-    addRecentInStore(menuId);
-  }, [addRecentInStore]);
+  const addToRecent = useCallback(
+    (menuId: string) => {
+      addRecentInStore(menuId);
+    },
+    [addRecentInStore]
+  );
 
   // 获取菜单路径
-  const getMenuPath = useCallback((menuId: string): MenuItem[] => {
-    const path: MenuItem[] = [];
-    let currentMenu = findMenuById(menus, menuId);
+  const getMenuPath = useCallback(
+    (menuId: string): MenuItem[] => {
+      const path: MenuItem[] = [];
+      let currentMenu = findMenuById(menus, menuId);
 
-    while (currentMenu) {
-      path.unshift(currentMenu);
-      if (currentMenu.parentId) {
-        currentMenu = findMenuById(menus, currentMenu.parentId);
-      } else {
-        break;
+      while (currentMenu) {
+        path.unshift(currentMenu);
+        if (currentMenu.parentId) {
+          currentMenu = findMenuById(menus, currentMenu.parentId);
+        } else {
+          break;
+        }
       }
-    }
 
-    return path;
-  }, [menus]);
+      return path;
+    },
+    [menus]
+  );
 
   // 获取菜单层级信息
-  const getMenuHierarchy = useCallback((menuId: string): MenuHierarchy => {
-    const menu = findMenuById(menus, menuId);
-    if (!menu) {
+  const getMenuHierarchy = useCallback(
+    (menuId: string): MenuHierarchy => {
+      const menu = findMenuById(menus, menuId);
+      if (!menu) {
+        return {
+          depth: 0,
+          currentLevel: MenuLevel.MAIN,
+          parentPath: [],
+          childrenCount: 0,
+          hasChildren: false,
+          levelTitles: {
+            [MenuLevel.MAIN]: '主菜单',
+            [MenuLevel.SUB]: '子菜单',
+            [MenuLevel.DETAIL]: '详情页面',
+          },
+        };
+      }
+
+      const path = getMenuPath(menuId);
+      const children = menu.children || [];
+
       return {
-        depth: 0,
-        currentLevel: MenuLevel.MAIN,
-        parentPath: [],
-        childrenCount: 0,
-        hasChildren: false,
+        depth: path.length,
+        currentLevel: menu.level,
+        parentPath: path.slice(0, -1).map((m) => m.id),
+        childrenCount: children.length,
+        hasChildren: children.length > 0,
         levelTitles: {
           [MenuLevel.MAIN]: '主菜单',
           [MenuLevel.SUB]: '子菜单',
-          [MenuLevel.DETAIL]: '详情页面'
-        }
+          [MenuLevel.DETAIL]: '详情页面',
+        },
       };
-    }
-
-    const path = getMenuPath(menuId);
-    const children = menu.children || [];
-
-    return {
-      depth: path.length,
-      currentLevel: menu.level,
-      parentPath: path.slice(0, -1).map(m => m.id),
-      childrenCount: children.length,
-      hasChildren: children.length > 0,
-      levelTitles: {
-        [MenuLevel.MAIN]: '主菜单',
-        [MenuLevel.SUB]: '子菜单',
-        [MenuLevel.DETAIL]: '详情页面'
-      }
-    };
-  }, [menus, getMenuPath]);
+    },
+    [menus, getMenuPath]
+  );
 
   // 获取父菜单
-  const getParentMenu = useCallback((menuId: string): MenuItem | null => {
-    const menu = findMenuById(menus, menuId);
-    if (!menu || !menu.parentId) {
-      return null;
-    }
-    return findMenuById(menus, menu.parentId) || null;
-  }, [menus]);
+  const getParentMenu = useCallback(
+    (menuId: string): MenuItem | null => {
+      const menu = findMenuById(menus, menuId);
+      if (!menu || !menu.parentId) {
+        return null;
+      }
+      return findMenuById(menus, menu.parentId) || null;
+    },
+    [menus]
+  );
 
   // 获取子菜单
-  const getChildMenus = useCallback((menuId: string): MenuItem[] => {
-    const menu = findMenuById(menus, menuId);
-    return menu?.children?.filter(child => child.isActive && child.isVisible) || [];
-  }, [menus]);
+  const getChildMenus = useCallback(
+    (menuId: string): MenuItem[] => {
+      const menu = findMenuById(menus, menuId);
+      return menu?.children?.filter((child) => child.isActive && child.isVisible) || [];
+    },
+    [menus]
+  );
 
   // 获取同级菜单
-  const getSiblingMenus = useCallback((menuId: string): MenuItem[] => {
-    const menu = findMenuById(menus, menuId);
-    if (!menu || !menu.parentId) {
-      return [];
-    }
+  const getSiblingMenus = useCallback(
+    (menuId: string): MenuItem[] => {
+      const menu = findMenuById(menus, menuId);
+      if (!menu || !menu.parentId) {
+        return [];
+      }
 
-    const parent = findMenuById(menus, menu.parentId);
-    return parent?.children?.filter(child =>
-      child.id !== menuId && child.isActive && child.isVisible
-    ) || [];
-  }, [menus]);
+      const parent = findMenuById(menus, menu.parentId);
+      return (
+        parent?.children?.filter(
+          (child) => child.id !== menuId && child.isActive && child.isVisible
+        ) || []
+      );
+    },
+    [menus]
+  );
 
   // 获取主菜单
-  const getMainMenu = useCallback((menu: MenuItem): MenuItem | null => {
-    if (menu.level === MenuLevel.MAIN) {
-      return menu;
-    }
+  const getMainMenu = useCallback(
+    (menu: MenuItem): MenuItem | null => {
+      if (menu.level === MenuLevel.MAIN) {
+        return menu;
+      }
 
-    if (menu.parentId) {
-      const parent = findMenuById(menus, menu.parentId);
-      return parent?.level === MenuLevel.MAIN ? parent : getMainMenu(parent!);
-    }
+      if (menu.parentId) {
+        const parent = findMenuById(menus, menu.parentId);
+        return parent?.level === MenuLevel.MAIN ? parent : getMainMenu(parent!);
+      }
 
-    return null;
-  }, [menus]);
+      return null;
+    },
+    [menus]
+  );
 
   // 获取子菜单
-  const getSubMenus = useCallback((mainMenuId: string): MenuItem[] => {
-    const mainMenu = findMenuById(menus, mainMenuId);
-    return mainMenu?.children?.filter(
-      child => child.level === MenuLevel.SUB && child.isActive && child.isVisible
-    ) || [];
-  }, [menus]);
+  const getSubMenus = useCallback(
+    (mainMenuId: string): MenuItem[] => {
+      const mainMenu = findMenuById(menus, mainMenuId);
+      return (
+        mainMenu?.children?.filter(
+          (child) => child.level === MenuLevel.SUB && child.isActive && child.isVisible
+        ) || []
+      );
+    },
+    [menus]
+  );
 
   // 按功能区域过滤菜单
-  const filterByFunctionalArea = useCallback((area: FunctionalArea): MenuItem[] => {
-    return flatMenus.filter(
-      menu => menu.functionalArea === area && menu.isActive && menu.isVisible
-    );
-  }, [flatMenus]);
+  const filterByFunctionalArea = useCallback(
+    (area: FunctionalArea): MenuItem[] => {
+      return flatMenus.filter(
+        (menu) => menu.functionalArea === area && menu.isActive && menu.isVisible
+      );
+    },
+    [flatMenus]
+  );
 
   // 获取指定功能区域的菜单
-  const getMenusByFunctionalArea = useCallback((area: FunctionalArea): MenuItem[] => {
-    return flatMenus.filter(
-      menu => menu.functionalArea === area && menu.isActive && menu.isVisible
-    );
-  }, [flatMenus]);
+  const getMenusByFunctionalArea = useCallback(
+    (area: FunctionalArea): MenuItem[] => {
+      return flatMenus.filter(
+        (menu) => menu.functionalArea === area && menu.isActive && menu.isVisible
+      );
+    },
+    [flatMenus]
+  );
 
   // 按功能区域分组菜单
   const groupMenusByArea = useCallback((): Record<FunctionalArea, MenuGroup> => {
@@ -421,10 +476,10 @@ export const useNavigation = (): UseNavigationReturn => {
       FunctionalArea.SCHEDULING,
       FunctionalArea.ORDER_MANAGEMENT,
       FunctionalArea.OPERATIONS,
-      FunctionalArea.SYSTEM_MANAGEMENT
+      FunctionalArea.SYSTEM_MANAGEMENT,
     ];
 
-    mainAreas.forEach(area => {
+    mainAreas.forEach((area) => {
       const areaMenus = getMenusByFunctionalArea(area);
       groups[area] = {
         id: area,
@@ -433,7 +488,7 @@ export const useNavigation = (): UseNavigationReturn => {
         menus: areaMenus,
         sortOrder: getFunctionalAreaSortOrder(area),
         isExpanded: true,
-        isVisible: areaMenus.length > 0
+        isVisible: areaMenus.length > 0,
       };
     });
 
@@ -464,7 +519,7 @@ export const useNavigation = (): UseNavigationReturn => {
       [FunctionalArea.PRICING_PROMOTION]: '促销价格',
       [FunctionalArea.USER_MANAGEMENT]: '用户管理',
       [FunctionalArea.ROLE_MANAGEMENT]: '角色管理',
-      [FunctionalArea.PERMISSION_MANAGEMENT]: '权限管理'
+      [FunctionalArea.PERMISSION_MANAGEMENT]: '权限管理',
     };
     return nameMap[area] || area;
   };
@@ -493,7 +548,7 @@ export const useNavigation = (): UseNavigationReturn => {
       [FunctionalArea.PRICING_PROMOTION]: '促销活动价格管理',
       [FunctionalArea.USER_MANAGEMENT]: '用户账号管理',
       [FunctionalArea.ROLE_MANAGEMENT]: '角色权限管理',
-      [FunctionalArea.PERMISSION_MANAGEMENT]: '功能权限管理'
+      [FunctionalArea.PERMISSION_MANAGEMENT]: '功能权限管理',
     };
     return descMap[area] || '';
   };
@@ -522,7 +577,7 @@ export const useNavigation = (): UseNavigationReturn => {
       [FunctionalArea.PRICING_PROMOTION]: 52,
       [FunctionalArea.USER_MANAGEMENT]: 101,
       [FunctionalArea.ROLE_MANAGEMENT]: 102,
-      [FunctionalArea.PERMISSION_MANAGEMENT]: 103
+      [FunctionalArea.PERMISSION_MANAGEMENT]: 103,
     };
     return orderMap[area] || 999;
   };
@@ -532,7 +587,7 @@ export const useNavigation = (): UseNavigationReturn => {
     const hierarchy: Record<string, MenuHierarchy> = {};
 
     const buildHierarchy = (menus: MenuItem[]) => {
-      menus.forEach(menu => {
+      menus.forEach((menu) => {
         hierarchy[menu.id] = getMenuHierarchy(menu.id);
         if (menu.children) {
           buildHierarchy(menu.children);
@@ -609,6 +664,6 @@ export const useNavigation = (): UseNavigationReturn => {
 
     // 数据操作
     refreshMenus,
-    clearError
+    clearError,
   };
 };

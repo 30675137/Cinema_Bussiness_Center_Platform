@@ -1,5 +1,5 @@
 // 导出API服务
-export { spuService } from './api/spuApi'
+export { spuService } from './api/spuApi';
 
 // 导出React Query hooks
 export {
@@ -10,8 +10,8 @@ export {
   useUpdateSPU,
   useDeleteSPU,
   useBatchOperation,
-  spuQueryKeys
-} from './hooks/useSPU'
+  spuQueryKeys,
+} from './hooks/useSPU';
 
 // 导出SKU相关
 export { skuService } from './skuService';
@@ -31,4 +31,4 @@ export const createMutationOptions = (options: any = {}) => ({
 });
 
 // 导出服务类型
-export type { SPUService } from './api/spuApi'
+export type { SPUService } from './api/spuApi';

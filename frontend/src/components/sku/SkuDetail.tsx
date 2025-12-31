@@ -49,19 +49,16 @@ interface SkuDetailProps {
 /**
  * SKU详情组件
  */
-export const SkuDetail: React.FC<SkuDetailProps> = ({
-  open,
-  skuId,
-  onClose,
-  onEdit,
-}) => {
+export const SkuDetail: React.FC<SkuDetailProps> = ({ open, skuId, onClose, onEdit }) => {
   const { closeDetailDrawer, openFormDrawer } = useSkuStore();
-  
+
   // 获取SKU详情
-  const { data: skuData, isLoading: loading, error: detailError, refetch } = useSkuQuery(
-    skuId || null,
-    open && !!skuId
-  );
+  const {
+    data: skuData,
+    isLoading: loading,
+    error: detailError,
+    refetch,
+  } = useSkuQuery(skuId || null, open && !!skuId);
 
   // 状态切换Mutation
   const toggleStatusMutation = useToggleSkuStatusMutation();
@@ -133,9 +130,7 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
         <Space>
           <span>SKU详情</span>
           {skuData && (
-            <Tag color={getSkuStatusColor(skuData.status)}>
-              {getSkuStatusText(skuData.status)}
-            </Tag>
+            <Tag color={getSkuStatusColor(skuData.status)}>{getSkuStatusText(skuData.status)}</Tag>
           )}
         </Space>
       }
@@ -166,19 +161,16 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
             </Button>
           )}
           {skuData && (
-            <Button 
-              type="primary" 
-              icon={<EditOutlined />} 
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
               onClick={handleEdit}
               data-testid={`sku-detail-edit-button-${skuData.id}`}
             >
               编辑
             </Button>
           )}
-          <Button 
-            onClick={handleClose}
-            data-testid="sku-detail-close-button"
-          >
+          <Button onClick={handleClose} data-testid="sku-detail-close-button">
             关闭
           </Button>
         </Space>
@@ -207,12 +199,8 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
           {/* 规格属性 */}
           <Title level={5}>规格属性</Title>
           <Descriptions column={2} bordered size="small">
-            <Descriptions.Item label="规格/型号">
-              {skuData.spec || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="口味">
-              {skuData.flavor || '-'}
-            </Descriptions.Item>
+            <Descriptions.Item label="规格/型号">{skuData.spec || '-'}</Descriptions.Item>
+            <Descriptions.Item label="口味">{skuData.flavor || '-'}</Descriptions.Item>
             <Descriptions.Item label="包装形式" span={2}>
               {skuData.packaging || '-'}
             </Descriptions.Item>
@@ -223,9 +211,7 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
           {/* 单位配置 */}
           <Title level={5}>单位配置</Title>
           <Descriptions column={2} bordered size="small">
-            <Descriptions.Item label="主库存单位">
-              {skuData.mainUnit}
-            </Descriptions.Item>
+            <Descriptions.Item label="主库存单位">{skuData.mainUnit}</Descriptions.Item>
             <Descriptions.Item label="销售单位" span={2}>
               {skuData.salesUnits && skuData.salesUnits.length > 0 ? (
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
@@ -292,12 +278,8 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
                 {skuData.allowNegativeStock ? '是' : '否'}
               </Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="最小起订量">
-              {skuData.minOrderQty || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="最小销售量">
-              {skuData.minSaleQty || '-'}
-            </Descriptions.Item>
+            <Descriptions.Item label="最小起订量">{skuData.minOrderQty || '-'}</Descriptions.Item>
+            <Descriptions.Item label="最小销售量">{skuData.minSaleQty || '-'}</Descriptions.Item>
             <Descriptions.Item label="状态">
               <Tag color={getSkuStatusColor(skuData.status)}>
                 {getSkuStatusText(skuData.status)}
@@ -381,18 +363,10 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
           {/* 元数据 */}
           <Title level={5}>元数据</Title>
           <Descriptions column={2} bordered size="small">
-            <Descriptions.Item label="创建时间">
-              {formatSkuCreatedTime(skuData)}
-            </Descriptions.Item>
-            <Descriptions.Item label="创建人">
-              {skuData.createdByName || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="更新时间">
-              {formatSkuUpdatedTime(skuData)}
-            </Descriptions.Item>
-            <Descriptions.Item label="最近编辑人">
-              {skuData.updatedByName || '-'}
-            </Descriptions.Item>
+            <Descriptions.Item label="创建时间">{formatSkuCreatedTime(skuData)}</Descriptions.Item>
+            <Descriptions.Item label="创建人">{skuData.createdByName || '-'}</Descriptions.Item>
+            <Descriptions.Item label="更新时间">{formatSkuUpdatedTime(skuData)}</Descriptions.Item>
+            <Descriptions.Item label="最近编辑人">{skuData.updatedByName || '-'}</Descriptions.Item>
           </Descriptions>
         </div>
       )}
@@ -401,4 +375,3 @@ export const SkuDetail: React.FC<SkuDetailProps> = ({
 };
 
 export default SkuDetail;
-

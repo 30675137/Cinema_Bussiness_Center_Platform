@@ -60,7 +60,9 @@ function Card({
     return (
       <div className="flex items-center gap-3">
         {avatar && (
-          <Avatar size={size === CardSize.SMALL ? 'small' : size === CardSize.LARGE ? 'large' : 'default'}>
+          <Avatar
+            size={size === CardSize.SMALL ? 'small' : size === CardSize.LARGE ? 'large' : 'default'}
+          >
             {avatar}
           </Avatar>
         )}
@@ -138,20 +140,24 @@ function Card({
       cover={cover}
       title={title ? renderTitle() : undefined}
       extra={title ? undefined : extra}
-      actions={actions && actions.length > 0 ? actions.map(action => (
-        <Button
-          key={action.key}
-          type={action.type || 'text'}
-          size="small"
-          icon={action.icon}
-          disabled={action.disabled}
-          loading={action.loading}
-          danger={action.danger}
-          onClick={action.onClick}
-        >
-          {action.label}
-        </Button>
-      )) : undefined}
+      actions={
+        actions && actions.length > 0
+          ? actions.map((action) => (
+              <Button
+                key={action.key}
+                type={action.type || 'text'}
+                size="small"
+                icon={action.icon}
+                disabled={action.disabled}
+                loading={action.loading}
+                danger={action.danger}
+                onClick={action.onClick}
+              >
+                {action.label}
+              </Button>
+            ))
+          : undefined
+      }
       headStyle={headStyle}
       bodyStyle={customBodyStyle}
       onClick={onClick}
@@ -193,12 +199,8 @@ function StatCard({
 
     return (
       <div className="flex items-center gap-1">
-        {showTrendIcon && (
-          <TrendIcon style={{ color: trendColor, fontSize: '12px' }} />
-        )}
-        <Text style={{ color: trendColor, fontSize: '12px' }}>
-          {formatTrend(value)}
-        </Text>
+        {showTrendIcon && <TrendIcon style={{ color: trendColor, fontSize: '12px' }} />}
+        <Text style={{ color: trendColor, fontSize: '12px' }}>{formatTrend(value)}</Text>
         {description && (
           <Text type="secondary" className="text-xs ml-1">
             {description}
@@ -209,10 +211,7 @@ function StatCard({
   };
 
   return (
-    <Card
-      {...cardProps}
-      className={cn('stat-card', cardProps.className)}
-    >
+    <Card {...cardProps} className={cn('stat-card', cardProps.className)}>
       <div className="stat-card-content">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -240,11 +239,7 @@ function StatCard({
               </div>
             )}
 
-            {data.trend && (
-              <div className="stat-card-trend mt-2">
-                {renderTrend()}
-              </div>
-            )}
+            {data.trend && <div className="stat-card-trend mt-2">{renderTrend()}</div>}
           </div>
 
           {data.icon && (

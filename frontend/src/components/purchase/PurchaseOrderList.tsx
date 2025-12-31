@@ -279,15 +279,16 @@ const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
       },
     ];
 
-    if (order.status === PurchaseOrderStatus.DRAFT || order.status === PurchaseOrderStatus.REJECTED) {
-      items.push(
-        {
-          key: 'edit',
-          icon: <EditOutlined />,
-          label: '编辑',
-          onClick: () => handleEditOrder(order),
-        }
-      );
+    if (
+      order.status === PurchaseOrderStatus.DRAFT ||
+      order.status === PurchaseOrderStatus.REJECTED
+    ) {
+      items.push({
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: '编辑',
+        onClick: () => handleEditOrder(order),
+      });
     }
 
     if (order.status === PurchaseOrderStatus.PENDING) {
@@ -308,14 +309,12 @@ const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
     }
 
     if (order.status === PurchaseOrderStatus.APPROVED) {
-      items.push(
-        {
-          key: 'confirm',
-          icon: <CheckOutlined />,
-          label: '确认',
-          onClick: () => handleConfirmOrder(order),
-        }
-      );
+      items.push({
+        key: 'confirm',
+        icon: <CheckOutlined />,
+        label: '确认',
+        onClick: () => handleConfirmOrder(order),
+      });
     }
 
     items.push(
@@ -369,11 +368,7 @@ const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
       width: 140,
       fixed: 'left',
       render: (text: string, record: PurchaseOrder) => (
-        <Button
-          type="link"
-          size="small"
-          onClick={() => handleViewOrder(record)}
-        >
+        <Button type="link" size="small" onClick={() => handleViewOrder(record)}>
           {text}
         </Button>
       ),
@@ -535,13 +530,25 @@ const PurchaseOrderList: React.FC<PurchaseOrderListProps> = ({
         <Card className="mb-4">
           <Row gutter={16} align="middle">
             <Col>
-              <Title level={4} className="m-0">采购订单管理</Title>
+              <Title level={4} className="m-0">
+                采购订单管理
+              </Title>
             </Col>
             <Col flex="auto">
               <Space size="large">
                 <Statistic title="总订单数" value={filteredOrders.length} />
-                <Statistic title="待审核" value={filteredOrders.filter(o => o.status === PurchaseOrderStatus.PENDING).length} />
-                <Statistic title="已完成" value={filteredOrders.filter(o => o.status === PurchaseOrderStatus.COMPLETED).length} />
+                <Statistic
+                  title="待审核"
+                  value={
+                    filteredOrders.filter((o) => o.status === PurchaseOrderStatus.PENDING).length
+                  }
+                />
+                <Statistic
+                  title="已完成"
+                  value={
+                    filteredOrders.filter((o) => o.status === PurchaseOrderStatus.COMPLETED).length
+                  }
+                />
               </Space>
             </Col>
           </Row>

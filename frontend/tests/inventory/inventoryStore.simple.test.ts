@@ -63,8 +63,8 @@ describe('inventoryStore - 基本功能测试', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
-        remark: '测试库存项'
+        averageCost: 15.5,
+        remark: '测试库存项',
       });
 
       expect(newInventoryId).toBeDefined();
@@ -85,7 +85,7 @@ describe('inventoryStore - 基本功能测试', () => {
           minStock: 25,
           maxStock: 600,
           safeStock: 35,
-          averageCost: 16.00
+          averageCost: 16.0,
         });
 
         expect(store.loading).toBe(false);
@@ -130,11 +130,11 @@ describe('inventoryStore - 基本功能测试', () => {
         code: 'TEST-001',
         type: 'warehouse',
         capacity: 1000,
-        description: '测试用仓库'
+        description: '测试用仓库',
       });
 
       expect(newLocationId).toBeDefined();
-      expect(store.locations.some(loc => loc.name === '测试仓库')).toBe(true);
+      expect(store.locations.some((loc) => loc.name === '测试仓库')).toBe(true);
       expect(store.loading).toBe(false);
     });
 
@@ -148,7 +148,7 @@ describe('inventoryStore - 基本功能测试', () => {
 
         await store.updateLocation(firstLocation.id, {
           name: '更新后的仓库名称',
-          capacity: 2000
+          capacity: 2000,
         });
 
         expect(store.loading).toBe(false);
@@ -166,7 +166,7 @@ describe('inventoryStore - 基本功能测试', () => {
         code: 'TEMP-001',
         type: 'warehouse',
         capacity: 500,
-        description: '临时创建用于删除测试'
+        description: '临时创建用于删除测试',
       });
 
       const initialCount = store.locations.length;
@@ -194,11 +194,11 @@ describe('inventoryStore - 基本功能测试', () => {
           quantity: 50,
           unit: firstItem.unit,
           unitPrice: firstItem.averageCost,
-          reason: '测试入库'
+          reason: '测试入库',
         });
 
         // 验证库存是否增加
-        const updatedItem = store.inventoryItems.find(item => item.id === firstItem.id);
+        const updatedItem = store.inventoryItems.find((item) => item.id === firstItem.id);
         expect(updatedItem?.currentStock).toBeGreaterThan(initialStock);
         expect(store.loading).toBe(false);
       }
@@ -210,7 +210,7 @@ describe('inventoryStore - 基本功能测试', () => {
       await store.fetchInventoryItems();
 
       // 找一个有足够库存的商品
-      const itemWithStock = store.inventoryItems.find(item => item.currentStock > 10);
+      const itemWithStock = store.inventoryItems.find((item) => item.currentStock > 10);
 
       if (itemWithStock) {
         const initialStock = itemWithStock.currentStock;
@@ -221,11 +221,11 @@ describe('inventoryStore - 基本功能测试', () => {
           quantity: 5,
           unit: itemWithStock.unit,
           unitPrice: itemWithStock.averageCost,
-          reason: '测试出库'
+          reason: '测试出库',
         });
 
         // 验证库存是否减少
-        const updatedItem = store.inventoryItems.find(item => item.id === itemWithStock.id);
+        const updatedItem = store.inventoryItems.find((item) => item.id === itemWithStock.id);
         expect(updatedItem?.currentStock).toBeLessThan(initialStock);
         expect(store.loading).toBe(false);
       }
@@ -253,7 +253,7 @@ describe('inventoryStore - 基本功能测试', () => {
 
       store.setFilters({
         keyword: 'test',
-        status: InventoryStatus.IN_STOCK as any
+        status: InventoryStatus.IN_STOCK as any,
       });
 
       store.resetFilters();

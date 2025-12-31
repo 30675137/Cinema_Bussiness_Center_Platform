@@ -82,8 +82,8 @@ const template = await attributeService.createTemplate({
       options: [
         { label: '小份', value: 'small' },
         { label: '中份', value: 'medium' },
-        { label: '大份', value: 'large' }
-      ]
+        { label: '大份', value: 'large' },
+      ],
     },
     {
       name: '口味',
@@ -93,11 +93,11 @@ const template = await attributeService.createTemplate({
       options: [
         { label: '原味', value: 'original' },
         { label: '焦糖味', value: 'caramel' },
-        { label: '巧克力味', value: 'chocolate' }
-      ]
-    }
-  ]
-})
+        { label: '巧克力味', value: 'chocolate' },
+      ],
+    },
+  ],
+});
 ```
 
 ### 2. 在SPU表单中使用模板
@@ -110,8 +110,8 @@ const template = await attributeService.createTemplate({
     attributeTemplateId: 'POPCORN_ATTRS',
     attributeValues: {
       capacity: 'large',
-      flavor: ['original', 'caramel']
-    }
+      flavor: ['original', 'caramel'],
+    },
   }}
   onSubmit={handleSubmit}
   onCancel={handleCancel}

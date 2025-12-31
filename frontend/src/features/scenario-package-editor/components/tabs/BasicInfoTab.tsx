@@ -24,11 +24,7 @@ interface BasicInfoTabProps {
 /**
  * 场景包基础信息标签页
  */
-const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
-  packageId,
-  packageData,
-  loading = false,
-}) => {
+const BasicInfoTab: React.FC<BasicInfoTabProps> = ({ packageId, packageData, loading = false }) => {
   const isDirty = useScenarioPackageStore((state) => state.dirtyTabs.basic);
 
   // 将服务端数据转换为表单数据
@@ -50,15 +46,8 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
   }
 
   return (
-    <EditableCard
-      title="基础信息"
-      description="配置场景包名称、分类和主图"
-      isDirty={isDirty}
-    >
-      <BasicInfoForm
-        packageId={packageId}
-        initialData={initialData}
-      />
+    <EditableCard title="基础信息" description="配置场景包名称、分类和主图" isDirty={isDirty}>
+      <BasicInfoForm packageId={packageId} initialData={initialData} />
     </EditableCard>
   );
 };

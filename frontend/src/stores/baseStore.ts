@@ -93,10 +93,7 @@ export interface ModalActions {
 /**
  * 创建基础Store的工厂函数
  */
-export function createStore<T>(
-  name: string,
-  initialData?: Partial<CrudState<T>>
-) {
+export function createStore<T>(name: string, initialData?: Partial<CrudState<T>>) {
   // 初始状态
   const initialState: CrudState<T> = {
     // 基础状态
@@ -143,60 +140,96 @@ export function createStore<T>(
   // 分页动作
   const paginationActions: PaginationActions = (set, get) => ({
     setCurrentPage: (current: number) =>
-      set((state) => ({
-        pagination: { ...state.pagination, current }
-      }), false, 'setCurrentPage'),
+      set(
+        (state) => ({
+          pagination: { ...state.pagination, current },
+        }),
+        false,
+        'setCurrentPage'
+      ),
 
     setPageSize: (pageSize: number) =>
-      set((state) => ({
-        pagination: { ...state.pagination, pageSize, current: 1 }
-      }), false, 'setPageSize'),
+      set(
+        (state) => ({
+          pagination: { ...state.pagination, pageSize, current: 1 },
+        }),
+        false,
+        'setPageSize'
+      ),
 
     setPagination: (pagination: Partial<PaginationState>) =>
-      set((state) => ({
-        pagination: { ...state.pagination, ...pagination }
-      }), false, 'setPagination'),
+      set(
+        (state) => ({
+          pagination: { ...state.pagination, ...pagination },
+        }),
+        false,
+        'setPagination'
+      ),
   });
 
   // 搜索动作
   const searchActions: SearchActions = (set, get) => ({
     setKeyword: (keyword: string) =>
-      set((state) => ({
-        search: { ...state.search, keyword }
-      }), false, 'setKeyword'),
+      set(
+        (state) => ({
+          search: { ...state.search, keyword },
+        }),
+        false,
+        'setKeyword'
+      ),
 
     setFilters: (filters: Record<string, any>) =>
-      set((state) => ({
-        search: { ...state.search, filters }
-      }), false, 'setFilters'),
+      set(
+        (state) => ({
+          search: { ...state.search, filters },
+        }),
+        false,
+        'setFilters'
+      ),
 
     updateFilter: (key: string, value: any) =>
-      set((state) => ({
-        search: {
-          ...state.search,
-          filters: { ...state.search.filters, [key]: value }
-        }
-      }), false, 'updateFilter'),
+      set(
+        (state) => ({
+          search: {
+            ...state.search,
+            filters: { ...state.search.filters, [key]: value },
+          },
+        }),
+        false,
+        'updateFilter'
+      ),
 
     clearFilters: () =>
-      set((state) => ({
-        search: { ...state.search, filters: {} }
-      }), false, 'clearFilters'),
+      set(
+        (state) => ({
+          search: { ...state.search, filters: {} },
+        }),
+        false,
+        'clearFilters'
+      ),
 
     setSort: (sortField?: string, sortOrder?: 'ascend' | 'descend') =>
-      set((state) => ({
-        search: { ...state.search, sortField, sortOrder }
-      }), false, 'setSort'),
+      set(
+        (state) => ({
+          search: { ...state.search, sortField, sortOrder },
+        }),
+        false,
+        'setSort'
+      ),
 
     resetSearch: () =>
-      set((state) => ({
-        search: {
-          keyword: '',
-          filters: {},
-          sortField: undefined,
-          sortOrder: undefined,
-        }
-      }), false, 'resetSearch'),
+      set(
+        (state) => ({
+          search: {
+            keyword: '',
+            filters: {},
+            sortField: undefined,
+            sortOrder: undefined,
+          },
+        }),
+        false,
+        'resetSearch'
+      ),
   });
 
   // CRUD动作
@@ -206,40 +239,44 @@ export function createStore<T>(
     ...paginationActions(set, get),
     ...searchActions(set, get),
 
-    setItems: (items: T[]) =>
-      set({ items }, false, 'setItems'),
+    setItems: (items: T[]) => set({ items }, false, 'setItems'),
 
     addItem: (item: T) =>
-      set((state) => ({
-        items: [...state.items, item]
-      }), false, 'addItem'),
+      set(
+        (state) => ({
+          items: [...state.items, item],
+        }),
+        false,
+        'addItem'
+      ),
 
     updateItem: (id: string, updates: Partial<T>) =>
-      set((state) => ({
-        items: state.items.map((item: any) =>
-          item.id === id ? { ...item, ...updates } : item
-        )
-      }), false, 'updateItem'),
+      set(
+        (state) => ({
+          items: state.items.map((item: any) => (item.id === id ? { ...item, ...updates } : item)),
+        }),
+        false,
+        'updateItem'
+      ),
 
     removeItem: (id: string) =>
-      set((state) => ({
-        items: state.items.filter((item: any) => item.id !== id),
-        selectedItem: state.selectedItem && (state.selectedItem as any).id === id
-          ? null
-          : state.selectedItem
-      }), false, 'removeItem'),
+      set(
+        (state) => ({
+          items: state.items.filter((item: any) => item.id !== id),
+          selectedItem:
+            state.selectedItem && (state.selectedItem as any).id === id ? null : state.selectedItem,
+        }),
+        false,
+        'removeItem'
+      ),
 
-    setSelectedItem: (selectedItem: T | null) =>
-      set({ selectedItem }, false, 'setSelectedItem'),
+    setSelectedItem: (selectedItem: T | null) => set({ selectedItem }, false, 'setSelectedItem'),
 
-    setCreating: (isCreating: boolean) =>
-      set({ isCreating }, false, 'setCreating'),
+    setCreating: (isCreating: boolean) => set({ isCreating }, false, 'setCreating'),
 
-    setUpdating: (isUpdating: boolean) =>
-      set({ isUpdating }, false, 'setUpdating'),
+    setUpdating: (isUpdating: boolean) => set({ isUpdating }, false, 'setUpdating'),
 
-    setDeleting: (isDeleting: boolean) =>
-      set({ isDeleting }, false, 'setDeleting'),
+    setDeleting: (isDeleting: boolean) => set({ isDeleting }, false, 'setDeleting'),
   });
 
   // 创建Store
@@ -285,23 +322,30 @@ export function createModalStore(name: string, initialState?: Partial<ModalState
         ...initialModalState,
 
         openModal: (mode: 'create' | 'edit' | 'view', title?: string, data?: any) =>
-          set({
-            visible: true,
-            mode,
-            title: title || getDefaultTitle(mode),
-            data: data || null,
-          }, false, 'openModal'),
+          set(
+            {
+              visible: true,
+              mode,
+              title: title || getDefaultTitle(mode),
+              data: data || null,
+            },
+            false,
+            'openModal'
+          ),
 
         closeModal: () =>
-          set({
-            visible: false,
-            mode: 'create',
-            title: '',
-            data: null,
-          }, false, 'closeModal'),
+          set(
+            {
+              visible: false,
+              mode: 'create',
+              title: '',
+              data: null,
+            },
+            false,
+            'closeModal'
+          ),
 
-        setModalData: (data: any) =>
-          set({ data }, false, 'setModalData'),
+        setModalData: (data: any) => set({ data }, false, 'setModalData'),
       }),
       {
         name: `${name}-modal-store`,
@@ -364,19 +408,14 @@ export const createSearchDebounce = (
 /**
  * 创建带有乐观更新的CRUD动作
  */
-export const createOptimisticActions = <T>(
-  set: any,
-  get: any
-) => ({
+export const createOptimisticActions = <T>(set: any, get: any) => ({
   optimisticUpdate: (id: string, updates: Partial<T>, action: () => Promise<void>) => {
     // 保存原始状态
     const originalItem = get().items.find((item: any) => item.id === id);
 
     // 乐观更新
     set((state: any) => ({
-      items: state.items.map((item: any) =>
-        item.id === id ? { ...item, ...updates } : item
-      )
+      items: state.items.map((item: any) => (item.id === id ? { ...item, ...updates } : item)),
     }));
 
     // 执行实际更新
@@ -384,9 +423,7 @@ export const createOptimisticActions = <T>(
       // 回滚更新
       if (originalItem) {
         set((state: any) => ({
-          items: state.items.map((item: any) =>
-            item.id === id ? originalItem : item
-          ),
+          items: state.items.map((item: any) => (item.id === id ? originalItem : item)),
           error: error.message || '更新失败',
         }));
       }
@@ -400,7 +437,7 @@ export const createOptimisticActions = <T>(
 
     // 乐观删除
     set((state: any) => ({
-      items: state.items.filter((item: any) => item.id !== id)
+      items: state.items.filter((item: any) => item.id !== id),
     }));
 
     // 执行实际删除

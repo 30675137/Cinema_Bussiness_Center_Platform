@@ -71,7 +71,7 @@ test.describe('品牌筛选功能', () => {
       // 检查筛选结果
       const brandRows = page.locator('[data-testid="brand-table-row"]');
 
-      if (await brandRows.count() > 0) {
+      if ((await brandRows.count()) > 0) {
         for (const row of await brandRows.all()) {
           const typeTag = await row.locator('[data-testid="brand-type"]').textContent();
           expect(typeTag).toContain(brandType);
@@ -100,7 +100,7 @@ test.describe('品牌筛选功能', () => {
       // 检查筛选结果
       const brandRows = page.locator('[data-testid="brand-table-row"]');
 
-      if (await brandRows.count() > 0) {
+      if ((await brandRows.count()) > 0) {
         for (const row of await brandRows.all()) {
           const statusTag = await row.locator('[data-testid="brand-status"]').textContent();
           expect(statusTag).toContain(status);
@@ -192,7 +192,7 @@ test.describe('品牌筛选功能', () => {
     // 验证筛选条件已部分更新
     const brandRows = page.locator('[data-testid="brand-table-row"]');
 
-    if (await brandRows.count() > 0) {
+    if ((await brandRows.count()) > 0) {
       for (const row of await brandRows.all()) {
         const typeTag = await row.locator('[data-testid="brand-type"]').textContent();
         const statusTag = await row.locator('[data-testid="brand-status"]').textContent();
@@ -220,8 +220,12 @@ test.describe('品牌筛选功能', () => {
     // 检查筛选状态标签是否存在（如果有这个功能）
     const activeFilterTags = page.locator('[data-testid="active-filter-tags"]');
     if (await activeFilterTags.isVisible()) {
-      await expect(activeFilterTags.locator('[data-testid="filter-tag-type"]')).toContainText('代理品牌');
-      await expect(activeFilterTags.locator('[data-testid="filter-tag-status"]')).toContainText('停用');
+      await expect(activeFilterTags.locator('[data-testid="filter-tag-type"]')).toContainText(
+        '代理品牌'
+      );
+      await expect(activeFilterTags.locator('[data-testid="filter-tag-status"]')).toContainText(
+        '停用'
+      );
     }
   });
 
@@ -297,7 +301,7 @@ test.describe('品牌筛选功能', () => {
 
       // 验证翻页后筛选条件仍然有效
       const brandRows = page.locator('[data-testid="brand-table-row"]');
-      if (await brandRows.count() > 0) {
+      if ((await brandRows.count()) > 0) {
         for (const row of await brandRows.all()) {
           const typeTag = await row.locator('[data-testid="brand-type"]').textContent();
           expect(typeTag).toContain('自有品牌');

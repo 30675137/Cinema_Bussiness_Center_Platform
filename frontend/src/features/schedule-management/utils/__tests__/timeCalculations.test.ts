@@ -1,6 +1,6 @@
 /**
  * Unit tests for timeCalculations utility
- * 
+ *
  * Tests time positioning and formatting functions
  */
 
@@ -139,4 +139,3 @@ describe('timeCalculations', () => {
     });
   });
 });
-

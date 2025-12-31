@@ -56,9 +56,8 @@ export const formatNumber = (
     decimalPart = decimalPart.padEnd(decimals, '0').slice(0, decimals);
   }
 
-  const formattedNumber = decimals > 0
-    ? `${integerPart}${decimalSeparator}${decimalPart}`
-    : integerPart;
+  const formattedNumber =
+    decimals > 0 ? `${integerPart}${decimalSeparator}${decimalPart}` : integerPart;
 
   return `${prefix}${formattedNumber}${suffix}`;
 };
@@ -78,12 +77,7 @@ export const formatCurrency = (
     locale?: string;
   } = {}
 ): string => {
-  const {
-    currency = 'CNY',
-    decimals = 2,
-    showSymbol = true,
-    locale = 'zh-CN',
-  } = options;
+  const { currency = 'CNY', decimals = 2, showSymbol = true, locale = 'zh-CN' } = options;
 
   const number = typeof amount === 'string' ? parseFloat(amount) : amount;
 
@@ -206,10 +200,7 @@ export const formatBankCard = (cardNumber: string, mask = false): string => {
  * @param format - 格式字符串
  * @returns 格式化后的日期字符串
  */
-export const formatDate = (
-  date: string | Date | undefined,
-  format = 'YYYY-MM-DD'
-): string => {
+export const formatDate = (date: string | Date | undefined, format = 'YYYY-MM-DD'): string => {
   if (!date) return '';
   return dayjs(date).format(format);
 };
@@ -220,10 +211,7 @@ export const formatDate = (
  * @param format - 格式字符串
  * @returns 格式化后的时间字符串
  */
-export const formatTime = (
-  date: string | Date | undefined,
-  format = 'HH:mm:ss'
-): string => {
+export const formatTime = (date: string | Date | undefined, format = 'HH:mm:ss'): string => {
   if (!date) return '';
   return dayjs(date).format(format);
 };
@@ -267,12 +255,7 @@ export const formatDuration = (
     separator?: string;
   } = {}
 ): string => {
-  const {
-    showHours = true,
-    showMinutes = true,
-    showSeconds = true,
-    separator = ':',
-  } = options;
+  const { showHours = true, showMinutes = true, showSeconds = true, separator = ':' } = options;
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -302,15 +285,11 @@ export const formatDuration = (
  * @param maxItems - 最大显示数量
  * @returns 格式化后的字符串
  */
-export const formatArray = <T>(
-  array: T[],
-  separator = ', ',
-  maxItems?: number
-): string => {
+export const formatArray = <T>(array: T[], separator = ', ', maxItems?: number): string => {
   if (!array || array.length === 0) return '';
 
   const items = maxItems ? array.slice(0, maxItems) : array;
-  const formatted = items.map(item => String(item)).join(separator);
+  const formatted = items.map((item) => String(item)).join(separator);
 
   if (maxItems && array.length > maxItems) {
     return `${formatted} 等${array.length}项`;
@@ -334,12 +313,7 @@ export const formatObject = (
     maxDepth?: number;
   } = {}
 ): string => {
-  const {
-    separator = '\n',
-    keyValueSeparator = ': ',
-    indent = '',
-    maxDepth = 3,
-  } = options;
+  const { separator = '\n', keyValueSeparator = ': ', indent = '', maxDepth = 3 } = options;
 
   if (maxDepth <= 0) {
     return '{...}';
@@ -364,11 +338,7 @@ export const formatObject = (
  * @param suffix - 后缀
  * @returns 格式化后的文本
  */
-export const formatText = (
-  text: string,
-  maxLength: number,
-  suffix = '...'
-): string => {
+export const formatText = (text: string, maxLength: number, suffix = '...'): string => {
   if (!text || text.length <= maxLength) return text;
   return text.slice(0, maxLength - suffix.length) + suffix;
 };
@@ -389,11 +359,7 @@ export const formatURL = (
 ): string => {
   if (!url) return '';
 
-  const {
-    showProtocol = true,
-    showWWW = true,
-    maxLength,
-  } = options;
+  const { showProtocol = true, showWWW = true, maxLength } = options;
 
   let formattedUrl = url;
 
@@ -436,7 +402,7 @@ export const formatHighlight = (
 
   let highlightedText = text;
 
-  keywords.forEach(keyword => {
+  keywords.forEach((keyword) => {
     if (!keyword) return;
 
     const regex = new RegExp(`(${keyword})`, 'gi');
@@ -524,9 +490,6 @@ export const formatBoolean = (
  * @param placeholder - 占位符
  * @returns 格式化后的值
  */
-export const formatEmpty = <T>(
-  value: T | undefined | null,
-  placeholder = '-'
-): T | string => {
+export const formatEmpty = <T>(value: T | undefined | null, placeholder = '-'): T | string => {
   return value === undefined || value === null || value === '' ? placeholder : value;
 };

@@ -13,7 +13,7 @@ import {
   Alert,
   Typography,
   Radio,
-  Divider
+  Divider,
 } from 'antd';
 import {
   SaveOutlined,
@@ -23,7 +23,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   LeftOutlined,
-  RightOutlined
+  RightOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -36,9 +36,7 @@ import SpecsTab from '@/components/product/ProductForm/SpecsTab';
 import BomTab from '@/components/product/ProductForm/BomTab';
 import ChannelOverrideTab from '@/components/product/ProductForm/ChannelOverrideTab';
 
-import {
-  ProductFormSchema
-} from '../../../types/product';
+import { ProductFormSchema } from '../../../types/product';
 import { FormStep } from '../../../types/product';
 import { ProductStatus } from '../../../types/index';
 
@@ -84,7 +82,11 @@ interface ProductFormData {
   status: any;
 }
 import { useAppActions } from '@/stores/appStore';
-import { useProductsQuery, useCreateProductMutation, useUpdateProductMutation } from '@/stores/productStore';
+import {
+  useProductsQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+} from '@/stores/productStore';
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -94,10 +96,7 @@ interface ProductFormProps {
   mode?: 'create' | 'edit';
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({
-  productId,
-  mode = 'create'
-}) => {
+const ProductForm: React.FC<ProductFormProps> = ({ productId, mode = 'create' }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { setBreadcrumbs } = useAppActions();
@@ -110,7 +109,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const { data: product, isLoading } = useProductsQuery({
     page: 1,
     pageSize: 1,
-    ...(productId && { skuId: productId })
+    ...(productId && { skuId: productId }),
   });
 
   const createMutation = useCreateProductMutation();
@@ -138,11 +137,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
         title: '',
         subtitle: '',
         description: '',
-        images: []
+        images: [],
       },
       specifications: [],
-      channelOverrides: []
-    }
+      channelOverrides: [],
+    },
   });
 
   const {
@@ -151,56 +150,70 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setValue: formSetValue,
     getValues,
     formState: { errors, touched, isValid },
-    trigger
+    trigger,
   } = form;
 
   // 使用 useCallback 包装 setValue 以确保正确的 this 上下文
-  const setValue = useCallback((name: string, value: any, options?: any) => {
-    form.setValue(name as any, value, options);
-  }, [form]);
+  const setValue = useCallback(
+    (name: string, value: any, options?: any) => {
+      form.setValue(name as any, value, options);
+    },
+    [form]
+  );
 
   // 检查步骤是否有错误
-  const checkStepErrors = useCallback((stepKey: FormStep): boolean => {
-    const currentErrors = form.formState.errors;
-    
-    switch (stepKey) {
-      case FormStep.BASIC_INFO:
-        return !!(currentErrors.name || currentErrors.categoryId || currentErrors.materialType || currentErrors.basePrice);
-      case FormStep.CONTENT:
-        return !!currentErrors.content;
-      case FormStep.SPECS:
-        return !!currentErrors.specifications;
-      case FormStep.BOM:
-        return !!currentErrors.bom;
-      case FormStep.CHANNEL_OVERRIDE:
-        return !!currentErrors.channelOverrides;
-      default:
-        return false;
-    }
-  }, [form.formState.errors]);
+  const checkStepErrors = useCallback(
+    (stepKey: FormStep): boolean => {
+      const currentErrors = form.formState.errors;
+
+      switch (stepKey) {
+        case FormStep.BASIC_INFO:
+          return !!(
+            currentErrors.name ||
+            currentErrors.categoryId ||
+            currentErrors.materialType ||
+            currentErrors.basePrice
+          );
+        case FormStep.CONTENT:
+          return !!currentErrors.content;
+        case FormStep.SPECS:
+          return !!currentErrors.specifications;
+        case FormStep.BOM:
+          return !!currentErrors.bom;
+        case FormStep.CHANNEL_OVERRIDE:
+          return !!currentErrors.channelOverrides;
+        default:
+          return false;
+      }
+    },
+    [form.formState.errors]
+  );
 
   // 检查步骤是否完成
-  const checkStepCompleted = useCallback((stepKey: FormStep): boolean => {
-    const values = getValues();
-    
-    switch (stepKey) {
-      case FormStep.BASIC_INFO:
-        return !!(values.name && values.categoryId && values.materialType && values.basePrice);
-      case FormStep.CONTENT:
-        return !!(values.content?.title);
-      case FormStep.SPECS:
-        return true; // 可选步骤，只要有值就算完成
-      case FormStep.BOM:
-        if (values.materialType === 'finished_goods') {
-          return !!(values.bom && Array.isArray(values.bom) && values.bom.length > 0);
-        }
-        return true; // 非成品不需要BOM
-      case FormStep.CHANNEL_OVERRIDE:
-        return true; // 可选步骤
-      default:
-        return false;
-    }
-  }, [getValues]);
+  const checkStepCompleted = useCallback(
+    (stepKey: FormStep): boolean => {
+      const values = getValues();
+
+      switch (stepKey) {
+        case FormStep.BASIC_INFO:
+          return !!(values.name && values.categoryId && values.materialType && values.basePrice);
+        case FormStep.CONTENT:
+          return !!values.content?.title;
+        case FormStep.SPECS:
+          return true; // 可选步骤，只要有值就算完成
+        case FormStep.BOM:
+          if (values.materialType === 'finished_goods') {
+            return !!(values.bom && Array.isArray(values.bom) && values.bom.length > 0);
+          }
+          return true; // 非成品不需要BOM
+        case FormStep.CHANNEL_OVERRIDE:
+          return true; // 可选步骤
+        default:
+          return false;
+      }
+    },
+    [getValues]
+  );
 
   // 步骤配置（动态计算状态）
   const steps: FormStepConfig[] = [
@@ -210,7 +223,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '填写商品基础信息',
       required: true,
       completed: checkStepCompleted(FormStep.BASIC_INFO),
-      valid: !checkStepErrors(FormStep.BASIC_INFO)
+      valid: !checkStepErrors(FormStep.BASIC_INFO),
     },
     {
       key: FormStep.CONTENT,
@@ -218,7 +231,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '管理商品展示内容',
       required: true,
       completed: checkStepCompleted(FormStep.CONTENT),
-      valid: !checkStepErrors(FormStep.CONTENT)
+      valid: !checkStepErrors(FormStep.CONTENT),
     },
     {
       key: FormStep.SPECS,
@@ -226,7 +239,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '配置商品规格属性',
       required: false,
       completed: checkStepCompleted(FormStep.SPECS),
-      valid: !checkStepErrors(FormStep.SPECS)
+      valid: !checkStepErrors(FormStep.SPECS),
     },
     {
       key: FormStep.BOM,
@@ -234,7 +247,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '配置BOM配方（仅成品）',
       required: false,
       completed: checkStepCompleted(FormStep.BOM),
-      valid: !checkStepErrors(FormStep.BOM)
+      valid: !checkStepErrors(FormStep.BOM),
     },
     {
       key: FormStep.CHANNEL_OVERRIDE,
@@ -242,15 +255,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
       description: '设置渠道特定内容',
       required: false,
       completed: checkStepCompleted(FormStep.CHANNEL_OVERRIDE),
-      valid: !checkStepErrors(FormStep.CHANNEL_OVERRIDE)
-    }
+      valid: !checkStepErrors(FormStep.CHANNEL_OVERRIDE),
+    },
   ];
 
   // 设置面包屑
   useEffect(() => {
     const breadcrumbItems = [
       { title: t('menu.product') },
-      { title: mode === 'create' ? t('product.create') : t('product.edit') }
+      { title: mode === 'create' ? t('product.create') : t('product.edit') },
     ];
     setBreadcrumbs(breadcrumbItems);
   }, [mode, setBreadcrumbs, t]);
@@ -259,7 +272,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (mode === 'edit' && product && product.length > 0) {
       const productData = product[0];
-      Object.keys(productData).forEach(key => {
+      Object.keys(productData).forEach((key) => {
         if (key in getValues()) {
           setValue(key as keyof ProductFormData, productData[key as any]);
         }
@@ -272,7 +285,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const subscription = form.watch((value, { name }) => {
       setIsDirty(true);
       // 更新步骤状态显示
-      setStepUpdateKey(prev => prev + 1);
+      setStepUpdateKey((prev) => prev + 1);
     });
 
     return () => subscription.unsubscribe();
@@ -315,10 +328,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
       if (element) {
         formItem = element.closest('.ant-form-item') as HTMLElement;
       }
-      
+
       // 方法2: 通过 name 属性查找（react-hook-form 会设置 name）
       if (!element) {
-        const input = document.querySelector(`input[name="${fieldName}"], textarea[name="${fieldName}"]`) as HTMLElement;
+        const input = document.querySelector(
+          `input[name="${fieldName}"], textarea[name="${fieldName}"]`
+        ) as HTMLElement;
         if (input) {
           element = input;
           formItem = input.closest('.ant-form-item') as HTMLElement;
@@ -334,7 +349,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
           if (labelElement && labelElement.textContent?.trim() === label) {
             formItem = item as HTMLElement;
             // 查找输入元素
-            const input = item.querySelector('input, textarea, .ant-input-number-input, .ant-select-selector') as HTMLElement;
+            const input = item.querySelector(
+              'input, textarea, .ant-input-number-input, .ant-select-selector'
+            ) as HTMLElement;
             if (input) {
               element = input;
             }
@@ -344,12 +361,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
       // 如果找到 Form.Item，滚动到它
       if (formItem) {
-        formItem.scrollIntoView({ 
-          behavior: 'smooth', 
+        formItem.scrollIntoView({
+          behavior: 'smooth',
           block: 'center',
-          inline: 'nearest'
+          inline: 'nearest',
         });
-        
+
         // 添加高亮效果
         formItem.style.transition = 'box-shadow 0.3s ease';
         formItem.style.boxShadow = '0 0 0 2px rgba(255, 77, 79, 0.2)';
@@ -384,7 +401,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // 获取验证失败的字段列表（从 errors 对象中）
   const getFailedFields = (fields: string[]): string[] => {
     const failedFields: string[] = [];
-    fields.forEach(field => {
+    fields.forEach((field) => {
       // 检查字段是否有错误，支持嵌套字段（如 content.title）
       const fieldError = errors[field];
       if (fieldError) {
@@ -397,7 +414,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // 验证当前步骤并返回失败的字段
   const validateCurrentStep = async (): Promise<{ isValid: boolean; failedFields: string[] }> => {
     let fieldsToCheck: string[] = [];
-    
+
     switch (currentStep) {
       case FormStep.BASIC_INFO:
         fieldsToCheck = ['name', 'categoryId', 'materialType', 'basePrice'];
@@ -415,18 +432,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
 
     const isValid = await trigger(fieldsToCheck);
-    
+
     // trigger 会同步更新 errors，但为了确保获取最新的错误状态，
     // 我们使用 formState 来获取最新的错误信息
     const currentErrors = form.formState.errors;
     const failedFields = fieldsToCheck
-      .filter(field => {
+      .filter((field) => {
         // 检查字段是否有错误
         const fieldError = currentErrors[field as keyof typeof currentErrors];
         return !!fieldError;
       })
-      .map(field => getFieldLabel(field));
-    
+      .map((field) => getFieldLabel(field));
+
     return { isValid, failedFields };
   };
 
@@ -434,17 +451,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const handleNext = async () => {
     const { isValid, failedFields } = await validateCurrentStep();
     if (!isValid) {
-      const currentStepName = steps.find(step => step.key === currentStep)?.title || '当前步骤';
-      
+      const currentStepName = steps.find((step) => step.key === currentStep)?.title || '当前步骤';
+
       // 获取第一个失败的字段名（用于跳转）
       let firstFailedField: string | null = null;
       switch (currentStep) {
         case FormStep.BASIC_INFO:
           const basicFields = ['name', 'categoryId', 'materialType', 'basePrice'];
-          firstFailedField = basicFields.find(field => {
-            const fieldError = form.formState.errors[field as keyof typeof form.formState.errors];
-            return !!fieldError;
-          }) || null;
+          firstFailedField =
+            basicFields.find((field) => {
+              const fieldError = form.formState.errors[field as keyof typeof form.formState.errors];
+              return !!fieldError;
+            }) || null;
           break;
         case FormStep.CONTENT:
           // 检查 content 相关字段
@@ -468,13 +486,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
           }
           break;
       }
-      
+
       if (failedFields.length > 0) {
         message.error({
           content: `请完善${currentStepName}的必填信息：${failedFields.join('、')}`,
           duration: 5,
         });
-        
+
         // 自动跳转到第一个失败的字段
         if (firstFailedField) {
           scrollToField(firstFailedField);
@@ -485,7 +503,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
-    const currentIndex = steps.findIndex(step => step.key === currentStep);
+    const currentIndex = steps.findIndex((step) => step.key === currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1].key);
     }
@@ -493,7 +511,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   // 上一步
   const handlePrevious = () => {
-    const currentIndex = steps.findIndex(step => step.key === currentStep);
+    const currentIndex = steps.findIndex((step) => step.key === currentStep);
     if (currentIndex > 0) {
       setCurrentStep(steps[currentIndex - 1].key);
     }
@@ -501,9 +519,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   // 切换到指定步骤（带验证）
   const handleStepChange = async (targetStep: FormStep) => {
-    const currentIndex = steps.findIndex(step => step.key === currentStep);
-    const targetIndex = steps.findIndex(step => step.key === targetStep);
-    
+    const currentIndex = steps.findIndex((step) => step.key === currentStep);
+    const targetIndex = steps.findIndex((step) => step.key === targetStep);
+
     // 如果向后跳转，需要先验证当前步骤
     if (targetIndex > currentIndex) {
       const { isValid } = await validateCurrentStep();
@@ -512,7 +530,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         return;
       }
     }
-    
+
     // 切换步骤
     setCurrentStep(targetStep);
   };
@@ -524,9 +542,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
       FormStep.CONTENT,
       FormStep.SPECS,
       FormStep.BOM,
-      FormStep.CHANNEL_OVERRIDE
+      FormStep.CHANNEL_OVERRIDE,
     ];
-    
+
     for (const stepKey of stepOrder) {
       if (checkStepErrors(stepKey)) {
         return stepKey;
@@ -547,12 +565,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
         const currentErrors = form.formState.errors;
         // 收集所有验证失败的字段
         const allFailedFields = Object.keys(currentErrors)
-          .filter(field => {
+          .filter((field) => {
             const fieldError = currentErrors[field as keyof typeof currentErrors];
             return !!fieldError;
           })
-          .map(field => getFieldLabel(field));
-        
+          .map((field) => getFieldLabel(field));
+
         // 查找第一个有错误的步骤并自动切换
         const firstErrorStep = findFirstErrorStep();
         if (firstErrorStep && firstErrorStep !== currentStep) {
@@ -560,7 +578,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           // 等待步骤切换完成后再滚动
           setTimeout(() => {
             // 获取第一个失败的字段名（用于跳转）
-            const firstFailedFieldName = Object.keys(currentErrors).find(field => {
+            const firstFailedFieldName = Object.keys(currentErrors).find((field) => {
               const fieldError = currentErrors[field as keyof typeof currentErrors];
               return !!fieldError;
             });
@@ -570,7 +588,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           }, 100);
         } else {
           // 获取第一个失败的字段名（用于跳转）
-          const firstFailedFieldName = Object.keys(currentErrors).find(field => {
+          const firstFailedFieldName = Object.keys(currentErrors).find((field) => {
             const fieldError = currentErrors[field as keyof typeof currentErrors];
             return !!fieldError;
           });
@@ -578,16 +596,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
             scrollToField(firstFailedFieldName);
           }
         }
-        
+
         if (allFailedFields.length > 0) {
           // 显示前5个失败的字段，避免消息过长
           const displayFields = allFailedFields.slice(0, 5);
           const moreCount = allFailedFields.length > 5 ? `等${allFailedFields.length}个字段` : '';
-          const stepName = firstErrorStep ? steps.find(s => s.key === firstErrorStep)?.title : '';
-          const errorMessage = firstErrorStep && firstErrorStep !== currentStep
-            ? `已自动切换到"${stepName}"步骤，请完善以下必填信息：${displayFields.join('、')}${moreCount}`
-            : `请完善以下必填信息：${displayFields.join('、')}${moreCount}`;
-          
+          const stepName = firstErrorStep ? steps.find((s) => s.key === firstErrorStep)?.title : '';
+          const errorMessage =
+            firstErrorStep && firstErrorStep !== currentStep
+              ? `已自动切换到"${stepName}"步骤，请完善以下必填信息：${displayFields.join('、')}${moreCount}`
+              : `请完善以下必填信息：${displayFields.join('、')}${moreCount}`;
+
           message.error({
             content: errorMessage,
             duration: 6,
@@ -606,7 +625,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       } else {
         await updateMutation.mutateAsync({
           id: productId!,
-          ...formData
+          ...formData,
         });
         message.success('商品更新成功');
       }
@@ -630,7 +649,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         content: '您有未保存的更改，确定要离开吗？',
         okText: '离开',
         cancelText: '继续编辑',
-        onOk: () => navigate('/product')
+        onOk: () => navigate('/product'),
       });
     } else {
       navigate('/product');
@@ -656,21 +675,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
         );
       case FormStep.CONTENT:
-        return (
-          <ContentTab
-            control={control}
-            errors={errors}
-            touched={touched}
-          />
-        );
+        return <ContentTab control={control} errors={errors} touched={touched} />;
       case FormStep.SPECS:
-        return (
-          <SpecsTab
-            control={control}
-            errors={errors}
-            touched={touched}
-          />
-        );
+        return <SpecsTab control={control} errors={errors} touched={touched} />;
       case FormStep.BOM:
         return (
           <BomTab
@@ -683,13 +690,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
         );
       case FormStep.CHANNEL_OVERRIDE:
-        return (
-          <ChannelOverrideTab
-            control={control}
-            errors={errors}
-            touched={touched}
-          />
-        );
+        return <ChannelOverrideTab control={control} errors={errors} touched={touched} />;
       default:
         return null;
     }
@@ -713,18 +714,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {mode === 'create' ? t('product.create') : t('product.edit')}
         </Title>
 
-        <Form
-          layout="vertical"
-          onSubmit={handleSubmit(handleSave)}
-        >
+        <Form layout="vertical" onSubmit={handleSubmit(handleSave)}>
           {/* 顶部区域：步骤导航 + 状态设置 + 操作按钮 */}
           <div style={{ marginBottom: 8 }}>
             {/* 步骤导航 */}
             <Steps
-              current={steps.findIndex(step => step.key === currentStep)}
+              current={steps.findIndex((step) => step.key === currentStep)}
               items={steps.map((step, index) => {
                 let stepStatus: 'wait' | 'process' | 'finish' | 'error' = 'wait';
-                
+
                 if (step.completed) {
                   stepStatus = 'finish';
                 } else if (currentStep === step.key) {
@@ -732,13 +730,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 } else if (!step.valid) {
                   stepStatus = 'error';
                 }
-                
+
                 return {
                   title: (
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         cursor: 'pointer',
-                        color: stepStatus === 'error' ? '#ff4d4f' : undefined
+                        color: stepStatus === 'error' ? '#ff4d4f' : undefined,
                       }}
                       onClick={() => handleStepChange(step.key)}
                     >
@@ -747,11 +745,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     </span>
                   ),
                   description: (
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         cursor: 'pointer',
                         fontSize: '12px',
-                        color: stepStatus === 'error' ? '#ff4d4f' : undefined
+                        color: stepStatus === 'error' ? '#ff4d4f' : undefined,
                       }}
                       onClick={() => handleStepChange(step.key)}
                     >
@@ -759,9 +757,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       {stepStatus === 'error' && ' (有错误)'}
                     </span>
                   ),
-                  icon: step.completed ? <CheckCircleOutlined style={{ color: '#52c41a' }} /> : 
-                         stepStatus === 'error' ? <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} /> : undefined,
-                  status: stepStatus
+                  icon: step.completed ? (
+                    <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                  ) : stepStatus === 'error' ? (
+                    <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                  ) : undefined,
+                  status: stepStatus,
                 };
               })}
               style={{ marginBottom: 8 }}
@@ -785,11 +786,33 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       }}
                       data-testid="product-form-status-radio"
                     >
-                      <Radio value={ProductStatus.DRAFT} data-testid="product-form-status-draft">草稿</Radio>
-                      <Radio value={ProductStatus.PENDING_REVIEW} data-testid="product-form-status-pending">待审核</Radio>
-                      <Radio value={ProductStatus.APPROVED} data-testid="product-form-status-approved">已审核</Radio>
-                      <Radio value={ProductStatus.PUBLISHED} data-testid="product-form-status-published">已发布</Radio>
-                      <Radio value={ProductStatus.DISABLED} data-testid="product-form-status-disabled">已禁用</Radio>
+                      <Radio value={ProductStatus.DRAFT} data-testid="product-form-status-draft">
+                        草稿
+                      </Radio>
+                      <Radio
+                        value={ProductStatus.PENDING_REVIEW}
+                        data-testid="product-form-status-pending"
+                      >
+                        待审核
+                      </Radio>
+                      <Radio
+                        value={ProductStatus.APPROVED}
+                        data-testid="product-form-status-approved"
+                      >
+                        已审核
+                      </Radio>
+                      <Radio
+                        value={ProductStatus.PUBLISHED}
+                        data-testid="product-form-status-published"
+                      >
+                        已发布
+                      </Radio>
+                      <Radio
+                        value={ProductStatus.DISABLED}
+                        data-testid="product-form-status-disabled"
+                      >
+                        已禁用
+                      </Radio>
                     </Radio.Group>
                   )}
                 />
@@ -802,7 +825,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </Card>
 
             {/* 操作按钮区 */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 8,
+              }}
+            >
               <Space>
                 <Button
                   icon={<LeftOutlined />}
@@ -855,29 +885,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {/* 底部区域：内容录入区 */}
           <div style={{ minHeight: 133 }}>
             {currentStep === FormStep.BASIC_INFO && (
-              <div data-testid="basic-info-tab">
-                {renderStepContent()}
-              </div>
+              <div data-testid="basic-info-tab">{renderStepContent()}</div>
             )}
             {currentStep === FormStep.CONTENT && (
-              <div data-testid="content-tab">
-                {renderStepContent()}
-              </div>
+              <div data-testid="content-tab">{renderStepContent()}</div>
             )}
             {currentStep === FormStep.SPECS && (
-              <div data-testid="specs-tab">
-                {renderStepContent()}
-              </div>
+              <div data-testid="specs-tab">{renderStepContent()}</div>
             )}
-            {currentStep === FormStep.BOM && (
-              <div data-testid="bom-tab">
-                {renderStepContent()}
-              </div>
-            )}
+            {currentStep === FormStep.BOM && <div data-testid="bom-tab">{renderStepContent()}</div>}
             {currentStep === FormStep.CHANNEL_OVERRIDE && (
-              <div data-testid="channel-override-tab">
-                {renderStepContent()}
-              </div>
+              <div data-testid="channel-override-tab">{renderStepContent()}</div>
             )}
           </div>
         </Form>
@@ -891,7 +909,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         footer={[
           <Button key="close" onClick={() => setPreviewVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
       >

@@ -81,7 +81,7 @@ const handlers = [
 
     let stores = mockStores;
     if (status) {
-      stores = mockStores.filter(s => s.status === status);
+      stores = mockStores.filter((s) => s.status === status);
     }
 
     return HttpResponse.json({
@@ -93,13 +93,10 @@ const handlers = [
   // GET /api/stores/:storeId - 门店详情
   http.get('/api/stores/:storeId', ({ params }) => {
     const { storeId } = params;
-    const store = mockStores.find(s => s.id === storeId);
+    const store = mockStores.find((s) => s.id === storeId);
 
     if (!store) {
-      return HttpResponse.json(
-        { error: 'NOT_FOUND', message: '门店不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: 'NOT_FOUND', message: '门店不存在' }, { status: 404 });
     }
 
     return HttpResponse.json({ data: store });
@@ -120,10 +117,10 @@ const handlers = [
     }
 
     if (status) {
-      halls = halls.filter(h => h.status === status.toLowerCase());
+      halls = halls.filter((h) => h.status === status.toLowerCase());
     }
     if (type) {
-      halls = halls.filter(h => h.type === type);
+      halls = halls.filter((h) => h.type === type);
     }
 
     return HttpResponse.json({
@@ -155,11 +152,7 @@ function createTestQueryClient() {
 // Test wrapper component
 function TestWrapper({ children }: { children: React.ReactNode }) {
   const queryClient = createTestQueryClient();
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
 
 describe('Hall Resources Integration Tests', () => {
@@ -254,8 +247,26 @@ describe('Hall Resources Integration Tests', () => {
     it('should filter halls by status', async () => {
       // Given: 添加一个包含不同状态影厅的门店
       const mixedStatusHalls: Hall[] = [
-        { id: 'h1', name: '活动厅', capacity: 100, type: 'VIP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-        { id: 'h2', name: '停用厅', capacity: 80, type: 'Public', tags: [], status: 'inactive', createdAt: '', updatedAt: '' },
+        {
+          id: 'h1',
+          name: '活动厅',
+          capacity: 100,
+          type: 'VIP',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: 'h2',
+          name: '停用厅',
+          capacity: 80,
+          type: 'Public',
+          tags: [],
+          status: 'inactive',
+          createdAt: '',
+          updatedAt: '',
+        },
       ];
 
       server.use(
@@ -265,7 +276,7 @@ describe('Hall Resources Integration Tests', () => {
 
           let halls = mixedStatusHalls;
           if (status) {
-            halls = halls.filter(h => h.status === status.toLowerCase());
+            halls = halls.filter((h) => h.status === status.toLowerCase());
           }
 
           return HttpResponse.json({

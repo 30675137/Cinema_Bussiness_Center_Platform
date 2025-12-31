@@ -17,12 +17,12 @@ import {
   useIsTablet,
   useIsDesktop,
   useResponsiveNavigation,
-  useResponsiveActions
+  useResponsiveActions,
 } from '../useResponsive';
 
 // Mock usehooks-ts
 vi.mock('usehooks-ts', () => ({
-  useMediaQuery: vi.fn()
+  useMediaQuery: vi.fn(),
 }));
 
 const { useMediaQuery } = vi.mocked(require('usehooks-ts'));
@@ -109,14 +109,16 @@ describe('useResponsive', () => {
 
 describe('useBreakpointValue', () => {
   it('should return value for current breakpoint', () => {
-    const { result } = renderHook(() => useBreakpointValue({
-      xs: 'small',
-      sm: 'medium',
-      md: 'large',
-      lg: 'extra-large',
-      xl: 'huge',
-      xxl: 'massive'
-    }));
+    const { result } = renderHook(() =>
+      useBreakpointValue({
+        xs: 'small',
+        sm: 'medium',
+        md: 'large',
+        lg: 'extra-large',
+        xl: 'huge',
+        xxl: 'massive',
+      })
+    );
 
     expect(typeof result.current).toBe('string');
   });
@@ -134,10 +136,12 @@ describe('useBreakpointValue', () => {
       return false;
     });
 
-    const { result } = renderHook(() => useBreakpointValue({
-      xs: 'small',
-      lg: 'large'
-    }));
+    const { result } = renderHook(() =>
+      useBreakpointValue({
+        xs: 'small',
+        lg: 'large',
+      })
+    );
 
     expect(result.current).toBe('large');
   });
@@ -216,7 +220,7 @@ describe('useResponsiveColumns', () => {
       xs: 12,
       sm: 8,
       md: 6,
-      lg: 4
+      lg: 4,
     };
 
     const { result } = renderHook(() => useResponsiveColumns(columnMap));
@@ -234,7 +238,7 @@ describe('useResponsiveGutter', () => {
     const gutterMap = {
       xs: [8, 8] as [number, number],
       md: [16, 16] as [number, number],
-      lg: [24, 24] as [number, number]
+      lg: [24, 24] as [number, number],
     };
 
     const { result } = renderHook(() => useResponsiveGutter(gutterMap));

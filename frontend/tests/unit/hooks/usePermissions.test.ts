@@ -26,7 +26,7 @@ describe('usePermissions Hook', () => {
         permissions: ['product.read', 'product.write', 'inventory.read'],
         hasPermission: vi.fn((permission: string) => {
           return ['product.read', 'product.write', 'inventory.read'].includes(permission);
-        })
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -41,7 +41,7 @@ describe('usePermissions Hook', () => {
         permissions: ['product.read'],
         hasPermission: vi.fn((permission: string) => {
           return ['product.read'].includes(permission);
-        })
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -53,7 +53,7 @@ describe('usePermissions Hook', () => {
     it('空权限数组应返回false', () => {
       mockUserStore.mockReturnValue({
         permissions: [],
-        hasPermission: vi.fn(() => false)
+        hasPermission: vi.fn(() => false),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -67,22 +67,26 @@ describe('usePermissions Hook', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read', 'product.write', 'inventory.read'],
         hasPermissions: vi.fn((permissions: string[]) => {
-          return permissions.every(perm => ['product.read', 'product.write', 'inventory.read'].includes(perm));
-        })
+          return permissions.every((perm) =>
+            ['product.read', 'product.write', 'inventory.read'].includes(perm)
+          );
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
 
       expect(result.current.hasPermissions(['product.read', 'product.write'])).toBe(true);
-      expect(result.current.hasPermissions(['product.read', 'inventory.read', 'product.write'])).toBe(true);
+      expect(
+        result.current.hasPermissions(['product.read', 'inventory.read', 'product.write'])
+      ).toBe(true);
     });
 
     it('当用户缺少部分权限时应返回false', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read', 'inventory.read'],
         hasPermissions: vi.fn((permissions: string[]) => {
-          return permissions.every(perm => ['product.read', 'inventory.read'].includes(perm));
-        })
+          return permissions.every((perm) => ['product.read', 'inventory.read'].includes(perm));
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -97,8 +101,8 @@ describe('usePermissions Hook', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read', 'inventory.read'],
         hasAnyPermission: vi.fn((permissions: string[]) => {
-          return permissions.some(perm => ['product.read', 'inventory.read'].includes(perm));
-        })
+          return permissions.some((perm) => ['product.read', 'inventory.read'].includes(perm));
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -110,7 +114,7 @@ describe('usePermissions Hook', () => {
     it('当用户没有任何权限时应返回false', () => {
       mockUserStore.mockReturnValue({
         permissions: [],
-        hasAnyPermission: vi.fn(() => false)
+        hasAnyPermission: vi.fn(() => false),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -134,7 +138,7 @@ describe('usePermissions Hook', () => {
             permissions: [],
             isActive: true,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           {
             id: 'role_operator',
@@ -143,20 +147,20 @@ describe('usePermissions Hook', () => {
             permissions: [],
             isActive: true,
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         ],
         permissions: ['admin.access'],
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserStore.mockReturnValue({
         user: mockUser,
         hasRole: vi.fn((roleCode: string) => {
-          return mockUser.roles.some(role => role.code === roleCode && role.isActive);
-        })
+          return mockUser.roles.some((role) => role.code === roleCode && role.isActive);
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -180,20 +184,20 @@ describe('usePermissions Hook', () => {
             permissions: [],
             isActive: false, // 角色不活跃
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         ],
         permissions: [],
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserStore.mockReturnValue({
         user: mockUser,
         hasRole: vi.fn((roleCode: string) => {
-          return mockUser.roles.some(role => role.code === roleCode && role.isActive);
-        })
+          return mockUser.roles.some((role) => role.code === roleCode && role.isActive);
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -207,11 +211,13 @@ describe('usePermissions Hook', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read', 'product.write', 'inventory.read'],
         checkPermissions: vi.fn((requiredPermissions: string[]) => ({
-          hasAccess: requiredPermissions.every(perm => ['product.read', 'product.write', 'inventory.read'].includes(perm)),
+          hasAccess: requiredPermissions.every((perm) =>
+            ['product.read', 'product.write', 'inventory.read'].includes(perm)
+          ),
           requiredPermissions,
           userPermissions: ['product.read', 'product.write', 'inventory.read'],
-          missingPermissions: []
-        }))
+          missingPermissions: [],
+        })),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -220,7 +226,11 @@ describe('usePermissions Hook', () => {
 
       expect(checkResult.hasAccess).toBe(true);
       expect(checkResult.requiredPermissions).toEqual(['product.read', 'product.write']);
-      expect(checkResult.userPermissions).toEqual(['product.read', 'product.write', 'inventory.read']);
+      expect(checkResult.userPermissions).toEqual([
+        'product.read',
+        'product.write',
+        'inventory.read',
+      ]);
       expect(checkResult.missingPermissions).toEqual([]);
     });
 
@@ -228,11 +238,13 @@ describe('usePermissions Hook', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read', 'inventory.read'],
         checkPermissions: vi.fn((requiredPermissions: string[]) => ({
-          hasAccess: requiredPermissions.every(perm => ['product.read', 'inventory.read'].includes(perm)),
+          hasAccess: requiredPermissions.every((perm) =>
+            ['product.read', 'inventory.read'].includes(perm)
+          ),
           requiredPermissions,
           userPermissions: ['product.read', 'inventory.read'],
-          missingPermissions: ['product.write']
-        }))
+          missingPermissions: ['product.write'],
+        })),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -252,8 +264,8 @@ describe('usePermissions Hook', () => {
           hasAccess: true,
           requiredPermissions: [],
           userPermissions: [],
-          missingPermissions: []
-        }))
+          missingPermissions: [],
+        })),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -289,7 +301,7 @@ describe('usePermissions Hook', () => {
         hasAnyPermission: vi.fn(),
         checkPermissions: vi.fn(() => {
           throw new Error('Permission check error');
-        })
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -316,9 +328,9 @@ describe('usePermissions Hook', () => {
             requiredPermissions: ['product.read', 'product.write'],
             userPermissions: ['product.read', 'product.write'],
             checkPermissionsCallCount,
-            missingPermissions: []
+            missingPermissions: [],
           };
-        })
+        }),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -335,12 +347,14 @@ describe('usePermissions Hook', () => {
     it('大量权限检查时应该保持性能', () => {
       mockUserStore.mockReturnValue({
         permissions: Array.from({ length: 100 }, (_, i) => `permission.${i}`),
-        hasPermissions: vi.fn((permissions: string[]) => permissions.every(perm =>
-          Array.from({ length: 100 }, (_, i) => `permission.${i}`).includes(perm)
-        )),
+        hasPermissions: vi.fn((permissions: string[]) =>
+          permissions.every((perm) =>
+            Array.from({ length: 100 }, (_, i) => `permission.${i}`).includes(perm)
+          )
+        ),
         hasPermission: vi.fn((permission: string) =>
           Array.from({ length: 100 }, (_, i) => `permission.${i}`).includes(permission)
-        )
+        ),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -365,11 +379,11 @@ describe('usePermissions Hook', () => {
         permissions: ['product.read'],
         hasPermission: vi.fn((permission: string) => permission === 'product.read'),
         hasPermissions: vi.fn((permissions: string[]) =>
-          permissions.every(perm => perm === 'product.read')
+          permissions.every((perm) => perm === 'product.read')
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
-          permissions.some(perm => perm === 'product.read')
-        )
+          permissions.some((perm) => perm === 'product.read')
+        ),
       });
 
       const { result } = renderHook(() => usePermissions());
@@ -382,15 +396,18 @@ describe('usePermissions Hook', () => {
     it('null和undefined权限应该被正确处理', () => {
       mockUserStore.mockReturnValue({
         permissions: ['product.read'],
-        hasPermission: vi.fn((permission: string) =>
-          permission !== null && permission !== undefined && permission === 'product.read'
+        hasPermission: vi.fn(
+          (permission: string) =>
+            permission !== null && permission !== undefined && permission === 'product.read'
         ),
         hasPermissions: vi.fn((permissions: string[]) =>
-          permissions.every(perm => perm !== null && perm !== undefined && perm === 'product.read')
+          permissions.every(
+            (perm) => perm !== null && perm !== undefined && perm === 'product.read'
+          )
         ),
         hasAnyPermission: vi.fn((permissions: string[]) =>
-          permissions.some(perm => perm !== null && perm !== undefined && perm === 'product.read')
-        )
+          permissions.some((perm) => perm !== null && perm !== undefined && perm === 'product.read')
+        ),
       });
 
       const { result } = renderHook(() => usePermissions());

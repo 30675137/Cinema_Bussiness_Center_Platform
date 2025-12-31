@@ -117,13 +117,7 @@ export const BenefitSelector: React.FC<BenefitSelectorProps> = ({
           onConfirm={() => handleRemove(record.id)}
           disabled={disabled}
         >
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            disabled={disabled}
-          />
+          <Button type="text" danger size="small" icon={<DeleteOutlined />} disabled={disabled} />
         </Popconfirm>
       ),
     },
@@ -177,10 +171,7 @@ export const BenefitSelector: React.FC<BenefitSelectorProps> = ({
             label="权益类型"
             rules={[{ required: true, message: '请选择权益类型' }]}
           >
-            <Select
-              options={BENEFIT_TYPE_OPTIONS}
-              onChange={(v) => setSelectedBenefitType(v)}
-            />
+            <Select options={BENEFIT_TYPE_OPTIONS} onChange={(v) => setSelectedBenefitType(v)} />
           </Form.Item>
 
           {selectedBenefitType === 'DISCOUNT_TICKET' && (

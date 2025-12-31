@@ -13,30 +13,30 @@ import { SkuStatus } from '@/types/sku';
 export interface SkuStoreState {
   // 筛选条件
   filters: Partial<SkuQueryParams>;
-  
+
   // 分页信息
   pagination: {
     page: number;
     pageSize: number;
   };
-  
+
   // 排序信息
   sorting: {
     field?: string;
     order?: 'asc' | 'desc';
   };
-  
+
   // 选中的SKU ID列表
   selectedSkuIds: string[];
-  
+
   // 抽屉状态
   formDrawerOpen: boolean;
   formDrawerMode: 'create' | 'edit';
   formDrawerSkuId: string | null;
-  
+
   detailDrawerOpen: boolean;
   detailDrawerSkuId: string | null;
-  
+
   selectorModalOpen: boolean;
 }
 
@@ -48,32 +48,32 @@ export interface SkuStoreActions {
   setFilters: (filters: Partial<SkuQueryParams>) => void;
   updateFilter: (key: keyof SkuQueryParams, value: any) => void;
   clearFilters: () => void;
-  
+
   // 分页操作
   setPagination: (pagination: { page?: number; pageSize?: number }) => void;
   setPage: (page: number) => void;
   setPageSize: (pageSize: number) => void;
-  
+
   // 排序操作
   setSorting: (sorting: { field?: string; order?: 'asc' | 'desc' }) => void;
-  
+
   // 选择操作
   setSelectedSkuIds: (ids: string[]) => void;
   toggleSkuSelection: (id: string) => void;
   clearSelection: () => void;
-  
+
   // 表单抽屉操作
   openFormDrawer: (mode: 'create' | 'edit', skuId?: string) => void;
   closeFormDrawer: () => void;
-  
+
   // 详情抽屉操作
   openDetailDrawer: (skuId: string) => void;
   closeDetailDrawer: () => void;
-  
+
   // 选择器弹窗操作
   openSelectorModal: () => void;
   closeSelectorModal: () => void;
-  
+
   // 重置状态
   reset: () => void;
 }
@@ -119,7 +119,7 @@ export const useSkuStore = create<SkuStore>()(
       filters: initialState.filters || { status: 'all' },
       pagination: initialState.pagination || { page: 1, pageSize: 20 },
       sorting: initialState.sorting || { field: 'createdAt', order: 'desc' },
-      
+
       // 筛选操作
       setFilters: (filters) =>
         set(
@@ -130,7 +130,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'setFilters'
         ),
-      
+
       updateFilter: (key, value) =>
         set(
           (state) => ({
@@ -140,7 +140,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'updateFilter'
         ),
-      
+
       clearFilters: () =>
         set(
           (state) => ({
@@ -153,7 +153,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'clearFilters'
         ),
-      
+
       // 分页操作
       setPagination: (pagination) =>
         set(
@@ -163,7 +163,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'setPagination'
         ),
-      
+
       setPage: (page) =>
         set(
           (state) => ({
@@ -172,7 +172,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'setPage'
         ),
-      
+
       setPageSize: (pageSize) =>
         set(
           (state) => ({
@@ -181,7 +181,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'setPageSize'
         ),
-      
+
       // 排序操作
       setSorting: (sorting) =>
         set(
@@ -191,11 +191,10 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'setSorting'
         ),
-      
+
       // 选择操作
-      setSelectedSkuIds: (ids) =>
-        set({ selectedSkuIds: ids }, false, 'setSelectedSkuIds'),
-      
+      setSelectedSkuIds: (ids) => set({ selectedSkuIds: ids }, false, 'setSelectedSkuIds'),
+
       toggleSkuSelection: (id) =>
         set(
           (state) => ({
@@ -206,10 +205,9 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'toggleSkuSelection'
         ),
-      
-      clearSelection: () =>
-        set({ selectedSkuIds: [] }, false, 'clearSelection'),
-      
+
+      clearSelection: () => set({ selectedSkuIds: [] }, false, 'clearSelection'),
+
       // 表单抽屉操作
       openFormDrawer: (mode, skuId) =>
         set(
@@ -221,7 +219,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'openFormDrawer'
         ),
-      
+
       closeFormDrawer: () =>
         set(
           {
@@ -232,7 +230,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'closeFormDrawer'
         ),
-      
+
       // 详情抽屉操作
       openDetailDrawer: (skuId) =>
         set(
@@ -243,7 +241,7 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'openDetailDrawer'
         ),
-      
+
       closeDetailDrawer: () =>
         set(
           {
@@ -253,18 +251,15 @@ export const useSkuStore = create<SkuStore>()(
           false,
           'closeDetailDrawer'
         ),
-      
+
       // 选择器弹窗操作
-      openSelectorModal: () =>
-        set({ selectorModalOpen: true }, false, 'openSelectorModal'),
-      
-      closeSelectorModal: () =>
-        set({ selectorModalOpen: false }, false, 'closeSelectorModal'),
-      
+      openSelectorModal: () => set({ selectorModalOpen: true }, false, 'openSelectorModal'),
+
+      closeSelectorModal: () => set({ selectorModalOpen: false }, false, 'closeSelectorModal'),
+
       // 重置状态
       reset: () => set(initialState, false, 'reset'),
     }),
     { name: 'SkuStore' }
   )
 );
-

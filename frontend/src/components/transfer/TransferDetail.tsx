@@ -63,11 +63,7 @@ interface TransferDetailProps {
 /**
  * 调拨详情组件
  */
-const TransferDetail: React.FC<TransferDetailProps> = ({
-  transferId,
-  onEdit,
-  onBack,
-}) => {
+const TransferDetail: React.FC<TransferDetailProps> = ({ transferId, onEdit, onBack }) => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -305,14 +301,14 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
       dataIndex: 'productionDate',
       key: 'productionDate',
       width: 120,
-      render: (value: string) => value ? formatDate(value) : '-',
+      render: (value: string) => (value ? formatDate(value) : '-'),
     },
     {
       title: '有效期',
       dataIndex: 'expiryDate',
       key: 'expiryDate',
       width: 120,
-      render: (value: string) => value ? formatDate(value) : '-',
+      render: (value: string) => (value ? formatDate(value) : '-'),
     },
     {
       title: '备注',
@@ -404,11 +400,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
                 >
                   审批通过
                 </Button>
-                <Button
-                  danger
-                  icon={<CloseOutlined />}
-                  onClick={() => setShowRejectModal(true)}
-                >
+                <Button danger icon={<CloseOutlined />} onClick={() => setShowRejectModal(true)}>
                   审批拒绝
                 </Button>
               </>
@@ -434,9 +426,11 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
               </Button>
             )}
 
-            {[TransferStatus.DRAFT, TransferStatus.PENDING_APPROVAL, TransferStatus.REJECTED].includes(
-              currentTransfer.status
-            ) && (
+            {[
+              TransferStatus.DRAFT,
+              TransferStatus.PENDING_APPROVAL,
+              TransferStatus.REJECTED,
+            ].includes(currentTransfer.status) && (
               <Button danger onClick={handleCancel}>
                 取消调拨
               </Button>
@@ -463,9 +457,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
               <Descriptions.Item label="调拨单号">
                 {currentTransfer.transferNumber}
               </Descriptions.Item>
-              <Descriptions.Item label="调拨标题">
-                {currentTransfer.title}
-              </Descriptions.Item>
+              <Descriptions.Item label="调拨标题">{currentTransfer.title}</Descriptions.Item>
               <Descriptions.Item label="调拨类型">
                 {getTypeTag(currentTransfer.type)}
               </Descriptions.Item>
@@ -484,9 +476,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
                 {formatDate(currentTransfer.plannedDate)}
               </Descriptions.Item>
               <Descriptions.Item label="实际发货日期">
-                {currentTransfer.actualShipDate
-                  ? formatDate(currentTransfer.actualShipDate)
-                  : '-'}
+                {currentTransfer.actualShipDate ? formatDate(currentTransfer.actualShipDate) : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="实际收货日期">
                 {currentTransfer.actualReceiveDate
@@ -507,9 +497,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
 
           <Col xs={24} sm={12} md={8}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="承运商">
-                {currentTransfer.carrier || '-'}
-              </Descriptions.Item>
+              <Descriptions.Item label="承运商">{currentTransfer.carrier || '-'}</Descriptions.Item>
               <Descriptions.Item label="预计到达日期">
                 {currentTransfer.estimatedArrivalDate
                   ? formatDate(currentTransfer.estimatedArrivalDate)
@@ -521,9 +509,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
                 </span>
               </Descriptions.Item>
               <Descriptions.Item label="运费">
-                {currentTransfer.shippingCost
-                  ? formatCurrency(currentTransfer.shippingCost)
-                  : '-'}
+                {currentTransfer.shippingCost ? formatCurrency(currentTransfer.shippingCost) : '-'}
               </Descriptions.Item>
               <Descriptions.Item label="保险费">
                 {currentTransfer.insuranceCost
@@ -537,9 +523,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
         {currentTransfer.description && (
           <div className="mt-4">
             <Descriptions column={1}>
-              <Descriptions.Item label="调拨描述">
-                {currentTransfer.description}
-              </Descriptions.Item>
+              <Descriptions.Item label="调拨描述">{currentTransfer.description}</Descriptions.Item>
             </Descriptions>
           </div>
         )}
@@ -547,9 +531,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
         {currentTransfer.remarks && (
           <div className="mt-4">
             <Descriptions column={1}>
-              <Descriptions.Item label="备注">
-                {currentTransfer.remarks}
-              </Descriptions.Item>
+              <Descriptions.Item label="备注">{currentTransfer.remarks}</Descriptions.Item>
             </Descriptions>
           </div>
         )}
@@ -619,9 +601,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
             <div className="bg-blue-50 p-4 rounded">
               <h4 className="font-semibold mb-3">申请人</h4>
               <Descriptions column={1} size="small">
-                <Descriptions.Item label="姓名">
-                  {currentTransfer.applicant.name}
-                </Descriptions.Item>
+                <Descriptions.Item label="姓名">{currentTransfer.applicant.name}</Descriptions.Item>
                 <Descriptions.Item label="部门">
                   {currentTransfer.applicant.department}
                 </Descriptions.Item>
@@ -700,30 +680,24 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
           <TabPane tab="附件" key="attachments">
             {currentTransfer.attachments.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {currentTransfer.attachments.map(attachment => (
+                {currentTransfer.attachments.map((attachment) => (
                   <div
                     key={attachment.id}
                     className="border rounded p-3 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center space-x-2 mb-2">
                       <PaperClipOutlined className="text-gray-500" />
-                      <span className="font-medium text-sm truncate">
-                        {attachment.fileName}
-                      </span>
+                      <span className="font-medium text-sm truncate">{attachment.fileName}</span>
                     </div>
                     <div className="text-xs text-gray-500">
                       {attachment.fileType} • {(attachment.fileSize / 1024).toFixed(2)} KB
                     </div>
-                    <div className="text-xs text-gray-400">
-                      {formatDate(attachment.uploadedAt)}
-                    </div>
+                    <div className="text-xs text-gray-400">{formatDate(attachment.uploadedAt)}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                暂无附件
-              </div>
+              <div className="text-center py-8 text-gray-500">暂无附件</div>
             )}
           </TabPane>
         </Tabs>
@@ -743,7 +717,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
             plannedDate: currentTransfer.plannedDate,
             shippingMethod: currentTransfer.shippingMethod,
             estimatedArrivalDate: currentTransfer.estimatedArrivalDate,
-            items: currentTransfer.items.map(item => ({
+            items: currentTransfer.items.map((item) => ({
               productId: item.productId,
               productName: item.productName,
               productCode: item.productCode,
@@ -780,16 +754,8 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
         cancelText="取消"
       >
         <Form form={approvalForm} layout="vertical">
-          <Form.Item
-            label="审批意见"
-            name="remarks"
-          >
-            <TextArea
-              rows={4}
-              placeholder="请输入审批意见（可选）"
-              maxLength={500}
-              showCount
-            />
+          <Form.Item label="审批意见" name="remarks">
+            <TextArea rows={4} placeholder="请输入审批意见（可选）" maxLength={500} showCount />
           </Form.Item>
         </Form>
       </Modal>
@@ -809,12 +775,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
             name="reason"
             rules={[{ required: true, message: '请输入拒绝原因' }]}
           >
-            <TextArea
-              rows={4}
-              placeholder="请输入拒绝原因"
-              maxLength={500}
-              showCount
-            />
+            <TextArea rows={4} placeholder="请输入拒绝原因" maxLength={500} showCount />
           </Form.Item>
         </Form>
       </Modal>
@@ -829,10 +790,7 @@ const TransferDetail: React.FC<TransferDetailProps> = ({
         cancelText="取消"
       >
         <Form form={startForm} layout="vertical">
-          <Form.Item
-            label="运输单号"
-            name="trackingNumber"
-          >
+          <Form.Item label="运输单号" name="trackingNumber">
             <Input
               placeholder="请输入运输单号（可选）"
               value={trackingNumber}

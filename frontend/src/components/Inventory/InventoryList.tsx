@@ -108,10 +108,10 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
   // 处理日期范围选择
   const handleDateRangeChange: RangePickerProps['onChange'] = (dates) => {
     if (dates && dates.length === 2) {
-      const dateRange = [
-        dates[0]!.format('YYYY-MM-DD'),
-        dates[1]!.format('YYYY-MM-DD'),
-      ] as [string, string];
+      const dateRange = [dates[0]!.format('YYYY-MM-DD'), dates[1]!.format('YYYY-MM-DD')] as [
+        string,
+        string,
+      ];
       setFilters({ dateRange });
       handleRefresh();
     } else {
@@ -179,9 +179,7 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          await Promise.all(
-            selectedItems.map(id => deleteInventoryItem(id))
-          );
+          await Promise.all(selectedItems.map((id) => deleteInventoryItem(id)));
           message.success('批量删除成功');
           setSelectedItems([]);
           handleRefresh();
@@ -481,7 +479,7 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
                 onChange={(value) => handleFilterChange('locationId', value)}
                 style={{ width: '100%' }}
               >
-                {locations.map(location => (
+                {locations.map((location) => (
                   <Option key={location.id} value={location.id}>
                     {location.name}
                   </Option>
@@ -522,42 +520,24 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
             >
               新建库存项
             </Button>
-            <Button
-              icon={<SyncOutlined />}
-              onClick={handleSync}
-              loading={loading}
-            >
+            <Button icon={<SyncOutlined />} onClick={handleSync} loading={loading}>
               同步数据
             </Button>
-            <Button
-              icon={<ExportOutlined />}
-              onClick={handleExport}
-            >
+            <Button icon={<ExportOutlined />} onClick={handleExport}>
               导出数据
             </Button>
-            <Button
-              icon={<WarningOutlined />}
-              onClick={() => setAlertVisible(true)}
-            >
+            <Button icon={<WarningOutlined />} onClick={() => setAlertVisible(true)}>
               库存预警
             </Button>
             {selectedItems.length > 0 && (
               <>
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={handleBatchDelete}
-                >
+                <Button danger icon={<DeleteOutlined />} onClick={handleBatchDelete}>
                   批量删除 ({selectedItems.length})
                 </Button>
-                <Button onClick={() => setSelectedItems([])}>
-                  取消选择
-                </Button>
+                <Button onClick={() => setSelectedItems([])}>取消选择</Button>
               </>
             )}
-            <Button onClick={handleResetFilters}>
-              重置筛选
-            </Button>
+            <Button onClick={handleResetFilters}>重置筛选</Button>
           </Space>
         </div>
 
@@ -574,8 +554,7 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
             onChange: handleTableChange,
             onShowSizeChange: handleTableChange,
           }}
@@ -600,29 +579,21 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
         {currentRecord && (
           <div>
             <Descriptions title="基本信息" bordered column={2}>
-              <Descriptions.Item label="商品编码">
-                {currentRecord.productCode}
-              </Descriptions.Item>
-              <Descriptions.Item label="商品名称">
-                {currentRecord.productName}
-              </Descriptions.Item>
+              <Descriptions.Item label="商品编码">{currentRecord.productCode}</Descriptions.Item>
+              <Descriptions.Item label="商品名称">{currentRecord.productName}</Descriptions.Item>
               <Descriptions.Item label="商品分类">
                 {currentRecord.productCategory}
               </Descriptions.Item>
-              <Descriptions.Item label="商品规格">
-                {currentRecord.productSpec}
-              </Descriptions.Item>
-              <Descriptions.Item label="计量单位">
-                {currentRecord.unit}
-              </Descriptions.Item>
-              <Descriptions.Item label="存储位置">
-                {currentRecord.locationName}
-              </Descriptions.Item>
+              <Descriptions.Item label="商品规格">{currentRecord.productSpec}</Descriptions.Item>
+              <Descriptions.Item label="计量单位">{currentRecord.unit}</Descriptions.Item>
+              <Descriptions.Item label="存储位置">{currentRecord.locationName}</Descriptions.Item>
             </Descriptions>
 
             <Descriptions title="库存信息" bordered column={2} style={{ marginTop: 24 }}>
               <Descriptions.Item label="当前库存">
-                <Text strong>{currentRecord.currentStock} {currentRecord.unit}</Text>
+                <Text strong>
+                  {currentRecord.currentStock} {currentRecord.unit}
+                </Text>
               </Descriptions.Item>
               <Descriptions.Item label="最小库存">
                 {currentRecord.minStock} {currentRecord.unit}
@@ -655,9 +626,7 @@ const InventoryList: React.FC<InventoryListProps> = ({ onEdit, onView }) => {
 
             {currentRecord.remark && (
               <Descriptions title="备注" bordered column={1} style={{ marginTop: 24 }}>
-                <Descriptions.Item label="备注信息">
-                  {currentRecord.remark}
-                </Descriptions.Item>
+                <Descriptions.Item label="备注信息">{currentRecord.remark}</Descriptions.Item>
               </Descriptions>
             )}
           </div>

@@ -3,14 +3,17 @@
  * 订单列表页面 - User Story 1 & 2
  */
 
-import React from 'react'
-import { Card, message, Space, Typography } from 'antd'
-import { OrderList } from '../../features/order-management/components/OrderList'
-import { OrderFilter, type OrderFilterValues } from '../../features/order-management/components/OrderFilter'
-import { useOrders, useOrderQueryParams } from '../../features/order-management/hooks/useOrders'
-import dayjs from 'dayjs'
+import React from 'react';
+import { Card, message, Space, Typography } from 'antd';
+import { OrderList } from '../../features/order-management/components/OrderList';
+import {
+  OrderFilter,
+  type OrderFilterValues,
+} from '../../features/order-management/components/OrderFilter';
+import { useOrders, useOrderQueryParams } from '../../features/order-management/hooks/useOrders';
+import dayjs from 'dayjs';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 /**
  * 订单列表页面
@@ -29,44 +32,44 @@ const { Title } = Typography
  */
 const OrderListPage: React.FC = () => {
   // 从 URL 同步查询参数
-  const [queryParams, updateQueryParams] = useOrderQueryParams()
+  const [queryParams, updateQueryParams] = useOrderQueryParams();
 
   // 设置默认时间范围（最近30天）
   React.useEffect(() => {
     if (!queryParams.startDate && !queryParams.endDate) {
-      const startDate = dayjs().subtract(30, 'days').format('YYYY-MM-DD')
-      const endDate = dayjs().format('YYYY-MM-DD')
-      updateQueryParams({ startDate, endDate })
+      const startDate = dayjs().subtract(30, 'days').format('YYYY-MM-DD');
+      const endDate = dayjs().format('YYYY-MM-DD');
+      updateQueryParams({ startDate, endDate });
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 使用 TanStack Query 查询订单列表
-  const { data, isLoading, isError, error } = useOrders(queryParams)
+  const { data, isLoading, isError, error } = useOrders(queryParams);
 
   // 错误处理
   React.useEffect(() => {
     if (isError && error) {
-      message.error(error.message || '加载订单列表失败，请稍后重试')
+      message.error(error.message || '加载订单列表失败，请稍后重试');
     }
-  }, [isError, error])
+  }, [isError, error]);
 
   // 筛选处理
   const handleFilter = (values: OrderFilterValues) => {
-    const { status, dateRange, search } = values
+    const { status, dateRange, search } = values;
 
     updateQueryParams({
       status,
       startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
       endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
       search,
-      page: 1 // 筛选时重置到第一页
-    })
-  }
+      page: 1, // 筛选时重置到第一页
+    });
+  };
 
   // 重置处理
   const handleReset = () => {
-    const startDate = dayjs().subtract(30, 'days').format('YYYY-MM-DD')
-    const endDate = dayjs().format('YYYY-MM-DD')
+    const startDate = dayjs().subtract(30, 'days').format('YYYY-MM-DD');
+    const endDate = dayjs().format('YYYY-MM-DD');
 
     updateQueryParams({
       status: undefined,
@@ -74,23 +77,24 @@ const OrderListPage: React.FC = () => {
       endDate,
       search: undefined,
       page: 1,
-      pageSize: 20
-    })
-  }
+      pageSize: 20,
+    });
+  };
 
   // 分页变化处理
   const handlePaginationChange = (page: number, pageSize: number) => {
-    updateQueryParams({ page, pageSize })
-  }
+    updateQueryParams({ page, pageSize });
+  };
 
   // 准备筛选组件的默认值
   const filterDefaultValues: OrderFilterValues = {
     status: queryParams.status,
-    dateRange: queryParams.startDate && queryParams.endDate
-      ? [dayjs(queryParams.startDate), dayjs(queryParams.endDate)]
-      : [dayjs().subtract(30, 'days'), dayjs()],
-    search: queryParams.search
-  }
+    dateRange:
+      queryParams.startDate && queryParams.endDate
+        ? [dayjs(queryParams.startDate), dayjs(queryParams.endDate)]
+        : [dayjs().subtract(30, 'days'), dayjs()],
+    search: queryParams.search,
+  };
 
   return (
     <div style={{ padding: '24px' }}>
@@ -123,7 +127,7 @@ const OrderListPage: React.FC = () => {
         </Card>
       </Space>
     </div>
-  )
-}
+  );
+};
 
-export default OrderListPage
+export default OrderListPage;

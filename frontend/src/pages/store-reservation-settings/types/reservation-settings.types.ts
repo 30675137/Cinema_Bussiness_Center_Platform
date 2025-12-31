@@ -3,7 +3,7 @@
  *
  * Type definitions for Store Reservation Settings entities matching backend DTOs exactly.
  * Based on specs/016-store-reservation-settings/data-model.md
- * 
+ *
  * @updated 016-store-reservation-settings 添加时间段、提前量、时长单位、押金字段
  */
 
@@ -19,7 +19,7 @@ export type DurationUnit = 1 | 2 | 4;
 export interface TimeSlot {
   dayOfWeek: DayOfWeek;
   startTime: string; // HH:mm 格式
-  endTime: string;   // HH:mm 格式
+  endTime: string; // HH:mm 格式
 }
 
 /**
@@ -27,22 +27,22 @@ export interface TimeSlot {
  * Matches backend StoreReservationSettingsDTO fields exactly
  */
 export interface StoreReservationSettings {
-  id: string;                    // UUID as string
-  storeId: string;               // UUID as string
+  id: string; // UUID as string
+  storeId: string; // UUID as string
   isReservationEnabled: boolean; // 是否开放预约
-  maxReservationDays: number;    // 可预约天数 (0-365)
-  createdAt: string;             // ISO 8601 timestamp
-  updatedAt: string;             // ISO 8601 timestamp
-  updatedBy?: string;            // 最后更新人（可选）
-  
+  maxReservationDays: number; // 可预约天数 (0-365)
+  createdAt: string; // ISO 8601 timestamp
+  updatedAt: string; // ISO 8601 timestamp
+  updatedBy?: string; // 最后更新人（可选）
+
   // 016-store-reservation-settings 新增字段
-  timeSlots?: TimeSlot[];         // 可预约时间段列表
-  minAdvanceHours?: number;       // 最小提前小时数
-  durationUnit?: DurationUnit;    // 预约时长单位 (1/2/4 小时)
-  depositRequired?: boolean;      // 是否需要押金
-  depositAmount?: number;         // 押金金额
-  depositPercentage?: number;     // 押金比例 (0-100)
-  isActive?: boolean;             // 配置是否生效
+  timeSlots?: TimeSlot[]; // 可预约时间段列表
+  minAdvanceHours?: number; // 最小提前小时数
+  durationUnit?: DurationUnit; // 预约时长单位 (1/2/4 小时)
+  depositRequired?: boolean; // 是否需要押金
+  depositAmount?: number; // 押金金额
+  depositPercentage?: number; // 押金比例 (0-100)
+  isActive?: boolean; // 配置是否生效
 }
 
 /**
@@ -52,7 +52,7 @@ export interface StoreReservationSettings {
 export interface UpdateStoreReservationSettingsRequest {
   isReservationEnabled: boolean;
   maxReservationDays: number; // 1-365 when enabled, 0 when disabled
-  
+
   // 016-store-reservation-settings 新增字段
   timeSlots?: TimeSlot[];
   minAdvanceHours?: number;

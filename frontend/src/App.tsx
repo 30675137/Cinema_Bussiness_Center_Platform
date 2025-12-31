@@ -21,6 +21,9 @@ const ProductList = lazy(() => import('./pages/product/ProductList'));
 const ProductForm = lazy(() => import('./pages/product/ProductForm'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
+// SKU管理页面 (@spec O004-beverage-sku-reuse)
+const SKUManagementPage = lazy(() => import('./pages/ProductManagement/SKUManagementPage'));
+
 // 价格管理页面
 const PriceManagement = lazy(() => import('./pages/price/PriceManagement'));
 
@@ -117,9 +120,7 @@ class ErrorBoundary extends React.Component<
           <details style={{ whiteSpace: 'pre-wrap' }}>
             {this.state.error && this.state.error.toString()}
           </details>
-          <button onClick={() => window.location.reload()}>
-            重新加载页面
-          </button>
+          <button onClick={() => window.location.reload()}>重新加载页面</button>
         </div>
       );
     }
@@ -155,6 +156,9 @@ const App: React.FC = () => {
                 <Route path="/products/:id" element={<ProductForm />} />
                 <Route path="/products/:id/edit" element={<ProductForm />} />
 
+                {/* SKU管理路由 (@spec O004-beverage-sku-reuse) */}
+                <Route path="/skus" element={<SKUManagementPage />} />
+
                 {/* 仪表板 */}
                 <Route path="/dashboard" element={<Dashboard />} />
 
@@ -188,9 +192,7 @@ const App: React.FC = () => {
                 <Route
                   path="/performance"
                   element={
-                    <LazyLoadWrapper
-                      loader={() => import('./monitoring/PerformanceDashboard')}
-                    />
+                    <LazyLoadWrapper loader={() => import('./monitoring/PerformanceDashboard')} />
                   }
                 />
 

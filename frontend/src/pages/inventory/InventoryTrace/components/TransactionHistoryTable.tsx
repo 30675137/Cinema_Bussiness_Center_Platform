@@ -12,7 +12,7 @@ import {
   Statistic,
   Typography,
   Alert,
-  Empty
+  Empty,
 } from 'antd';
 import {
   EyeOutlined,
@@ -27,7 +27,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   ArrowUpOutlined,
-  ArrowDownOutlined
+  ArrowDownOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -36,7 +36,7 @@ import {
   TransactionType,
   SourceType,
   TRANSACTION_TYPE_OPTIONS,
-  SOURCE_TYPE_OPTIONS
+  SOURCE_TYPE_OPTIONS,
 } from '@/types/inventory';
 
 const { Text } = Typography;
@@ -61,7 +61,7 @@ const mockTransactionData: TransactionDetail[] = [
       address: '北京市朝阳区CBD',
       contactInfo: '010-12345678',
       managerInfo: '张经理',
-      isActive: true
+      isActive: true,
     },
     skuId: 'SKU001',
     sku: {
@@ -74,7 +74,7 @@ const mockTransactionData: TransactionDetail[] = [
       unit: '瓶',
       weight: 0.35,
       dimensions: { length: 6, width: 6, height: 20 },
-      isActive: true
+      isActive: true,
     },
     transactionType: TransactionType.PURCHASE_IN,
     quantity: 100,
@@ -96,13 +96,13 @@ const mockTransactionData: TransactionDetail[] = [
       username: 'lisi',
       email: 'lisi@example.com',
       department: '采购部',
-      position: '采购员'
+      position: '采购员',
     },
     transactionTime: '2024-01-15 10:30:00',
     remarks: '正常采购入库',
     metadata: { supplier: '可口可乐公司' },
     createdAt: '2024-01-15 10:30:00',
-    updatedAt: '2024-01-15 10:30:00'
+    updatedAt: '2024-01-15 10:30:00',
   },
   {
     id: '2',
@@ -114,7 +114,7 @@ const mockTransactionData: TransactionDetail[] = [
       address: '北京市朝阳区CBD',
       contactInfo: '010-12345678',
       managerInfo: '张经理',
-      isActive: true
+      isActive: true,
     },
     skuId: 'SKU002',
     sku: {
@@ -127,7 +127,7 @@ const mockTransactionData: TransactionDetail[] = [
       unit: '份',
       weight: 0.2,
       dimensions: { length: 15, width: 15, height: 10 },
-      isActive: true
+      isActive: true,
     },
     transactionType: TransactionType.SALE_OUT,
     quantity: 25,
@@ -148,14 +148,14 @@ const mockTransactionData: TransactionDetail[] = [
       username: 'wangwu',
       email: 'wangwu@example.com',
       department: '销售部',
-      position: '收银员'
+      position: '收银员',
     },
     transactionTime: '2024-01-15 14:20:00',
     remarks: '电影院正常销售',
     metadata: { customerId: 'CUST001', orderId: 'ORDER001' },
     createdAt: '2024-01-15 14:20:00',
-    updatedAt: '2024-01-15 14:20:00'
-  }
+    updatedAt: '2024-01-15 14:20:00',
+  },
 ];
 
 const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
@@ -163,7 +163,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
   dataSource,
   loading = false,
   pagination,
-  onViewDetail
+  onViewDetail,
 }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
@@ -173,42 +173,46 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
   // 计算统计数据
   const statistics = {
     totalTransactions: transactionData.length,
-    totalInbound: transactionData.filter(t => [
-      TransactionType.PURCHASE_IN,
-      TransactionType.TRANSFER_IN,
-      TransactionType.ADJUSTMENT_IN,
-      TransactionType.RETURN_IN,
-      TransactionType.PRODUCTION_IN
-    ].includes(t.transactionType)).length,
-    totalOutbound: transactionData.filter(t => [
-      TransactionType.SALE_OUT,
-      TransactionType.TRANSFER_OUT,
-      TransactionType.ADJUSTMENT_OUT,
-      TransactionType.RETURN_OUT,
-      TransactionType.DAMAGE_OUT,
-      TransactionType.EXPIRED_OUT
-    ].includes(t.transactionType)).length,
+    totalInbound: transactionData.filter((t) =>
+      [
+        TransactionType.PURCHASE_IN,
+        TransactionType.TRANSFER_IN,
+        TransactionType.ADJUSTMENT_IN,
+        TransactionType.RETURN_IN,
+        TransactionType.PRODUCTION_IN,
+      ].includes(t.transactionType)
+    ).length,
+    totalOutbound: transactionData.filter((t) =>
+      [
+        TransactionType.SALE_OUT,
+        TransactionType.TRANSFER_OUT,
+        TransactionType.ADJUSTMENT_OUT,
+        TransactionType.RETURN_OUT,
+        TransactionType.DAMAGE_OUT,
+        TransactionType.EXPIRED_OUT,
+      ].includes(t.transactionType)
+    ).length,
     totalValue: transactionData.reduce((sum, t) => sum + (t.totalCost || 0), 0),
-    todayTransactions: transactionData.filter(t =>
-      dayjs(t.transactionTime).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
-    ).length
+    todayTransactions: transactionData.filter(
+      (t) => dayjs(t.transactionTime).format('YYYY-MM-DD') === dayjs().format('YYYY-MM-DD')
+    ).length,
   };
 
   // 获取交易类型的图标和颜色
   const getTransactionTypeInfo = (type: TransactionType) => {
-    const option = TRANSACTION_TYPE_OPTIONS.find(opt => opt.value === type);
+    const option = TRANSACTION_TYPE_OPTIONS.find((opt) => opt.value === type);
     const isInbound = [
       TransactionType.PURCHASE_IN,
       TransactionType.TRANSFER_IN,
       TransactionType.ADJUSTMENT_IN,
       TransactionType.RETURN_IN,
-      TransactionType.PRODUCTION_IN
+      TransactionType.PRODUCTION_IN,
     ].includes(type);
 
     return {
       ...option,
       isInbound,
-      icon: isInbound ? <ArrowUpOutlined /> : <ArrowDownOutlined />
+      icon: isInbound ? <ArrowUpOutlined /> : <ArrowDownOutlined />,
     };
   };
 
@@ -230,7 +234,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             {dayjs(text).format('HH:mm:ss')}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '商品信息',
@@ -249,7 +253,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             </div>
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '门店',
@@ -268,7 +272,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             </div>
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '交易类型',
@@ -283,11 +287,11 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
           </Tag>
         );
       },
-      filters: TRANSACTION_TYPE_OPTIONS.map(option => ({
+      filters: TRANSACTION_TYPE_OPTIONS.map((option) => ({
         text: option.label,
-        value: option.value
+        value: option.value,
       })),
-      onFilter: (value, record) => record.transactionType === value
+      onFilter: (value, record) => record.transactionType === value,
     },
     {
       title: '数量变化',
@@ -299,14 +303,15 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
         return (
           <Space direction="vertical" size="small">
             <Text strong style={{ color: typeInfo?.isInbound ? '#52c41a' : '#ff4d4f' }}>
-              {typeInfo?.isInbound ? '+' : '-'}{record.quantity}
+              {typeInfo?.isInbound ? '+' : '-'}
+              {record.quantity}
             </Text>
             <Text type="secondary" style={{ fontSize: '12px' }}>
               {record.sku.unit}
             </Text>
           </Space>
         );
-      }
+      },
     },
     {
       title: '库存前后',
@@ -315,14 +320,13 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
       render: (_, record) => (
         <Space direction="vertical" size="small" style={{ fontSize: '12px' }}>
           <div>交易前: {record.stockBefore}</div>
-          <div style={{ color: '#1890ff', fontWeight: 'bold' }}>
-            交易后: {record.stockAfter}
-          </div>
+          <div style={{ color: '#1890ff', fontWeight: 'bold' }}>交易后: {record.stockAfter}</div>
           <div style={{ color: '#999' }}>
-            变化: {record.stockAfter - record.stockBefore > 0 ? '+' : ''}{record.stockAfter - record.stockBefore}
+            变化: {record.stockAfter - record.stockBefore > 0 ? '+' : ''}
+            {record.stockAfter - record.stockBefore}
           </div>
         </Space>
-      )
+      ),
     },
     {
       title: '可用库存',
@@ -335,7 +339,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             可用后: {record.availableAfter}
           </div>
         </Space>
-      )
+      ),
     },
     {
       title: '来源',
@@ -343,13 +347,9 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
       key: 'sourceType',
       width: 100,
       render: (type) => {
-        const option = SOURCE_TYPE_OPTIONS.find(opt => opt.value === type);
-        return option ? (
-          <Tag color={option.color}>{option.label}</Tag>
-        ) : (
-          <Tag>{type}</Tag>
-        );
-      }
+        const option = SOURCE_TYPE_OPTIONS.find((opt) => opt.value === type);
+        return option ? <Tag color={option.color}>{option.label}</Tag> : <Tag>{type}</Tag>;
+      },
     },
     {
       title: '操作人',
@@ -368,7 +368,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             </div>
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '成本信息',
@@ -376,16 +376,14 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
       width: 120,
       render: (_, record) => (
         <Space direction="vertical" size="small">
-          {record.unitCost && (
-            <div>单价: ¥{record.unitCost.toFixed(2)}</div>
-          )}
+          {record.unitCost && <div>单价: ¥{record.unitCost.toFixed(2)}</div>}
           {record.totalCost && (
             <Text strong style={{ color: '#cf1322' }}>
               总价: ¥{record.totalCost.toFixed(2)}
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '批次信息',
@@ -393,9 +391,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
       width: 120,
       render: (_, record) => (
         <Space direction="vertical" size="small" style={{ fontSize: '12px' }}>
-          {record.batchNumber && (
-            <div>批次: {record.batchNumber}</div>
-          )}
+          {record.batchNumber && <div>批次: {record.batchNumber}</div>}
           {record.expiryDate && (
             <Tooltip title={record.expiryDate}>
               <div>
@@ -407,7 +403,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
             </Tooltip>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '操作',
@@ -423,8 +419,8 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
         >
           详情
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   // 使用传入的columns或默认columns
@@ -458,10 +454,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
               <Button size="small">批量操作</Button>
             </Badge>
           )}
-          <Button
-            icon={<DownloadOutlined />}
-            size="small"
-          >
+          <Button icon={<DownloadOutlined />} size="small">
             导出数据
           </Button>
         </Space>
@@ -530,10 +523,7 @@ const TransactionHistoryTable: React.FC<TransactionHistoryTableProps> = ({
       />
 
       {transactionData.length === 0 && !loading && (
-        <Empty
-          description="暂无交易记录"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
+        <Empty description="暂无交易记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />
       )}
     </Card>
   );

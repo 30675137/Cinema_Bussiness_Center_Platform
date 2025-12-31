@@ -61,10 +61,7 @@ const DEFAULT_QUERY_OPTIONS = {
  */
 export function useScheduleListQuery(
   params: ScheduleQueryParams,
-  options?: Omit<
-    UseQueryOptions<ScheduleEvent[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<ScheduleEvent[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<ScheduleEvent[], Error>({
     queryKey: scheduleKeys.list(params),
@@ -85,10 +82,7 @@ export function useScheduleListQuery(
  */
 export function useScheduleDetailQuery(
   id: string | undefined,
-  options?: Omit<
-    UseQueryOptions<ScheduleEvent, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<ScheduleEvent, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<ScheduleEvent, Error>({
     queryKey: scheduleKeys.detail(id || ''),
@@ -117,10 +111,7 @@ export function useScheduleDetailQuery(
  */
 export function useHallsListQuery(
   params?: HallQueryParams,
-  options?: Omit<
-    UseQueryOptions<Hall[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Hall[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Hall[], Error>({
     queryKey: scheduleKeys.hallsList(params),
@@ -145,10 +136,7 @@ export function useHallsListQuery(
  */
 export function useAllHallsQuery(
   params?: HallQueryParams,
-  options?: Omit<
-    UseQueryOptions<Hall[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Hall[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Hall[], Error>({
     queryKey: scheduleKeys.hallsList(params),
@@ -172,10 +160,7 @@ export function useAllHallsQuery(
  */
 export function useHallDetailQuery(
   id: string | undefined,
-  options?: Omit<
-    UseQueryOptions<Hall, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Hall, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Hall, Error>({
     queryKey: scheduleKeys.hallDetail(id || ''),
@@ -208,10 +193,7 @@ export function useHallDetailQuery(
  */
 export function useStoresListQuery(
   params?: StoreQueryParams,
-  options?: Omit<
-    UseQueryOptions<Store[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Store[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Store[], Error>({
     queryKey: scheduleKeys.storesList(params),
@@ -235,10 +217,7 @@ export function useStoresListQuery(
  */
 export function useStoreDetailQuery(
   id: string | undefined,
-  options?: Omit<
-    UseQueryOptions<Store, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Store, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Store, Error>({
     queryKey: scheduleKeys.storeDetail(id || ''),
@@ -268,10 +247,7 @@ export function useStoreDetailQuery(
 export function useHallsByStoreQuery(
   storeId: string | undefined,
   params?: HallQueryParams,
-  options?: Omit<
-    UseQueryOptions<Hall[], Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<Hall[], Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<Hall[], Error>({
     queryKey: scheduleKeys.hallsByStore(storeId || '', params),
@@ -293,4 +269,3 @@ export function useHallsByStoreQuery(
     ...options,
   });
 }
-

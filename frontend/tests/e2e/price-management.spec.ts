@@ -87,7 +87,7 @@ test.describe('用户故事3: 价格配置管理', () => {
 
         // 填写折扣价格
         const discountInputs = priceTable.locator('[data-testid="discount-price-input"]');
-        if (await discountInputs.count() > 0) {
+        if ((await discountInputs.count()) > 0) {
           await discountInputs.first().fill('25.90');
         }
       }
@@ -176,7 +176,7 @@ test.describe('用户故事3: 价格配置管理', () => {
 
     // 验证筛选结果
     const configRows = page.locator('[data-testid="config-row"]');
-    if (await configRows.count() > 0) {
+    if ((await configRows.count()) > 0) {
       await expect(configRows.first()).toBeVisible();
     }
   });
@@ -268,7 +268,7 @@ test.describe('用户故事3: 价格配置管理', () => {
 
       // 验证历史记录表格
       const historyRows = page.locator('[data-testid="history-row"]');
-      if (await historyRows.count() > 0) {
+      if ((await historyRows.count()) > 0) {
         const firstRow = historyRows.first();
 
         // 验证历史记录信息

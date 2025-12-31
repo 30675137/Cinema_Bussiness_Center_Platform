@@ -5,7 +5,10 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { reservationSettingsSchema, batchUpdateReservationSettingsSchema } from '../../../../src/pages/store-reservation-settings/types/reservation-settings.schema';
+import {
+  reservationSettingsSchema,
+  batchUpdateReservationSettingsSchema,
+} from '../../../../src/pages/store-reservation-settings/types/reservation-settings.schema';
 
 describe('reservationSettingsSchema', () => {
   describe('valid inputs', () => {
@@ -73,9 +76,11 @@ describe('reservationSettingsSchema', () => {
       const result = reservationSettingsSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some(issue => 
-          issue.message.includes('开启预约时必须设置可预约天数')
-        )).toBe(true);
+        expect(
+          result.error.issues.some((issue) =>
+            issue.message.includes('开启预约时必须设置可预约天数')
+          )
+        ).toBe(true);
       }
     });
 
@@ -115,10 +120,7 @@ describe('batchUpdateReservationSettingsSchema', () => {
   describe('valid inputs', () => {
     it('should validate batch update with valid store IDs and settings', () => {
       const validData = {
-        storeIds: [
-          '550e8400-e29b-41d4-a716-446655440000',
-          '550e8400-e29b-41d4-a716-446655440001',
-        ],
+        storeIds: ['550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440001'],
         settings: {
           isReservationEnabled: true,
           maxReservationDays: 7,
@@ -156,9 +158,9 @@ describe('batchUpdateReservationSettingsSchema', () => {
       const result = batchUpdateReservationSettingsSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some(issue => 
-          issue.message.includes('至少选择一个门店')
-        )).toBe(true);
+        expect(
+          result.error.issues.some((issue) => issue.message.includes('至少选择一个门店'))
+        ).toBe(true);
       }
     });
 
@@ -189,4 +191,3 @@ describe('batchUpdateReservationSettingsSchema', () => {
     });
   });
 });
-

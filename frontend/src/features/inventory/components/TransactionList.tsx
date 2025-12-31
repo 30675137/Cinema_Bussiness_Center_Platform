@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 库存流水列表组件
- * 
+ *
  * 显示库存流水记录列表，支持时间筛选。
  * 实现 T031 任务。
- * 
+ *
  * @since US2 - 查看库存流水记录
  */
 
@@ -30,13 +30,13 @@ export interface TransactionListProps {
 
 /**
  * 库存流水列表组件
- * 
+ *
  * 功能：
  * - 显示流水记录列表
  * - 时间范围筛选
  * - 入库绿色+/出库红色- 显示
  * - 分页支持
- * 
+ *
  * @example
  * ```tsx
  * <TransactionList skuId="sku-001" storeId="store-001" />
@@ -59,14 +59,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   };
 
   // 构建查询参数
-  const queryParams = useMemo(() => ({
-    skuId,
-    storeId,
-    startDate: dateRange?.[0],
-    endDate: dateRange?.[1],
-    page,
-    pageSize,
-  }), [skuId, storeId, dateRange, page, pageSize]);
+  const queryParams = useMemo(
+    () => ({
+      skuId,
+      storeId,
+      startDate: dateRange?.[0],
+      endDate: dateRange?.[1],
+      page,
+      pageSize,
+    }),
+    [skuId, storeId, dateRange, page, pageSize]
+  );
 
   // 查询流水记录
   const { data, isLoading, isError } = useTransactions(queryParams, !!skuId);
@@ -74,10 +77,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   // 日期范围变化处理
   const handleDateChange = (dates: any) => {
     if (dates) {
-      setDateRange([
-        dates[0].format('YYYY-MM-DD'),
-        dates[1].format('YYYY-MM-DD'),
-      ]);
+      setDateRange([dates[0].format('YYYY-MM-DD'), dates[1].format('YYYY-MM-DD')]);
     } else {
       setDateRange(null);
     }
@@ -99,9 +99,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       key: 'transactionType',
       width: 100,
       render: (type: string) => (
-        <Tag color={type.includes('_in') ? 'green' : 'orange'}>
-          {getTransactionTypeName(type)}
-        </Tag>
+        <Tag color={type.includes('_in') ? 'green' : 'orange'}>{getTransactionTypeName(type)}</Tag>
       ),
     },
     {
@@ -110,9 +108,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       key: 'quantity',
       width: 120,
       align: 'center',
-      render: (quantity: number) => (
-        <TransactionQuantityTag quantity={quantity} size="small" />
-      ),
+      render: (quantity: number) => <TransactionQuantityTag quantity={quantity} size="small" />,
     },
     {
       title: '库存变化',
@@ -158,10 +154,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
       <div style={{ marginBottom: 16 }}>
         <Space>
           <Text type="secondary">时间范围：</Text>
-          <RangePicker 
-            onChange={handleDateChange} 
-            placeholder={['开始日期', '结束日期']}
-          />
+          <RangePicker onChange={handleDateChange} placeholder={['开始日期', '结束日期']} />
         </Space>
       </div>
 

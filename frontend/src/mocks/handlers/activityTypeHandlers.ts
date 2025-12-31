@@ -61,13 +61,13 @@ export const activityTypeHandlers = [
   http.get('/api/activity-types', ({ request }) => {
     const url = new URL(request.url);
     const statusParam = url.searchParams.get('status');
-    
-    let types = getMockActivityTypes().filter(t => t.status !== ActivityTypeStatus.DELETED);
-    
+
+    let types = getMockActivityTypes().filter((t) => t.status !== ActivityTypeStatus.DELETED);
+
     if (statusParam) {
-      types = types.filter(t => t.status === statusParam);
+      types = types.filter((t) => t.status === statusParam);
     }
-    
+
     // 按 sort ASC, createdAt ASC 排序
     types.sort((a, b) => {
       if (a.sort !== b.sort) {
@@ -86,7 +86,7 @@ export const activityTypeHandlers = [
   // GET /api/activity-types/enabled - 获取启用状态的活动类型列表（小程序端）
   http.get('/api/activity-types/enabled', () => {
     const types = getMockActivityTypes()
-      .filter(t => t.status === ActivityTypeStatus.ENABLED)
+      .filter((t) => t.status === ActivityTypeStatus.ENABLED)
       .sort((a, b) => {
         if (a.sort !== b.sort) {
           return a.sort - b.sort;
@@ -105,7 +105,7 @@ export const activityTypeHandlers = [
   http.get('/api/activity-types/:id', ({ params }) => {
     const { id } = params;
     const types = getMockActivityTypes();
-    const activityType = types.find(t => t.id === id && t.status !== ActivityTypeStatus.DELETED);
+    const activityType = types.find((t) => t.id === id && t.status !== ActivityTypeStatus.DELETED);
 
     if (!activityType) {
       return HttpResponse.json(
@@ -126,12 +126,12 @@ export const activityTypeHandlers = [
 
   // POST /api/activity-types - 创建活动类型
   http.post('/api/activity-types', async ({ request }) => {
-    const payload = await request.json() as { name: string; description?: string; sort: number };
+    const payload = (await request.json()) as { name: string; description?: string; sort: number };
     const types = getMockActivityTypes();
 
     // 检查名称唯一性（排除已删除状态）
     const existing = types.find(
-      t => t.name === payload.name && t.status !== ActivityTypeStatus.DELETED
+      (t) => t.name === payload.name && t.status !== ActivityTypeStatus.DELETED
     );
     if (existing) {
       return HttpResponse.json(
@@ -168,9 +168,9 @@ export const activityTypeHandlers = [
   // PUT /api/activity-types/:id - 更新活动类型
   http.put('/api/activity-types/:id', async ({ params, request }) => {
     const { id } = params;
-    const payload = await request.json() as { name: string; description?: string; sort: number };
+    const payload = (await request.json()) as { name: string; description?: string; sort: number };
     const types = getMockActivityTypes();
-    const index = types.findIndex(t => t.id === id && t.status !== ActivityTypeStatus.DELETED);
+    const index = types.findIndex((t) => t.id === id && t.status !== ActivityTypeStatus.DELETED);
 
     if (index === -1) {
       return HttpResponse.json(
@@ -185,7 +185,7 @@ export const activityTypeHandlers = [
 
     // 检查名称唯一性（排除当前记录和已删除状态）
     const existing = types.find(
-      t => t.id !== id && t.name === payload.name && t.status !== ActivityTypeStatus.DELETED
+      (t) => t.id !== id && t.name === payload.name && t.status !== ActivityTypeStatus.DELETED
     );
     if (existing) {
       return HttpResponse.json(
@@ -218,7 +218,7 @@ export const activityTypeHandlers = [
   http.delete('/api/activity-types/:id', ({ params }) => {
     const { id } = params;
     const types = getMockActivityTypes();
-    const index = types.findIndex(t => t.id === id);
+    const index = types.findIndex((t) => t.id === id);
 
     if (index === -1) {
       return HttpResponse.json(
@@ -249,9 +249,9 @@ export const activityTypeHandlers = [
   // PATCH /api/activity-types/:id/status - 切换活动类型状态
   http.patch('/api/activity-types/:id/status', async ({ params, request }) => {
     const { id } = params;
-    const payload = await request.json() as { status: ActivityTypeStatus };
+    const payload = (await request.json()) as { status: ActivityTypeStatus };
     const types = getMockActivityTypes();
-    const index = types.findIndex(t => t.id === id && t.status !== ActivityTypeStatus.DELETED);
+    const index = types.findIndex((t) => t.id === id && t.status !== ActivityTypeStatus.DELETED);
 
     if (index === -1) {
       return HttpResponse.json(
@@ -264,7 +264,10 @@ export const activityTypeHandlers = [
       );
     }
 
-    if (payload.status !== ActivityTypeStatus.ENABLED && payload.status !== ActivityTypeStatus.DISABLED) {
+    if (
+      payload.status !== ActivityTypeStatus.ENABLED &&
+      payload.status !== ActivityTypeStatus.DISABLED
+    ) {
       return HttpResponse.json(
         {
           success: false,
@@ -289,4 +292,3 @@ export const activityTypeHandlers = [
     });
   }),
 ];
-

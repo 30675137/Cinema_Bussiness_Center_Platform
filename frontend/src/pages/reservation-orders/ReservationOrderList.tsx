@@ -4,30 +4,30 @@
  * B端运营平台预约单管理的主入口页面
  */
 
-import React, { useState, useCallback, useMemo } from 'react'
-import { Card, Table, Button, Space, Empty, Typography, message } from 'antd'
-import { EyeOutlined, CheckOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons'
-import { useNavigate } from 'react-router-dom'
-import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
-import dayjs from 'dayjs'
+import React, { useState, useCallback, useMemo } from 'react';
+import { Card, Table, Button, Space, Empty, Typography, message } from 'antd';
+import { EyeOutlined, CheckOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import dayjs from 'dayjs';
 
-import { useReservationOrders } from './hooks/useReservationOrders'
-import OrderStatusBadge, { canConfirm, canCancel } from './components/OrderStatusBadge'
-import OrderFilters from './components/OrderFilters'
+import { useReservationOrders } from './hooks/useReservationOrders';
+import OrderStatusBadge, { canConfirm, canCancel } from './components/OrderStatusBadge';
+import OrderFilters from './components/OrderFilters';
 import type {
   ReservationListItem,
   ReservationListQueryRequest,
   ReservationFilterFormValues,
   ReservationStatus,
-} from './types/reservation-order.types'
+} from './types/reservation-order.types';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 /**
  * 预约单管理列表页
  */
 const ReservationOrderList: React.FC = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // 查询参数状态
   const [queryParams, setQueryParams] = useState<ReservationListQueryRequest>({
@@ -35,10 +35,10 @@ const ReservationOrderList: React.FC = () => {
     size: 20,
     sortBy: 'createdAt',
     sortDirection: 'desc',
-  })
+  });
 
   // 获取列表数据
-  const { data, isLoading, error, refetch } = useReservationOrders(queryParams)
+  const { data, isLoading, error, refetch } = useReservationOrders(queryParams);
 
   /**
    * 处理筛选条件变更
@@ -56,40 +56,37 @@ const ReservationOrderList: React.FC = () => {
       reservationDateEnd: filters.dateRange?.[1]
         ? dayjs(filters.dateRange[1]).format('YYYY-MM-DD')
         : undefined,
-    }))
-  }, [])
+    }));
+  }, []);
 
   /**
    * 处理分页变更
    */
-  const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig) => {
-      setQueryParams((prev: ReservationListQueryRequest) => ({
-        ...prev,
-        page: (pagination.current || 1) - 1,
-        size: pagination.pageSize || 20,
-      }))
-    },
-    []
-  )
+  const handleTableChange = useCallback((pagination: TablePaginationConfig) => {
+    setQueryParams((prev: ReservationListQueryRequest) => ({
+      ...prev,
+      page: (pagination.current || 1) - 1,
+      size: pagination.pageSize || 20,
+    }));
+  }, []);
 
   /**
    * 查看详情
    */
   const handleViewDetail = useCallback(
     (id: string) => {
-      navigate(`/reservation-orders/${id}`)
+      navigate(`/reservation-orders/${id}`);
     },
     [navigate]
-  )
+  );
 
   /**
    * 刷新列表
    */
   const handleRefresh = useCallback(() => {
-    refetch()
-    message.success('列表已刷新')
-  }, [refetch])
+    refetch();
+    message.success('列表已刷新');
+  }, [refetch]);
 
   /**
    * 表格列配置
@@ -102,9 +99,7 @@ const ReservationOrderList: React.FC = () => {
         key: 'orderNumber',
         width: 180,
         fixed: 'left' as const,
-        render: (text: string, record) => (
-          <a onClick={() => handleViewDetail(record.id)}>{text}</a>
-        ),
+        render: (text: string, record) => <a onClick={() => handleViewDetail(record.id)}>{text}</a>,
       },
       {
         title: '联系人',
@@ -142,8 +137,7 @@ const ReservationOrderList: React.FC = () => {
         title: '预订时段',
         key: 'timeSlot',
         width: 120,
-        render: (_, record) =>
-          `${record.reservationTime} - ${record.reservationEndTime}`,
+        render: (_, record) => `${record.reservationTime} - ${record.reservationEndTime}`,
       },
       {
         title: '金额',
@@ -158,17 +152,14 @@ const ReservationOrderList: React.FC = () => {
         dataIndex: 'status',
         key: 'status',
         width: 100,
-        render: (status: ReservationStatus) => (
-          <OrderStatusBadge status={status} />
-        ),
+        render: (status: ReservationStatus) => <OrderStatusBadge status={status} />,
       },
       {
         title: '创建时间',
         dataIndex: 'createdAt',
         key: 'createdAt',
         width: 160,
-        render: (text: string) =>
-          text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-',
+        render: (text: string) => (text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-'),
       },
       {
         title: '操作',
@@ -190,22 +181,19 @@ const ReservationOrderList: React.FC = () => {
       },
     ],
     [handleViewDetail]
-  )
+  );
 
   // 错误处理
   if (error) {
     return (
       <Card>
-        <Empty
-          description={`加载失败: ${error.message}`}
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
+        <Empty description={`加载失败: ${error.message}`} image={Empty.PRESENTED_IMAGE_SIMPLE}>
           <Button type="primary" onClick={() => refetch()}>
             重试
           </Button>
         </Empty>
       </Card>
-    )
+    );
   }
 
   return (
@@ -219,10 +207,7 @@ const ReservationOrderList: React.FC = () => {
 
       {/* 筛选区域 */}
       <Card style={{ marginBottom: 16 }}>
-        <OrderFilters
-          onFilterChange={handleFilterChange}
-          loading={isLoading}
-        />
+        <OrderFilters onFilterChange={handleFilterChange} loading={isLoading} />
       </Card>
 
       {/* 列表区域 */}
@@ -246,22 +231,16 @@ const ReservationOrderList: React.FC = () => {
             total: data?.totalElements || 0,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
           onChange={handleTableChange}
           locale={{
-            emptyText: (
-              <Empty
-                description="暂无预约单"
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-              />
-            ),
+            emptyText: <Empty description="暂无预约单" image={Empty.PRESENTED_IMAGE_SIMPLE} />,
           }}
         />
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default ReservationOrderList
+export default ReservationOrderList;

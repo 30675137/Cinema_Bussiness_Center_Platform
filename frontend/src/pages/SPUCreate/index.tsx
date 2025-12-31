@@ -1,51 +1,48 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Card, Button, message, Space, Breadcrumb } from 'antd'
-import { useNavigate } from 'react-router-dom'
-import { ArrowLeftOutlined } from '@ant-design/icons'
-import SPUForm from '@/components/forms/SPUForm'
-import { SPUNotificationService } from '@/components/common/Notification'
-import type { Brand, Category } from '@/types/spu'
-import type { CreateSPURequest } from '@/services/spuService'
-import { spuService } from '@/services/spuService'
-import { validateSPUForm } from '@/utils/validation'
-import { Breadcrumb as CustomBreadcrumb } from '@/components/common'
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, Button, message, Space, Breadcrumb } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import SPUForm from '@/components/forms/SPUForm';
+import { SPUNotificationService } from '@/components/common/Notification';
+import type { Brand, Category } from '@/types/spu';
+import type { CreateSPURequest } from '@/services/spuService';
+import { spuService } from '@/services/spuService';
+import { validateSPUForm } from '@/utils/validation';
+import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
 
 const SPUCreatePage: React.FC = () => {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [dataLoading, setDataLoading] = useState(true)
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   // 加载品牌和分类数据
   useEffect(() => {
-    loadInitialData()
-  }, [])
+    loadInitialData();
+  }, []);
 
   const loadInitialData = async () => {
     try {
-      setDataLoading(true)
+      setDataLoading(true);
 
       // 并行加载品牌和分类数据
-      const [brandsResult, categoriesResult] = await Promise.all([
-        loadBrands(),
-        loadCategories(),
-      ])
+      const [brandsResult, categoriesResult] = await Promise.all([loadBrands(), loadCategories()]);
 
-      setBrands(brandsResult)
-      setCategories(categoriesResult)
+      setBrands(brandsResult);
+      setCategories(categoriesResult);
     } catch (error) {
-      console.error('Failed to load initial data:', error)
-      message.error('加载数据失败，请刷新页面重试')
+      console.error('Failed to load initial data:', error);
+      message.error('加载数据失败，请刷新页面重试');
     } finally {
-      setDataLoading(false)
+      setDataLoading(false);
     }
-  }
+  };
 
   // Mock加载品牌数据
   const loadBrands = async (): Promise<Brand[]> => {
     // 模拟API延迟
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return [
       {
@@ -86,13 +83,13 @@ const SPUCreatePage: React.FC = () => {
         description: '知名食品饮料品牌',
         status: 'active',
       },
-    ]
-  }
+    ];
+  };
 
   // Mock加载分类数据
   const loadCategories = async (): Promise<Category[]> => {
     // 模拟API延迟
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return [
       {
@@ -191,69 +188,72 @@ const SPUCreatePage: React.FC = () => {
           },
         ],
       },
-    ]
-  }
+    ];
+  };
 
   // 处理表单提交
-  const handleSubmit = useCallback(async (formData: CreateSPURequest) => {
-    // 客户端验证
-    const validation = validateSPUForm(formData)
-    if (!validation.isValid) {
-      SPUNotificationService.validationFailed(validation.fieldErrors)
-      return
-    }
-
-    try {
-      setLoading(true)
-
-      // 调用API创建SPU
-      const response = await spuService.createSPU(formData)
-
-      if (response.success) {
-        // 显示创建成功通知，并提供操作选项
-        SPUNotificationService.createSuccess(
-          {
-            id: response.data.id,
-            name: response.data.name,
-            code: response.data.code,
-          },
-          () => {
-            // 点击通知时跳转到详情页
-            navigate(`/spu/${response.data.id}`, { replace: true })
-          }
-        )
-
-        // 延迟跳转，让用户看到成功消息
-        setTimeout(() => {
-          // 跳转到SPU详情页
-          navigate(`/spu/${response.data.id}`, { replace: true })
-        }, 2000)
-      } else {
-        SPUNotificationService.actionFailed('创建SPU', response.message)
+  const handleSubmit = useCallback(
+    async (formData: CreateSPURequest) => {
+      // 客户端验证
+      const validation = validateSPUForm(formData);
+      if (!validation.isValid) {
+        SPUNotificationService.validationFailed(validation.fieldErrors);
+        return;
       }
-    } catch (error) {
-      console.error('Create SPU error:', error)
-      SPUNotificationService.networkError('创建SPU')
-    } finally {
-      setLoading(false)
-    }
-  }, [navigate])
+
+      try {
+        setLoading(true);
+
+        // 调用API创建SPU
+        const response = await spuService.createSPU(formData);
+
+        if (response.success) {
+          // 显示创建成功通知，并提供操作选项
+          SPUNotificationService.createSuccess(
+            {
+              id: response.data.id,
+              name: response.data.name,
+              code: response.data.code,
+            },
+            () => {
+              // 点击通知时跳转到详情页
+              navigate(`/spu/${response.data.id}`, { replace: true });
+            }
+          );
+
+          // 延迟跳转，让用户看到成功消息
+          setTimeout(() => {
+            // 跳转到SPU详情页
+            navigate(`/spu/${response.data.id}`, { replace: true });
+          }, 2000);
+        } else {
+          SPUNotificationService.actionFailed('创建SPU', response.message);
+        }
+      } catch (error) {
+        console.error('Create SPU error:', error);
+        SPUNotificationService.networkError('创建SPU');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [navigate]
+  );
 
   // 处理取消操作
   const handleCancel = useCallback(() => {
     // 确认取消
-    const confirmed = window.confirm('确定要取消创建吗？未保存的数据将丢失。')
+    const confirmed = window.confirm('确定要取消创建吗？未保存的数据将丢失。');
     if (confirmed) {
-      navigate('/spu')
+      navigate('/spu');
     }
-  }, [navigate])
+  }, [navigate]);
 
   // 面包屑导航
   const breadcrumbItems = [
     { title: '首页', path: '/dashboard' },
     { title: 'SPU管理', path: '/spu' },
     { title: '创建SPU' },
-  ]
+  ];
 
   if (dataLoading) {
     return (
@@ -261,7 +261,7 @@ const SPUCreatePage: React.FC = () => {
         <Card loading style={{ marginBottom: 16 }} />
         <Card loading />
       </div>
-    )
+    );
   }
 
   return (
@@ -273,10 +273,7 @@ const SPUCreatePage: React.FC = () => {
 
       {/* 返回按钮 */}
       <div style={{ marginBottom: 16 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/spu')}
-        >
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/spu')}>
           返回列表
         </Button>
       </div>
@@ -306,16 +303,18 @@ const SPUCreatePage: React.FC = () => {
       </Card>
 
       {/* 页脚信息 */}
-      <div style={{
-        marginTop: 24,
-        textAlign: 'center',
-        color: '#666',
-        fontSize: 12,
-      }}>
+      <div
+        style={{
+          marginTop: 24,
+          textAlign: 'center',
+          color: '#666',
+          fontSize: 12,
+        }}
+      >
         <p>提示：请填写完整的SPU信息，标记 * 的为必填项</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SPUCreatePage
+export default SPUCreatePage;

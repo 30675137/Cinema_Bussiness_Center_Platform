@@ -10,14 +10,8 @@ import { z } from 'zod';
  */
 export const createConversionSchema = z
   .object({
-    fromUnit: z
-      .string()
-      .min(1, '源单位不能为空')
-      .max(20, '源单位不能超过20字符'),
-    toUnit: z
-      .string()
-      .min(1, '目标单位不能为空')
-      .max(20, '目标单位不能超过20字符'),
+    fromUnit: z.string().min(1, '源单位不能为空').max(20, '源单位不能超过20字符'),
+    toUnit: z.string().min(1, '目标单位不能为空').max(20, '目标单位不能超过20字符'),
     conversionRate: z
       .number({ invalid_type_error: '请输入有效的换算率' })
       .positive('换算率必须为正数')

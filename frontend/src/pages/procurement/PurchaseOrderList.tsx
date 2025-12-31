@@ -1,6 +1,12 @@
 import React from 'react';
 import { Card, Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col } from 'antd';
-import { PlusOutlined, ExportOutlined, ReloadOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  ExportOutlined,
+  ReloadOutlined,
+  EyeOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Search } = Input;
@@ -37,7 +43,7 @@ const PurchaseOrderList: React.FC = () => {
       priority: 'high',
       orderDate: '2025-12-11',
       expectedDeliveryDate: '2025-12-15',
-      creator: '张三'
+      creator: '张三',
     },
     {
       id: '2',
@@ -49,7 +55,7 @@ const PurchaseOrderList: React.FC = () => {
       priority: 'normal',
       orderDate: '2025-12-10',
       expectedDeliveryDate: '2025-12-14',
-      creator: '李四'
+      creator: '李四',
     },
   ];
 
@@ -193,11 +199,7 @@ const PurchaseOrderList: React.FC = () => {
         {/* 筛选区域 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Search
-              placeholder="搜索订单编号、标题或供应商"
-              onSearch={handleSearch}
-              allowClear
-            />
+            <Search placeholder="搜索订单编号、标题或供应商" onSearch={handleSearch} allowClear />
           </Col>
           <Col span={4}>
             <Select placeholder="订单状态" style={{ width: '100%' }} allowClear>

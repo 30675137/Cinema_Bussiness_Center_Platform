@@ -22,7 +22,7 @@ import {
   Tooltip,
   Popconfirm,
   Typography,
-  Tag
+  Tag,
 } from 'antd';
 import {
   PlusOutlined,
@@ -31,7 +31,7 @@ import {
   SaveOutlined,
   EyeOutlined,
   CalculatorOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { PurchaseOrder, PurchaseOrderFormData, PurchaseOrderPriority } from '@/types/purchase';
 import { usePurchaseOrderStore } from '@/stores/purchaseOrderStore';
@@ -56,7 +56,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
   mode,
   onSubmit,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm<PurchaseOrderFormData>();
   const [items, setItems] = useState<PurchaseOrder['items']>([]);
@@ -81,7 +81,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
         expectedDeliveryDate: dayjs(initialData.expectedDeliveryDate),
         priority: initialData.priority,
         remarks: initialData.remarks,
-        budgetAmount: initialData.budgetAmount
+        budgetAmount: initialData.budgetAmount,
       });
       setItems(initialData.items);
     } else {
@@ -107,7 +107,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
       discountAmount: 0,
       taxAmount: 0,
       subtotal: 0,
-      remarks: ''
+      remarks: '',
     };
     setItems([...items, newItem]);
   };
@@ -155,7 +155,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
         return;
       }
 
-      const invalidItems = items.filter(item => !item.productId || !item.productName);
+      const invalidItems = items.filter((item) => !item.productId || !item.productName);
       if (invalidItems.length > 0) {
         message.error('请完善所有订单项的产品信息');
         return;
@@ -164,18 +164,18 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
       // 构建提交数据
       const submitData: PurchaseOrderFormData = {
         ...values,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           ...item,
           // 移除临时ID
-          id: item.id.startsWith('temp_') ? undefined : item.id
+          id: item.id.startsWith('temp_') ? undefined : item.id,
         })),
         totalAmount,
-        attachments: fileList.map(file => ({
+        attachments: fileList.map((file) => ({
           name: file.name,
           url: file.url || file.response?.url || '',
           size: file.size,
-          type: file.type
-        }))
+          type: file.type,
+        })),
       };
 
       await onSubmit(submitData);
@@ -205,7 +205,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           onChange={(e) => handleUpdateItem(index, 'productName', e.target.value)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '产品编码',
@@ -219,7 +219,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           onChange={(e) => handleUpdateItem(index, 'productCode', e.target.value)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '规格型号',
@@ -233,7 +233,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           onChange={(e) => handleUpdateItem(index, 'specifications', e.target.value)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '单位',
@@ -252,10 +252,10 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
             { label: '箱', value: '箱' },
             { label: '米', value: '米' },
             { label: '公斤', value: '公斤' },
-            { label: '吨', value: '吨' }
+            { label: '吨', value: '吨' },
           ]}
         />
-      )
+      ),
     },
     {
       title: '数量',
@@ -270,7 +270,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           style={{ width: '100%' }}
           precision={0}
         />
-      )
+      ),
     },
     {
       title: '单价',
@@ -287,7 +287,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           formatter={(value) => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
           parser={(value) => value!.replace(/¥\s?|(,*)/g, '')}
         />
-      )
+      ),
     },
     {
       title: '折扣率(%)',
@@ -303,16 +303,14 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           style={{ width: '100%' }}
           precision={2}
         />
-      )
+      ),
     },
     {
       title: '小计',
       dataIndex: 'subtotal',
       key: 'subtotal',
       width: 120,
-      render: (value: number) => (
-        <Text strong>{formatCurrency(value)}</Text>
-      )
+      render: (value: number) => <Text strong>{formatCurrency(value)}</Text>,
     },
     {
       title: '操作',
@@ -325,15 +323,10 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           okText="确定"
           cancelText="取消"
         >
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-          />
+          <Button type="text" danger icon={<DeleteOutlined />} size="small" />
         </Popconfirm>
-      )
-    }
+      ),
+    },
   ];
 
   // 优先级选项
@@ -341,7 +334,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
     { label: '低', value: PurchaseOrderPriority.LOW, color: 'blue' },
     { label: '中', value: PurchaseOrderPriority.MEDIUM, color: 'orange' },
     { label: '高', value: PurchaseOrderPriority.HIGH, color: 'red' },
-    { label: '紧急', value: PurchaseOrderPriority.URGENT, color: 'magenta' }
+    { label: '紧急', value: PurchaseOrderPriority.URGENT, color: 'magenta' },
   ];
 
   return (
@@ -354,7 +347,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           orderDate: dayjs(),
           expectedDeliveryDate: dayjs().add(7, 'day'),
           priority: PurchaseOrderPriority.MEDIUM,
-          taxRate: 0.13
+          taxRate: 0.13,
         }}
       >
         <Card title="基本信息" style={{ marginBottom: '16px' }}>
@@ -410,7 +403,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
                 rules={[{ required: true, message: '请选择优先级' }]}
               >
                 <Select placeholder="请选择优先级">
-                  {priorityOptions.map(option => (
+                  {priorityOptions.map((option) => (
                     <Option key={option.value} value={option.value}>
                       <Tag color={option.color}>{option.label}</Tag>
                     </Option>
@@ -449,23 +442,14 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           </Row>
 
           <Form.Item name="description" label="订单描述">
-            <TextArea
-              placeholder="请输入订单描述"
-              rows={3}
-              maxLength={500}
-              showCount
-            />
+            <TextArea placeholder="请输入订单描述" rows={3} maxLength={500} showCount />
           </Form.Item>
         </Card>
 
         <Card
           title="订单明细"
           extra={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddItem}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddItem}>
               添加订单项
             </Button>
           }
@@ -515,35 +499,19 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
 
         <Card title="备注信息" style={{ marginBottom: '24px' }}>
           <Form.Item name="remarks" label="备注">
-            <TextArea
-              placeholder="请输入备注信息"
-              rows={3}
-              maxLength={500}
-              showCount
-            />
+            <TextArea placeholder="请输入备注信息" rows={3} maxLength={500} showCount />
           </Form.Item>
         </Card>
 
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <Space size="large">
-            <Button
-              icon={<EyeOutlined />}
-              onClick={handlePreview}
-              disabled={items.length === 0}
-            >
+            <Button icon={<EyeOutlined />} onClick={handlePreview} disabled={items.length === 0}>
               预览订单
             </Button>
 
-            <Button onClick={onCancel}>
-              取消
-            </Button>
+            <Button onClick={onCancel}>取消</Button>
 
-            <Button
-              type="primary"
-              htmlType="submit"
-              icon={<SaveOutlined />}
-              loading={loading}
-            >
+            <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={loading}>
               {mode === 'create' ? '创建订单' : '保存修改'}
             </Button>
           </Space>
@@ -561,7 +529,7 @@ const PurchaseOrderForm: React.FC<PurchaseOrderFormProps> = ({
           </Button>,
           <Button key="submit" type="primary" onClick={() => form.submit()}>
             确认提交
-          </Button>
+          </Button>,
         ]}
         width={1000}
       >

@@ -57,30 +57,34 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
     });
     return map;
   }, [overrides]);
-  
+
   // 渲染日期单元格
   const dateCellRender = (value: Dayjs) => {
     const dateStr = value.format('YYYY-MM-DD');
     const dayOverrides = overridesByDate.get(dateStr) || [];
-    
+
     if (dayOverrides.length === 0) {
       return null;
     }
-    
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {dayOverrides.slice(0, 3).map((override) => {
-          const config = OVERRIDE_TYPE_CONFIG[override.overrideType as keyof typeof OVERRIDE_TYPE_CONFIG];
-          const timeDisplay = override.overrideType === 'CANCEL' 
-            ? '全天取消' 
-            : `${override.startTime?.substring(0, 5) || ''}-${override.endTime?.substring(0, 5) || ''}`;
-          
+          const config =
+            OVERRIDE_TYPE_CONFIG[override.overrideType as keyof typeof OVERRIDE_TYPE_CONFIG];
+          const timeDisplay =
+            override.overrideType === 'CANCEL'
+              ? '全天取消'
+              : `${override.startTime?.substring(0, 5) || ''}-${override.endTime?.substring(0, 5) || ''}`;
+
           return (
             <Tooltip
               key={override.id}
               title={
                 <div>
-                  <div>{config.text}: {timeDisplay}</div>
+                  <div>
+                    {config.text}: {timeDisplay}
+                  </div>
                   {override.reason && <div>原因: {override.reason}</div>}
                 </div>
               }
@@ -110,7 +114,7 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
       </div>
     );
   };
-  
+
   // 点击日期
   const handleDateSelect = (date: Dayjs) => {
     // 不允许选择过去的日期
@@ -119,11 +123,18 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
     }
     onAddOverride(date.format('YYYY-MM-DD'));
   };
-  
+
   // 渲染头部单元格（月份模式）
   const headerRender = ({ value, onChange }: { value: Dayjs; onChange: (date: Dayjs) => void }) => {
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 16px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '8px 16px',
+        }}
+      >
         <div>
           <Button onClick={() => onChange(value.subtract(1, 'month'))}>{'<'}</Button>
           <Text strong style={{ margin: '0 16px' }}>
@@ -139,12 +150,12 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
       </div>
     );
   };
-  
+
   // 禁用过去的日期
   const disabledDate = (current: Dayjs) => {
     return current && current.isBefore(dayjs(), 'day');
   };
-  
+
   return (
     <Card loading={loading}>
       <div style={{ marginBottom: 16 }}>
@@ -152,7 +163,7 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
           点击日期可添加特定日期的时段覆盖规则（新增/修改/取消）。覆盖规则优先于周模板。
         </Text>
       </div>
-      
+
       <Calendar
         fullscreen={false}
         headerRender={headerRender}
@@ -166,12 +177,9 @@ export const CalendarOverrideView: React.FC<CalendarOverrideViewProps> = ({
         disabledDate={disabledDate}
         style={{ maxWidth: 800 }}
       />
-      
+
       {overrides.length === 0 && (
-        <Empty
-          description="暂无日期覆盖规则"
-          style={{ marginTop: 24 }}
-        >
+        <Empty description="暂无日期覆盖规则" style={{ marginTop: 24 }}>
           <Button
             type="dashed"
             icon={<PlusOutlined />}

@@ -8,12 +8,7 @@
 export { OptimizedList, default as List } from './OptimizedList';
 
 // 预设组件
-export {
-  StandardList,
-  LargeList,
-  CardList,
-  ListPresets,
-} from './OptimizedList';
+export { StandardList, LargeList, CardList, ListPresets } from './OptimizedList';
 
 // 类型定义
 export type {

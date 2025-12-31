@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: '../scenarios',  // Changed to support scenario-based tests
+  testDir: '../scenarios', // Changed to support scenario-based tests
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -18,7 +18,7 @@ export default defineConfig({
     ['html', { outputFolder: '../reports/e2e/html', open: 'never' }],
     ['json', { outputFile: '../reports/e2e/json/results.json' }],
     ['junit', { outputFile: '../reports/e2e/junit/results.xml' }],
-    ['list']
+    ['list'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -77,24 +77,26 @@ export default defineConfig({
 
   /* Run dev servers for cross-system tests */
   // Enable webServer for cross-system E2E tests (C-end + B-end)
-  webServer: process.env.CROSS_SYSTEM_TEST ? [
-    // C端 Taro H5 开发服务器
-    {
-      command: 'cd ../hall-reserve-taro && npm run dev:h5',
-      url: 'http://localhost:10086',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000, // 2 minutes
-      stdout: 'pipe',
-      stderr: 'pipe',
-    },
-    // B端 React Admin 开发服务器
-    {
-      command: 'npm run dev',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-      stdout: 'pipe',
-      stderr: 'pipe',
-    }
-  ] : undefined,
+  webServer: process.env.CROSS_SYSTEM_TEST
+    ? [
+        // C端 Taro H5 开发服务器
+        {
+          command: 'cd ../hall-reserve-taro && npm run dev:h5',
+          url: 'http://localhost:10086',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120 * 1000, // 2 minutes
+          stdout: 'pipe',
+          stderr: 'pipe',
+        },
+        // B端 React Admin 开发服务器
+        {
+          command: 'npm run dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120 * 1000,
+          stdout: 'pipe',
+          stderr: 'pipe',
+        },
+      ]
+    : undefined,
 });

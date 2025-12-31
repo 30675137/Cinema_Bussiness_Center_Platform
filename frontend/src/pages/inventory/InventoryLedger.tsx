@@ -20,7 +20,7 @@ export const InventoryLedger: React.FC = () => {
   const { isMobile } = useResponsive();
   const defaultPageSize = useResponsivePageSize();
   const { canAdjustInventory } = usePermissions();
-  
+
   const [filters, setFilters] = useState<Partial<InventoryQueryParams>>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
@@ -87,11 +87,7 @@ export const InventoryLedger: React.FC = () => {
           title="库存台账管理"
           extra={
             <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() => refetch()}
-                loading={isLoading}
-              >
+              <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
                 {!isMobile && '刷新'}
               </Button>
               <PermissionHide permissions={Permission.EXPORT_INVENTORY}>
@@ -123,11 +119,7 @@ export const InventoryLedger: React.FC = () => {
         />
 
         {/* 筛选器 */}
-        <InventoryFilters
-          onFilter={handleFilter}
-          onReset={handleReset}
-          loading={isLoading}
-        />
+        <InventoryFilters onFilter={handleFilter} onReset={handleReset} loading={isLoading} />
 
         {/* 数据表格 */}
         <Card>

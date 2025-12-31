@@ -84,11 +84,7 @@ const PackageTierCard: React.FC<PackageTierCardProps> = ({
               {formatPrice(tier.price)}
             </Text>
             {tier.originalPrice && tier.originalPrice > tier.price && (
-              <Text
-                delete
-                type="secondary"
-                style={{ marginLeft: 8, fontSize: 13 }}
-              >
+              <Text delete type="secondary" style={{ marginLeft: 8, fontSize: 13 }}>
                 {formatPrice(tier.originalPrice)}
               </Text>
             )}
@@ -109,12 +105,7 @@ const PackageTierCard: React.FC<PackageTierCardProps> = ({
         {/* 操作按钮 */}
         <Space>
           <Tooltip title="编辑">
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(tier)}
-            />
+            <Button type="text" size="small" icon={<EditOutlined />} onClick={() => onEdit(tier)} />
           </Tooltip>
           <Popconfirm
             title="删除套餐"

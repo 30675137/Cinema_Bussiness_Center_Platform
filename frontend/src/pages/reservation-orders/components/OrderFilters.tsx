@@ -4,14 +4,17 @@
  * 提供按状态、日期范围、关键词筛选功能
  */
 
-import React, { useCallback, memo } from 'react'
-import { Form, Input, Select, DatePicker, Button, Space, Row, Col } from 'antd'
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
-import type { ReservationFilterFormValues, OrderFiltersProps } from '../types/reservation-order.types'
-import { RESERVATION_STATUS_CONFIG } from '../types/reservation-order.types'
-import type { ReservationStatus } from '@/types/reservationOrder'
+import React, { useCallback, memo } from 'react';
+import { Form, Input, Select, DatePicker, Button, Space, Row, Col } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import type {
+  ReservationFilterFormValues,
+  OrderFiltersProps,
+} from '../types/reservation-order.types';
+import { RESERVATION_STATUS_CONFIG } from '../types/reservation-order.types';
+import type { ReservationStatus } from '@/types/reservationOrder';
 
-const { RangePicker } = DatePicker
+const { RangePicker } = DatePicker;
 
 /**
  * 状态选项
@@ -21,39 +24,39 @@ const STATUS_OPTIONS = (Object.keys(RESERVATION_STATUS_CONFIG) as ReservationSta
     value: key,
     label: RESERVATION_STATUS_CONFIG[key].label,
   })
-)
+);
 
 /**
  * 预约单列表筛选组件
  */
 const OrderFilters: React.FC<OrderFiltersProps> = ({ onFilterChange, loading }) => {
-  const [form] = Form.useForm<ReservationFilterFormValues>()
+  const [form] = Form.useForm<ReservationFilterFormValues>();
 
   /**
    * 处理筛选条件变更
    */
   const handleFilter = useCallback(
     (values: ReservationFilterFormValues) => {
-      onFilterChange(values)
+      onFilterChange(values);
     },
     [onFilterChange]
-  )
+  );
 
   /**
    * 处理重置
    */
   const handleReset = useCallback(() => {
-    form.resetFields()
-    onFilterChange({})
-  }, [form, onFilterChange])
+    form.resetFields();
+    onFilterChange({});
+  }, [form, onFilterChange]);
 
   /**
    * 处理搜索
    */
   const handleSearch = useCallback(() => {
-    const values = form.getFieldsValue()
-    handleFilter(values)
-  }, [form, handleFilter])
+    const values = form.getFieldsValue();
+    handleFilter(values);
+  }, [form, handleFilter]);
 
   return (
     <Form
@@ -93,10 +96,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({ onFilterChange, loading }) 
         {/* 预订日期范围 */}
         <Col xs={24} sm={12} md={8} lg={6}>
           <Form.Item name="dateRange" style={{ marginBottom: 0, width: '100%' }}>
-            <RangePicker
-              placeholder={['预订开始', '预订结束']}
-              style={{ width: '100%' }}
-            />
+            <RangePicker placeholder={['预订开始', '预订结束']} style={{ width: '100%' }} />
           </Form.Item>
         </Col>
 
@@ -118,7 +118,7 @@ const OrderFilters: React.FC<OrderFiltersProps> = ({ onFilterChange, loading }) 
         </Col>
       </Row>
     </Form>
-  )
-}
+  );
+};
 
-export default memo(OrderFilters)
+export default memo(OrderFilters);

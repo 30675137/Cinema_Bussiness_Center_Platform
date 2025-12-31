@@ -109,7 +109,7 @@ const AddOnItemCard: React.FC<AddOnItemCardProps> = ({
               库存: {item.inventory}
             </Text>
           )}
-          
+
           {/* 必选选项 */}
           {selected && onRequiredChange && (
             <div style={{ marginTop: 8 }} onClick={(e) => e.stopPropagation()}>
@@ -117,7 +117,9 @@ const AddOnItemCard: React.FC<AddOnItemCardProps> = ({
                 checked={isRequired}
                 onChange={(e) => onRequiredChange(item.id, e.target.checked)}
               >
-                <Text type="secondary" style={{ fontSize: 12 }}>设为必选</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  设为必选
+                </Text>
               </Checkbox>
             </div>
           )}

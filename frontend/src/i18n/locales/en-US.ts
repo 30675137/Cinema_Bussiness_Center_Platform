@@ -49,7 +49,7 @@ export default {
     login: 'Login',
     register: 'Register',
     profile: 'Profile',
-    dashboard: 'Dashboard'
+    dashboard: 'Dashboard',
   },
 
   // Error Messages
@@ -69,7 +69,7 @@ export default {
     invalidEmail: 'Invalid email format',
     invalidPhone: 'Invalid phone number format',
     passwordTooWeak: 'Password is too weak',
-    passwordsNotMatch: 'Passwords do not match'
+    passwordsNotMatch: 'Passwords do not match',
   },
 
   // Success Messages
@@ -83,7 +83,7 @@ export default {
     exportSuccess: 'Exported successfully',
     loginSuccess: 'Login successful',
     logoutSuccess: 'Logout successful',
-    operationSuccess: 'Operation successful'
+    operationSuccess: 'Operation successful',
   },
 
   // Navigation Menu
@@ -110,7 +110,7 @@ export default {
     systemConfig: 'System Configuration',
     logs: 'System Logs',
     reports: 'Reports & Statistics',
-    dataAnalysis: 'Data Analysis'
+    dataAnalysis: 'Data Analysis',
   },
 
   // Inventory Management
@@ -143,7 +143,7 @@ export default {
     overStock: 'Over Stock',
     stockAdjustment: 'Stock Adjustment',
     stockMovement: 'Stock Movement',
-    stockWarning: 'Stock Warning'
+    stockWarning: 'Stock Warning',
   },
 
   // Price Management
@@ -174,7 +174,7 @@ export default {
     rejected: 'Rejected',
     priceHistory: 'Price History',
     priceChange: 'Price Change',
-    priceChangeReason: 'Change Reason'
+    priceChangeReason: 'Change Reason',
   },
 
   // Audit Management
@@ -200,7 +200,7 @@ export default {
     urgent: 'Urgent',
     normal: 'Normal',
     lowPriority: 'Low Priority',
-    highPriority: 'High Priority'
+    highPriority: 'High Priority',
   },
 
   // Form Fields
@@ -238,7 +238,7 @@ export default {
     city: 'City',
     district: 'District',
     street: 'Street',
-    postalCode: 'Postal Code'
+    postalCode: 'Postal Code',
   },
 
   // Confirmation Messages
@@ -249,7 +249,7 @@ export default {
     submitConfirm: 'Are you sure you want to submit the current operation?',
     resetConfirm: 'Are you sure you want to reset all data?',
     logoutConfirm: 'Are you sure you want to logout?',
-    clearDataConfirm: 'Are you sure you want to clear all data? This operation cannot be undone.'
+    clearDataConfirm: 'Are you sure you want to clear all data? This operation cannot be undone.',
   },
 
   // Pagination
@@ -262,7 +262,7 @@ export default {
     prev: 'Previous',
     next: 'Next',
     first: 'First',
-    last: 'Last'
+    last: 'Last',
   },
 
   // Search and Filter
@@ -286,7 +286,7 @@ export default {
     thisYear: 'This Year',
     lastWeek: 'Last Week',
     lastMonth: 'Last Month',
-    lastYear: 'Last Year'
+    lastYear: 'Last Year',
   },
 
   // Time
@@ -310,7 +310,7 @@ export default {
     thisMorning: 'This morning',
     thisAfternoon: 'This afternoon',
     thisEvening: 'This evening',
-    tonight: 'Tonight'
+    tonight: 'Tonight',
   },
 
   // Units
@@ -334,7 +334,7 @@ export default {
     meter: 'Meter',
     centimeter: 'Centimeter',
     squareMeter: 'Square Meter',
-    cubicMeter: 'Cubic Meter'
+    cubicMeter: 'Cubic Meter',
   },
 
   // System Messages
@@ -349,6 +349,6 @@ export default {
     pageNotFound: 'Page not found',
     serverError: 'Server error, please contact administrator',
     operationInProgress: 'Operation in progress, please wait...',
-    operationCompleted: 'Operation completed'
-  }
+    operationCompleted: 'Operation completed',
+  },
 } as const;

@@ -153,7 +153,9 @@ export const useLowStockProducts = (threshold: number = 10, enabled: boolean = t
   return useQuery({
     queryKey: productKeys.lowStock(threshold),
     queryFn: async (): Promise<Product[]> => {
-      const response = await httpClient.get<Product[]>(`/products/low-stock?threshold=${threshold}`);
+      const response = await httpClient.get<Product[]>(
+        `/products/low-stock?threshold=${threshold}`
+      );
       return response.data;
     },
     enabled,
@@ -271,7 +273,7 @@ export const useBatchDeleteProducts = () => {
       message.success(`成功删除 ${ids.length} 个产品`);
 
       // 批量移除产品详情缓存
-      ids.forEach(id => {
+      ids.forEach((id) => {
         queryClient.removeQueries({ queryKey: productKeys.product(id) });
       });
 
@@ -299,7 +301,7 @@ export const useBatchUpdateProducts = () => {
       message.success(`成功更新 ${ids.length} 个产品`);
 
       // 批量更新产品详情缓存
-      updatedProducts.forEach(product => {
+      updatedProducts.forEach((product) => {
         queryClient.setQueryData(productKeys.product(product.id), product);
       });
 
@@ -348,7 +350,7 @@ export const useUploadProductImages = () => {
   return useMutation({
     mutationFn: async (files: File[]): Promise<string[]> => {
       const formData = new FormData();
-      files.forEach(file => {
+      files.forEach((file) => {
         formData.append('images', file);
       });
 
@@ -387,11 +389,15 @@ export const usePrefetchProducts = () => {
           page: (params.page || 1).toString(),
           pageSize: (params.pageSize || 20).toString(),
           ...Object.fromEntries(
-            Object.entries(params.filters || {}).filter(([_, value]) => value !== undefined && value !== '')
+            Object.entries(params.filters || {}).filter(
+              ([_, value]) => value !== undefined && value !== ''
+            )
           ),
         });
 
-        const response = await httpClient.get<PaginatedResponse<Product>>(`/products?${queryParams}`);
+        const response = await httpClient.get<PaginatedResponse<Product>>(
+          `/products?${queryParams}`
+        );
         return response.data;
       },
       staleTime: 2 * 60 * 1000, // 2 分钟

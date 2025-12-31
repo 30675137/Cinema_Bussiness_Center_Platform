@@ -28,7 +28,7 @@ interface TagInputProps {
 
 /**
  * 标签输入组件
- * 
+ *
  * 支持输入标签并按回车添加，点击标签可删除
  */
 const TagInput: React.FC<TagInputProps> = ({
@@ -54,11 +54,11 @@ const TagInput: React.FC<TagInputProps> = ({
   // 输入确认（按回车或失去焦点）
   const handleInputConfirm = () => {
     const trimmedValue = inputValue.trim();
-    
+
     if (trimmedValue && !value.includes(trimmedValue) && value.length < maxCount) {
       onChange([...value, trimmedValue]);
     }
-    
+
     setInputVisible(false);
     setInputValue('');
   };
@@ -96,7 +96,8 @@ const TagInput: React.FC<TagInputProps> = ({
             disabled={disabled}
           />
         ) : (
-          value.length < maxCount && !disabled && (
+          value.length < maxCount &&
+          !disabled && (
             <Tag
               onClick={showInput}
               style={{

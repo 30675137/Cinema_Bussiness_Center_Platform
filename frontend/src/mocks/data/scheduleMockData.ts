@@ -1,6 +1,6 @@
 /**
  * Mock data for Schedule Management
- * 
+ *
  * Provides initial mock data for halls and schedule events
  */
 
@@ -74,7 +74,7 @@ export const mockHalls: Hall[] = [
  */
 export function generateMockEvents(date: string): ScheduleEvent[] {
   const baseDate = date;
-  
+
   return [
     // --- 1号厅 (VIP) ---
     {
@@ -413,4 +413,3 @@ export function getScheduleEventsStore(): ScheduleEvent[] {
 export function setScheduleEventsStore(events: ScheduleEvent[]): void {
   scheduleEventsStore = events;
 }
-

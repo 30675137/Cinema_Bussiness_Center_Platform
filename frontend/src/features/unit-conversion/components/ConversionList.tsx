@@ -41,7 +41,11 @@ const ConversionList: React.FC = () => {
     openEditModal,
   } = useConversionUIStore();
 
-  const { data: conversions, isLoading, isFetching } = useConversions({
+  const {
+    data: conversions,
+    isLoading,
+    isFetching,
+  } = useConversions({
     category: categoryFilter || undefined,
     search: searchTerm || undefined,
   });
@@ -113,9 +117,7 @@ const ConversionList: React.FC = () => {
         key: 'category',
         width: 100,
         render: (category: DbUnitCategory) => (
-          <Tag color={getCategoryColor(category)}>
-            {DB_CATEGORY_LABELS[category]}
-          </Tag>
+          <Tag color={getCategoryColor(category)}>{DB_CATEGORY_LABELS[category]}</Tag>
         ),
       },
       {
@@ -124,11 +126,7 @@ const ConversionList: React.FC = () => {
         width: 120,
         render: (_: unknown, record: UnitConversion) => (
           <Space size="small">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => openEditModal(record)}
-            />
+            <Button type="text" icon={<EditOutlined />} onClick={() => openEditModal(record)} />
             <Popconfirm
               title="确定删除此换算规则？"
               description="删除后不可恢复"
@@ -154,7 +152,15 @@ const ConversionList: React.FC = () => {
   return (
     <div>
       {/* 工具栏 */}
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+      <div
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
         <Space wrap>
           <Input
             placeholder="搜索单位名称"

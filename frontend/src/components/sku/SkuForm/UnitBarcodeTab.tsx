@@ -40,12 +40,20 @@ export const UnitBarcodeTab: React.FC<UnitBarcodeTabProps> = ({
   const checkBarcodeMutation = useCheckBarcodeMutation();
 
   // 使用 useFieldArray 管理动态字段
-  const { fields: salesUnitFields, append: appendSalesUnit, remove: removeSalesUnit } = useFieldArray({
+  const {
+    fields: salesUnitFields,
+    append: appendSalesUnit,
+    remove: removeSalesUnit,
+  } = useFieldArray({
     control,
     name: 'salesUnits',
   });
 
-  const { fields: barcodeFields, append: appendBarcode, remove: removeBarcode } = useFieldArray({
+  const {
+    fields: barcodeFields,
+    append: appendBarcode,
+    remove: removeBarcode,
+  } = useFieldArray({
     control,
     name: 'otherBarcodes',
   });

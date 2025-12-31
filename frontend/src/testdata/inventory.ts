@@ -44,7 +44,7 @@ export const confirm_production_btn = {
   code: '6901234568806',
   name: 'Confirm Production Btn',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 
@@ -67,7 +67,7 @@ export const product_whiskey_cola = {
   code: '6901234567153',
   name: 'Product Whiskey Cola',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 
@@ -80,7 +80,7 @@ export const products_page = {
   code: '6901234569343',
   name: 'Products Page',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 
@@ -229,7 +229,7 @@ export const product_sku = {
   code: '6901234564004',
   name: 'Product Sku',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 
@@ -242,7 +242,7 @@ export const product_sku_cola = {
   code: '6901234564242',
   name: 'Product Sku Cola',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 
@@ -255,7 +255,7 @@ export const product_with_bom = {
   code: '6901234565664',
   name: 'Product With Bom',
   category: '分类',
-  price: 35.00,
+  price: 35.0,
   unit: '个',
 };
 

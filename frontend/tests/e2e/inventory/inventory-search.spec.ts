@@ -11,7 +11,9 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 查看页面
     // Then 应该显示搜索框
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]');
+    const searchInput = page.locator(
+      'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+    );
     await expect(searchInput.first()).toBeVisible();
   });
 
@@ -20,12 +22,16 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 等待防抖后
     // Then 列表显示匹配的SKU
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
     await expect(searchInput).toBeVisible();
 
     // 输入搜索关键词
     await searchInput.fill('SKU001');
-    
+
     // 等待防抖 (300ms) 和 API 响应
     await page.waitForTimeout(800);
 
@@ -39,8 +45,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 搜索执行
     // Then 匹配的SKU应该显示
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入SKU编码
     await searchInput.fill('SKU');
     await page.waitForTimeout(800);
@@ -62,8 +72,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 搜索执行
     // Then 匹配的SKU应该显示
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入商品名称
     await searchInput.fill('可乐');
     await page.waitForTimeout(800);
@@ -78,15 +92,19 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 输入完成后等待防抖
     // Then 只发送一次请求
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 快速输入多个字符
     await searchInput.fill('S');
     await page.waitForTimeout(100);
     await searchInput.fill('SK');
     await page.waitForTimeout(100);
     await searchInput.fill('SKU');
-    
+
     // 等待防抖完成
     await page.waitForTimeout(500);
 
@@ -100,8 +118,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 清空搜索框
     // Then 列表恢复显示所有数据
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 先输入搜索词
     await searchInput.fill('SKU001');
     await page.waitForTimeout(800);
@@ -125,8 +147,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 搜索执行
     // Then 显示无结果提示
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入不可能存在的关键词
     await searchInput.fill('ZZZZZZZZNOTEXIST');
     await page.waitForTimeout(800);
@@ -134,14 +160,14 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // 验证显示空状态或无结果提示
     const emptyState = page.locator('.ant-empty, [data-testid="empty-state"]');
     const noDataRow = page.locator('.ant-table-placeholder');
-    
+
     // 应该显示空状态或空表格
     const rows = page.locator('.ant-table-tbody tr.ant-table-row');
     const rowCount = await rows.count();
 
     if (rowCount === 0) {
       // 验证空状态或占位符显示
-      const hasEmpty = await emptyState.isVisible() || await noDataRow.isVisible();
+      const hasEmpty = (await emptyState.isVisible()) || (await noDataRow.isVisible());
       expect(hasEmpty).toBe(true);
     }
   });
@@ -151,8 +177,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 切换分页
     // Then 保持搜索条件
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入搜索词
     await searchInput.fill('SKU');
     await page.waitForTimeout(800);
@@ -177,8 +207,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 按下回车键
     // Then 立即执行搜索
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入搜索词并按回车
     await searchInput.fill('SKU001');
     await searchInput.press('Enter');
@@ -194,8 +228,12 @@ test.describe('门店SKU库存查询 - 用户故事2: 搜索库存', () => {
     // When 搜索执行
     // Then 应该匹配大小写不敏感的结果
 
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
-    
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
+
     // 输入小写
     await searchInput.fill('sku');
     await page.waitForTimeout(800);

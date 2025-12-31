@@ -102,38 +102,47 @@ const NavigationSearch: React.FC<NavigationSearchProps> = ({
   /**
    * 处理输入变化
    */
-  const handleInputChange = useCallback((value: string) => {
-    setSearchQuery(value);
-    performSearch(value);
-  }, [performSearch]);
+  const handleInputChange = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      performSearch(value);
+    },
+    [performSearch]
+  );
 
   /**
    * 处理搜索确认
    */
-  const handleSearch = useCallback((value: string) => {
-    setSearchQuery(value);
-    performSearch(value);
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      performSearch(value);
 
-    if (inputRef.current) {
-      inputRef.current.blur();
-    }
-  }, [performSearch]);
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
+    },
+    [performSearch]
+  );
 
   /**
    * 处理结果选择
    */
-  const handleSelect = useCallback((item: SearchResult) => {
-    setSearchQuery(item.title);
-    setShowResults(false);
-    setIsFocused(false);
+  const handleSelect = useCallback(
+    (item: SearchResult) => {
+      setSearchQuery(item.title);
+      setShowResults(false);
+      setIsFocused(false);
 
-    // 导航到对应页面
-    if (item.menuItem) {
-      navigateToMenuItem(item.menuItem);
-    }
+      // 导航到对应页面
+      if (item.menuItem) {
+        navigateToMenuItem(item.menuItem);
+      }
 
-    onSelect?.(item);
-  }, [navigateToMenuItem, onSelect]);
+      onSelect?.(item);
+    },
+    [navigateToMenuItem, onSelect]
+  );
 
   /**
    * 处理焦点事件
@@ -166,17 +175,23 @@ const NavigationSearch: React.FC<NavigationSearchProps> = ({
   /**
    * 处理历史记录点击
    */
-  const handleHistoryClick = useCallback((query: string) => {
-    setSearchQuery(query);
-    performSearch(query);
-  }, [performSearch]);
+  const handleHistoryClick = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      performSearch(query);
+    },
+    [performSearch]
+  );
 
   /**
    * 处理历史记录删除
    */
-  const handleHistoryRemove = useCallback((query: string) => {
-    removeFromSearchHistory(query);
-  }, [removeFromSearchHistory]);
+  const handleHistoryRemove = useCallback(
+    (query: string) => {
+      removeFromSearchHistory(query);
+    },
+    [removeFromSearchHistory]
+  );
 
   /**
    * 点击外部关闭

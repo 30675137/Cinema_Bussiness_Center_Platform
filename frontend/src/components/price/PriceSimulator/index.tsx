@@ -16,7 +16,7 @@ import {
   Tag,
   Divider,
   Progress,
-  Result
+  Result,
 } from 'antd';
 import {
   PlayCircleOutlined,
@@ -24,7 +24,7 @@ import {
   DollarOutlined,
   LineChartOutlined,
   FireOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { useCalculatePriceQuery } from '@/stores/priceStore';
@@ -75,35 +75,26 @@ const PriceSimulator: React.FC = () => {
       channel: 'online',
       date: dayjs().format('YYYY-MM-DD'),
       customerId: '',
-      location: ''
-    }
+      location: '',
+    },
   });
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    getValues
-  } = form;
+  const { control, handleSubmit, watch, setValue, getValues } = form;
 
   // 监听表单变化，实时计算价格
   const watchedValues = watch();
   const {
     data: calculationResult,
     isLoading,
-    refetch
-  } = useCalculatePriceQuery(
-      watchedValues.productId,
-      {
-        quantity: watchedValues.quantity,
-        memberLevel: watchedValues.memberLevel,
-        channel: watchedValues.channel,
-        date: watchedValues.date,
-        customerId: watchedValues.customerId,
-        location: watchedValues.location
-      }
-  );
+    refetch,
+  } = useCalculatePriceQuery(watchedValues.productId, {
+    quantity: watchedValues.quantity,
+    memberLevel: watchedValues.memberLevel,
+    channel: watchedValues.channel,
+    date: watchedValues.date,
+    customerId: watchedValues.customerId,
+    location: watchedValues.location,
+  });
 
   useEffect(() => {
     if (calculationResult && watchedValues.productId) {
@@ -116,7 +107,7 @@ const PriceSimulator: React.FC = () => {
         currency: calculationResult.currency,
         effectiveUntil: calculationResult.effectiveUntil,
         estimatedRevenue: calculationResult.finalPrice * (watchedValues.quantity || 1),
-        estimatedMargin: calculationResult.metadata?.margin || 0
+        estimatedMargin: calculationResult.metadata?.margin || 0,
       };
       setCurrentResult(result);
     }
@@ -158,9 +149,9 @@ const PriceSimulator: React.FC = () => {
     { value: 'bronze', label: '青铜会员' },
     { value: 'silver', label: '白银会员' },
     { value: 'gold', label: '黄金会员' },
-    {value: 'platinum', label: '铂金会员' },
-    {value: 'diamond', label: '钻石会员' },
-    { value: 'vip', label: 'VIP会员' }
+    { value: 'platinum', label: '铂金会员' },
+    { value: 'diamond', label: '钻石会员' },
+    { value: 'vip', label: 'VIP会员' },
   ];
 
   // 渠道选项
@@ -170,7 +161,7 @@ const PriceSimulator: React.FC = () => {
     { value: 'wechat', label: '微信小程序' },
     { value: 'app', label: 'APP应用' },
     { value: 'website', label: '官方网站' },
-    { value: 'partner', label: '合作伙伴' }
+    { value: 'partner', label: '合作伙伴' },
   ];
 
   // 商品选项（模拟数据）
@@ -179,7 +170,7 @@ const PriceSimulator: React.FC = () => {
     { value: 'PROD002', label: '爆米花 中份', basePrice: 8.0 },
     { value: 'PROD003', label: '电影票 标准场', basePrice: 35.0 },
     { value: 'PROD004', label: 'VIP座位', basePrice: 68.0 },
-    { value: 'PROD005', label: '3D电影票', basePrice: 45.0 }
+    { value: 'PROD005', label: '3D电影票', basePrice: 45.0 },
   ];
 
   // 历史记录表格列
@@ -188,16 +179,16 @@ const PriceSimulator: React.FC = () => {
       title: '时间',
       key: 'time',
       width: 120,
-      render: () => new Date().toLocaleTimeString()
+      render: () => new Date().toLocaleTimeString(),
     },
     {
       title: '商品',
       dataIndex: 'productId',
       key: 'productId',
       render: (productId: string) => {
-        const product = productOptions.find(p => p.value === productId);
+        const product = productOptions.find((p) => p.value === productId);
         return product ? product.label : productId;
-      }
+      },
     },
     {
       title: '原价',
@@ -205,16 +196,14 @@ const PriceSimulator: React.FC = () => {
       width: 100,
       render: (_: any, record: SimulationResult) => (
         <Text delete>¥{record.originalPrice.toFixed(2)}</Text>
-      )
+      ),
     },
     {
       title: '最终价',
       dataIndex: 'finalPrice',
       key: 'finalPrice',
       width: 100,
-      render: (finalPrice: number) => (
-        <Text strong>¥{finalPrice.toFixed(2)}</Text>
-      )
+      render: (finalPrice: number) => <Text strong>¥{finalPrice.toFixed(2)}</Text>,
     },
     {
       title: '折扣',
@@ -225,7 +214,7 @@ const PriceSimulator: React.FC = () => {
           <Tag color="red">-¥{record.discountAmount.toFixed(2)}</Tag>
           <Tag color="blue">{record.discountPercentage}%</Tag>
         </Space>
-      )
+      ),
     },
     {
       title: '适用规则',
@@ -240,8 +229,8 @@ const PriceSimulator: React.FC = () => {
             </Tag>
           ))}
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 模拟结果统计
@@ -293,7 +282,7 @@ const PriceSimulator: React.FC = () => {
               precision={2}
               suffix="%"
               valueStyle={{
-                color: currentResult.estimatedMargin >= 20 ? '#52c41a' : '#fa8c16'
+                color: currentResult.estimatedMargin >= 20 ? '#52c41a' : '#fa8c16',
               }}
             />
           </Card>
@@ -312,9 +301,7 @@ const PriceSimulator: React.FC = () => {
               <CalculatorOutlined style={{ marginRight: 8 }} />
               价格模拟器
             </Title>
-            <Text type="secondary">
-              模拟不同条件下商品的实际价格，帮助优化定价策略
-            </Text>
+            <Text type="secondary">模拟不同条件下商品的实际价格，帮助优化定价策略</Text>
           </Col>
           <Col>
             <Space>
@@ -342,10 +329,7 @@ const PriceSimulator: React.FC = () => {
         <Col span={12}>
           <Card title="模拟参数" style={{ marginBottom: 16 }}>
             <Form layout="vertical" onSubmit={handleSubmit(handleSimulate)}>
-              <Form.Item
-                label="商品选择"
-                required
-              >
+              <Form.Item label="商品选择" required>
                 <Controller
                   name="productId"
                   control={control}
@@ -359,7 +343,7 @@ const PriceSimulator: React.FC = () => {
                         option?.children?.toString().toLowerCase().includes(input.toLowerCase())
                       }
                     >
-                      {productOptions.map(product => (
+                      {productOptions.map((product) => (
                         <Option key={product.value} value={product.value}>
                           <Space>
                             {product.label}
@@ -396,12 +380,8 @@ const PriceSimulator: React.FC = () => {
                       name="memberLevel"
                       control={control}
                       render={({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="请选择会员等级"
-                          style={{ width: '100%' }}
-                        >
-                          {memberLevelOptions.map(option => (
+                        <Select {...field} placeholder="请选择会员等级" style={{ width: '100%' }}>
+                          {memberLevelOptions.map((option) => (
                             <Option key={option.value} value={option.value}>
                               {option.label}
                             </Option>
@@ -420,12 +400,8 @@ const PriceSimulator: React.FC = () => {
                       name="channel"
                       control={control}
                       render={({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="请选择销售渠道"
-                          style={{ width: '100%' }}
-                        >
-                          {channelOptions.map(option => (
+                        <Select {...field} placeholder="请选择销售渠道" style={{ width: '100%' }}>
+                          {channelOptions.map((option) => (
                             <Option key={option.value} value={option.value}>
                               {option.label}
                             </Option>
@@ -496,9 +472,7 @@ const PriceSimulator: React.FC = () => {
                     {currentResult.appliedRules.map((rule, index) => (
                       <Tag key={index} color="green" style={{ marginBottom: 4 }}>
                         <div>{rule.ruleName}</div>
-                        <div style={{ fontSize: 11, opacity: 0.8 }}>
-                          {rule.ruleType}
-                        </div>
+                        <div style={{ fontSize: 11, opacity: 0.8 }}>{rule.ruleType}</div>
                       </Tag>
                     ))}
                   </Space>

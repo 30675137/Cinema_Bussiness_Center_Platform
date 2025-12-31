@@ -180,7 +180,8 @@ export const useScenarioPackageStore = create<ScenarioPackageEditorStore>()(
 
 export const selectPackageId = (state: ScenarioPackageEditorStore) => state.packageId;
 export const selectActiveTab = (state: ScenarioPackageEditorStore) => state.activeTab;
-export const selectIsDirty = (tab: TabKey) => (state: ScenarioPackageEditorStore) => state.dirtyTabs[tab];
+export const selectIsDirty = (tab: TabKey) => (state: ScenarioPackageEditorStore) =>
+  state.dirtyTabs[tab];
 export const selectIsSaving = (state: ScenarioPackageEditorStore) => state.isSaving;
 export const selectShowLeaveConfirm = (state: ScenarioPackageEditorStore) => state.showLeaveConfirm;
 

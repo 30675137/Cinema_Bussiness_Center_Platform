@@ -15,104 +15,104 @@ const { Option } = Select;
  */
 const ProductList: React.FC = React.memo(() => {
   // 模拟数据 - 使用useMemo避免每次渲染重新计算
-  const dataSource = React.useMemo(() => [
-    {
-      key: '1',
-      id: 'P001',
-      name: '爆米花套餐',
-      category: '套餐类',
-      price: 25.00,
-      stock: 150,
-      status: '上架',
-      createTime: '2025-12-01',
-      updateTime: '2025-12-10'
-    },
-    {
-      key: '2',
-      id: 'P002',
-      name: '可乐饮料',
-      category: '饮品类',
-      price: 8.00,
-      stock: 200,
-      status: '上架',
-      createTime: '2025-12-01',
-      updateTime: '2025-12-09'
-    },
-    {
-      key: '3',
-      id: 'P003',
-      name: '3D眼镜',
-      category: '配件类',
-      price: 35.00,
-      stock: 80,
-      status: '上架',
-      createTime: '2025-12-01',
-      updateTime: '2025-12-08'
-    }
-  ], []);
+  const dataSource = React.useMemo(
+    () => [
+      {
+        key: '1',
+        id: 'P001',
+        name: '爆米花套餐',
+        category: '套餐类',
+        price: 25.0,
+        stock: 150,
+        status: '上架',
+        createTime: '2025-12-01',
+        updateTime: '2025-12-10',
+      },
+      {
+        key: '2',
+        id: 'P002',
+        name: '可乐饮料',
+        category: '饮品类',
+        price: 8.0,
+        stock: 200,
+        status: '上架',
+        createTime: '2025-12-01',
+        updateTime: '2025-12-09',
+      },
+      {
+        key: '3',
+        id: 'P003',
+        name: '3D眼镜',
+        category: '配件类',
+        price: 35.0,
+        stock: 80,
+        status: '上架',
+        createTime: '2025-12-01',
+        updateTime: '2025-12-08',
+      },
+    ],
+    []
+  );
 
-  const columns = React.useMemo(() => [
-    {
-      title: '商品编号',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '商品名称',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: '商品分类',
-      dataIndex: 'category',
-      key: 'category',
-    },
-    {
-      title: '价格',
-      dataIndex: 'price',
-      key: 'price',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: '库存',
-      dataIndex: 'stock',
-      key: 'stock',
-      render: (stock: number) => (
-        <span style={{ color: stock < 100 ? '#f5222d' : '#52c41a' }}>
-          {stock}
-        </span>
-      ),
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag color={status === '上架' ? 'green' : 'red'}>
-          {status}
-        </Tag>
-      ),
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record: any) => (
-        <Space size="middle">
-          <Button type="link" icon={<EditOutlined />} size="small">
-            编辑
-          </Button>
-          <Button type="link" icon={<DeleteOutlined />} size="small" danger>
-            删除
-          </Button>
-        </Space>
-      ),
-    },
-  ], []);
+  const columns = React.useMemo(
+    () => [
+      {
+        title: '商品编号',
+        dataIndex: 'id',
+        key: 'id',
+      },
+      {
+        title: '商品名称',
+        dataIndex: 'name',
+        key: 'name',
+      },
+      {
+        title: '商品分类',
+        dataIndex: 'category',
+        key: 'category',
+      },
+      {
+        title: '价格',
+        dataIndex: 'price',
+        key: 'price',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: '库存',
+        dataIndex: 'stock',
+        key: 'stock',
+        render: (stock: number) => (
+          <span style={{ color: stock < 100 ? '#f5222d' : '#52c41a' }}>{stock}</span>
+        ),
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        render: (status: string) => <Tag color={status === '上架' ? 'green' : 'red'}>{status}</Tag>,
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createTime',
+        key: 'createTime',
+      },
+      {
+        title: '操作',
+        key: 'action',
+        render: (_, record: any) => (
+          <Space size="middle">
+            <Button type="link" icon={<EditOutlined />} size="small">
+              编辑
+            </Button>
+            <Button type="link" icon={<DeleteOutlined />} size="small" danger>
+              删除
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div style={{ padding: '24px' }}>
@@ -122,19 +122,19 @@ const ProductList: React.FC = React.memo(() => {
           {
             title: '首页',
             path: '/',
-            icon: <HomeOutlined />
+            icon: <HomeOutlined />,
           },
           {
             title: '基础设置与主数据',
-            path: '/mdm-pim'
+            path: '/mdm-pim',
           },
           {
             title: '商品管理 (MDM/PIM)',
-            path: '/mdm-pim/spu'
+            path: '/mdm-pim/spu',
           },
           {
-            title: 'SPU 管理'
-          }
+            title: 'SPU 管理',
+          },
         ]}
         style={{ marginBottom: '16px' }}
       />
@@ -178,8 +178,7 @@ const ProductList: React.FC = React.memo(() => {
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
           }}
         />
       </Card>

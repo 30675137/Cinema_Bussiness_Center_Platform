@@ -6,7 +6,9 @@ import type { SPUItem, SPUQueryParams, SPUStatus, Category, Brand } from '@/type
  * @param status - SPU状态
  * @returns 状态标签和样式信息
  */
-export const formatSPUStatus = (status: SPUStatus): {
+export const formatSPUStatus = (
+  status: SPUStatus
+): {
   label: string;
   color: string;
   bgColor: string;
@@ -49,7 +51,9 @@ export const formatSPUCode = (code: string): string => {
  */
 export const generateSPUCode = (prefix?: string): string => {
   const datePrefix = prefix || dayjs().format('YYYYMMDD');
-  const random = Math.floor(Math.random() * 9999).toString().padStart(4, '0');
+  const random = Math.floor(Math.random() * 9999)
+    .toString()
+    .padStart(4, '0');
   return `SPU${datePrefix}${random}`;
 };
 
@@ -59,10 +63,7 @@ export const generateSPUCode = (prefix?: string): string => {
  * @param separator - 分隔符
  * @returns 完整分类路径
  */
-export const formatCategoryPath = (
-  category: Category | null,
-  separator = ' / '
-): string => {
+export const formatCategoryPath = (category: Category | null, separator = ' / '): string => {
   if (!category) return '-';
 
   const pathParts: string[] = [];
@@ -154,19 +155,19 @@ export const calculateSPUCompleteness = (
     { key: 'status', label: '状态' },
   ];
 
-  const filledRequired = requiredFields.filter(field => {
+  const filledRequired = requiredFields.filter((field) => {
     const value = spu[field.key as keyof SPUItem];
     if (Array.isArray(value)) return value.length > 0;
     return value !== undefined && value !== null && value !== '';
   });
 
-  const filledOptional = optionalFields.filter(field => {
+  const filledOptional = optionalFields.filter((field) => {
     const value = spu[field.key as keyof SPUItem];
     if (Array.isArray(value)) return value.length > 0;
     return value !== undefined && value !== null && value !== '';
   });
 
-  const missingRequired = requiredFields.filter(field => {
+  const missingRequired = requiredFields.filter((field) => {
     const value = spu[field.key as keyof SPUItem];
     if (Array.isArray(value)) return value.length === 0;
     return value === undefined || value === null || value === '';
@@ -182,7 +183,7 @@ export const calculateSPUCompleteness = (
 
   return {
     percentage: totalPercentage,
-    missingFields: missingRequired.map(field => field.label),
+    missingFields: missingRequired.map((field) => field.label),
     level,
   };
 };
@@ -193,17 +194,14 @@ export const calculateSPUCompleteness = (
  * @returns 搜索关键词数组
  */
 export const generateSPUSearchKeywords = (spu: SPUItem): string[] => {
-  const keywords: string[] = [
-    spu.code.toLowerCase(),
-    spu.name.toLowerCase(),
-  ];
+  const keywords: string[] = [spu.code.toLowerCase(), spu.name.toLowerCase()];
 
   if (spu.description) {
     keywords.push(spu.description.toLowerCase());
   }
 
   if (spu.tags && spu.tags.length > 0) {
-    keywords.push(...spu.tags.map(tag => tag.toLowerCase()));
+    keywords.push(...spu.tags.map((tag) => tag.toLowerCase()));
   }
 
   if (spu.brand?.name) {
@@ -217,7 +215,7 @@ export const generateSPUSearchKeywords = (spu: SPUItem): string[] => {
   }
 
   // 分词处理名称
-  keywords.push(...spu.name.split(/\s+/).map(word => word.toLowerCase()));
+  keywords.push(...spu.name.split(/\s+/).map((word) => word.toLowerCase()));
 
   return [...new Set(keywords)]; // 去重
 };
@@ -228,17 +226,14 @@ export const generateSPUSearchKeywords = (spu: SPUItem): string[] => {
  * @param keyword - 搜索关键词
  * @returns 过滤后的SPU列表
  */
-export const filterSPUByKeyword = (
-  spus: SPUItem[],
-  keyword: string
-): SPUItem[] => {
+export const filterSPUByKeyword = (spus: SPUItem[], keyword: string): SPUItem[] => {
   if (!keyword || keyword.trim() === '') return spus;
 
   const lowerKeyword = keyword.toLowerCase().trim();
 
-  return spus.filter(spu => {
+  return spus.filter((spu) => {
     const searchKeywords = generateSPUSearchKeywords(spu);
-    return searchKeywords.some(kw => kw.includes(lowerKeyword));
+    return searchKeywords.some((kw) => kw.includes(lowerKeyword));
   });
 };
 
@@ -266,12 +261,15 @@ export const buildQueryParams = (params: Partial<SPUQueryParams>): SPUQueryParam
  * @returns URL查询字符串
  */
 export const formatQueryParams = (params: Partial<SPUQueryParams>): string => {
-  const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      acc[key] = String(value);
-    }
-    return acc;
-  }, {} as Record<string, string>);
+  const cleanParams = Object.entries(params).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = String(value);
+      }
+      return acc;
+    },
+    {} as Record<string, string>
+  );
 
   const searchParams = new URLSearchParams(cleanParams);
   return searchParams.toString();
@@ -372,7 +370,7 @@ export const validateSPUData = (
     if (data.tags.length > 10) {
       errors.tags = '标签不能超过10个';
     }
-    const invalidTags = data.tags.filter(tag => tag.length > 20);
+    const invalidTags = data.tags.filter((tag) => tag.length > 20);
     if (invalidTags.length > 0) {
       errors.tags = '标签长度不能超过20个字符';
     }
@@ -404,8 +402,15 @@ export const compareSPUChanges = (
 
   // 比较各个字段
   const fieldsToCompare = [
-    'name', 'description', 'brandId', 'categoryId', 'status',
-    'tags', 'specifications', 'images', 'attributes'
+    'name',
+    'description',
+    'brandId',
+    'categoryId',
+    'status',
+    'tags',
+    'specifications',
+    'images',
+    'attributes',
   ];
 
   for (const field of fieldsToCompare) {
@@ -436,12 +441,12 @@ export const compareSPUChanges = (
  * @param specifications - 规格参数数组
  * @returns 格式化后的文本
  */
-export const formatSpecifications = (specifications: Array<{ name: string; value: string }>): string => {
+export const formatSpecifications = (
+  specifications: Array<{ name: string; value: string }>
+): string => {
   if (!specifications || specifications.length === 0) return '-';
 
-  return specifications
-    .map(spec => `${spec.name}: ${spec.value}`)
-    .join(' | ');
+  return specifications.map((spec) => `${spec.name}: ${spec.value}`).join(' | ');
 };
 
 /**
@@ -452,31 +457,23 @@ export const formatSpecifications = (specifications: Array<{ name: string; value
 export const exportSPUToCSV = (spus: SPUItem[], filename = 'spu-list'): void => {
   if (!spus || spus.length === 0) return;
 
-  const headers = [
-    '编码',
-    '名称',
-    '品牌',
-    '分类',
-    '状态',
-    '描述',
-    '标签',
-    '创建时间',
-    '更新时间'
-  ];
+  const headers = ['编码', '名称', '品牌', '分类', '状态', '描述', '标签', '创建时间', '更新时间'];
 
   const csvContent = [
     headers.join(','),
-    ...spus.map(spu => [
-      spu.code,
-      spu.name,
-      spu.brand?.name || '',
-      formatCategoryPath(spu.category),
-      formatSPUStatus(spu.status).label,
-      `"${spu.description.replace(/"/g, '""')}"`, // 处理描述中的引号
-      `"${(spu.tags || []).join('; ')}"`,
-      formatSPUDate(spu.createdAt),
-      formatSPUDate(spu.updatedAt)
-    ].join(','))
+    ...spus.map((spu) =>
+      [
+        spu.code,
+        spu.name,
+        spu.brand?.name || '',
+        formatCategoryPath(spu.category),
+        formatSPUStatus(spu.status).label,
+        `"${spu.description.replace(/"/g, '""')}"`, // 处理描述中的引号
+        `"${(spu.tags || []).join('; ')}"`,
+        formatSPUDate(spu.createdAt),
+        formatSPUDate(spu.updatedAt),
+      ].join(',')
+    ),
   ].join('\n');
 
   // 创建Blob并下载

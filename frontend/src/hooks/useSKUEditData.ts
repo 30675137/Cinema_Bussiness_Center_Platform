@@ -2,13 +2,13 @@
  * @spec P006-fix-sku-edit-data
  * SKU编辑页面数据加载Hook
  */
-import { useQuery } from '@tanstack/react-query'
-import type { SKUDetailResponse } from '@/types/product'
+import { useQuery } from '@tanstack/react-query';
+import type { SKUDetailResponse } from '@/types/product';
 
 /**
  * API基础URL（从环境变量读取）
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 /**
  * 获取SKU详情API调用
@@ -21,24 +21,24 @@ async function fetchSKUDetails(skuId: string): Promise<SKUDetailResponse> {
       // TODO: 添加认证token
       // 'Authorization': `Bearer ${getToken()}`,
     },
-  })
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({
       error: 'UNKNOWN_ERROR',
       message: '请求失败',
-    }))
+    }));
 
-    throw new Error(errorData.message || `HTTP ${response.status}`)
+    throw new Error(errorData.message || `HTTP ${response.status}`);
   }
 
-  const result = await response.json()
+  const result = await response.json();
 
   if (!result.success) {
-    throw new Error(result.message || '数据加载失败')
+    throw new Error(result.message || '数据加载失败');
   }
 
-  return result.data
+  return result.data;
 }
 
 /**
@@ -76,5 +76,5 @@ export function useSKUEditData(skuId: string) {
     staleTime: 2 * 60 * 1000, // 2分钟内数据视为新鲜
     gcTime: 5 * 60 * 1000, // 5分钟后清理缓存（原cacheTime）
     retry: 1, // 失败时重试1次
-  })
+  });
 }

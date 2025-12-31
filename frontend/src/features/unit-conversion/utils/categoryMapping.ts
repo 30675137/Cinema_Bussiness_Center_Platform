@@ -87,8 +87,9 @@ export function getCategoryLabel(category: DbUnitCategory | UnitCategory): strin
  * 获取类别的默认精度
  */
 export function getDefaultPrecision(category: DbUnitCategory | UnitCategory): number {
-  const displayCategory = category in DB_TO_DISPLAY
-    ? DB_TO_DISPLAY[category as DbUnitCategory]
-    : category as UnitCategory;
+  const displayCategory =
+    category in DB_TO_DISPLAY
+      ? DB_TO_DISPLAY[category as DbUnitCategory]
+      : (category as UnitCategory);
   return DEFAULT_PRECISION[displayCategory];
 }

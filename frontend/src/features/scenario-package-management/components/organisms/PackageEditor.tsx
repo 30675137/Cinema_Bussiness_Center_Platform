@@ -8,15 +8,7 @@
  */
 
 import React from 'react';
-import {
-  Card,
-  Button,
-  Space,
-  Alert,
-  Descriptions,
-  Spin,
-  Form,
-} from 'antd';
+import { Card, Button, Space, Alert, Descriptions, Spin, Form } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import PackageForm from '../molecules/PackageForm';
 import StatusBadge from '../atoms/StatusBadge';
@@ -140,12 +132,7 @@ export const PackageEditor: React.FC<PackageEditorProps> = ({
           <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack} />
           <span>{isEditMode ? '编辑场景包' : '新建场景包'}</span>
           {isEditMode && (
-            <Button
-              type="text"
-              icon={<ReloadOutlined />}
-              onClick={onRefresh}
-              loading={loading}
-            >
+            <Button type="text" icon={<ReloadOutlined />} onClick={onRefresh} loading={loading}>
               刷新
             </Button>
           )}
@@ -165,9 +152,7 @@ export const PackageEditor: React.FC<PackageEditorProps> = ({
               <StatusBadge status={packageData.status} />
             </Descriptions.Item>
             <Descriptions.Item label="版本">v{packageData.version}</Descriptions.Item>
-            <Descriptions.Item label="乐观锁版本">
-              {packageData.versionLock}
-            </Descriptions.Item>
+            <Descriptions.Item label="乐观锁版本">{packageData.versionLock}</Descriptions.Item>
             <Descriptions.Item label="创建时间">
               {new Date(packageData.createdAt).toLocaleString('zh-CN')}
             </Descriptions.Item>

@@ -13,7 +13,7 @@ export const i18n = new I18n({
   fallback: 'zh-CN',
   default: 'zh-CN',
   supportedLanguages: ['zh-CN', 'en-US'],
-  debug: process.env.NODE_ENV === 'development'
+  debug: process.env.NODE_ENV === 'development',
 });
 
 // 加载语言包

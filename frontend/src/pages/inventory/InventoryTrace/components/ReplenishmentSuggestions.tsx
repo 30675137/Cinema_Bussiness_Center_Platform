@@ -14,7 +14,7 @@ import {
   Statistic,
   Badge,
   Modal,
-  message
+  message,
 } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -25,7 +25,7 @@ import {
   InfoCircleOutlined,
   PlusOutlined,
   EyeOutlined,
-  FilterOutlined
+  FilterOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -52,7 +52,7 @@ const mockReplenishmentData = {
       reason: '当前库存远低于重购点，预计2天内售罄',
       estimatedCost: 1200,
       daysOfSupply: 3,
-      leadTime: 7
+      leadTime: 7,
     },
     {
       skuId: 'SKU001',
@@ -67,7 +67,7 @@ const mockReplenishmentData = {
       reason: '接近重购点，建议及时补货',
       estimatedCost: 140,
       daysOfSupply: 8,
-      leadTime: 5
+      leadTime: 5,
     },
     {
       skuId: 'SKU004',
@@ -82,7 +82,7 @@ const mockReplenishmentData = {
       reason: '周末需求增加，库存不足',
       estimatedCost: 700,
       daysOfSupply: 5,
-      leadTime: 3
+      leadTime: 3,
     },
     {
       skuId: 'SKU005',
@@ -97,20 +97,20 @@ const mockReplenishmentData = {
       reason: '维持安全库存水平',
       estimatedCost: 400,
       daysOfSupply: 12,
-      leadTime: 5
-    }
+      leadTime: 5,
+    },
   ],
   summary: {
     totalSuggestions: 4,
     estimatedTotalCost: 2440,
     criticalItems: 1,
-    highPriorityItems: 2
-  }
+    highPriorityItems: 2,
+  },
 };
 
 const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
   data,
-  loading = false
+  loading = false,
 }) => {
   const [selectedUrgency, setSelectedUrgency] = useState<string>('all');
   const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
@@ -120,9 +120,10 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
   const suggestions = replenishmentData.suggestions;
 
   // 过滤建议
-  const filteredSuggestions = selectedUrgency === 'all'
-    ? suggestions
-    : suggestions.filter(item => item.urgency === selectedUrgency);
+  const filteredSuggestions =
+    selectedUrgency === 'all'
+      ? suggestions
+      : suggestions.filter((item) => item.urgency === selectedUrgency);
 
   // 获取紧急程度信息
   const getUrgencyInfo = (urgency: string) => {
@@ -156,7 +157,7 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
       content: `是否为 ${suggestion.skuName} 创建采购订单？\n建议采购数量：${suggestion.suggestedQuantity} ${suggestion.unit || '件'}`,
       onOk: () => {
         message.success('采购订单创建成功');
-      }
+      },
     });
   };
 
@@ -179,16 +180,14 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
             {record.skuId}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '门店',
       dataIndex: 'storeName',
       key: 'store',
       width: 150,
-      render: (text) => (
-        <Text>{text}</Text>
-      )
+      render: (text) => <Text>{text}</Text>,
     },
     {
       title: '紧急程度',
@@ -207,9 +206,9 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
         { text: '紧急', value: 'critical' },
         { text: '高', value: 'high' },
         { text: '中', value: 'medium' },
-        { text: '低', value: 'low' }
+        { text: '低', value: 'low' },
       ],
-      onFilter: (value, record) => record.urgency === value
+      onFilter: (value, record) => record.urgency === value,
     },
     {
       title: '库存状态',
@@ -225,12 +224,10 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
               size="small"
               format={() => `${health.score}%`}
             />
-            <Text style={{ fontSize: '12px', color: health.color }}>
-              {health.status}
-            </Text>
+            <Text style={{ fontSize: '12px', color: health.color }}>{health.status}</Text>
           </Space>
         );
-      }
+      },
     },
     {
       title: '当前库存',
@@ -238,12 +235,14 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
       width: 120,
       render: (_, record) => (
         <Space direction="vertical" size="small">
-          <Text strong style={{ fontSize: '14px' }}>{record.currentStock}</Text>
+          <Text strong style={{ fontSize: '14px' }}>
+            {record.currentStock}
+          </Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             重购点: {record.reorderPoint}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '建议采购',
@@ -258,7 +257,7 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
             预计: ¥{record.estimatedCost}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '供应天数',
@@ -272,7 +271,7 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
             交期: {record.leadTime}天
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '建议原因',
@@ -284,7 +283,7 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
         <Tooltip title={text}>
           <Text>{text}</Text>
         </Tooltip>
-      )
+      ),
     },
     {
       title: '操作',
@@ -310,8 +309,8 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
             />
           </Tooltip>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -320,29 +319,21 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
         <Space>
           <ShoppingCartOutlined />
           补货建议
-          <Badge count={replenishmentData.summary.totalSuggestions} style={{ backgroundColor: '#1890ff' }} />
+          <Badge
+            count={replenishmentData.summary.totalSuggestions}
+            style={{ backgroundColor: '#1890ff' }}
+          />
         </Space>
       }
       extra={
         <Space>
-          <Button
-            size="small"
-            icon={<FilterOutlined />}
-            onClick={() => setSelectedUrgency('all')}
-          >
+          <Button size="small" icon={<FilterOutlined />} onClick={() => setSelectedUrgency('all')}>
             全部 ({replenishmentData.summary.totalSuggestions})
           </Button>
-          <Button
-            size="small"
-            danger
-            onClick={() => setSelectedUrgency('critical')}
-          >
+          <Button size="small" danger onClick={() => setSelectedUrgency('critical')}>
             紧急 ({replenishmentData.summary.criticalItems})
           </Button>
-          <Button
-            size="small"
-            onClick={() => setSelectedUrgency('high')}
-          >
+          <Button size="small" onClick={() => setSelectedUrgency('high')}>
             高优先级 ({replenishmentData.summary.highPriorityItems})
           </Button>
         </Space>
@@ -416,7 +407,7 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
           pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
         }}
         scroll={{ x: 1200 }}
         size="small"
@@ -434,14 +425,18 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
           <Button key="cancel" onClick={() => setDetailModalVisible(false)}>
             取消
           </Button>,
-          <Button key="create" type="primary" onClick={() => {
-            if (selectedSuggestion) {
-              handleCreatePurchaseOrder(selectedSuggestion);
-              setDetailModalVisible(false);
-            }
-          }}>
+          <Button
+            key="create"
+            type="primary"
+            onClick={() => {
+              if (selectedSuggestion) {
+                handleCreatePurchaseOrder(selectedSuggestion);
+                setDetailModalVisible(false);
+              }
+            }}
+          >
             创建采购单
-          </Button>
+          </Button>,
         ]}
         width={600}
       >
@@ -465,25 +460,13 @@ const ReplenishmentSuggestions: React.FC<ReplenishmentSuggestionsProps> = ({
               <Title level={5}>库存状态</Title>
               <Row gutter={16}>
                 <Col span={8}>
-                  <Statistic
-                    title="当前库存"
-                    value={selectedSuggestion.currentStock}
-                    suffix="件"
-                  />
+                  <Statistic title="当前库存" value={selectedSuggestion.currentStock} suffix="件" />
                 </Col>
                 <Col span={8}>
-                  <Statistic
-                    title="重购点"
-                    value={selectedSuggestion.reorderPoint}
-                    suffix="件"
-                  />
+                  <Statistic title="重购点" value={selectedSuggestion.reorderPoint} suffix="件" />
                 </Col>
                 <Col span={8}>
-                  <Statistic
-                    title="最大库存"
-                    value={selectedSuggestion.maxStock}
-                    suffix="件"
-                  />
+                  <Statistic title="最大库存" value={selectedSuggestion.maxStock} suffix="件" />
                 </Col>
               </Row>
             </div>

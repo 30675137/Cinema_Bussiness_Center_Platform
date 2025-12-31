@@ -21,7 +21,7 @@ import {
   Input,
   Rate,
   message,
-  Divider
+  Divider,
 } from 'antd';
 import {
   UserOutlined,
@@ -34,9 +34,18 @@ import {
   TrophyOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
-import { Supplier, SupplierStatus, SupplierLevel, SupplierType, ContactInfo, BankAccount, SupplierQualification, SupplierEvaluation } from '@/types/supplier';
+import {
+  Supplier,
+  SupplierStatus,
+  SupplierLevel,
+  SupplierType,
+  ContactInfo,
+  BankAccount,
+  SupplierQualification,
+  SupplierEvaluation,
+} from '@/types/supplier';
 import { useSupplierStore } from '@/stores/supplierStore';
 import { formatCurrency, formatDate, formatPhoneNumber } from '@/utils/formatters';
 
@@ -49,21 +58,13 @@ interface SupplierDetailProps {
   onBack?: () => void;
 }
 
-const SupplierDetail: React.FC<SupplierDetailProps> = ({
-  supplierId,
-  onEdit,
-  onBack
-}) => {
+const SupplierDetail: React.FC<SupplierDetailProps> = ({ supplierId, onEdit, onBack }) => {
   const [supplier, setSupplier] = useState<Supplier | null>(null);
   const [loading, setLoading] = useState(false);
   const [evaluationModalVisible, setEvaluationModalVisible] = useState(false);
   const [evaluationForm] = Form.useForm();
 
-  const {
-    fetchSupplierById,
-    addEvaluation,
-    updatePurchaseStats
-  } = useSupplierStore();
+  const { fetchSupplierById, addEvaluation, updatePurchaseStats } = useSupplierStore();
 
   useEffect(() => {
     if (supplierId) {
@@ -102,7 +103,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             position: '销售经理',
             phone: '13800138000',
             email: 'lisi@example.com',
-            isPrimary: true
+            isPrimary: true,
           },
           {
             id: '2',
@@ -110,8 +111,8 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             position: '技术支持',
             phone: '13900139000',
             email: 'wangwu@example.com',
-            isPrimary: false
-          }
+            isPrimary: false,
+          },
         ],
         bankAccounts: [
           {
@@ -120,8 +121,8 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             bankCode: 'ICBC',
             accountName: '示例供应商有限公司',
             accountNumber: '6222021234567890123',
-            isDefault: true
-          }
+            isDefault: true,
+          },
         ],
         qualifications: [
           {
@@ -133,8 +134,8 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             issueDate: '2020-01-01',
             expireDate: '2030-01-01',
             status: 'valid',
-            certificateFile: '/files/business-license.pdf'
-          }
+            certificateFile: '/files/business-license.pdf',
+          },
         ],
         evaluations: [
           {
@@ -144,7 +145,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             grade: 'A',
             comments: '产品质量优秀，交付及时，服务态度良好',
             evaluatorId: 'admin',
-            evaluationDate: '2024-01-15'
+            evaluationDate: '2024-01-15',
           },
           {
             id: '2',
@@ -153,15 +154,15 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             grade: 'A',
             comments: '产品质量稳定，符合标准',
             evaluatorId: 'quality-manager',
-            evaluationDate: '2024-01-10'
-          }
+            evaluationDate: '2024-01-10',
+          },
         ],
         purchaseStats: {
           totalOrders: 156,
           totalAmount: 2580000,
           onTimeDeliveryRate: 95.5,
           qualityPassRate: 98.2,
-          lastOrderDate: '2024-01-20'
+          lastOrderDate: '2024-01-20',
         },
         productCategories: ['食品原料', '包装材料'],
         mainProducts: '薯片、爆米花原料、包装袋、纸杯',
@@ -172,7 +173,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
         createdById: 'admin',
         createdAt: '2020-01-01T00:00:00Z',
         updatedById: 'admin',
-        updatedAt: '2024-01-20T00:00:00Z'
+        updatedAt: '2024-01-20T00:00:00Z',
       };
 
       setSupplier(mockSupplier);
@@ -187,10 +188,26 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
   // 供应商状态配置
   const statusConfig = {
     [SupplierStatus.ACTIVE]: { color: 'green', text: '正常合作', icon: <CheckCircleOutlined /> },
-    [SupplierStatus.SUSPENDED]: { color: 'orange', text: '暂停合作', icon: <ExclamationCircleOutlined /> },
-    [SupplierStatus.TERMINATED]: { color: 'red', text: '终止合作', icon: <ExclamationCircleOutlined /> },
-    [SupplierStatus.PENDING_APPROVAL]: { color: 'blue', text: '待审批', icon: <ClockCircleOutlined /> },
-    [SupplierStatus.UNDER_REVIEW]: { color: 'purple', text: '复核中', icon: <ExclamationCircleOutlined /> }
+    [SupplierStatus.SUSPENDED]: {
+      color: 'orange',
+      text: '暂停合作',
+      icon: <ExclamationCircleOutlined />,
+    },
+    [SupplierStatus.TERMINATED]: {
+      color: 'red',
+      text: '终止合作',
+      icon: <ExclamationCircleOutlined />,
+    },
+    [SupplierStatus.PENDING_APPROVAL]: {
+      color: 'blue',
+      text: '待审批',
+      icon: <ClockCircleOutlined />,
+    },
+    [SupplierStatus.UNDER_REVIEW]: {
+      color: 'purple',
+      text: '复核中',
+      icon: <ExclamationCircleOutlined />,
+    },
   };
 
   // 供应商等级配置
@@ -198,7 +215,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
     [SupplierLevel.STRATEGIC]: { color: 'gold', text: '战略供应商', icon: '⭐⭐⭐' },
     [SupplierLevel.PREFERRED]: { color: 'blue', text: '优选供应商', icon: '⭐⭐' },
     [SupplierLevel.STANDARD]: { color: 'green', text: '标准供应商', icon: '⭐' },
-    [SupplierLevel.TRIAL]: { color: 'gray', text: '试用供应商', icon: '📋' }
+    [SupplierLevel.TRIAL]: { color: 'gray', text: '试用供应商', icon: '📋' },
   };
 
   // 供应商类型配置
@@ -207,7 +224,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
     [SupplierType.WHOLESALER]: '批发商',
     [SupplierType.DISTRIBUTOR]: '经销商',
     [SupplierType.SERVICE_PROVIDER]: '服务提供商',
-    [SupplierType.OTHER]: '其他'
+    [SupplierType.OTHER]: '其他',
   };
 
   // 处理评价提交
@@ -216,7 +233,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
       await addEvaluation(supplierId, {
         evaluationType: values.evaluationType,
         score: values.score,
-        comments: values.comments
+        comments: values.comments,
       });
       message.success('评价添加成功');
       setEvaluationModalVisible(false);
@@ -254,26 +271,30 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
         <Space>
           <Avatar size="small" icon={<UserOutlined />} />
           <span>{text}</span>
-          {record.isPrimary && <Tag color="blue" size="small">主要</Tag>}
+          {record.isPrimary && (
+            <Tag color="blue" size="small">
+              主要
+            </Tag>
+          )}
         </Space>
-      )
+      ),
     },
     {
       title: '职位',
       dataIndex: 'position',
-      key: 'position'
+      key: 'position',
     },
     {
       title: '手机',
       dataIndex: 'phone',
       key: 'phone',
-      render: (phone: string) => formatPhoneNumber(phone)
+      render: (phone: string) => formatPhoneNumber(phone),
     },
     {
       title: '邮箱',
       dataIndex: 'email',
-      key: 'email'
-    }
+      key: 'email',
+    },
   ];
 
   // 银行账户表格列
@@ -281,26 +302,24 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
     {
       title: '开户行',
       dataIndex: 'bankName',
-      key: 'bankName'
+      key: 'bankName',
     },
     {
       title: '账户名称',
       dataIndex: 'accountName',
-      key: 'accountName'
+      key: 'accountName',
     },
     {
       title: '账号',
       dataIndex: 'accountNumber',
-      key: 'accountNumber'
+      key: 'accountNumber',
     },
     {
       title: '默认',
       dataIndex: 'isDefault',
       key: 'isDefault',
-      render: (isDefault: boolean) => (
-        isDefault ? <Tag color="green">默认</Tag> : '-'
-      )
-    }
+      render: (isDefault: boolean) => (isDefault ? <Tag color="green">默认</Tag> : '-'),
+    },
   ];
 
   // 资质证书表格列
@@ -308,28 +327,28 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
     {
       title: '资质类型',
       dataIndex: 'qualificationType',
-      key: 'qualificationType'
+      key: 'qualificationType',
     },
     {
       title: '证书名称',
       dataIndex: 'qualificationName',
-      key: 'qualificationName'
+      key: 'qualificationName',
     },
     {
       title: '证书编号',
       dataIndex: 'certificateNumber',
-      key: 'certificateNumber'
+      key: 'certificateNumber',
     },
     {
       title: '发证机关',
       dataIndex: 'issuingAuthority',
-      key: 'issuingAuthority'
+      key: 'issuingAuthority',
     },
     {
       title: '有效期至',
       dataIndex: 'expireDate',
       key: 'expireDate',
-      render: (date: string) => formatDate(date)
+      render: (date: string) => formatDate(date),
     },
     {
       title: '状态',
@@ -339,12 +358,12 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
         const statusMap = {
           valid: { color: 'green', text: '有效' },
           expired: { color: 'red', text: '已过期' },
-          pending: { color: 'blue', text: '待验证' }
+          pending: { color: 'blue', text: '待验证' },
         };
         const config = statusMap[status as keyof typeof statusMap];
         return <Tag color={config?.color}>{config?.text}</Tag>;
-      }
-    }
+      },
+    },
   ];
 
   // 评价历史表格列
@@ -359,18 +378,16 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
           delivery: '交付评价',
           service: '服务评价',
           price: '价格评价',
-          comprehensive: '综合评价'
+          comprehensive: '综合评价',
         };
         return typeMap[type as keyof typeof typeMap] || type;
-      }
+      },
     },
     {
       title: '评分',
       dataIndex: 'score',
       key: 'score',
-      render: (score: number) => (
-        <Rate disabled defaultValue={score} style={{ fontSize: 14 }} />
-      )
+      render: (score: number) => <Rate disabled defaultValue={score} style={{ fontSize: 14 }} />,
     },
     {
       title: '等级',
@@ -379,37 +396,40 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
       render: (grade: string) => {
         const colorMap = { A: 'green', B: 'blue', C: 'orange', D: 'red' };
         return <Tag color={colorMap[grade as keyof typeof colorMap]}>{grade}</Tag>;
-      }
+      },
     },
     {
       title: '评价说明',
       dataIndex: 'comments',
       key: 'comments',
-      ellipsis: true
+      ellipsis: true,
     },
     {
       title: '评价时间',
       dataIndex: 'evaluationDate',
       key: 'evaluationDate',
-      render: (date: string) => formatDate(date)
-    }
+      render: (date: string) => formatDate(date),
+    },
   ];
 
   return (
     <div style={{ padding: '24px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       {/* 操作按钮 */}
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
           <Button onClick={onBack}>返回</Button>
           <span style={{ fontSize: '18px', fontWeight: 600 }}>供应商详情</span>
         </Space>
         <Space>
-          <Button onClick={() => setEvaluationModalVisible(true)}>
-            添加评价
-          </Button>
-          <Button onClick={handleUpdatePurchaseStats}>
-            更新统计
-          </Button>
+          <Button onClick={() => setEvaluationModalVisible(true)}>添加评价</Button>
+          <Button onClick={handleUpdatePurchaseStats}>更新统计</Button>
           <Button type="primary" icon={<EditOutlined />} onClick={() => onEdit?.(supplier)}>
             编辑
           </Button>
@@ -431,13 +451,22 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="供应商状态">
-                <Tag color={statusConfig[supplier.status].color} icon={statusConfig[supplier.status].icon}>
+                <Tag
+                  color={statusConfig[supplier.status].color}
+                  icon={statusConfig[supplier.status].icon}
+                >
                   {statusConfig[supplier.status].text}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="统一社会信用代码">{supplier.creditCode || '-'}</Descriptions.Item>
-              <Descriptions.Item label="法定代表人">{supplier.legalRepresentative || '-'}</Descriptions.Item>
-              <Descriptions.Item label="公司地址" span={2}>{supplier.address}</Descriptions.Item>
+              <Descriptions.Item label="统一社会信用代码">
+                {supplier.creditCode || '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label="法定代表人">
+                {supplier.legalRepresentative || '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label="公司地址" span={2}>
+                {supplier.address}
+              </Descriptions.Item>
               <Descriptions.Item label="邮政编码">{supplier.postalCode || '-'}</Descriptions.Item>
               <Descriptions.Item label="公司电话">
                 <Space>
@@ -457,7 +486,9 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
                   <a href={supplier.website} target="_blank" rel="noopener noreferrer">
                     {supplier.website}
                   </a>
-                ) : '-'}
+                ) : (
+                  '-'
+                )}
               </Descriptions.Item>
               <Descriptions.Item label="供应品类" span={2}>
                 <Space wrap>
@@ -466,14 +497,22 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
                   ))}
                 </Space>
               </Descriptions.Item>
-              <Descriptions.Item label="主营产品" span={2}>{supplier.mainProducts || '-'}</Descriptions.Item>
-              <Descriptions.Item label="合作开始日期">{formatDate(supplier.cooperationStartDate)}</Descriptions.Item>
+              <Descriptions.Item label="主营产品" span={2}>
+                {supplier.mainProducts || '-'}
+              </Descriptions.Item>
+              <Descriptions.Item label="合作开始日期">
+                {formatDate(supplier.cooperationStartDate)}
+              </Descriptions.Item>
               <Descriptions.Item label="合作结束日期">
                 {supplier.cooperationEndDate ? formatDate(supplier.cooperationEndDate) : '长期合作'}
               </Descriptions.Item>
-              <Descriptions.Item label="信用额度">{formatCurrency(supplier.creditLimit || 0)}</Descriptions.Item>
+              <Descriptions.Item label="信用额度">
+                {formatCurrency(supplier.creditLimit || 0)}
+              </Descriptions.Item>
               <Descriptions.Item label="付款条件">{supplier.paymentTerms || '-'}</Descriptions.Item>
-              <Descriptions.Item label="备注" span={2}>{supplier.remarks || '-'}</Descriptions.Item>
+              <Descriptions.Item label="备注" span={2}>
+                {supplier.remarks || '-'}
+              </Descriptions.Item>
             </Descriptions>
           </Col>
           <Col span={8}>
@@ -501,7 +540,9 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
                     <div style={{ marginBottom: '8px' }}>准时交付率</div>
                     <Progress
                       percent={supplier.purchaseStats.onTimeDeliveryRate}
-                      status={supplier.purchaseStats.onTimeDeliveryRate >= 95 ? 'success' : 'exception'}
+                      status={
+                        supplier.purchaseStats.onTimeDeliveryRate >= 95 ? 'success' : 'exception'
+                      }
                     />
                   </div>
                 </Col>
@@ -510,14 +551,19 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
                     <div style={{ marginBottom: '8px' }}>质量合格率</div>
                     <Progress
                       percent={supplier.purchaseStats.qualityPassRate}
-                      status={supplier.purchaseStats.qualityPassRate >= 98 ? 'success' : 'exception'}
+                      status={
+                        supplier.purchaseStats.qualityPassRate >= 98 ? 'success' : 'exception'
+                      }
                     />
                   </div>
                 </Col>
               </Row>
               <div style={{ marginTop: '16px', textAlign: 'center' }}>
                 <small className="text-gray-500">
-                  最近采购: {supplier.purchaseStats.lastOrderDate ? formatDate(supplier.purchaseStats.lastOrderDate) : '暂无记录'}
+                  最近采购:{' '}
+                  {supplier.purchaseStats.lastOrderDate
+                    ? formatDate(supplier.purchaseStats.lastOrderDate)
+                    : '暂无记录'}
                 </small>
               </div>
             </Card>
@@ -579,11 +625,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
         }}
         destroyOnClose
       >
-        <Form
-          form={evaluationForm}
-          layout="vertical"
-          onFinish={handleEvaluationSubmit}
-        >
+        <Form form={evaluationForm} layout="vertical" onFinish={handleEvaluationSubmit}>
           <Form.Item
             name="evaluationType"
             label="评价类型"
@@ -598,11 +640,7 @@ const SupplierDetail: React.FC<SupplierDetailProps> = ({
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="score"
-            label="评分"
-            rules={[{ required: true, message: '请选择评分' }]}
-          >
+          <Form.Item name="score" label="评分" rules={[{ required: true, message: '请选择评分' }]}>
             <Rate />
           </Form.Item>
 

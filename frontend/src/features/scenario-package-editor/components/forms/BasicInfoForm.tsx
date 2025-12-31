@@ -27,11 +27,7 @@ interface BasicInfoFormProps {
 /**
  * 场景包基础信息表单
  */
-const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
-  packageId,
-  initialData,
-  onSaveSuccess,
-}) => {
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ packageId, initialData, onSaveSuccess }) => {
   const setIsSaving = useScenarioPackageStore((state) => state.setIsSaving);
   const setDirty = useScenarioPackageStore((state) => state.setDirty);
 
@@ -46,7 +42,12 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
     mode: 'onChange',
   });
 
-  const { control, handleSubmit, reset, formState: { errors, isDirty, isValid } } = form;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty, isValid },
+  } = form;
 
   // 同步初始数据
   useEffect(() => {
@@ -82,11 +83,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
   };
 
   return (
-    <Form
-      layout="vertical"
-      onFinish={handleSubmit(onSubmit)}
-      style={{ maxWidth: 600 }}
-    >
+    <Form layout="vertical" onFinish={handleSubmit(onSubmit)} style={{ maxWidth: 600 }}>
       {/* 场景包名称 */}
       <Form.Item
         label="场景包名称"
@@ -163,12 +160,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         <Controller
           name="mainImage"
           control={control}
-          render={({ field }) => (
-            <ImageUploader
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
+          render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />}
         />
       </Form.Item>
 
@@ -183,10 +175,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           >
             保存
           </Button>
-          <Button
-            onClick={() => reset(initialData)}
-            disabled={!isDirty}
-          >
+          <Button onClick={() => reset(initialData)} disabled={!isDirty}>
             重置
           </Button>
         </Space>

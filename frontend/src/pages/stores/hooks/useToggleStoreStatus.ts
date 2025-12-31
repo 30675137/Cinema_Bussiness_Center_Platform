@@ -16,11 +16,11 @@ interface ToggleStatusParams {
 
 /**
  * Hook for toggling store status (ACTIVE <-> INACTIVE)
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useToggleStoreStatus();
- * 
+ *
  * const handleToggle = (storeId: string, newStatus: StoreStatusEnum) => {
  *   mutate({ storeId, data: { status: newStatus } }, {
  *     onSuccess: () => message.success('状态切换成功'),

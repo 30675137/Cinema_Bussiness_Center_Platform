@@ -25,11 +25,7 @@ const queryClient = new QueryClient({
  * QueryClient Provider 组件
  */
 export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
 export { queryClient };

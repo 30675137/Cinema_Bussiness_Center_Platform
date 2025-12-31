@@ -10,7 +10,7 @@ import { MenuItem, User } from './navigation';
 export enum LayoutSize {
   SMALL = 'small',
   MEDIUM = 'medium',
-  LARGE = 'large'
+  LARGE = 'large',
 }
 
 /**
@@ -19,7 +19,7 @@ export enum LayoutSize {
 export enum SidebarState {
   EXPANDED = 'expanded',
   COLLAPSED = 'collapsed',
-  HIDDEN = 'hidden'
+  HIDDEN = 'hidden',
 }
 
 /**

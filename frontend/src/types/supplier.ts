@@ -6,21 +6,21 @@
  * 供应商状态枚举
  */
 export enum SupplierStatus {
-  ACTIVE = 'active',           // 正常合作
-  SUSPENDED = 'suspended',     // 暂停合作
-  TERMINATED = 'terminated',   // 终止合作
+  ACTIVE = 'active', // 正常合作
+  SUSPENDED = 'suspended', // 暂停合作
+  TERMINATED = 'terminated', // 终止合作
   PENDING_APPROVAL = 'pending_approval', // 待审批
-  UNDER_REVIEW = 'under_review' // 复核中
+  UNDER_REVIEW = 'under_review', // 复核中
 }
 
 /**
  * 供应商等级枚举
  */
 export enum SupplierLevel {
-  STRATEGIC = 'strategic',     // 战略供应商
-  PREFERRED = 'preferred',     // 优选供应商
-  STANDARD = 'standard',       // 标准供应商
-  TRIAL = 'trial'             // 试用供应商
+  STRATEGIC = 'strategic', // 战略供应商
+  PREFERRED = 'preferred', // 优选供应商
+  STANDARD = 'standard', // 标准供应商
+  TRIAL = 'trial', // 试用供应商
 }
 
 /**
@@ -28,10 +28,10 @@ export enum SupplierLevel {
  */
 export enum SupplierType {
   MANUFACTURER = 'manufacturer', // 生产商
-  WHOLESALER = 'wholesaler',     // 批发商
-  DISTRIBUTOR = 'distributor',   // 经销商
+  WHOLESALER = 'wholesaler', // 批发商
+  DISTRIBUTOR = 'distributor', // 经销商
   SERVICE_PROVIDER = 'service_provider', // 服务提供商
-  OTHER = 'other'               // 其他
+  OTHER = 'other', // 其他
 }
 
 /**

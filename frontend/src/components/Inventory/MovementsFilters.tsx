@@ -4,10 +4,7 @@ import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { InventoryQueryParams } from '@/types/inventory';
 import { TransactionType, SourceType } from '@/types/inventory';
 import { useResponsive } from '@/hooks/useResponsive';
-import {
-  getTransactionTypeLabel,
-  getSourceTypeLabel,
-} from '@/utils/inventoryHelpers';
+import { getTransactionTypeLabel, getSourceTypeLabel } from '@/utils/inventoryHelpers';
 
 const { RangePicker } = DatePicker;
 
@@ -53,7 +50,7 @@ export const MovementsFilters: React.FC<MovementsFiltersProps> = ({
   };
 
   // 交易类型选项
-  const transactionTypeOptions = Object.values(TransactionType).map(type => {
+  const transactionTypeOptions = Object.values(TransactionType).map((type) => {
     const { label, color } = getTransactionTypeLabel(type);
     return {
       label,
@@ -62,7 +59,7 @@ export const MovementsFilters: React.FC<MovementsFiltersProps> = ({
   });
 
   // 来源类型选项
-  const sourceTypeOptions = Object.values(SourceType).map(type => {
+  const sourceTypeOptions = Object.values(SourceType).map((type) => {
     const { label } = getSourceTypeLabel(type);
     return {
       label,
@@ -85,41 +82,24 @@ export const MovementsFilters: React.FC<MovementsFiltersProps> = ({
 
   return (
     <Card size="small" style={{ marginBottom: 16 }}>
-      <Form
-        form={form}
-        onFinish={handleFinish}
-        {...formLayout}
-        style={{ marginBottom: 0 }}
-      >
+      <Form form={form} onFinish={handleFinish} {...formLayout} style={{ marginBottom: 0 }}>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: isMobile
-              ? '1fr'
-              : isTablet
-              ? 'repeat(2, 1fr)'
-              : 'repeat(4, 1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
             gap: 16,
             marginBottom: 16,
           }}
         >
           <Form.Item label="关键词" name="keyword" style={{ marginBottom: 0 }}>
-            <Input
-              placeholder="SKU编码/单据号"
-              prefix={<SearchOutlined />}
-              allowClear
-            />
+            <Input placeholder="SKU编码/单据号" prefix={<SearchOutlined />} allowClear />
           </Form.Item>
 
           <Form.Item label="门店/仓库" name="storeId" style={{ marginBottom: 0 }}>
             <Select placeholder="选择门店" options={storeOptions} allowClear />
           </Form.Item>
 
-          <Form.Item
-            label="交易类型"
-            name="transactionType"
-            style={{ marginBottom: 0 }}
-          >
+          <Form.Item label="交易类型" name="transactionType" style={{ marginBottom: 0 }}>
             <Select
               mode="multiple"
               placeholder="选择交易类型"
@@ -129,11 +109,7 @@ export const MovementsFilters: React.FC<MovementsFiltersProps> = ({
             />
           </Form.Item>
 
-          <Form.Item
-            label="来源类型"
-            name="sourceType"
-            style={{ marginBottom: 0 }}
-          >
+          <Form.Item label="来源类型" name="sourceType" style={{ marginBottom: 0 }}>
             <Select
               mode="multiple"
               placeholder="选择来源类型"
@@ -159,27 +135,16 @@ export const MovementsFilters: React.FC<MovementsFiltersProps> = ({
             wrapperCol={{ span: isMobile ? 24 : 21 }}
             style={{ marginBottom: 0 }}
           >
-            <RangePicker
-              style={{ width: '100%' }}
-              showTime
-              format="YYYY-MM-DD HH:mm"
-            />
+            <RangePicker style={{ width: '100%' }} showTime format="YYYY-MM-DD HH:mm" />
           </Form.Item>
         </div>
 
-        <Form.Item
-          style={{ marginBottom: 0, textAlign: isMobile ? 'center' : 'right' }}
-        >
+        <Form.Item style={{ marginBottom: 0, textAlign: isMobile ? 'center' : 'right' }}>
           <Space>
             <Button onClick={handleReset} icon={<ReloadOutlined />}>
               重置
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              icon={<SearchOutlined />}
-            >
+            <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
               查询
             </Button>
           </Space>

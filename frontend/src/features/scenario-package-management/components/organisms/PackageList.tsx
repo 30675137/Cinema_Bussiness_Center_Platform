@@ -143,8 +143,7 @@ export const PackageList: React.FC<PackageListProps> = ({
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
-      render: (date: string) =>
-        date ? new Date(date).toLocaleString('zh-CN') : '-',
+      render: (date: string) => (date ? new Date(date).toLocaleString('zh-CN') : '-'),
     },
     {
       title: '操作',

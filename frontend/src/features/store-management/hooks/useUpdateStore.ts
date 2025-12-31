@@ -77,11 +77,7 @@ async function updateStoreAddress(
 export function useUpdateStore() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    Store,
-    Error,
-    { storeId: string; data: UpdateStoreAddressPayload }
-  >({
+  return useMutation<Store, Error, { storeId: string; data: UpdateStoreAddressPayload }>({
     mutationFn: async ({ storeId, data }) => {
       return updateStoreAddress(storeId, data);
     },

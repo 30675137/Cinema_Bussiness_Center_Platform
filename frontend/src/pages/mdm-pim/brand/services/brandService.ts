@@ -277,7 +277,10 @@ class BrandService {
   /**
    * 批量操作品牌
    */
-  async batchOperate(operation: 'enable' | 'disable' | 'delete', brandIds: string[]): Promise<void> {
+  async batchOperate(
+    operation: 'enable' | 'disable' | 'delete',
+    brandIds: string[]
+  ): Promise<void> {
     try {
       const response = await fetch(`${this.baseURL}/batch`, {
         method: 'POST',
@@ -335,9 +338,11 @@ class BrandService {
   /**
    * 检查品牌名称是否重复
    */
-  async checkNameDuplication(
-    params: { name: string; brandType: string; excludeId?: string }
-  ): Promise<ApiResponse<{ isDuplicate: boolean }>> {
+  async checkNameDuplication(params: {
+    name: string;
+    brandType: string;
+    excludeId?: string;
+  }): Promise<ApiResponse<{ isDuplicate: boolean }>> {
     try {
       const queryParams = new URLSearchParams();
       queryParams.append('name', params.name);

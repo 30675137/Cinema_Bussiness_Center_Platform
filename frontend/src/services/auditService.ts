@@ -9,7 +9,7 @@ import {
   AuditConfig,
   CreateAuditRequest,
   UpdateAuditRequest,
-  AuditFormData
+  AuditFormData,
 } from '@/types/audit';
 
 /**
@@ -124,7 +124,9 @@ export const auditService = {
   /**
    * 创建审核配置
    */
-  async createAuditConfig(data: Omit<AuditConfig, 'id' | 'createdAt' | 'updatedAt'>): Promise<AuditConfig> {
+  async createAuditConfig(
+    data: Omit<AuditConfig, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<AuditConfig> {
     const response = await apiClient.post('/audit-configs', data);
     return response.data;
   },
@@ -246,7 +248,7 @@ export const auditService = {
     includeHistory?: boolean;
   }): Promise<Blob> {
     const response = await apiClient.post('/audits/export', params, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
   },
@@ -254,10 +256,13 @@ export const auditService = {
   /**
    * 导入审核数据
    */
-  async importAuditData(file: File, options?: {
-    updateMode?: 'create' | 'update';
-    validateOnly?: boolean;
-  }): Promise<{
+  async importAuditData(
+    file: File,
+    options?: {
+      updateMode?: 'create' | 'update';
+      validateOnly?: boolean;
+    }
+  ): Promise<{
     imported: number;
     failed: number;
     errors: Array<{
@@ -277,8 +282,8 @@ export const auditService = {
 
     const response = await apiClient.post('/audits/import', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -395,5 +400,5 @@ export const auditService = {
   }> {
     const response = await apiClient.post('/audits/send-reminders', params);
     return response.data;
-  }
+  },
 };

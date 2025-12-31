@@ -59,7 +59,7 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
         // 验证显示低库存标签
         const statusTags = page.locator('.ant-tag:has-text("低于安全库存")');
         const tagCount = await statusTags.count();
-        
+
         if (tagCount > 0) {
           // 验证标签颜色
           const firstTag = statusTags.first();
@@ -75,15 +75,19 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
     // Then 表格按库存状态重新排序显示
 
     // 查找可排序的列头
-    const sortableHeaders = page.locator('[data-testid="inventory-table"] th .ant-table-column-sorters');
-    
-    if (await sortableHeaders.count() > 0) {
+    const sortableHeaders = page.locator(
+      '[data-testid="inventory-table"] th .ant-table-column-sorters'
+    );
+
+    if ((await sortableHeaders.count()) > 0) {
       // 点击第一个可排序列
       await sortableHeaders.first().click();
       await page.waitForTimeout(500);
 
       // 验证排序图标激活
-      const activeSorter = page.locator('[data-testid="inventory-table"] .ant-table-column-sorter-up.active, .ant-table-column-sorter-down.active');
+      const activeSorter = page.locator(
+        '[data-testid="inventory-table"] .ant-table-column-sorter-up.active, .ant-table-column-sorter-down.active'
+      );
       await expect(activeSorter.first()).toBeVisible();
 
       // 再次点击反向排序
@@ -99,8 +103,8 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
 
     // 查找详情按钮
     const detailButtons = page.locator('button:has-text("详情")');
-    
-    if (await detailButtons.count() > 0) {
+
+    if ((await detailButtons.count()) > 0) {
       // 点击第一条记录的详情按钮
       await detailButtons.first().click();
       await page.waitForTimeout(500);
@@ -177,7 +181,7 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
 
         // 验证调整按钮显示
         const adjustButtons = page.locator('button:has-text("调整")');
-        if (await adjustButtons.count() > 0) {
+        if ((await adjustButtons.count()) > 0) {
           await expect(adjustButtons.first()).toBeVisible();
         }
       }
@@ -204,7 +208,7 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
 
     // 点击调整按钮
     const adjustButtons = page.locator('button:has-text("调整")');
-    if (await adjustButtons.count() > 0) {
+    if ((await adjustButtons.count()) > 0) {
       await adjustButtons.first().click();
       await page.waitForTimeout(500);
 
@@ -272,7 +276,7 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
     if (await pagination.isVisible()) {
       // 获取当前页码
       const currentPage = await pagination.locator('.ant-pagination-item-active').textContent();
-      
+
       // 查找下一页按钮
       const nextButton = pagination.locator('.ant-pagination-next');
       if (await nextButton.isEnabled()) {
@@ -323,5 +327,4 @@ test.describe('用户故事1: 库存台账查看与筛选', () => {
       }
     }
   });
-
 });

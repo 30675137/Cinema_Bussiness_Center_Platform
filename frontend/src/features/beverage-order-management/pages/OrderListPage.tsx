@@ -2,23 +2,14 @@
  * @spec O003-beverage-order
  * B端订单列表页面
  */
-import React, { useState } from 'react'
-import {
-  Card,
-  Table,
-  Space,
-  Button,
-  Select,
-  Input,
-  Typography,
-  type TableColumnsType,
-} from 'antd'
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
-import { useBeverageOrders } from '../../../hooks/useBeverageOrders'
-import { BeverageOrderStatusBadge, OrderActionButtons } from '../components'
-import type { BeverageOrderDTO, BeverageOrderStatus } from '../../../types/beverageOrder'
+import React, { useState } from 'react';
+import { Card, Table, Space, Button, Select, Input, Typography, type TableColumnsType } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useBeverageOrders } from '../../../hooks/useBeverageOrders';
+import { BeverageOrderStatusBadge, OrderActionButtons } from '../components';
+import type { BeverageOrderDTO, BeverageOrderStatus } from '../../../types/beverageOrder';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 /**
  * B端订单列表页面
@@ -30,11 +21,11 @@ const { Title } = Typography
  * - 快捷操作
  */
 export const OrderListPage: React.FC = () => {
-  const [storeId] = useState('00000000-0000-0000-0000-000000000001')
-  const [statusFilter, setStatusFilter] = useState<BeverageOrderStatus | undefined>()
-  const [searchText, setSearchText] = useState('')
-  const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(20)
+  const [storeId] = useState('00000000-0000-0000-0000-000000000001');
+  const [statusFilter, setStatusFilter] = useState<BeverageOrderStatus | undefined>();
+  const [searchText, setSearchText] = useState('');
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
 
   const {
     data: orderPage,
@@ -47,20 +38,20 @@ export const OrderListPage: React.FC = () => {
     status: statusFilter,
     page,
     pageSize,
-  })
+  });
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('zh-CN')
-  }
+    return new Date(dateString).toLocaleString('zh-CN');
+  };
 
   const formatSpecs = (specsJson: string) => {
     try {
-      const specs = JSON.parse(specsJson)
-      return Object.values(specs).filter(Boolean).join(' · ')
+      const specs = JSON.parse(specsJson);
+      return Object.values(specs).filter(Boolean).join(' · ');
     } catch {
-      return specsJson
+      return specsJson;
     }
-  }
+  };
 
   const columns: TableColumnsType<BeverageOrderDTO> = [
     {
@@ -137,20 +128,18 @@ export const OrderListPage: React.FC = () => {
         />
       ),
     },
-  ]
+  ];
 
   // 客户端搜索过滤
   const filteredData = orderPage?.data.filter((order) =>
     searchText ? order.orderNumber.includes(searchText) : true
-  )
+  );
 
   return (
     <div style={{ padding: 24 }}>
       <Card>
         {/* 页面头部 */}
-        <Space
-          style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}
-        >
+        <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 16 }}>
           <Title level={3} style={{ margin: 0 }}>
             订单管理
           </Title>
@@ -176,11 +165,7 @@ export const OrderListPage: React.FC = () => {
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refetch()}
-              loading={isRefetching}
-            >
+            <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isRefetching}>
               刷新
             </Button>
           </Space>
@@ -201,8 +186,8 @@ export const OrderListPage: React.FC = () => {
             showQuickJumper: true,
             showTotal: (total) => `共 ${total} 条`,
             onChange: (newPage, newPageSize) => {
-              setPage(newPage - 1)
-              setPageSize(newPageSize)
+              setPage(newPage - 1);
+              setPageSize(newPageSize);
             },
           }}
         />
@@ -214,5 +199,5 @@ export const OrderListPage: React.FC = () => {
         )}
       </Card>
     </div>
-  )
-}
+  );
+};

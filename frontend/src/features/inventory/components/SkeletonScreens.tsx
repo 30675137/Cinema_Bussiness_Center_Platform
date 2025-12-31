@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 列表骨架屏组件
- * 
+ *
  * 为库存和调整列表提供加载状态的骨架屏显示。
  * 实现 T064 任务。
- * 
+ *
  * @since Phase 8 - Polish
  */
 
@@ -34,41 +34,43 @@ export const TableSkeleton: React.FC<TableSkeletonProps> = ({
     <div className="table-skeleton" data-testid="table-skeleton">
       {/* 表头骨架 */}
       {showHeader && (
-        <div style={{ 
-          display: 'flex', 
-          gap: 16, 
-          padding: '12px 16px',
-          background: '#fafafa',
-          borderBottom: '1px solid #f0f0f0',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 16,
+            padding: '12px 16px',
+            background: '#fafafa',
+            borderBottom: '1px solid #f0f0f0',
+          }}
+        >
           {Array.from({ length: columns }).map((_, i) => (
-            <Skeleton.Input 
-              key={`header-${i}`} 
-              active 
-              size="small" 
-              style={{ width: i === 0 ? 80 : 100 }} 
+            <Skeleton.Input
+              key={`header-${i}`}
+              active
+              size="small"
+              style={{ width: i === 0 ? 80 : 100 }}
             />
           ))}
         </div>
       )}
-      
+
       {/* 表格行骨架 */}
       {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div 
+        <div
           key={`row-${rowIndex}`}
-          style={{ 
-            display: 'flex', 
-            gap: 16, 
+          style={{
+            display: 'flex',
+            gap: 16,
             padding: '16px',
             borderBottom: '1px solid #f0f0f0',
           }}
         >
           {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton.Input 
-              key={`cell-${rowIndex}-${colIndex}`} 
-              active 
-              size="small" 
-              style={{ width: colIndex === 0 ? 120 : 80 + Math.random() * 40 }} 
+            <Skeleton.Input
+              key={`cell-${rowIndex}-${colIndex}`}
+              active
+              size="small"
+              style={{ width: colIndex === 0 ? 120 : 80 + Math.random() * 40 }}
             />
           ))}
         </div>
@@ -90,10 +92,7 @@ export interface CardSkeletonProps {
 /**
  * 卡片列表骨架屏
  */
-export const CardListSkeleton: React.FC<CardSkeletonProps> = ({
-  count = 6,
-  columns = 3,
-}) => {
+export const CardListSkeleton: React.FC<CardSkeletonProps> = ({ count = 6, columns = 3 }) => {
   return (
     <Row gutter={[16, 16]} data-testid="card-list-skeleton">
       {Array.from({ length: count }).map((_, index) => (
@@ -116,7 +115,7 @@ export const DetailSkeleton: React.FC = () => {
       <Space direction="vertical" style={{ width: '100%' }} size="large">
         {/* 标题 */}
         <Skeleton.Input active style={{ width: 200 }} />
-        
+
         {/* 描述列表 */}
         {Array.from({ length: 4 }).map((_, index) => (
           <div key={index} style={{ display: 'flex', gap: 16 }}>
@@ -124,10 +123,10 @@ export const DetailSkeleton: React.FC = () => {
             <Skeleton.Input active size="small" style={{ width: 150 }} />
           </div>
         ))}
-        
+
         {/* 分隔线 */}
         <div style={{ height: 1, background: '#f0f0f0', margin: '16px 0' }} />
-        
+
         {/* 更多内容 */}
         <Skeleton active paragraph={{ rows: 3 }} />
       </Space>
@@ -143,7 +142,9 @@ export const ApprovalListSkeleton: React.FC<{ rows?: number }> = ({ rows = 5 }) 
     <div data-testid="approval-list-skeleton">
       {Array.from({ length: rows }).map((_, index) => (
         <Card key={index} style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}
+          >
             <div style={{ flex: 1 }}>
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Skeleton.Input active style={{ width: 200 }} />

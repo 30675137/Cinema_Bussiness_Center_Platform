@@ -94,10 +94,7 @@ export const MovementsTable: React.FC<MovementsTableProps> = ({
         const { label, color } = getTransactionTypeLabel(type);
         const isInbound = isInboundTransaction(type);
         return (
-          <Tag
-            color={color}
-            icon={isInbound ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-          >
+          <Tag color={color} icon={isInbound ? <ArrowUpOutlined /> : <ArrowDownOutlined />}>
             {label}
           </Tag>
         );
@@ -113,10 +110,7 @@ export const MovementsTable: React.FC<MovementsTableProps> = ({
       render: (qty: number, record) => {
         const isInbound = isInboundTransaction(record.transactionType);
         return (
-          <Text
-            strong
-            style={{ color: isInbound ? '#52c41a' : '#ff4d4f' }}
-          >
+          <Text strong style={{ color: isInbound ? '#52c41a' : '#ff4d4f' }}>
             {formatTransactionQuantity(qty, record.transactionType, record.sku?.unit)}
           </Text>
         );
@@ -136,9 +130,7 @@ export const MovementsTable: React.FC<MovementsTableProps> = ({
       key: 'stockAfter',
       width: 100,
       align: 'right',
-      render: (qty: number, record) => (
-        <Text strong>{formatQuantity(qty, record.sku?.unit)}</Text>
-      ),
+      render: (qty: number, record) => <Text strong>{formatQuantity(qty, record.sku?.unit)}</Text>,
     },
     {
       title: '单价',
@@ -171,13 +163,8 @@ export const MovementsTable: React.FC<MovementsTableProps> = ({
       dataIndex: 'sourceDocument',
       key: 'sourceDocument',
       width: 150,
-      render: (doc?: string) => (
-        doc ? (
-          <Link onClick={(e) => e.stopPropagation()}>
-            {doc}
-          </Link>
-        ) : '-'
-      ),
+      render: (doc?: string) =>
+        doc ? <Link onClick={(e) => e.stopPropagation()}>{doc}</Link> : '-',
     },
     {
       title: '操作人',

@@ -10,7 +10,8 @@ test.describe('移动端用户体验', () => {
     // 设置移动端用户代理
     await page.setViewportSize({ width: 375, height: 667 });
     await page.setExtraHTTPHeaders({
-      'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+      'User-Agent':
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1',
     });
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
@@ -89,16 +90,31 @@ test.describe('移动端用户体验', () => {
     const drawerBoundingBox = await drawer.boundingBox();
     if (drawerBoundingBox) {
       // 从抽屉左侧边缘向右滑动（测试滑动手势）
-      await page.touchscreen.tap(drawerBoundingBox.x + 10, drawerBoundingBox.y + drawerBoundingBox.height / 2);
-      await page.touchscreen.tap(drawerBoundingBox.x + 50, drawerBoundingBox.y + drawerBoundingBox.height / 2);
-      await page.touchscreen.tap(drawerBoundingBox.x + 100, drawerBoundingBox.y + drawerBoundingBox.height / 2);
+      await page.touchscreen.tap(
+        drawerBoundingBox.x + 10,
+        drawerBoundingBox.y + drawerBoundingBox.height / 2
+      );
+      await page.touchscreen.tap(
+        drawerBoundingBox.x + 50,
+        drawerBoundingBox.y + drawerBoundingBox.height / 2
+      );
+      await page.touchscreen.tap(
+        drawerBoundingBox.x + 100,
+        drawerBoundingBox.y + drawerBoundingBox.height / 2
+      );
 
       // 等待动画完成
       await page.waitForTimeout(300);
 
       // 或者尝试从右向左滑动关闭抽屉
-      await page.touchscreen.tap(drawerBoundingBox.x + drawerBoundingBox.width - 10, drawerBoundingBox.y + drawerBoundingBox.height / 2);
-      await page.touchscreen.tap(drawerBoundingBox.x - 50, drawerBoundingBox.y + drawerBoundingBox.height / 2);
+      await page.touchscreen.tap(
+        drawerBoundingBox.x + drawerBoundingBox.width - 10,
+        drawerBoundingBox.y + drawerBoundingBox.height / 2
+      );
+      await page.touchscreen.tap(
+        drawerBoundingBox.x - 50,
+        drawerBoundingBox.y + drawerBoundingBox.height / 2
+      );
 
       await page.waitForTimeout(300);
     }
@@ -119,7 +135,9 @@ test.describe('移动端用户体验', () => {
     await page.waitForSelector('.ant-drawer-open', { timeout: 3000 });
 
     // 查找移动端搜索框
-    const mobileSearchInput = page.locator('.ant-drawer-open .sidebar-search input[placeholder*="搜索"]');
+    const mobileSearchInput = page.locator(
+      '.ant-drawer-open .sidebar-search input[placeholder*="搜索"]'
+    );
 
     if (await mobileSearchInput.isVisible()) {
       await expect(mobileSearchInput).toBeVisible();
@@ -185,7 +203,9 @@ test.describe('移动端用户体验', () => {
 
     if (itemCount > 0) {
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 长按或点击收藏按钮
       if (await favoriteButton.isVisible()) {
@@ -220,17 +240,19 @@ test.describe('移动端用户体验', () => {
       await page.waitForTimeout(200);
 
       // 验证触摸反馈样式
-      const menuItemStyles = await firstMenuItem.evaluate(el => {
+      const menuItemStyles = await firstMenuItem.evaluate((el) => {
         return window.getComputedStyle(el);
       });
 
       // 检查是否有触摸反馈效果
-      expect(menuItemStyles.transition || menuItemStyles.transform || menuItemStyles.opacity).toBeDefined();
+      expect(
+        menuItemStyles.transition || menuItemStyles.transform || menuItemStyles.opacity
+      ).toBeDefined();
     }
 
     // 测试抽屉的动画效果
     const drawer = page.locator('.ant-drawer-open');
-    const drawerStyles = await drawer.evaluate(el => {
+    const drawerStyles = await drawer.evaluate((el) => {
       return window.getComputedStyle(el);
     });
 
@@ -249,14 +271,14 @@ test.describe('移动端用户体验', () => {
 
     if (await scrollableMenu.isVisible()) {
       // 检查是否需要滚动
-      const needsScroll = await scrollableMenu.evaluate(el => {
+      const needsScroll = await scrollableMenu.evaluate((el) => {
         return el.scrollHeight > el.clientHeight;
       });
 
       if (needsScroll) {
         // 测试滚动功能
-        const scrollHeight = await scrollableMenu.evaluate(el => el.scrollHeight);
-        const clientHeight = await scrollableMenu.evaluate(el => el.clientHeight);
+        const scrollHeight = await scrollableMenu.evaluate((el) => el.scrollHeight);
+        const clientHeight = await scrollableMenu.evaluate((el) => el.clientHeight);
 
         // 向下滚动
         await scrollableMenu.evaluate((el, scrollAmount) => {
@@ -266,11 +288,11 @@ test.describe('移动端用户体验', () => {
         await page.waitForTimeout(300);
 
         // 验证滚动位置
-        const scrollTop = await scrollableMenu.evaluate(el => el.scrollTop);
+        const scrollTop = await scrollableMenu.evaluate((el) => el.scrollTop);
         expect(scrollTop).toBeGreaterThan(0);
 
         // 检查滚动是否有平滑效果
-        const scrollBehavior = await scrollableMenu.evaluate(el => {
+        const scrollBehavior = await scrollableMenu.evaluate((el) => {
           return window.getComputedStyle(el).scrollBehavior || el.style.scrollBehavior;
         });
       }
@@ -290,7 +312,7 @@ test.describe('移动端用户体验', () => {
     // 获取当前聚焦元素
     const focusedElement = page.locator(':focus');
     if (await focusedElement.isVisible()) {
-      const tagName = await focusedElement.evaluate(el => el.tagName.toLowerCase());
+      const tagName = await focusedElement.evaluate((el) => el.tagName.toLowerCase());
       expect(['button', 'input', 'a', 'div']).toContain(tagName);
     }
 
@@ -340,12 +362,19 @@ test.describe('移动端用户体验', () => {
   test('T062-10: 移动端性能测试', async ({ page }) => {
     // 测试页面加载性能
     const performanceMetrics = await page.evaluate(() => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
       return {
-        domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+        domContentLoaded:
+          navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
         loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
-        firstPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime || 0,
-        firstContentfulPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-contentful-paint')?.startTime || 0
+        firstPaint:
+          performance.getEntriesByType('paint').find((p) => p.name === 'first-paint')?.startTime ||
+          0,
+        firstContentfulPaint:
+          performance.getEntriesByType('paint').find((p) => p.name === 'first-contentful-paint')
+            ?.startTime || 0,
       };
     });
 
@@ -386,7 +415,7 @@ test.describe('移动端用户体验', () => {
     await expect(drawer).toBeVisible();
 
     // 检查抽屉在横屏模式下的宽度
-    const drawerWidth = await drawer.evaluate(el => {
+    const drawerWidth = await drawer.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return style.width;
     });
@@ -408,7 +437,10 @@ test.describe('移动端用户体验', () => {
     await page.waitForSelector('.ant-drawer-open', { timeout: 3000 });
 
     // 查找表单相关的菜单项
-    const formMenuItem = page.locator('.ant-drawer-open .sidebar-menu .ant-menu-item').filter({ hasText: /添加|新增|创建|编辑/ }).first();
+    const formMenuItem = page
+      .locator('.ant-drawer-open .sidebar-menu .ant-menu-item')
+      .filter({ hasText: /添加|新增|创建|编辑/ })
+      .first();
 
     if (await formMenuItem.isVisible()) {
       await formMenuItem.click();

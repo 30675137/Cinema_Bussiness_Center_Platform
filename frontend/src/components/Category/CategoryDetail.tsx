@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Card,
   Descriptions,
@@ -10,167 +10,174 @@ import {
   Spin,
   Modal,
   Tooltip,
-  Popconfirm
-} from 'antd'
+  Popconfirm,
+} from 'antd';
 import {
   EditOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
-  PoweroffOutlined
-} from '@ant-design/icons'
-import type { Category } from '@/types/category'
-import { useCategoryDetailQuery } from '@/hooks/api/useCategoryQuery'
-import { useCategoryStore } from '@/stores/categoryStore'
-import CategoryForm from './CategoryForm'
-import { 
-  useUpdateCategoryMutation, 
+  PoweroffOutlined,
+} from '@ant-design/icons';
+import type { Category } from '@/types/category';
+import { useCategoryDetailQuery } from '@/hooks/api/useCategoryQuery';
+import { useCategoryStore } from '@/stores/categoryStore';
+import CategoryForm from './CategoryForm';
+import {
+  useUpdateCategoryMutation,
   useUpdateCategoryStatusMutation,
-  useDeleteCategoryMutation 
-} from '@/hooks/api/useCategoryMutation'
-import { useQueryClient } from '@tanstack/react-query'
-import { categoryKeys } from '@/services/queryKeys'
+  useDeleteCategoryMutation,
+} from '@/hooks/api/useCategoryMutation';
+import { useQueryClient } from '@tanstack/react-query';
+import { categoryKeys } from '@/services/queryKeys';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 interface CategoryDetailProps {
-  categoryId?: string | null
-  onEdit?: (category: Category) => void
-  showEditButton?: boolean
+  categoryId?: string | null;
+  onEdit?: (category: Category) => void;
+  showEditButton?: boolean;
 }
 
 const CategoryDetail: React.FC<CategoryDetailProps> = ({
   categoryId,
   onEdit,
-  showEditButton = true
+  showEditButton = true,
 }) => {
-  const { selectedCategoryId, isEditing, setEditing, setSelectedCategoryId } = useCategoryStore()
-  const effectiveCategoryId = categoryId || selectedCategoryId
-  const queryClient = useQueryClient()
+  const { selectedCategoryId, isEditing, setEditing, setSelectedCategoryId } = useCategoryStore();
+  const effectiveCategoryId = categoryId || selectedCategoryId;
+  const queryClient = useQueryClient();
 
-  const { data: category, isLoading, error } = useCategoryDetailQuery(
-    effectiveCategoryId || '',
-    !!effectiveCategoryId
-  )
+  const {
+    data: category,
+    isLoading,
+    error,
+  } = useCategoryDetailQuery(effectiveCategoryId || '', !!effectiveCategoryId);
 
-  const updateMutation = useUpdateCategoryMutation()
-  const statusMutation = useUpdateCategoryStatusMutation()
-  const deleteMutation = useDeleteCategoryMutation()
-  
-  const [statusModalVisible, setStatusModalVisible] = useState(false)
+  const updateMutation = useUpdateCategoryMutation();
+  const statusMutation = useUpdateCategoryStatusMutation();
+  const deleteMutation = useDeleteCategoryMutation();
+
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
 
   // 处理编辑按钮点击
   const handleEditClick = () => {
     if (category) {
-      setEditing(true)
-      onEdit?.(category)
+      setEditing(true);
+      onEdit?.(category);
     }
-  }
+  };
 
   // 处理取消编辑
   const handleCancelEdit = () => {
-    setEditing(false)
-  }
+    setEditing(false);
+  };
 
   // 处理保存编辑
   const handleSaveEdit = async (values: any) => {
-    if (!category) return
-    
+    if (!category) return;
+
     try {
       await updateMutation.mutateAsync({
         id: category.id,
-        data: values
-      })
-      setEditing(false)
+        data: values,
+      });
+      setEditing(false);
     } catch (error) {
-      console.error('Update category error:', error)
+      console.error('Update category error:', error);
     }
-  }
+  };
 
   // 处理状态切换
   const handleStatusToggle = () => {
-    if (!category) return
-    setStatusModalVisible(true)
-  }
+    if (!category) return;
+    setStatusModalVisible(true);
+  };
 
   // 确认状态切换
   const handleConfirmStatusChange = async () => {
-    if (!category) return
-    
-    const newStatus = category.status === 'active' ? 'inactive' : 'active'
+    if (!category) return;
+
+    const newStatus = category.status === 'active' ? 'inactive' : 'active';
     try {
       await statusMutation.mutateAsync({
         id: category.id,
-        status: newStatus
-      })
-      setStatusModalVisible(false)
+        status: newStatus,
+      });
+      setStatusModalVisible(false);
     } catch (error) {
-      console.error('Update status error:', error)
+      console.error('Update status error:', error);
     }
-  }
+  };
 
   // 处理删除
   const handleDelete = async () => {
-    if (!category) return
-    
+    if (!category) return;
+
     try {
-      await deleteMutation.mutateAsync(category.id)
+      await deleteMutation.mutateAsync(category.id);
       // 删除成功后，清除选中状态并刷新树
-      setSelectedCategoryId(null)
-      queryClient.invalidateQueries({ queryKey: categoryKeys.tree() })
+      setSelectedCategoryId(null);
+      queryClient.invalidateQueries({ queryKey: categoryKeys.tree() });
     } catch (error) {
-      console.error('Delete category error:', error)
+      console.error('Delete category error:', error);
     }
-  }
+  };
 
   if (!effectiveCategoryId) {
     return (
       <Card>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '400px',
-          color: '#999'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '400px',
+            color: '#999',
+          }}
+        >
           <Text type="secondary">请选择一个类目查看详情</Text>
         </div>
       </Card>
-    )
+    );
   }
 
   if (isLoading) {
     return (
       <Card>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '400px'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '400px',
+          }}
+        >
           <Spin size="large" />
         </div>
       </Card>
-    )
+    );
   }
 
   if (error || !category) {
     return (
       <Card>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '400px',
-          color: '#ff4d4f'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '400px',
+            color: '#ff4d4f',
+          }}
+        >
           <CloseCircleOutlined style={{ fontSize: 48, marginBottom: 16 }} />
           <Text type="danger">加载类目详情失败</Text>
         </div>
       </Card>
-    )
+    );
   }
 
   // 编辑模式：显示表单
@@ -183,13 +190,13 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         onCancel={handleCancelEdit}
         loading={updateMutation.isPending}
       />
-    )
+    );
   }
 
   // 格式化路径显示
   const formatPath = (path: string[]): string => {
-    return path.length > 0 ? path.join(' / ') : '根类目'
-  }
+    return path.length > 0 ? path.join(' / ') : '根类目';
+  };
 
   // 格式化日期
   const formatDate = (dateString: string): string => {
@@ -199,12 +206,12 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit'
-      })
+        minute: '2-digit',
+      });
     } catch {
-      return dateString
+      return dateString;
     }
-  }
+  };
 
   return (
     <Card
@@ -215,18 +222,15 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
           </Title>
           {showEditButton && !isEditing && (
             <>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEditClick}
-                size="small"
-              >
+              <Button type="primary" icon={<EditOutlined />} onClick={handleEditClick} size="small">
                 编辑
               </Button>
               {category && (
                 <>
                   <Button
-                    icon={category.status === 'active' ? <PoweroffOutlined /> : <CheckCircleOutlined />}
+                    icon={
+                      category.status === 'active' ? <PoweroffOutlined /> : <CheckCircleOutlined />
+                    }
                     onClick={handleStatusToggle}
                     size="small"
                     loading={statusMutation.isPending}
@@ -277,7 +281,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         labelStyle={{
           width: '120px',
           backgroundColor: '#fafafa',
-          fontWeight: 500
+          fontWeight: 500,
         }}
       >
         <Descriptions.Item label="类目名称">
@@ -329,9 +333,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         )}
 
         <Descriptions.Item label="关联SPU数量">
-          <Tag color={category.spuCount > 0 ? 'orange' : 'default'}>
-            {category.spuCount} 个
-          </Tag>
+          <Tag color={category.spuCount > 0 ? 'orange' : 'default'}>{category.spuCount} 个</Tag>
           {category.spuCount > 0 && (
             <Text type="secondary" style={{ marginLeft: 8, fontSize: '12px' }}>
               （该类目已被使用，不可删除）
@@ -379,9 +381,9 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         onCancel={() => setStatusModalVisible(false)}
         okText="确定"
         cancelText="取消"
-        okButtonProps={{ 
+        okButtonProps={{
           danger: category?.status === 'active',
-          loading: statusMutation.isPending 
+          loading: statusMutation.isPending,
         }}
       >
         {category?.status === 'active' ? (
@@ -401,8 +403,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         )}
       </Modal>
     </Card>
-  )
-}
+  );
+};
 
-export default CategoryDetail
-
+export default CategoryDetail;

@@ -12,7 +12,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   DragOutlined,
-  PlusOutlined
+  PlusOutlined,
 } from '@ant-design/icons';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -99,33 +99,45 @@ const FavoriteMenu: React.FC<FavoriteMenuProps> = ({
   /**
    * 处理收藏项点击
    */
-  const handleItemClick = useCallback((item: MenuItem) => {
-    navigateToMenuItem(item);
-    onItemClick?.(item);
-  }, [navigateToMenuItem, onItemClick]);
+  const handleItemClick = useCallback(
+    (item: MenuItem) => {
+      navigateToMenuItem(item);
+      onItemClick?.(item);
+    },
+    [navigateToMenuItem, onItemClick]
+  );
 
   /**
    * 处理添加收藏
    */
-  const handleAddFavorite = useCallback((item: MenuItem) => {
-    addToFavorites(item.id);
-    onManage?.('add', item);
-  }, [addToFavorites, onManage]);
+  const handleAddFavorite = useCallback(
+    (item: MenuItem) => {
+      addToFavorites(item.id);
+      onManage?.('add', item);
+    },
+    [addToFavorites, onManage]
+  );
 
   /**
    * 处理移除收藏
    */
-  const handleRemoveFavorite = useCallback((item: MenuItem) => {
-    removeFromFavorites(item.id);
-    onManage?.('remove', item);
-  }, [removeFromFavorites, onManage]);
+  const handleRemoveFavorite = useCallback(
+    (item: MenuItem) => {
+      removeFromFavorites(item.id);
+      onManage?.('remove', item);
+    },
+    [removeFromFavorites, onManage]
+  );
 
   /**
    * 处理编辑收藏
    */
-  const handleEditFavorite = useCallback((item: MenuItem) => {
-    onManage?.('edit', item);
-  }, [onManage]);
+  const handleEditFavorite = useCallback(
+    (item: MenuItem) => {
+      onManage?.('edit', item);
+    },
+    [onManage]
+  );
 
   /**
    * 处理拖拽开始
@@ -144,13 +156,16 @@ const FavoriteMenu: React.FC<FavoriteMenuProps> = ({
   /**
    * 处理拖拽放置
    */
-  const handleDrop = useCallback((targetItem: MenuItem) => {
-    if (draggedItem && draggedItem.id !== targetItem.id) {
-      // 这里应该实现重新排序逻辑
-      onManage?.('reorder', draggedItem);
-    }
-    setDraggedItem(null);
-  }, [draggedItem, onManage]);
+  const handleDrop = useCallback(
+    (targetItem: MenuItem) => {
+      if (draggedItem && draggedItem.id !== targetItem.id) {
+        // 这里应该实现重新排序逻辑
+        onManage?.('reorder', draggedItem);
+      }
+      setDraggedItem(null);
+    },
+    [draggedItem, onManage]
+  );
 
   /**
    * 获取操作菜单
@@ -277,12 +292,7 @@ const FavoriteMenu: React.FC<FavoriteMenuProps> = ({
                     完成
                   </Button>
                   <Tooltip title="拖拽调整顺序">
-                    <Button
-                      size="small"
-                      type="text"
-                      icon={<DragOutlined />}
-                      className="drag-hint"
-                    >
+                    <Button size="small" type="text" icon={<DragOutlined />} className="drag-hint">
                       拖拽排序
                     </Button>
                   </Tooltip>
@@ -307,11 +317,7 @@ const FavoriteMenu: React.FC<FavoriteMenuProps> = ({
                   }}
                   placement="bottomRight"
                 >
-                  <Button
-                    size="small"
-                    type="text"
-                    icon={<MoreOutlined />}
-                  />
+                  <Button size="small" type="text" icon={<MoreOutlined />} />
                 </Dropdown>
               )}
             </Space>
@@ -328,15 +334,11 @@ const FavoriteMenu: React.FC<FavoriteMenuProps> = ({
       title={renderHeader()}
       bordered={false}
     >
-      <div className="favorite-content">
-        {renderFavoriteItems()}
-      </div>
+      <div className="favorite-content">{renderFavoriteItems()}</div>
 
       {favoriteItems.length > maxItems && (
         <div className="favorite-more">
-          <Text type="secondary">
-            还有 {favoriteItems.length - maxItems} 个收藏项
-          </Text>
+          <Text type="secondary">还有 {favoriteItems.length - maxItems} 个收藏项</Text>
         </div>
       )}
     </Card>

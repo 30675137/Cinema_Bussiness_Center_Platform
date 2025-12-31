@@ -1,5 +1,5 @@
-import React from 'react'
-import { Layout, Menu, Typography } from 'antd'
+import React from 'react';
+import { Layout, Menu, Typography } from 'antd';
 import {
   DashboardOutlined,
   AppstoreOutlined,
@@ -10,21 +10,21 @@ import {
   BarChartOutlined,
   SettingOutlined,
   CoffeeOutlined,
-} from '@ant-design/icons'
-import { useNavigate, useLocation } from 'react-router-dom'
-import type { MenuProps } from 'antd'
+} from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
+import type { MenuProps } from 'antd';
 
-const { Sider } = Layout
-const { Title } = Typography
+const { Sider } = Layout;
+const { Title } = Typography;
 
 interface SidebarProps {
-  collapsed?: boolean
-  onCollapse?: (collapsed: boolean) => void
+  collapsed?: boolean;
+  onCollapse?: (collapsed: boolean) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems: MenuProps['items'] = [
     {
@@ -144,35 +144,37 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
         },
       ],
     },
-  ]
+  ];
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    navigate(key)
-  }
+    navigate(key);
+  };
 
   const getSelectedKeys = () => {
-    const { pathname } = location
-    return [pathname]
-  }
+    const { pathname } = location;
+    return [pathname];
+  };
 
   const getOpenKeys = () => {
-    const { pathname } = location
+    const { pathname } = location;
 
     // 商品管理菜单：包含 /product, /spu, /category, /brand 等路径
-    if (pathname.startsWith('/product') || 
-        pathname.startsWith('/spu') || 
-        pathname.startsWith('/category') || 
-        pathname.startsWith('/brand')) {
-      return ['/product']
+    if (
+      pathname.startsWith('/product') ||
+      pathname.startsWith('/spu') ||
+      pathname.startsWith('/category') ||
+      pathname.startsWith('/brand')
+    ) {
+      return ['/product'];
     }
-    if (pathname.startsWith('/schedule')) return ['/schedule']
-    if (pathname.startsWith('/inventory')) return ['/inventory']
-    if (pathname.startsWith('/pricing') || pathname.startsWith('/price')) return ['/pricing']
-    if (pathname.startsWith('/procurement')) return ['/procurement']
-    if (pathname.startsWith('/analytics')) return ['/analytics']
+    if (pathname.startsWith('/schedule')) return ['/schedule'];
+    if (pathname.startsWith('/inventory')) return ['/inventory'];
+    if (pathname.startsWith('/pricing') || pathname.startsWith('/price')) return ['/pricing'];
+    if (pathname.startsWith('/procurement')) return ['/procurement'];
+    if (pathname.startsWith('/analytics')) return ['/analytics'];
 
-    return []
-  }
+    return [];
+  };
 
   return (
     <Sider
@@ -217,7 +219,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
         }}
       />
     </Sider>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

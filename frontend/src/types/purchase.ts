@@ -5,14 +5,14 @@ import { User, ContactInfo, Address, ApprovalRecord, Attachment } from './common
 
 // 采购订单状态枚举
 export enum PurchaseOrderStatus {
-  DRAFT = 'draft',              // 草稿
-  PENDING = 'pending',          // 待审核
-  APPROVED = 'approved',        // 已审核
-  REJECTED = 'rejected',        // 已拒绝
-  CONFIRMED = 'confirmed',      // 已确认
+  DRAFT = 'draft', // 草稿
+  PENDING = 'pending', // 待审核
+  APPROVED = 'approved', // 已审核
+  REJECTED = 'rejected', // 已拒绝
+  CONFIRMED = 'confirmed', // 已确认
   PARTIAL_RECEIVED = 'partial_received', // 部分收货
-  COMPLETED = 'completed',      // 已完成
-  CANCELLED = 'cancelled',      // 已取消
+  COMPLETED = 'completed', // 已完成
+  CANCELLED = 'cancelled', // 已取消
 }
 
 // 采购订单优先级枚举
@@ -25,21 +25,21 @@ export enum PurchaseOrderPriority {
 
 // 采购订单项状态枚举
 export enum PurchaseOrderItemStatus {
-  PENDING = 'pending',          // 待收货
+  PENDING = 'pending', // 待收货
   PARTIAL_RECEIVED = 'partial_received', // 部分收货
-  COMPLETED = 'completed',      // 已完成
-  CANCELLED = 'cancelled',      // 已取消
+  COMPLETED = 'completed', // 已完成
+  CANCELLED = 'cancelled', // 已取消
 }
 
 // 收货单状态枚举
 export enum GoodsReceiptStatus {
-  DRAFT = 'draft',              // 草稿
+  DRAFT = 'draft', // 草稿
   PENDING_INSPECTION = 'pending_inspection', // 待检验
-  INSPECTING = 'inspecting',    // 检验中
-  QUALIFIED = 'qualified',      // 质检合格
-  UNQUALIFIED = 'unqualified',  // 质检不合格
-  COMPLETED = 'completed',      // 已完成
-  CANCELLED = 'cancelled',      // 已取消
+  INSPECTING = 'inspecting', // 检验中
+  QUALIFIED = 'qualified', // 质检合格
+  UNQUALIFIED = 'unqualified', // 质检不合格
+  COMPLETED = 'completed', // 已完成
+  CANCELLED = 'cancelled', // 已取消
 }
 
 // 供应商信息接口
@@ -414,11 +414,14 @@ export interface PurchaseWorkflowConfig {
   enabled: boolean;
   steps: PurchaseWorkflowStep[];
   approvers: Record<PurchaseWorkflowStep, User[]>;
-  conditions: Record<PurchaseWorkflowStep, {
-    minAmount?: number;
-    maxAmount?: number;
-    requiredRoles?: string[];
-  }>;
+  conditions: Record<
+    PurchaseWorkflowStep,
+    {
+      minAmount?: number;
+      maxAmount?: number;
+      requiredRoles?: string[];
+    }
+  >;
 }
 
 // 采购预算接口

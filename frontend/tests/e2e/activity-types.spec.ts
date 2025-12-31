@@ -40,11 +40,17 @@ test.describe('活动类型管理', () => {
     await expect(table).toBeVisible();
 
     // 检查是否有数据行或空状态提示
-    const hasData = await page.locator('tbody tr').count().catch(() => 0);
-    const hasEmptyState = await page.locator('text=暂无数据').or(page.locator('text=No data')).isVisible().catch(() => false);
+    const hasData = await page
+      .locator('tbody tr')
+      .count()
+      .catch(() => 0);
+    const hasEmptyState = await page
+      .locator('text=暂无数据')
+      .or(page.locator('text=No data'))
+      .isVisible()
+      .catch(() => false);
 
     // 应该要么有数据，要么显示空状态
     expect(hasData > 0 || hasEmptyState).toBe(true);
   });
 });
-

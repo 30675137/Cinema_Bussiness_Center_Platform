@@ -123,7 +123,10 @@ export interface PerformanceConfig {
 /**
  * DataTable组件Props接口
  */
-export interface DataTableProps<T = any> extends Omit<TableProps<T>, 'columns' | 'dataSource' | 'pagination' | 'title'> {
+export interface DataTableProps<T = any> extends Omit<
+  TableProps<T>,
+  'columns' | 'dataSource' | 'pagination' | 'title'
+> {
   /** 表格列配置 */
   columns: DataTableColumn<T>[];
   /** 数据源 */

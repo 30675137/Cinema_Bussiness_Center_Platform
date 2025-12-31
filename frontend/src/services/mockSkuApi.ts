@@ -24,10 +24,26 @@ import {
 
 // 预定义品牌列表
 const BRANDS = [
-  '可口可乐', '百事可乐', '康师傅', '统一', '农夫山泉',
-  '娃哈哈', '蒙牛', '伊利', '光明', '雀巢',
-  '星巴克', '三只松鼠', '良品铺子', '来伊份', '洽洽',
-  '德芙', '费列罗', '好时', '士力架', '奥利奥',
+  '可口可乐',
+  '百事可乐',
+  '康师傅',
+  '统一',
+  '农夫山泉',
+  '娃哈哈',
+  '蒙牛',
+  '伊利',
+  '光明',
+  '雀巢',
+  '星巴克',
+  '三只松鼠',
+  '良品铺子',
+  '来伊份',
+  '洽洽',
+  '德芙',
+  '费列罗',
+  '好时',
+  '士力架',
+  '奥利奥',
 ];
 
 // 预定义类目列表
@@ -60,7 +76,7 @@ const UNITS: Unit[] = [
 const generateMockSpus = (): SPU[] => {
   const spus: SPU[] = [];
   const spuCount = generateRandomNumber(50, 100);
-  
+
   for (let i = 1; i <= spuCount; i++) {
     const brand = generateRandomChoice(BRANDS);
     const category = generateRandomChoice(CATEGORIES);
@@ -73,7 +89,7 @@ const generateMockSpus = (): SPU[] => {
       categoryId: category.id,
     });
   }
-  
+
   return spus;
 };
 
@@ -92,8 +108,8 @@ const generateEAN13Barcode = (): string => {
 const generateSalesUnits = (mainUnitId: string): SalesUnit[] => {
   const salesUnits: SalesUnit[] = [];
   const salesUnitCount = generateRandomNumber(0, 3);
-  const salesUnitOptions = UNITS.filter(u => u.type === 'sales');
-  
+  const salesUnitOptions = UNITS.filter((u) => u.type === 'sales');
+
   for (let i = 0; i < salesUnitCount; i++) {
     const unit = generateRandomChoice(salesUnitOptions);
     salesUnits.push({
@@ -105,7 +121,7 @@ const generateSalesUnits = (mainUnitId: string): SalesUnit[] => {
       sortOrder: i,
     });
   }
-  
+
   return salesUnits;
 };
 
@@ -113,7 +129,7 @@ const generateSalesUnits = (mainUnitId: string): SalesUnit[] => {
 const generateOtherBarcodes = (): Barcode[] => {
   const barcodes: Barcode[] = [];
   const barcodeCount = generateRandomNumber(0, 2);
-  
+
   for (let i = 0; i < barcodeCount; i++) {
     barcodes.push({
       id: generateId('barcode'),
@@ -122,14 +138,14 @@ const generateOtherBarcodes = (): Barcode[] => {
       remark: `备用条码${i + 1}`,
     });
   }
-  
+
   return barcodes;
 };
 
 // 生成单个SKU
 const generateSingleSku = (index: number): SKU => {
   const spu = generateRandomChoice(MOCK_SPUS);
-  const mainUnit = generateRandomChoice(UNITS.filter(u => u.type === 'inventory'));
+  const mainUnit = generateRandomChoice(UNITS.filter((u) => u.type === 'inventory'));
   const statusOptions: SkuStatus[] = [SkuStatus.DRAFT, SkuStatus.ENABLED, SkuStatus.DISABLED];
   const statusWeights = [0.2, 0.6, 0.2]; // 草稿20%，启用60%，停用20%
   const random = Math.random();
@@ -141,14 +157,14 @@ const generateSingleSku = (index: number): SKU => {
   } else {
     status = SkuStatus.DISABLED;
   }
-  
+
   const specOptions = ['330ml', '500ml', '1L', '250ml', '1.5L', '2L', '大份', '中份', '小份'];
   const flavorOptions = ['原味', '柠檬味', '草莓味', '葡萄味', '橙子味', '苹果味', undefined];
   const packagingOptions = ['瓶装', '听装', '袋装', '盒装', '罐装'];
-  
+
   const createdAt = generateRandomDateTime(new Date('2024-01-01'), new Date());
   const updatedAt = generateRandomDateTime(new Date(createdAt), new Date());
-  
+
   return {
     id: generateId('sku'),
     code: `SKU${String(index).padStart(6, '0')}`,
@@ -205,71 +221,72 @@ generateMockSkus();
  */
 export const getSkus = async (params: SkuQueryParams): Promise<SkuListResponse> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
   let filtered = [...mockSkus];
-  
+
   // 关键字搜索
   if (params.keyword) {
     const keyword = params.keyword.toLowerCase();
-    filtered = filtered.filter(sku =>
-      sku.code.toLowerCase().includes(keyword) ||
-      sku.name.toLowerCase().includes(keyword) ||
-      sku.mainBarcode.includes(keyword) ||
-      sku.otherBarcodes.some(b => b.code.includes(keyword))
+    filtered = filtered.filter(
+      (sku) =>
+        sku.code.toLowerCase().includes(keyword) ||
+        sku.name.toLowerCase().includes(keyword) ||
+        sku.mainBarcode.includes(keyword) ||
+        sku.otherBarcodes.some((b) => b.code.includes(keyword))
     );
   }
-  
+
   // SPU筛选
   if (params.spuId) {
-    filtered = filtered.filter(sku => sku.spuId === params.spuId);
+    filtered = filtered.filter((sku) => sku.spuId === params.spuId);
   }
-  
+
   // 品牌筛选
   if (params.brand) {
-    filtered = filtered.filter(sku => sku.brand === params.brand);
+    filtered = filtered.filter((sku) => sku.brand === params.brand);
   }
-  
+
   // 类目筛选
   if (params.categoryId) {
-    filtered = filtered.filter(sku => sku.categoryId === params.categoryId);
+    filtered = filtered.filter((sku) => sku.categoryId === params.categoryId);
   }
-  
+
   // 状态筛选
   if (params.status && params.status !== 'all') {
-    filtered = filtered.filter(sku => sku.status === params.status);
+    filtered = filtered.filter((sku) => sku.status === params.status);
   }
-  
+
   // 是否管理库存筛选
   if (params.manageInventory !== undefined) {
-    filtered = filtered.filter(sku => sku.manageInventory === params.manageInventory);
+    filtered = filtered.filter((sku) => sku.manageInventory === params.manageInventory);
   }
-  
+
   // 排序
   const sortField = params.sortField || 'createdAt';
   const sortOrder = params.sortOrder || 'desc';
-  
+
   filtered.sort((a, b) => {
     let aValue: any = a[sortField as keyof SKU];
     let bValue: any = b[sortField as keyof SKU];
-    
+
     if (sortField === 'createdAt' || sortField === 'updatedAt') {
       aValue = new Date(aValue).getTime();
       bValue = new Date(bValue).getTime();
     }
-    
+
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
-  
+
   // 分页
   const page = params.page || 1;
   const pageSize = params.pageSize || 20;
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
   const paginatedItems = filtered.slice(start, end);
-  
+
   return {
     items: paginatedItems,
     total: filtered.length,
@@ -284,9 +301,9 @@ export const getSkus = async (params: SkuQueryParams): Promise<SkuListResponse> 
  */
 export const getSkuById = async (id: string): Promise<SKU> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  const sku = mockSkus.find(s => s.id === id);
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const sku = mockSkus.find((s) => s.id === id);
   if (!sku) {
     throw new Error(`SKU with id ${id} not found`);
   }
@@ -298,42 +315,42 @@ export const getSkuById = async (id: string): Promise<SKU> => {
  */
 export const createSku = async (formData: SkuFormData): Promise<SKU> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
   // 检查条码重复
   if (formData.mainBarcode) {
-    const existing = mockSkus.find(s => s.mainBarcode === formData.mainBarcode);
+    const existing = mockSkus.find((s) => s.mainBarcode === formData.mainBarcode);
     if (existing) {
       throw new Error('主条码已存在');
     }
   }
-  
+
   // 检查其他条码重复
   if (formData.otherBarcodes) {
     for (const barcode of formData.otherBarcodes) {
-      const existing = mockSkus.find(s =>
-        s.mainBarcode === barcode.code ||
-        s.otherBarcodes.some(b => b.code === barcode.code)
+      const existing = mockSkus.find(
+        (s) =>
+          s.mainBarcode === barcode.code || s.otherBarcodes.some((b) => b.code === barcode.code)
       );
       if (existing) {
         throw new Error(`条码 ${barcode.code} 已存在`);
       }
     }
   }
-  
-  const spu = MOCK_SPUS.find(s => s.id === formData.spuId);
+
+  const spu = MOCK_SPUS.find((s) => s.id === formData.spuId);
   if (!spu) {
     throw new Error('SPU不存在');
   }
-  
-  const mainUnit = UNITS.find(u => u.id === formData.mainUnitId);
+
+  const mainUnit = UNITS.find((u) => u.id === formData.mainUnitId);
   if (!mainUnit) {
     throw new Error('单位不存在');
   }
-  
+
   const now = new Date().toISOString();
   const nextCode = `SKU${String(mockSkus.length + 1).padStart(6, '0')}`;
-  
+
   const newSku: SKU = {
     id: generateId('sku'),
     code: nextCode,
@@ -350,14 +367,14 @@ export const createSku = async (formData: SkuFormData): Promise<SKU> => {
     mainUnitId: formData.mainUnitId,
     salesUnits: formData.salesUnits.map((su, index) => ({
       id: generateId('su'),
-      unit: UNITS.find(u => u.id === su.unitId)?.name || '',
+      unit: UNITS.find((u) => u.id === su.unitId)?.name || '',
       unitId: su.unitId,
       conversionRate: su.conversionRate,
       enabled: su.enabled,
       sortOrder: index,
     })),
     mainBarcode: formData.mainBarcode || '',
-    otherBarcodes: formData.otherBarcodes.map(b => ({
+    otherBarcodes: formData.otherBarcodes.map((b) => ({
       id: generateId('barcode'),
       code: b.code,
       type: 'EAN13',
@@ -375,7 +392,7 @@ export const createSku = async (formData: SkuFormData): Promise<SKU> => {
     updatedBy: generateId('user'),
     updatedByName: '当前用户',
   };
-  
+
   mockSkus.unshift(newSku); // 添加到开头
   return newSku;
 };
@@ -385,47 +402,47 @@ export const createSku = async (formData: SkuFormData): Promise<SKU> => {
  */
 export const updateSku = async (id: string, formData: SkuFormData): Promise<SKU> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const index = mockSkus.findIndex(s => s.id === id);
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  const index = mockSkus.findIndex((s) => s.id === id);
   if (index === -1) {
     throw new Error(`SKU with id ${id} not found`);
   }
-  
+
   const existingSku = mockSkus[index];
-  
+
   // 检查条码重复（排除当前SKU）
   if (formData.mainBarcode && formData.mainBarcode !== existingSku.mainBarcode) {
-    const duplicate = mockSkus.find(s => s.id !== id && s.mainBarcode === formData.mainBarcode);
+    const duplicate = mockSkus.find((s) => s.id !== id && s.mainBarcode === formData.mainBarcode);
     if (duplicate) {
       throw new Error('主条码已存在');
     }
   }
-  
+
   // 检查其他条码重复
   if (formData.otherBarcodes) {
     for (const barcode of formData.otherBarcodes) {
-      const duplicate = mockSkus.find(s =>
-        s.id !== id &&
-        (s.mainBarcode === barcode.code ||
-          s.otherBarcodes.some(b => b.code === barcode.code))
+      const duplicate = mockSkus.find(
+        (s) =>
+          s.id !== id &&
+          (s.mainBarcode === barcode.code || s.otherBarcodes.some((b) => b.code === barcode.code))
       );
       if (duplicate) {
         throw new Error(`条码 ${barcode.code} 已存在`);
       }
     }
   }
-  
-  const spu = MOCK_SPUS.find(s => s.id === formData.spuId);
+
+  const spu = MOCK_SPUS.find((s) => s.id === formData.spuId);
   if (!spu) {
     throw new Error('SPU不存在');
   }
-  
-  const mainUnit = UNITS.find(u => u.id === formData.mainUnitId);
+
+  const mainUnit = UNITS.find((u) => u.id === formData.mainUnitId);
   if (!mainUnit) {
     throw new Error('单位不存在');
   }
-  
+
   const updatedSku: SKU = {
     ...existingSku,
     name: formData.name,
@@ -441,14 +458,14 @@ export const updateSku = async (id: string, formData: SkuFormData): Promise<SKU>
     mainUnitId: formData.mainUnitId,
     salesUnits: formData.salesUnits.map((su, idx) => ({
       id: generateId('su'),
-      unit: UNITS.find(u => u.id === su.unitId)?.name || '',
+      unit: UNITS.find((u) => u.id === su.unitId)?.name || '',
       unitId: su.unitId,
       conversionRate: su.conversionRate,
       enabled: su.enabled,
       sortOrder: idx,
     })),
     mainBarcode: formData.mainBarcode || '',
-    otherBarcodes: formData.otherBarcodes.map(b => ({
+    otherBarcodes: formData.otherBarcodes.map((b) => ({
       id: generateId('barcode'),
       code: b.code,
       type: 'EAN13',
@@ -463,7 +480,7 @@ export const updateSku = async (id: string, formData: SkuFormData): Promise<SKU>
     updatedBy: generateId('user'),
     updatedByName: '当前用户',
   };
-  
+
   mockSkus[index] = updatedSku;
   return updatedSku;
 };
@@ -473,20 +490,20 @@ export const updateSku = async (id: string, formData: SkuFormData): Promise<SKU>
  */
 export const toggleSkuStatus = async (id: string, status: SkuStatus): Promise<SKU> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 200));
-  
-  const index = mockSkus.findIndex(s => s.id === id);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+
+  const index = mockSkus.findIndex((s) => s.id === id);
   if (index === -1) {
     throw new Error(`SKU with id ${id} not found`);
   }
-  
+
   const sku = mockSkus[index];
-  
+
   // 状态转换验证
   if (sku.status === SkuStatus.DRAFT && status === SkuStatus.DISABLED) {
     throw new Error('草稿状态不能直接停用，请先启用');
   }
-  
+
   const updatedSku: SKU = {
     ...sku,
     status,
@@ -494,7 +511,7 @@ export const toggleSkuStatus = async (id: string, status: SkuStatus): Promise<SK
     updatedBy: generateId('user'),
     updatedByName: '当前用户',
   };
-  
+
   mockSkus[index] = updatedSku;
   return updatedSku;
 };
@@ -507,20 +524,21 @@ export const checkBarcodeDuplicate = async (
   excludeSkuId?: string
 ): Promise<{ available: boolean; message: string }> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  const duplicate = mockSkus.find(s =>
-    s.id !== excludeSkuId &&
-    (s.mainBarcode === barcode || s.otherBarcodes.some(b => b.code === barcode))
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const duplicate = mockSkus.find(
+    (s) =>
+      s.id !== excludeSkuId &&
+      (s.mainBarcode === barcode || s.otherBarcodes.some((b) => b.code === barcode))
   );
-  
+
   if (duplicate) {
     return {
       available: false,
       message: `条码 ${barcode} 已被SKU ${duplicate.code} 使用`,
     };
   }
-  
+
   return {
     available: true,
     message: '条码可用',
@@ -535,17 +553,17 @@ export const checkSkuNameDuplicate = async (
   excludeSkuId?: string
 ): Promise<{ available: boolean; message: string }> => {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  const duplicate = mockSkus.find(s => s.id !== excludeSkuId && s.name === name);
-  
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const duplicate = mockSkus.find((s) => s.id !== excludeSkuId && s.name === name);
+
   if (duplicate) {
     return {
       available: false,
       message: `SKU名称 "${name}" 已存在`,
     };
   }
-  
+
   return {
     available: true,
     message: '名称可用',
@@ -556,7 +574,7 @@ export const checkSkuNameDuplicate = async (
  * 获取SPU列表（供选择器使用）
  */
 export const getSpus = async (): Promise<SPU[]> => {
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
   return MOCK_SPUS;
 };
 
@@ -564,7 +582,6 @@ export const getSpus = async (): Promise<SPU[]> => {
  * 获取单位列表（供选择器使用）
  */
 export const getUnits = async (): Promise<Unit[]> => {
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve, 50));
   return UNITS;
 };
-

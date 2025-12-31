@@ -90,11 +90,7 @@ const DataTable = <T extends Record<string, any>>({
     switch (field.type) {
       case 'input':
         return (
-          <Input
-            placeholder={field.placeholder}
-            allowClear
-            style={{ width: field.width || 200 }}
-          />
+          <Input placeholder={field.placeholder} allowClear style={{ width: field.width || 200 }} />
         );
       case 'select':
         return (
@@ -141,28 +137,26 @@ const DataTable = <T extends Record<string, any>>({
   };
 
   // 分页配置
-  const paginationConfig: PaginationProps = pagination === true ? {
-    current,
-    pageSize,
-    total,
-    showSizeChanger,
-    showQuickJumper,
-    showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-    onChange: handlePaginationChange,
-    onShowSizeChange: handlePaginationChange,
-  } : pagination as PaginationProps;
+  const paginationConfig: PaginationProps =
+    pagination === true
+      ? {
+          current,
+          pageSize,
+          total,
+          showSizeChanger,
+          showQuickJumper,
+          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+          onChange: handlePaginationChange,
+          onShowSizeChange: handlePaginationChange,
+        }
+      : (pagination as PaginationProps);
 
   return (
     <div className="data-table">
       {/* 搜索区域 */}
       {searchable && searchFields.length > 0 && (
         <div className="table-search mb-4">
-          <Form
-            form={searchForm}
-            layout="inline"
-            onFinish={handleSearch}
-            className="search-form"
-          >
+          <Form form={searchForm} layout="inline" onFinish={handleSearch} className="search-form">
             <Row gutter={[16, 16]} style={{ width: '100%' }}>
               {searchFields.slice(0, expanded ? searchFields.length : 3).map((field) => (
                 <Col key={field.name}>
@@ -176,14 +170,9 @@ const DataTable = <T extends Record<string, any>>({
                   <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     搜索
                   </Button>
-                  <Button onClick={handleReset}>
-                    重置
-                  </Button>
+                  <Button onClick={handleReset}>重置</Button>
                   {searchFields.length > 3 && (
-                    <Button
-                      type="link"
-                      onClick={() => setExpanded(!expanded)}
-                    >
+                    <Button type="link" onClick={() => setExpanded(!expanded)}>
                       {expanded ? '收起' : '展开'}
                     </Button>
                   )}
@@ -199,9 +188,7 @@ const DataTable = <T extends Record<string, any>>({
         <div className="table-toolbar mb-4">
           <Row justify="space-between" align="middle">
             <Col>
-              <Space>
-                {extraButtons}
-              </Space>
+              <Space>{extraButtons}</Space>
             </Col>
             <Col>
               <Space>

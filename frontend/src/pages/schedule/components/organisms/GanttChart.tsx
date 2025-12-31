@@ -56,7 +56,9 @@ const GanttChart: React.FC<GanttChartProps> = ({
         </div>
         <TimelineHeader startHour={startHour} endHour={endHour} interval={interval} />
       </div>
-      <div style={{ maxHeight: '70vh', overflow: 'auto', background: '#fff', position: 'relative' }}>
+      <div
+        style={{ maxHeight: '70vh', overflow: 'auto', background: '#fff', position: 'relative' }}
+      >
         {showCurrentTime && currentTimeLeft && (
           <div
             style={{
@@ -102,4 +104,3 @@ const GanttChart: React.FC<GanttChartProps> = ({
 };
 
 export default GanttChart;
-

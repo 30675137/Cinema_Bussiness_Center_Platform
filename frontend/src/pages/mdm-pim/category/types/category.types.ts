@@ -321,5 +321,5 @@ export type {
   CategoryFormProps,
   AttributeTemplateProps,
   MockSPU,
-  MockDataState
+  MockDataState,
 };

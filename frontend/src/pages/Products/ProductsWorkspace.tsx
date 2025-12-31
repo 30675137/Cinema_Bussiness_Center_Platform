@@ -32,7 +32,7 @@ const ProductsWorkspace: React.FC = () => {
     updateProduct,
     deleteProduct,
     setFilters,
-    setSelectedProducts
+    setSelectedProducts,
   } = useProductStore();
 
   // 初始化加载数据
@@ -117,7 +117,10 @@ const ProductsWorkspace: React.FC = () => {
   return (
     <Layout className="h-screen" data-testid="products-workspace">
       {/* 顶部工具栏 */}
-      <Header className="bg-white shadow-sm px-6 flex items-center justify-between" data-testid="workspace-header">
+      <Header
+        className="bg-white shadow-sm px-6 flex items-center justify-between"
+        data-testid="workspace-header"
+      >
         <div className="flex items-center">
           <Title level={3} className="!mb-0 mr-6" data-testid="workspace-title">
             商品工作台
@@ -146,11 +149,7 @@ const ProductsWorkspace: React.FC = () => {
             刷新
           </Button>
 
-          <Button
-            icon={<ExportOutlined />}
-            onClick={handleExport}
-            data-testid="export-btn"
-          >
+          <Button icon={<ExportOutlined />} onClick={handleExport} data-testid="export-btn">
             导出
           </Button>
         </div>
@@ -160,11 +159,7 @@ const ProductsWorkspace: React.FC = () => {
       <Content className="p-6" data-testid="workspace-content">
         {/* 筛选区域 */}
         <div className="mb-4" data-testid="filter-section">
-          <ProductFilter
-            filters={filters}
-            onFilter={handleFilter}
-            loading={loading}
-          />
+          <ProductFilter filters={filters} onFilter={handleFilter} loading={loading} />
         </div>
 
         {/* 数据表格 */}
@@ -183,8 +178,7 @@ const ProductsWorkspace: React.FC = () => {
             onChange: handlePageChange,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
         />
       </Content>

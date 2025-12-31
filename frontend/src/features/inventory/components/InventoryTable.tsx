@@ -1,7 +1,7 @@
 /**
  * P003-inventory-query: 库存表格组件
  * P004-inventory-adjustment: 添加调整按钮
- * 
+ *
  * 显示库存列表，包含7列：SKU编码、名称、现存数量、可用数量、预占数量、状态、单位
  * 以及操作列（调整按钮）
  */
@@ -28,7 +28,7 @@ interface InventoryTableProps {
 
 /**
  * 库存表格组件
- * 
+ *
  * 根据 FR-001 规范显示7列信息：
  * - SKU编码
  * - SKU名称

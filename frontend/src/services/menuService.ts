@@ -3,12 +3,7 @@
  * 提供菜单数据的CRUD操作和业务逻辑处理
  */
 
-import {
-  MenuItem,
-  FunctionalArea,
-  MenuLevel,
-  MenuFilterResult
-} from '@/types/navigation';
+import { MenuItem, FunctionalArea, MenuLevel, MenuFilterResult } from '@/types/navigation';
 import apiClient from './apiClient';
 import { mockApi } from './mockApi';
 
@@ -101,8 +96,8 @@ class MenuService {
           level: undefined,
           functionalArea: undefined,
           isActive: true,
-          isVisible: true
-        }
+          isVisible: true,
+        },
       });
 
       return response.data.menus || [];
@@ -248,7 +243,7 @@ class MenuService {
       parentId,
       level: MenuLevel.SUB,
       isActive: true,
-      isVisible: true
+      isVisible: true,
     });
   }
 
@@ -262,7 +257,7 @@ class MenuService {
       }
 
       const response = await apiClient.get('/navigation/menus/search', {
-        params: { query, limit }
+        params: { query, limit },
       });
 
       return response.data.menus || [];
@@ -282,7 +277,7 @@ class MenuService {
       }
 
       const response = await apiClient.get('/navigation/menus/validate-code', {
-        params: { code, excludeId }
+        params: { code, excludeId },
       });
 
       return response.data.isValid;
@@ -322,14 +317,14 @@ class MenuService {
   private calculateStats(menus: MenuItem[]): MenuStats {
     const stats: MenuStats = {
       totalMenus: menus.length,
-      activeMenus: menus.filter(menu => menu.isActive).length,
-      mainMenus: menus.filter(menu => menu.level === MenuLevel.MAIN).length,
-      subMenus: menus.filter(menu => menu.level === MenuLevel.SUB).length,
-      menusByArea: {} as Record<FunctionalArea, number>
+      activeMenus: menus.filter((menu) => menu.isActive).length,
+      mainMenus: menus.filter((menu) => menu.level === MenuLevel.MAIN).length,
+      subMenus: menus.filter((menu) => menu.level === MenuLevel.SUB).length,
+      menusByArea: {} as Record<FunctionalArea, number>,
     };
 
     // 按功能区域分组统计
-    menus.forEach(menu => {
+    menus.forEach((menu) => {
       const area = menu.functionalArea;
       stats.menusByArea[area] = (stats.menusByArea[area] || 0) + 1;
     });
@@ -342,9 +337,4 @@ class MenuService {
 export const menuService = new MenuService();
 
 // 导出类型
-export type {
-  MenuQueryParams,
-  CreateMenuParams,
-  UpdateMenuParams,
-  MenuStats
-};
+export type { MenuQueryParams, CreateMenuParams, UpdateMenuParams, MenuStats };

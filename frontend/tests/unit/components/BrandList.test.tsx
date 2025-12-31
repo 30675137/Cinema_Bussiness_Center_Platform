@@ -96,9 +96,7 @@ const renderWithProviders = (component: React.ReactElement) => {
   return render(
     <ConfigProvider locale={zhCN}>
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          {component}
-        </MemoryRouter>
+        <MemoryRouter>{component}</MemoryRouter>
       </QueryClientProvider>
     </ConfigProvider>
   );
@@ -194,8 +192,10 @@ describe('BrandList Component', () => {
     await waitFor(() => {
       // 验证启用状态
       const enabledBrands = screen.getAllByTestId('brand-status');
-      const enabledStatus = enabledBrands.find(el =>
-        el.closest('[data-testid="brand-table-row"]')?.querySelector('[data-testid="brand-name"]')?.textContent === '可口可乐'
+      const enabledStatus = enabledBrands.find(
+        (el) =>
+          el.closest('[data-testid="brand-table-row"]')?.querySelector('[data-testid="brand-name"]')
+            ?.textContent === '可口可乐'
       );
       expect(enabledStatus).toHaveTextContent('启用');
     });
@@ -207,7 +207,9 @@ describe('BrandList Component', () => {
     await waitFor(() => {
       // 验证代理品牌
       const agencyBrand = screen.getByText('可口可乐').closest('[data-testid="brand-table-row"]');
-      expect(agencyBrand?.querySelector('[data-testid="brand-type"]')).toHaveTextContent('代理品牌');
+      expect(agencyBrand?.querySelector('[data-testid="brand-type"]')).toHaveTextContent(
+        '代理品牌'
+      );
 
       // 验证自有品牌
       const ownBrand = screen.getByText('农夫山泉').closest('[data-testid="brand-table-row"]');
@@ -320,22 +322,29 @@ describe('BrandList Component', () => {
 
   it('应该显示加载状态', async () => {
     // Mock 延迟加载
-    mockBrandService.getBrands.mockImplementation(() => new Promise(resolve => {
-      setTimeout(() => resolve({
-        success: true,
-        data: mockBrands,
-        pagination: {
-          current: 1,
-          pageSize: 20,
-          total: mockBrands.length,
-          totalPages: 1,
-          hasNext: false,
-          hasPrev: false,
-        },
-        message: '获取成功',
-        timestamp: new Date().toISOString(),
-      }), 100);
-    }));
+    mockBrandService.getBrands.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(
+            () =>
+              resolve({
+                success: true,
+                data: mockBrands,
+                pagination: {
+                  current: 1,
+                  pageSize: 20,
+                  total: mockBrands.length,
+                  totalPages: 1,
+                  hasNext: false,
+                  hasPrev: false,
+                },
+                message: '获取成功',
+                timestamp: new Date().toISOString(),
+              }),
+            100
+          );
+        })
+    );
 
     renderWithProviders(<BrandList />);
 
@@ -383,7 +392,7 @@ describe('BrandList Component', () => {
       expect(brandRows).toHaveLength(mockBrands.length);
 
       // 验证每行都有操作按钮
-      brandRows.forEach(row => {
+      brandRows.forEach((row) => {
         expect(row.querySelector('[data-testid="brand-actions"]')).toBeInTheDocument();
         expect(row.querySelector('[data-testid="view-button"]')).toBeInTheDocument();
         expect(row.querySelector('[data-testid="edit-button"]')).toBeInTheDocument();

@@ -18,7 +18,7 @@ import {
   Col,
   Statistic,
   Progress,
-  Tag
+  Tag,
 } from 'antd';
 import {
   PlusOutlined,
@@ -31,7 +31,7 @@ import {
   HomeOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import BreadcrumbNavigation from '@/components/layout/Breadcrumb';
@@ -130,7 +130,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
   estimatedCompletion,
   children,
   className,
-  style
+  style,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -157,7 +157,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
     </Button>,
     <Button key="settings" icon={<SettingOutlined />}>
       设置
-    </Button>
+    </Button>,
   ];
 
   // 处理操作按钮点击
@@ -190,11 +190,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
             <Title level={3} className="page-title">
               {title}
             </Title>
-            {description && (
-              <Paragraph className="page-description">
-                {description}
-              </Paragraph>
-            )}
+            {description && <Paragraph className="page-description">{description}</Paragraph>}
           </div>
         </div>
 
@@ -202,11 +198,14 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
           <div className="page-actions">
             <Space>
               {(actions || defaultActions).map((action, index) => (
-                <div key={index} onClick={() => {
-                  const actionElement = action as React.ReactElement;
-                  const actionKey = actionElement.key || `action-${index}`;
-                  handleActionClick(actionKey as string);
-                }}>
+                <div
+                  key={index}
+                  onClick={() => {
+                    const actionElement = action as React.ReactElement;
+                    const actionKey = actionElement.key || `action-${index}`;
+                    handleActionClick(actionKey as string);
+                  }}
+                >
                   {action}
                 </div>
               ))}
@@ -219,11 +218,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
         <div className="page-search-section">
           <div className="search-container">
             <SearchOutlined className="search-icon" />
-            <input
-              type="text"
-              placeholder="搜索内容..."
-              className="search-input"
-            />
+            <input type="text" placeholder="搜索内容..." className="search-input" />
           </div>
         </div>
       )}
@@ -244,14 +239,19 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
                 value={stat.value}
                 prefix={stat.prefix}
                 suffix={stat.suffix}
-                valueStyle={{ color: stat.trend ? (stat.trend.isPositive ? '#3f8600' : '#cf1322') : undefined }}
+                valueStyle={{
+                  color: stat.trend ? (stat.trend.isPositive ? '#3f8600' : '#cf1322') : undefined,
+                }}
               />
               {stat.trend && (
                 <div className="statistic-trend">
                   <Tag color={stat.trend.isPositive ? 'success' : 'error'}>
-                    {stat.trend.isPositive ? '+' : ''}{stat.trend}%
+                    {stat.trend.isPositive ? '+' : ''}
+                    {stat.trend}%
                   </Tag>
-                  <Text type="secondary" className="trend-text">较上期</Text>
+                  <Text type="secondary" className="trend-text">
+                    较上期
+                  </Text>
                 </div>
               )}
             </Card>
@@ -335,9 +335,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
                 <div className="content-placeholder">
                   <SettingOutlined className="placeholder-icon" />
                   <Title level={4}>功能页面</Title>
-                  <Text type="secondary">
-                    这是 {title} 页面的基础框架，具体功能正在开发中
-                  </Text>
+                  <Text type="secondary">这是 {title} 页面的基础框架，具体功能正在开发中</Text>
                 </div>
               </div>
             )}
@@ -351,11 +349,7 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
       {/* 面包屑导航 */}
       {showBreadcrumb && (
         <div className="page-breadcrumb">
-          <BreadcrumbNavigation
-            items={breadcrumbItems}
-            showHome={true}
-            homePath="/"
-          />
+          <BreadcrumbNavigation items={breadcrumbItems} showHome={true} homePath="/" />
         </div>
       )}
 
@@ -374,18 +368,9 @@ const PagePlaceholder: React.FC<PagePlaceholderProps> = ({
           {/* 标签页 */}
           {showTabs && tabs && tabs.length > 0 && (
             <div className="page-tabs">
-              <Tabs
-                activeKey={activeTab}
-                onChange={setActiveTab}
-                type="card"
-                size="small"
-              >
-                {tabs.map(tab => (
-                  <TabPane
-                    key={tab.key}
-                    tab={tab.label}
-                    disabled={tab.disabled}
-                  >
+              <Tabs activeKey={activeTab} onChange={setActiveTab} type="card" size="small">
+                {tabs.map((tab) => (
+                  <TabPane key={tab.key} tab={tab.label} disabled={tab.disabled}>
                     {tab.content}
                   </TabPane>
                 ))}

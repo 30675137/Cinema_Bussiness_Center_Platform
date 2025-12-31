@@ -3,15 +3,15 @@
  * 订单详情页面 - User Story 3
  */
 
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { Card, Typography, Button, Space, Spin, Result, message } from 'antd'
-import { ArrowLeftOutlined } from '@ant-design/icons'
-import { OrderDetail } from '../../features/order-management/components/OrderDetail'
-import { OrderActions } from '../../features/order-management/components/OrderActions'
-import { useOrderDetail } from '../../features/order-management/hooks/useOrderDetail'
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Card, Typography, Button, Space, Spin, Result, message } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { OrderDetail } from '../../features/order-management/components/OrderDetail';
+import { OrderActions } from '../../features/order-management/components/OrderActions';
+import { useOrderDetail } from '../../features/order-management/hooks/useOrderDetail';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 /**
  * 订单详情页面
@@ -29,17 +29,17 @@ const { Title } = Typography
  * User Story: US3 - 订单详情查看
  */
 const OrderDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>();
 
   // 使用 TanStack Query 查询订单详情
-  const { data, isLoading, isError, error } = useOrderDetail(id)
+  const { data, isLoading, isError, error } = useOrderDetail(id);
 
   // 错误处理
   React.useEffect(() => {
     if (isError && error) {
-      message.error(error.message || '加载订单详情失败，请稍后重试')
+      message.error(error.message || '加载订单详情失败，请稍后重试');
     }
-  }, [isError, error])
+  }, [isError, error]);
 
   return (
     <div style={{ padding: '24px' }}>
@@ -51,12 +51,12 @@ const OrderDetailPage: React.FC = () => {
               <Link to="/orders/list">
                 <Button icon={<ArrowLeftOutlined />}>返回列表</Button>
               </Link>
-              <Title level={2} style={{ margin: 0 }}>订单详情</Title>
+              <Title level={2} style={{ margin: 0 }}>
+                订单详情
+              </Title>
             </Space>
             {/* 订单操作按钮 - User Story 4 */}
-            {!isLoading && !isError && data?.data && (
-              <OrderActions order={data.data} />
-            )}
+            {!isLoading && !isError && data?.data && <OrderActions order={data.data} />}
           </Space>
         </Card>
 
@@ -105,12 +105,10 @@ const OrderDetailPage: React.FC = () => {
         )}
 
         {/* 订单详情内容 */}
-        {!isLoading && !isError && data?.data && (
-          <OrderDetail order={data.data} />
-        )}
+        {!isLoading && !isError && data?.data && <OrderDetail order={data.data} />}
       </Space>
     </div>
-  )
-}
+  );
+};
 
-export default OrderDetailPage
+export default OrderDetailPage;

@@ -15,7 +15,12 @@ const ScheduleManagement: React.FC = () => {
   const { selectedDate, setSelectedDate, selectedEvent, setSelectedEvent } = useScheduleStore();
   const [formOpen, setFormOpen] = React.useState(false);
   const [formMode, setFormMode] = React.useState<'create' | 'edit'>('create');
-  const [prefill, setPrefill] = React.useState<{ hallId?: string; startHour?: number; duration?: number; type?: 'maintenance' | 'cleaning' }>({});
+  const [prefill, setPrefill] = React.useState<{
+    hallId?: string;
+    startHour?: number;
+    duration?: number;
+    type?: 'maintenance' | 'cleaning';
+  }>({});
 
   const schedulesQuery = useScheduleListQuery({ date: selectedDate });
   const hallsQuery = useHallsListQuery();
@@ -23,7 +28,7 @@ const ScheduleManagement: React.FC = () => {
   const isLoading = schedulesQuery.isLoading || hallsQuery.isLoading;
   const isError = schedulesQuery.isError || hallsQuery.isError;
 
-React.useEffect(() => {
+  React.useEffect(() => {
     if (location.pathname.startsWith('/schedule/create') && !formOpen) {
       setFormMode('create');
       setPrefill({});
@@ -97,9 +102,7 @@ React.useEffect(() => {
           <Button type="primary" onClick={handleNew}>
             新增预约
           </Button>
-          <Button onClick={handleMaintenance}>
-            锁座/维护
-          </Button>
+          <Button onClick={handleMaintenance}>锁座/维护</Button>
         </Space>
       }
     >
@@ -122,9 +125,22 @@ React.useEffect(() => {
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16, padding: '8px 0' }}>
             <Space size="small">
               <span style={{ fontSize: 12, color: '#666' }}>图例：</span>
-              <Tag color="blue" style={{ margin: 0 }}>公映</Tag>
-              <Tag color="green" style={{ margin: 0 }}>包场</Tag>
-              <Tag style={{ margin: 0, background: 'repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 6px, #e5e7eb 6px, #e5e7eb 12px)', borderColor: '#d1d5db' }}>维护/保洁</Tag>
+              <Tag color="blue" style={{ margin: 0 }}>
+                公映
+              </Tag>
+              <Tag color="green" style={{ margin: 0 }}>
+                包场
+              </Tag>
+              <Tag
+                style={{
+                  margin: 0,
+                  background:
+                    'repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 6px, #e5e7eb 6px, #e5e7eb 12px)',
+                  borderColor: '#d1d5db',
+                }}
+              >
+                维护/保洁
+              </Tag>
             </Space>
           </div>
           <GanttChart
@@ -160,4 +176,3 @@ React.useEffect(() => {
 };
 
 export default ScheduleManagement;
-

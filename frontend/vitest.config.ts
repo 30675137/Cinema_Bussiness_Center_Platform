@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -19,17 +19,17 @@ export default defineConfig({
         '**/*.config.*',
         '**/coverage/**',
         'dist/',
-        'build/'
+        'build/',
       ],
       thresholds: {
         global: {
           branches: 60,
           functions: 60,
           lines: 60,
-          statements: 60
-        }
-      }
-    }
+          statements: 60,
+        },
+      },
+    },
   },
   resolve: {
     alias: {
@@ -44,7 +44,7 @@ export default defineConfig({
       '@/theme': resolve(__dirname, 'src/theme'),
       '@/i18n': resolve(__dirname, 'src/i18n'),
       '@/mocks': resolve(__dirname, 'src/mocks'),
-      '@/test': resolve(__dirname, 'src/test')
-    }
-  }
-})
+      '@/test': resolve(__dirname, 'src/test'),
+    },
+  },
+});

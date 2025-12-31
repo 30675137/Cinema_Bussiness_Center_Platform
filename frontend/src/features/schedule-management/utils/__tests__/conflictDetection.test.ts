@@ -23,9 +23,7 @@ const baseEvent = (override: Partial<ScheduleEvent> = {}): ScheduleEvent => ({
 describe('conflictDetection', () => {
   describe('checkTimeConflict', () => {
     it('should detect overlap in same hall and date', () => {
-      const existing: ScheduleEvent[] = [
-        baseEvent({ id: 'e2', startHour: 10, duration: 2 }),
-      ];
+      const existing: ScheduleEvent[] = [baseEvent({ id: 'e2', startHour: 10, duration: 2 })];
 
       const conflicts = checkTimeConflict(
         { hallId: 'h1', date: '2025-01-27', startHour: 11, duration: 2 },
@@ -72,9 +70,7 @@ describe('conflictDetection', () => {
     });
 
     it('should exclude current event when updating', () => {
-      const existing: ScheduleEvent[] = [
-        baseEvent({ id: 'e2', startHour: 10, duration: 2 }),
-      ];
+      const existing: ScheduleEvent[] = [baseEvent({ id: 'e2', startHour: 10, duration: 2 })];
 
       const conflicts = checkTimeConflict(
         { hallId: 'h1', date: '2025-01-27', startHour: 10, duration: 2 },
@@ -111,4 +107,3 @@ describe('conflictDetection', () => {
     });
   });
 });
-

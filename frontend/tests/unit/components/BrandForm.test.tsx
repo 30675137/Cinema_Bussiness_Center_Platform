@@ -6,7 +6,12 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import BrandForm from '../../../src/pages/mdm-pim/brand/components/molecules/BrandForm';
-import { Brand, BrandType, BrandStatus, CreateBrandRequest } from '../../../src/pages/mdm-pim/brand/types/brand.types';
+import {
+  Brand,
+  BrandType,
+  BrandStatus,
+  CreateBrandRequest,
+} from '../../../src/pages/mdm-pim/brand/types/brand.types';
 
 // Mock 数据
 const mockBrand: Brand = {
@@ -49,9 +54,7 @@ const renderWithProviders = (component: React.ReactElement) => {
   const queryClient = createTestQueryClient();
   return render(
     <ConfigProvider locale={zhCN}>
-      <QueryClientProvider client={queryClient}>
-        {component}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{component}</QueryClientProvider>
     </ConfigProvider>
   );
 };
@@ -93,9 +96,7 @@ describe('BrandForm Component', () => {
   });
 
   it('应该正确渲染编辑模式表单', () => {
-    renderWithProviders(
-      <BrandForm {...defaultProps} mode="edit" brand={mockBrand} />
-    );
+    renderWithProviders(<BrandForm {...defaultProps} mode="edit" brand={mockBrand} />);
 
     // 验证标题
     expect(screen.getByTestId('brand-form-title')).toHaveTextContent('编辑品牌');
@@ -109,9 +110,7 @@ describe('BrandForm Component', () => {
   });
 
   it('应该正确渲染查看模式表单', () => {
-    renderWithProviders(
-      <BrandForm {...defaultProps} mode="view" brand={mockBrand} />
-    );
+    renderWithProviders(<BrandForm {...defaultProps} mode="view" brand={mockBrand} />);
 
     // 验证标题
     expect(screen.getByTestId('brand-form-title')).toHaveTextContent('品牌详情');
@@ -351,9 +350,7 @@ describe('BrandForm Component', () => {
       logoUrl: 'https://example.com/logo.png',
     };
 
-    renderWithProviders(
-      <BrandForm {...defaultProps} mode="edit" brand={brandWithLogo} />
-    );
+    renderWithProviders(<BrandForm {...defaultProps} mode="edit" brand={brandWithLogo} />);
 
     // 验证现有LOGO显示
     expect(screen.getByTestId('existing-logo-preview')).toBeInTheDocument();

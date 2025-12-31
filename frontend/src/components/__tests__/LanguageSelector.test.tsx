@@ -12,12 +12,12 @@ vi.mock('@/i18n/hooks', () => ({
     currentLanguage: 'zh-CN',
     supportedLanguages: [
       { code: 'zh-CN', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', rtl: false },
-      { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+      { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
     ],
     changeLanguage: vi.fn(),
     nextLanguage: vi.fn(),
-    setFromBrowser: vi.fn()
-  })
+    setFromBrowser: vi.fn(),
+  }),
 }));
 
 // Mock antd components
@@ -34,12 +34,12 @@ vi.mock('antd', () => ({
   ),
   Space: ({ children }: any) => <div data-testid="space">{children}</div>,
   Typography: {
-    Text: ({ children }: any) => <span data-testid="text">{children}</span>
-  }
+    Text: ({ children }: any) => <span data-testid="text">{children}</span>,
+  },
 }));
 
 vi.mock('@ant-design/icons', () => ({
-  GlobalOutlined: () => <span data-testid="global-icon">🌐</span>
+  GlobalOutlined: () => <span data-testid="global-icon">🌐</span>,
 }));
 
 describe('LanguageDropdown', () => {
@@ -51,11 +51,11 @@ describe('LanguageDropdown', () => {
       currentLanguage: 'zh-CN',
       supportedLanguages: [
         { code: 'zh-CN', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', rtl: false },
-        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
       ],
       changeLanguage: mockChangeLanguage,
       nextLanguage: vi.fn(),
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
   });
 
@@ -122,11 +122,11 @@ describe('LanguageToggle', () => {
       currentLanguage: 'zh-CN',
       supportedLanguages: [
         { code: 'zh-CN', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', rtl: false },
-        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
       ],
       changeLanguage: vi.fn(),
       nextLanguage: mockNextLanguage,
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
   });
 
@@ -167,11 +167,11 @@ describe('LanguageToggle', () => {
       currentLanguage: 'en-US',
       supportedLanguages: [
         { code: 'zh-CN', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', rtl: false },
-        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
       ],
       changeLanguage: vi.fn(),
       nextLanguage: mockNextLanguage,
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
 
     render(<LanguageToggle />);
@@ -206,11 +206,11 @@ describe('Accessibility', () => {
       currentLanguage: 'zh-CN',
       supportedLanguages: [
         { code: 'zh-CN', name: 'Chinese', nativeName: '简体中文', flag: '🇨🇳', rtl: false },
-        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
       ],
       changeLanguage: vi.fn(),
       nextLanguage: vi.fn(),
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
   });
 
@@ -241,11 +241,11 @@ describe('Integration', () => {
     vi.mocked(require('@/i18n/hooks').useLanguageSelector).mockReturnValue({
       currentLanguage: 'en-US',
       supportedLanguages: [
-        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false }
+        { code: 'en-US', name: 'English', nativeName: 'English', flag: '🇺🇸', rtl: false },
       ],
       changeLanguage: vi.fn(),
       nextLanguage: vi.fn(),
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
 
     render(<LanguageDropdown />);
@@ -260,7 +260,7 @@ describe('Integration', () => {
       supportedLanguages: [],
       changeLanguage: vi.fn(),
       nextLanguage: vi.fn(),
-      setFromBrowser: vi.fn()
+      setFromBrowser: vi.fn(),
     });
 
     expect(() => render(<LanguageDropdown />)).not.toThrow();

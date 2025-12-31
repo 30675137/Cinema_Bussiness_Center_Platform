@@ -12,7 +12,7 @@ import {
   ReloadOutlined,
   ExpandOutlined,
   CompressOutlined,
-  LoadingOutlined
+  LoadingOutlined,
 } from '@ant-design/icons';
 // 临时定义以避免模块导入问题
 type CategoryLevel = 1 | 2 | 3;
@@ -82,27 +82,40 @@ const convertToTreeNode = (node: CategoryTreeNode, lazy = false): DataNode => {
         <span style={{ flex: 1 }}>{node.name}</span>
         <Space size={4}>
           {node.status === 'disabled' && (
-            <Tag color="default" size="small">停用</Tag>
+            <Tag color="default" size="small">
+              停用
+            </Tag>
           )}
           {node.level === 1 && (
-            <Tag color="blue" size="small">一级</Tag>
+            <Tag color="blue" size="small">
+              一级
+            </Tag>
           )}
           {node.level === 2 && (
-            <Tag color="green" size="small">二级</Tag>
+            <Tag color="green" size="small">
+              二级
+            </Tag>
           )}
           {node.level === 3 && (
-            <Tag color="orange" size="small">三级</Tag>
+            <Tag color="orange" size="small">
+              三级
+            </Tag>
           )}
           {hasChildren && (
-            <Tag color="purple" size="small">{node.children?.length || 0}</Tag>
+            <Tag color="purple" size="small">
+              {node.children?.length || 0}
+            </Tag>
           )}
         </Space>
       </div>
     ),
     isLeaf: node.isLeaf,
-    children: lazy && hasChildren ? undefined : node.children?.map(child => convertToTreeNode(child, lazy)),
+    children:
+      lazy && hasChildren
+        ? undefined
+        : node.children?.map((child) => convertToTreeNode(child, lazy)),
     // 存储原始数据，供其他操作使用
-    nodeData: node
+    nodeData: node,
   };
 };
 
@@ -121,7 +134,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
   onExpand,
   onSearch,
   onSearchClear,
-  onLoadData
+  onLoadData,
 }) => {
   const [localExpandedKeys, setLocalExpandedKeys] = useState<string[]>(expandedKeys);
   const [searchValue, setSearchValue] = useState(searchKeyword);
@@ -171,66 +184,69 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
   /**
    * 处理键盘事件
    */
-  const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    } else if (e.key === 'Escape') {
-      handleSearchClear();
-    }
-  }, [handleSearch, handleSearchClear]);
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      } else if (e.key === 'Escape') {
+        handleSearchClear();
+      }
+    },
+    [handleSearch, handleSearchClear]
+  );
 
   /**
    * 处理节点选择
    */
-  const handleSelect = useCallback((
-    selectedKeys: React.Key[],
-    info: { selected: boolean; node: EventDataNode }
-  ) => {
-    onSelect?.(selectedKeys as string[], info);
-  }, [onSelect]);
+  const handleSelect = useCallback(
+    (selectedKeys: React.Key[], info: { selected: boolean; node: EventDataNode }) => {
+      onSelect?.(selectedKeys as string[], info);
+    },
+    [onSelect]
+  );
 
   /**
    * 处理节点展开
    */
-  const handleExpand = useCallback(async (
-    expandedKeys: React.Key[],
-    info: { expanded: boolean; node: EventDataNode }
-  ) => {
-    setLocalExpandedKeys(expandedKeys as string[]);
-    setAutoExpandParent(false);
+  const handleExpand = useCallback(
+    async (expandedKeys: React.Key[], info: { expanded: boolean; node: EventDataNode }) => {
+      setLocalExpandedKeys(expandedKeys as string[]);
+      setAutoExpandParent(false);
 
-    const { expanded, node } = info;
-    const nodeKey = String(node.key);
-    const nodeData = node.nodeData as CategoryTreeNode;
+      const { expanded, node } = info;
+      const nodeKey = String(node.key);
+      const nodeData = node.nodeData as CategoryTreeNode;
 
-    // 如果是展开操作且启用懒加载
-    if (expanded && lazy && onLoadData && !node.children?.length && nodeData?.children?.length) {
-      setLoadingKeys(prev => new Set(prev).add(nodeKey));
+      // 如果是展开操作且启用懒加载
+      if (expanded && lazy && onLoadData && !node.children?.length && nodeData?.children?.length) {
+        setLoadingKeys((prev) => new Set(prev).add(nodeKey));
 
-      try {
-        const childrenData = await onLoadData({
-          key: nodeKey,
-          children: []
-        });
+        try {
+          const childrenData = await onLoadData({
+            key: nodeKey,
+            children: [],
+          });
 
-        // 更新节点的children
-        if (childrenData && childrenData.length > 0) {
-          // 这里需要更新树数据，但由于props是只读的，实际实现中可能需要通过状态管理来处理
-          console.log('懒加载完成:', nodeKey, childrenData);
+          // 更新节点的children
+          if (childrenData && childrenData.length > 0) {
+            // 这里需要更新树数据，但由于props是只读的，实际实现中可能需要通过状态管理来处理
+            console.log('懒加载完成:', nodeKey, childrenData);
+          }
+        } catch (error) {
+          console.error('懒加载失败:', error);
+        } finally {
+          setLoadingKeys((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(nodeKey);
+            return newSet;
+          });
         }
-      } catch (error) {
-        console.error('懒加载失败:', error);
-      } finally {
-        setLoadingKeys(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(nodeKey);
-          return newSet;
-        });
       }
-    }
 
-    onExpand?.(expandedKeys as string[], info);
-  }, [lazy, onLoadData, onExpand]);
+      onExpand?.(expandedKeys as string[], info);
+    },
+    [lazy, onLoadData, onExpand]
+  );
 
   /**
    * 全部展开
@@ -238,7 +254,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
   const handleExpandAll = useCallback(() => {
     const allKeys: string[] = [];
     const collectKeys = (nodes: CategoryTreeNode[]) => {
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         allKeys.push(node.id);
         if (node.children && node.children.length > 0) {
           collectKeys(node.children);
@@ -268,9 +284,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
       const expandedKeys: string[] = [];
 
       const filterNode = (node: DataNode): DataNode | null => {
-        const nodeTitle = typeof node.title === 'string'
-          ? node.title
-          : node.key;
+        const nodeTitle = typeof node.title === 'string' ? node.title : node.key;
 
         const titleLower = nodeTitle.toLowerCase();
         const searchLower = searchValue.toLowerCase();
@@ -281,7 +295,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
 
           return {
             ...node,
-            children: filteredChildren
+            children: filteredChildren,
           };
         }
 
@@ -292,7 +306,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
             expandedKeys.push(String(node.key));
             return {
               ...node,
-              children: filteredChildren
+              children: filteredChildren,
             };
           }
         }
@@ -309,7 +323,10 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
   }, [antdTreeData, searchValue]);
 
   return (
-    <div className="category-tree" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div
+      className="category-tree"
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       {/* 搜索和工具栏 */}
       <div style={{ marginBottom: 12 }}>
         <Space orientation="vertical" style={{ width: '100%' }} size={8}>
@@ -371,11 +388,7 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
           </div>
         ) : filteredTreeData.length === 0 ? (
           <Empty
-            description={
-              searchValue.trim()
-                ? `没有找到包含"${searchValue}"的类目`
-                : '暂无类目数据'
-            }
+            description={searchValue.trim() ? `没有找到包含"${searchValue}"的类目` : '暂无类目数据'}
             style={{ marginTop: 40 }}
           />
         ) : (
@@ -389,58 +402,76 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
             onExpand={handleExpand}
             treeData={filteredTreeData}
             virtual={virtual}
-            height={virtual ? 400 : (treeData.length > 50 ? 400 : undefined)}
+            height={virtual ? 400 : treeData.length > 50 ? 400 : undefined}
             blockNode={virtual}
             listHeight={virtual ? 400 : undefined}
-            loadData={lazy ? async (node: any) => {
-              const nodeKey = String(node.key);
-              if (onLoadData) {
-                const childrenData = await onLoadData({
-                  key: nodeKey,
-                  children: []
-                });
-                return childrenData;
-              }
-              return [];
-            } : undefined}
+            loadData={
+              lazy
+                ? async (node: any) => {
+                    const nodeKey = String(node.key);
+                    if (onLoadData) {
+                      const childrenData = await onLoadData({
+                        key: nodeKey,
+                        children: [],
+                      });
+                      return childrenData;
+                    }
+                    return [];
+                  }
+                : undefined
+            }
             style={{
               background: 'transparent',
-              fontSize: 14
+              fontSize: 14,
             }}
             titleRender={(nodeData) => {
               const node = nodeData.nodeData as CategoryTreeNode;
               const isLoading = loadingKeys.has(node.key as string);
 
               return (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '2px 0'
-                }}>
-                  <span style={{
-                    flex: 1,
-                    color: node.status === 'disabled' ? '#999' : 'inherit'
-                  }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    padding: '2px 0',
+                  }}
+                >
+                  <span
+                    style={{
+                      flex: 1,
+                      color: node.status === 'disabled' ? '#999' : 'inherit',
+                    }}
+                  >
                     {node.name}
                   </span>
                   <Space size={4}>
                     {isLoading && <LoadingOutlined style={{ color: '#1890ff' }} />}
                     {node.status === 'disabled' && (
-                      <Tag color="default" size="small">停用</Tag>
+                      <Tag color="default" size="small">
+                        停用
+                      </Tag>
                     )}
                     {node.level === 1 && (
-                      <Tag color="blue" size="small">一级</Tag>
+                      <Tag color="blue" size="small">
+                        一级
+                      </Tag>
                     )}
                     {node.level === 2 && (
-                      <Tag color="green" size="small">二级</Tag>
+                      <Tag color="green" size="small">
+                        二级
+                      </Tag>
                     )}
                     {node.level === 3 && (
-                      <Tag color="orange" size="small">三级</Tag>
+                      <Tag color="orange" size="small">
+                        三级
+                      </Tag>
                     )}
                     {node.children && node.children.length > 0 && !virtual && (
-                      <Tag color="purple" size="small">{node.children.length}</Tag>
+                      <Tag color="purple" size="small">
+                        {node.children.length}
+                      </Tag>
                     )}
                   </Space>
                 </div>
@@ -452,13 +483,15 @@ const CategoryTree: React.FC<CategoryTreeProps> = ({
 
       {/* 统计信息 */}
       {!loading && filteredTreeData.length > 0 && (
-        <div style={{
-          borderTop: '1px solid #f0f0f0',
-          paddingTop: 8,
-          marginTop: 8,
-          fontSize: 12,
-          color: '#666'
-        }}>
+        <div
+          style={{
+            borderTop: '1px solid #f0f0f0',
+            paddingTop: 8,
+            marginTop: 8,
+            fontSize: 12,
+            color: '#666',
+          }}
+        >
           共 {treeData.length} 个类目
           {searchValue.trim() && ` (搜索到 ${filteredTreeData.length} 个)`}
         </div>

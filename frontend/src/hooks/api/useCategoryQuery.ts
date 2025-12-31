@@ -86,6 +86,3 @@ export function useCategorySearchQuery(keyword: string, enabled: boolean = true)
     },
   });
 }
-
-
-

@@ -15,14 +15,14 @@ import type {
   CategoryQueryParams,
   CategoryTreeResponse,
   CategoryListResponse,
-  AttributeTemplateResponse
+  AttributeTemplateResponse,
 } from '../../../pages/mdm-pim/category/types/category.types';
 
 // 默认查询配置
 const DEFAULT_QUERY_OPTIONS: Partial<UseQueryOptions> = {
   staleTime: 5 * 60 * 1000, // 5分钟内数据被认为是新鲜的
-  gcTime: 10 * 60 * 1000,   // 10分钟后从内存中清理
-  retry: 2,                 // 失败后重试2次
+  gcTime: 10 * 60 * 1000, // 10分钟后从内存中清理
+  retry: 2, // 失败后重试2次
   refetchOnWindowFocus: false, // 窗口聚焦时不自动重新获取
 };
 
@@ -30,14 +30,14 @@ const DEFAULT_QUERY_OPTIONS: Partial<UseQueryOptions> = {
 const TREE_QUERY_OPTIONS: UseQueryOptions<CategoryTreeResponse> = {
   ...DEFAULT_QUERY_OPTIONS,
   staleTime: 2 * 60 * 1000, // 类目树2分钟内被认为是新鲜的
-  gcTime: 5 * 60 * 1000,    // 5分钟后从内存中清理
+  gcTime: 5 * 60 * 1000, // 5分钟后从内存中清理
 };
 
 // 属性模板查询配置
 const ATTRIBUTE_TEMPLATE_QUERY_OPTIONS: UseQueryOptions<AttributeTemplateResponse> = {
   ...DEFAULT_QUERY_OPTIONS,
   staleTime: 10 * 60 * 1000, // 属性模板10分钟内被认为是新鲜的
-  gcTime: 15 * 60 * 1000,    // 15分钟后从内存中清理
+  gcTime: 15 * 60 * 1000, // 15分钟后从内存中清理
 };
 
 /**
@@ -94,7 +94,7 @@ export const useCategoryQuery = (
       }
       return response.data;
     },
-    enabled: !!id && (options.enabled !== false), // 只有当ID存在时才启用查询
+    enabled: !!id && options.enabled !== false, // 只有当ID存在时才启用查询
     ...DEFAULT_QUERY_OPTIONS,
     ...options,
   });
@@ -118,7 +118,7 @@ export const useChildrenCategoriesQuery = (
       }
       return response.data;
     },
-    enabled: !!parentId && (options.enabled !== false), // 只有当父类目ID存在时才启用查询
+    enabled: !!parentId && options.enabled !== false, // 只有当父类目ID存在时才启用查询
     ...DEFAULT_QUERY_OPTIONS,
     ...options,
   });
@@ -149,7 +149,7 @@ export const useAttributeTemplateQuery = (
       }
       return response.data;
     },
-    enabled: !!categoryId && (options.enabled !== false), // 只有当类目ID存在时才启用查询
+    enabled: !!categoryId && options.enabled !== false, // 只有当类目ID存在时才启用查询
     ...ATTRIBUTE_TEMPLATE_QUERY_OPTIONS,
     ...options,
   });
@@ -173,7 +173,7 @@ export const useSearchCategoriesQuery = (
       }
       return response.data;
     },
-    enabled: !!keyword && keyword.trim().length > 0 && (options.enabled !== false), // 只有当关键词不为空时才启用查询
+    enabled: !!keyword && keyword.trim().length > 0 && options.enabled !== false, // 只有当关键词不为空时才启用查询
     staleTime: 1 * 60 * 1000, // 搜索结果1分钟内被认为是新鲜的
     ...DEFAULT_QUERY_OPTIONS,
     ...options,
@@ -200,11 +200,7 @@ export const useCategoriesInfiniteQuery = (
 // 预获取函数，用于数据预加载
 export const categoryQueries = {
   // 预获取类目树
-  prefetchCategoryTree: async (
-    queryClient: any,
-    keyword?: string,
-    options?: any
-  ) => {
+  prefetchCategoryTree: async (queryClient: any, keyword?: string, options?: any) => {
     return queryClient.prefetchQuery({
       queryKey: keyword ? categoryKeys.search(keyword) : categoryKeys.tree(),
       queryFn: () => categoryService.getCategoryTree(keyword),
@@ -232,11 +228,7 @@ export const categoryQueries = {
   },
 
   // 预获取属性模板
-  prefetchAttributeTemplate: async (
-    queryClient: any,
-    categoryId: string,
-    options?: any
-  ) => {
+  prefetchAttributeTemplate: async (queryClient: any, categoryId: string, options?: any) => {
     if (!categoryId) return;
 
     return queryClient.prefetchQuery({

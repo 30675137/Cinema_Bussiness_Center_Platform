@@ -5,89 +5,89 @@
 
 // 品牌类型枚举
 export enum BrandType {
-  OWN = 'own',           // 自有品牌
-  AGENCY = 'agency',     // 代理品牌
-  JOINT = 'joint',       // 联营品牌
-  OTHER = 'other'        // 其他
+  OWN = 'own', // 自有品牌
+  AGENCY = 'agency', // 代理品牌
+  JOINT = 'joint', // 联营品牌
+  OTHER = 'other', // 其他
 }
 
 // 品牌状态枚举
 export enum BrandStatus {
-  DRAFT = 'draft',       // 草稿
-  ENABLED = 'enabled',   // 启用
-  DISABLED = 'disabled'   // 停用
+  DRAFT = 'draft', // 草稿
+  ENABLED = 'enabled', // 启用
+  DISABLED = 'disabled', // 停用
 }
 
 // 品牌实体接口
 export interface Brand {
   // 核心标识
-  id: string;                    // 系统生成的唯一标识符
-  brandCode: string;             // 品牌编码（系统生成或手动输入）
+  id: string; // 系统生成的唯一标识符
+  brandCode: string; // 品牌编码（系统生成或手动输入）
 
   // 基本信息
-  name: string;                  // 品牌名称（中文，必填）
-  englishName?: string;          // 品牌英文名（可选）
-  brandType: BrandType;          // 品牌类型（必选）
+  name: string; // 品牌名称（中文，必填）
+  englishName?: string; // 品牌英文名（可选）
+  brandType: BrandType; // 品牌类型（必选）
 
   // 扩展信息
-  primaryCategories: string[];   // 主营类目（多选）
-  company?: string;              // 所属公司/供应商
-  brandLevel?: string;           // 品牌等级（A/B/C等）
-  tags: string[];                // 品牌标签（多选）
-  description?: string;          // 品牌介绍
+  primaryCategories: string[]; // 主营类目（多选）
+  company?: string; // 所属公司/供应商
+  brandLevel?: string; // 品牌等级（A/B/C等）
+  tags: string[]; // 品牌标签（多选）
+  description?: string; // 品牌介绍
 
   // 展示信息
-  logoUrl?: string;              // 品牌LOGO URL
+  logoUrl?: string; // 品牌LOGO URL
 
   // 状态管理
-  status: BrandStatus;           // 品牌状态
+  status: BrandStatus; // 品牌状态
 
   // 审计字段
-  createdAt: string;             // 创建时间
-  updatedAt: string;             // 更新时间
-  createdBy: string;             // 创建人
-  updatedBy: string;             // 更新人
+  createdAt: string; // 创建时间
+  updatedAt: string; // 更新时间
+  createdBy: string; // 创建人
+  updatedBy: string; // 更新人
 }
 
 // 品牌使用统计接口
 export interface BrandUsageStatistics {
-  brandId: string;              // 品牌ID（外键）
-  spuCount: number;             // 关联SPU数量
-  skuCount: number;             // 关联SKU数量
-  lastUsedAt?: string;          // 最后使用时间
-  calculatedAt: string;         // 统计计算时间
+  brandId: string; // 品牌ID（外键）
+  spuCount: number; // 关联SPU数量
+  skuCount: number; // 关联SKU数量
+  lastUsedAt?: string; // 最后使用时间
+  calculatedAt: string; // 统计计算时间
 }
 
 // 品牌状态转换记录接口
 export interface BrandStatusTransition {
-  id: string;                   // 转换记录ID
-  brandId: string;              // 品牌ID（外键）
-  oldStatus: BrandStatus;       // 原状态
-  newStatus: BrandStatus;       // 新状态
-  changedBy: string;            // 操作人
-  changedAt: string;            // 变更时间
-  reason?: string;              // 变更原因
+  id: string; // 转换记录ID
+  brandId: string; // 品牌ID（外键）
+  oldStatus: BrandStatus; // 原状态
+  newStatus: BrandStatus; // 新状态
+  changedBy: string; // 操作人
+  changedAt: string; // 变更时间
+  reason?: string; // 变更原因
 }
 
 // 查询参数接口
 export interface BrandQueryParams {
-  page?: number;                // 页码，默认1
-  pageSize?: number;            // 每页大小，默认20
-  keyword?: string;             // 关键字搜索（品牌名称/英文名/编码）
-  brandType?: BrandType;        // 品牌类型筛选
-  status?: BrandStatus;         // 状态筛选
-  sortBy?: 'createdAt' | 'name' | 'updatedAt';  // 排序字段
-  sortOrder?: 'asc' | 'desc';  // 排序方向
+  page?: number; // 页码，默认1
+  pageSize?: number; // 每页大小，默认20
+  keyword?: string; // 关键字搜索（品牌名称/英文名/编码）
+  brandType?: BrandType; // 品牌类型筛选
+  status?: BrandStatus; // 状态筛选
+  sortBy?: 'createdAt' | 'name' | 'updatedAt'; // 排序字段
+  sortOrder?: 'asc' | 'desc'; // 排序方向
 }
 
 // 分页响应接口
 export interface BrandPaginationResponse {
-  current: number;              // 当前页码
-  pageSize: number;            // 每页大小
-  total: number;                // 总记录数
-  totalPages: number;          // 总页数
-  hasNext: boolean;             // 是否有下一页
-  hasPrev: boolean;             // 是否有上一页
+  current: number; // 当前页码
+  pageSize: number; // 每页大小
+  total: number; // 总记录数
+  totalPages: number; // 总页数
+  hasNext: boolean; // 是否有下一页
+  hasPrev: boolean; // 是否有上一页
 }
 
 // API响应基础接口
@@ -118,57 +118,59 @@ export interface BrandListResponse extends ApiResponse<Brand[]> {
 }
 
 // 品牌详情响应接口
-export interface BrandDetailResponse extends ApiResponse<Brand & { usageStats: BrandUsageStatistics }> {}
+export interface BrandDetailResponse extends ApiResponse<
+  Brand & { usageStats: BrandUsageStatistics }
+> {}
 
 // 创建品牌请求接口
 export interface CreateBrandRequest {
-  name: string;                  // 品牌名称（必填）
-  englishName?: string;          // 品牌英文名（可选）
-  brandType: BrandType;          // 品牌类型（必选）
-  primaryCategories: string[];   // 主营类目（多选）
-  company?: string;              // 所属公司/供应商（可选）
-  brandLevel?: string;           // 品牌等级（可选）
-  tags?: string[];               // 品牌标签（可选）
-  description?: string;          // 品牌介绍（可选）
-  status?: BrandStatus;          // 状态（可选，默认为草稿）
+  name: string; // 品牌名称（必填）
+  englishName?: string; // 品牌英文名（可选）
+  brandType: BrandType; // 品牌类型（必选）
+  primaryCategories: string[]; // 主营类目（多选）
+  company?: string; // 所属公司/供应商（可选）
+  brandLevel?: string; // 品牌等级（可选）
+  tags?: string[]; // 品牌标签（可选）
+  description?: string; // 品牌介绍（可选）
+  status?: BrandStatus; // 状态（可选，默认为草稿）
 }
 
 // 更新品牌请求接口
 export interface UpdateBrandRequest {
-  name?: string;                 // 品牌名称
-  englishName?: string;          // 品牌英文名
-  brandType?: BrandType;         // 品牌类型
-  primaryCategories?: string[];  // 主营类目
-  company?: string;              // 所属公司/供应商
-  brandLevel?: string;           // 品牌等级
-  tags?: string[];               // 品牌标签
-  description?: string;          // 品牌介绍
+  name?: string; // 品牌名称
+  englishName?: string; // 品牌英文名
+  brandType?: BrandType; // 品牌类型
+  primaryCategories?: string[]; // 主营类目
+  company?: string; // 所属公司/供应商
+  brandLevel?: string; // 品牌等级
+  tags?: string[]; // 品牌标签
+  description?: string; // 品牌介绍
 }
 
 // 更改品牌状态请求接口
 export interface UpdateBrandStatusRequest {
-  status: BrandStatus;          // 新状态
-  reason?: string;              // 变更原因
+  status: BrandStatus; // 新状态
+  reason?: string; // 变更原因
 }
 
 // 品牌筛选条件接口
 export interface BrandFilters {
-  keyword?: string;             // 关键字
-  brandType?: BrandType;        // 品牌类型
-  status?: BrandStatus;         // 状态
-  category?: string;            // 类目
+  keyword?: string; // 关键字
+  brandType?: BrandType; // 品牌类型
+  status?: BrandStatus; // 状态
+  category?: string; // 类目
 }
 
 // Zustand Store状态接口
 export interface BrandStore {
   // 状态
-  brands: Brand[];               // 品牌列表
-  currentBrand: Brand | null;    // 当前选中的品牌
-  loading: boolean;             // 加载状态
-  error?: string;                // 错误信息
+  brands: Brand[]; // 品牌列表
+  currentBrand: Brand | null; // 当前选中的品牌
+  loading: boolean; // 加载状态
+  error?: string; // 错误信息
 
   // 查询状态
-  filters: BrandFilters;         // 筛选条件
+  filters: BrandFilters; // 筛选条件
   pagination: {
     current: number;
     pageSize: number;

@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { brandService } from '../../../src/pages/mdm-pim/brand/services/brandService';
-import { Brand, BrandStatus, CreateBrandRequest, UpdateBrandRequest } from '../../../src/pages/mdm-pim/brand/types/brand.types';
+import {
+  Brand,
+  BrandStatus,
+  CreateBrandRequest,
+  UpdateBrandRequest,
+} from '../../../src/pages/mdm-pim/brand/types/brand.types';
 
 // Mock MSW handlers
 vi.mock('../../../src/mocks/handlers/brandHandlers', () => ({
@@ -34,8 +39,8 @@ describe('brandService', () => {
             createdAt: '2024-01-01T00:00:00Z',
             updatedAt: '2024-01-01T00:00:00Z',
             createdBy: 'admin',
-            updatedBy: 'admin'
-          }
+            updatedBy: 'admin',
+          },
         ],
         pagination: {
           current: 1,
@@ -43,10 +48,10 @@ describe('brandService', () => {
           total: 1,
           totalPages: 1,
           hasNext: false,
-          hasPrev: false
+          hasPrev: false,
         },
         message: 'Success',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // Mock fetch
@@ -57,7 +62,7 @@ describe('brandService', () => {
 
       const result = await brandService.getBrands({
         page: 1,
-        pageSize: 20
+        pageSize: 20,
       });
 
       expect(result.success).toBe(true);
@@ -76,10 +81,10 @@ describe('brandService', () => {
           total: 0,
           totalPages: 0,
           hasNext: false,
-          hasPrev: false
+          hasPrev: false,
         },
         message: 'Success',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -92,7 +97,7 @@ describe('brandService', () => {
         pageSize: 10,
         keyword: '测试',
         brandType: 'own',
-        status: 'enabled'
+        status: 'enabled',
       });
 
       expect(fetch).toHaveBeenCalledWith(
@@ -136,15 +141,15 @@ describe('brandService', () => {
         usageStats: {
           spuCount: 10,
           skuCount: 50,
-          lastUsedAt: '2024-01-01T00:00:00Z'
-        }
+          lastUsedAt: '2024-01-01T00:00:00Z',
+        },
       };
 
       const mockResponse = {
         success: true,
         data: mockBrand,
         message: 'Success',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -165,9 +170,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'BRAND_NOT_FOUND',
-          message: '品牌不存在'
+          message: '品牌不存在',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -191,7 +196,7 @@ describe('brandService', () => {
         brandLevel: 'A',
         tags: ['新品牌'],
         description: '新品牌描述',
-        status: 'draft'
+        status: 'draft',
       };
 
       const mockResponse = {
@@ -204,10 +209,10 @@ describe('brandService', () => {
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z',
           createdBy: 'admin',
-          updatedBy: 'admin'
+          updatedBy: 'admin',
         },
         message: 'Brand created successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -227,7 +232,7 @@ describe('brandService', () => {
       const createData: CreateBrandRequest = {
         name: '重复品牌',
         brandType: 'own',
-        primaryCategories: []
+        primaryCategories: [],
       };
 
       const mockResponse = {
@@ -238,11 +243,11 @@ describe('brandService', () => {
           details: [
             {
               field: 'name',
-              message: '系统中已存在同名品牌，请检查是否重复创建'
-            }
-          ]
+              message: '系统中已存在同名品牌，请检查是否重复创建',
+            },
+          ],
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -263,9 +268,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: '验证失败'
+          message: '验证失败',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -295,14 +300,14 @@ describe('brandService', () => {
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z',
       createdBy: 'admin',
-      updatedBy: 'admin'
+      updatedBy: 'admin',
     };
 
     it('应该能够更新品牌信息', async () => {
       const updateData: UpdateBrandRequest = {
         name: '更新后的品牌',
         englishName: 'Updated Brand',
-        description: '更新后的描述'
+        description: '更新后的描述',
       };
 
       const mockResponse = {
@@ -310,10 +315,10 @@ describe('brandService', () => {
         data: {
           ...existingBrand,
           ...updateData,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         },
         message: 'Brand updated successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -330,16 +335,16 @@ describe('brandService', () => {
 
     it('应该处理品牌不存在的情况', async () => {
       const updateData: UpdateBrandRequest = {
-        name: '更新的品牌'
+        name: '更新的品牌',
       };
 
       const mockResponse = {
         success: false,
         error: {
           code: 'BRAND_NOT_FOUND',
-          message: '品牌不存在'
+          message: '品牌不存在',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -361,10 +366,10 @@ describe('brandService', () => {
           status: 'enabled' as BrandStatus,
           oldStatus: 'disabled' as BrandStatus,
           updatedAt: new Date().toISOString(),
-          updatedBy: 'admin'
+          updatedBy: 'admin',
         },
         message: 'Brand status updated successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -387,10 +392,10 @@ describe('brandService', () => {
           status: 'disabled' as BrandStatus,
           oldStatus: 'enabled' as BrandStatus,
           updatedAt: new Date().toISOString(),
-          updatedBy: 'admin'
+          updatedBy: 'admin',
         },
         message: 'Brand status updated successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -410,9 +415,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'INVALID_STATUS_TRANSITION',
-          message: '无效的状态转换'
+          message: '无效的状态转换',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -421,7 +426,9 @@ describe('brandService', () => {
         json: () => Promise.resolve(mockResponse),
       });
 
-      await expect(brandService.updateBrandStatus('1', 'invalid' as BrandStatus)).rejects.toThrow('无效的状态转换');
+      await expect(brandService.updateBrandStatus('1', 'invalid' as BrandStatus)).rejects.toThrow(
+        '无效的状态转换'
+      );
     });
 
     it('应该在停用时提供原因', async () => {
@@ -433,10 +440,10 @@ describe('brandService', () => {
           oldStatus: 'enabled' as BrandStatus,
           reason: '违反品牌政策',
           updatedAt: new Date().toISOString(),
-          updatedBy: 'admin'
+          updatedBy: 'admin',
         },
         message: 'Brand status updated successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -452,8 +459,8 @@ describe('brandService', () => {
           method: 'PATCH',
           body: JSON.stringify({
             status: 'disabled',
-            reason: '违反品牌政策'
-          })
+            reason: '违反品牌政策',
+          }),
         })
       );
     });
@@ -466,10 +473,10 @@ describe('brandService', () => {
         success: true,
         data: {
           logoUrl: 'https://example.com/logo/brand-1-123456789.png',
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         },
         message: 'Logo uploaded successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -490,9 +497,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'INVALID_FILE_TYPE',
-          message: '请上传图片文件'
+          message: '请上传图片文件',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -513,9 +520,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'FILE_TOO_LARGE',
-          message: '文件大小超过限制'
+          message: '文件大小超过限制',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -533,10 +540,10 @@ describe('brandService', () => {
       const mockResponse = {
         success: true,
         data: {
-          isDuplicate: false
+          isDuplicate: false,
         },
         message: '检查完成',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -546,7 +553,7 @@ describe('brandService', () => {
 
       const result = await brandService.checkNameDuplication({
         name: '新品牌',
-        brandType: 'own'
+        brandType: 'own',
       });
 
       expect(result.success).toBe(true);
@@ -557,10 +564,10 @@ describe('brandService', () => {
       const mockResponse = {
         success: true,
         data: {
-          isDuplicate: false
+          isDuplicate: false,
         },
         message: '检查完成',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -571,7 +578,7 @@ describe('brandService', () => {
       const result = await brandService.checkNameDuplication({
         name: '测试品牌',
         brandType: 'own',
-        excludeId: '1'
+        excludeId: '1',
       });
 
       expect(result.success).toBe(true);
@@ -588,10 +595,10 @@ describe('brandService', () => {
           spuCount: 25,
           skuCount: 120,
           lastUsedAt: '2024-01-01T00:00:00Z',
-          calculatedAt: new Date().toISOString()
+          calculatedAt: new Date().toISOString(),
         },
         message: 'Usage statistics retrieved successfully',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({
@@ -611,9 +618,9 @@ describe('brandService', () => {
         success: false,
         error: {
           code: 'BRAND_NOT_FOUND',
-          message: '品牌不存在'
+          message: '品牌不存在',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       global.fetch = vi.fn().mockResolvedValue({

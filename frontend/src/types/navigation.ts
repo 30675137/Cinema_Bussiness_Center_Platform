@@ -7,37 +7,37 @@
  * 功能区域枚举
  */
 export enum FunctionalArea {
-  BASIC_SETTINGS = 'basic_settings',           // 基础设置与主数据
-  PRODUCT_MANAGEMENT = 'product_management',   // 商品管理
-  BOM_MANAGEMENT = 'bom_management',           // BOM/配方与成本管理
-  SCENARIO_PACKAGE = 'scenario_package',       // 场景包/套餐管理
-  PRICING_SYSTEM = 'pricing_system',           // 价格体系管理
-  PROCUREMENT = 'procurement',                 // 采购与入库管理
-  INVENTORY = 'inventory',                     // 库存与仓店库存管理
-  SCHEDULING = 'scheduling',                   // 档期/排期/资源预约管理
-  ORDER_MANAGEMENT = 'order_management',       // 订单与履约管理
-  OPERATIONS = 'operations',                   // 运营 & 报表 / 指标看板
-  SYSTEM_MANAGEMENT = 'system_management',      // 系统管理 / 设置 /权限
+  BASIC_SETTINGS = 'basic_settings', // 基础设置与主数据
+  PRODUCT_MANAGEMENT = 'product_management', // 商品管理
+  BOM_MANAGEMENT = 'bom_management', // BOM/配方与成本管理
+  SCENARIO_PACKAGE = 'scenario_package', // 场景包/套餐管理
+  PRICING_SYSTEM = 'pricing_system', // 价格体系管理
+  PROCUREMENT = 'procurement', // 采购与入库管理
+  INVENTORY = 'inventory', // 库存与仓店库存管理
+  SCHEDULING = 'scheduling', // 档期/排期/资源预约管理
+  ORDER_MANAGEMENT = 'order_management', // 订单与履约管理
+  OPERATIONS = 'operations', // 运营 & 报表 / 指标看板
+  SYSTEM_MANAGEMENT = 'system_management', // 系统管理 / 设置 /权限
   // 子功能区域
-  PRODUCT_CATALOG = 'product_catalog',         // 商品目录
-  PRODUCT_CATEGORY = 'product_category',       // 商品分类
-  PRODUCT_SPECS = 'product_specs',             // 商品规格
+  PRODUCT_CATALOG = 'product_catalog', // 商品目录
+  PRODUCT_CATEGORY = 'product_category', // 商品分类
+  PRODUCT_SPECS = 'product_specs', // 商品规格
   INVENTORY_WAREHOUSE = 'inventory_warehouse', // 仓库库存
-  INVENTORY_STORE = 'inventory_store',         // 门店库存
-  PRICING_STRATEGY = 'pricing_strategy',       // 定价策略
-  PRICING_PROMOTION = 'pricing_promotion',     // 促销价格
-  USER_MANAGEMENT = 'user_management',         // 用户管理
-  ROLE_MANAGEMENT = 'role_management',         // 角色管理
-  PERMISSION_MANAGEMENT = 'permission_management' // 权限管理
+  INVENTORY_STORE = 'inventory_store', // 门店库存
+  PRICING_STRATEGY = 'pricing_strategy', // 定价策略
+  PRICING_PROMOTION = 'pricing_promotion', // 促销价格
+  USER_MANAGEMENT = 'user_management', // 用户管理
+  ROLE_MANAGEMENT = 'role_management', // 角色管理
+  PERMISSION_MANAGEMENT = 'permission_management', // 权限管理
 }
 
 /**
  * 菜单层级枚举
  */
 export enum MenuLevel {
-  MAIN = 1,    // 一级菜单
-  SUB = 2,     // 二级菜单
-  DETAIL = 3   // 三级菜单（详情页面）
+  MAIN = 1, // 一级菜单
+  SUB = 2, // 二级菜单
+  DETAIL = 3, // 三级菜单（详情页面）
 }
 
 /**
@@ -84,30 +84,30 @@ export interface MenuGroup {
  * 导航动作枚举
  */
 export enum NavigationAction {
-  MENU_CLICK = 'menu_click',           // 菜单点击
+  MENU_CLICK = 'menu_click', // 菜单点击
   BREADCRUMB_CLICK = 'breadcrumb_click', // 面包屑点击
-  SEARCH_SELECT = 'search_select',     // 搜索选择
-  FAVORITE_CLICK = 'favorite_click',   // 收藏点击
-  PAGE_VIEW = 'page_view',             // 页面浏览
-  PAGE_EXIT = 'page_exit'              // 页面退出
+  SEARCH_SELECT = 'search_select', // 搜索选择
+  FAVORITE_CLICK = 'favorite_click', // 收藏点击
+  PAGE_VIEW = 'page_view', // 页面浏览
+  PAGE_EXIT = 'page_exit', // 页面退出
 }
 
 /**
  * 侧边栏状态枚举
  */
 export enum SidebarState {
-  EXPANDED = 'expanded',     // 展开状态
-  COLLAPSED = 'collapsed',   // 折叠状态
-  HIDDEN = 'hidden'         // 隐藏状态（移动端）
+  EXPANDED = 'expanded', // 展开状态
+  COLLAPSED = 'collapsed', // 折叠状态
+  HIDDEN = 'hidden', // 隐藏状态（移动端）
 }
 
 /**
  * 屏幕尺寸枚举
  */
 export enum LayoutSize {
-  SMALL = 'small',   // 移动端 < 768px
+  SMALL = 'small', // 移动端 < 768px
   MEDIUM = 'medium', // 平板端 768px - 992px
-  LARGE = 'large'    // 桌面端 > 992px
+  LARGE = 'large', // 桌面端 > 992px
 }
 
 /**
@@ -480,11 +480,11 @@ export interface Permission {
  * 权限分类枚举
  */
 export enum PermissionCategory {
-  ADMIN = 'admin',       // 管理权限
-  READ = 'read',         // 读权限
-  WRITE = 'write',       // 写权限
-  DELETE = 'delete',     // 删除权限
-  EXECUTE = 'execute'    // 执行权限
+  ADMIN = 'admin', // 管理权限
+  READ = 'read', // 读权限
+  WRITE = 'write', // 写权限
+  DELETE = 'delete', // 删除权限
+  EXECUTE = 'execute', // 执行权限
 }
 
 /**

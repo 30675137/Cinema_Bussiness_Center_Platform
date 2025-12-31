@@ -1,13 +1,6 @@
 import dayjs from 'dayjs';
-import type {
-  CurrentInventory,
-  InventoryTransaction,
-} from '@/types/inventory';
-import {
-  TransactionType,
-  SourceType,
-  InventoryStatus,
-} from '@/types/inventory';
+import type { CurrentInventory, InventoryTransaction } from '@/types/inventory';
+import { TransactionType, SourceType, InventoryStatus } from '@/types/inventory';
 
 /**
  * 格式化库存数量
@@ -17,12 +10,12 @@ import {
  */
 export const formatQuantity = (quantity: number, unit?: string): string => {
   if (quantity === 0) return '0';
-  
+
   const formattedNumber = new Intl.NumberFormat('zh-CN', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(quantity);
-  
+
   return unit ? `${formattedNumber} ${unit}` : formattedNumber;
 };
 
@@ -37,7 +30,7 @@ export const formatCurrency = (amount: number, currency = '¥'): string => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
-  
+
   return `${currency}${formattedAmount}`;
 };
 
@@ -68,7 +61,7 @@ export const calculateInventoryStatus = (
   color: string;
 } => {
   const { availableQty, safetyStock, minStock, maxStock } = inventory;
-  
+
   if (availableQty === 0) {
     return {
       status: 'out_of_stock',
@@ -76,7 +69,7 @@ export const calculateInventoryStatus = (
       color: 'red',
     };
   }
-  
+
   if (availableQty < safetyStock || availableQty < minStock) {
     return {
       status: 'low_stock',
@@ -84,7 +77,7 @@ export const calculateInventoryStatus = (
       color: 'orange',
     };
   }
-  
+
   if (availableQty > maxStock) {
     return {
       status: 'overstock',
@@ -92,7 +85,7 @@ export const calculateInventoryStatus = (
       color: 'purple',
     };
   }
-  
+
   return {
     status: 'normal',
     label: '正常',
@@ -121,7 +114,7 @@ export const getTransactionTypeLabel = (
     [TransactionType.PRODUCTION_IN]: { label: '生产入库', color: 'geekblue' },
     [TransactionType.EXPIRED_OUT]: { label: '过期出库', color: 'default' },
   };
-  
+
   return labels[type] || { label: type, color: 'default' };
 };
 
@@ -130,9 +123,7 @@ export const getTransactionTypeLabel = (
  * @param type - 来源类型
  * @returns 标签和颜色
  */
-export const getSourceTypeLabel = (
-  type: SourceType
-): { label: string; color: string } => {
+export const getSourceTypeLabel = (type: SourceType): { label: string; color: string } => {
   const labels: Record<SourceType, { label: string; color: string }> = {
     [SourceType.PURCHASE_ORDER]: { label: '采购订单', color: 'blue' },
     [SourceType.SALES_ORDER]: { label: '销售订单', color: 'green' },
@@ -143,7 +134,7 @@ export const getSourceTypeLabel = (
     [SourceType.PRODUCTION_ORDER]: { label: '生产单', color: 'geekblue' },
     [SourceType.SYSTEM_ADJUST]: { label: '系统调整', color: 'default' },
   };
-  
+
   return labels[type] || { label: type, color: 'default' };
 };
 
@@ -177,7 +168,7 @@ export const formatTransactionQuantity = (
   const isInbound = isInboundTransaction(type);
   const sign = isInbound ? '+' : '-';
   const absQuantity = Math.abs(quantity);
-  
+
   return `${sign}${formatQuantity(absQuantity, unit)}`;
 };
 
@@ -203,10 +194,7 @@ export const calculateTurnoverRate = (
  * @param avgDailySales - 日均销量
  * @returns 库存天数
  */
-export const calculateDaysOfInventory = (
-  currentQty: number,
-  avgDailySales: number
-): number => {
+export const calculateDaysOfInventory = (currentQty: number, avgDailySales: number): number => {
   if (avgDailySales === 0) return Infinity;
   return currentQty / avgDailySales;
 };
@@ -221,18 +209,15 @@ export const generateSKUSearchKeywords = (sku: {
   name: string;
   category?: string;
 }): string[] => {
-  const keywords: string[] = [
-    sku.skuCode.toLowerCase(),
-    sku.name.toLowerCase(),
-  ];
-  
+  const keywords: string[] = [sku.skuCode.toLowerCase(), sku.name.toLowerCase()];
+
   if (sku.category) {
     keywords.push(sku.category.toLowerCase());
   }
-  
+
   // 分词处理
-  keywords.push(...sku.name.split(/\s+/).map(w => w.toLowerCase()));
-  
+  keywords.push(...sku.name.split(/\s+/).map((w) => w.toLowerCase()));
+
   return [...new Set(keywords)]; // 去重
 };
 
@@ -247,15 +232,15 @@ export const filterInventoriesByKeyword = (
   keyword: string
 ): CurrentInventory[] => {
   if (!keyword || keyword.trim() === '') return inventories;
-  
+
   const lowerKeyword = keyword.toLowerCase().trim();
-  
-  return inventories.filter(inventory => {
+
+  return inventories.filter((inventory) => {
     const skuCode = inventory.sku?.skuCode?.toLowerCase() || '';
     const skuName = inventory.sku?.name?.toLowerCase() || '';
     const storeCode = inventory.store?.code?.toLowerCase() || '';
     const storeName = inventory.store?.name?.toLowerCase() || '';
-    
+
     return (
       skuCode.includes(lowerKeyword) ||
       skuName.includes(lowerKeyword) ||
@@ -280,7 +265,7 @@ export const sortInventories = (
   return [...inventories].sort((a, b) => {
     let aValue: any;
     let bValue: any;
-    
+
     if (sortBy === 'status') {
       const aStatus = calculateInventoryStatus(a);
       const bStatus = calculateInventoryStatus(b);
@@ -290,9 +275,9 @@ export const sortInventories = (
       aValue = a[sortBy];
       bValue = b[sortBy];
     }
-    
+
     if (aValue === bValue) return 0;
-    
+
     const comparison = aValue > bValue ? 1 : -1;
     return sortOrder === 'asc' ? comparison : -comparison;
   });
@@ -305,33 +290,33 @@ export const sortInventories = (
  */
 export const exportToCSV = (data: any[], filename: string): void => {
   if (!data || data.length === 0) return;
-  
+
   // 获取表头
   const headers = Object.keys(data[0]);
-  
+
   // 生成CSV内容
   const csvContent = [
     headers.join(','),
-    ...data.map(row =>
-      headers.map(header => {
-        const value = row[header];
-        // 处理包含逗号的值
-        return typeof value === 'string' && value.includes(',')
-          ? `"${value}"`
-          : value;
-      }).join(',')
+    ...data.map((row) =>
+      headers
+        .map((header) => {
+          const value = row[header];
+          // 处理包含逗号的值
+          return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+        })
+        .join(',')
     ),
   ].join('\n');
-  
+
   // 创建Blob并下载
   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `${filename}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -352,7 +337,7 @@ export const toggleSelection = (
   if (checked) {
     return [...new Set([...selectedKeys, key])];
   } else {
-    return selectedKeys.filter(k => k !== key);
+    return selectedKeys.filter((k) => k !== key);
   }
 };
 
@@ -362,9 +347,6 @@ export const toggleSelection = (
  * @param checked - 是否全选
  * @returns 新的选中key数组
  */
-export const toggleSelectAll = (
-  allKeys: string[],
-  checked: boolean
-): string[] => {
+export const toggleSelectAll = (allKeys: string[], checked: boolean): string[] => {
   return checked ? [...allKeys] : [];
 };

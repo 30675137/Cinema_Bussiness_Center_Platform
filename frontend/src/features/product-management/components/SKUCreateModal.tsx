@@ -9,8 +9,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, InputNumber, Button, Space, message } from 'antd';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, Select, InputNumber, Button, message } from 'antd';
 import { Controller } from 'react-hook-form';
 import { useSkuCreateForm } from '../hooks/useSkuForm';
 import { useCreateSKU, useSPUs, useUnits } from '@/hooks/useSKUs';
@@ -48,11 +47,7 @@ export interface SKUCreateModalProps {
  * />
  * ```
  */
-export const SKUCreateModal: React.FC<SKUCreateModalProps> = ({
-  visible,
-  onCancel,
-  onSuccess,
-}) => {
+export const SKUCreateModal: React.FC<SKUCreateModalProps> = ({ visible, onCancel, onSuccess }) => {
   const { createFormDraft, saveCreateFormDraft, clearCreateFormDraft } = useSkuManagementStore();
   const form = useSkuCreateForm(createFormDraft || undefined);
   const createSKU = useCreateSKU();
@@ -114,12 +109,7 @@ export const SKUCreateModal: React.FC<SKUCreateModalProps> = ({
         <Button key="cancel" onClick={handleCancel}>
           取消
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={createSKU.isPending}
-          onClick={handleSubmit}
-        >
+        <Button key="submit" type="primary" loading={createSKU.isPending} onClick={handleSubmit}>
           创建
         </Button>,
       ]}
@@ -225,9 +215,7 @@ export const SKUCreateModal: React.FC<SKUCreateModalProps> = ({
           <Controller
             name="mainBarcode"
             control={form.control}
-            render={({ field }) => (
-              <Input {...field} placeholder="请输入主条码" />
-            )}
+            render={({ field }) => <Input {...field} placeholder="请输入主条码" />}
           />
         </Form.Item>
 

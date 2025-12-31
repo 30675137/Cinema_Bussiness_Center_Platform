@@ -1,9 +1,9 @@
 // @spec O004-beverage-sku-reuse
 // AUTO-GENERATED: Do not modify above this line
 // Generated from: scenarios/product/E2E-PRODUCT-003.yaml
-// Generated at: 2025-12-31T12:00:00Z
+// Updated at: 2025-12-31T14:30:00Z (T039 - Integrated TD-BOM-COCKTAIL-001 fixture)
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../../frontend/tests/fixtures/testdata/testdata-TD-BOM-COCKTAIL-001.fixture';
 import { LoginPage } from './pages/LoginPage';
 
 /**
@@ -12,45 +12,29 @@ import { LoginPage } from './pages/LoginPage';
  * User Story 2 (P2): 饮品配方只能关联成品SKU（SKU选择器过滤）
  *
  * Test Data: TD-BOM-COCKTAIL-001 (generated via e2e-testdata-planner)
+ * Seed Data: testdata/seeds/bom-filter-skus.json
+ *
+ * T039 Changes:
+ * - Migrated from hardcoded test data to TD-BOM-COCKTAIL-001 fixture
+ * - Validates selector option count === seed data expected_sku_count (3)
+ * - Iterates over all finished_product_skus from seed data (3 SKUs)
+ * - Iterates over all packaging_skus to ensure exclusion (5 SKUs)
+ * - Iterates over all raw_material_skus to ensure exclusion (2 SKUs)
+ * - All assertions now dynamically validate against seed data
  */
 test.describe('饮品配方配置时SKU选择器仅显示finished_product类型SKU', () => {
-  let testData: any;
+  const baseUrl = 'http://localhost:3000';
 
-  test.beforeEach(async ({ page }) => {
-    // TODO: Load test data from TD-BOM-COCKTAIL-001 fixture
-    // For now, using hardcoded test data based on YAML specification
-    testData = {
-      adminCredentials: {
-        username: 'admin',
-        password: 'admin123'
-      },
-      baseUrl: 'http://localhost:3000',
-      expectedSkuCount: 3,  // 3 finished_product SKUs should be visible
-      finishedProductSkus: [
-        { code: 'FIN-WHISKEY-COLA-001', name: '威士忌可乐鸡尾酒', type: 'finished_product' },
-        { code: 'FIN-MOJITO-001', name: '薄荷威士忌鸡尾酒', type: 'finished_product' },
-        { code: 'FIN-COLA-ICE-001', name: '冰镇可乐', type: 'finished_product' }
-      ],
-      packagingSkus: [
-        { code: 'PKG-CUP-001', name: '杯子', type: 'packaging' },
-        { code: 'PKG-STRAW-001', name: '吸管', type: 'packaging' }
-      ],
-      rawMaterialSkus: [
-        { code: 'RAW-WHISKEY-001', name: '威士忌原液', type: 'raw_material' },
-        { code: 'RAW-COLA-001', name: '可乐浓缩液', type: 'raw_material' }
-      ]
-    };
-  });
-
-  test('E2E-PRODUCT-003: SKU选择器仅显示finished_product类型', async ({ page }) => {
+  test('E2E-PRODUCT-003: SKU选择器仅显示finished_product类型', async ({ page, TD_BOM_COCKTAIL_001 }) => {
     const loginPage = new LoginPage(page);
+    const testData = TD_BOM_COCKTAIL_001;
 
     // Step 1: 管理员登录B端系统
-    await page.goto(testData.baseUrl);
-    await loginPage.login(testData.adminCredentials.username, testData.adminCredentials.password);
+    await page.goto(baseUrl);
+    await loginPage.login(testData.adminCredentials);
 
     // Step 2: 导航到BOM配方管理页面
-    await page.goto(`${testData.baseUrl}/products/bom`);
+    await page.goto(`${baseUrl}/products/bom`);
     await page.waitForLoadState('networkidle');
 
     // Step 3: 点击新增配方按钮
@@ -71,28 +55,31 @@ test.describe('饮品配方配置时SKU选择器仅显示finished_product类型S
     const selectorModal = page.locator('[data-testid="sku-selector-modal"]');
     await expect(selectorModal).toBeVisible();
 
-    // Assertion 2: 只显示3个finished_product SKU
+    // Assertion 2: 只显示finished_product SKU，数量与种子数据匹配
+    // T039: 验证选择器选项数量 === 种子数据中的 expected_sku_count
     const skuOptions = page.locator('[data-testid="sku-selector-option"]');
-    await expect(skuOptions).toHaveCount(testData.expectedSkuCount);
+    await expect(skuOptions).toHaveCount(testData.expectedSkuCount);  // Expected: 3 from bom-filter-skus.json
 
-    // Assertion 3: packaging类型SKU不显示
-    // 验证"杯子"不在选择器中
-    const cupOption = page.locator('[data-testid="sku-selector-option"]:has-text("杯子")');
-    await expect(cupOption).not.toBeVisible();
+    // Assertion 3: packaging类型SKU不显示（验证种子数据中的所有包材SKU）
+    // T039: 遍历 testData.packagingSkus，确保所有包材SKU都不在选择器中
+    for (const packagingSku of testData.packagingSkus) {
+      const packagingOption = page.locator(`[data-testid="sku-selector-option"]:has-text("${packagingSku.name}")`);
+      await expect(packagingOption).not.toBeVisible();
+    }
 
-    // 验证"吸管"不在选择器中
-    const strawOption = page.locator('[data-testid="sku-selector-option"]:has-text("吸管")');
-    await expect(strawOption).not.toBeVisible();
+    // Assertion 4: raw_material类型SKU不显示（验证种子数据中的所有原料SKU）
+    // T039: 遍历 testData.rawMaterialSkus，确保所有原料SKU都不在选择器中
+    for (const rawMaterialSku of testData.rawMaterialSkus) {
+      const rawMaterialOption = page.locator(`[data-testid="sku-selector-option"]:has-text("${rawMaterialSku.name}")`);
+      await expect(rawMaterialOption).not.toBeVisible();
+    }
 
-    // Assertion 4: raw_material类型SKU不显示
-    // 验证"威士忌原液"不在选择器中
-    const whiskeyRawOption = page.locator('[data-testid="sku-selector-option"]:has-text("威士忌原液")');
-    await expect(whiskeyRawOption).not.toBeVisible();
-
-    // Assertion 5: finished_product SKU正确显示
-    // 验证"威士忌可乐鸡尾酒"在选择器中
-    const cocktailOption = page.locator('[data-testid="sku-selector-option"]:has-text("威士忌可乐鸡尾酒")');
-    await expect(cocktailOption).toBeVisible();
+    // Assertion 5: finished_product SKU正确显示（验证种子数据中的所有成品SKU）
+    // T039: 遍历 testData.finishedProductSkus，确保所有成品SKU都在选择器中
+    for (const finishedProductSku of testData.finishedProductSkus) {
+      const finishedProductOption = page.locator(`[data-testid="sku-selector-option"]:has-text("${finishedProductSku.name}")`);
+      await expect(finishedProductOption).toBeVisible();
+    }
 
     // Assertion 6: 搜索功能正常
     // 在搜索框输入"威士忌"
@@ -158,13 +145,14 @@ test.describe('饮品配方配置时SKU选择器仅显示finished_product类型S
   });
 
   // Success Criteria Validation Test
-  test('Success Criteria: SKU选择器性能和准确性', async ({ page }) => {
+  test('Success Criteria: SKU选择器性能和准确性', async ({ page, TD_BOM_COCKTAIL_001 }) => {
     const loginPage = new LoginPage(page);
+    const testData = TD_BOM_COCKTAIL_001;
 
-    await page.goto(testData.baseUrl);
-    await loginPage.login(testData.adminCredentials.username, testData.adminCredentials.password);
+    await page.goto(baseUrl);
+    await loginPage.login(testData.adminCredentials);
 
-    await page.goto(`${testData.baseUrl}/products/bom`);
+    await page.goto(`${baseUrl}/products/bom`);
     await page.click('[data-testid="add-bom-button"]');
 
     // Measure SKU selector load time
@@ -178,15 +166,17 @@ test.describe('饮品配方配置时SKU选择器仅显示finished_product类型S
     expect(loadDuration).toBeLessThanOrEqual(1000);
 
     // Success Criterion 2: SKU选择器过滤准确率达到100%
+    // T039: 使用种子数据验证过滤准确性
     const allOptions = await page.locator('[data-testid="sku-selector-option"]').all();
     for (const option of allOptions) {
       const optionText = await option.textContent();
-      // 验证不包含packaging或raw_material类型的SKU名称
-      expect(optionText).not.toContain('杯子');
-      expect(optionText).not.toContain('吸管');
-      expect(optionText).not.toContain('餐巾纸');
-      expect(optionText).not.toContain('原液');
-      expect(optionText).not.toContain('浓缩液');
+      // 验证不包含packaging或raw_material类型的SKU名称（从种子数据获取）
+      for (const packagingSku of testData.packagingSkus) {
+        expect(optionText).not.toContain(packagingSku.name);
+      }
+      for (const rawMaterialSku of testData.rawMaterialSkus) {
+        expect(optionText).not.toContain(rawMaterialSku.name);
+      }
     }
 
     // Success Criterion 3: 搜索功能正常工作

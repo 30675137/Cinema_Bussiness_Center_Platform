@@ -1,21 +1,21 @@
-import React from 'react'
-import { Modal, Typography, Button } from 'antd'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import React from 'react';
+import { Modal, Typography, Button } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-const { Text } = Typography
+const { Text } = Typography;
 
 interface ConfirmDialogProps {
-  visible: boolean
-  title?: string
-  content?: React.ReactNode
-  description?: string
-  type?: 'info' | 'success' | 'warning' | 'error'
-  okText?: string
-  cancelText?: string
-  onOk?: () => void | Promise<void>
-  onCancel?: () => void
-  width?: number
-  centered?: boolean
+  visible: boolean;
+  title?: string;
+  content?: React.ReactNode;
+  description?: string;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  okText?: string;
+  cancelText?: string;
+  onOk?: () => void | Promise<void>;
+  onCancel?: () => void;
+  width?: number;
+  centered?: boolean;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -29,7 +29,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onOk,
   onCancel,
   width = 416,
-  centered = true
+  centered = true,
 }) => {
   return (
     <Modal
@@ -49,7 +49,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </Button>,
         <Button key="ok" type={type === 'error' ? 'danger' : 'primary'} onClick={onOk}>
           {okText}
-        </Button>
+        </Button>,
       ]}
     >
       {content || (
@@ -58,7 +58,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         </div>
       )}
     </Modal>
-  )
-}
+  );
+};
 
-export default ConfirmDialog
+export default ConfirmDialog;

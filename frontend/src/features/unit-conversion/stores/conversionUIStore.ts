@@ -76,11 +76,9 @@ export const useConversionUIStore = create<ConversionUIState>((set) => ({
 /**
  * 选择器：获取是否处于编辑模式
  */
-export const selectIsEditing = (state: ConversionUIState) =>
-  state.editingRule?.id !== undefined;
+export const selectIsEditing = (state: ConversionUIState) => state.editingRule?.id !== undefined;
 
 /**
  * 选择器：获取编辑中的规则 ID
  */
-export const selectEditingId = (state: ConversionUIState) =>
-  state.editingRule?.id;
+export const selectEditingId = (state: ConversionUIState) => state.editingRule?.id;

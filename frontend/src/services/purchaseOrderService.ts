@@ -2,7 +2,13 @@
  * 采购订单服务
  */
 import { BaseApiService } from './baseService';
-import { PurchaseOrder, PurchaseOrderStatus, PurchaseOrderFormData, PurchaseOrderQueryParams, PurchaseStatistics } from '../types/purchase';
+import {
+  PurchaseOrder,
+  PurchaseOrderStatus,
+  PurchaseOrderFormData,
+  PurchaseOrderQueryParams,
+  PurchaseStatistics,
+} from '../types/purchase';
 
 // 采购订单API响应接口
 export interface PurchaseOrderResponse {
@@ -46,7 +52,12 @@ export class PurchaseOrderService extends BaseApiService {
    */
   async getOrders(params?: PurchaseOrderQueryParams): Promise<PurchaseOrderListResponse> {
     const response = await this.get<PurchaseOrderListResponse>('', params);
-    return response.data || { items: [], pagination: { current: 1, pageSize: 20, total: 0, totalPages: 0 } };
+    return (
+      response.data || {
+        items: [],
+        pagination: { current: 1, pageSize: 20, total: 0, totalPages: 0 },
+      }
+    );
   }
 
   /**
@@ -115,7 +126,11 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 提交审批
    */
-  async submitForApproval(id: string, approverIds: string[], remarks?: string): Promise<PurchaseOrder> {
+  async submitForApproval(
+    id: string,
+    approverIds: string[],
+    remarks?: string
+  ): Promise<PurchaseOrder> {
     const response = await this.post<PurchaseOrder>(`/${id}/submit`, {
       approverIds,
       remarks,
@@ -126,7 +141,10 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 批量审批
    */
-  async batchApprove(orderIds: string[], remarks?: string): Promise<{ success: number; failed: number }> {
+  async batchApprove(
+    orderIds: string[],
+    remarks?: string
+  ): Promise<{ success: number; failed: number }> {
     const response = await this.post<{ success: number; failed: number }>('/batch-approve', {
       orderIds,
       remarks,
@@ -137,7 +155,10 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 批量拒绝
    */
-  async batchReject(orderIds: string[], remarks: string): Promise<{ success: number; failed: number }> {
+  async batchReject(
+    orderIds: string[],
+    remarks: string
+  ): Promise<{ success: number; failed: number }> {
     const response = await this.post<{ success: number; failed: number }>('/batch-reject', {
       orderIds,
       remarks,
@@ -148,7 +169,10 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 批量取消
    */
-  async batchCancel(orderIds: string[], reason: string): Promise<{ success: number; failed: number }> {
+  async batchCancel(
+    orderIds: string[],
+    reason: string
+  ): Promise<{ success: number; failed: number }> {
     const response = await this.post<{ success: number; failed: number }>('/batch-cancel', {
       orderIds,
       reason,
@@ -205,7 +229,10 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 导出采购订单
    */
-  async exportOrders(params?: PurchaseOrderQueryParams, format: 'excel' | 'csv' | 'pdf' = 'excel'): Promise<Blob> {
+  async exportOrders(
+    params?: PurchaseOrderQueryParams,
+    format: 'excel' | 'csv' | 'pdf' = 'excel'
+  ): Promise<Blob> {
     return this.export('', { ...params, format }, format);
   }
 
@@ -226,7 +253,12 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 发送邮件通知
    */
-  async sendEmailNotification(id: string, recipients: string[], subject?: string, message?: string): Promise<void> {
+  async sendEmailNotification(
+    id: string,
+    recipients: string[],
+    subject?: string,
+    message?: string
+  ): Promise<void> {
     await this.post(`/${id}/notify`, {
       recipients,
       subject,
@@ -237,7 +269,11 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 上传附件
    */
-  async uploadAttachment(id: string, file: File, type: string): Promise<{ id: string; url: string }> {
+  async uploadAttachment(
+    id: string,
+    file: File,
+    type: string
+  ): Promise<{ id: string; url: string }> {
     return this.uploadFile(`/${id}/attachments`, file, { type });
   }
 
@@ -259,13 +295,15 @@ export class PurchaseOrderService extends BaseApiService {
   /**
    * 计算订单金额
    */
-  async calculateOrderAmount(items: Array<{
-    productId: string;
-    quantity: number;
-    unitPrice: number;
-    taxRate: number;
-    discountRate: number;
-  }>): Promise<{
+  async calculateOrderAmount(
+    items: Array<{
+      productId: string;
+      quantity: number;
+      unitPrice: number;
+      taxRate: number;
+      discountRate: number;
+    }>
+  ): Promise<{
     subtotal: number;
     totalTax: number;
     totalDiscount: number;
@@ -370,7 +408,7 @@ export class MockPurchaseOrderService extends PurchaseOrderService {
   // Mock实现继承自BaseApiService的方法
   protected async request<T>(endpoint: string, config: any = {}): Promise<any> {
     // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // 根据endpoint返回不同的mock数据
     if (endpoint.includes('/statistics')) {

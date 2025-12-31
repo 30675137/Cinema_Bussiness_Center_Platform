@@ -1,6 +1,6 @@
 /**
  * Validation Utilities
- * 
+ *
  * Zod schemas for validating dictionary and attribute template data
  */
 
@@ -278,4 +278,3 @@ export type AttributeTemplateUpdate = z.infer<typeof updateAttributeTemplateSche
 export type AttributeInput = z.infer<typeof createAttributeSchema>;
 export type AttributeUpdate = z.infer<typeof updateAttributeSchema>;
 export type BatchUpdateSortInput = z.infer<typeof batchUpdateSortSchema>;
-

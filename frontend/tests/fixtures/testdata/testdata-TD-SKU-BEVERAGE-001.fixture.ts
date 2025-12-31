@@ -42,44 +42,48 @@ export interface TD_SKU_BEVERAGE_001_Data {
  * ```
  */
 export const test = base.extend<{ TD_SKU_BEVERAGE_001: TD_SKU_BEVERAGE_001_Data }>({
-  TD_SKU_BEVERAGE_001: [async ({}, use) => {
-    // ========== Setup: Load seed data ==========
-    const seedPath = path.join(process.cwd(), 'testdata/seeds/beverage-skus.json');
+  TD_SKU_BEVERAGE_001: [
+    async ({}, use) => {
+      // ========== Setup: Load seed data ==========
+      const seedPath = path.join(process.cwd(), 'testdata/seeds/beverage-skus.json');
 
-    // Read and parse seed file
-    const seedContent = fs.readFileSync(seedPath, 'utf-8');
-    const seedData = JSON.parse(seedContent);
+      // Read and parse seed file
+      const seedContent = fs.readFileSync(seedPath, 'utf-8');
+      const seedData = JSON.parse(seedContent);
 
-    // Find the specific seed item by key
-    const beverageData = seedData.find((item: any) => item.key === 'mojito-cocktail');
+      // Find the specific seed item by key
+      const beverageData = seedData.find((item: any) => item.key === 'mojito-cocktail');
 
-    if (!beverageData) {
-      throw new Error('Seed key "mojito-cocktail" not found in testdata/seeds/beverage-skus.json');
-    }
-
-    // Map seed data to fixture interface
-    const fixtureData: TD_SKU_BEVERAGE_001_Data = {
-      skuCode: beverageData.code,
-      skuName: beverageData.name,
-      skuType: beverageData.type,
-      categoryPath: beverageData.category,
-      price: beverageData.price,
-      unit: beverageData.unit,
-      status: beverageData.status,
-      adminCredentials: {
-        username: beverageData.admin_credentials.username,
-        password: beverageData.admin_credentials.password
+      if (!beverageData) {
+        throw new Error(
+          'Seed key "mojito-cocktail" not found in testdata/seeds/beverage-skus.json'
+        );
       }
-    };
 
-    // Provide fixture data to test
-    await use(fixtureData);
+      // Map seed data to fixture interface
+      const fixtureData: TD_SKU_BEVERAGE_001_Data = {
+        skuCode: beverageData.code,
+        skuName: beverageData.name,
+        skuType: beverageData.type,
+        categoryPath: beverageData.category,
+        price: beverageData.price,
+        unit: beverageData.unit,
+        status: beverageData.status,
+        adminCredentials: {
+          username: beverageData.admin_credentials.username,
+          password: beverageData.admin_credentials.password,
+        },
+      };
 
-    // ========== Teardown ==========
-    // No teardown needed for seed strategy
-    // Seed data is static and doesn't require cleanup
+      // Provide fixture data to test
+      await use(fixtureData);
 
-  }, { scope: 'test' }]  // 每个测试独立加载数据
+      // ========== Teardown ==========
+      // No teardown needed for seed strategy
+      // Seed data is static and doesn't require cleanup
+    },
+    { scope: 'test' },
+  ], // 每个测试独立加载数据
 });
 
 export { expect } from '@playwright/test';

@@ -38,11 +38,7 @@ const FormWrapper: React.FC<{
   const [form] = Form.useForm();
 
   return (
-    <Form
-      form={form}
-      onFinish={onSubmit}
-      initialValues={initialValues}
-    >
+    <Form form={form} onFinish={onSubmit} initialValues={initialValues}>
       {children}
       <button type="submit">提交</button>
     </Form>
@@ -60,12 +56,7 @@ describe('PackageForm Component', () => {
   describe('Rendering', () => {
     it('should render all form fields', () => {
       const [form] = Form.useForm();
-      render(
-        <PackageForm
-          form={form}
-          hallTypes={mockHallTypes}
-        />
-      );
+      render(<PackageForm form={form} hallTypes={mockHallTypes} />);
 
       // Basic fields
       expect(screen.getByLabelText('场景包名称')).toBeInTheDocument();
@@ -110,11 +101,7 @@ describe('PackageForm Component', () => {
       };
 
       render(
-        <PackageForm
-          form={form}
-          hallTypes={mockHallTypes}
-          initialValues={customInitialValues}
-        />
+        <PackageForm form={form} hallTypes={mockHallTypes} initialValues={customInitialValues} />
       );
 
       // Custom values should override defaults
@@ -369,13 +356,7 @@ describe('PackageForm Component', () => {
   describe('Disabled State', () => {
     it('should disable all fields when disabled prop is true', () => {
       const [form] = Form.useForm();
-      render(
-        <PackageForm
-          form={form}
-          hallTypes={mockHallTypes}
-          disabled={true}
-        />
-      );
+      render(<PackageForm form={form} hallTypes={mockHallTypes} disabled={true} />);
 
       const nameInput = screen.getByLabelText('场景包名称') as HTMLInputElement;
       const descriptionInput = screen.getByLabelText('描述') as HTMLTextAreaElement;
@@ -388,13 +369,7 @@ describe('PackageForm Component', () => {
 
     it('should disable fields when loading is true', () => {
       const [form] = Form.useForm();
-      render(
-        <PackageForm
-          form={form}
-          hallTypes={mockHallTypes}
-          loading={true}
-        />
-      );
+      render(<PackageForm form={form} hallTypes={mockHallTypes} loading={true} />);
 
       const nameInput = screen.getByLabelText('场景包名称') as HTMLInputElement;
       expect(nameInput).toBeDisabled();
@@ -403,12 +378,7 @@ describe('PackageForm Component', () => {
     it('should enable fields when both disabled and loading are false', () => {
       const [form] = Form.useForm();
       render(
-        <PackageForm
-          form={form}
-          hallTypes={mockHallTypes}
-          disabled={false}
-          loading={false}
-        />
+        <PackageForm form={form} hallTypes={mockHallTypes} disabled={false} loading={false} />
       );
 
       const nameInput = screen.getByLabelText('场景包名称') as HTMLInputElement;
@@ -420,11 +390,7 @@ describe('PackageForm Component', () => {
     it('should pass packageId to ImageUpload component', () => {
       const [form] = Form.useForm();
       const { container } = render(
-        <PackageForm
-          form={form}
-          packageId="test-package-id"
-          hallTypes={mockHallTypes}
-        />
+        <PackageForm form={form} packageId="test-package-id" hallTypes={mockHallTypes} />
       );
 
       // ImageUpload component should be rendered

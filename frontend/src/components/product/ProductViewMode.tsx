@@ -21,10 +21,13 @@ const ProductViewMode: React.FC<ProductViewModeProps> = ({ product }) => {
       published: { color: 'success', text: '已发布' },
       rejected: { color: 'error', text: '已驳回' },
       offline: { color: 'warning', text: '已下线' },
-      abnormal: { color: 'red', text: '异常' }
+      abnormal: { color: 'red', text: '异常' },
     };
 
-    const config = statusMap[status as keyof typeof statusMap] || { color: 'default', text: status };
+    const config = statusMap[status as keyof typeof statusMap] || {
+      color: 'default',
+      text: status,
+    };
     return <Tag color={config.color}>{config.text}</Tag>;
   };
 
@@ -56,7 +59,9 @@ const ProductViewMode: React.FC<ProductViewModeProps> = ({ product }) => {
         <Descriptions.Item label="当前库存">{product.currentStock || 0}</Descriptions.Item>
         <Descriptions.Item label="安全库存">{product.safetyStock || '-'}</Descriptions.Item>
 
-        <Descriptions.Item label="描述" span={2}>{product.description || '-'}</Descriptions.Item>
+        <Descriptions.Item label="描述" span={2}>
+          {product.description || '-'}
+        </Descriptions.Item>
 
         <Descriptions.Item label="商品图片" span={2}>
           {product.content?.images && product.content.images.length > 0 ? (
@@ -72,7 +77,9 @@ const ProductViewMode: React.FC<ProductViewModeProps> = ({ product }) => {
                 />
               ))}
             </Space>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="创建人">{product.createdBy || '-'}</Descriptions.Item>
@@ -81,7 +88,9 @@ const ProductViewMode: React.FC<ProductViewModeProps> = ({ product }) => {
         <Descriptions.Item label="更新时间">{formatDateTime(product.updatedAt)}</Descriptions.Item>
 
         {product.publishedAt && (
-          <Descriptions.Item label="发布时间" span={2}>{formatDateTime(product.publishedAt)}</Descriptions.Item>
+          <Descriptions.Item label="发布时间" span={2}>
+            {formatDateTime(product.publishedAt)}
+          </Descriptions.Item>
         )}
       </Descriptions>
     </div>

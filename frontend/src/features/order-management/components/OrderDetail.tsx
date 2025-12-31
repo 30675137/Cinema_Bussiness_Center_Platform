@@ -3,21 +3,32 @@
  * 订单详情组件 - User Story 3
  */
 
-import React from 'react'
-import { Card, Descriptions, Table, Timeline, Tag, Typography, Row, Col, Divider, type TableProps } from 'antd'
-import type { ProductOrder, OrderItem, OrderLog } from '../types/order'
-import { OrderStatusBadge } from './OrderStatusBadge'
-import { maskPhone } from '../utils/maskPhone'
-import { formatOrderStatus } from '../utils/formatOrderStatus'
-import dayjs from 'dayjs'
+import React from 'react';
+import {
+  Card,
+  Descriptions,
+  Table,
+  Timeline,
+  Tag,
+  Typography,
+  Row,
+  Col,
+  Divider,
+  type TableProps,
+} from 'antd';
+import type { ProductOrder, OrderItem, OrderLog } from '../types/order';
+import { OrderStatusBadge } from './OrderStatusBadge';
+import { maskPhone } from '../utils/maskPhone';
+import { formatOrderStatus } from '../utils/formatOrderStatus';
+import dayjs from 'dayjs';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 export interface OrderDetailProps {
   /**
    * 订单数据
    */
-  order: ProductOrder
+  order: ProductOrder;
 }
 
 /**
@@ -42,45 +53,43 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
     {
       title: '商品名称',
       dataIndex: 'productName',
-      key: 'productName'
+      key: 'productName',
     },
     {
       title: '规格',
       dataIndex: 'productSpec',
       key: 'productSpec',
-      render: (spec) => spec || '-'
+      render: (spec) => spec || '-',
     },
     {
       title: '单价',
       dataIndex: 'unitPrice',
       key: 'unitPrice',
       align: 'right',
-      render: (price: number) => `¥${price.toFixed(2)}`
+      render: (price: number) => `¥${price.toFixed(2)}`,
     },
     {
       title: '数量',
       dataIndex: 'quantity',
       key: 'quantity',
-      align: 'center'
+      align: 'center',
     },
     {
       title: '小计',
       dataIndex: 'subtotal',
       key: 'subtotal',
       align: 'right',
-      render: (subtotal: number) => (
-        <Text strong>¥{subtotal.toFixed(2)}</Text>
-      )
-    }
-  ]
+      render: (subtotal: number) => <Text strong>¥{subtotal.toFixed(2)}</Text>,
+    },
+  ];
 
   // 格式化地址
   const formatAddress = () => {
-    const { shippingAddress } = order
-    if (!shippingAddress) return '-'
-    const { province, city, district, detail } = shippingAddress
-    return `${province}${city}${district}${detail}`
-  }
+    const { shippingAddress } = order;
+    if (!shippingAddress) return '-';
+    const { province, city, district, detail } = shippingAddress;
+    return `${province}${city}${district}${detail}`;
+  };
 
   return (
     <div className="order-detail">
@@ -88,7 +97,9 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
       <Card title="订单信息" style={{ marginBottom: 16 }}>
         <Descriptions column={{ xs: 1, sm: 2, md: 3 }} bordered>
           <Descriptions.Item label="订单号" span={2}>
-            <Text copyable strong>{order.orderNumber}</Text>
+            <Text copyable strong>
+              {order.orderNumber}
+            </Text>
           </Descriptions.Item>
           <Descriptions.Item label="订单状态">
             <OrderStatusBadge status={order.status} />
@@ -99,18 +110,14 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
           <Descriptions.Item label="更新时间">
             {dayjs(order.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
           </Descriptions.Item>
-          <Descriptions.Item label="订单版本">
-            v{order.version}
-          </Descriptions.Item>
+          <Descriptions.Item label="订单版本">v{order.version}</Descriptions.Item>
         </Descriptions>
       </Card>
 
       {/* 用户信息 */}
       <Card title="用户信息" style={{ marginBottom: 16 }}>
         <Descriptions column={{ xs: 1, sm: 2 }} bordered>
-          <Descriptions.Item label="用户名">
-            {order.user?.username || '-'}
-          </Descriptions.Item>
+          <Descriptions.Item label="用户名">{order.user?.username || '-'}</Descriptions.Item>
           <Descriptions.Item label="联系电话">
             {order.user?.phone ? maskPhone(order.user.phone) : '-'}
           </Descriptions.Item>
@@ -139,9 +146,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
               <Descriptions.Item label="商品金额">
                 ¥{order.productTotal.toFixed(2)}
               </Descriptions.Item>
-              <Descriptions.Item label="运费">
-                ¥{order.shippingFee.toFixed(2)}
-              </Descriptions.Item>
+              <Descriptions.Item label="运费">¥{order.shippingFee.toFixed(2)}</Descriptions.Item>
               <Descriptions.Item label="优惠金额">
                 -¥{order.discountAmount.toFixed(2)}
               </Descriptions.Item>
@@ -158,9 +163,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
       {/* 支付信息 */}
       <Card title="支付信息" style={{ marginBottom: 16 }}>
         <Descriptions column={{ xs: 1, sm: 2 }} bordered>
-          <Descriptions.Item label="支付方式">
-            {order.paymentMethod || '-'}
-          </Descriptions.Item>
+          <Descriptions.Item label="支付方式">{order.paymentMethod || '-'}</Descriptions.Item>
           <Descriptions.Item label="支付时间">
             {order.paymentTime ? dayjs(order.paymentTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
           </Descriptions.Item>
@@ -179,11 +182,11 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
           {order.status === 'CANCELLED' && (
             <>
               <Descriptions.Item label="取消时间">
-                {order.cancelledTime ? dayjs(order.cancelledTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                {order.cancelledTime
+                  ? dayjs(order.cancelledTime).format('YYYY-MM-DD HH:mm:ss')
+                  : '-'}
               </Descriptions.Item>
-              <Descriptions.Item label="取消原因">
-                {order.cancelReason || '-'}
-              </Descriptions.Item>
+              <Descriptions.Item label="取消原因">{order.cancelReason || '-'}</Descriptions.Item>
             </>
           )}
         </Descriptions>
@@ -212,14 +215,14 @@ export const OrderDetail: React.FC<OrderDetailProps> = React.memo(({ order }) =>
                   </Text>
                 </div>
               </div>
-            )
+            ),
           }))}
         />
       </Card>
     </div>
-  )
-})
+  );
+});
 
-OrderDetail.displayName = 'OrderDetail'
+OrderDetail.displayName = 'OrderDetail';
 
-export default OrderDetail
+export default OrderDetail;

@@ -1,15 +1,15 @@
 /**
  * P004-inventory-adjustment: 库存流水详情抽屉组件
- * 
+ *
  * 显示单条流水记录的完整详情。
- * 
+ *
  * @since US2 - 查看库存流水记录
  */
 
 import React from 'react';
 import { Drawer, Descriptions, Tag, Divider, Typography } from 'antd';
-import { 
-  ArrowUpOutlined, 
+import {
+  ArrowUpOutlined,
   ArrowDownOutlined,
   ClockCircleOutlined,
   UserOutlined,
@@ -35,13 +35,13 @@ export interface TransactionDetailDrawerProps {
  */
 function getSourceTypeName(sourceType?: string): string {
   const sourceTypeMap: Record<string, string> = {
-    'purchase_order': '采购订单',
-    'sales_order': '销售订单',
-    'inventory_adjustment': '库存调整',
-    'safety_stock_config': '安全库存配置',
-    'transfer_order': '调拨单',
-    'return_order': '退货单',
-    'manual': '手工操作',
+    purchase_order: '采购订单',
+    sales_order: '销售订单',
+    inventory_adjustment: '库存调整',
+    safety_stock_config: '安全库存配置',
+    transfer_order: '调拨单',
+    return_order: '退货单',
+    manual: '手工操作',
   };
   return sourceTypeMap[sourceType || ''] || sourceType || '-';
 }
@@ -55,12 +55,12 @@ function isInboundType(type: string): boolean {
 
 /**
  * 库存流水详情抽屉组件
- * 
+ *
  * 功能：
  * - 显示流水记录的完整详情
  * - 包含时间、类型、数量变化、来源信息等
  * - 备注信息显示
- * 
+ *
  * @example
  * ```tsx
  * <TransactionDetailDrawer
@@ -93,8 +93,16 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
       destroyOnClose
     >
       {/* 交易概览 */}
-      <div style={{ textAlign: 'center', marginBottom: 24, padding: '16px 0', background: '#fafafa', borderRadius: 8 }}>
-        <Tag 
+      <div
+        style={{
+          textAlign: 'center',
+          marginBottom: 24,
+          padding: '16px 0',
+          background: '#fafafa',
+          borderRadius: 8,
+        }}
+      >
+        <Tag
           color={isInbound ? 'success' : 'warning'}
           icon={isInbound ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
           style={{ fontSize: 14, padding: '4px 12px' }}
@@ -102,7 +110,8 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
           {getTransactionTypeName(transaction.transactionType)}
         </Tag>
         <Title level={2} style={{ color: quantityColor, margin: '16px 0 8px' }}>
-          {quantityPrefix}{Math.abs(transaction.quantity)}
+          {quantityPrefix}
+          {Math.abs(transaction.quantity)}
         </Title>
         <Text type="secondary">
           <ClockCircleOutlined style={{ marginRight: 8 }} />
@@ -116,7 +125,8 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
       <Descriptions title="库存变化" column={1} bordered size="small">
         <Descriptions.Item label="变动数量">
           <Text strong style={{ color: quantityColor }}>
-            {quantityPrefix}{Math.abs(transaction.quantity)}
+            {quantityPrefix}
+            {Math.abs(transaction.quantity)}
           </Text>
         </Descriptions.Item>
         <Descriptions.Item label="库存变化">
@@ -124,10 +134,12 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
             {transaction.stockBefore} → <Text strong>{transaction.stockAfter}</Text>
           </Text>
         </Descriptions.Item>
-        {(transaction.availableBefore !== undefined || transaction.availableAfter !== undefined) && (
+        {(transaction.availableBefore !== undefined ||
+          transaction.availableAfter !== undefined) && (
           <Descriptions.Item label="可用数量变化">
             <Text>
-              {transaction.availableBefore ?? '-'} → <Text strong>{transaction.availableAfter ?? '-'}</Text>
+              {transaction.availableBefore ?? '-'} →{' '}
+              <Text strong>{transaction.availableAfter ?? '-'}</Text>
             </Text>
           </Descriptions.Item>
         )}
@@ -146,7 +158,9 @@ export const TransactionDetailDrawer: React.FC<TransactionDetailDrawerProps> = (
               <FileTextOutlined style={{ marginRight: 8 }} />
               {transaction.sourceId}
             </Text>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
       </Descriptions>
 

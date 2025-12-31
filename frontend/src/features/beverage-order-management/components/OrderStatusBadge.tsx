@@ -2,9 +2,9 @@
  * @spec O003-beverage-order
  * OrderStatusBadge - 订单状态徽章组件
  */
-import React from 'react'
-import { Tag } from 'antd'
-import type { TagProps } from 'antd'
+import React from 'react';
+import { Tag } from 'antd';
+import type { TagProps } from 'antd';
 
 /**
  * 饮品订单状态枚举
@@ -53,17 +53,17 @@ const STATUS_CONFIG: Record<BeverageOrderStatus, { color: TagProps['color']; tex
     color: 'error',
     text: '已取消',
   },
-}
+};
 
 export interface OrderStatusBadgeProps {
   /**
    * 订单状态
    */
-  status: BeverageOrderStatus | string
+  status: BeverageOrderStatus | string;
   /**
    * 自定义类名
    */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -84,13 +84,13 @@ export const OrderStatusBadge: React.FC<OrderStatusBadgeProps> = ({ status, clas
   const config = STATUS_CONFIG[status as BeverageOrderStatus] || {
     color: 'default',
     text: status,
-  }
+  };
 
   return (
     <Tag color={config.color} className={className}>
       {config.text}
     </Tag>
-  )
-}
+  );
+};
 
-export default OrderStatusBadge
+export default OrderStatusBadge;

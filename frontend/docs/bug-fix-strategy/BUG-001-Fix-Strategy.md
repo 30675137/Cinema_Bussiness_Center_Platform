@@ -77,6 +77,7 @@ npx madge --image deps-graph.svg src/types/inventory.ts src/
 **预期结果**: 如果发现循环依赖，需要打破循环
 
 **常见循环依赖模式**:
+
 ```
 inventory.ts → store.ts → inventoryStore.ts → inventory.ts
 ```
@@ -115,6 +116,7 @@ cat tsconfig.json | grep -A 5 "paths"
 ```
 
 **检查点**:
+
 - `@/` 别名是否正确指向 `src/`
 - TypeScript 和 Vite 的配置是否一致
 
@@ -163,6 +165,7 @@ export const TestInventoryPage: React.FC = () => {
 ```
 
 **测试步骤**:
+
 1. 在 App.tsx 添加路由: `<Route path="/test-inventory" element={<TestInventoryPage />} />`
 2. 访问 `http://localhost:3000/test-inventory`
 3. 如果成功，说明类型导入本身没问题
@@ -267,6 +270,7 @@ export const inventoryService = { ... };
 ```
 
 **检查清单**:
+
 - [ ] inventoryService 只有一种导出方式
 - [ ] 所有类型使用 `export type` 或 `export interface`
 - [ ] 所有导入使用 `import type` 导入类型
@@ -301,6 +305,7 @@ export default defineConfig({
 ```
 
 **验证**:
+
 ```bash
 # 测试路径解析
 npx tsc --showConfig | grep paths
@@ -341,6 +346,7 @@ import type { CurrentInventory } from '@/types/inventory/base';
 ```
 
 **优点**:
+
 - 减少单个文件的复杂度
 - 降低循环依赖风险
 - 提高可维护性
@@ -386,6 +392,7 @@ import type { CurrentInventory } from './types';
 
 **优点**: 快速让页面工作起来
 **缺点**:
+
 - 不是长期方案
 - 类型定义重复
 - 后续需要重构
@@ -395,6 +402,7 @@ import type { CurrentInventory } from './types';
 ## 推荐执行顺序
 
 ### 第一轮：快速验证（15分钟）
+
 1. ✅ 执行 1.1 - 验证类型定义本身
 2. ✅ 执行 1.3 - 搜索错误导入
 3. ✅ 执行 2.1 - 创建最小化测试页面
@@ -402,19 +410,24 @@ import type { CurrentInventory } from './types';
 **目标**: 确认问题的确切位置
 
 ### 第二轮：针对性修复（30分钟）
+
 根据第一轮结果，选择对应方案：
+
 - 如果测试页面成功 → 问题在现有组件，执行 2.2
 - 如果有循环依赖 → 执行方案 A
 - 如果有错误导入 → 修复导入
 - 如果路径有问题 → 执行方案 D
 
 ### 第三轮：深度修复（60分钟，可选）
+
 如果第二轮失败，执行：
+
 1. 执行方案 B - 彻底清除缓存
 2. 执行方案 E - 拆分大文件
 3. 考虑方案 C - 统一模块系统
 
 ### 最后手段：临时绕过（15分钟）
+
 如果所有方案都失败，执行方案 F 让页面先工作起来
 
 ---
@@ -433,6 +446,7 @@ import type { CurrentInventory } from './types';
 ### 未来避免类似问题
 
 1. **建立导入规范**:
+
    ```typescript
    // ✅ 好的实践
    import type { TypeName } from '@/types/module';
@@ -443,6 +457,7 @@ import type { CurrentInventory } from './types';
    ```
 
 2. **添加 ESLint 规则**:
+
    ```json
    {
      "rules": {
@@ -453,6 +468,7 @@ import type { CurrentInventory } from './types';
    ```
 
 3. **定期检查依赖**:
+
    ```bash
    # 添加到 package.json scripts
    "check-deps": "npx madge --circular src/"
@@ -468,11 +484,11 @@ import type { CurrentInventory } from './types';
 
 ## 时间估算
 
-| 阶段 | 最佳情况 | 最坏情况 |
-|------|---------|---------|
-| 诊断 | 15分钟 | 30分钟 |
-| 修复 | 15分钟 | 60分钟 |
-| 验证 | 10分钟 | 15分钟 |
+| 阶段     | 最佳情况   | 最坏情况    |
+| -------- | ---------- | ----------- |
+| 诊断     | 15分钟     | 30分钟      |
+| 修复     | 15分钟     | 60分钟      |
+| 验证     | 10分钟     | 15分钟      |
 | **总计** | **40分钟** | **105分钟** |
 
 ---
@@ -490,16 +506,19 @@ npm install --save-dev dependency-cruiser
 ---
 
 **开始执行前**:
+
 1. 确保代码已提交到 git（以便回滚）
 2. 记录当前的错误信息
 3. 准备好调试工具（浏览器 DevTools）
 
 **执行中**:
+
 1. 每完成一步，记录结果
 2. 如果某个方案有效，立即停止并提交代码
 3. 保持耐心，系统化地排查
 
 **执行后**:
+
 1. 更新测试报告
 2. 记录最终解决方案
 3. 添加预防措施到开发规范中

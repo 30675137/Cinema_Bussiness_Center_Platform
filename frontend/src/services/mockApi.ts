@@ -14,7 +14,7 @@ import {
   MenuLevel,
   PaginatedResponse,
   ApiResponse,
-  MenuStats
+  MenuStats,
 } from '@/types/navigation';
 import { MenuQueryParams, CreateMenuParams, UpdateMenuParams } from './menuService';
 
@@ -29,7 +29,7 @@ const mockPermissions: Permission[] = [
     resource: 'admin',
     action: 'access',
     description: '系统管理员访问权限',
-    category: PermissionCategory.ADMIN
+    category: PermissionCategory.ADMIN,
   },
   {
     id: 'perm_product_read',
@@ -38,7 +38,7 @@ const mockPermissions: Permission[] = [
     resource: 'product',
     action: 'read',
     description: '查看商品信息权限',
-    category: PermissionCategory.READ
+    category: PermissionCategory.READ,
   },
   {
     id: 'perm_product_write',
@@ -47,7 +47,7 @@ const mockPermissions: Permission[] = [
     resource: 'product',
     action: 'write',
     description: '编辑商品信息权限',
-    category: PermissionCategory.WRITE
+    category: PermissionCategory.WRITE,
   },
   {
     id: 'perm_inventory_read',
@@ -56,7 +56,7 @@ const mockPermissions: Permission[] = [
     resource: 'inventory',
     action: 'read',
     description: '查看库存信息权限',
-    category: PermissionCategory.READ
+    category: PermissionCategory.READ,
   },
   {
     id: 'perm_inventory_write',
@@ -65,7 +65,7 @@ const mockPermissions: Permission[] = [
     resource: 'inventory',
     action: 'write',
     description: '编辑库存信息权限',
-    category: PermissionCategory.WRITE
+    category: PermissionCategory.WRITE,
   },
   {
     id: 'perm_pricing_read',
@@ -74,7 +74,7 @@ const mockPermissions: Permission[] = [
     resource: 'pricing',
     action: 'read',
     description: '查看价格信息权限',
-    category: PermissionCategory.READ
+    category: PermissionCategory.READ,
   },
   {
     id: 'perm_pricing_write',
@@ -83,7 +83,7 @@ const mockPermissions: Permission[] = [
     resource: 'pricing',
     action: 'write',
     description: '编辑价格信息权限',
-    category: PermissionCategory.WRITE
+    category: PermissionCategory.WRITE,
   },
 ];
 
@@ -99,27 +99,27 @@ const mockRoles: UserRole[] = [
     permissions: mockPermissions,
     isActive: true,
     createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-01')
+    updatedAt: new Date('2025-01-01'),
   },
   {
     id: 'role_department_admin',
     name: '部门管理员',
     code: 'department_admin',
     description: '部门管理权限',
-    permissions: mockPermissions.filter(p => p.category !== PermissionCategory.ADMIN),
+    permissions: mockPermissions.filter((p) => p.category !== PermissionCategory.ADMIN),
     isActive: true,
     createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-01')
+    updatedAt: new Date('2025-01-01'),
   },
   {
     id: 'role_operator',
     name: '业务操作员',
     code: 'operator',
     description: '负责日常业务操作',
-    permissions: mockPermissions.filter(p => p.category === PermissionCategory.READ),
+    permissions: mockPermissions.filter((p) => p.category === PermissionCategory.READ),
     isActive: true,
     createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-01')
+    updatedAt: new Date('2025-01-01'),
   },
 ];
 
@@ -152,7 +152,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 1,
         requiredPermissions: ['admin.access'],
         isActive: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       },
       {
         id: 'menu_unit_management',
@@ -164,7 +164,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 2,
         requiredPermissions: ['admin.access'],
         isActive: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       },
       {
         id: 'menu_dictionary_config',
@@ -176,7 +176,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 3,
         requiredPermissions: ['admin.access'],
         isActive: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       },
       {
         id: 'menu_role_permission',
@@ -188,7 +188,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 4,
         requiredPermissions: ['admin.access'],
         isActive: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       },
       {
         id: 'menu_approval_flow',
@@ -200,9 +200,9 @@ const mockMenus: MenuItem[] = [
         sortOrder: 5,
         requiredPermissions: ['admin.access'],
         isActive: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
-      }
-    ]
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
+      },
+    ],
   },
 
   // 商品管理 (MDM / PIM)
@@ -230,7 +230,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 1,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_sku_management',
@@ -243,7 +243,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: ['product.read'],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_attribute_spec',
@@ -255,7 +255,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 3,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_product_status',
@@ -267,7 +267,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 4,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_content_edit',
@@ -279,7 +279,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 5,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_material_library',
@@ -291,7 +291,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 6,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_channel_mapping',
@@ -303,7 +303,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 7,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
       },
       {
         id: 'menu_content_publish',
@@ -315,9 +315,9 @@ const mockMenus: MenuItem[] = [
         sortOrder: 8,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT
-      }
-    ]
+        functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
+      },
+    ],
   },
 
   // BOM / 配方 & 成本管理
@@ -345,7 +345,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 1,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.BOM_MANAGEMENT
+        functionalArea: FunctionalArea.BOM_MANAGEMENT,
       },
       {
         id: 'menu_bom_config',
@@ -357,7 +357,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 2,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.BOM_MANAGEMENT
+        functionalArea: FunctionalArea.BOM_MANAGEMENT,
       },
       {
         id: 'menu_unit_conversion',
@@ -369,7 +369,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 3,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.BOM_MANAGEMENT
+        functionalArea: FunctionalArea.BOM_MANAGEMENT,
       },
       {
         id: 'menu_cost_estimation',
@@ -381,7 +381,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 4,
         requiredPermissions: ['pricing.read'],
         isActive: true,
-        functionalArea: FunctionalArea.BOM_MANAGEMENT
+        functionalArea: FunctionalArea.BOM_MANAGEMENT,
       },
       {
         id: 'menu_bom_version',
@@ -393,9 +393,9 @@ const mockMenus: MenuItem[] = [
         sortOrder: 5,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.BOM_MANAGEMENT
-      }
-    ]
+        functionalArea: FunctionalArea.BOM_MANAGEMENT,
+      },
+    ],
   },
 
   // 场景包/套餐管理
@@ -423,7 +423,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 1,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
       },
       {
         id: 'menu_resource_rules',
@@ -435,7 +435,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 2,
         requiredPermissions: ['product.read'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
       },
       {
         id: 'menu_content_combination',
@@ -447,7 +447,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 3,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
       },
       {
         id: 'menu_addon_strategy',
@@ -459,7 +459,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 4,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
       },
       {
         id: 'menu_scenario_pricing',
@@ -471,7 +471,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 5,
         requiredPermissions: ['pricing.write'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
       },
       {
         id: 'menu_package_version',
@@ -483,9 +483,9 @@ const mockMenus: MenuItem[] = [
         sortOrder: 6,
         requiredPermissions: ['product.write'],
         isActive: true,
-        functionalArea: FunctionalArea.SCENARIO_PACKAGE
-      }
-    ]
+        functionalArea: FunctionalArea.SCENARIO_PACKAGE,
+      },
+    ],
   },
 
   // 价格体系管理
@@ -513,7 +513,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 1,
         requiredPermissions: ['pricing.read'],
         isActive: true,
-        functionalArea: FunctionalArea.PRICING_SYSTEM
+        functionalArea: FunctionalArea.PRICING_SYSTEM,
       },
       {
         id: 'menu_price_review',
@@ -525,7 +525,7 @@ const mockMenus: MenuItem[] = [
         sortOrder: 2,
         requiredPermissions: ['pricing.write'],
         isActive: true,
-        functionalArea: FunctionalArea.PRICING_SYSTEM
+        functionalArea: FunctionalArea.PRICING_SYSTEM,
       },
       {
         id: 'menu_price_rules',
@@ -537,9 +537,9 @@ const mockMenus: MenuItem[] = [
         sortOrder: 3,
         requiredPermissions: ['pricing.write'],
         isActive: true,
-        functionalArea: FunctionalArea.PRICING_SYSTEM
-      }
-    ]
+        functionalArea: FunctionalArea.PRICING_SYSTEM,
+      },
+    ],
   },
 
   // 采购与入库管理
@@ -568,7 +568,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.PROCUREMENT
+        functionalArea: FunctionalArea.PROCUREMENT,
       },
       {
         id: 'menu_purchase_order',
@@ -581,7 +581,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.PROCUREMENT
+        functionalArea: FunctionalArea.PROCUREMENT,
       },
       {
         id: 'menu_receiving',
@@ -594,7 +594,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.PROCUREMENT
+        functionalArea: FunctionalArea.PROCUREMENT,
       },
       {
         id: 'menu_transfer_management',
@@ -607,9 +607,9 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.PROCUREMENT
-      }
-    ]
+        functionalArea: FunctionalArea.PROCUREMENT,
+      },
+    ],
   },
 
   // 库存与仓店库存管理
@@ -638,7 +638,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.INVENTORY
+        functionalArea: FunctionalArea.INVENTORY,
       },
       {
         id: 'menu_stock_operation',
@@ -651,7 +651,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.INVENTORY
+        functionalArea: FunctionalArea.INVENTORY,
       },
       {
         id: 'menu_stock_check',
@@ -664,7 +664,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.INVENTORY
+        functionalArea: FunctionalArea.INVENTORY,
       },
       {
         id: 'menu_stock_allocation',
@@ -677,9 +677,9 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.INVENTORY
-      }
-    ]
+        functionalArea: FunctionalArea.INVENTORY,
+      },
+    ],
   },
 
   // 档期/排期/资源预约管理
@@ -708,7 +708,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SCHEDULING
+        functionalArea: FunctionalArea.SCHEDULING,
       },
       {
         id: 'menu_schedule_gantt',
@@ -721,7 +721,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SCHEDULING
+        functionalArea: FunctionalArea.SCHEDULING,
       },
       {
         id: 'menu_schedule_calendar',
@@ -734,7 +734,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SCHEDULING
+        functionalArea: FunctionalArea.SCHEDULING,
       },
       {
         id: 'menu_conflict_check',
@@ -747,9 +747,9 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SCHEDULING
-      }
-    ]
+        functionalArea: FunctionalArea.SCHEDULING,
+      },
+    ],
   },
 
   // 订单与履约管理
@@ -778,7 +778,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.ORDER_MANAGEMENT
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT,
       },
       {
         id: 'menu_order_confirm',
@@ -791,7 +791,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.ORDER_MANAGEMENT
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT,
       },
       {
         id: 'menu_order_verification',
@@ -804,7 +804,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.ORDER_MANAGEMENT
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT,
       },
       {
         id: 'menu_order_refund',
@@ -817,7 +817,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.ORDER_MANAGEMENT
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT,
       },
       {
         id: 'menu_reservation_orders',
@@ -830,9 +830,9 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.ORDER_MANAGEMENT
-      }
-    ]
+        functionalArea: FunctionalArea.ORDER_MANAGEMENT,
+      },
+    ],
   },
 
   // 运营 & 报表 / 指标看板
@@ -861,7 +861,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
+        functionalArea: FunctionalArea.OPERATIONS,
       },
       {
         id: 'menu_data_quality_report',
@@ -874,7 +874,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
+        functionalArea: FunctionalArea.OPERATIONS,
       },
       {
         id: 'menu_stock_accuracy_report',
@@ -887,7 +887,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
+        functionalArea: FunctionalArea.OPERATIONS,
       },
       {
         id: 'menu_sales_analysis',
@@ -900,7 +900,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
+        functionalArea: FunctionalArea.OPERATIONS,
       },
       {
         id: 'menu_resource_utilization',
@@ -913,7 +913,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
+        functionalArea: FunctionalArea.OPERATIONS,
       },
       {
         id: 'menu_summary_reports',
@@ -926,9 +926,9 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.OPERATIONS
-      }
-    ]
+        functionalArea: FunctionalArea.OPERATIONS,
+      },
+    ],
   },
 
   // 系统管理 / 设置 /权限
@@ -957,7 +957,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT
+        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT,
       },
       {
         id: 'menu_audit_log',
@@ -970,7 +970,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT
+        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT,
       },
       {
         id: 'menu_system_config',
@@ -983,7 +983,7 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT
+        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT,
       },
       {
         id: 'menu_data_import_export',
@@ -996,10 +996,10 @@ const mockMenus: MenuItem[] = [
         requiredPermissions: [],
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT
-      }
-    ]
-  }
+        functionalArea: FunctionalArea.SYSTEM_MANAGEMENT,
+      },
+    ],
+  },
 ];
 
 /**
@@ -1012,7 +1012,7 @@ export class MockApiService {
    * 模拟网络延迟
    */
   private async delayMs(): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, this.delay));
+    return new Promise((resolve) => setTimeout(resolve, this.delay));
   }
 
   /**
@@ -1022,7 +1022,7 @@ export class MockApiService {
     return {
       success: true,
       data,
-      message: '操作成功'
+      message: '操作成功',
     };
   }
 
@@ -1051,25 +1051,28 @@ export class MockApiService {
    * 根据权限过滤菜单
    */
   private filterMenusByPermissions(menus: MenuItem[], permissions: string[]): MenuItem[] {
-    return menus.filter(menu => {
-      // 检查用户是否有访问该菜单的权限
-      const hasPermission = menu.requiredPermissions.length === 0 ||
-        menu.requiredPermissions.some(perm => permissions.includes(perm));
+    return menus
+      .filter((menu) => {
+        // 检查用户是否有访问该菜单的权限
+        const hasPermission =
+          menu.requiredPermissions.length === 0 ||
+          menu.requiredPermissions.some((perm) => permissions.includes(perm));
 
-      if (!hasPermission) {
-        return false;
-      }
+        if (!hasPermission) {
+          return false;
+        }
 
-      // 递归过滤子菜单
-      if (menu.children && menu.children.length > 0) {
-        menu.children = this.filterMenusByPermissions(menu.children, permissions);
-      }
+        // 递归过滤子菜单
+        if (menu.children && menu.children.length > 0) {
+          menu.children = this.filterMenusByPermissions(menu.children, permissions);
+        }
 
-      return true;
-    }).map(menu => ({
-      ...menu,
-      children: menu.children || []
-    }));
+        return true;
+      })
+      .map((menu) => ({
+        ...menu,
+        children: menu.children || [],
+      }));
   }
 
   /**
@@ -1092,8 +1095,10 @@ export class MockApiService {
     const lowerQuery = query.toLowerCase();
 
     const searchInMenu = (menu: MenuItem) => {
-      if (menu.name.toLowerCase().includes(lowerQuery) ||
-          menu.code.toLowerCase().includes(lowerQuery)) {
+      if (
+        menu.name.toLowerCase().includes(lowerQuery) ||
+        menu.code.toLowerCase().includes(lowerQuery)
+      ) {
         searchResults.push({ ...menu, children: [] }); // 返回扁平化的结果
       }
 
@@ -1115,28 +1120,31 @@ export class MockApiService {
     // 根据用户ID返回不同权限（这里简化处理）
     if (userId?.includes('admin')) {
       return {
-        permissions: mockPermissions.map(p => p.code),
-        roles: [mockRoles[0]] // 超级管理员
+        permissions: mockPermissions.map((p) => p.code),
+        roles: [mockRoles[0]], // 超级管理员
       };
     } else if (userId?.includes('operator')) {
       return {
         permissions: mockPermissions
-          .filter(p => p.category === PermissionCategory.READ)
-          .map(p => p.code),
-        roles: [mockRoles[2]] // 业务操作员
+          .filter((p) => p.category === PermissionCategory.READ)
+          .map((p) => p.code),
+        roles: [mockRoles[2]], // 业务操作员
       };
     }
 
     return {
       permissions: [],
-      roles: []
+      roles: [],
     };
   }
 
   /**
    * 检查用户权限
    */
-  async checkUserPermissions(permissions: string[], userId?: string): Promise<{
+  async checkUserPermissions(
+    permissions: string[],
+    userId?: string
+  ): Promise<{
     hasAllPermissions: boolean;
     permissionResults: Record<string, boolean>;
   }> {
@@ -1145,15 +1153,15 @@ export class MockApiService {
     const userPerms = await this.getUserPermissions(userId);
     const permissionResults: Record<string, boolean> = {};
 
-    permissions.forEach(perm => {
+    permissions.forEach((perm) => {
       permissionResults[perm] = userPerms.permissions.includes(perm);
     });
 
-    const hasAllPermissions = permissions.every(perm => userPerms.permissions.includes(perm));
+    const hasAllPermissions = permissions.every((perm) => userPerms.permissions.includes(perm));
 
     return {
       hasAllPermissions,
-      permissionResults
+      permissionResults,
     };
   }
 
@@ -1173,7 +1181,7 @@ export class MockApiService {
       theme: 'light',
       language: 'zh-CN',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
   }
 
@@ -1190,7 +1198,7 @@ export class MockApiService {
     return {
       ...current,
       ...preferences,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
   }
 
@@ -1215,7 +1223,7 @@ export class MockApiService {
     await this.delayMs();
 
     const current = await this.getUserPreferences(userId);
-    const favoriteMenus = current.favoriteMenus.filter(id => id !== menuId);
+    const favoriteMenus = current.favoriteMenus.filter((id) => id !== menuId);
 
     return { favoriteMenus };
   }
@@ -1240,7 +1248,7 @@ export class MockApiService {
       ...logData,
       timestamp: new Date(),
       userAgent: navigator.userAgent,
-      ipAddress: '127.0.0.1' // 实际应用中需要获取真实IP
+      ipAddress: '127.0.0.1', // 实际应用中需要获取真实IP
     });
 
     return { logId };
@@ -1270,23 +1278,23 @@ export class MockApiService {
 
     // 过滤条件
     if (params.level !== undefined) {
-      menus = menus.filter(menu => menu.level === params.level);
+      menus = menus.filter((menu) => menu.level === params.level);
     }
 
     if (params.functionalArea !== undefined) {
-      menus = menus.filter(menu => menu.functionalArea === params.functionalArea);
+      menus = menus.filter((menu) => menu.functionalArea === params.functionalArea);
     }
 
     if (params.isActive !== undefined) {
-      menus = menus.filter(menu => menu.isActive === params.isActive);
+      menus = menus.filter((menu) => menu.isActive === params.isActive);
     }
 
     if (params.isVisible !== undefined) {
-      menus = menus.filter(menu => menu.isVisible === params.isVisible);
+      menus = menus.filter((menu) => menu.isVisible === params.isVisible);
     }
 
     if (params.parentId !== undefined) {
-      menus = menus.filter(menu => menu.parentId === params.parentId);
+      menus = menus.filter((menu) => menu.parentId === params.parentId);
     }
 
     // 排序
@@ -1347,7 +1355,7 @@ export class MockApiService {
       isVisible: true,
       functionalArea: params.functionalArea,
       description: params.description,
-      children: []
+      children: [],
     };
 
     // 在实际应用中，这里会保存到数据库
@@ -1447,15 +1455,15 @@ export class MockApiService {
 
     const stats: MenuStats = {
       totalMenus: flatMenus.length,
-      activeMenus: flatMenus.filter(menu => menu.isActive).length,
-      mainMenus: flatMenus.filter(menu => menu.level === MenuLevel.MAIN).length,
-      subMenus: flatMenus.filter(menu => menu.level === MenuLevel.SUB).length,
-      menusByArea: {} as Record<FunctionalArea, number>
+      activeMenus: flatMenus.filter((menu) => menu.isActive).length,
+      mainMenus: flatMenus.filter((menu) => menu.level === MenuLevel.MAIN).length,
+      subMenus: flatMenus.filter((menu) => menu.level === MenuLevel.SUB).length,
+      menusByArea: {} as Record<FunctionalArea, number>,
     };
 
     // 按功能区域统计
-    Object.values(FunctionalArea).forEach(area => {
-      stats.menusByArea[area] = flatMenus.filter(menu => menu.functionalArea === area).length;
+    Object.values(FunctionalArea).forEach((area) => {
+      stats.menusByArea[area] = flatMenus.filter((menu) => menu.functionalArea === area).length;
     });
 
     return stats;
@@ -1475,14 +1483,15 @@ export class MockApiService {
     const lowerQuery = query.toLowerCase();
 
     const results = flatMenus
-      .filter(menu =>
-        menu.name.toLowerCase().includes(lowerQuery) ||
-        menu.code.toLowerCase().includes(lowerQuery) ||
-        (menu.description && menu.description.toLowerCase().includes(lowerQuery))
+      .filter(
+        (menu) =>
+          menu.name.toLowerCase().includes(lowerQuery) ||
+          menu.code.toLowerCase().includes(lowerQuery) ||
+          (menu.description && menu.description.toLowerCase().includes(lowerQuery))
       )
       .slice(0, limit);
 
-    return results.map(menu => ({ ...menu, children: [] })); // 返回扁平化结果
+    return results.map((menu) => ({ ...menu, children: [] })); // 返回扁平化结果
   }
 
   /**
@@ -1492,9 +1501,7 @@ export class MockApiService {
     await this.delayMs();
 
     const flatMenus = this.flattenMenus(mockMenus);
-    return !flatMenus.some(menu =>
-      menu.code === code && menu.id !== excludeId
-    );
+    return !flatMenus.some((menu) => menu.code === code && menu.id !== excludeId);
   }
 
   /**
@@ -1526,7 +1533,7 @@ export class MockApiService {
     const result: MenuItem[] = [];
 
     const flatten = (items: MenuItem[]) => {
-      items.forEach(item => {
+      items.forEach((item) => {
         result.push({ ...item, children: [] }); // 扁平化时清空子菜单
         if (item.children && item.children.length > 0) {
           flatten(item.children);

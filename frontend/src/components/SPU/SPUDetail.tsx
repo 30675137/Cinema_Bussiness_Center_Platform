@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   Descriptions,
@@ -17,8 +17,8 @@ import {
   List,
   Avatar,
   Tooltip,
-  message
-} from 'antd'
+  message,
+} from 'antd';
 import {
   EditOutlined,
   ArrowLeftOutlined,
@@ -32,26 +32,26 @@ import {
   StarOutlined,
   ShareAltOutlined,
   PrinterOutlined,
-  DownloadOutlined
-} from '@ant-design/icons'
-import { useNavigate, useParams } from 'react-router-dom'
-import type { SPUItem, SPUStatus } from '@/types/spu'
-import { spuService } from '@/services/spuService'
-import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers'
-import { statusColors } from '@/theme'
-import { SPUNotificationService } from '@/components/common/Notification'
-import AttributeDisplay from './AttributeDisplay'
+  DownloadOutlined,
+} from '@ant-design/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import type { SPUItem, SPUStatus } from '@/types/spu';
+import { spuService } from '@/services/spuService';
+import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers';
+import { statusColors } from '@/theme';
+import { SPUNotificationService } from '@/components/common/Notification';
+import AttributeDisplay from './AttributeDisplay';
 
-const { Title, Paragraph, Text } = Typography
-const { TabPane } = Tabs
+const { Title, Paragraph, Text } = Typography;
+const { TabPane } = Tabs;
 
 interface SPUDetailProps {
-  spuId?: string
-  showHeader?: boolean
-  showActions?: boolean
-  mode?: 'page' | 'modal'
-  onEdit?: (spu: SPUItem) => void
-  onClose?: () => void
+  spuId?: string;
+  showHeader?: boolean;
+  showActions?: boolean;
+  mode?: 'page' | 'modal';
+  onEdit?: (spu: SPUItem) => void;
+  onClose?: () => void;
 }
 
 const SPUDetail: React.FC<SPUDetailProps> = ({
@@ -60,129 +60,125 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
   showActions = true,
   mode = 'page',
   onEdit,
-  onClose
+  onClose,
 }) => {
-  const navigate = useNavigate()
-  const params = useParams()
-  const currentSpuid = spuId || params.id
+  const navigate = useNavigate();
+  const params = useParams();
+  const currentSpuid = spuId || params.id;
 
   // 状态管理
-  const [loading, setLoading] = useState(true)
-  const [spu, setSPU] = useState<SPUItem | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState('basic')
+  const [loading, setLoading] = useState(true);
+  const [spu, setSPU] = useState<SPUItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('basic');
 
   // 加载SPU详情数据
   const loadSPUDetail = useCallback(async (id: string) => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await spuService.getSPUDetail(id)
+      const response = await spuService.getSPUDetail(id);
 
       if (response.success) {
-        setSPU(response.data)
-        SPUNotificationService.success('加载SPU详情成功')
+        setSPU(response.data);
+        SPUNotificationService.success('加载SPU详情成功');
       } else {
-        throw new Error(response.message || '加载SPU详情失败')
+        throw new Error(response.message || '加载SPU详情失败');
       }
     } catch (error) {
-      console.error('Load SPU detail error:', error)
-      setError(error instanceof Error ? error.message : '加载SPU详情失败')
-      message.error('加载SPU详情失败，请稍后重试')
+      console.error('Load SPU detail error:', error);
+      setError(error instanceof Error ? error.message : '加载SPU详情失败');
+      message.error('加载SPU详情失败，请稍后重试');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   // 初始化加载数据
   useEffect(() => {
     if (currentSpuid) {
-      loadSPUDetail(currentSpuid)
+      loadSPUDetail(currentSpuid);
     }
-  }, [currentSpuid, loadSPUDetail])
+  }, [currentSpuid, loadSPUDetail]);
 
   // 处理编辑
   const handleEdit = useCallback(() => {
     if (spu) {
       if (onEdit) {
-        onEdit(spu)
+        onEdit(spu);
       } else {
-        navigate(`/spu/${spu.id}/edit`)
+        navigate(`/spu/${spu.id}/edit`);
       }
     }
-  }, [spu, onEdit, navigate])
+  }, [spu, onEdit, navigate]);
 
   // 处理返回
   const handleBack = useCallback(() => {
     if (onClose) {
-      onClose()
+      onClose();
     } else {
-      navigate('/spu')
+      navigate('/spu');
     }
-  }, [navigate, onClose])
+  }, [navigate, onClose]);
 
   // 处理分享
   const handleShare = useCallback(() => {
     if (spu) {
-      const shareUrl = `${window.location.origin}/spu/${spu.id}`
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        message.success('分享链接已复制到剪贴板')
-      }).catch(() => {
-        message.error('复制链接失败')
-      })
+      const shareUrl = `${window.location.origin}/spu/${spu.id}`;
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          message.success('分享链接已复制到剪贴板');
+        })
+        .catch(() => {
+          message.error('复制链接失败');
+        });
     }
-  }, [spu])
+  }, [spu]);
 
   // 处理打印
   const handlePrint = useCallback(() => {
     if (spu) {
-      window.print()
+      window.print();
     }
-  }, [spu])
+  }, [spu]);
 
   // 处理导出
   const handleExport = useCallback(async () => {
     if (spu) {
       try {
-        const response = await spuService.exportSPU(spu.id)
+        const response = await spuService.exportSPU(spu.id);
         if (response.success) {
           // 模拟下载
-          const link = document.createElement('a')
-          link.href = response.data.downloadUrl
-          link.download = response.data.fileName
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          message.success(`导出成功：${response.data.fileName}`)
+          const link = document.createElement('a');
+          link.href = response.data.downloadUrl;
+          link.download = response.data.fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          message.success(`导出成功：${response.data.fileName}`);
         }
       } catch (error) {
-        message.error('导出失败，请重试')
+        message.error('导出失败，请重试');
       }
     }
-  }, [spu])
+  }, [spu]);
 
   // 获取状态标签
   const getStatusTag = (status: SPUStatus) => {
-    const statusInfo = statusColors[status as keyof typeof statusColors]
+    const statusInfo = statusColors[status as keyof typeof statusColors];
     return (
       <Tag color={statusInfo.color} style={{ fontSize: '14px', padding: '4px 12px' }}>
         {statusInfo.text}
       </Tag>
-    )
-  }
+    );
+  };
 
   // 渲染操作历史
   const renderOperationHistory = () => {
     if (!spu?.operationHistory || spu.operationHistory.length === 0) {
-      return (
-        <Alert
-          message="暂无操作记录"
-          type="info"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )
+      return <Alert message="暂无操作记录" type="info" showIcon style={{ marginTop: 16 }} />;
     }
 
     return (
@@ -219,12 +215,12 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
           </Timeline.Item>
         ))}
       </Timeline>
-    )
-  }
+    );
+  };
 
   // 渲染基础信息
   const renderBasicInfo = () => {
-    if (!spu) return null
+    if (!spu) return null;
 
     return (
       <Descriptions
@@ -259,19 +255,13 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
         <Descriptions.Item label="品牌" span={1}>
           {spu.brand ? (
             <Space>
-              {spu.brand.logo && (
-                <Avatar
-                  src={spu.brand.logo}
-                  size="small"
-                  alt={spu.brand.name}
-                />
-              )}
+              {spu.brand.logo && <Avatar src={spu.brand.logo} size="small" alt={spu.brand.name} />}
               <span>{spu.brand.name}</span>
-              {spu.brand.code && (
-                <Text type="secondary">({spu.brand.code})</Text>
-              )}
+              {spu.brand.code && <Text type="secondary">({spu.brand.code})</Text>}
             </Space>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="分类" span={1}>
@@ -279,7 +269,9 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
             <Tooltip title={spu.category.path?.join(' / ')}>
               <Tag color="green">{spu.category.name}</Tag>
             </Tooltip>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="标签" span={2}>
@@ -291,7 +283,9 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
                 </Tag>
               ))}
             </Space>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="创建时间" span={1}>
@@ -315,29 +309,22 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
             <Tag color={spu.auditStatus === 'approved' ? 'green' : 'orange'}>
               {spu.auditStatus === 'approved' ? '已审核' : '待审核'}
             </Tag>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="商品描述" span={3}>
-          <Paragraph ellipsis={{ rows: 4, expandable: true }}>
-            {spu.description || '-'}
-          </Paragraph>
+          <Paragraph ellipsis={{ rows: 4, expandable: true }}>{spu.description || '-'}</Paragraph>
         </Descriptions.Item>
       </Descriptions>
-    )
-  }
+    );
+  };
 
   // 渲染图片信息
   const renderImages = () => {
     if (!spu?.images || spu.images.length === 0) {
-      return (
-        <Alert
-          message="暂无图片"
-          type="info"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )
+      return <Alert message="暂无图片" type="info" showIcon style={{ marginTop: 16 }} />;
     }
 
     return (
@@ -350,7 +337,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
               alt={image.alt || `图片${index + 1}`}
               style={{ borderRadius: '8px', border: '1px solid #f0f0f0' }}
               preview={{
-                mask: '预览'
+                mask: '预览',
               }}
               fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMCThS6VzhQM+oi6lP4UrWixxg1Gko1+B8OJh0l7IJgJZYC7tdy4wJKjEzzHJcNglMcAA=="
             />
@@ -362,37 +349,25 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
           </Col>
         ))}
       </Row>
-    )
-  }
+    );
+  };
 
   // 渲染规格参数
   const renderSpecifications = () => {
     if (!spu?.specifications || spu.specifications.length === 0) {
-      return (
-        <Alert
-          message="暂无规格参数"
-          type="info"
-          showIcon
-          style={{ marginTop: 16 }}
-        />
-      )
+      return <Alert message="暂无规格参数" type="info" showIcon style={{ marginTop: 16 }} />;
     }
 
     return (
-      <Descriptions
-        bordered
-        column={{ xs: 1, sm: 2 }}
-        size="middle"
-        style={{ marginTop: 16 }}
-      >
+      <Descriptions bordered column={{ xs: 1, sm: 2 }} size="middle" style={{ marginTop: 16 }}>
         {spu.specifications.map((spec, index) => (
           <Descriptions.Item key={index} label={spec.name}>
             {spec.value}
           </Descriptions.Item>
         ))}
       </Descriptions>
-    )
-  }
+    );
+  };
 
   // 加载状态
   if (loading) {
@@ -403,7 +378,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
           <Text type="secondary">正在加载SPU详情...</Text>
         </div>
       </div>
-    )
+    );
   }
 
   // 错误状态
@@ -422,26 +397,25 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
           }
         />
       </div>
-    )
+    );
   }
 
   return (
     <div style={{ padding: 24, backgroundColor: '#fff' }}>
       {/* 页面头部 */}
       {showHeader && mode === 'page' && (
-        <div style={{
-          marginBottom: 24,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 16
-        }}>
+        <div
+          style={{
+            marginBottom: 24,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
-            >
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
               返回
             </Button>
             <div>
@@ -456,29 +430,16 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
 
           {showActions && (
             <Space wrap>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEdit}
-              >
+              <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
                 编辑
               </Button>
-              <Button
-                icon={<ShareAltOutlined />}
-                onClick={handleShare}
-              >
+              <Button icon={<ShareAltOutlined />} onClick={handleShare}>
                 分享
               </Button>
-              <Button
-                icon={<PrinterOutlined />}
-                onClick={handlePrint}
-              >
+              <Button icon={<PrinterOutlined />} onClick={handlePrint}>
                 打印
               </Button>
-              <Button
-                icon={<DownloadOutlined />}
-                onClick={handleExport}
-              >
+              <Button icon={<DownloadOutlined />} onClick={handleExport}>
                 导出
               </Button>
             </Space>
@@ -534,10 +495,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
           key="attributes"
         >
           <div style={{ marginTop: 16 }}>
-            <AttributeDisplay
-              attributes={spu.attributes || []}
-              mode="view"
-            />
+            <AttributeDisplay attributes={spu.attributes || []} mode="view" />
           </div>
         </TabPane>
 
@@ -554,7 +512,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
         </TabPane>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
-export default SPUDetail
+export default SPUDetail;

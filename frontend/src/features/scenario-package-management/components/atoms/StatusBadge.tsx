@@ -39,20 +39,13 @@ const STATUS_CONFIG: Record<PackageStatus, { color: string; text: string }> = {
  *
  * 根据场景包状态显示对应的颜色标签
  */
-export const StatusBadge: React.FC<StatusBadgeProps> = ({
-  status,
-  showText = true,
-}) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, showText = true }) => {
   const config = STATUS_CONFIG[status] || {
     color: 'default',
     text: status,
   };
 
-  return (
-    <Tag color={config.color}>
-      {showText ? config.text : null}
-    </Tag>
-  );
+  return <Tag color={config.color}>{showText ? config.text : null}</Tag>;
 };
 
 /**

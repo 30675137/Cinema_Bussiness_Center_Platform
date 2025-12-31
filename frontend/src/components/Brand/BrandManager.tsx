@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Card,
   Table,
@@ -19,8 +19,8 @@ import {
   Divider,
   Row,
   Col,
-  Alert
-} from 'antd'
+  Alert,
+} from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -30,36 +30,36 @@ import {
   ReloadOutlined,
   UploadOutlined,
   StarOutlined,
-  ShopOutlined
-} from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
-import type { UploadFile, UploadProps } from 'antd/es/upload/interface'
-import type { Brand } from '@/types/spu'
-import { SPUNotificationService } from '@/components/common/Notification'
-import { statusColors } from '@/theme'
+  ShopOutlined,
+} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import type { Brand } from '@/types/spu';
+import { SPUNotificationService } from '@/components/common/Notification';
+import { statusColors } from '@/theme';
 
-const { Title, Text } = Typography
-const { TextArea } = Input
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 interface BrandManagerProps {
-  mode?: 'manage' | 'select'
-  onBrandSelect?: (brand: Brand) => void
-  selectedBrandIds?: string[]
-  showActions?: boolean
-  height?: number
+  mode?: 'manage' | 'select';
+  onBrandSelect?: (brand: Brand) => void;
+  selectedBrandIds?: string[];
+  showActions?: boolean;
+  height?: number;
 }
 
 interface BrandFormData {
-  name: string
-  code: string
-  status: boolean
-  logo?: string
-  description?: string
-  website?: string
-  contactPerson?: string
-  contactPhone?: string
-  contactEmail?: string
-  sortOrder?: number
+  name: string;
+  code: string;
+  status: boolean;
+  logo?: string;
+  description?: string;
+  website?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  sortOrder?: number;
 }
 
 const BrandManager: React.FC<BrandManagerProps> = ({
@@ -67,31 +67,31 @@ const BrandManager: React.FC<BrandManagerProps> = ({
   onBrandSelect,
   selectedBrandIds = [],
   showActions = true,
-  height = 600
+  height = 600,
 }) => {
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [loading, setLoading] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [editingBrand, setEditingBrand] = useState<Brand | null>(null)
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>(selectedBrandIds)
-  const [form] = Form.useForm()
-  const [fileList, setFileList] = useState<UploadFile[]>([])
-  const [searchText, setSearchText] = useState('')
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>(selectedBrandIds);
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [searchText, setSearchText] = useState('');
 
   // 加载品牌数据
   const loadBrands = useCallback(async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       // Mock品牌数据 - 实际项目中从API获取
-      const mockBrands = generateMockBrands()
-      setBrands(mockBrands)
+      const mockBrands = generateMockBrands();
+      setBrands(mockBrands);
     } catch (error) {
-      console.error('Load brands error:', error)
-      message.error('加载品牌数据失败')
+      console.error('Load brands error:', error);
+      message.error('加载品牌数据失败');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   // 生成Mock品牌数据
   const generateMockBrands = (): Brand[] => {
@@ -109,7 +109,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'coke@example.com',
         sortOrder: 1,
         createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       {
         id: 'brand_002',
@@ -124,7 +124,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'pepsi@example.com',
         sortOrder: 2,
         createdAt: '2024-01-02T00:00:00Z',
-        updatedAt: '2024-01-02T00:00:00Z'
+        updatedAt: '2024-01-02T00:00:00Z',
       },
       {
         id: 'brand_003',
@@ -139,7 +139,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'nongfu@example.com',
         sortOrder: 3,
         createdAt: '2024-01-03T00:00:00Z',
-        updatedAt: '2024-01-03T00:00:00Z'
+        updatedAt: '2024-01-03T00:00:00Z',
       },
       {
         id: 'brand_004',
@@ -154,7 +154,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'ksf@example.com',
         sortOrder: 4,
         createdAt: '2024-01-04T00:00:00Z',
-        updatedAt: '2024-01-04T00:00:00Z'
+        updatedAt: '2024-01-04T00:00:00Z',
       },
       {
         id: 'brand_005',
@@ -169,7 +169,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'uni@example.com',
         sortOrder: 5,
         createdAt: '2024-01-05T00:00:00Z',
-        updatedAt: '2024-01-05T00:00:00Z'
+        updatedAt: '2024-01-05T00:00:00Z',
       },
       {
         id: 'brand_006',
@@ -184,7 +184,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'wangwang@example.com',
         sortOrder: 6,
         createdAt: '2024-01-06T00:00:00Z',
-        updatedAt: '2024-01-06T00:00:00Z'
+        updatedAt: '2024-01-06T00:00:00Z',
       },
       {
         id: 'brand_007',
@@ -199,7 +199,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'oreo@example.com',
         sortOrder: 7,
         createdAt: '2024-01-07T00:00:00Z',
-        updatedAt: '2024-01-07T00:00:00Z'
+        updatedAt: '2024-01-07T00:00:00Z',
       },
       {
         id: 'brand_008',
@@ -214,38 +214,38 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: 'lays@example.com',
         sortOrder: 8,
         createdAt: '2024-01-08T00:00:00Z',
-        updatedAt: '2024-01-08T00:00:00Z'
-      }
-    ]
-  }
+        updatedAt: '2024-01-08T00:00:00Z',
+      },
+    ];
+  };
 
   // 初始化
   useEffect(() => {
-    loadBrands()
-  }, [loadBrands])
+    loadBrands();
+  }, [loadBrands]);
 
   // 过滤品牌数据
-  const filteredBrands = brands.filter(brand => {
-    if (!searchText) return true
-    const searchLower = searchText.toLowerCase()
+  const filteredBrands = brands.filter((brand) => {
+    if (!searchText) return true;
+    const searchLower = searchText.toLowerCase();
     return (
       brand.name.toLowerCase().includes(searchLower) ||
       brand.code.toLowerCase().includes(searchLower) ||
       brand.description?.toLowerCase().includes(searchLower)
-    )
-  })
+    );
+  });
 
   // 处理添加品牌
   const handleAdd = () => {
-    setEditingBrand(null)
-    form.resetFields()
-    setFileList([])
-    setModalVisible(true)
-  }
+    setEditingBrand(null);
+    form.resetFields();
+    setFileList([]);
+    setModalVisible(true);
+  };
 
   // 处理编辑品牌
   const handleEdit = (brand: Brand) => {
-    setEditingBrand(brand)
+    setEditingBrand(brand);
     form.setFieldsValue({
       name: brand.name,
       code: brand.code,
@@ -255,39 +255,41 @@ const BrandManager: React.FC<BrandManagerProps> = ({
       contactPerson: brand.contactPerson,
       contactPhone: brand.contactPhone,
       contactEmail: brand.contactEmail,
-      sortOrder: brand.sortOrder
-    })
+      sortOrder: brand.sortOrder,
+    });
 
     if (brand.logo) {
-      setFileList([{
-        uid: '-1',
-        name: brand.logo,
-        status: 'done',
-        url: brand.logo,
-      }])
+      setFileList([
+        {
+          uid: '-1',
+          name: brand.logo,
+          status: 'done',
+          url: brand.logo,
+        },
+      ]);
     } else {
-      setFileList([])
+      setFileList([]);
     }
 
-    setModalVisible(true)
-  }
+    setModalVisible(true);
+  };
 
   // 处理删除品牌
   const handleDelete = async (brandId: string) => {
     try {
       // Mock删除操作
-      message.success('品牌删除成功')
-      SPUNotificationService.success('删除', '品牌')
-      loadBrands()
+      message.success('品牌删除成功');
+      SPUNotificationService.success('删除', '品牌');
+      loadBrands();
     } catch (error) {
-      message.error('删除失败，请重试')
+      message.error('删除失败，请重试');
     }
-  }
+  };
 
   // 处理保存
   const handleSave = async () => {
     try {
-      const values = await form.validateFields()
+      const values = await form.validateFields();
 
       // 构建品牌数据
       const brandData: Brand = {
@@ -303,30 +305,30 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         contactEmail: values.contactEmail,
         sortOrder: values.sortOrder || 0,
         createdAt: editingBrand?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      };
 
       if (editingBrand) {
-        message.success('品牌更新成功')
-        SPUNotificationService.success('更新', '品牌')
+        message.success('品牌更新成功');
+        SPUNotificationService.success('更新', '品牌');
       } else {
-        message.success('品牌添加成功')
-        SPUNotificationService.success('添加', '品牌')
+        message.success('品牌添加成功');
+        SPUNotificationService.success('添加', '品牌');
       }
 
-      setModalVisible(false)
-      form.resetFields()
-      setFileList([])
-      loadBrands()
+      setModalVisible(false);
+      form.resetFields();
+      setFileList([]);
+      loadBrands();
     } catch (error) {
-      console.error('Save brand error:', error)
+      console.error('Save brand error:', error);
     }
-  }
+  };
 
   // 处理选择品牌
   const handleSelect = (selectedKeys: React.Key[]) => {
-    setSelectedRowKeys(selectedKeys)
-  }
+    setSelectedRowKeys(selectedKeys);
+  };
 
   // 上传配置
   const uploadProps: UploadProps = {
@@ -335,22 +337,22 @@ const BrandManager: React.FC<BrandManagerProps> = ({
     listType: 'picture-card',
     fileList,
     beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/')
+      const isImage = file.type.startsWith('image/');
       if (!isImage) {
-        message.error('只能上传图片文件')
-        return false
+        message.error('只能上传图片文件');
+        return false;
       }
-      const isLt2M = file.size / 1024 / 1024 < 2
+      const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isLt2M) {
-        message.error('图片大小不能超过2MB')
-        return false
+        message.error('图片大小不能超过2MB');
+        return false;
       }
-      return false // 阻止自动上传
+      return false; // 阻止自动上传
     },
     onChange: ({ fileList }) => {
-      setFileList(fileList)
-    }
-  }
+      setFileList(fileList);
+    },
+  };
 
   // 表格列配置
   const columns: ColumnsType<Brand> = [
@@ -369,11 +371,13 @@ const BrandManager: React.FC<BrandManagerProps> = ({
           <div>
             <div style={{ fontWeight: 500, marginBottom: 4 }}>{record.name}</div>
             <div style={{ fontSize: '12px', color: '#666' }}>
-              <Tag color="blue" style={{ fontSize: '11px' }}>{record.code}</Tag>
+              <Tag color="blue" style={{ fontSize: '11px' }}>
+                {record.code}
+              </Tag>
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '状态',
@@ -385,7 +389,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         <Tag color={status === 'active' ? 'green' : 'orange'}>
           {status === 'active' ? '启用' : '停用'}
         </Tag>
-      )
+      ),
     },
     {
       title: '描述',
@@ -396,7 +400,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         <Tooltip title={text} placement="topLeft">
           <span>{text || '-'}</span>
         </Tooltip>
-      )
+      ),
     },
     {
       title: '联系人',
@@ -409,29 +413,32 @@ const BrandManager: React.FC<BrandManagerProps> = ({
               <div>{record.contactPerson}</div>
               <div style={{ color: '#666' }}>{record.contactPhone || '-'}</div>
             </>
-          ) : '-'}
+          ) : (
+            '-'
+          )}
         </div>
-      )
+      ),
     },
     {
       title: '官网',
       dataIndex: 'website',
       key: 'website',
       width: 150,
-      render: (website: string) => (
+      render: (website: string) =>
         website ? (
           <a href={website} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px' }}>
             {website.replace('https://', '').replace('http://', '')}
           </a>
-        ) : '-'
-      )
+        ) : (
+          '-'
+        ),
     },
     {
       title: '排序',
       dataIndex: 'sortOrder',
       key: 'sortOrder',
       width: 60,
-      align: 'center'
+      align: 'center',
     },
     {
       title: '操作',
@@ -462,35 +469,32 @@ const BrandManager: React.FC<BrandManagerProps> = ({
                 okText="确定"
                 cancelText="取消"
               >
-                <Button
-                  type="text"
-                  size="small"
-                  danger
-                  icon={<DeleteOutlined />}
-                />
+                <Button type="text" size="small" danger icon={<DeleteOutlined />} />
               </Popconfirm>
             </>
           )}
         </Space>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   return (
     <div>
       {/* 操作栏 */}
-      <div style={{
-        marginBottom: 16,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <div
+        style={{
+          marginBottom: 16,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <div>
           <Title level={4} style={{ margin: 0 }}>
             <ShopOutlined /> 品牌管理
           </Title>
           <Text type="secondary">
-            共 {brands.length} 个品牌，{brands.filter(b => b.status === 'active').length} 个启用
+            共 {brands.length} 个品牌，{brands.filter((b) => b.status === 'active').length} 个启用
           </Text>
         </div>
 
@@ -500,21 +504,14 @@ const BrandManager: React.FC<BrandManagerProps> = ({
             prefix={<SearchOutlined />}
             style={{ width: 200 }}
             value={searchText}
-            onChange={e => setSearchText(e.target.value)}
+            onChange={(e) => setSearchText(e.target.value)}
             allowClear
           />
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={loadBrands}
-          >
+          <Button icon={<ReloadOutlined />} onClick={loadBrands}>
             刷新
           </Button>
           {mode === 'manage' && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               添加品牌
             </Button>
           )}
@@ -533,13 +530,17 @@ const BrandManager: React.FC<BrandManagerProps> = ({
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-            defaultPageSize: 10
+            defaultPageSize: 10,
           }}
-          rowSelection={mode === 'select' ? {
-            selectedRowKeys,
-            onChange: handleSelect,
-            type: 'checkbox'
-          } : undefined}
+          rowSelection={
+            mode === 'select'
+              ? {
+                  selectedRowKeys,
+                  onChange: handleSelect,
+                  type: 'checkbox',
+                }
+              : undefined
+          }
         />
       </Card>
 
@@ -548,9 +549,9 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         title={editingBrand ? '编辑品牌' : '添加品牌'}
         open={modalVisible}
         onCancel={() => {
-          setModalVisible(false)
-          form.resetFields()
-          setFileList([])
+          setModalVisible(false);
+          form.resetFields();
+          setFileList([]);
         }}
         onOk={handleSave}
         width={800}
@@ -560,7 +561,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
           form={form}
           layout="vertical"
           initialValues={{
-            status: true
+            status: true,
           }}
         >
           <Row gutter={16}>
@@ -570,7 +571,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
                 label="品牌名称"
                 rules={[
                   { required: true, message: '请输入品牌名称' },
-                  { max: 50, message: '名称不能超过50个字符' }
+                  { max: 50, message: '名称不能超过50个字符' },
                 ]}
               >
                 <Input placeholder="请输入品牌名称" />
@@ -582,7 +583,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
                 label="品牌编码"
                 rules={[
                   { required: true, message: '请输入品牌编码' },
-                  { pattern: /^[a-zA-Z0-9_]+$/, message: '编码只能包含字母、数字和下划线' }
+                  { pattern: /^[a-zA-Z0-9_]+$/, message: '编码只能包含字母、数字和下划线' },
                 ]}
               >
                 <Input placeholder="请输入品牌编码" />
@@ -592,11 +593,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
 
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item
-                name="status"
-                label="状态"
-                valuePropName="checked"
-              >
+              <Form.Item name="status" label="状态" valuePropName="checked">
                 <Switch checkedChildren="启用" unCheckedChildren="停用" />
               </Form.Item>
             </Col>
@@ -625,16 +622,8 @@ const BrandManager: React.FC<BrandManagerProps> = ({
             </Text>
           </Form.Item>
 
-          <Form.Item
-            name="description"
-            label="品牌描述"
-          >
-            <TextArea
-              rows={3}
-              placeholder="请输入品牌描述"
-              showCount
-              maxLength={200}
-            />
+          <Form.Item name="description" label="品牌描述">
+            <TextArea rows={3} placeholder="请输入品牌描述" showCount maxLength={200} />
           </Form.Item>
 
           <Row gutter={16}>
@@ -660,18 +649,12 @@ const BrandManager: React.FC<BrandManagerProps> = ({
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                name="contactPerson"
-                label="联系人"
-              >
+              <Form.Item name="contactPerson" label="联系人">
                 <Input placeholder="请输入联系人姓名" />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="contactPhone"
-                label="联系电话"
-              >
+              <Form.Item name="contactPhone" label="联系电话">
                 <Input placeholder="请输入联系电话" />
               </Form.Item>
             </Col>
@@ -679,7 +662,7 @@ const BrandManager: React.FC<BrandManagerProps> = ({
         </Form>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default BrandManager
+export default BrandManager;

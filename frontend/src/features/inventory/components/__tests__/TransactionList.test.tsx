@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: TransactionList 组件单元测试
- * 
+ *
  * 测试流水列表显示和筛选功能。
  * 实现 T027 任务。
- * 
+ *
  * @since US2 - 查看库存流水记录
  */
 
@@ -45,19 +45,19 @@ describe('TransactionList', () => {
   describe('组件渲染', () => {
     it('应该渲染流水列表容器', () => {
       render(<TransactionList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByTestId('transaction-list')).toBeInTheDocument();
     });
 
     it('应该接收 skuId 参数', () => {
       render(<TransactionList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText(/SKU: sku-001/)).toBeInTheDocument();
     });
 
     it('应该接收 storeId 参数', () => {
       render(<TransactionList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText(/Store: store-001/)).toBeInTheDocument();
     });
   });

@@ -240,7 +240,12 @@ export const SKUManagementPage: React.FC = () => {
       {/* 操作按钮 */}
       <Card style={{ marginBottom: 16 }}>
         <Space>
-          <Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={openCreateModal}
+            data-testid="add-sku-button"
+          >
             创建 SKU
           </Button>
           <Button

@@ -1,6 +1,12 @@
 import React from 'react';
 import { Card, Table, Button, Space, Input, Select, Tag, InputNumber, Form } from 'antd';
-import { PlusOutlined, EditOutlined, SearchOutlined, CopyOutlined, HistoryOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  EditOutlined,
+  SearchOutlined,
+  CopyOutlined,
+  HistoryOutlined,
+} from '@ant-design/icons';
 import { cn } from '@/utils/cn';
 import { FormModal } from '@/components/common/Modal';
 
@@ -16,160 +22,166 @@ const PricingList: React.FC = React.memo(() => {
   const [modalVisible, setModalVisible] = React.useState(false);
 
   // 模拟数据 - 使用useMemo避免每次渲染重新计算
-  const dataSource = React.useMemo(() => [
-    {
-      key: '1',
-      id: 'PRICE001',
-      productName: '爆米花套餐',
-      productCode: 'P001',
-      basePrice: 25.00,
-      memberPrice: 22.50,
-      vipPrice: 20.00,
-      weekendPrice: 28.00,
-      holidayPrice: 30.00,
-      status: '生效',
-      effectiveDate: '2025-12-01',
-      lastUpdate: '2025-12-10',
-    },
-    {
-      key: '2',
-      id: 'PRICE002',
-      productName: '可乐饮料',
-      productCode: 'P002',
-      basePrice: 8.00,
-      memberPrice: 7.20,
-      vipPrice: 6.40,
-      weekendPrice: 9.00,
-      holidayPrice: 10.00,
-      status: '生效',
-      effectiveDate: '2025-12-01',
-      lastUpdate: '2025-12-09',
-    },
-    {
-      key: '3',
-      id: 'PRICE003',
-      productName: '3D眼镜',
-      productCode: 'P003',
-      basePrice: 35.00,
-      memberPrice: 31.50,
-      vipPrice: 28.00,
-      weekendPrice: 40.00,
-      holidayPrice: 45.00,
-      status: '待审核',
-      effectiveDate: '2025-12-15',
-      lastUpdate: '2025-12-08',
-    }
-  ], []);
-
-  const columns = React.useMemo(() => [
-    {
-      title: '价格编号',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '商品名称',
-      dataIndex: 'productName',
-      key: 'productName',
-    },
-    {
-      title: '商品编码',
-      dataIndex: 'productCode',
-      key: 'productCode',
-    },
-    {
-      title: '基础价格',
-      dataIndex: 'basePrice',
-      key: 'basePrice',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: '会员价',
-      dataIndex: 'memberPrice',
-      key: 'memberPrice',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: 'VIP价',
-      dataIndex: 'vipPrice',
-      key: 'vipPrice',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: '周末价',
-      dataIndex: 'weekendPrice',
-      key: 'weekendPrice',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: '节假日价',
-      dataIndex: 'holidayPrice',
-      key: 'holidayPrice',
-      render: (price: number) => `¥${price.toFixed(2)}`,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => {
-        const colorMap: Record<string, string> = {
-          '生效': 'green',
-          '待审核': 'orange',
-          '已过期': 'red',
-          '草稿': 'default',
-        };
-        return <Tag color={colorMap[status]}>{status}</Tag>;
+  const dataSource = React.useMemo(
+    () => [
+      {
+        key: '1',
+        id: 'PRICE001',
+        productName: '爆米花套餐',
+        productCode: 'P001',
+        basePrice: 25.0,
+        memberPrice: 22.5,
+        vipPrice: 20.0,
+        weekendPrice: 28.0,
+        holidayPrice: 30.0,
+        status: '生效',
+        effectiveDate: '2025-12-01',
+        lastUpdate: '2025-12-10',
       },
-    },
-    {
-      title: '生效日期',
-      dataIndex: 'effectiveDate',
-      key: 'effectiveDate',
-    },
-    {
-      title: '最后更新',
-      dataIndex: 'lastUpdate',
-      key: 'lastUpdate',
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record: any) => (
-        <Space size="middle">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            size="small"
-            classNames={{
-              root: "action-button edit-button"
-            }}
-          >
-            编辑
-          </Button>
-          <Button
-            type="link"
-            icon={<CopyOutlined />}
-            size="small"
-            classNames={{
-              root: "action-button copy-button"
-            }}
-          >
-            复制
-          </Button>
-          <Button
-            type="link"
-            icon={<HistoryOutlined />}
-            size="small"
-            classNames={{
-              root: "action-button history-button"
-            }}
-          >
-            历史
-          </Button>
-        </Space>
-      ),
-    },
-  ], []);
+      {
+        key: '2',
+        id: 'PRICE002',
+        productName: '可乐饮料',
+        productCode: 'P002',
+        basePrice: 8.0,
+        memberPrice: 7.2,
+        vipPrice: 6.4,
+        weekendPrice: 9.0,
+        holidayPrice: 10.0,
+        status: '生效',
+        effectiveDate: '2025-12-01',
+        lastUpdate: '2025-12-09',
+      },
+      {
+        key: '3',
+        id: 'PRICE003',
+        productName: '3D眼镜',
+        productCode: 'P003',
+        basePrice: 35.0,
+        memberPrice: 31.5,
+        vipPrice: 28.0,
+        weekendPrice: 40.0,
+        holidayPrice: 45.0,
+        status: '待审核',
+        effectiveDate: '2025-12-15',
+        lastUpdate: '2025-12-08',
+      },
+    ],
+    []
+  );
+
+  const columns = React.useMemo(
+    () => [
+      {
+        title: '价格编号',
+        dataIndex: 'id',
+        key: 'id',
+      },
+      {
+        title: '商品名称',
+        dataIndex: 'productName',
+        key: 'productName',
+      },
+      {
+        title: '商品编码',
+        dataIndex: 'productCode',
+        key: 'productCode',
+      },
+      {
+        title: '基础价格',
+        dataIndex: 'basePrice',
+        key: 'basePrice',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: '会员价',
+        dataIndex: 'memberPrice',
+        key: 'memberPrice',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: 'VIP价',
+        dataIndex: 'vipPrice',
+        key: 'vipPrice',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: '周末价',
+        dataIndex: 'weekendPrice',
+        key: 'weekendPrice',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: '节假日价',
+        dataIndex: 'holidayPrice',
+        key: 'holidayPrice',
+        render: (price: number) => `¥${price.toFixed(2)}`,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        render: (status: string) => {
+          const colorMap: Record<string, string> = {
+            生效: 'green',
+            待审核: 'orange',
+            已过期: 'red',
+            草稿: 'default',
+          };
+          return <Tag color={colorMap[status]}>{status}</Tag>;
+        },
+      },
+      {
+        title: '生效日期',
+        dataIndex: 'effectiveDate',
+        key: 'effectiveDate',
+      },
+      {
+        title: '最后更新',
+        dataIndex: 'lastUpdate',
+        key: 'lastUpdate',
+      },
+      {
+        title: '操作',
+        key: 'action',
+        render: (_, record: any) => (
+          <Space size="middle">
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              size="small"
+              classNames={{
+                root: 'action-button edit-button',
+              }}
+            >
+              编辑
+            </Button>
+            <Button
+              type="link"
+              icon={<CopyOutlined />}
+              size="small"
+              classNames={{
+                root: 'action-button copy-button',
+              }}
+            >
+              复制
+            </Button>
+            <Button
+              type="link"
+              icon={<HistoryOutlined />}
+              size="small"
+              classNames={{
+                root: 'action-button history-button',
+              }}
+            >
+              历史
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    []
+  );
 
   const handleAddPrice = React.useCallback(() => {
     setModalVisible(true);
@@ -185,12 +197,15 @@ const PricingList: React.FC = React.memo(() => {
   }, [form]);
 
   // 价格统计 - 使用useMemo优化计算
-  const priceStats = React.useMemo(() => ({
-    total: dataSource.length,
-    active: dataSource.filter(item => item.status === '生效').length,
-    pending: dataSource.filter(item => item.status === '待审核').length,
-    expired: dataSource.filter(item => item.status === '已过期').length,
-  }), [dataSource]);
+  const priceStats = React.useMemo(
+    () => ({
+      total: dataSource.length,
+      active: dataSource.filter((item) => item.status === '生效').length,
+      pending: dataSource.filter((item) => item.status === '待审核').length,
+      expired: dataSource.filter((item) => item.status === '已过期').length,
+    }),
+    [dataSource]
+  );
 
   return (
     <div style={{ padding: '24px' }}>
@@ -252,7 +267,7 @@ const PricingList: React.FC = React.memo(() => {
               icon={<PlusOutlined />}
               onClick={handleAddPrice}
               classNames={{
-                root: "add-price-button"
+                root: 'add-price-button',
               }}
             >
               新增价格
@@ -260,7 +275,7 @@ const PricingList: React.FC = React.memo(() => {
             <Button
               icon={<CopyOutlined />}
               classNames={{
-                root: "batch-import-button"
+                root: 'batch-import-button',
               }}
             >
               批量导入
@@ -277,8 +292,7 @@ const PricingList: React.FC = React.memo(() => {
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
           }}
         />
       </Card>
@@ -337,11 +351,7 @@ const PricingList: React.FC = React.memo(() => {
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
-            <Form.Item
-              name="vipPrice"
-              label="VIP价格"
-              style={{ flex: 1 }}
-            >
+            <Form.Item name="vipPrice" label="VIP价格" style={{ flex: 1 }}>
               <InputNumber
                 style={{ width: '100%' }}
                 min={0}
@@ -351,11 +361,7 @@ const PricingList: React.FC = React.memo(() => {
               />
             </Form.Item>
 
-            <Form.Item
-              name="weekendPrice"
-              label="周末价格"
-              style={{ flex: 1 }}
-            >
+            <Form.Item name="weekendPrice" label="周末价格" style={{ flex: 1 }}>
               <InputNumber
                 style={{ width: '100%' }}
                 min={0}
@@ -366,10 +372,7 @@ const PricingList: React.FC = React.memo(() => {
             </Form.Item>
           </div>
 
-          <Form.Item
-            name="holidayPrice"
-            label="节假日价格"
-          >
+          <Form.Item name="holidayPrice" label="节假日价格">
             <InputNumber
               style={{ width: '100%' }}
               min={0}

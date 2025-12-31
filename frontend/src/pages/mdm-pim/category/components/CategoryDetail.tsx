@@ -20,7 +20,7 @@ import {
   InputNumber,
   Select,
   Tooltip,
-  Popconfirm
+  Popconfirm,
 } from 'antd';
 import {
   EditOutlined,
@@ -29,7 +29,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
   ReloadOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
 // 导入面包屑组件
@@ -73,7 +73,7 @@ import { useCategoryStore, useCategoryActions } from '../../../../stores/categor
 import {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
-  useDeleteCategoryMutation
+  useDeleteCategoryMutation,
 } from '../../../../services/category/categoryMutations';
 import { useAttributeTemplateQuery } from '../../../../services/category/categoryQueries';
 import { useCategoryTreeQuery } from '../../../../services/category/categoryQueries';
@@ -107,7 +107,7 @@ export interface CategoryDetailProps {
 const formatStatus = (status: CategoryStatus): { color: string; text: string } => {
   const statusMap = {
     enabled: { color: 'success', text: '启用' },
-    disabled: { color: 'default', text: '停用' }
+    disabled: { color: 'default', text: '停用' },
   };
   return statusMap[status];
 };
@@ -119,7 +119,7 @@ const formatLevel = (level: number): { color: string; text: string } => {
   const levelMap = {
     1: { color: 'blue', text: '一级类目' },
     2: { color: 'green', text: '二级类目' },
-    3: { color: 'orange', text: '三级类目' }
+    3: { color: 'orange', text: '三级类目' },
   };
   return levelMap[level as keyof typeof levelMap] || { color: 'default', text: `第${level}级类目` };
 };
@@ -133,7 +133,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
   onUpdate,
   onCreate,
   onDelete,
-  onRefresh
+  onRefresh,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [createFormVisible, setCreateFormVisible] = useState(false);
@@ -157,12 +157,12 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
 
   // 属性模板查询
   const { data: attributeTemplate } = useAttributeTemplateQuery(category?.id || '', {
-    enabled: !!category?.id
+    enabled: !!category?.id,
   });
 
   // 类目树数据查询（用于删除验证）
   const { data: treeData } = useCategoryTreeQuery('', {
-    enabled: deleteConfirmVisible // 只在需要验证删除时查询
+    enabled: deleteConfirmVisible, // 只在需要验证删除时查询
   });
 
   // 同步编辑状态
@@ -171,7 +171,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       setEditingData({
         name: category.name,
         sortOrder: category.sortOrder,
-        status: category.status
+        status: category.status,
       });
       setIsEditing(false); // 默认不处于编辑状态
     }
@@ -200,7 +200,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       form.setFieldsValue({
         name: category.name,
         sortOrder: category.sortOrder,
-        status: category.status
+        status: category.status,
       });
     }
   }, [category, startEditing, form]);
@@ -215,12 +215,12 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       setEditingData({
         name: category.name,
         sortOrder: category.sortOrder,
-        status: category.status
+        status: category.status,
       });
       form.setFieldsValue({
         name: category.name,
         sortOrder: category.sortOrder,
-        status: category.status
+        status: category.status,
       });
     }
   }, [category, cancelEditing, form]);
@@ -240,7 +240,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       // 调用 API 更新
       await updateMutation.mutateAsync({
         id: category.id,
-        data: values
+        data: values,
       });
 
       setIsEditing(false);
@@ -250,7 +250,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       const updatedCategory: Category = {
         ...category,
         ...values,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       onUpdate?.(updatedCategory);
@@ -279,7 +279,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
         createdAt: node.createdAt,
         updatedAt: node.updatedAt,
         createdBy: node.createdBy,
-        updatedBy: node.updatedBy
+        updatedBy: node.updatedBy,
       }));
 
       const validation = await CategoryDeletionUtils.canDeleteCategory(category, allCategories);
@@ -301,7 +301,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
               </ul>
             </div>
           ),
-          width: 500
+          width: 500,
         });
       }
     } catch (error) {
@@ -355,10 +355,13 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
   /**
    * 处理子类目创建成功
    */
-  const handleCreateSuccess = useCallback((newCategory: Category) => {
-    setCreateFormVisible(false);
-    onCreate?.(newCategory);
-  }, [onCreate]);
+  const handleCreateSuccess = useCallback(
+    (newCategory: Category) => {
+      setCreateFormVisible(false);
+      onCreate?.(newCategory);
+    },
+    [onCreate]
+  );
 
   return (
     <div className="category-detail">
@@ -368,17 +371,21 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
           <div style={{ color: '#666' }}>加载类目详情...</div>
         </div>
       ) : !category ? (
-        <Empty
-          description="请从左侧选择一个类目查看详情"
-          style={{ padding: '60px 0' }}
-        />
+        <Empty description="请从左侧选择一个类目查看详情" style={{ padding: '60px 0' }} />
       ) : (
         <div>
           {/* 面包屑导航 */}
           <CategoryBreadcrumb categoryId={category?.id} categoryName={category?.name} />
 
           {/* 操作栏 */}
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div
+            style={{
+              marginBottom: 16,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <Space>
               {isEditing ? (
                 <>
@@ -429,11 +436,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
             </Space>
 
             <Tooltip title="刷新数据">
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() => onRefresh?.()}
-                disabled={loading}
-              >
+              <Button icon={<ReloadOutlined />} onClick={() => onRefresh?.()} disabled={loading}>
                 刷新
               </Button>
             </Tooltip>
@@ -442,18 +445,14 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
           {/* 基本信息 */}
           <Card title="基本信息" style={{ marginBottom: 16 }}>
             {isEditing ? (
-              <Form
-                form={form}
-                layout="vertical"
-                initialValues={editingData}
-              >
+              <Form form={form} layout="vertical" initialValues={editingData}>
                 <Form.Item
                   label="类目名称"
                   name="name"
                   rules={[
                     { required: true, message: '请输入类目名称' },
                     { min: 2, message: '类目名称至少需要2个字符' },
-                    { max: 50, message: '类目名称不能超过50个字符' }
+                    { max: 50, message: '类目名称不能超过50个字符' },
                   ]}
                 >
                   <Input placeholder="请输入类目名称" />
@@ -464,7 +463,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
                   name="sortOrder"
                   rules={[
                     { type: 'number', min: 0, message: '排序序号必须为非负整数' },
-                    { type: 'number', max: 999999, message: '排序序号不能大于999999' }
+                    { type: 'number', max: 999999, message: '排序序号不能大于999999' },
                   ]}
                 >
                   <InputNumber
@@ -488,12 +487,8 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
               </Form>
             ) : (
               <Descriptions column={2} bordered>
-                <Descriptions.Item label="类目名称">
-                  {category.name}
-                </Descriptions.Item>
-                <Descriptions.Item label="类目编码">
-                  {category.code || '-'}
-                </Descriptions.Item>
+                <Descriptions.Item label="类目名称">{category.name}</Descriptions.Item>
+                <Descriptions.Item label="类目编码">{category.code || '-'}</Descriptions.Item>
                 <Descriptions.Item label="类目层级">
                   <Tag color={formatLevel(category.level).color}>
                     {formatLevel(category.level).text}
@@ -508,9 +503,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
                     <span style={{ color: '#999' }}>无（根类目）</span>
                   )}
                 </Descriptions.Item>
-                <Descriptions.Item label="排序序号">
-                  {category.sortOrder || 0}
-                </Descriptions.Item>
+                <Descriptions.Item label="排序序号">{category.sortOrder || 0}</Descriptions.Item>
                 <Descriptions.Item label="状态">
                   <Tag color={formatStatus(category.status).color}>
                     {formatStatus(category.status).text}
@@ -527,12 +520,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
           </Card>
 
           {/* 属性模板 */}
-          {category && (
-            <AttributeTemplate
-              categoryId={category.id}
-              disabled={isEditing}
-            />
-          )}
+          {category && <AttributeTemplate categoryId={category.id} disabled={isEditing} />}
         </div>
       )}
 
@@ -573,13 +561,30 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
             {/* 基本信息 */}
             <div style={{ marginBottom: 16 }}>
               <h4>类目信息</h4>
-              <p><strong>名称：</strong>{category.name}</p>
-              <p><strong>编码：</strong>{category.code || '-'}</p>
-              <p><strong>层级：</strong>{CategoryFormatUtils.formatLevel(category.level)}</p>
+              <p>
+                <strong>名称：</strong>
+                {category.name}
+              </p>
+              <p>
+                <strong>编码：</strong>
+                {category.code || '-'}
+              </p>
+              <p>
+                <strong>层级：</strong>
+                {CategoryFormatUtils.formatLevel(category.level)}
+              </p>
             </div>
 
             {/* 警告信息 */}
-            <div style={{ marginBottom: 16, padding: '12px', backgroundColor: '#fff2e8', border: '1px solid #ffbb96', borderRadius: '6px' }}>
+            <div
+              style={{
+                marginBottom: 16,
+                padding: '12px',
+                backgroundColor: '#fff2e8',
+                border: '1px solid #ffbb96',
+                borderRadius: '6px',
+              }}
+            >
               <p style={{ margin: 0, color: '#d46b08' }}>
                 <strong>⚠️ 注意事项：</strong>
               </p>

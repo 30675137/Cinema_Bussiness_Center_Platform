@@ -23,10 +23,10 @@ export const useBrandStore = create<BrandState>()(
       setItems: (items) => set({ items }),
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
-      reset: () => set({ items: [], loading: false, error: undefined })
+      reset: () => set({ items: [], loading: false, error: undefined }),
     }),
     {
-      name: 'brand-store'
+      name: 'brand-store',
     }
   )
 );

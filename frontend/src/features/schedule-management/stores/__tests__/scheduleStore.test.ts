@@ -1,6 +1,6 @@
 /**
  * Unit tests for scheduleStore
- * 
+ *
  * Tests UI state management (selectedDate, selectedEvent, filters, viewportScroll)
  */
 
@@ -20,7 +20,7 @@ describe('scheduleStore', () => {
   });
 
   describe('selectedDate', () => {
-    it('should initialize with today\'s date', () => {
+    it("should initialize with today's date", () => {
       const store = useScheduleStore.getState();
       const today = new Date().toISOString().split('T')[0];
       expect(store.selectedDate).toBe(today);
@@ -29,18 +29,18 @@ describe('scheduleStore', () => {
     it('should update selectedDate', () => {
       const store = useScheduleStore.getState();
       const newDate = '2025-01-28';
-      
+
       store.setSelectedDate(newDate);
-      
+
       expect(useScheduleStore.getState().selectedDate).toBe(newDate);
     });
 
     it('should persist selectedDate to localStorage', () => {
       const store = useScheduleStore.getState();
       const newDate = '2025-01-28';
-      
+
       store.setSelectedDate(newDate);
-      
+
       const persisted = localStorage.getItem('schedule_ui_state');
       expect(persisted).toBeTruthy();
       if (persisted) {
@@ -71,9 +71,9 @@ describe('scheduleStore', () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       store.setSelectedEvent(event);
-      
+
       expect(useScheduleStore.getState().selectedEvent).toEqual(event);
     });
 
@@ -90,10 +90,10 @@ describe('scheduleStore', () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       store.setSelectedEvent(event);
       store.setSelectedEvent(null);
-      
+
       expect(useScheduleStore.getState().selectedEvent).toBeNull();
     });
   });
@@ -110,18 +110,18 @@ describe('scheduleStore', () => {
         hallIds: ['h1', 'h2'],
         eventTypes: ['public', 'private'] as const,
       };
-      
+
       store.setFilters(filters);
-      
+
       expect(useScheduleStore.getState().filters).toEqual(filters);
     });
 
     it('should merge filters', () => {
       const store = useScheduleStore.getState();
-      
+
       store.setFilters({ hallIds: ['h1'] });
       store.setFilters({ eventTypes: ['public'] as const });
-      
+
       const state = useScheduleStore.getState();
       expect(state.filters.hallIds).toEqual(['h1']);
       expect(state.filters.eventTypes).toEqual(['public']);
@@ -129,10 +129,10 @@ describe('scheduleStore', () => {
 
     it('should reset filters', () => {
       const store = useScheduleStore.getState();
-      
+
       store.setFilters({ hallIds: ['h1'], eventTypes: ['public'] as const });
       store.resetFilters();
-      
+
       expect(useScheduleStore.getState().filters).toEqual({});
     });
 
@@ -142,9 +142,9 @@ describe('scheduleStore', () => {
         hallIds: ['h1'],
         eventTypes: ['public'] as const,
       };
-      
+
       store.setFilters(filters);
-      
+
       const persisted = localStorage.getItem('schedule_ui_state');
       expect(persisted).toBeTruthy();
       if (persisted) {
@@ -163,18 +163,18 @@ describe('scheduleStore', () => {
     it('should update viewportScroll', () => {
       const store = useScheduleStore.getState();
       const scroll = { scrollTop: 100, scrollLeft: 50 };
-      
+
       store.setViewportScroll(scroll);
-      
+
       expect(useScheduleStore.getState().viewportScroll).toEqual(scroll);
     });
 
     it('should persist viewportScroll to localStorage', () => {
       const store = useScheduleStore.getState();
       const scroll = { scrollTop: 100, scrollLeft: 50 };
-      
+
       store.setViewportScroll(scroll);
-      
+
       const persisted = localStorage.getItem('schedule_ui_state');
       expect(persisted).toBeTruthy();
       if (persisted) {
@@ -184,4 +184,3 @@ describe('scheduleStore', () => {
     });
   });
 });
-

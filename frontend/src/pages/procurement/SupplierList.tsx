@@ -1,6 +1,26 @@
 import React, { useState } from 'react';
-import { Card, Table, Button, Space, Tag, Input, Select, Row, Col, Modal, Form, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ExportOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Table,
+  Button,
+  Space,
+  Tag,
+  Input,
+  Select,
+  Row,
+  Col,
+  Modal,
+  Form,
+  message,
+} from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ExportOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -116,10 +136,10 @@ const SupplierList: React.FC = () => {
   // 信用评级映射
   const creditRatingMap: Record<string, { label: string; color: string }> = {
     'A+': { label: 'A+', color: 'gold' },
-    'A': { label: 'A', color: 'green' },
-    'B': { label: 'B', color: 'blue' },
-    'C': { label: 'C', color: 'orange' },
-    'D': { label: 'D', color: 'red' },
+    A: { label: 'A', color: 'green' },
+    B: { label: 'B', color: 'blue' },
+    C: { label: 'C', color: 'orange' },
+    D: { label: 'D', color: 'red' },
   };
 
   // 表格列定义
@@ -220,13 +240,29 @@ const SupplierList: React.FC = () => {
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button type="link" size="small" icon={<SearchOutlined />} onClick={() => handleView(record)}>
+          <Button
+            type="link"
+            size="small"
+            icon={<SearchOutlined />}
+            onClick={() => handleView(record)}
+          >
             查看
           </Button>
-          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
             编辑
           </Button>
-          <Button type="link" size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)}>
+          <Button
+            type="link"
+            size="small"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
             删除
           </Button>
         </Space>
@@ -281,13 +317,13 @@ const SupplierList: React.FC = () => {
     try {
       const values = await form.validateFields();
       console.log('提交表单:', values);
-      
+
       if (editingSupplier) {
         message.success('更新成功');
       } else {
         message.success('创建成功');
       }
-      
+
       setIsModalVisible(false);
       form.resetFields();
     } catch (error) {
@@ -321,11 +357,7 @@ const SupplierList: React.FC = () => {
         {/* 筛选区域 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Search
-              placeholder="搜索供应商编码、名称或联系人"
-              onSearch={handleSearch}
-              allowClear
-            />
+            <Search placeholder="搜索供应商编码、名称或联系人" onSearch={handleSearch} allowClear />
           </Col>
           <Col span={4}>
             <Select placeholder="供应商类别" style={{ width: '100%' }} allowClear>

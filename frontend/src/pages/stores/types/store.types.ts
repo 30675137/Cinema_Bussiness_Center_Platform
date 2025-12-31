@@ -38,28 +38,28 @@ export enum OperationType {
  * @updated 022-store-crud 添加version字段
  */
 export interface Store {
-  id: string;                    // UUID as string
-  code: string | null;           // Optional store code
-  name: string;                  // Store name
-  region: string | null;         // Region/city (optional, can be null)
-  status: StoreStatus;           // Store status (active | inactive)
-  version: number;               // 乐观锁版本号 @since 022-store-crud
-  createdAt: string;             // ISO 8601 timestamp
-  updatedAt: string;             // ISO 8601 timestamp
-  createdBy?: string | null;     // 创建人ID @since 022-store-crud
-  updatedBy?: string | null;     // 最后修改人ID @since 022-store-crud
+  id: string; // UUID as string
+  code: string | null; // Optional store code
+  name: string; // Store name
+  region: string | null; // Region/city (optional, can be null)
+  status: StoreStatus; // Store status (active | inactive)
+  version: number; // 乐观锁版本号 @since 022-store-crud
+  createdAt: string; // ISO 8601 timestamp
+  updatedAt: string; // ISO 8601 timestamp
+  createdBy?: string | null; // 创建人ID @since 022-store-crud
+  updatedBy?: string | null; // 最后修改人ID @since 022-store-crud
   // 020-store-address 新增字段
-  province?: string | null;      // 省份
-  city?: string | null;          // 城市
-  district?: string | null;      // 区县
-  address?: string | null;       // 详细地址
-  phone?: string | null;         // 联系电话
+  province?: string | null; // 省份
+  city?: string | null; // 城市
+  district?: string | null; // 区县
+  address?: string | null; // 详细地址
+  phone?: string | null; // 联系电话
   addressSummary?: string | null; // 地址摘要（派生字段）
   // 023-store-cinema-fields 新增字段
-  openingDate?: string | null;    // 开业时间 (ISO date string)
-  area?: number | null;           // 面积(平方米)
-  hallCount?: number | null;      // 影厅数
-  seatCount?: number | null;      // 座位数
+  openingDate?: string | null; // 开业时间 (ISO date string)
+  area?: number | null; // 面积(平方米)
+  hallCount?: number | null; // 影厅数
+  seatCount?: number | null; // 座位数
 }
 
 /**
@@ -67,18 +67,18 @@ export interface Store {
  * @since 022-store-crud
  */
 export interface CreateStoreDTO {
-  name: string;           // 门店名称（必填，唯一）
-  region: string;         // 所属区域
-  city: string;           // 所属城市
-  province?: string;      // 所属省份
-  district?: string;      // 所属区县
-  address: string;        // 详细地址
-  phone: string;          // 联系电话
+  name: string; // 门店名称（必填，唯一）
+  region: string; // 所属区域
+  city: string; // 所属城市
+  province?: string; // 所属省份
+  district?: string; // 所属区县
+  address: string; // 详细地址
+  phone: string; // 联系电话
   // 023-store-cinema-fields 新增字段
-  openingDate?: string;   // 开业时间 (YYYY-MM-DD)
-  area?: number;          // 面积(平方米)
-  hallCount?: number;     // 影厅数
-  seatCount?: number;     // 座位数
+  openingDate?: string; // 开业时间 (YYYY-MM-DD)
+  area?: number; // 面积(平方米)
+  hallCount?: number; // 影厅数
+  seatCount?: number; // 座位数
   // status defaults to ACTIVE on server side
 }
 
@@ -87,19 +87,19 @@ export interface CreateStoreDTO {
  * @since 022-store-crud
  */
 export interface UpdateStoreDTO {
-  name?: string;          // 门店名称
-  region?: string;        // 所属区域
-  city?: string;          // 所属城市
-  province?: string;      // 所属省份
-  district?: string;      // 所属区县
-  address?: string;       // 详细地址
-  phone?: string;         // 联系电话
+  name?: string; // 门店名称
+  region?: string; // 所属区域
+  city?: string; // 所属城市
+  province?: string; // 所属省份
+  district?: string; // 所属区县
+  address?: string; // 详细地址
+  phone?: string; // 联系电话
   // 023-store-cinema-fields 新增字段
-  openingDate?: string;   // 开业时间 (YYYY-MM-DD)
-  area?: number;          // 面积(平方米)
-  hallCount?: number;     // 影厅数
-  seatCount?: number;     // 座位数
-  version: number;        // 必填，用于乐观锁
+  openingDate?: string; // 开业时间 (YYYY-MM-DD)
+  area?: number; // 面积(平方米)
+  hallCount?: number; // 影厅数
+  seatCount?: number; // 座位数
+  version: number; // 必填，用于乐观锁
 }
 
 /**

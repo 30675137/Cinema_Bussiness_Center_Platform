@@ -23,14 +23,14 @@ export interface InventoryFilterState {
 
 /**
  * 库存筛选状态 Zustand Store
- * 
+ *
  * 用于管理库存查询页面的筛选条件状态。
- * 
+ *
  * @example
  * ```tsx
  * const { storeId, statuses, setStoreId, resetFilters } = useFilterStore();
  * ```
- * 
+ *
  * @since P003-inventory-query
  */
 export const useFilterStore = create<InventoryFilterState>((set) => ({
@@ -41,16 +41,17 @@ export const useFilterStore = create<InventoryFilterState>((set) => ({
 
   // Actions
   setStoreId: (storeId) => set({ storeId }),
-  
+
   setStatuses: (statuses) => set({ statuses }),
-  
+
   setCategoryId: (categoryId) => set({ categoryId }),
-  
-  resetFilters: () => set({
-    storeId: undefined,
-    statuses: [],
-    categoryId: undefined,
-  }),
+
+  resetFilters: () =>
+    set({
+      storeId: undefined,
+      statuses: [],
+      categoryId: undefined,
+    }),
 }));
 
 export default useFilterStore;

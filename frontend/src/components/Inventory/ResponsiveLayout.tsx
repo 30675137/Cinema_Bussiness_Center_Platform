@@ -4,18 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Layout,
-  Row,
-  Col,
-  Space,
-  Button,
-  Drawer,
-  Typography,
-  Card,
-  BackTop,
-  Affix,
-} from 'antd';
+import { Layout, Row, Col, Space, Button, Drawer, Typography, Card, BackTop, Affix } from 'antd';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -44,12 +33,12 @@ interface ResponsiveLayoutProps {
 
 // 响应式断点配置
 const RESPONSIVE_CONFIG = {
-  xs: 24,    // 手机: 1列
-  sm: 24,    // 小屏: 1列
-  md: 24,    // 中屏: 1列
-  lg: 18,    // 大屏: 内容18列, 侧边栏6列
-  xl: 18,    // 超大屏: 内容18列, 侧边栏6列
-  xxl: 16,   // 超大屏: 内容16列, 侧边栏8列
+  xs: 24, // 手机: 1列
+  sm: 24, // 小屏: 1列
+  md: 24, // 中屏: 1列
+  lg: 18, // 大屏: 内容18列, 侧边栏6列
+  xl: 18, // 超大屏: 内容18列, 侧边栏6列
+  xxl: 16, // 超大屏: 内容16列, 侧边栏8列
 };
 
 const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
@@ -86,11 +75,13 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     if (!title && !subtitle && !extra) return null;
 
     return (
-      <div style={{
-        padding: '16px 0',
-        borderBottom: '1px solid #f0f0f0',
-        marginBottom: 16
-      }}>
+      <div
+        style={{
+          padding: '16px 0',
+          borderBottom: '1px solid #f0f0f0',
+          marginBottom: 16,
+        }}
+      >
         <Row justify="space-between" align="middle" gutter={[16, 8]}>
           <Col xs={24} sm={16} md={18}>
             <Space direction="vertical" size="small">
@@ -109,9 +100,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           <Col xs={24} sm={8} md={6} style={{ textAlign: 'right' }}>
             <Space wrap>
               {extra}
-              {showUserSelector && !isMobile && (
-                <UserRoleSelector compact />
-              )}
+              {showUserSelector && !isMobile && <UserRoleSelector compact />}
             </Space>
           </Col>
         </Row>
@@ -143,9 +132,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
                     筛选
                   </Button>
                 </Col>
-                <Col>
-                  {extra}
-                </Col>
+                <Col>{extra}</Col>
               </Row>
             </Card>
           </Affix>
@@ -158,19 +145,13 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             onClose={() => setFilterDrawerVisible(false)}
             bodyStyle={{ padding: 0 }}
           >
-            <div style={{ padding: 16 }}>
-              {filterContent}
-            </div>
+            <div style={{ padding: 16 }}>{filterContent}</div>
           </Drawer>
         </>
       );
     }
 
-    return (
-      <div style={{ marginBottom: 16 }}>
-        {filterContent}
-      </div>
-    );
+    return <div style={{ marginBottom: 16 }}>{filterContent}</div>;
   };
 
   // 渲染侧边栏
@@ -205,9 +186,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
             onClose={() => setSiderDrawerVisible(false)}
             bodyStyle={{ padding: 0 }}
           >
-            <div style={{ padding: 16 }}>
-              {siderContent}
-            </div>
+            <div style={{ padding: 16 }}>{siderContent}</div>
           </Drawer>
         </>
       );
@@ -233,11 +212,13 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     // 桌面端使用固定侧边栏
     return (
       <Col span={siderCol}>
-        <div style={{
-          position: 'sticky',
-          top: 80,
-          height: 'fit-content'
-        }}>
+        <div
+          style={{
+            position: 'sticky',
+            top: 80,
+            height: 'fit-content',
+          }}
+        >
           {siderContent}
         </div>
       </Col>
@@ -252,9 +233,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
           <div className="inventory-layout">
             {renderHeader()}
             {renderFilters()}
-            <div style={{ minHeight: 'calc(100vh - 200px)' }}>
-              {children}
-            </div>
+            <div style={{ minHeight: 'calc(100vh - 200px)' }}>{children}</div>
           </div>
         </Col>
       );
@@ -265,9 +244,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
         <div className="inventory-layout">
           {renderHeader()}
           {renderFilters()}
-          <div style={{ minHeight: 'calc(100vh - 200px)' }}>
-            {children}
-          </div>
+          <div style={{ minHeight: 'calc(100vh - 200px)' }}>{children}</div>
         </div>
       </Col>
     );
@@ -278,12 +255,14 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     if (!isDesktop && !siderContent) return null;
 
     return (
-      <div style={{
-        position: 'fixed',
-        top: 80,
-        right: 16,
-        zIndex: 999,
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: 80,
+          right: 16,
+          zIndex: 999,
+        }}
+      >
         <Space direction="vertical">
           {siderContent && isDesktop && (
             <Button
@@ -311,18 +290,18 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({
     // 移动端或无侧边栏：单列布局
     return (
       <Layout className={className}>
-        <Content style={{ padding: isMobile ? 8 : 16 }}>
-          {renderMainContent()}
-        </Content>
+        <Content style={{ padding: isMobile ? 8 : 16 }}>{renderMainContent()}</Content>
         {renderLayoutControls()}
         {showUserSelector && isMobile && (
-          <div style={{
-            position: 'fixed',
-            bottom: 16,
-            left: 16,
-            right: 16,
-            zIndex: 999,
-          }}>
+          <div
+            style={{
+              position: 'fixed',
+              bottom: 16,
+              left: 16,
+              right: 16,
+              zIndex: 999,
+            }}
+          >
             <UserRoleSelector compact />
           </div>
         )}
@@ -371,14 +350,7 @@ export const StatisticsLayout: React.FC<{
   return (
     <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
       {React.Children.map(children, (child, index) => (
-        <Col
-          key={index}
-          span={24 / responsiveColumns}
-          xs={24}
-          sm={12}
-          md={8}
-          lg={6}
-        >
+        <Col key={index} span={24 / responsiveColumns} xs={24} sm={12} md={8} lg={6}>
           {child}
         </Col>
       ))}

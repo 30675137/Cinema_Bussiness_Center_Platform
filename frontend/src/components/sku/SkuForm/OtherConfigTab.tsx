@@ -21,11 +21,7 @@ interface OtherConfigTabProps {
 /**
  * 其他配置步骤组件
  */
-export const OtherConfigTab: React.FC<OtherConfigTabProps> = ({
-  control,
-  errors,
-  mode,
-}) => {
+export const OtherConfigTab: React.FC<OtherConfigTabProps> = ({ control, errors, mode }) => {
   return (
     <div data-testid="sku-form-other-config-tab">
       <Form.Item

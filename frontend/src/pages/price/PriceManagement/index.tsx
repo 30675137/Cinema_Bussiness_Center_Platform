@@ -20,7 +20,7 @@ import {
   Dropdown,
   Statistic,
   Progress,
-  Tabs
+  Tabs,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { MenuProps } from 'antd';
@@ -42,7 +42,7 @@ import {
   LineChartOutlined,
   FireOutlined,
   CalculatorOutlined,
-  ExperimentOutlined
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -58,7 +58,7 @@ import {
   usePricesQuery,
   useDeletePriceMutation,
   useBatchUpdatePricesMutation,
-  usePriceStatistics
+  usePriceStatistics,
 } from '@/stores/priceStore';
 import { useAppActions } from '@/stores/appStore';
 import {
@@ -67,7 +67,7 @@ import {
   PriceType,
   PriceStatus,
   PriceStatusConfig,
-  PriceTypeConfig
+  PriceTypeConfig,
 } from '@/types/price';
 
 const { Title, Text } = Typography;
@@ -96,7 +96,7 @@ const PriceManagement: React.FC = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
-    total: 0
+    total: 0,
   });
 
   // 排序状态
@@ -110,7 +110,7 @@ const PriceManagement: React.FC = () => {
     keyword: searchKeyword,
     ...filters,
     sortBy: sortField,
-    sortOrder
+    sortOrder,
   };
 
   const { data: pricesData, isLoading, refetch } = usePricesQuery(queryParams);
@@ -120,10 +120,7 @@ const PriceManagement: React.FC = () => {
 
   // 设置面包屑
   useEffect(() => {
-    setBreadcrumbs([
-      { title: t('menu.price') },
-      { title: t('price.management') }
-    ]);
+    setBreadcrumbs([{ title: t('menu.price') }, { title: t('price.management') }]);
   }, [setBreadcrumbs, t]);
 
   // 处理分页变化
@@ -131,7 +128,7 @@ const PriceManagement: React.FC = () => {
     setPagination({
       ...pagination,
       current: paginationInfo.current,
-      pageSize: paginationInfo.pageSize
+      pageSize: paginationInfo.pageSize,
     });
 
     if (sorter.field) {
@@ -215,7 +212,7 @@ const PriceManagement: React.FC = () => {
         } catch (error) {
           message.error('批量删除失败');
         }
-      }
+      },
     });
   };
 
@@ -231,7 +228,7 @@ const PriceManagement: React.FC = () => {
         try {
           await batchUpdateMutation.mutateAsync({
             ids: selectedRowKeys,
-            data: { status: PriceStatus.ACTIVE }
+            data: { status: PriceStatus.ACTIVE },
           });
           message.success(`成功激活 ${selectedRowKeys.length} 个价格`);
           setSelectedRowKeys([]);
@@ -244,7 +241,7 @@ const PriceManagement: React.FC = () => {
         try {
           await batchUpdateMutation.mutateAsync({
             ids: selectedRowKeys,
-            data: { status: PriceStatus.INACTIVE }
+            data: { status: PriceStatus.INACTIVE },
           });
           message.success(`成功停用 ${selectedRowKeys.length} 个价格`);
           setSelectedRowKeys([]);
@@ -292,25 +289,25 @@ const PriceManagement: React.FC = () => {
         key: 'history',
         label: '查看历史',
         icon: <HistoryOutlined />,
-        onClick: () => handleViewHistory(record)
+        onClick: () => handleViewHistory(record),
       },
       {
         key: 'copy',
         label: '复制价格',
         icon: <CopyOutlined />,
-        onClick: () => handleCopy(record)
+        onClick: () => handleCopy(record),
       },
       {
-        type: 'divider'
+        type: 'divider',
       },
       {
         key: 'delete',
         label: '删除价格',
         icon: <DeleteOutlined />,
         danger: true,
-        onClick: () => handleDelete(record.id)
-      }
-    ]
+        onClick: () => handleDelete(record.id),
+      },
+    ],
   });
 
   // 表格列定义
@@ -321,21 +318,17 @@ const PriceManagement: React.FC = () => {
       width: 250,
       render: (_, record) => (
         <div>
-          <div style={{ fontWeight: 500, marginBottom: 4 }}>
-            {record.productId}
-          </div>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-            SKU: {record.skuId || '-'}
-          </div>
+          <div style={{ fontWeight: 500, marginBottom: 4 }}>{record.productId}</div>
+          <div style={{ fontSize: 12, color: '#8c8c8c' }}>SKU: {record.skuId || '-'}</div>
         </div>
-      )
+      ),
     },
     {
       title: '价格类型',
       dataIndex: 'priceType',
       key: 'priceType',
       width: 120,
-      render: (type: PriceType) => getPriceTypeTag(type)
+      render: (type: PriceType) => getPriceTypeTag(type),
     },
     {
       title: '价格信息',
@@ -343,16 +336,14 @@ const PriceManagement: React.FC = () => {
       width: 180,
       render: (_, record) => (
         <div>
-          <div style={{ fontWeight: 500 }}>
-            ¥{record.currentPrice.toFixed(2)}
-          </div>
+          <div style={{ fontWeight: 500 }}>¥{record.currentPrice.toFixed(2)}</div>
           {record.originalPrice && record.originalPrice !== record.currentPrice && (
             <Text type="secondary" delete style={{ fontSize: 12 }}>
               ¥{record.originalPrice.toFixed(2)}
             </Text>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '生效时间',
@@ -367,25 +358,21 @@ const PriceManagement: React.FC = () => {
             </Text>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: PriceStatus) => getStatusTag(status)
+      render: (status: PriceStatus) => getStatusTag(status),
     },
     {
       title: '优先级',
       dataIndex: 'priority',
       key: 'priority',
       width: 80,
-      render: (priority: number) => (
-        <Tag color={priority > 5 ? 'red' : 'blue'}>
-          {priority}
-        </Tag>
-      )
+      render: (priority: number) => <Tag color={priority > 5 ? 'red' : 'blue'}>{priority}</Tag>,
     },
     {
       title: '创建时间',
@@ -393,7 +380,7 @@ const PriceManagement: React.FC = () => {
       key: 'createdAt',
       width: 150,
       sorter: true,
-      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm')
+      render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm'),
     },
     {
       title: '操作',
@@ -419,15 +406,11 @@ const PriceManagement: React.FC = () => {
             />
           </Tooltip>
           <Dropdown menu={getMoreMenu(record)} trigger={['click']}>
-            <Button
-              type="text"
-              size="small"
-              icon={<MoreOutlined />}
-            />
+            <Button type="text" size="small" icon={<MoreOutlined />} />
           </Dropdown>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 表格选择配置
@@ -435,7 +418,7 @@ const PriceManagement: React.FC = () => {
     selectedRowKeys,
     onChange: (newSelectedRowKeys: React.Key[]) => {
       setSelectedRowKeys(newSelectedRowKeys as string[]);
-    }
+    },
   };
 
   const prices = pricesData?.data || [];
@@ -508,9 +491,7 @@ const PriceManagement: React.FC = () => {
               <Button icon={<ExportOutlined />} onClick={handleExport}>
                 导出
               </Button>
-              <Button icon={<ImportOutlined />}>
-                导入
-              </Button>
+              <Button icon={<ImportOutlined />}>导入</Button>
               <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
                 新建价格
               </Button>
@@ -566,9 +547,11 @@ const PriceManagement: React.FC = () => {
                           style={{ width: 100 }}
                           allowClear
                           value={filters.status?.[0]}
-                          onChange={(value) => handleFilter({
-                            status: value ? [value] : undefined
-                          })}
+                          onChange={(value) =>
+                            handleFilter({
+                              status: value ? [value] : undefined,
+                            })
+                          }
                         >
                           <Option value={PriceStatus.ACTIVE}>生效中</Option>
                           <Option value={PriceStatus.INACTIVE}>已失效</Option>
@@ -576,7 +559,10 @@ const PriceManagement: React.FC = () => {
                           <Option value={PriceStatus.EXPIRED}>已过期</Option>
                         </Select>
 
-                        <Button icon={<FilterOutlined />} onClick={() => setFilterDrawerVisible(true)}>
+                        <Button
+                          icon={<FilterOutlined />}
+                          onClick={() => setFilterDrawerVisible(true)}
+                        >
                           高级筛选
                         </Button>
                       </Space>
@@ -627,15 +613,14 @@ const PriceManagement: React.FC = () => {
                       total: totalCount,
                       showSizeChanger: true,
                       showQuickJumper: true,
-                      showTotal: (total, range) =>
-                        `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+                      showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
                     }}
                     onChange={handleTableChange}
                     scroll={{ x: 1400 }}
                   />
                 </Card>
               </>
-            )
+            ),
           },
           {
             key: 'batch',
@@ -645,7 +630,7 @@ const PriceManagement: React.FC = () => {
                 批量调整
               </span>
             ),
-            children: <BatchPriceAdjustment />
+            children: <BatchPriceAdjustment />,
           },
           {
             key: 'rules',
@@ -655,7 +640,7 @@ const PriceManagement: React.FC = () => {
                 价格规则
               </span>
             ),
-            children: <PriceRulesManager />
+            children: <PriceRulesManager />,
           },
           {
             key: 'simulator',
@@ -665,7 +650,7 @@ const PriceManagement: React.FC = () => {
                 价格模拟
               </span>
             ),
-            children: <PriceSimulator />
+            children: <PriceSimulator />,
           },
           {
             key: 'history',
@@ -675,7 +660,7 @@ const PriceManagement: React.FC = () => {
                 历史记录
               </span>
             ),
-            children: <PriceHistory />
+            children: <PriceHistory />,
           },
           {
             key: 'analytics',
@@ -690,13 +675,15 @@ const PriceManagement: React.FC = () => {
                 <div style={{ textAlign: 'center', padding: '100px 0' }}>
                   <LineChartOutlined style={{ fontSize: 64, color: '#d9d9d9' }} />
                   <div style={{ marginTop: 16 }}>
-                    <Title level={4} type="secondary">统计分析功能开发中...</Title>
+                    <Title level={4} type="secondary">
+                      统计分析功能开发中...
+                    </Title>
                     <Text type="secondary">即将推出价格趋势分析和销量预测功能</Text>
                   </div>
                 </div>
               </Card>
-            )
-          }
+            ),
+          },
         ]}
       />
 

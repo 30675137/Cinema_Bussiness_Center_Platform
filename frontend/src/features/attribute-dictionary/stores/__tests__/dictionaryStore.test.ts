@@ -1,6 +1,6 @@
 /**
  * Unit tests for dictionaryStore
- * 
+ *
  * Tests dictionary type and item CRUD operations
  */
 
@@ -260,5 +260,3 @@ describe('dictionaryStore', () => {
     });
   });
 });
-
-

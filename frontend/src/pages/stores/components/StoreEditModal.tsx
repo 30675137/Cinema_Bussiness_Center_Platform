@@ -9,7 +9,9 @@
 
 import React, { useEffect } from 'react';
 import { Modal, Form, Spin, Alert } from 'antd';
-import AddressForm, { type AddressFormData } from '../../../features/store-management/components/AddressForm';
+import AddressForm, {
+  type AddressFormData,
+} from '../../../features/store-management/components/AddressForm';
 import { useUpdateStore } from '../../../features/store-management/hooks/useUpdateStore';
 import type { Store } from '../types/store.types';
 
@@ -30,12 +32,7 @@ export interface StoreEditModalProps {
 /**
  * 门店地址编辑弹窗
  */
-const StoreEditModal: React.FC<StoreEditModalProps> = ({
-  open,
-  store,
-  onClose,
-  onSuccess,
-}) => {
+const StoreEditModal: React.FC<StoreEditModalProps> = ({ open, store, onClose, onSuccess }) => {
   const [form] = Form.useForm<AddressFormData>();
   const { mutate: updateStore, isPending } = useUpdateStore();
 
@@ -99,8 +96,14 @@ const StoreEditModal: React.FC<StoreEditModalProps> = ({
               message="门店基本信息"
               description={
                 <>
-                  <div><strong>门店名称：</strong>{store.name}</div>
-                  <div><strong>门店编码：</strong>{store.code || '-'}</div>
+                  <div>
+                    <strong>门店名称：</strong>
+                    {store.name}
+                  </div>
+                  <div>
+                    <strong>门店编码：</strong>
+                    {store.code || '-'}
+                  </div>
                 </>
               }
               type="info"

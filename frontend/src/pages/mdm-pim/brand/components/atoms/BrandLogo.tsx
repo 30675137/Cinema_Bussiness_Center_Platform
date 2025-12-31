@@ -11,7 +11,7 @@ const BrandLogo: React.FC<BrandLogoProps> = ({
   src,
   alt = '品牌LOGO',
   size = 'medium',
-  className
+  className,
 }) => {
   // 根据size设置尺寸
   const getAvatarSize = (size: 'small' | 'medium' | 'large') => {

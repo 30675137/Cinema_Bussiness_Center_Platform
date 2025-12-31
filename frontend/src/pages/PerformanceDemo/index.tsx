@@ -25,7 +25,9 @@ const PerformanceDemo: React.FC = () => {
       stock: Math.floor(Math.random() * 200) + 10,
       status: index % 3 === 0 ? 'active' : index % 3 === 1 ? 'pending' : 'inactive',
       description: `这是商品 ${index + 1} 的详细描述信息，包含产品的各种特性和使用说明`,
-      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
     }));
   }, []);
 
@@ -176,15 +178,15 @@ const PerformanceDemo: React.FC = () => {
         {/* 页面标题 */}
         <div className="mb-8">
           <Title level={2}>性能优化演示</Title>
-          <Paragraph type="secondary">
-            展示懒加载、虚拟滚动、性能监控等优化技术的应用效果
-          </Paragraph>
+          <Paragraph type="secondary">展示懒加载、虚拟滚动、性能监控等优化技术的应用效果</Paragraph>
         </div>
 
         {/* 性能控制面板 */}
         <Card title="性能控制" className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}>
+            <div
+              className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}
+            >
               <Text strong>虚拟滚动</Text>
               <Switch
                 checked={enableVirtualScroll}
@@ -194,7 +196,9 @@ const PerformanceDemo: React.FC = () => {
               />
             </div>
 
-            <div className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}>
+            <div
+              className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}
+            >
               <Text strong>性能监控</Text>
               <Switch
                 checked={enablePerformanceMonitoring}
@@ -204,7 +208,9 @@ const PerformanceDemo: React.FC = () => {
               />
             </div>
 
-            <div className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}>
+            <div
+              className={cn('flex items-center justify-between', tailwindPreset('card-compact'))}
+            >
               <Text strong>严格模式</Text>
               <Switch
                 checked={enableStrictMode}
@@ -233,11 +239,21 @@ const PerformanceDemo: React.FC = () => {
           message="性能优化特性"
           description={
             <div className="space-y-1">
-              <div>✅ <Text strong>懒加载</Text>: 组件按需加载，减少初始包体积</div>
-              <div>✅ <Text strong>虚拟滚动</Text>: 大数据集渲染优化，只渲染可见区域</div>
-              <div>✅ <Text strong>React.memo</Text>: 组件重渲染优化，避免不必要的更新</div>
-              <div>✅ <Text strong>性能监控</Text>: 实时监控组件渲染性能</div>
-              <div>✅ <Text strong>骨架屏</Text>: 优雅的加载状态，提升用户体验</div>
+              <div>
+                ✅ <Text strong>懒加载</Text>: 组件按需加载，减少初始包体积
+              </div>
+              <div>
+                ✅ <Text strong>虚拟滚动</Text>: 大数据集渲染优化，只渲染可见区域
+              </div>
+              <div>
+                ✅ <Text strong>React.memo</Text>: 组件重渲染优化，避免不必要的更新
+              </div>
+              <div>
+                ✅ <Text strong>性能监控</Text>: 实时监控组件渲染性能
+              </div>
+              <div>
+                ✅ <Text strong>骨架屏</Text>: 优雅的加载状态，提升用户体验
+              </div>
             </div>
           }
           type="info"
@@ -357,9 +373,7 @@ const PerformanceDemo: React.FC = () => {
         {/* 使用说明 */}
         <Card title="使用说明" className="mt-6">
           <div className="prose max-w-none">
-            <Paragraph>
-              本页面演示了如何在影院商品管理中台中应用性能优化技术：
-            </Paragraph>
+            <Paragraph>本页面演示了如何在影院商品管理中台中应用性能优化技术：</Paragraph>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

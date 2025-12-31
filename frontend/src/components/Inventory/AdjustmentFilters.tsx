@@ -18,11 +18,7 @@ import {
   InputNumber,
   Divider,
 } from 'antd';
-import {
-  SearchOutlined,
-  ClearOutlined,
-  FilterOutlined,
-} from '@ant-design/icons';
+import { SearchOutlined, ClearOutlined, FilterOutlined } from '@ant-design/icons';
 import type { InventoryAdjustmentFilters } from '@/types/inventory';
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -79,55 +75,58 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
   }, [filters, form]);
 
   // 处理表单提交
-  const handleSubmit = useCallback((values: any) => {
-    const newFilters: Partial<InventoryAdjustmentFilters> = {};
+  const handleSubmit = useCallback(
+    (values: any) => {
+      const newFilters: Partial<InventoryAdjustmentFilters> = {};
 
-    // 处理关键词搜索（SKU或商品名称）
-    if (values.keyword) {
-      newFilters.sku = values.keyword;
-      newFilters.productName = values.keyword;
-    } else {
-      delete newFilters.sku;
-      delete newFilters.productName;
-    }
+      // 处理关键词搜索（SKU或商品名称）
+      if (values.keyword) {
+        newFilters.sku = values.keyword;
+        newFilters.productName = values.keyword;
+      } else {
+        delete newFilters.sku;
+        delete newFilters.productName;
+      }
 
-    // 处理调整类型
-    if (values.adjustmentType) {
-      newFilters.adjustmentType = values.adjustmentType;
-    } else {
-      delete newFilters.adjustmentType;
-    }
+      // 处理调整类型
+      if (values.adjustmentType) {
+        newFilters.adjustmentType = values.adjustmentType;
+      } else {
+        delete newFilters.adjustmentType;
+      }
 
-    // 处理状态
-    if (values.status) {
-      newFilters.status = values.status;
-    } else {
-      delete newFilters.status;
-    }
+      // 处理状态
+      if (values.status) {
+        newFilters.status = values.status;
+      } else {
+        delete newFilters.status;
+      }
 
-    // 处理申请人
-    if (values.requestedBy) {
-      newFilters.requestedBy = values.requestedBy;
-    } else {
-      delete newFilters.requestedBy;
-    }
+      // 处理申请人
+      if (values.requestedBy) {
+        newFilters.requestedBy = values.requestedBy;
+      } else {
+        delete newFilters.requestedBy;
+      }
 
-    // 处理时间范围
-    if (values.dateRange && values.dateRange.length === 2) {
-      newFilters.dateRange = values.dateRange;
-    } else {
-      delete newFilters.dateRange;
-    }
+      // 处理时间范围
+      if (values.dateRange && values.dateRange.length === 2) {
+        newFilters.dateRange = values.dateRange;
+      } else {
+        delete newFilters.dateRange;
+      }
 
-    // 处理数量范围
-    if (values.quantityRange && values.quantityRange.length === 2) {
-      newFilters.quantityRange = values.quantityRange;
-    } else {
-      delete newFilters.quantityRange;
-    }
+      // 处理数量范围
+      if (values.quantityRange && values.quantityRange.length === 2) {
+        newFilters.quantityRange = values.quantityRange;
+      } else {
+        delete newFilters.quantityRange;
+      }
 
-    onFiltersChange(newFilters);
-  }, [onFiltersChange]);
+      onFiltersChange(newFilters);
+    },
+    [onFiltersChange]
+  );
 
   // 处理重置
   const handleReset = useCallback(() => {
@@ -146,23 +145,14 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
     <Row gutter={[16, 16]}>
       <Col xs={24} sm={12} md={6}>
         <Form.Item name="keyword" label="搜索">
-          <Input
-            placeholder="SKU或商品名称"
-            allowClear
-            prefix={<SearchOutlined />}
-          />
+          <Input placeholder="SKU或商品名称" allowClear prefix={<SearchOutlined />} />
         </Form.Item>
       </Col>
 
       <Col xs={24} sm={12} md={6}>
         <Form.Item name="adjustmentType" label="调整类型">
-          <Select
-            placeholder="请选择调整类型"
-            allowClear
-            showSearch
-            optionFilterProp="children"
-          >
-            {ADJUSTMENT_TYPE_OPTIONS.map(option => (
+          <Select placeholder="请选择调整类型" allowClear showSearch optionFilterProp="children">
+            {ADJUSTMENT_TYPE_OPTIONS.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -173,13 +163,8 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
 
       <Col xs={24} sm={12} md={6}>
         <Form.Item name="status" label="状态">
-          <Select
-            placeholder="请选择状态"
-            allowClear
-            showSearch
-            optionFilterProp="children"
-          >
-            {STATUS_OPTIONS.map(option => (
+          <Select placeholder="请选择状态" allowClear showSearch optionFilterProp="children">
+            {STATUS_OPTIONS.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -190,10 +175,7 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
 
       <Col xs={24} sm={12} md={6}>
         <Form.Item name="requestedBy" label="申请人">
-          <Input
-            placeholder="请输入申请人"
-            allowClear
-          />
+          <Input placeholder="请输入申请人" allowClear />
         </Form.Item>
       </Col>
     </Row>
@@ -216,16 +198,8 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
         <Col xs={24} sm={12} md={8}>
           <Form.Item name="quantityRange" label="调整数量范围">
             <Space.Compact style={{ width: '100%' }}>
-              <InputNumber
-                style={{ width: '45%' }}
-                placeholder="最小值"
-                min={0}
-              />
-              <InputNumber
-                style={{ width: '45%' }}
-                placeholder="最大值"
-                min={0}
-              />
+              <InputNumber style={{ width: '45%' }} placeholder="最小值" min={0} />
+              <InputNumber style={{ width: '45%' }} placeholder="最大值" min={0} />
             </Space.Compact>
           </Form.Item>
         </Col>
@@ -244,32 +218,24 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
       >
         搜索
       </Button>
-      <Button
-        icon={<ClearOutlined />}
-        onClick={handleClear}
-      >
+      <Button icon={<ClearOutlined />} onClick={handleClear}>
         清除
       </Button>
-      <Button
-        onClick={handleReset}
-      >
-        重置
-      </Button>
+      <Button onClick={handleReset}>重置</Button>
     </Space>
   );
 
   return (
-    <Card size="small" title={
-      <Space>
-        <FilterOutlined />
-        <Text>筛选条件</Text>
-      </Space>
-    }>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
+    <Card
+      size="small"
+      title={
+        <Space>
+          <FilterOutlined />
+          <Text>筛选条件</Text>
+        </Space>
+      }
+    >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {renderBasicFilters()}
 
@@ -282,17 +248,11 @@ const AdjustmentFilters: React.FC<AdjustmentFiltersProps> = ({
 
           <Row justify="space-between" align="middle">
             <Col>
-              <Button
-                type="link"
-                size="small"
-                onClick={() => setExpanded(!expanded)}
-              >
+              <Button type="link" size="small" onClick={() => setExpanded(!expanded)}>
                 {expanded ? '收起高级筛选' : '展开高级筛选'}
               </Button>
             </Col>
-            <Col>
-              {renderActions()}
-            </Col>
+            <Col>{renderActions()}</Col>
           </Row>
         </Space>
       </Form>

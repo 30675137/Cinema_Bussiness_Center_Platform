@@ -3,7 +3,7 @@
  * 饮品配方(BOM)配置弹窗组件 (User Story 3 - FR-035, FR-036, FR-037)
  */
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Modal,
   Table,
@@ -18,38 +18,33 @@ import {
   Collapse,
   Descriptions,
   Select,
-} from 'antd'
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  MinusCircleOutlined,
-} from '@ant-design/icons'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { ColumnsType } from 'antd/es/table'
+} from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { ColumnsType } from 'antd/es/table';
 import {
   getBeverageRecipes,
   addBeverageRecipe,
   updateBeverageRecipe,
   deleteBeverageRecipe,
-} from '../services/beverageAdminApi'
-import { getSkuList, type SkuDTO } from '../services/skuApi'
+} from '../services/beverageAdminApi';
+import { getSkuList, type SkuDTO } from '../services/skuApi';
 import type {
   BeverageRecipeDTO,
   CreateRecipeRequest,
   UpdateRecipeRequest,
   RecipeIngredientDTO,
   RecipeIngredientRequest,
-} from '../types/beverage'
+} from '../types/beverage';
 
-const { TextArea } = Input
-const { Panel } = Collapse
+const { TextArea } = Input;
+const { Panel } = Collapse;
 
 interface RecipeConfigModalProps {
-  open: boolean
-  beverageId: string | null
-  beverageName?: string
-  onClose: () => void
+  open: boolean;
+  beverageId: string | null;
+  beverageName?: string;
+  onClose: () => void;
 }
 
 export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
@@ -58,76 +53,75 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
   beverageName,
   onClose,
 }) => {
-  const [form] = Form.useForm()
-  const queryClient = useQueryClient()
-  const [editingRecipe, setEditingRecipe] = useState<BeverageRecipeDTO | null>(null)
-  const [formVisible, setFormVisible] = useState(false)
+  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
+  const [editingRecipe, setEditingRecipe] = useState<BeverageRecipeDTO | null>(null);
+  const [formVisible, setFormVisible] = useState(false);
 
   // 获取配方列表
   const { data: recipes, isLoading } = useQuery({
     queryKey: ['beverage-recipes', beverageId],
     queryFn: () => getBeverageRecipes(beverageId!),
     enabled: !!beverageId && open,
-  })
+  });
 
   // 获取 SKU 列表（原料）
   const { data: skuList = [], isLoading: isLoadingSkus } = useQuery({
     queryKey: ['skus', 'RAW_MATERIAL'],
     queryFn: () => getSkuList('RAW_MATERIAL'),
     enabled: open,
-  })
+  });
 
   // 添加配方
   const addMutation = useMutation({
-    mutationFn: (data: CreateRecipeRequest) =>
-      addBeverageRecipe(beverageId!, data),
+    mutationFn: (data: CreateRecipeRequest) => addBeverageRecipe(beverageId!, data),
     onSuccess: () => {
-      message.success('添加配方成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] })
-      handleFormCancel()
+      message.success('添加配方成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] });
+      handleFormCancel();
     },
     onError: (error: Error) => {
-      message.error(`添加失败: ${error.message}`)
+      message.error(`添加失败: ${error.message}`);
     },
-  })
+  });
 
   // 更新配方
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateRecipeRequest }) =>
       updateBeverageRecipe(beverageId!, id, data),
     onSuccess: () => {
-      message.success('更新配方成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] })
-      handleFormCancel()
+      message.success('更新配方成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] });
+      handleFormCancel();
     },
     onError: (error: Error) => {
-      message.error(`更新失败: ${error.message}`)
+      message.error(`更新失败: ${error.message}`);
     },
-  })
+  });
 
   // 删除配方
   const deleteMutation = useMutation({
     mutationFn: (recipeId: string) => deleteBeverageRecipe(beverageId!, recipeId),
     onSuccess: () => {
-      message.success('删除配方成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] })
+      message.success('删除配方成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-recipes', beverageId] });
     },
     onError: (error: Error) => {
-      message.error(`删除失败: ${error.message}`)
+      message.error(`删除失败: ${error.message}`);
     },
-  })
+  });
 
   const handleAddRecipe = () => {
-    setEditingRecipe(null)
-    form.resetFields()
+    setEditingRecipe(null);
+    form.resetFields();
     form.setFieldsValue({
       ingredients: [{ skuId: undefined, ingredientName: '', quantity: 0, unit: '' }],
-    })
-    setFormVisible(true)
-  }
+    });
+    setFormVisible(true);
+  };
 
   const handleEditRecipe = (recipe: BeverageRecipeDTO) => {
-    setEditingRecipe(recipe)
+    setEditingRecipe(recipe);
     form.setFieldsValue({
       name: recipe.name,
       applicableSpecs: recipe.applicableSpecs,
@@ -139,17 +133,17 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
         unit: ing.unit,
         note: ing.note,
       })),
-    })
-    setFormVisible(true)
-  }
+    });
+    setFormVisible(true);
+  };
 
   const handleDeleteRecipe = (recipeId: string) => {
-    deleteMutation.mutate(recipeId)
-  }
+    deleteMutation.mutate(recipeId);
+  };
 
   const handleFormSubmit = async () => {
     try {
-      const values = await form.validateFields()
+      const values = await form.validateFields();
 
       const ingredients: RecipeIngredientRequest[] = values.ingredients.map(
         (ing: RecipeIngredientRequest) => ({
@@ -159,7 +153,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
           unit: ing.unit,
           note: ing.note,
         })
-      )
+      );
 
       if (editingRecipe) {
         // 编辑模式
@@ -168,8 +162,8 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
           applicableSpecs: values.applicableSpecs,
           description: values.description,
           ingredients,
-        }
-        updateMutation.mutate({ id: editingRecipe.id, data: updateData })
+        };
+        updateMutation.mutate({ id: editingRecipe.id, data: updateData });
       } else {
         // 新增模式
         const createData: CreateRecipeRequest = {
@@ -177,34 +171,34 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
           applicableSpecs: values.applicableSpecs,
           description: values.description,
           ingredients,
-        }
-        addMutation.mutate(createData)
+        };
+        addMutation.mutate(createData);
       }
     } catch (error) {
-      console.error('表单验证失败:', error)
+      console.error('表单验证失败:', error);
     }
-  }
+  };
 
   const handleFormCancel = () => {
-    form.resetFields()
-    setFormVisible(false)
-    setEditingRecipe(null)
-  }
+    form.resetFields();
+    setFormVisible(false);
+    setEditingRecipe(null);
+  };
 
   // SKU 选择变更处理
   const handleSkuChange = (skuId: string, fieldIndex: number) => {
-    const selectedSku = skuList.find((sku) => sku.id === skuId)
+    const selectedSku = skuList.find((sku) => sku.id === skuId);
     if (selectedSku) {
-      const ingredients = form.getFieldValue('ingredients') || []
+      const ingredients = form.getFieldValue('ingredients') || [];
       ingredients[fieldIndex] = {
         ...ingredients[fieldIndex],
         skuId: skuId, // SKU ID 是 UUID 字符串，不转换为 Number
         ingredientName: selectedSku.name,
         unit: selectedSku.main_unit, // 使用 main_unit 字段
-      }
-      form.setFieldsValue({ ingredients })
+      };
+      form.setFieldsValue({ ingredients });
     }
-  }
+  };
 
   const ingredientColumns: ColumnsType<RecipeIngredientDTO> = [
     {
@@ -223,8 +217,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
       title: '用量',
       key: 'quantity',
       width: 150,
-      render: (_: unknown, record: RecipeIngredientDTO) =>
-        `${record.quantity} ${record.unit}`,
+      render: (_: unknown, record: RecipeIngredientDTO) => `${record.quantity} ${record.unit}`,
     },
     {
       title: '库存状态',
@@ -232,12 +225,12 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
       key: 'stockStatus',
       width: 120,
       render: (stockStatus?: RecipeIngredientDTO['stockStatus']) => {
-        if (!stockStatus) return '-'
+        if (!stockStatus) return '-';
         return stockStatus.inStock ? (
           <Tag color="green">{stockStatus.statusText}</Tag>
         ) : (
           <Tag color="red">{stockStatus.statusText}</Tag>
-        )
+        );
       },
     },
     {
@@ -246,7 +239,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
       key: 'note',
       ellipsis: true,
     },
-  ]
+  ];
 
   return (
     <Modal
@@ -301,9 +294,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
           >
             <Descriptions size="small" column={2} style={{ marginBottom: 16 }}>
               {recipe.applicableSpecs && (
-                <Descriptions.Item label="适用规格">
-                  {recipe.applicableSpecs}
-                </Descriptions.Item>
+                <Descriptions.Item label="适用规格">{recipe.applicableSpecs}</Descriptions.Item>
               )}
               {recipe.description && (
                 <Descriptions.Item label="描述" span={2}>
@@ -352,7 +343,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
           <Form.Item
             label="适用规格"
             name="applicableSpecs"
-            tooltip="可选，JSON格式存储规格组合，例如: {&quot;SIZE&quot;: &quot;LARGE&quot;}"
+            tooltip='可选，JSON格式存储规格组合，例如: {"SIZE": "LARGE"}'
           >
             <Input placeholder='例如: {"SIZE": "LARGE", "TEMPERATURE": "HOT"}' />
           </Form.Item>
@@ -371,7 +362,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
               {
                 validator: async (_, ingredients) => {
                   if (!ingredients || ingredients.length < 1) {
-                    return Promise.reject(new Error('至少添加一种原料'))
+                    return Promise.reject(new Error('至少添加一种原料'));
                   }
                 },
               },
@@ -391,11 +382,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
                   </Button>
                 </div>
                 {fields.map(({ key, name, ...restField }) => (
-                  <Space
-                    key={key}
-                    style={{ display: 'flex', marginBottom: 8 }}
-                    align="baseline"
-                  >
+                  <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
                     <Form.Item
                       {...restField}
                       name={[name, 'skuId']}
@@ -456,7 +443,7 @@ export const RecipeConfigModal: React.FC<RecipeConfigModalProps> = ({
         </Form>
       </Modal>
     </Modal>
-  )
-}
+  );
+};
 
-export default RecipeConfigModal
+export default RecipeConfigModal;

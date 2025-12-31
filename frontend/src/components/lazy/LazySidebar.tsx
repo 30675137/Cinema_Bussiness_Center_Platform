@@ -14,14 +14,7 @@ import { createLazyComponent, LazyConfigPresets } from './LazyWrapper';
  * />
  * ```
  */
-export default createLazyComponent(
-  () => import('../layout/Sidebar'),
-  LazyConfigPresets.navigation
-);
+export default createLazyComponent(() => import('../layout/Sidebar'), LazyConfigPresets.navigation);
 
 // 重导出类型
-export type {
-  SidebarProps,
-  MenuItemType,
-  SidebarTheme,
-} from '../layout/Sidebar/types';
+export type { SidebarProps, MenuItemType, SidebarTheme } from '../layout/Sidebar/types';

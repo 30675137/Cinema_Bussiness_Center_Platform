@@ -2,7 +2,13 @@
  * 活动类型管理 - API 服务
  */
 
-import type { ActivityType, ActivityTypeListResponse, ActivityTypeQueryParams, CreateActivityTypePayload, UpdateActivityTypePayload } from '../types/activity-type.types';
+import type {
+  ActivityType,
+  ActivityTypeListResponse,
+  ActivityTypeQueryParams,
+  CreateActivityTypePayload,
+  UpdateActivityTypePayload,
+} from '../types/activity-type.types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
@@ -93,7 +99,9 @@ export async function getActivityType(id: string): Promise<ActivityType> {
 /**
  * 创建活动类型
  */
-export async function createActivityType(payload: CreateActivityTypePayload): Promise<ActivityType> {
+export async function createActivityType(
+  payload: CreateActivityTypePayload
+): Promise<ActivityType> {
   const url = `${API_BASE_URL}/api/activity-types`;
 
   const response = await fetch(url, {
@@ -126,7 +134,10 @@ export async function createActivityType(payload: CreateActivityTypePayload): Pr
 /**
  * 更新活动类型
  */
-export async function updateActivityType(id: string, payload: UpdateActivityTypePayload): Promise<ActivityType> {
+export async function updateActivityType(
+  id: string,
+  payload: UpdateActivityTypePayload
+): Promise<ActivityType> {
   const url = `${API_BASE_URL}/api/activity-types/${id}`;
 
   const response = await fetch(url, {
@@ -187,7 +198,10 @@ export async function deleteActivityType(id: string): Promise<ActivityType> {
 /**
  * 切换活动类型状态（启用/停用）
  */
-export async function toggleActivityTypeStatus(id: string, status: 'ENABLED' | 'DISABLED'): Promise<ActivityType> {
+export async function toggleActivityTypeStatus(
+  id: string,
+  status: 'ENABLED' | 'DISABLED'
+): Promise<ActivityType> {
   const url = `${API_BASE_URL}/api/activity-types/${id}/status`;
 
   const response = await fetch(url, {
@@ -214,4 +228,3 @@ export async function toggleActivityTypeStatus(id: string, status: 'ENABLED' | '
   const result = await response.json();
   return result.data;
 }
-

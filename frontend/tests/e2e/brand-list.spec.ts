@@ -47,14 +47,30 @@ test.describe('品牌列表页面加载', () => {
 
   test('应该显示正确的表头', async ({ page }) => {
     // 检查表格表头
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-name"]')).toContainText('品牌名称');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-english-name"]')).toContainText('英文名');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-code"]')).toContainText('品牌编码');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-type"]')).toContainText('品牌类型');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-primary-category"]')).toContainText('主营类目');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-status"]')).toContainText('状态');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-created-time"]')).toContainText('创建时间');
-    await expect(page.locator('[data-testid="brand-table"] thead th[data-testid="header-actions"]')).toContainText('操作');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-name"]')
+    ).toContainText('品牌名称');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-english-name"]')
+    ).toContainText('英文名');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-code"]')
+    ).toContainText('品牌编码');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-brand-type"]')
+    ).toContainText('品牌类型');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-primary-category"]')
+    ).toContainText('主营类目');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-status"]')
+    ).toContainText('状态');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-created-time"]')
+    ).toContainText('创建时间');
+    await expect(
+      page.locator('[data-testid="brand-table"] thead th[data-testid="header-actions"]')
+    ).toContainText('操作');
   });
 
   test('应该显示分页控件', async ({ page }) => {
@@ -73,7 +89,10 @@ test.describe('品牌列表页面加载', () => {
   test('应该显示筛选控件', async ({ page }) => {
     // 检查搜索输入框
     await expect(page.locator('[data-testid="keyword-input"]')).toBeVisible();
-    await expect(page.locator('[data-testid="keyword-input"]')).toHaveAttribute('placeholder', '输入品牌名称 / 英文名 / 编码');
+    await expect(page.locator('[data-testid="keyword-input"]')).toHaveAttribute(
+      'placeholder',
+      '输入品牌名称 / 英文名 / 编码'
+    );
 
     // 检查品牌类型筛选
     await expect(page.locator('[data-testid="brand-type-select"]')).toBeVisible();

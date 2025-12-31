@@ -1,25 +1,14 @@
 /**
  * P004-inventory-adjustment: 审批列表组件
- * 
+ *
  * 显示库存调整记录列表，支持状态筛选和审批通过/拒绝操作。
  * 实现 T047 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
 import React, { useState } from 'react';
-import {
-  Table,
-  Button,
-  Space,
-  Typography,
-  Modal,
-  Input,
-  Empty,
-  Spin,
-  Tooltip,
-  Card,
-} from 'antd';
+import { Table, Button, Space, Typography, Modal, Input, Empty, Spin, Tooltip, Card } from 'antd';
 import type { TableProps } from 'antd';
 import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -51,7 +40,7 @@ interface ApprovalModalData {
 
 /**
  * 审批列表组件
- * 
+ *
  * @example
  * ```tsx
  * <ApprovalList statusFilter="pending_approval" onViewDetail={(adj) => setSelectedAdjustment(adj)} />
@@ -92,7 +81,7 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
   // 确认审批
   const handleConfirmApproval = () => {
     if (!modalData) return;
-    
+
     processApproval({
       adjustmentId: modalData.adjustment.id,
       action: modalData.action,
@@ -116,7 +105,9 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
       render: (_, record) => (
         <div>
           <div>{record.sku?.name || '-'}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>{record.sku?.code}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {record.sku?.code}
+          </Text>
         </div>
       ),
     },
@@ -132,7 +123,20 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
           damage: { text: '报损', color: 'red' },
         };
         const config = typeMap[type] || { text: type, color: 'default' };
-        return <Text style={{ color: config.color === 'green' ? '#52c41a' : config.color === 'orange' ? '#fa8c16' : '#ff4d4f' }}>{config.text}</Text>;
+        return (
+          <Text
+            style={{
+              color:
+                config.color === 'green'
+                  ? '#52c41a'
+                  : config.color === 'orange'
+                    ? '#fa8c16'
+                    : '#ff4d4f',
+            }}
+          >
+            {config.text}
+          </Text>
+        );
       },
     },
     {
@@ -143,7 +147,8 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
       align: 'right',
       render: (qty: number, record) => (
         <Text strong>
-          {record.adjustmentType === 'surplus' ? '+' : '-'}{qty}
+          {record.adjustmentType === 'surplus' ? '+' : '-'}
+          {qty}
         </Text>
       ),
     },
@@ -252,10 +257,10 @@ export const ApprovalList: React.FC<ApprovalListProps> = ({
       <Card
         title={
           <Space>
-            <Title level={5} style={{ margin: 0 }}>{getListTitle()}</Title>
-            {data?.total !== undefined && (
-              <Text type="secondary">({getCountLabel()})</Text>
-            )}
+            <Title level={5} style={{ margin: 0 }}>
+              {getListTitle()}
+            </Title>
+            {data?.total !== undefined && <Text type="secondary">({getCountLabel()})</Text>}
           </Space>
         }
       >

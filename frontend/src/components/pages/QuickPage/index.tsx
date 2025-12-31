@@ -40,23 +40,23 @@ const statusConfig = {
   planning: {
     text: '规划中',
     color: 'default',
-    description: '该功能正在需求分析和规划阶段'
+    description: '该功能正在需求分析和规划阶段',
   },
   developing: {
     text: '开发中',
     color: 'processing',
-    description: '该功能正在开发实现中'
+    description: '该功能正在开发实现中',
   },
   testing: {
     text: '测试中',
     color: 'warning',
-    description: '该功能正在测试验证阶段'
+    description: '该功能正在测试验证阶段',
   },
   completed: {
     text: '已完成',
     color: 'success',
-    description: '该功能已经开发完成'
-  }
+    description: '该功能已经开发完成',
+  },
 };
 
 /**
@@ -66,7 +66,7 @@ const priorityConfig = {
   low: { text: '低', color: 'green' },
   medium: { text: '中', color: 'blue' },
   high: { text: '高', color: 'orange' },
-  urgent: { text: '紧急', color: 'red' }
+  urgent: { text: '紧急', color: 'red' },
 };
 
 /**
@@ -97,9 +97,7 @@ const QuickPage: React.FC<QuickPageProps> = ({
         <div className="quick-page-header">
           <SettingOutlined className="quick-page-icon" />
           <Title level={4}>{featureName}</Title>
-          <Text type="secondary">
-            {featureDescription || `这是${featureName}功能的基础页面`}
-          </Text>
+          <Text type="secondary">{featureDescription || `这是${featureName}功能的基础页面`}</Text>
         </div>
 
         {showDetails && (
@@ -107,16 +105,12 @@ const QuickPage: React.FC<QuickPageProps> = ({
             <Card size="small" title="功能信息" className="details-card">
               <div className="detail-item">
                 <Text strong>状态：</Text>
-                <span className={`status-badge status-${featureStatus}`}>
-                  {status.text}
-                </span>
+                <span className={`status-badge status-${featureStatus}`}>{status.text}</span>
               </div>
 
               <div className="detail-item">
                 <Text strong>优先级：</Text>
-                <span className={`priority-badge priority-${priority}`}>
-                  {priorityInfo.text}
-                </span>
+                <span className={`priority-badge priority-${priority}`}>{priorityInfo.text}</span>
               </div>
 
               {owner && (

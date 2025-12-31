@@ -8,12 +8,12 @@ import { OrderStatus, OrderPriority } from './purchase';
  * 收货单状态
  */
 export enum ReceiptStatus {
-  DRAFT = 'draft',                    // 草稿
-  PENDING = 'pending',                // 待收货
+  DRAFT = 'draft', // 草稿
+  PENDING = 'pending', // 待收货
   PARTIAL_RECEIVED = 'partial_received', // 部分收货
-  COMPLETED = 'completed',            // 已完成
-  CANCELLED = 'cancelled',            // 已取消
-  RETURNED = 'returned'               // 已退货
+  COMPLETED = 'completed', // 已完成
+  CANCELLED = 'cancelled', // 已取消
+  RETURNED = 'returned', // 已退货
 }
 
 /**
@@ -23,17 +23,17 @@ export enum ReceiptPriority {
   LOW = 'low',
   NORMAL = 'normal',
   HIGH = 'high',
-  URGENT = 'urgent'
+  URGENT = 'urgent',
 }
 
 /**
  * 质检状态
  */
 export enum QualityStatus {
-  PENDING = 'pending',     // 待质检
-  PASSED = 'passed',       // 质检合格
-  FAILED = 'failed',       // 质检不合格
-  EXCEPTION = 'exception'  // 质检异常
+  PENDING = 'pending', // 待质检
+  PASSED = 'passed', // 质检合格
+  FAILED = 'failed', // 质检不合格
+  EXCEPTION = 'exception', // 质检异常
 }
 
 /**
@@ -46,21 +46,21 @@ export interface ReceiptItem {
   productName: string;
   specification?: string;
   unit: string;
-  orderedQuantity: number;      // 订单数量
-  receivedQuantity: number;     // 实收数量
-  qualifiedQuantity: number;    // 合格数量
-  defectiveQuantity: number;    // 次品数量
+  orderedQuantity: number; // 订单数量
+  receivedQuantity: number; // 实收数量
+  qualifiedQuantity: number; // 合格数量
+  defectiveQuantity: number; // 次品数量
   unitPrice: number;
   totalPrice: number;
-  batchNumber?: string;         // 批次号
-  productionDate?: string;      // 生产日期
-  expiryDate?: string;          // 过期日期
-  warehouseLocation?: string;   // 仓库位置
+  batchNumber?: string; // 批次号
+  productionDate?: string; // 生产日期
+  expiryDate?: string; // 过期日期
+  warehouseLocation?: string; // 仓库位置
   qualityStatus: QualityStatus;
-  qualityResult?: string;       // 质检结果
-  images?: string[];            // 质检图片
-  operator?: string;            // 操作员
-  checkTime?: string;           // 检验时间
+  qualityResult?: string; // 质检结果
+  images?: string[]; // 质检图片
+  operator?: string; // 操作员
+  checkTime?: string; // 检验时间
   remarks?: string;
 }
 
@@ -91,38 +91,38 @@ export interface ReceiptWarehouse {
  */
 export interface Receipt {
   id: string;
-  receiptNumber: string;          // 收货单号
-  relatedOrderNumber?: string;    // 关联订单号
+  receiptNumber: string; // 收货单号
+  relatedOrderNumber?: string; // 关联订单号
   status: ReceiptStatus;
   priority: ReceiptPriority;
   supplier: ReceiptSupplier;
   warehouse: ReceiptWarehouse;
-  receiptDate: string;            // 收货日期
-  expectedDate?: string;          // 预期到货日期
-  operator: string;               // 收货员
-  reviewer?: string;              // 复核人
-  approvalUser?: string;          // 审批人
+  receiptDate: string; // 收货日期
+  expectedDate?: string; // 预期到货日期
+  operator: string; // 收货员
+  reviewer?: string; // 复核人
+  approvalUser?: string; // 审批人
 
   // 数量统计
-  totalItems: number;             // 总行数
-  totalOrderedQuantity: number;   // 总订单数量
-  totalReceivedQuantity: number;  // 总实收数量
+  totalItems: number; // 总行数
+  totalOrderedQuantity: number; // 总订单数量
+  totalReceivedQuantity: number; // 总实收数量
   totalQualifiedQuantity: number; // 总合格数量
   totalDefectiveQuantity: number; // 总次品数量
 
   // 金额统计
-  totalAmount: number;            // 总金额
-  taxAmount: number;              // 税额
-  totalAmountWithTax: number;     // 含税总金额
+  totalAmount: number; // 总金额
+  taxAmount: number; // 税额
+  totalAmountWithTax: number; // 含税总金额
 
   items: ReceiptItem[];
 
   // 附件信息
   attachments?: {
-    deliveryNote?: string[];     // 送货单
-    qualityReport?: string[];    // 质检报告
-    images?: string[];           // 现场照片
-    other?: string[];            // 其他附件
+    deliveryNote?: string[]; // 送货单
+    qualityReport?: string[]; // 质检报告
+    images?: string[]; // 现场照片
+    other?: string[]; // 其他附件
   };
 
   remarks?: string;
@@ -141,7 +141,10 @@ export interface CreateReceiptParams {
   warehouseId: string;
   expectedDate?: string;
   priority?: ReceiptPriority;
-  items: Omit<ReceiptItem, 'id' | 'qualityStatus' | 'receivedQuantity' | 'qualifiedQuantity' | 'defectiveQuantity'>[];
+  items: Omit<
+    ReceiptItem,
+    'id' | 'qualityStatus' | 'receivedQuantity' | 'qualifiedQuantity' | 'defectiveQuantity'
+  >[];
   remarks?: string;
 }
 

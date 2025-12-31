@@ -13,12 +13,12 @@ const MULTI_ROLE_USERS = [
     roles: ['超级管理员', '部门管理员', '业务操作员'],
     expectedMenuCount: 5,
     expectedMenus: [
-      '基础设置与主数据',      // 超级管理员权限
-      '商品管理',              // 超级管理员 + 部门管理员 + 业务操作员权限
+      '基础设置与主数据', // 超级管理员权限
+      '商品管理', // 超级管理员 + 部门管理员 + 业务操作员权限
       '库存 & 仓店库存管理', // 超级管理员 + 部门管理员 + 业务操作员权限
-      '价格体系管理',          // 超级管理员 + 部门管理员权限
-      '运营 & 报表 / 指标看板'  // 超级管理员权限
-    ]
+      '价格体系管理', // 超级管理员 + 部门管理员权限
+      '运营 & 报表 / 指标看板', // 超级管理员权限
+    ],
   },
   {
     username: 'multi-role-operator',
@@ -26,10 +26,10 @@ const MULTI_ROLE_USERS = [
     roles: ['业务操作员', '审核员'],
     expectedMenuCount: 3,
     expectedMenus: [
-      '商品管理',              // 业务操作员权限
+      '商品管理', // 业务操作员权限
       '库存 & 仓店库存管理', // 业务操作员权限
-      '运营 & 报表 / 指标看板'  // 审核员权限
-    ]
+      '运营 & 报表 / 指标看板', // 审核员权限
+    ],
   },
   {
     username: 'multi-role-manager',
@@ -37,12 +37,12 @@ const MULTI_ROLE_USERS = [
     roles: ['部门管理员', '审核员'],
     expectedMenuCount: 4,
     expectedMenus: [
-      '商品管理',              // 部门管理员权限
+      '商品管理', // 部门管理员权限
       '库存 & 仓店库存管理', // 部门管理员权限
-      '价格体系管理',          // 部门管理员权限
-      '运营 & 报表 / 指标看板'  // 审核员权限
-    ]
-  }
+      '价格体系管理', // 部门管理员权限
+      '运营 & 报表 / 指标看板', // 审核员权限
+    ],
+  },
 ];
 
 // 权限组合测试数据
@@ -52,39 +52,39 @@ const PERMISSION_COMBINATIONS = [
     user: 'admin-operator-combo',
     password: 'admin-operator-combo',
     uniquePermissions: [
-      'admin.access',      // 超级管理员特有
-      'product.write',     // 两者都有，但应只显示一次
-      'inventory.read',    // 两者都有
-      'product.read',      // 两者都有
-      'pricing.write'      // 超级管理员特有
+      'admin.access', // 超级管理员特有
+      'product.write', // 两者都有，但应只显示一次
+      'inventory.read', // 两者都有
+      'product.read', // 两者都有
+      'pricing.write', // 超级管理员特有
     ],
     accessibleFeatures: [
-      '基础设置',           // 超级管理员权限
-      '商品编辑',           // 超级管理员权限
-      '库存查看',           // 两者权限
-      '价格设置',           // 超级管理员权限
-      '业务操作',           // 业务操作员权限
-    ]
+      '基础设置', // 超级管理员权限
+      '商品编辑', // 超级管理员权限
+      '库存查看', // 两者权限
+      '价格设置', // 超级管理员权限
+      '业务操作', // 业务操作员权限
+    ],
   },
   {
     combination: '部门管理员 + 审核员',
     user: 'manager-auditor-combo',
     password: 'manager-auditor-combo',
     uniquePermissions: [
-      'product.write',     // 部门管理员权限
-      'inventory.write',    // 部门管理员权限
-      'pricing.read',       // 部门管理员权限
-      'audit.review',      // 审核员特有
-      'report.analyze'      // 审核员权限
+      'product.write', // 部门管理员权限
+      'inventory.write', // 部门管理员权限
+      'pricing.read', // 部门管理员权限
+      'audit.review', // 审核员特有
+      'report.analyze', // 审核员权限
     ],
     accessibleFeatures: [
-      '商品管理',           // 部门管理员权限
-      '库存管理',           // 部门管理员权限
-      '价格管理',           // 部门管理员权限
-      '报表审核',           // 审核员权限
-      '数据分析',           // 审核员权限
-    ]
-  }
+      '商品管理', // 部门管理员权限
+      '库存管理', // 部门管理员权限
+      '价格管理', // 部门管理员权限
+      '报表审核', // 审核员权限
+      '数据分析', // 审核员权限
+    ],
+  },
 ];
 
 test.describe('多重角色权限并集测试', () => {
@@ -137,12 +137,12 @@ test.describe('多重角色权限并集测试', () => {
 
       // 监控权限检查API调用
       const permissionChecks: any[] = [];
-      page.on('response', response => {
+      page.on('response', (response) => {
         if (response.url().includes('/permissions/check')) {
           permissionChecks.push({
             status: response.status(),
             url: response.url(),
-            body: response.body()
+            body: response.body(),
           });
         }
       });
@@ -199,12 +199,14 @@ test.describe('多重角色权限并集测试', () => {
     // 模拟角色更新（添加管理员权限）
     await page.evaluate(() => {
       // 模拟添加管理员角色
-      window.dispatchEvent(new CustomEvent('roles-updated', {
-        detail: {
-          addedRoles: ['超级管理员'],
-          removedRoles: []
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('roles-updated', {
+          detail: {
+            addedRoles: ['超级管理员'],
+            removedRoles: [],
+          },
+        })
+      );
     });
 
     // 等待UI更新
@@ -242,12 +244,14 @@ test.describe('多重角色权限并集测试', () => {
     // 模拟角色移除（移除管理员权限，保留基础权限）
     await page.evaluate(() => {
       // 模拟移除管理员角色
-      window.dispatchEvent(new CustomEvent('roles-updated', {
-        detail: {
-          addedRoles: [],
-          removedRoles: ['超级管理员']
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('roles-updated', {
+          detail: {
+            addedRoles: [],
+            removedRoles: ['超级管理员'],
+          },
+        })
+      );
     });
 
     // 等待UI更新
@@ -304,12 +308,14 @@ test.describe('多重角色权限并集测试', () => {
     // 模拟临时权限授予
     await page.evaluate(() => {
       // 模拟临时授予价格管理权限
-      window.dispatchEvent(new CustomEvent('temporary-permission-granted', {
-        detail: {
-          permissions: ['pricing.read', 'pricing.write'],
-          duration: 3600000 // 1小时
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('temporary-permission-granted', {
+          detail: {
+            permissions: ['pricing.read', 'pricing.write'],
+            duration: 3600000, // 1小时
+          },
+        })
+      );
     });
 
     // 等待UI更新
@@ -334,11 +340,13 @@ test.describe('多重角色权限并集测试', () => {
     // 模拟临时权限撤销
     await page.evaluate(() => {
       // 模拟撤销临时权限
-      window.dispatchEvent(new CustomEvent('temporary-permission-revoked', {
-        detail: {
-          permissions: ['pricing.read', 'pricing.write']
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('temporary-permission-revoked', {
+          detail: {
+            permissions: ['pricing.read', 'pricing.write'],
+          },
+        })
+      );
     });
 
     // 等待UI更新
@@ -359,13 +367,13 @@ test.describe('多重角色权限并集测试', () => {
 // 辅助函数：根据功能名称获取菜单名称
 function getFeatureMenuName(feature: string): string | null {
   const featureToMenu: Record<string, string> = {
-    '基础设置': '基础设置与主数据',
-    '商品编辑': '商品管理',
-    '库存查看': '库存 & 仓店库存管理',
-    '价格设置': '价格体系管理',
-    '业务操作': '商品管理',
-    '报表审核': '运营 & 报表 / 指标看板',
-    '数据分析': '运营 & 报表 / 指标看板'
+    基础设置: '基础设置与主数据',
+    商品编辑: '商品管理',
+    库存查看: '库存 & 仓店库存管理',
+    价格设置: '价格体系管理',
+    业务操作: '商品管理',
+    报表审核: '运营 & 报表 / 指标看板',
+    数据分析: '运营 & 报表 / 指标看板',
   };
 
   return featureToMenu[feature] || null;

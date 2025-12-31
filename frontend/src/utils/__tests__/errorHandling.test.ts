@@ -3,7 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ErrorHandler, handleError, handleNetworkError, handleBusinessError } from '../errorHandling';
+import {
+  ErrorHandler,
+  handleError,
+  handleNetworkError,
+  handleBusinessError,
+} from '../errorHandling';
 
 describe('ErrorHandler', () => {
   let errorHandler: ErrorHandler;
@@ -52,7 +57,7 @@ describe('ErrorHandler', () => {
     it('should handle 401 error', () => {
       const error = {
         response: { status: 401 },
-        message: 'Unauthorized'
+        message: 'Unauthorized',
       } as any;
 
       expect(() => errorHandler.handleNetworkError(error)).not.toThrow();
@@ -61,7 +66,7 @@ describe('ErrorHandler', () => {
     it('should handle 403 error', () => {
       const error = {
         response: { status: 403 },
-        message: 'Forbidden'
+        message: 'Forbidden',
       } as any;
 
       expect(() => errorHandler.handleNetworkError(error)).not.toThrow();
@@ -69,7 +74,7 @@ describe('ErrorHandler', () => {
 
     it('should handle network connection error', () => {
       const error = {
-        message: 'fetch failed'
+        message: 'fetch failed',
       } as any;
 
       expect(() => errorHandler.handleNetworkError(error)).not.toThrow();
@@ -96,7 +101,7 @@ describe('ErrorHandler', () => {
     it('should handle validation errors', () => {
       const errors = {
         name: 'Name is required',
-        email: 'Invalid email format'
+        email: 'Invalid email format',
       };
 
       expect(() => errorHandler.handleValidationError(errors)).not.toThrow();
@@ -155,7 +160,7 @@ describe('ErrorHandler', () => {
     it('should allow configuration updates', () => {
       const newConfig = {
         enableLogging: false,
-        maxErrorCount: 3
+        maxErrorCount: 3,
       };
 
       expect(() => errorHandler.configure(newConfig)).not.toThrow();
@@ -181,7 +186,7 @@ describe('Convenience Functions', () => {
     it('should call error manager handle network error', () => {
       const error = {
         response: { status: 500 },
-        message: 'Server error'
+        message: 'Server error',
       } as any;
 
       expect(() => handleNetworkError(error)).not.toThrow();

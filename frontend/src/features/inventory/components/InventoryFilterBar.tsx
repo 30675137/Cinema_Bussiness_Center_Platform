@@ -20,43 +20,51 @@ export interface InventoryFilterBarProps {
 /**
  * 库存筛选栏组件
  * 提供门店、库存状态、商品分类的多维度筛选功能。
- * 
+ *
  * @example
  * ```tsx
  * <InventoryFilterBar onFilterChange={handleFilterChange} />
  * ```
- * 
+ *
  * @since P003-inventory-query US3
  */
-export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({
-  onFilterChange,
-}) => {
+export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({ onFilterChange }) => {
   // 从 Zustand store 获取筛选状态
-  const { storeId, statuses, categoryId, setStoreId, setStatuses, setCategoryId, resetFilters } = useFilterStore();
+  const { storeId, statuses, categoryId, setStoreId, setStatuses, setCategoryId, resetFilters } =
+    useFilterStore();
 
   // 获取分类列表
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
-  
+
   // 获取可访问门店列表
   const { data: storesData, isLoading: storesLoading } = useAccessibleStores();
 
   // 门店变化处理
-  const handleStoreChange = useCallback((value: string | undefined) => {
-    setStoreId(value);
-    onFilterChange?.({ storeId: value, statuses, categoryId });
-  }, [setStoreId, onFilterChange, statuses, categoryId]);
+  const handleStoreChange = useCallback(
+    (value: string | undefined) => {
+      setStoreId(value);
+      onFilterChange?.({ storeId: value, statuses, categoryId });
+    },
+    [setStoreId, onFilterChange, statuses, categoryId]
+  );
 
   // 状态变化处理
-  const handleStatusChange = useCallback((value: InventoryStatus[]) => {
-    setStatuses(value);
-    onFilterChange?.({ storeId, statuses: value, categoryId });
-  }, [setStatuses, onFilterChange, storeId, categoryId]);
+  const handleStatusChange = useCallback(
+    (value: InventoryStatus[]) => {
+      setStatuses(value);
+      onFilterChange?.({ storeId, statuses: value, categoryId });
+    },
+    [setStatuses, onFilterChange, storeId, categoryId]
+  );
 
   // 分类变化处理
-  const handleCategoryChange = useCallback((value: string | undefined) => {
-    setCategoryId(value);
-    onFilterChange?.({ storeId, statuses, categoryId: value });
-  }, [setCategoryId, onFilterChange, storeId, statuses]);
+  const handleCategoryChange = useCallback(
+    (value: string | undefined) => {
+      setCategoryId(value);
+      onFilterChange?.({ storeId, statuses, categoryId: value });
+    },
+    [setCategoryId, onFilterChange, storeId, statuses]
+  );
 
   // 重置筛选
   const handleReset = useCallback(() => {
@@ -147,11 +155,7 @@ export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({
       />
 
       {/* 重置按钮 */}
-      <Button
-        icon={<ReloadOutlined />}
-        onClick={handleReset}
-        data-testid="reset-filter"
-      >
+      <Button icon={<ReloadOutlined />} onClick={handleReset} data-testid="reset-filter">
         重置
       </Button>
     </Space>

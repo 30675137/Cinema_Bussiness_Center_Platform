@@ -38,10 +38,18 @@ export interface ScreenSize {
  */
 export const useResponsive = (): ScreenSize => {
   const xs = useMediaQuery(`(max-width: ${BREAKPOINTS.xs}px)`);
-  const sm = useMediaQuery(`(min-width: ${BREAKPOINTS.sm}px) and (max-width: ${BREAKPOINTS.md - 1}px)`);
-  const md = useMediaQuery(`(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`);
-  const lg = useMediaQuery(`(min-width: ${BREAKPOINTS.lg}px) and (max-width: ${BREAKPOINTS.xl - 1}px)`);
-  const xl = useMediaQuery(`(min-width: ${BREAKPOINTS.xl}px) and (max-width: ${BREAKPOINTS.xxl - 1}px)`);
+  const sm = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.sm}px) and (max-width: ${BREAKPOINTS.md - 1}px)`
+  );
+  const md = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`
+  );
+  const lg = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.lg}px) and (max-width: ${BREAKPOINTS.xl - 1}px)`
+  );
+  const xl = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.xl}px) and (max-width: ${BREAKPOINTS.xxl - 1}px)`
+  );
   const xxl = useMediaQuery(`(min-width: ${BREAKPOINTS.xxl}px)`);
 
   const [current, setCurrent] = useState<Breakpoint>('md');
@@ -76,16 +84,16 @@ export const useResponsive = (): ScreenSize => {
  */
 export const useBreakpointValue = <T>(values: Partial<Record<Breakpoint, T>>): T | undefined => {
   const screen = useResponsive();
-  
+
   // 从大到小查找匹配的断点值
   const breakpoints: Breakpoint[] = ['xxl', 'xl', 'lg', 'md', 'sm', 'xs'];
-  
+
   for (const breakpoint of breakpoints) {
     if (screen[breakpoint] && values[breakpoint] !== undefined) {
       return values[breakpoint];
     }
   }
-  
+
   return undefined;
 };
 
@@ -94,7 +102,7 @@ export const useBreakpointValue = <T>(values: Partial<Record<Breakpoint, T>>): T
  */
 export const useResponsivePageSize = (): number => {
   const screen = useResponsive();
-  
+
   if (screen.isMobile) return 10;
   if (screen.isTablet) return 15;
   return 20;
@@ -122,7 +130,9 @@ export const useResponsiveColumns = (columnMap: Partial<Record<Breakpoint, numbe
 /**
  * 获取响应式的栅格间距
  */
-export const useResponsiveGutter = (gutterMap: Partial<Record<Breakpoint, [number, number]>>): [number, number] => {
+export const useResponsiveGutter = (
+  gutterMap: Partial<Record<Breakpoint, [number, number]>>
+): [number, number] => {
   return useBreakpointValue(gutterMap) || [16, 16];
 };
 
@@ -228,9 +238,9 @@ export const useIsTouchDevice = (): boolean => {
     const checkTouch = () => {
       setIsTouchDevice(
         'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        // @ts-ignore
-        navigator.msMaxTouchPoints > 0
+          navigator.maxTouchPoints > 0 ||
+          // @ts-ignore
+          navigator.msMaxTouchPoints > 0
       );
     };
 

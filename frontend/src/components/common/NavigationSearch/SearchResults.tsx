@@ -11,7 +11,7 @@ import {
   StarOutlined,
   StarFilled,
   CloseOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import { SearchResult, MenuItem } from '@/types/navigation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -174,7 +174,7 @@ const HistoryItem: React.FC<{
           icon={<CloseOutlined />}
           onClick={handleRemove}
           className="history-remove-btn"
-        />
+        />,
       ]}
     >
       <List.Item.Meta

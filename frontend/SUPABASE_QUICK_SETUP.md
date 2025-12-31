@@ -8,10 +8,12 @@ cd frontend
 ```
 
 按提示输入：
+
 1. **SUPABASE_URL**: `https://xxxxx.supabase.co`
 2. **SUPABASE_SERVICE_ROLE_KEY**: `eyJhbGciOiJIUz...`
 
 脚本会自动：
+
 - ✅ 创建 `.env.test` 文件
 - ✅ 安装必要的依赖
 - ✅ 验证数据库连接
@@ -24,6 +26,7 @@ cd frontend
 ### 步骤 1: 获取凭证
 
 访问 https://app.supabase.com
+
 1. 选择项目
 2. 进入 **Settings** > **API**
 3. 复制 **Project URL**

@@ -1088,7 +1088,7 @@ export const Selected = {
 
 ### 1. JSDoc注释
 
-```typescript
+````typescript
 /**
  * 商品卡片组件
  *
@@ -1136,7 +1136,7 @@ export interface ProductCardProps {
   /** 测试ID，用于测试定位 */
   testId?: string;
 }
-```
+````
 
 ### 2. Storybook文档
 

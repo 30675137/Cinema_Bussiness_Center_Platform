@@ -16,11 +16,11 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 限制 |
-|--------|------|------|------|------|
-| file | File | 是 | 上传的文件 | 最大10MB |
-| type | string | 否 | 文件类型 | image/document/video |
-| category | string | 否 | 文件分类 | product/avatar/document |
+| 参数名   | 类型   | 必填 | 说明       | 限制                    |
+| -------- | ------ | ---- | ---------- | ----------------------- |
+| file     | File   | 是   | 上传的文件 | 最大10MB                |
+| type     | string | 否   | 文件类型   | image/document/video    |
+| category | string | 否   | 文件分类   | product/avatar/document |
 
 **响应示例**:
 
@@ -46,10 +46,10 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| files | File[] | 是 | 文件数组，最多20个 |
-| type | string | 否 | 文件类型 |
+| 参数名 | 类型   | 必填 | 说明               |
+| ------ | ------ | ---- | ------------------ |
+| files  | File[] | 是   | 文件数组，最多20个 |
+| type   | string | 否   | 文件类型           |
 
 ### 1.3 获取上传进度
 
@@ -67,10 +67,10 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| type | string | 否 | 字典类型 |
-| code | string | 否 | 字典编码 |
+| 参数名 | 类型   | 必填 | 说明     |
+| ------ | ------ | ---- | -------- |
+| type   | string | 否   | 字典类型 |
+| code   | string | 否   | 字典编码 |
 
 **响应示例**:
 
@@ -212,15 +212,15 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| userId | string | 否 | 用户ID |
-| action | string | 否 | 操作类型 |
-| resource | string | 否 | 资源类型 |
-| startTime | string | 否 | 开始时间 |
-| endTime | string | 否 | 结束时间 |
-| page | number | 否 | 页码 |
-| pageSize | number | 否 | 每页数量 |
+| 参数名    | 类型   | 必填 | 说明     |
+| --------- | ------ | ---- | -------- |
+| userId    | string | 否   | 用户ID   |
+| action    | string | 否   | 操作类型 |
+| resource  | string | 否   | 资源类型 |
+| startTime | string | 否   | 开始时间 |
+| endTime   | string | 否   | 结束时间 |
+| page      | number | 否   | 页码     |
+| pageSize  | number | 否   | 每页数量 |
 
 ## 6. 通知消息
 
@@ -232,12 +232,12 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| type | string | 否 | 通知类型 |
-| status | string | 否 | 消息状态 |
-| page | number | 否 | 页码 |
-| pageSize | number | 否 | 每页数量 |
+| 参数名   | 类型   | 必填 | 说明     |
+| -------- | ------ | ---- | -------- |
+| type     | string | 否   | 通知类型 |
+| status   | string | 否   | 消息状态 |
+| page     | number | 否   | 页码     |
+| pageSize | number | 否   | 每页数量 |
 
 ### 6.2 标记已读
 
@@ -261,12 +261,12 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| keyword | string | 是 | 搜索关键词 |
-| type | string | 否 | 搜索类型 |
-| page | number | 否 | 页码 |
-| pageSize | number | 否 | 每页数量 |
+| 参数名   | 类型   | 必填 | 说明       |
+| -------- | ------ | ---- | ---------- |
+| keyword  | string | 是   | 搜索关键词 |
+| type     | string | 否   | 搜索类型   |
+| page     | number | 否   | 页码       |
+| pageSize | number | 否   | 每页数量   |
 
 **响应示例**:
 
@@ -328,15 +328,15 @@
 
 ## 9. 错误码说明
 
-| 错误码 | HTTP状态码 | 说明 |
-|--------|------------|------|
-| UPLOAD_FILE_TOO_LARGE | 413 | 上传文件过大 |
-| UPLOAD_INVALID_FILE_TYPE | 400 | 不支持的文件类型 |
-| AUTH_INVALID_CREDENTIALS | 401 | 用户名或密码错误 |
-| AUTH_TOKEN_EXPIRED | 401 | 访问令牌已过期 |
-| AUTH_INSUFFICIENT_PERMISSION | 403 | 权限不足 |
-| RATE_LIMIT_EXCEEDED | 429 | 请求频率超限 |
-| INTERNAL_SERVER_ERROR | 500 | 服务器内部错误 |
+| 错误码                       | HTTP状态码 | 说明             |
+| ---------------------------- | ---------- | ---------------- |
+| UPLOAD_FILE_TOO_LARGE        | 413        | 上传文件过大     |
+| UPLOAD_INVALID_FILE_TYPE     | 400        | 不支持的文件类型 |
+| AUTH_INVALID_CREDENTIALS     | 401        | 用户名或密码错误 |
+| AUTH_TOKEN_EXPIRED           | 401        | 访问令牌已过期   |
+| AUTH_INSUFFICIENT_PERMISSION | 403        | 权限不足         |
+| RATE_LIMIT_EXCEEDED          | 429        | 请求频率超限     |
+| INTERNAL_SERVER_ERROR        | 500        | 服务器内部错误   |
 
 ## 10. 使用限制
 
@@ -391,8 +391,8 @@ const ws = new WebSocket('ws://localhost:8080/ws?token=your_access_token');
 
 ### 11.4 支持的频道
 
-| 频道名 | 说明 | 数据内容 |
-|--------|------|----------|
-| product_updates | 商品更新通知 | 商品变更信息 |
-| system_notifications | 系统通知 | 系统公告和警告 |
-| user_messages | 用户消息 | 个人消息和提醒 |
+| 频道名               | 说明         | 数据内容       |
+| -------------------- | ------------ | -------------- |
+| product_updates      | 商品更新通知 | 商品变更信息   |
+| system_notifications | 系统通知     | 系统公告和警告 |
+| user_messages        | 用户消息     | 个人消息和提醒 |

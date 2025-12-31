@@ -6,7 +6,7 @@ import {
   EditOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { Product, ProductStatus } from '../../types/product';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -30,8 +30,8 @@ const ProductPanel: React.FC<ProductPanelProps> = ({
   mode,
   product,
   onSave,
-  onCancel
-                                                   }) => {
+  onCancel,
+}) => {
   const [activeTab, setActiveTab] = useState('basic');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -99,10 +99,18 @@ const ProductPanel: React.FC<ProductPanelProps> = ({
   const getStatusTag = (status: ProductStatus) => {
     const statusConfig = {
       [ProductStatus.DRAFT]: { color: 'default', icon: <EditOutlined />, text: '草稿' },
-      [ProductStatus.PENDING_REVIEW]: { color: 'orange', icon: <ClockCircleOutlined />, text: '待审核' },
+      [ProductStatus.PENDING_REVIEW]: {
+        color: 'orange',
+        icon: <ClockCircleOutlined />,
+        text: '待审核',
+      },
       [ProductStatus.PUBLISHED]: { color: 'green', icon: <CheckCircleOutlined />, text: '已发布' },
       [ProductStatus.REJECTED]: { color: 'red', icon: <ExclamationCircleOutlined />, text: '驳回' },
-      [ProductStatus.ABNORMAL]: { color: 'purple', icon: <ExclamationCircleOutlined />, text: '异常' }
+      [ProductStatus.ABNORMAL]: {
+        color: 'purple',
+        icon: <ExclamationCircleOutlined />,
+        text: '异常',
+      },
     };
 
     const config = statusConfig[status] || statusConfig[ProductStatus.DRAFT];
@@ -166,14 +174,13 @@ const ProductPanel: React.FC<ProductPanelProps> = ({
     }
 
     // 草稿状态的商品可以提交审核
-    if (product && product.status === ProductStatus.DRAFT && hasPermission('product:submit_review')) {
+    if (
+      product &&
+      product.status === ProductStatus.DRAFT &&
+      hasPermission('product:submit_review')
+    ) {
       actions.push(
-        <Button
-          key="submit"
-          type="default"
-          loading={submitting}
-          onClick={handleSubmitForReview}
-        >
+        <Button key="submit" type="default" loading={submitting} onClick={handleSubmitForReview}>
           提交审核
         </Button>
       );
@@ -197,11 +204,7 @@ const ProductPanel: React.FC<ProductPanelProps> = ({
       extra={
         <Space>
           {getExtraActions()}
-          <Button
-            type="text"
-            icon={<CloseOutlined />}
-            onClick={handleCancel}
-          />
+          <Button type="text" icon={<CloseOutlined />} onClick={handleCancel} />
         </Space>
       }
       destroyOnClose={true}
@@ -278,9 +281,7 @@ const ProductPanel: React.FC<ProductPanelProps> = ({
             </div>
 
             <Space>
-              <Button onClick={handleCancel}>
-                取消
-              </Button>
+              <Button onClick={handleCancel}>取消</Button>
 
               <Button
                 type="primary"

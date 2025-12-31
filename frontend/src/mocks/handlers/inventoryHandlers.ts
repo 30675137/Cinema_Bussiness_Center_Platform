@@ -1,12 +1,12 @@
 /**
  * P003-inventory-query: 库存查询 MSW 处理器
- * 
+ *
  * 提供库存列表、详情、分类、门店的 Mock 数据。
  */
 
 import { http, HttpResponse, delay } from 'msw';
-import type { 
-  InventoryListResponse, 
+import type {
+  InventoryListResponse,
   InventoryDetailResponse,
   CategoryListResponse,
   StoreListResponse,
@@ -28,9 +28,33 @@ const mockCategories: Category[] = [
     sortOrder: 1,
     status: 'ACTIVE',
     children: [
-      { id: '11111111-1111-1111-1111-111111111112', code: 'CAT001-01', name: '威士忌', parentId: '11111111-1111-1111-1111-111111111111', level: 2, sortOrder: 1, status: 'ACTIVE' },
-      { id: '11111111-1111-1111-1111-111111111113', code: 'CAT001-02', name: '啤酒', parentId: '11111111-1111-1111-1111-111111111111', level: 2, sortOrder: 2, status: 'ACTIVE' },
-      { id: '11111111-1111-1111-1111-111111111114', code: 'CAT001-03', name: '软饮料', parentId: '11111111-1111-1111-1111-111111111111', level: 2, sortOrder: 3, status: 'ACTIVE' },
+      {
+        id: '11111111-1111-1111-1111-111111111112',
+        code: 'CAT001-01',
+        name: '威士忌',
+        parentId: '11111111-1111-1111-1111-111111111111',
+        level: 2,
+        sortOrder: 1,
+        status: 'ACTIVE',
+      },
+      {
+        id: '11111111-1111-1111-1111-111111111113',
+        code: 'CAT001-02',
+        name: '啤酒',
+        parentId: '11111111-1111-1111-1111-111111111111',
+        level: 2,
+        sortOrder: 2,
+        status: 'ACTIVE',
+      },
+      {
+        id: '11111111-1111-1111-1111-111111111114',
+        code: 'CAT001-03',
+        name: '软饮料',
+        parentId: '11111111-1111-1111-1111-111111111111',
+        level: 2,
+        sortOrder: 3,
+        status: 'ACTIVE',
+      },
     ],
   },
   {
@@ -41,8 +65,24 @@ const mockCategories: Category[] = [
     sortOrder: 2,
     status: 'ACTIVE',
     children: [
-      { id: '22222222-2222-2222-2222-222222222223', code: 'CAT002-01', name: '薯片', parentId: '22222222-2222-2222-2222-222222222222', level: 2, sortOrder: 1, status: 'ACTIVE' },
-      { id: '22222222-2222-2222-2222-222222222224', code: 'CAT002-02', name: '坚果', parentId: '22222222-2222-2222-2222-222222222222', level: 2, sortOrder: 2, status: 'ACTIVE' },
+      {
+        id: '22222222-2222-2222-2222-222222222223',
+        code: 'CAT002-01',
+        name: '薯片',
+        parentId: '22222222-2222-2222-2222-222222222222',
+        level: 2,
+        sortOrder: 1,
+        status: 'ACTIVE',
+      },
+      {
+        id: '22222222-2222-2222-2222-222222222224',
+        code: 'CAT002-02',
+        name: '坚果',
+        parentId: '22222222-2222-2222-2222-222222222222',
+        level: 2,
+        sortOrder: 2,
+        status: 'ACTIVE',
+      },
     ],
   },
   {
@@ -75,13 +115,25 @@ function calculateStatus(availableQty: number, safetyStock: number): InventorySt
 // 生成 Mock 库存数据（旧格式，用于 /api/inventory 兼容）
 function generateMockInventory(count: number): StoreInventoryItem[] {
   const skuNames = [
-    '威士忌-单杯', '青岛啤酒', '可口可乐', '矿泉水', '红牛',
-    '薯片-原味', '坚果拼盘', '爆米花-大', '爆米花-小', '热狗',
-    '鸡米花', '薯条', '汉堡套餐', '三明治', '沙拉',
+    '威士忌-单杯',
+    '青岛啤酒',
+    '可口可乐',
+    '矿泉水',
+    '红牛',
+    '薯片-原味',
+    '坚果拼盘',
+    '爆米花-大',
+    '爆米花-小',
+    '热狗',
+    '鸡米花',
+    '薯条',
+    '汉堡套餐',
+    '三明治',
+    '沙拉',
   ];
 
   const units = ['杯', '瓶', '罐', '份', '包', '桶'];
-  
+
   return Array.from({ length: count }, (_, i) => {
     const onHandQty = Math.floor(Math.random() * 200);
     const reservedQty = Math.floor(Math.random() * Math.min(50, onHandQty));
@@ -129,15 +181,15 @@ function generateCurrentInventory(count: number) {
     { code: '6901234567029', name: '威士忌-芝华士', unit: '杯', price: 68 },
     { code: '6901234567030', name: '长岛冰茶', unit: '杯', price: 58 },
   ];
-  
+
   const result: any[] = [];
-  
+
   for (let i = 0; i < count; i++) {
     const storeIndex = i % mockStores.length;
     const skuIndex = i % skuList.length;
     const sku = skuList[skuIndex];
     const store = mockStores[storeIndex];
-    
+
     // 随机生成库存数量，确保有不同状态
     let onHandQty, safetyStock;
     if (i % 10 === 0) {
@@ -157,11 +209,11 @@ function generateCurrentInventory(count: number) {
       onHandQty = Math.floor(Math.random() * 150) + 80;
       safetyStock = Math.floor(Math.random() * 30) + 20;
     }
-    
+
     const reservedQty = Math.floor(Math.random() * Math.min(20, onHandQty));
     const availableQty = onHandQty - reservedQty;
     const inTransitQty = Math.floor(Math.random() * 30);
-    
+
     result.push({
       id: `inv-${String(i + 1).padStart(6, '0')}`,
       skuId: `sku-${String(i + 1).padStart(6, '0')}`,
@@ -187,7 +239,9 @@ function generateCurrentInventory(count: number) {
       inTransitQty,
       damagedQty: Math.random() > 0.9 ? Math.floor(Math.random() * 5) : 0,
       expiredQty: Math.random() > 0.95 ? Math.floor(Math.random() * 3) : 0,
-      lastTransactionTime: new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(),
+      lastTransactionTime: new Date(
+        Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       totalValue: onHandQty * sku.price,
       averageCost: sku.price * 0.7,
       reorderPoint: Math.floor(safetyStock * 1.2),
@@ -197,7 +251,7 @@ function generateCurrentInventory(count: number) {
       lastUpdated: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
     });
   }
-  
+
   return result;
 }
 
@@ -222,17 +276,17 @@ export const inventoryHandlers = [
 
     // 筛选
     if (storeId) {
-      filtered = filtered.filter(item => item.storeId === storeId);
+      filtered = filtered.filter((item) => item.storeId === storeId);
     }
     if (keyword) {
       const kw = keyword.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.sku.name.toLowerCase().includes(kw) ||
-        item.sku.skuCode.toLowerCase().includes(kw)
+      filtered = filtered.filter(
+        (item) =>
+          item.sku.name.toLowerCase().includes(kw) || item.sku.skuCode.toLowerCase().includes(kw)
       );
     }
     if (categoryId) {
-      filtered = filtered.filter(item => item.sku.categoryId === categoryId);
+      filtered = filtered.filter((item) => item.sku.categoryId === categoryId);
     }
 
     // 分页
@@ -267,21 +321,20 @@ export const inventoryHandlers = [
 
     // 筛选
     if (storeId) {
-      filtered = filtered.filter(item => item.storeId === storeId);
+      filtered = filtered.filter((item) => item.storeId === storeId);
     }
     if (keyword) {
       const kw = keyword.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.skuName.toLowerCase().includes(kw) ||
-        item.skuCode.toLowerCase().includes(kw)
+      filtered = filtered.filter(
+        (item) => item.skuName.toLowerCase().includes(kw) || item.skuCode.toLowerCase().includes(kw)
       );
     }
     if (categoryId) {
-      filtered = filtered.filter(item => item.categoryId === categoryId);
+      filtered = filtered.filter((item) => item.categoryId === categoryId);
     }
     if (statuses) {
       const statusList = statuses.split(',') as InventoryStatus[];
-      filtered = filtered.filter(item => statusList.includes(item.inventoryStatus));
+      filtered = filtered.filter((item) => statusList.includes(item.inventoryStatus));
     }
 
     // 分页
@@ -305,7 +358,7 @@ export const inventoryHandlers = [
     await delay(200);
 
     const { id } = params;
-    const item = mockInventoryData.find(inv => inv.id === id);
+    const item = mockInventoryData.find((inv) => inv.id === id);
 
     if (!item) {
       return HttpResponse.json(
@@ -316,7 +369,7 @@ export const inventoryHandlers = [
 
     const detail: StoreInventoryDetail = {
       ...item,
-      storeCode: mockStores.find(s => s.id === item.storeId)?.code,
+      storeCode: mockStores.find((s) => s.id === item.storeId)?.code,
       createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     };
 
@@ -356,7 +409,7 @@ export const inventoryHandlers = [
   http.post('*/inventory/transactions', async ({ request }) => {
     await delay(300);
 
-    const body = await request.json() as {
+    const body = (await request.json()) as {
       skuId: string;
       storeId: string;
       transactionType: string;
@@ -369,20 +422,20 @@ export const inventoryHandlers = [
 
     const transactionId = `txn-${Date.now()}-${Math.random().toString(36).substr(2, 8)}`;
     const isIn = body.transactionType?.includes('_in');
-    
+
     // 查找对应的库存记录（根据 skuId 和 storeId 精确匹配）
     const inventoryIndex = mockCurrentInventoryData.findIndex(
-      item => item.skuId === body.skuId && item.storeId === body.storeId
+      (item) => item.skuId === body.skuId && item.storeId === body.storeId
     );
-    
+
     let stockBefore = 0;
     let stockAfter = 0;
-    let matchingInventory: typeof mockCurrentInventoryData[0] | undefined;
-    
+    let matchingInventory: (typeof mockCurrentInventoryData)[0] | undefined;
+
     if (inventoryIndex !== -1) {
       matchingInventory = mockCurrentInventoryData[inventoryIndex];
       stockBefore = matchingInventory.onHandQty;
-      
+
       // 根据调整类型更新库存
       if (isIn) {
         // 盘盈：增加库存
@@ -391,7 +444,7 @@ export const inventoryHandlers = [
         // 盘亏/报损：减少库存
         stockAfter = Math.max(0, stockBefore - body.quantity);
       }
-      
+
       // 【关键】实际更新 mock 数据中的库存数量
       mockCurrentInventoryData[inventoryIndex] = {
         ...matchingInventory,
@@ -400,7 +453,7 @@ export const inventoryHandlers = [
         lastUpdated: new Date().toISOString(),
         lastTransactionTime: new Date().toISOString(),
       };
-      
+
       console.log('[MSW] 库存更新:', {
         skuCode: matchingInventory.sku.skuCode,
         before: stockBefore,
@@ -410,7 +463,7 @@ export const inventoryHandlers = [
       });
     } else {
       // 如果找不到精确匹配，尝试只匹配 skuId
-      const skuOnlyMatch = mockCurrentInventoryData.find(item => item.skuId === body.skuId);
+      const skuOnlyMatch = mockCurrentInventoryData.find((item) => item.skuId === body.skuId);
       if (skuOnlyMatch) {
         matchingInventory = skuOnlyMatch;
         stockBefore = skuOnlyMatch.onHandQty;
@@ -455,7 +508,11 @@ export const inventoryHandlers = [
 
     // Mock 流水数据
     const transactionTypes = [
-      'purchase_in', 'sale_out', 'adjustment_in', 'adjustment_out', 'damage_out',
+      'purchase_in',
+      'sale_out',
+      'adjustment_in',
+      'adjustment_out',
+      'damage_out',
     ];
 
     const mockTransactions = Array.from({ length: 50 }, (_, i) => {
@@ -475,7 +532,12 @@ export const inventoryHandlers = [
         transactionTime: new Date(Date.now() - i * 3600000).toISOString(),
         createdAt: new Date(Date.now() - i * 3600000).toISOString(),
         store: mockStores[i % mockStores.length],
-        sku: { id: `sku-${(i % 5) + 1}`, skuCode: `SKU00${(i % 5) + 1}`, name: '测试商品', unit: '个' },
+        sku: {
+          id: `sku-${(i % 5) + 1}`,
+          skuCode: `SKU00${(i % 5) + 1}`,
+          name: '测试商品',
+          unit: '个',
+        },
         operator: { id: 'user-001', name: '操作员' },
       };
     });

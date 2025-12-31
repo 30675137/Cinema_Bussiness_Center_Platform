@@ -103,5 +103,3 @@ const DictionaryItemDrawer: React.FC<DictionaryItemDrawerProps> = ({
 };
 
 export default DictionaryItemDrawer;
-
-

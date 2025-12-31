@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Form,
@@ -19,8 +19,8 @@ import {
   message,
   Tooltip,
   Typography,
-  Popconfirm
-} from 'antd'
+  Popconfirm,
+} from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -29,36 +29,41 @@ import {
   InfoCircleOutlined,
   SettingOutlined,
   EyeOutlined,
-  CopyOutlined
-} from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
-import type { AttributeTemplateItem, AttributeOption, AttributeType, AttributeValidation } from '@/types/spu'
-import dayjs from 'dayjs'
+  CopyOutlined,
+} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import type {
+  AttributeTemplateItem,
+  AttributeOption,
+  AttributeType,
+  AttributeValidation,
+} from '@/types/spu';
+import dayjs from 'dayjs';
 
-const { Title, Text } = Typography
-const { Option } = Select
-const { TextArea } = Input
+const { Title, Text } = Typography;
+const { Option } = Select;
+const { TextArea } = Input;
 
 interface AttributeEditorProps {
-  attributes?: AttributeTemplateItem[]
-  onChange?: (attributes: AttributeTemplateItem[]) => void
-  readonly?: boolean
-  showGroup?: boolean
+  attributes?: AttributeTemplateItem[];
+  onChange?: (attributes: AttributeTemplateItem[]) => void;
+  readonly?: boolean;
+  showGroup?: boolean;
 }
 
 const AttributeEditor: React.FC<AttributeEditorProps> = ({
   attributes = [],
   onChange,
   readonly = false,
-  showGroup = true
+  showGroup = true,
 }) => {
-  const [form] = Form.useForm()
-  const [attributeList, setAttributeList] = useState<AttributeTemplateItem[]>(attributes)
-  const [editingAttribute, setEditingAttribute] = useState<AttributeTemplateItem | null>(null)
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
-  const [previewVisible, setPreviewVisible] = useState(false)
-  const [previewAttribute, setPreviewAttribute] = useState<AttributeTemplateItem | null>(null)
+  const [form] = Form.useForm();
+  const [attributeList, setAttributeList] = useState<AttributeTemplateItem[]>(attributes);
+  const [editingAttribute, setEditingAttribute] = useState<AttributeTemplateItem | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewAttribute, setPreviewAttribute] = useState<AttributeTemplateItem | null>(null);
 
   // 属性类型选项
   const attributeTypes: { value: AttributeType; label: string; description: string }[] = [
@@ -70,34 +75,34 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
     { value: 'date', label: '日期', description: '日期选择器' },
     { value: 'url', label: '网址', description: 'URL地址输入' },
     { value: 'image', label: '图片', description: '图片上传' },
-    { value: 'file', label: '文件', description: '文件上传' }
-  ]
+    { value: 'file', label: '文件', description: '文件上传' },
+  ];
 
   // 常用属性分组
-  const commonGroups = ['基础属性', '规格参数', '材质工艺', '功能特性', '服务保障', '包装信息']
+  const commonGroups = ['基础属性', '规格参数', '材质工艺', '功能特性', '服务保障', '包装信息'];
 
   useEffect(() => {
-    setAttributeList(attributes)
-  }, [attributes])
+    setAttributeList(attributes);
+  }, [attributes]);
 
   // 通知父组件属性变更
   const notifyChange = (newAttributes: AttributeTemplateItem[]) => {
-    setAttributeList(newAttributes)
-    onChange?.(newAttributes)
-  }
+    setAttributeList(newAttributes);
+    onChange?.(newAttributes);
+  };
 
   // 处理添加属性
   const handleAddAttribute = () => {
-    setEditingAttribute(null)
-    setModalMode('create')
-    form.resetFields()
-    setIsModalVisible(true)
-  }
+    setEditingAttribute(null);
+    setModalMode('create');
+    form.resetFields();
+    setIsModalVisible(true);
+  };
 
   // 处理编辑属性
   const handleEditAttribute = (attribute: AttributeTemplateItem) => {
-    setEditingAttribute(attribute)
-    setModalMode('edit')
+    setEditingAttribute(attribute);
+    setModalMode('edit');
     form.setFieldsValue({
       name: attribute.name,
       code: attribute.code,
@@ -109,10 +114,10 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
       sort: attribute.sort,
       status: attribute.status,
       validation: attribute.validation,
-      options: attribute.options?.map(opt => opt.label) || []
-    })
-    setIsModalVisible(true)
-  }
+      options: attribute.options?.map((opt) => opt.label) || [],
+    });
+    setIsModalVisible(true);
+  };
 
   // 处理复制属性
   const handleCopyAttribute = (attribute: AttributeTemplateItem) => {
@@ -121,71 +126,75 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
       id: '',
       name: `${attribute.name}_副本`,
       code: `${attribute.code}_copy`,
-      sort: attributeList.length + 1
-    }
-    delete newAttribute.id
+      sort: attributeList.length + 1,
+    };
+    delete newAttribute.id;
 
-    setEditingAttribute(newAttribute as AttributeTemplateItem)
-    setModalMode('create')
+    setEditingAttribute(newAttribute as AttributeTemplateItem);
+    setModalMode('create');
     form.setFieldsValue({
       ...newAttribute,
-      options: attribute.options?.map(opt => opt.label) || []
-    })
-    setIsModalVisible(true)
-    message.success('属性已复制，请修改后保存')
-  }
+      options: attribute.options?.map((opt) => opt.label) || [],
+    });
+    setIsModalVisible(true);
+    message.success('属性已复制，请修改后保存');
+  };
 
   // 处理删除属性
   const handleDeleteAttribute = (attributeId: string) => {
-    const newAttributes = attributeList.filter(attr => attr.id !== attributeId)
-    notifyChange(newAttributes)
-    message.success('删除成功')
-  }
+    const newAttributes = attributeList.filter((attr) => attr.id !== attributeId);
+    notifyChange(newAttributes);
+    message.success('删除成功');
+  };
 
   // 处理属性状态切换
   const handleToggleStatus = (attributeId: string) => {
-    const newAttributes = attributeList.map(attr =>
+    const newAttributes = attributeList.map((attr) =>
       attr.id === attributeId
         ? { ...attr, status: attr.status === 'active' ? 'inactive' : 'active' }
         : attr
-    )
-    notifyChange(newAttributes)
-  }
+    );
+    notifyChange(newAttributes);
+  };
 
   // 处理属性排序
   const handleMoveAttribute = (index: number, direction: 'up' | 'down') => {
-    const newAttributes = [...attributeList]
-    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    const newAttributes = [...attributeList];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
     if (targetIndex >= 0 && targetIndex < newAttributes.length) {
-      [newAttributes[index], newAttributes[targetIndex]] = [newAttributes[targetIndex], newAttributes[index]]
+      [newAttributes[index], newAttributes[targetIndex]] = [
+        newAttributes[targetIndex],
+        newAttributes[index],
+      ];
 
       // 更新排序值
       newAttributes.forEach((attr, idx) => {
-        attr.sort = idx + 1
-      })
+        attr.sort = idx + 1;
+      });
 
-      notifyChange(newAttributes)
+      notifyChange(newAttributes);
     }
-  }
+  };
 
   // 处理预览属性
   const handlePreviewAttribute = (attribute: AttributeTemplateItem) => {
-    setPreviewAttribute(attribute)
-    setPreviewVisible(true)
-  }
+    setPreviewAttribute(attribute);
+    setPreviewVisible(true);
+  };
 
   // 处理表单提交
   const handleSubmit = async (values: any) => {
     try {
       // 处理选项数据
-      const options: AttributeOption[] = values.options?.map((label: string, index: number) => ({
-        id: `opt_${Date.now()}_${index}`,
-        label: label.trim(),
-        value: label.trim().toLowerCase().replace(/\s+/g, '_'),
-        sort: index + 1,
-        status: 'active'
-      })) || []
+      const options: AttributeOption[] =
+        values.options?.map((label: string, index: number) => ({
+          id: `opt_${Date.now()}_${index}`,
+          label: label.trim(),
+          value: label.trim().toLowerCase().replace(/\s+/g, '_'),
+          sort: index + 1,
+          status: 'active',
+        })) || [];
 
       const attributeData: AttributeTemplateItem = {
         id: editingAttribute?.id || `attr_${Date.now()}`,
@@ -196,33 +205,33 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
         defaultValue: values.defaultValue,
         description: values.description,
         group: values.group,
-        sort: values.sort || (attributeList.length + 1),
+        sort: values.sort || attributeList.length + 1,
         status: values.status || 'active',
         validation: values.validation,
-        options
-      }
+        options,
+      };
 
-      let newAttributes: AttributeTemplateItem[]
+      let newAttributes: AttributeTemplateItem[];
 
       if (modalMode === 'create') {
-        newAttributes = [...attributeList, attributeData]
-        message.success('添加成功')
+        newAttributes = [...attributeList, attributeData];
+        message.success('添加成功');
       } else {
-        newAttributes = attributeList.map(attr =>
+        newAttributes = attributeList.map((attr) =>
           attr.id === editingAttribute?.id ? attributeData : attr
-        )
-        message.success('更新成功')
+        );
+        message.success('更新成功');
       }
 
-      notifyChange(newAttributes)
-      setIsModalVisible(false)
-      form.resetFields()
-      setEditingAttribute(null)
+      notifyChange(newAttributes);
+      setIsModalVisible(false);
+      form.resetFields();
+      setEditingAttribute(null);
     } catch (error) {
-      message.error(`${modalMode === 'create' ? '添加' : '更新'}失败`)
-      console.error('Submit attribute error:', error)
+      message.error(`${modalMode === 'create' ? '添加' : '更新'}失败`);
+      console.error('Submit attribute error:', error);
     }
-  }
+  };
 
   // 属性表格列定义
   const columns: ColumnsType<AttributeTemplateItem> = [
@@ -234,7 +243,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
         <div style={{ cursor: 'grab', color: '#999' }}>
           <DragOutlined />
         </div>
-      )
+      ),
     },
     {
       title: '属性名称',
@@ -246,7 +255,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
           <div style={{ fontWeight: 500 }}>{text}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>{record.code}</div>
         </div>
-      )
+      ),
     },
     {
       title: '类型',
@@ -254,20 +263,20 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
       key: 'type',
       width: 100,
       render: (type) => {
-        const typeConfig = attributeTypes.find(t => t.value === type)
+        const typeConfig = attributeTypes.find((t) => t.value === type);
         return (
           <Tooltip title={typeConfig?.description}>
             <Tag>{typeConfig?.label || type}</Tag>
           </Tooltip>
-        )
-      }
+        );
+      },
     },
     {
       title: '分组',
       dataIndex: 'group',
       key: 'group',
       width: 120,
-      render: (group) => group || '默认'
+      render: (group) => group || '默认',
     },
     {
       title: '必填',
@@ -275,9 +284,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
       key: 'required',
       width: 80,
       align: 'center',
-      render: (required) => (
-        <Switch size="small" checked={required} disabled />
-      )
+      render: (required) => <Switch size="small" checked={required} disabled />,
     },
     {
       title: '默认值',
@@ -286,11 +293,11 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
       width: 120,
       ellipsis: true,
       render: (value) => {
-        if (value === undefined || value === null) return '-'
-        if (typeof value === 'boolean') return value ? '是' : '否'
-        if (Array.isArray(value)) return value.join(', ')
-        return String(value)
-      }
+        if (value === undefined || value === null) return '-';
+        if (typeof value === 'boolean') return value ? '是' : '否';
+        if (Array.isArray(value)) return value.join(', ');
+        return String(value);
+      },
     },
     {
       title: '状态',
@@ -304,14 +311,14 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
           onChange={() => handleToggleStatus(record.id)}
           disabled={readonly}
         />
-      )
+      ),
     },
     {
       title: '排序',
       dataIndex: 'sort',
       key: 'sort',
       width: 80,
-      align: 'center'
+      align: 'center',
     },
     {
       title: '操作',
@@ -381,89 +388,74 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
             </Popconfirm>
           </Tooltip>
         </Space>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   // 渲染属性预览组件
   const renderAttributePreview = (attribute: AttributeTemplateItem) => {
     const commonProps = {
       placeholder: `请输入${attribute.name}`,
-      disabled: true
-    }
+      disabled: true,
+    };
 
     switch (attribute.type) {
       case 'text':
-        return <Input {...commonProps} />
+        return <Input {...commonProps} />;
       case 'number':
-        return <InputNumber {...commonProps} style={{ width: '100%' }} />
+        return <InputNumber {...commonProps} style={{ width: '100%' }} />;
       case 'boolean':
-        return <Switch checked={attribute.defaultValue} disabled />
+        return <Switch checked={attribute.defaultValue} disabled />;
       case 'select':
         return (
           <Select {...commonProps} style={{ width: '100%' }}>
-            {attribute.options?.map(option => (
+            {attribute.options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
             ))}
           </Select>
-        )
+        );
       case 'multiselect':
         return (
           <Select {...commonProps} mode="multiple" style={{ width: '100%' }}>
-            {attribute.options?.map(option => (
+            {attribute.options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
             ))}
           </Select>
-        )
+        );
       case 'date':
-        return (
-          <DatePicker
-            {...commonProps}
-            style={{ width: '100%' }}
-            format="YYYY-MM-DD"
-          />
-        )
+        return <DatePicker {...commonProps} style={{ width: '100%' }} format="YYYY-MM-DD" />;
       case 'url':
-        return <Input {...commonProps} addonBefore="http://" />
+        return <Input {...commonProps} addonBefore="http://" />;
       case 'image':
         return (
-          <Upload
-            disabled
-            listType="picture-card"
-            maxCount={1}
-            beforeUpload={() => false}
-          >
+          <Upload disabled listType="picture-card" maxCount={1} beforeUpload={() => false}>
             <div>
               <PlusOutlined />
               <div style={{ marginTop: 8 }}>上传图片</div>
             </div>
           </Upload>
-        )
+        );
       case 'file':
         return (
           <Upload disabled>
             <Button icon={<PlusOutlined />}>选择文件</Button>
           </Upload>
-        )
+        );
       default:
-        return <Input {...commonProps} />
+        return <Input {...commonProps} />;
     }
-  }
+  };
 
   return (
     <div>
       {/* 操作按钮区域 */}
       {!readonly && (
         <div style={{ marginBottom: 16 }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleAddAttribute}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddAttribute}>
             添加属性
           </Button>
         </div>
@@ -517,7 +509,10 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
                 name="code"
                 rules={[
                   { required: true, message: '请输入属性编码' },
-                  { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '编码只能包含字母、数字和下划线，且以字母开头' }
+                  {
+                    pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+                    message: '编码只能包含字母、数字和下划线，且以字母开头',
+                  },
                 ]}
               >
                 <Input placeholder="请输入属性编码" />
@@ -533,7 +528,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
                 rules={[{ required: true, message: '请选择属性类型' }]}
               >
                 <Select placeholder="请选择属性类型">
-                  {attributeTypes.map(type => (
+                  {attributeTypes.map((type) => (
                     <Option key={type.value} value={type.value}>
                       <div>
                         <div>{type.label}</div>
@@ -545,10 +540,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                label="属性分组"
-                name="group"
-              >
+              <Form.Item label="属性分组" name="group">
                 <Select
                   placeholder="请选择属性分组"
                   allowClear
@@ -556,7 +548,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
                   mode="tags"
                   maxTagCount={1}
                 >
-                  {commonGroups.map(group => (
+                  {commonGroups.map((group) => (
                     <Option key={group} value={group}>
                       {group}
                     </Option>
@@ -580,16 +572,8 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
             </Col>
           </Row>
 
-          <Form.Item
-            label="属性说明"
-            name="description"
-          >
-            <TextArea
-              rows={2}
-              placeholder="请输入属性说明（选填）"
-              maxLength={200}
-              showCount
-            />
+          <Form.Item label="属性说明" name="description">
+            <TextArea rows={2} placeholder="请输入属性说明（选填）" maxLength={200} showCount />
           </Form.Item>
 
           <Row gutter={16}>
@@ -609,16 +593,8 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="排序"
-                name="sort"
-              >
-                <InputNumber
-                  min={1}
-                  max={999}
-                  placeholder="排序值"
-                  style={{ width: '100%' }}
-                />
+              <Form.Item label="排序" name="sort">
+                <InputNumber min={1} max={999} placeholder="排序值" style={{ width: '100%' }} />
               </Form.Item>
             </Col>
           </Row>
@@ -626,7 +602,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
           {/* 根据属性类型显示不同的验证规则配置 */}
           <Form.Item dependencies={['type']} noStyle>
             {({ getFieldValue }) => {
-              const type = getFieldValue('type') as AttributeType
+              const type = getFieldValue('type') as AttributeType;
               return (
                 <Card size="small" title="验证规则配置" style={{ marginBottom: 16 }}>
                   {type === 'number' && (
@@ -661,15 +637,13 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
                     </Form.Item>
                   )}
                 </Card>
-              )
+              );
             }}
           </Form.Item>
 
           <div style={{ textAlign: 'right', marginTop: 24 }}>
             <Space>
-              <Button onClick={() => setIsModalVisible(false)}>
-                取消
-              </Button>
+              <Button onClick={() => setIsModalVisible(false)}>取消</Button>
               <Button type="primary" htmlType="submit">
                 {modalMode === 'create' ? '创建' : '更新'}
               </Button>
@@ -690,7 +664,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
         footer={[
           <Button key="close" onClick={() => setPreviewVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={600}
         destroyOnClose
@@ -716,9 +690,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
               {previewAttribute.description && (
                 <div style={{ marginTop: 12 }}>
                   <Text strong>属性说明：</Text>
-                  <div style={{ marginTop: 4, color: '#666' }}>
-                    {previewAttribute.description}
-                  </div>
+                  <div style={{ marginTop: 4, color: '#666' }}>{previewAttribute.description}</div>
                 </div>
               )}
             </Card>
@@ -735,7 +707,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
                 <div style={{ marginTop: 16 }}>
                   <Text strong>可选项：</Text>
                   <div style={{ marginTop: 8 }}>
-                    {previewAttribute.options.map(option => (
+                    {previewAttribute.options.map((option) => (
                       <Tag key={option.id} style={{ marginBottom: 4 }}>
                         {option.label} ({option.value})
                       </Tag>
@@ -748,7 +720,7 @@ const AttributeEditor: React.FC<AttributeEditorProps> = ({
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default AttributeEditor
+export default AttributeEditor;

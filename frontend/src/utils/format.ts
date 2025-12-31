@@ -32,10 +32,7 @@ export function formatPercent(value: number | string, decimals: number = 2): str
  * @param format - 格式模板，默认为 'YYYY-MM-DD'
  * @returns 格式化后的日期字符串
  */
-export function formatDate(
-  date: Date | string,
-  format: string = 'YYYY-MM-DD'
-): string {
+export function formatDate(date: Date | string, format: string = 'YYYY-MM-DD'): string {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
 

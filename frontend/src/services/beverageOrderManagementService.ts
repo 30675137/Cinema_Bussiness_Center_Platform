@@ -2,28 +2,24 @@
  * @spec O003-beverage-order
  * B端饮品订单管理服务
  */
-import { apiClient } from './apiClient'
-import type {
-  BeverageOrderDTO,
-  BeverageOrderStatus,
-  PageResponse,
-} from '../types/beverageOrder'
+import { apiClient } from './apiClient';
+import type { BeverageOrderDTO, BeverageOrderStatus, PageResponse } from '../types/beverageOrder';
 
 /**
  * 订单查询参数
  */
 export interface OrderQueryParams {
-  storeId?: string
-  status?: BeverageOrderStatus
-  page?: number
-  pageSize?: number
+  storeId?: string;
+  status?: BeverageOrderStatus;
+  page?: number;
+  pageSize?: number;
 }
 
 /**
  * 更新订单状态请求
  */
 export interface UpdateOrderStatusRequest {
-  targetStatus: BeverageOrderStatus
+  targetStatus: BeverageOrderStatus;
 }
 
 /**
@@ -37,19 +33,18 @@ export const beverageOrderManagementService = {
     const response = await apiClient.get<PageResponse<BeverageOrderDTO>>(
       '/api/admin/beverage-orders',
       { params }
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
    * 查询待处理订单（待制作 + 制作中）
    */
   async getPendingOrders(storeId: string): Promise<BeverageOrderDTO[]> {
-    const response = await apiClient.get<BeverageOrderDTO[]>(
-      '/api/admin/beverage-orders/pending',
-      { params: { storeId } }
-    )
-    return response.data
+    const response = await apiClient.get<BeverageOrderDTO[]>('/api/admin/beverage-orders/pending', {
+      params: { storeId },
+    });
+    return response.data;
   },
 
   /**
@@ -58,8 +53,8 @@ export const beverageOrderManagementService = {
   async getOrderById(orderId: string): Promise<BeverageOrderDTO> {
     const response = await apiClient.get<BeverageOrderDTO>(
       `/api/client/beverage-orders/${orderId}`
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
@@ -72,8 +67,8 @@ export const beverageOrderManagementService = {
     const response = await apiClient.put<BeverageOrderDTO>(
       `/api/admin/beverage-orders/${orderId}/status`,
       { targetStatus }
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
@@ -82,8 +77,8 @@ export const beverageOrderManagementService = {
   async startProduction(orderId: string): Promise<BeverageOrderDTO> {
     const response = await apiClient.post<BeverageOrderDTO>(
       `/api/admin/beverage-orders/${orderId}/start-production`
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
@@ -92,8 +87,8 @@ export const beverageOrderManagementService = {
   async completeOrder(orderId: string): Promise<BeverageOrderDTO> {
     const response = await apiClient.post<BeverageOrderDTO>(
       `/api/admin/beverage-orders/${orderId}/complete`
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
@@ -102,8 +97,8 @@ export const beverageOrderManagementService = {
   async deliverOrder(orderId: string): Promise<BeverageOrderDTO> {
     const response = await apiClient.post<BeverageOrderDTO>(
       `/api/admin/beverage-orders/${orderId}/deliver`
-    )
-    return response.data
+    );
+    return response.data;
   },
 
   /**
@@ -112,7 +107,7 @@ export const beverageOrderManagementService = {
   async cancelOrder(orderId: string): Promise<BeverageOrderDTO> {
     const response = await apiClient.post<BeverageOrderDTO>(
       `/api/admin/beverage-orders/${orderId}/cancel`
-    )
-    return response.data
+    );
+    return response.data;
   },
-}
+};

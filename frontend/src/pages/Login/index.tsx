@@ -55,26 +55,16 @@ const Login: React.FC = () => {
             </Space>
           </div>
 
-          <Form
-            name="login"
-            onFinish={onFinish}
-            autoComplete="off"
-            size="large"
-            layout="vertical"
-          >
+          <Form name="login" onFinish={onFinish} autoComplete="off" size="large" layout="vertical">
             <Form.Item
               label="用户名"
               name="username"
               rules={[
                 { required: true, message: '请输入用户名!' },
-                { min: 3, message: '用户名至少3个字符!' }
+                { min: 3, message: '用户名至少3个字符!' },
               ]}
             >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="请输入用户名"
-                autoComplete="username"
-              />
+              <Input prefix={<UserOutlined />} placeholder="请输入用户名" autoComplete="username" />
             </Form.Item>
 
             <Form.Item
@@ -82,7 +72,7 @@ const Login: React.FC = () => {
               name="password"
               rules={[
                 { required: true, message: '请输入密码!' },
-                { min: 6, message: '密码至少6个字符!' }
+                { min: 6, message: '密码至少6个字符!' },
               ]}
             >
               <Input.Password
@@ -97,7 +87,7 @@ const Login: React.FC = () => {
                 type="primary"
                 htmlType="submit"
                 classNames={{
-                  root: "w-full h-12 text-lg"
+                  root: 'w-full h-12 text-lg',
                 }}
               >
                 登录

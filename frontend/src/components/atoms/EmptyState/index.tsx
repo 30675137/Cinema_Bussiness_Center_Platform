@@ -2,34 +2,34 @@
  * @spec O003-beverage-order
  * EmptyState - 通用空状态组件
  */
-import React from 'react'
-import { Button, Empty } from 'antd'
+import React from 'react';
+import { Button, Empty } from 'antd';
 
 export interface EmptyStateProps {
   /**
    * 空状态描述文字
    */
-  description?: string
+  description?: string;
   /**
    * 操作按钮文字
    */
-  actionText?: string
+  actionText?: string;
   /**
    * 操作按钮点击回调
    */
-  onAction?: () => void
+  onAction?: () => void;
   /**
    * 自定义图片
    */
-  image?: React.ReactNode
+  image?: React.ReactNode;
   /**
    * 是否使用简单模式 (更小的图片)
    */
-  simple?: boolean
+  simple?: boolean;
   /**
    * 自定义类名
    */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -81,7 +81,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         )}
       </Empty>
     </div>
-  )
-}
+  );
+};
 
-export default EmptyState
+export default EmptyState;

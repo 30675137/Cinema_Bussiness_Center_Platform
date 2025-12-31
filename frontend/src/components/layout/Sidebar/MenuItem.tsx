@@ -34,7 +34,7 @@ import {
   PictureOutlined,
   BoxOutlined,
   SwapOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { MenuItem as MenuItemType, MenuLevel } from '@/types/navigation';
 
@@ -73,84 +73,84 @@ export interface MenuItemProps {
  */
 const iconMap: Record<string, React.ComponentType<any>> = {
   // 基础设置图标
-  'home': HomeOutlined,
-  'setting': SettingOutlined,
-  'user': UserOutlined,
-  'team': TeamOutlined,
-  'role': SafetyOutlined,
-  'approval': FileTextOutlined,
+  home: HomeOutlined,
+  setting: SettingOutlined,
+  user: UserOutlined,
+  team: TeamOutlined,
+  role: SafetyOutlined,
+  approval: FileTextOutlined,
 
   // 商品管理图标
-  'shop': ShopOutlined,
-  'product': ShopOutlined,
-  'package': DeploymentUnitOutlined,
-  'image': PictureOutlined,
-  'content': FileTextOutlined,
+  shop: ShopOutlined,
+  product: ShopOutlined,
+  package: DeploymentUnitOutlined,
+  image: PictureOutlined,
+  content: FileTextOutlined,
 
   // BOM/配方管理图标
-  'formula': PartitionOutlined,
-  'cost': DollarOutlined,
-  'material': DeploymentUnitOutlined,
-  'bom': PartitionOutlined,
+  formula: PartitionOutlined,
+  cost: DollarOutlined,
+  material: DeploymentUnitOutlined,
+  bom: PartitionOutlined,
 
   // 场景包管理图标
-  'scenario': CalendarTwoTone,
-  'combo': BoxOutlined,
-  'package': BoxOutlined,
+  scenario: CalendarTwoTone,
+  combo: BoxOutlined,
+  package: BoxOutlined,
 
   // 价格管理图标
-  'price': DollarOutlined,
-  'pricelist': FileSearchOutlined,
-  'pricing': PercentageOutlined,
+  price: DollarOutlined,
+  pricelist: FileSearchOutlined,
+  pricing: PercentageOutlined,
 
   // 采购管理图标
-  'procurement': ShoppingOutlined,
-  'supplier': UserOutlined,
-  'purchase': ShoppingOutlined,
-  'warehouse': InboxOutlined,
-  'receiving': InboxOutlined,
-  'transfer': SwapOutlined,
+  procurement: ShoppingOutlined,
+  supplier: UserOutlined,
+  purchase: ShoppingOutlined,
+  warehouse: InboxOutlined,
+  receiving: InboxOutlined,
+  transfer: SwapOutlined,
 
   // 库存管理图标
-  'inventory': HddOutlined,
-  'stock': InboxOutlined,
-  'allocation': PartitionOutlined,
+  inventory: HddOutlined,
+  stock: InboxOutlined,
+  allocation: PartitionOutlined,
 
   // 档期排期图标
-  'schedule': CalendarOutlined,
-  'resource': PartitionOutlined,
-  'gantt': BarChartOutlined,
-  'hall': CalendarOutlined,
-  'conflict': FileSearchOutlined,
+  schedule: CalendarOutlined,
+  resource: PartitionOutlined,
+  gantt: BarChartOutlined,
+  hall: CalendarOutlined,
+  conflict: FileSearchOutlined,
 
   // 库存管理图标
-  'inventory': HddOutlined,
-  'stock': InboxOutlined,
-  'transfer': SwapOutlined,
-  'check': FileSearchOutlined,
+  inventory: HddOutlined,
+  stock: InboxOutlined,
+  transfer: SwapOutlined,
+  check: FileSearchOutlined,
 
   // 档期排期图标
-  'schedule': CalendarOutlined,
-  'resource': PartitionOutlined,
-  'gantt': BarChartOutlined,
+  schedule: CalendarOutlined,
+  resource: PartitionOutlined,
+  gantt: BarChartOutlined,
 
   // 订单管理图标
-  'order': FileTextOutlined,
-  'fulfillment': ReconciliationOutlined,
-  'verification': SafetyOutlined,
+  order: FileTextOutlined,
+  fulfillment: ReconciliationOutlined,
+  verification: SafetyOutlined,
 
   // 运营报表图标
-  'dashboard': DashboardOutlined,
-  'report': BarChartOutlined,
-  'analytics': BarChartOutlined,
+  dashboard: DashboardOutlined,
+  report: BarChartOutlined,
+  analytics: BarChartOutlined,
 
   // 系统管理图标
-  'system': SettingOutlined,
-  'admin': SafetyOutlined,
-  'audit': FileSearchOutlined,
+  system: SettingOutlined,
+  admin: SafetyOutlined,
+  audit: FileSearchOutlined,
 
   // 默认图标
-  'default': FileTextOutlined
+  default: FileTextOutlined,
 };
 
 /**
@@ -192,7 +192,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   onToggle,
   onToggleFavorite,
   className,
-  level = 0
+  level = 0,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -241,8 +241,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
     !menu.isVisible && 'menu-item-hidden',
     isHovered && 'menu-item-hover',
     collapsed && 'menu-item-collapsed',
-    className
-  ].filter(Boolean).join(' ');
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // 渲染图标
   const renderIcon = () => {
@@ -273,13 +275,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
   const renderBadge = () => {
     if (!showBadge || childCount === 0) return null;
 
-    return (
-      <Badge
-        count={childCount}
-        size="small"
-        className="menu-item-badge"
-      />
-    );
+    return <Badge count={childCount} size="small" className="menu-item-badge" />;
   };
 
   // 渲染收藏按钮
@@ -291,11 +287,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
         className={`menu-item-favorite ${isFavorite ? 'favorited' : ''}`}
         onClick={handleFavoriteClick}
       >
-        {isFavorite ? (
-          <StarFilled style={{ color: '#faad14' }} />
-        ) : (
-          <StarOutlined />
-        )}
+        {isFavorite ? <StarFilled style={{ color: '#faad14' }} /> : <StarOutlined />}
       </span>
     );
   };
@@ -315,32 +307,20 @@ const MenuItem: React.FC<MenuItemProps> = ({
 
   // 渲染菜单标签
   const renderLabel = () => {
-    return (
-      <span className="menu-item-label">
-        {menu.name}
-      </span>
-    );
+    return <span className="menu-item-label">{menu.name}</span>;
   };
 
   // 渲染描述
   const renderDescription = () => {
     if (!menu.description || collapsed) return null;
 
-    return (
-      <div className="menu-item-description">
-        {menu.description}
-      </div>
-    );
+    return <div className="menu-item-description">{menu.description}</div>;
   };
 
   // 折叠状态下只显示图标
   if (collapsed) {
     return (
-      <Tooltip
-        title={menu.name}
-        placement="right"
-        mouseEnterDelay={0.5}
-      >
+      <Tooltip title={menu.name} placement="right" mouseEnterDelay={0.5}>
         <div
           className={`${menuClasses} menu-item-collapsed-view`}
           onClick={handleClick}

@@ -1,6 +1,13 @@
 import React from 'react';
 import { Card, Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col, Badge } from 'antd';
-import { PlusOutlined, ExportOutlined, ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  ExportOutlined,
+  ReloadOutlined,
+  EyeOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -28,7 +35,7 @@ interface ReceivingRecord {
  */
 const ReceivingList: React.FC = () => {
   const navigate = useNavigate();
-  
+
   // Mock数据
   const mockData: ReceivingRecord[] = [
     {
@@ -42,7 +49,7 @@ const ReceivingList: React.FC = () => {
       status: 'completed',
       warehouse: '中心仓库',
       receiver: '王五',
-      qualityStatus: 'passed'
+      qualityStatus: 'passed',
     },
     {
       id: '2',
@@ -55,7 +62,7 @@ const ReceivingList: React.FC = () => {
       status: 'partial',
       warehouse: '门店仓库A',
       receiver: '赵六',
-      qualityStatus: 'checking'
+      qualityStatus: 'checking',
     },
     {
       id: '3',
@@ -68,7 +75,7 @@ const ReceivingList: React.FC = () => {
       status: 'pending',
       warehouse: '中心仓库',
       receiver: '李四',
-      qualityStatus: 'waiting'
+      qualityStatus: 'waiting',
     },
   ];
 
@@ -102,9 +109,7 @@ const ReceivingList: React.FC = () => {
       dataIndex: 'purchaseOrderNumber',
       key: 'purchaseOrderNumber',
       width: 150,
-      render: (text: string) => (
-        <a style={{ color: '#1890ff' }}>{text}</a>
-      ),
+      render: (text: string) => <a style={{ color: '#1890ff' }}>{text}</a>,
     },
     {
       title: '供应商',
@@ -175,7 +180,12 @@ const ReceivingList: React.FC = () => {
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => navigate(`/purchase-management/receipts/${record.id}`)}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/purchase-management/receipts/${record.id}`)}
+          >
             查看
           </Button>
           {record.status === 'pending' && (

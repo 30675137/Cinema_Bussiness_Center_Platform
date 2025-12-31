@@ -159,7 +159,10 @@
   background: rgba(255, 255, 255, 0.01) !important;
 }
 
-.sidebar-menu .ant-menu-submenu.ant-menu-submenu-open > .ant-menu-submenu-title .ant-menu-submenu-arrow {
+.sidebar-menu
+  .ant-menu-submenu.ant-menu-submenu-open
+  > .ant-menu-submenu-title
+  .ant-menu-submenu-arrow {
   color: #ffffff !important;
 }
 
@@ -590,8 +593,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 错误状态 */
@@ -636,41 +643,41 @@
 }
 
 /* 深色主题适配 */
-.sidebar[data-theme="light"] {
+.sidebar[data-theme='light'] {
   background: #ffffff;
   border-right: 1px solid #f0f0f0;
 }
 
-.sidebar[data-theme="light"] .sidebar-title-text {
+.sidebar[data-theme='light'] .sidebar-title-text {
   color: #000000;
 }
 
-.sidebar[data-theme="light"] .menu-item {
+.sidebar[data-theme='light'] .menu-item {
   color: #000000;
 }
 
-.sidebar[data-theme="light"] .menu-item:hover {
+.sidebar[data-theme='light'] .menu-item:hover {
   background-color: #f5f5f5;
 }
 
-.sidebar[data-theme="light"] .menu-item-active {
+.sidebar[data-theme='light'] .menu-item-active {
   background-color: #1890ff !important;
   color: #ffffff !important;
 }
 
-.sidebar[data-theme="light"] .menu-item-active::before {
+.sidebar[data-theme='light'] .menu-item-active::before {
   background: #ffffff;
 }
 
-.sidebar[data-theme="light"] .sidebar-header {
+.sidebar[data-theme='light'] .sidebar-header {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.sidebar[data-theme="light"] .sidebar-footer {
+.sidebar[data-theme='light'] .sidebar-footer {
   border-top: 1px solid #f0f0f0;
 }
 
-.sidebar[data-theme="light"] .sidebar-version {
+.sidebar[data-theme='light'] .sidebar-version {
   color: #8c8c8c;
 }
 

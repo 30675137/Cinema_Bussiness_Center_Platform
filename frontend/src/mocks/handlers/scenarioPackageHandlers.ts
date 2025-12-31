@@ -42,8 +42,7 @@ export const scenarioPackageHandlers = [
     if (keyword) {
       filteredPackages = filteredPackages.filter(
         (pkg) =>
-          pkg.name.includes(keyword) ||
-          (pkg.description && pkg.description.includes(keyword))
+          pkg.name.includes(keyword) || (pkg.description && pkg.description.includes(keyword))
       );
     }
 
@@ -104,10 +103,11 @@ export const scenarioPackageHandlers = [
         minPeople: body.rule.minPeople,
         maxPeople: body.rule.maxPeople,
       },
-      hallTypes: body.hallTypeIds?.map((id) => ({
-        id,
-        name: `影厅-${id.substring(0, 8)}`,
-      })) || [],
+      hallTypes:
+        body.hallTypeIds?.map((id) => ({
+          id,
+          name: `影厅-${id.substring(0, 8)}`,
+        })) || [],
       content: {
         benefits: [],
         items: [],
@@ -179,15 +179,18 @@ export const scenarioPackageHandlers = [
       description: body.description ?? pkg.description,
       backgroundImageUrl: body.backgroundImageUrl ?? pkg.backgroundImageUrl,
       versionLock: pkg.versionLock + 1,
-      rule: body.rule ? {
-        durationHours: body.rule.durationHours,
-        minPeople: body.rule.minPeople,
-        maxPeople: body.rule.maxPeople,
-      } : pkg.rule,
-      hallTypes: body.hallTypeIds?.map((hallId) => ({
-        id: hallId,
-        name: `影厅-${hallId.substring(0, 8)}`,
-      })) || pkg.hallTypes,
+      rule: body.rule
+        ? {
+            durationHours: body.rule.durationHours,
+            minPeople: body.rule.minPeople,
+            maxPeople: body.rule.maxPeople,
+          }
+        : pkg.rule,
+      hallTypes:
+        body.hallTypeIds?.map((hallId) => ({
+          id: hallId,
+          name: `影厅-${hallId.substring(0, 8)}`,
+        })) || pkg.hallTypes,
       updatedAt: new Date().toISOString(),
     };
 

@@ -67,9 +67,7 @@ class ReservationSettingsService extends BaseApiService {
    * @param storeId 门店ID
    */
   async resetSettings(storeId: string): Promise<void> {
-    await this.delete(
-      `${this.endpoint}/${storeId}/reservation-settings`
-    );
+    await this.delete(`${this.endpoint}/${storeId}/reservation-settings`);
   }
 
   /**
@@ -140,10 +138,7 @@ class ReservationSettingsService extends BaseApiService {
    * @param isActive 是否启用
    * @returns 更新后的预约设置
    */
-  async setActive(
-    storeId: string,
-    isActive: boolean
-  ): Promise<ReservationSettings> {
+  async setActive(storeId: string, isActive: boolean): Promise<ReservationSettings> {
     return this.updateSettings(storeId, { isActive });
   }
 }

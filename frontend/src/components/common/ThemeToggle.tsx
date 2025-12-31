@@ -4,12 +4,7 @@
 
 import React from 'react';
 import { Button, Switch, Select, Space, Tooltip, Dropdown, MenuProps } from 'antd';
-import {
-  SunOutlined,
-  MoonOutlined,
-  BgColorsOutlined,
-  SettingOutlined
-} from '@ant-design/icons';
+import { SunOutlined, MoonOutlined, BgColorsOutlined, SettingOutlined } from '@ant-design/icons';
 import { useTheme, useThemeToggle, useThemeSettings } from '@/theme/hooks';
 import type { ThemeMode } from '@/theme/types';
 
@@ -28,7 +23,7 @@ export const ThemeToggleButton: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
   size = 'middle',
   showText = false,
   className,
-  style
+  style,
 }) => {
   const { mode, effectiveMode, toggleLightDark } = useThemeToggle();
 
@@ -69,7 +64,7 @@ export const ThemeToggleSwitch: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
   size = 'middle',
   showText = false,
   className,
-  style
+  style,
 }) => {
   const { mode, effectiveMode, toggleLightDark } = useThemeToggle();
   const isDark = effectiveMode === 'dark';
@@ -95,14 +90,14 @@ export const ThemeModeSelector: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
   size = 'middle',
   showText = false,
   className,
-  style
+  style,
 }) => {
   const { mode, setMode } = useThemeToggle();
 
   const modeOptions = [
     { value: 'light', label: '明亮', icon: <SunOutlined /> },
     { value: 'dark', label: '暗黑', icon: <MoonOutlined /> },
-    { value: 'auto', label: '自动', icon: <BgColorsOutlined /> }
+    { value: 'auto', label: '自动', icon: <BgColorsOutlined /> },
   ];
 
   return (
@@ -113,14 +108,14 @@ export const ThemeModeSelector: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
       className={className}
       style={{ minWidth: showText ? 100 : 80, ...style }}
       placeholder="选择主题"
-      options={modeOptions.map(option => ({
+      options={modeOptions.map((option) => ({
         value: option.value,
         label: (
           <Space>
             {option.icon}
             {showText && option.label}
           </Space>
-        )
+        ),
       }))}
     />
   );
@@ -132,7 +127,7 @@ export const ThemeModeSelector: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
 export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
   size = 'middle',
   className,
-  style
+  style,
 }) => {
   const { mode, setMode } = useThemeToggle();
   const { settings, updateSettings } = useThemeSettings();
@@ -156,7 +151,7 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
               {mode === 'light' && <span style={{ color: '#1890ff' }}>✓</span>}
             </Space>
           ),
-          onClick: () => handleModeChange('light')
+          onClick: () => handleModeChange('light'),
         },
         {
           key: 'dark',
@@ -167,7 +162,7 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
               {mode === 'dark' && <span style={{ color: '#1890ff' }}>✓</span>}
             </Space>
           ),
-          onClick: () => handleModeChange('dark')
+          onClick: () => handleModeChange('dark'),
         },
         {
           key: 'auto',
@@ -178,12 +173,12 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
               {mode === 'auto' && <span style={{ color: '#1890ff' }}>✓</span>}
             </Space>
           ),
-          onClick: () => handleModeChange('auto')
-        }
-      ]
+          onClick: () => handleModeChange('auto'),
+        },
+      ],
     },
     {
-      type: 'divider'
+      type: 'divider',
     },
     {
       key: 'accessibility',
@@ -198,7 +193,7 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
               {settings.enableHighContrast && <span style={{ color: '#1890ff' }}>✓</span>}
             </Space>
           ),
-          onClick: () => updateSettings({ enableHighContrast: !settings.enableHighContrast })
+          onClick: () => updateSettings({ enableHighContrast: !settings.enableHighContrast }),
         },
         {
           key: 'reduced-motion',
@@ -208,9 +203,9 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
               {settings.enableReducedMotion && <span style={{ color: '#1890ff' }}>✓</span>}
             </Space>
           ),
-          onClick: () => updateSettings({ enableReducedMotion: !settings.enableReducedMotion })
-        }
-      ]
+          onClick: () => updateSettings({ enableReducedMotion: !settings.enableReducedMotion }),
+        },
+      ],
     },
     {
       key: 'font-size',
@@ -224,17 +219,13 @@ export const ThemeDropdown: React.FC<Omit<ThemeToggleProps, 'type'>> = ({
             {settings.fontSize === size && <span style={{ color: '#1890ff' }}>✓</span>}
           </Space>
         ),
-        onClick: () => updateSettings({ fontSize: size as 'small' | 'medium' | 'large' })
-      }))
-    }
+        onClick: () => updateSettings({ fontSize: size as 'small' | 'medium' | 'large' }),
+      })),
+    },
   ];
 
   return (
-    <Dropdown
-      menu={{ items: menuItems }}
-      trigger={['click']}
-      placement="bottomRight"
-    >
+    <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
       <Button
         type="text"
         size={size}
@@ -254,17 +245,23 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   size = 'middle',
   showText = false,
   className,
-  style
+  style,
 }) => {
   switch (type) {
     case 'switch':
-      return <ThemeToggleSwitch size={size} showText={showText} className={className} style={style} />;
+      return (
+        <ThemeToggleSwitch size={size} showText={showText} className={className} style={style} />
+      );
     case 'select':
-      return <ThemeModeSelector size={size} showText={showText} className={className} style={style} />;
+      return (
+        <ThemeModeSelector size={size} showText={showText} className={className} style={style} />
+      );
     case 'dropdown':
       return <ThemeDropdown size={size} className={className} style={style} />;
     default:
-      return <ThemeToggleButton size={size} showText={showText} className={className} style={style} />;
+      return (
+        <ThemeToggleButton size={size} showText={showText} className={className} style={style} />
+      );
   }
 };
 

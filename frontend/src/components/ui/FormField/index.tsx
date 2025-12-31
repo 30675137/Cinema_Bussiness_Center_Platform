@@ -56,7 +56,7 @@ function FormField({
     let updatedConfig = { ...config };
 
     if (config.dependencies) {
-      config.dependencies.forEach(dep => {
+      config.dependencies.forEach((dep) => {
         const depValue = formValues[dep.field];
         const conditionMet = dep.condition(depValue);
         const targetConfig = conditionMet ? dep.then : dep.else;
@@ -72,77 +72,85 @@ function FormField({
   }, [config, formValues]);
 
   // 验证字段值
-  const validateField = useCallback((val: any): string | null => {
-    if (!finalConfig.rules) return null;
+  const validateField = useCallback(
+    (val: any): string | null => {
+      if (!finalConfig.rules) return null;
 
-    for (const rule of finalConfig.rules) {
-      // 必填验证
-      if (rule.required && (val === undefined || val === null || val === '')) {
-        return rule.message || `${finalConfig.label}是必填项`;
-      }
+      for (const rule of finalConfig.rules) {
+        // 必填验证
+        if (rule.required && (val === undefined || val === null || val === '')) {
+          return rule.message || `${finalConfig.label}是必填项`;
+        }
 
-      // 跳过空值的其他验证
-      if (val === undefined || val === null || val === '') continue;
+        // 跳过空值的其他验证
+        if (val === undefined || val === null || val === '') continue;
 
-      // 类型验证
-      if (rule.type) {
-        switch (rule.type) {
-          case 'email':
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
-              return rule.message || `${finalConfig.label}格式不正确`;
-            }
-            break;
-          case 'number':
-            if (isNaN(Number(val))) {
-              return rule.message || `${finalConfig.label}必须是数字`;
-            }
-            break;
-          case 'url':
-            try {
-              new URL(val);
-            } catch {
-              return rule.message || `${finalConfig.label}URL格式不正确`;
-            }
-            break;
+        // 类型验证
+        if (rule.type) {
+          switch (rule.type) {
+            case 'email':
+              if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+                return rule.message || `${finalConfig.label}格式不正确`;
+              }
+              break;
+            case 'number':
+              if (isNaN(Number(val))) {
+                return rule.message || `${finalConfig.label}必须是数字`;
+              }
+              break;
+            case 'url':
+              try {
+                new URL(val);
+              } catch {
+                return rule.message || `${finalConfig.label}URL格式不正确`;
+              }
+              break;
+          }
+        }
+
+        // 长度验证
+        if (rule.min !== undefined && String(val).length < rule.min) {
+          return rule.message || `${finalConfig.label}长度不能少于${rule.min}位`;
+        }
+        if (rule.max !== undefined && String(val).length > rule.max) {
+          return rule.message || `${finalConfig.label}长度不能超过${rule.max}位`;
+        }
+
+        // 正则验证
+        if (rule.pattern && !rule.pattern.test(String(val))) {
+          return rule.message || `${finalConfig.label}格式不正确`;
+        }
+
+        // 自定义验证
+        if (rule.validator) {
+          const result = rule.validator(val);
+          if (result !== true) {
+            return typeof result === 'string'
+              ? result
+              : rule.message || `${finalConfig.label}验证失败`;
+          }
         }
       }
 
-      // 长度验证
-      if (rule.min !== undefined && String(val).length < rule.min) {
-        return rule.message || `${finalConfig.label}长度不能少于${rule.min}位`;
-      }
-      if (rule.max !== undefined && String(val).length > rule.max) {
-        return rule.message || `${finalConfig.label}长度不能超过${rule.max}位`;
-      }
-
-      // 正则验证
-      if (rule.pattern && !rule.pattern.test(String(val))) {
-        return rule.message || `${finalConfig.label}格式不正确`;
-      }
-
-      // 自定义验证
-      if (rule.validator) {
-        const result = rule.validator(val);
-        if (result !== true) {
-          return typeof result === 'string' ? result : rule.message || `${finalConfig.label}验证失败`;
-        }
-      }
-    }
-
-    return null;
-  }, [finalConfig]);
+      return null;
+    },
+    [finalConfig]
+  );
 
   // 处理值变化
-  const handleChange = useCallback((val: any) => {
-    setInternalValue(val);
+  const handleChange = useCallback(
+    (val: any) => {
+      setInternalValue(val);
 
-    if (validateTrigger === 'onChange' || isTouched) {
-      const errorMessage = validateField(val);
-      // 可以通过回调传递错误信息
-    }
+      if (validateTrigger === 'onChange' || isTouched) {
+        const errorMessage = validateField(val);
+        // 可以通过回调传递错误信息
+      }
 
-    onChange?.(val, finalConfig.name);
-  }, [onChange, finalConfig.name, validateTrigger, isTouched, validateField]);
+      onChange?.(val, finalConfig.name);
+    },
+    [onChange, finalConfig.name, validateTrigger, isTouched, validateField]
+  );
 
   // 处理失焦事件
   const handleBlur = useCallback(() => {
@@ -349,15 +357,12 @@ function FormField({
 
       case FormFieldType.FILE_UPLOAD:
         return (
-          <Upload
-            {...finalConfig.inputProps}
-            disabled={finalConfig.disabled}
-          >
+          <Upload {...finalConfig.inputProps} disabled={finalConfig.disabled}>
             <Button
               icon={<UploadOutlined />}
               disabled={finalConfig.disabled}
               classNames={{
-                root: "upload-button"
+                root: 'upload-button',
               }}
             >
               上传文件
@@ -366,9 +371,9 @@ function FormField({
         );
 
       case FormFieldType.CUSTOM:
-        return finalConfig.render ? (
-          finalConfig.render(internalValue, handleChange, finalConfig)
-        ) : null;
+        return finalConfig.render
+          ? finalConfig.render(internalValue, handleChange, finalConfig)
+          : null;
 
       default:
         return null;

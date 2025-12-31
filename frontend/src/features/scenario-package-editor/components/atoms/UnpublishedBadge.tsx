@@ -32,7 +32,7 @@ const STATUS_CONFIG: Record<PublishStatus, { color: string; text: string }> = {
 
 /**
  * 发布状态徽章组件
- * 
+ *
  * @example
  * <UnpublishedBadge status="DRAFT" />
  * <UnpublishedBadge status="PUBLISHED" />

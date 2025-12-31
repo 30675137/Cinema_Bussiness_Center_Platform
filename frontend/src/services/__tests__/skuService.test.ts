@@ -702,9 +702,7 @@ describe('SKU Service', () => {
 
       vi.mocked(apiService.put).mockResolvedValue(mockBomResponse);
 
-      const components = [
-        { componentId: 'sku-001', quantity: 50, unit: 'ml', sortOrder: 1 },
-      ];
+      const components = [{ componentId: 'sku-001', quantity: 50, unit: 'ml', sortOrder: 1 }];
 
       await skuService.updateBom('sku-finished-001', components);
 

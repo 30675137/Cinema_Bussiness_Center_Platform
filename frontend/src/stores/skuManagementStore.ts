@@ -125,9 +125,10 @@ export const useSkuManagementStore = create<SkuManagementState>()(
             ...state.queryParams,
             ...params,
             // 如果关键字或状态变化,重置到第 1 页
-            page: params.keyword !== undefined || params.status !== undefined
-              ? 1
-              : params.page ?? state.queryParams.page,
+            page:
+              params.keyword !== undefined || params.status !== undefined
+                ? 1
+                : (params.page ?? state.queryParams.page),
           },
         })),
 
@@ -225,12 +226,10 @@ export const useSkuManagementStore = create<SkuManagementState>()(
  */
 
 /** 获取查询参数 */
-export const useQueryParams = () =>
-  useSkuManagementStore((state) => state.queryParams);
+export const useQueryParams = () => useSkuManagementStore((state) => state.queryParams);
 
 /** 获取选中的 SKU IDs */
-export const useSelectedSkuIds = () =>
-  useSkuManagementStore((state) => state.selectedSkuIds);
+export const useSelectedSkuIds = () => useSkuManagementStore((state) => state.selectedSkuIds);
 
 /** 获取创建模态框显示状态 */
 export const useCreateModalVisible = () =>

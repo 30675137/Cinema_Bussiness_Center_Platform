@@ -4,12 +4,45 @@
  * 参考设计原型: ProductBOM.tsx
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import { Modal, Form, Input, Select, InputNumber, Row, Col, Card, Button, Empty, message, Spin, Typography, Table, Tooltip, Tag } from 'antd';
-import { PlusOutlined, ArrowLeftOutlined, SaveOutlined, DeleteOutlined, SearchOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  InputNumber,
+  Row,
+  Col,
+  Card,
+  Button,
+  Empty,
+  message,
+  Spin,
+  Typography,
+  Table,
+  Tooltip,
+  Tag,
+} from 'antd';
+import {
+  PlusOutlined,
+  ArrowLeftOutlined,
+  SaveOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  CloseOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSpusQuery, useUnitsQuery, useCreateSkuMutation, useUpdateSkuMutation, useSkuQuery, useIngredientsQuery, useComboItemsQuery } from '@/hooks/useSku';
+import {
+  useSpusQuery,
+  useUnitsQuery,
+  useCreateSkuMutation,
+  useUpdateSkuMutation,
+  useSkuQuery,
+  useIngredientsQuery,
+  useComboItemsQuery,
+} from '@/hooks/useSku';
 import { useStoresQuery } from '@/pages/stores/hooks/useStoresQuery';
 import { useQueryClient } from '@tanstack/react-query';
 import { skuKeys } from '@/services';
@@ -76,13 +109,13 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   const createMutation = useCreateSkuMutation();
   const updateMutation = useUpdateSkuMutation();
   const queryClient = useQueryClient();
-  
+
   // 编辑模式下加载SKU数据
   const { data: skuData, isLoading: loadingSku } = useSkuQuery(
     mode === 'edit' ? skuId || null : null,
     mode === 'edit' && open
   );
-  
+
   const isEditMode = mode === 'edit';
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
@@ -113,10 +146,10 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
 
   const price = watch('price') || 0;
   const spuId = watch('spuId');
-  
+
   // 获取选中的SPU信息
   const selectedSpu = spus.find((spu: SPU) => spu.id === spuId);
-  
+
   // 获取当前产品类型（编辑模式优先使用 skuData.skuType，否则使用 selectedSpu.productType）
   const currentProductType = useMemo(() => {
     if (isEditMode && skuData?.skuType) {
@@ -124,13 +157,14 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
     }
     return (selectedSpu as any)?.productType || '';
   }, [isEditMode, skuData?.skuType, selectedSpu]);
-  
+
   // 是否为原料/包材类型
-  const isRawOrPackaging = currentProductType === 'raw_material' || currentProductType === 'packaging';
-  
+  const isRawOrPackaging =
+    currentProductType === 'raw_material' || currentProductType === 'packaging';
+
   // 是否为套餐类型
   const isComboType = currentProductType === 'combo';
-  
+
   // 根据产品类型选择数据源：套餐可选成品，成品只能选原料/包材
   const ingredients: Ingredient[] = useMemo(() => {
     const sourceData = isComboType ? rawComboItems : rawIngredients;
@@ -144,7 +178,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
 
   // 过滤后的原料列表
   const filteredIngredients = useMemo(() => {
-    return ingredients.filter((ing: Ingredient) => 
+    return ingredients.filter((ing: Ingredient) =>
       ing.name.toLowerCase().includes(ingSearchTerm.toLowerCase())
     );
   }, [ingSearchTerm, ingredients]);
@@ -162,13 +196,13 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
 
   // 添加原料到BOM
   const addBOMItem = (ing: Ingredient) => {
-    if (bomItems.find(b => b.ingredientId === ing.id)) return;
+    if (bomItems.find((b) => b.ingredientId === ing.id)) return;
     const newItem: BOMItem = {
       ingredientId: ing.id,
       name: ing.name,
       quantity: 1,
       unit: ing.unit,
-      cost: ing.unitPrice
+      cost: ing.unitPrice,
     };
     setBomItems([...bomItems, newItem]);
   };
@@ -176,16 +210,18 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   // 更新BOM项数量
   const updateBOMItemQuantity = (ingredientId: string, quantity: number) => {
     const ing = ingredients.find((i: Ingredient) => i.id === ingredientId);
-    setBomItems(items => items.map(item => 
-      item.ingredientId === ingredientId 
-        ? { ...item, quantity, cost: Number((quantity * (ing?.unitPrice || 0)).toFixed(3)) }
-        : item
-    ));
+    setBomItems((items) =>
+      items.map((item) =>
+        item.ingredientId === ingredientId
+          ? { ...item, quantity, cost: Number((quantity * (ing?.unitPrice || 0)).toFixed(3)) }
+          : item
+      )
+    );
   };
 
   // 删除BOM项
   const removeBOMItem = (ingredientId: string) => {
-    setBomItems(items => items.filter(item => item.ingredientId !== ingredientId));
+    setBomItems((items) => items.filter((item) => item.ingredientId !== ingredientId));
   };
 
   // 关闭时重置表单
@@ -202,16 +238,16 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
     if (open && isEditMode && skuData && spus.length > 0 && ingredients.length > 0) {
       // 确保 SPU 存在于列表中
       const spuExists = spus.some((spu: SPU) => spu.id === skuData.spuId);
-      
+
       // 根据 SKU 类型获取对应的数据
       const skuDataWithItems = skuData as any;
       const isCombo = skuDataWithItems.skuType === 'combo';
-      
+
       // 套餐类型读取 comboItems，成品类型读取 bomComponents
-      const itemsData = isCombo 
-        ? (skuDataWithItems.comboItems || []) 
-        : (skuDataWithItems.bomComponents || []);
-      
+      const itemsData = isCombo
+        ? skuDataWithItems.comboItems || []
+        : skuDataWithItems.bomComponents || [];
+
       console.log('[Edit Mode] Setting form values:', {
         spuId: skuData.spuId,
         spuExists,
@@ -225,33 +261,33 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
         itemsCount: itemsData.length,
         itemsData,
       });
-      
+
       // 填充 BOM/套餐子项数据（从 ingredients 列表查找组件名称）
       if (itemsData.length > 0) {
         const convertedItems: BOMItem[] = itemsData.map((item: any) => {
           // 套餐类型使用 subItemId，成品类型使用 componentId
-          const itemId = isCombo 
-            ? (item.subItemId || item.sub_item_id || item.id)
-            : (item.componentId || item.component_id || item.id);
+          const itemId = isCombo
+            ? item.subItemId || item.sub_item_id || item.id
+            : item.componentId || item.component_id || item.id;
           // 从 ingredients 列表中查找名称
           const ingredient = ingredients.find((ing: Ingredient) => ing.id === itemId);
           // 套餐子项名称优先从 subItemName 获取，BOM 从 componentName 获取
-          const itemName = isCombo 
-            ? (item.subItemName || ingredient?.name || '未知商品')
-            : (item.componentName || ingredient?.name || '未知原料');
-          
+          const itemName = isCombo
+            ? item.subItemName || ingredient?.name || '未知商品'
+            : item.componentName || ingredient?.name || '未知原料';
+
           return {
             ingredientId: itemId,
             name: itemName,
             quantity: Number(item.quantity) || 0,
             unit: item.unit || ingredient?.unit || 'g',
-            cost: Number(item.unitCost) || (Number(item.quantity) * (ingredient?.unitPrice || 0)),
+            cost: Number(item.unitCost) || Number(item.quantity) * (ingredient?.unitPrice || 0),
           };
         });
         setBomItems(convertedItems);
         console.log('[Edit Mode] Converted items:', convertedItems);
       }
-      
+
       // 延迟设置值，确保 Select 组件已渲染完成
       setTimeout(() => {
         if (spuExists) {
@@ -273,12 +309,12 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       // 获取默认单位ID（优先使用“份”，如果没有则使用第一个单位）
       const defaultUnit = units.find((u: { name: string }) => u.name === '份') || units[0];
       const mainUnitId = defaultUnit?.id || '';
-        
+
       if (!mainUnitId) {
         message.error('未找到可用的库存单位，请先配置单位数据');
         return;
       }
-  
+
       if (isEditMode && skuId) {
         // 编辑模式
         await updateMutation.mutateAsync({
@@ -293,23 +329,25 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             storeScope: values.storeScope, // 门店范围 (US-001 用户故事5)
             manageInventory: skuData?.manageInventory ?? true,
             allowNegativeStock: skuData?.allowNegativeStock ?? false,
-            salesUnits: skuData?.salesUnits?.map(su => ({
-              unitId: su.unitId,
-              conversionRate: su.conversionRate,
-              enabled: su.enabled,
-            })) || [],
-            otherBarcodes: skuData?.otherBarcodes?.map(b => ({
-              code: b.code,
-              remark: b.remark,
-            })) || [],
+            salesUnits:
+              skuData?.salesUnits?.map((su) => ({
+                unitId: su.unitId,
+                conversionRate: su.conversionRate,
+                enabled: su.enabled,
+              })) || [],
+            otherBarcodes:
+              skuData?.otherBarcodes?.map((b) => ({
+                code: b.code,
+                remark: b.remark,
+              })) || [],
             mainBarcode: skuData?.mainBarcode || skuData?.code || '',
           },
         });
-        
+
         // 更新BOM配方或套餐子项（根据SKU类型）
         if (bomItems.length > 0) {
           const isComboType = skuData?.skuType === 'combo';
-          
+
           try {
             if (isComboType) {
               // 套餐类型：更新套餐子项
@@ -340,38 +378,46 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           } catch (bomError: any) {
             console.error('[Edit Mode] BOM/Combo update failed:', bomError);
             const updateType = isComboType ? '套餐子项' : 'BOM配方';
-            message.warning(`SKU信息已更新，但${updateType}更新失败: ` + (bomError?.message || '未知错误'));
+            message.warning(
+              `SKU信息已更新，但${updateType}更新失败: ` + (bomError?.message || '未知错误')
+            );
           }
         }
-        
+
         message.success('SKU更新成功');
       } else {
-              // 创建模式
+        // 创建模式
         const autoCode = `SKU${Date.now()}`;
         // 从SPU继承产品类型
         const spuWithType = selectedSpu as any;
-        const inheritedSkuType = spuWithType?.productType as SkuType || SkuType.RAW_MATERIAL;
-        
+        const inheritedSkuType = (spuWithType?.productType as SkuType) || SkuType.RAW_MATERIAL;
+
         // 根据产品类型构建不同的子项数据
         const isComboTypeCreate = inheritedSkuType === 'combo';
-        
+
         // BOM组件数据（成品类型需要）
-        const bomComponents = (!isComboTypeCreate && bomItems.length > 0) ? bomItems.map((item, index) => ({
-          componentId: item.ingredientId,
-          quantity: item.quantity,
-          unit: item.unit,
-          isOptional: false,
-          sortOrder: index,
-        })) : undefined;
-        
+        const bomComponents =
+          !isComboTypeCreate && bomItems.length > 0
+            ? bomItems.map((item, index) => ({
+                componentId: item.ingredientId,
+                quantity: item.quantity,
+                unit: item.unit,
+                isOptional: false,
+                sortOrder: index,
+              }))
+            : undefined;
+
         // 套餐子项数据（套餐类型需要）
-        const comboItems = (isComboTypeCreate && bomItems.length > 0) ? bomItems.map((item, index) => ({
-          subItemId: item.ingredientId,
-          quantity: item.quantity,
-          unit: item.unit,
-          sortOrder: index,
-        })) : undefined;
-        
+        const comboItems =
+          isComboTypeCreate && bomItems.length > 0
+            ? bomItems.map((item, index) => ({
+                subItemId: item.ingredientId,
+                quantity: item.quantity,
+                unit: item.unit,
+                sortOrder: index,
+              }))
+            : undefined;
+
         await createMutation.mutateAsync({
           spuId: values.spuId,
           name: values.name,
@@ -417,7 +463,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
         <Row gutter={24}>
           {/* 左侧 - 基础属性 */}
           <Col span={10}>
-            <Card 
+            <Card
               title={
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 16 }}>🎁</span>
@@ -462,18 +508,18 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     <Row gutter={16}>
                       <Col span={12}>
                         <Form.Item label="品牌">
-                          <Input 
-                            value={selectedSpu.brand || '-'} 
-                            disabled 
+                          <Input
+                            value={selectedSpu.brand || '-'}
+                            disabled
                             style={{ background: '#f5f5f5' }}
                           />
                         </Form.Item>
                       </Col>
                       <Col span={12}>
                         <Form.Item label="分类">
-                          <Input 
-                            value={selectedSpu.category || '-'} 
-                            disabled 
+                          <Input
+                            value={selectedSpu.category || '-'}
+                            disabled
                             style={{ background: '#f5f5f5' }}
                           />
                         </Form.Item>
@@ -484,9 +530,14 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                       {(() => {
                         const spuWithType = selectedSpu as any;
                         const productType = spuWithType.productType;
-                        const typeConfig = PRODUCT_TYPE_OPTIONS.find(opt => opt.value === productType);
+                        const typeConfig = PRODUCT_TYPE_OPTIONS.find(
+                          (opt) => opt.value === productType
+                        );
                         return typeConfig ? (
-                          <Tag color={typeConfig.color} style={{ fontSize: 14, padding: '4px 12px' }}>
+                          <Tag
+                            color={typeConfig.color}
+                            style={{ fontSize: 14, padding: '4px 12px' }}
+                          >
                             {typeConfig.label}
                           </Tag>
                         ) : (
@@ -507,12 +558,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   <Controller
                     name="name"
                     control={control}
-                    render={({ field }) => (
-                      <Input 
-                        {...field} 
-                        placeholder="如: 经典马天尼"
-                      />
-                    )}
+                    render={({ field }) => <Input {...field} placeholder="如: 经典马天尼" />}
                   />
                 </Form.Item>
 
@@ -601,7 +647,9 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         allowClear
                         showSearch
                         filterOption={(input, option) =>
-                          (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                          (option?.children as unknown as string)
+                            ?.toLowerCase()
+                            .includes(input.toLowerCase())
                         }
                         style={{ width: '100%' }}
                       >
@@ -618,11 +666,11 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             </Card>
 
             {/* 盈利分析卡片 */}
-            <Card 
-              style={{ 
-                background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', 
+            <Card
+              style={{
+                background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
                 color: 'white',
-                border: 'none'
+                border: 'none',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
@@ -631,21 +679,48 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
               </div>
               <Row gutter={32}>
                 <Col span={12}>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>估算成本</Text>
+                  <Text
+                    style={{
+                      color: 'rgba(255,255,255,0.7)',
+                      fontSize: 12,
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                    }}
+                  >
+                    估算成本
+                  </Text>
                   <div style={{ fontSize: 24, fontWeight: 'bold' }}>¥ {totalCost.toFixed(2)}</div>
                 </Col>
                 <Col span={12}>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>预估毛利</Text>
-                  <div style={{ 
-                    fontSize: 24, 
-                    fontWeight: 'bold',
-                    color: marginRate > 60 ? '#4ade80' : marginRate > 30 ? '#fbbf24' : '#f87171'
-                  }}>
+                  <Text
+                    style={{
+                      color: 'rgba(255,255,255,0.7)',
+                      fontSize: 12,
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                    }}
+                  >
+                    预估毛利
+                  </Text>
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 'bold',
+                      color: marginRate > 60 ? '#4ade80' : marginRate > 30 ? '#fbbf24' : '#f87171',
+                    }}
+                  >
                     {marginRate.toFixed(1)}%
                   </div>
                 </Col>
               </Row>
-              <div style={{ marginTop: 16, fontSize: 12, color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+              <div
+                style={{
+                  marginTop: 16,
+                  fontSize: 12,
+                  color: 'rgba(255,255,255,0.5)',
+                  fontStyle: 'italic',
+                }}
+              >
                 * 成本基于{isComboType ? '套餐子项' : 'BOM 配方各原料'}单价累加自动计算得出
               </div>
             </Card>
@@ -653,7 +728,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
 
           {/* 右侧 - BOM配方管理/套餐子项管理 */}
           <Col span={14}>
-            <Card 
+            <Card
               title={
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 16, color: '#1890ff' }}>◇</span>
@@ -661,8 +736,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                 </span>
               }
               extra={
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   ghost
                   icon={<PlusOutlined />}
                   onClick={() => {
@@ -690,21 +765,23 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         key: 'name',
                         render: (name: string) => (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ 
-                              width: 32, 
-                              height: 32, 
-                              borderRadius: 8, 
-                              background: '#e6f7ff', 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              justifyContent: 'center',
-                              color: '#1890ff'
-                            }}>
+                            <div
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 8,
+                                background: '#e6f7ff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#1890ff',
+                              }}
+                            >
                               ◇
                             </div>
                             <span style={{ fontWeight: 500 }}>{name}</span>
                           </div>
-                        )
+                        ),
                       },
                       {
                         title: '标准用量',
@@ -713,16 +790,25 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         width: 150,
                         align: 'center' as const,
                         render: (quantity: number, record: BOMItem) => (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: 4,
+                            }}
+                          >
                             <InputNumber
                               value={quantity}
                               min={0}
                               style={{ width: 80 }}
-                              onChange={(val) => updateBOMItemQuantity(record.ingredientId, val || 0)}
+                              onChange={(val) =>
+                                updateBOMItemQuantity(record.ingredientId, val || 0)
+                              }
                             />
                             <span style={{ color: '#999' }}>{record.unit}</span>
                           </div>
-                        )
+                        ),
                       },
                       {
                         title: '成本小计',
@@ -731,8 +817,10 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         width: 100,
                         align: 'right' as const,
                         render: (cost: number) => (
-                          <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>¥ {cost.toFixed(2)}</span>
-                        )
+                          <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>
+                            ¥ {cost.toFixed(2)}
+                          </span>
+                        ),
                       },
                       {
                         title: '操作',
@@ -740,22 +828,26 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         width: 60,
                         align: 'center' as const,
                         render: (_: unknown, record: BOMItem) => (
-                          <Button 
-                            type="text" 
+                          <Button
+                            type="text"
                             danger
                             icon={<DeleteOutlined />}
                             onClick={() => removeBOMItem(record.ingredientId)}
                           />
-                        )
-                      }
+                        ),
+                      },
                     ]}
                     summary={() => (
                       <Table.Summary.Row>
                         <Table.Summary.Cell index={0} colSpan={2}>
-                          <span style={{ color: '#999' }}>共 {bomItems.length} 项{isComboType ? '商品' : '原料'}</span>
+                          <span style={{ color: '#999' }}>
+                            共 {bomItems.length} 项{isComboType ? '商品' : '原料'}
+                          </span>
                         </Table.Summary.Cell>
                         <Table.Summary.Cell index={1} align="right">
-                          <span style={{ fontSize: 16, fontWeight: 600 }}>¥ {totalCost.toFixed(2)}</span>
+                          <span style={{ fontSize: 16, fontWeight: 600 }}>
+                            ¥ {totalCost.toFixed(2)}
+                          </span>
                         </Table.Summary.Cell>
                         <Table.Summary.Cell index={2} />
                       </Table.Summary.Row>
@@ -767,7 +859,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
                   description={
                     <span style={{ color: '#999' }}>
-                      {isComboType 
+                      {isComboType
                         ? '尚未配置套餐，点击右上角按钮从成品库中选择'
                         : '尚未配置配方，点击右上角按钮从原料库中选择'}
                     </span>
@@ -798,21 +890,32 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           open={isIngModalOpen}
           onCancel={() => setIsIngModalOpen(false)}
           footer={
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 0',
+              }}
+            >
               <div style={{ fontSize: 14, color: '#666' }}>
-                已选择 <span style={{ color: '#1890ff', fontWeight: 700, fontSize: 18 }}>{bomItems.length}</span> 种{isComboType ? '商品' : '原料'}
+                已选择{' '}
+                <span style={{ color: '#1890ff', fontWeight: 700, fontSize: 18 }}>
+                  {bomItems.length}
+                </span>{' '}
+                种{isComboType ? '商品' : '原料'}
               </div>
-              <Button 
+              <Button
                 type="primary"
                 size="large"
                 onClick={() => setIsIngModalOpen(false)}
-                style={{ 
+                style={{
                   borderRadius: 10,
                   fontWeight: 600,
                   paddingLeft: 32,
                   paddingRight: 32,
                   height: 44,
-                  fontSize: 15
+                  fontSize: 15,
                 }}
               >
                 完成选择
@@ -820,30 +923,32 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             </div>
           }
           width={560}
-          styles={{ 
-            body: { 
-              padding: 0, 
-              maxHeight: '60vh', 
-              overflow: 'hidden', 
-              display: 'flex', 
-              flexDirection: 'column' 
+          styles={{
+            body: {
+              padding: 0,
+              maxHeight: '60vh',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
             },
             header: {
               borderBottom: '2px solid #f0f0f0',
-              padding: '20px 24px 16px'
+              padding: '20px 24px 16px',
             },
             footer: {
               borderTop: '2px solid #f0f0f0',
-              padding: '16px 24px'
-            }
+              padding: '16px 24px',
+            },
           }}
         >
           {/* 搜索框 */}
-          <div style={{ 
-            padding: '20px 24px', 
-            background: 'linear-gradient(180deg, #f8f9fc 0%, #fff 100%)', 
-            borderBottom: '1px solid #eee' 
-          }}>
+          <div
+            style={{
+              padding: '20px 24px',
+              background: 'linear-gradient(180deg, #f8f9fc 0%, #fff 100%)',
+              borderBottom: '1px solid #eee',
+            }}
+          >
             <Input
               placeholder={isComboType ? '🔍  输入商品名称搜索...' : '🔍  输入原料名称搜索...'}
               value={ingSearchTerm}
@@ -851,13 +956,13 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
               allowClear
               autoFocus
               size="large"
-              style={{ 
+              style={{
                 borderRadius: 12,
                 background: '#fff',
                 height: 48,
                 fontSize: 15,
                 border: '2px solid #e8e8e8',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
               }}
             />
           </div>
@@ -865,7 +970,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           {/* 原料列表 */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', background: '#fafbfc' }}>
             {filteredIngredients.map((ing, index) => {
-              const isAdded = bomItems.some(b => b.ingredientId === ing.id);
+              const isAdded = bomItems.some((b) => b.ingredientId === ing.id);
               return (
                 <div
                   key={ing.id}
@@ -877,16 +982,21 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                     padding: '16px 20px',
                     borderRadius: 14,
                     cursor: isAdded ? 'default' : 'pointer',
-                    background: isAdded ? 'linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%)' : '#fff',
+                    background: isAdded
+                      ? 'linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%)'
+                      : '#fff',
                     border: isAdded ? '2px solid #95de64' : '2px solid #f0f0f0',
                     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                     marginBottom: 12,
-                    boxShadow: isAdded ? '0 4px 12px rgba(82,196,26,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
-                    transform: 'translateY(0)'
+                    boxShadow: isAdded
+                      ? '0 4px 12px rgba(82,196,26,0.15)'
+                      : '0 2px 8px rgba(0,0,0,0.04)',
+                    transform: 'translateY(0)',
                   }}
                   onMouseEnter={(e) => {
                     if (!isAdded) {
-                      e.currentTarget.style.background = 'linear-gradient(135deg, #e6f4ff 0%, #f0f7ff 100%)';
+                      e.currentTarget.style.background =
+                        'linear-gradient(135deg, #e6f4ff 0%, #f0f7ff 100%)';
                       e.currentTarget.style.border = '2px solid #69b1ff';
                       e.currentTarget.style.boxShadow = '0 6px 16px rgba(24,144,255,0.2)';
                       e.currentTarget.style.transform = 'translateY(-2px)';
@@ -903,62 +1013,74 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     {/* 序号标识 */}
-                    <div style={{ 
-                      width: 28, 
-                      height: 28, 
-                      borderRadius: '50%', 
-                      background: isAdded ? '#52c41a' : '#f0f0f0', 
-                      color: isAdded ? '#fff' : '#999',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      fontSize: 13,
-                      fontWeight: 700
-                    }}>
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: isAdded ? '#52c41a' : '#f0f0f0',
+                        color: isAdded ? '#fff' : '#999',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}
+                    >
                       {index + 1}
                     </div>
                     {/* 原料图标 */}
-                    <div style={{ 
-                      width: 52, 
-                      height: 52, 
-                      borderRadius: 14, 
-                      background: isAdded ? '#fff' : 'linear-gradient(135deg, #e6f4ff 0%, #bae0ff 100%)', 
-                      border: isAdded ? '2px solid #b7eb8f' : '2px solid #91caff',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      color: isAdded ? '#52c41a' : '#1890ff',
-                      fontSize: 22,
-                      fontWeight: 600
-                    }}>
+                    <div
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 14,
+                        background: isAdded
+                          ? '#fff'
+                          : 'linear-gradient(135deg, #e6f4ff 0%, #bae0ff 100%)',
+                        border: isAdded ? '2px solid #b7eb8f' : '2px solid #91caff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: isAdded ? '#52c41a' : '#1890ff',
+                        fontSize: 22,
+                        fontWeight: 600,
+                      }}
+                    >
                       {isAdded ? '✓' : '◇'}
                     </div>
                     {/* 原料信息 */}
                     <div>
-                      <div style={{ 
-                        fontWeight: 700, 
-                        fontSize: 16,
-                        color: isAdded ? '#389e0d' : '#1a1a2e',
-                        marginBottom: 4,
-                        letterSpacing: 0.3
-                      }}>
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: 16,
+                          color: isAdded ? '#389e0d' : '#1a1a2e',
+                          marginBottom: 4,
+                          letterSpacing: 0.3,
+                        }}
+                      >
                         {ing.name}
                       </div>
-                      <div style={{ 
-                        fontSize: 14, 
-                        color: isAdded ? '#73d13d' : '#666',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4
-                      }}>
-                        <span style={{ 
-                          background: isAdded ? '#f6ffed' : '#fff7e6', 
-                          padding: '2px 8px', 
-                          borderRadius: 4,
-                          fontSize: 13,
-                          color: isAdded ? '#52c41a' : '#fa8c16'
-                        }}>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          color: isAdded ? '#73d13d' : '#666',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                      >
+                        <span
+                          style={{
+                            background: isAdded ? '#f6ffed' : '#fff7e6',
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            fontSize: 13,
+                            color: isAdded ? '#52c41a' : '#fa8c16',
+                          }}
+                        >
                           ¥{ing.unitPrice}
                         </span>
                         <span style={{ color: '#999' }}>/ {ing.unit}</span>
@@ -967,33 +1089,37 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                   </div>
                   {/* 操作按钮区域 */}
                   {isAdded ? (
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 8, 
-                      color: '#52c41a', 
-                      fontSize: 14,
-                      fontWeight: 700,
-                      padding: '10px 16px',
-                      background: '#fff',
-                      borderRadius: 10,
-                      border: '2px solid #b7eb8f',
-                      boxShadow: '0 2px 6px rgba(82,196,26,0.15)'
-                    }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        color: '#52c41a',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        padding: '10px 16px',
+                        background: '#fff',
+                        borderRadius: 10,
+                        border: '2px solid #b7eb8f',
+                        boxShadow: '0 2px 6px rgba(82,196,26,0.15)',
+                      }}
+                    >
                       <CheckCircleOutlined style={{ fontSize: 18 }} /> 已添加
                     </div>
                   ) : (
-                    <div style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: 'linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%)',
-                      border: '2px dashed #91caff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s'
-                    }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        background: 'linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%)',
+                        border: '2px dashed #91caff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.2s',
+                      }}
+                    >
                       <PlusOutlined style={{ color: '#1890ff', fontSize: 20, fontWeight: 700 }} />
                     </div>
                   )}
@@ -1001,10 +1127,12 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
               );
             })}
             {filteredIngredients.length === 0 && (
-              <Empty 
-                image={Empty.PRESENTED_IMAGE_SIMPLE} 
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
-                  <span style={{ color: '#999', fontSize: 15 }}>未找到相关原料，请尝试其他关键词</span>
+                  <span style={{ color: '#999', fontSize: 15 }}>
+                    未找到相关原料，请尝试其他关键词
+                  </span>
                 }
                 style={{ marginTop: 60, marginBottom: 60 }}
               />
@@ -1020,11 +1148,11 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
             size="large"
             onClick={handleSubmit(onSubmit)}
             loading={isSubmitting}
-            style={{ 
+            style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               border: 'none',
               paddingLeft: 32,
-              paddingRight: 32
+              paddingRight: 32,
             }}
           >
             保存商品

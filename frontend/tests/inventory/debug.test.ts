@@ -19,14 +19,14 @@ describe('inventoryStore - 调试测试', () => {
       locations: store.locations.length,
       filter: store.filter,
       loading: store.loading,
-      error: store.error
+      error: store.error,
     });
 
     // 先获取位置数据
     await store.fetchLocations();
     console.log('获取位置后:', {
       locations: store.locations.length,
-      loading: store.loading
+      loading: store.loading,
     });
 
     // 获取库存数据
@@ -35,7 +35,7 @@ describe('inventoryStore - 调试测试', () => {
       inventoryItems: store.inventoryItems.length,
       loading: store.loading,
       error: store.error,
-      filter: store.filter
+      filter: store.filter,
     });
 
     // 检查第一个库存项
@@ -60,7 +60,7 @@ describe('inventoryStore - 调试测试', () => {
         code: 'TEST-001',
         type: 'warehouse',
         capacity: 1000,
-        description: '测试用位置'
+        description: '测试用位置',
       });
       console.log('创建位置后:', store.locations.length);
     }
@@ -75,15 +75,15 @@ describe('inventoryStore - 调试测试', () => {
       minStock: 20,
       maxStock: 500,
       safeStock: 30,
-      averageCost: 15.50,
-      remark: '调试测试库存项'
+      averageCost: 15.5,
+      remark: '调试测试库存项',
     });
 
     console.log('创建库存项结果:', {
       newInventoryId,
       totalItems: store.inventoryItems.length,
       loading: store.loading,
-      error: store.error
+      error: store.error,
     });
 
     expect(newInventoryId).toBeDefined();

@@ -26,12 +26,12 @@ interface ImageUploaderProps {
 
 /**
  * 图片上传组件
- * 
+ *
  * 支持：
  * 1. 上传图片到服务器
  * 2. 预览已上传图片
  * 3. 删除图片
- * 
+ *
  * @example
  * <ImageUploader
  *   value={imageUrl}
@@ -75,7 +75,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       // TODO: 实际项目中应该上传到 Supabase Storage 或其他存储服务
       // 这里使用模拟 URL
       const mockUrl = URL.createObjectURL(file as Blob);
-      
+
       // 模拟上传延迟
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -118,20 +118,11 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
               customRequest={customUpload}
               accept="image/*"
             >
-              <Button
-                icon={<UploadOutlined />}
-                loading={uploading}
-                size="small"
-              >
+              <Button icon={<UploadOutlined />} loading={uploading} size="small">
                 更换
               </Button>
             </Upload>
-            <Button
-              icon={<DeleteOutlined />}
-              onClick={handleRemove}
-              size="small"
-              danger
-            >
+            <Button icon={<DeleteOutlined />} onClick={handleRemove} size="small" danger>
               删除
             </Button>
           </Space>
@@ -164,12 +155,8 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         }}
       >
         <UploadOutlined style={{ fontSize: 24, color: '#999' }} />
-        <div style={{ marginTop: 8, color: '#666' }}>
-          {uploading ? '上传中...' : '点击上传'}
-        </div>
-        <div style={{ fontSize: 12, color: '#999' }}>
-          支持 JPG、PNG，最大 {maxSize}MB
-        </div>
+        <div style={{ marginTop: 8, color: '#666' }}>{uploading ? '上传中...' : '点击上传'}</div>
+        <div style={{ fontSize: 12, color: '#999' }}>支持 JPG、PNG，最大 {maxSize}MB</div>
       </div>
     </Upload>
   );

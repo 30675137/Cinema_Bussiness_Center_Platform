@@ -10,7 +10,7 @@ import type {
   ThemeCustomization,
   ThemeEventType,
   ThemeEventListener,
-  CSSVariableMap
+  CSSVariableMap,
 } from './types';
 
 /**
@@ -33,7 +33,7 @@ export class ThemeManager {
       enableHighContrast: false,
       enableReducedMotion: false,
       fontSize: 'medium',
-      fontFamily: 'Inter'
+      fontFamily: 'Inter',
     };
 
     this.currentTheme = this.createDefaultTheme('light');
@@ -110,7 +110,7 @@ export class ThemeManager {
       id: `custom-${Date.now()}`,
       name,
       mode: this.currentMode,
-      ...customization
+      ...customization,
     };
 
     return customTheme;
@@ -130,8 +130,8 @@ export class ThemeManager {
    * 移除自定义主题
    */
   removeCustomTheme(themeId: string): void {
-    this.customThemes = this.customThemes.filter(theme => theme.id !== themeId);
-    this.settings.customThemes = this.settings.customThemes.filter(theme => theme.id !== themeId);
+    this.customThemes = this.customThemes.filter((theme) => theme.id !== themeId);
+    this.settings.customThemes = this.settings.customThemes.filter((theme) => theme.id !== themeId);
     this.saveSettings();
     this.emit('customThemeRemoved', { themeId });
   }
@@ -260,7 +260,7 @@ export class ThemeManager {
     if (typeof document === 'undefined' || !document.documentElement) {
       return;
     }
-    
+
     const root = document.documentElement;
     const variables = this.getCSSVariables();
 
@@ -316,16 +316,17 @@ export class ThemeManager {
           primary: isDark ? '#ffffff' : '#000000',
           secondary: isDark ? '#a6a6a6' : '#595959',
           disabled: isDark ? '#434343' : '#bfbfbf',
-          inverse: isDark ? '#000000' : '#ffffff'
+          inverse: isDark ? '#000000' : '#ffffff',
         },
         border: isDark ? '#434343' : '#d9d9d9',
-        shadow: isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'
+        shadow: isDark ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)',
       },
       typography: {
         fontFamily: {
-          primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          primary:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           monospace: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace',
-          sans: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+          sans: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         },
         fontSize: {
           xs: '0.75rem',
@@ -336,20 +337,20 @@ export class ThemeManager {
           '2xl': '1.5rem',
           '3xl': '1.875rem',
           '4xl': '2.25rem',
-          '5xl': '3rem'
+          '5xl': '3rem',
         },
         fontWeight: {
           light: 300,
           normal: 400,
           medium: 500,
           semibold: 600,
-          bold: 700
+          bold: 700,
         },
         lineHeight: {
           tight: 1.25,
           normal: 1.5,
-          relaxed: 1.75
-        }
+          relaxed: 1.75,
+        },
       },
       spacing: {
         xs: '0.25rem',
@@ -360,7 +361,7 @@ export class ThemeManager {
         '2xl': '3rem',
         '3xl': '4rem',
         '4xl': '6rem',
-        '5xl': '8rem'
+        '5xl': '8rem',
       },
       borderRadius: {
         none: '0',
@@ -370,7 +371,7 @@ export class ThemeManager {
         lg: '0.5rem',
         xl: '0.75rem',
         '2xl': '1rem',
-        full: '9999px'
+        full: '9999px',
       },
       boxShadow: {
         sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
@@ -379,7 +380,7 @@ export class ThemeManager {
         lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)'
+        inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       },
       breakpoints: {
         xs: '480px',
@@ -387,20 +388,20 @@ export class ThemeManager {
         md: '768px',
         lg: '992px',
         xl: '1200px',
-        '2xl': '1600px'
+        '2xl': '1600px',
       },
       animation: {
         duration: {
           fast: '150ms',
           normal: '300ms',
-          slow: '500ms'
+          slow: '500ms',
         },
         easing: {
           ease: 'ease',
           easeIn: 'ease-in',
           easeOut: 'ease-out',
-          easeInOut: 'ease-in-out'
-        }
+          easeInOut: 'ease-in-out',
+        },
       },
       zIndex: {
         hide: -1,
@@ -420,8 +421,8 @@ export class ThemeManager {
         actionMenu: 2000,
         notification: 2100,
         mask: 2200,
-        fullscreen: 2300
-      }
+        fullscreen: 2300,
+      },
     };
   }
 
@@ -500,7 +501,7 @@ export class ThemeManager {
   private emit(event: ThemeEventType, data: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => {
+      listeners.forEach((listener) => {
         try {
           listener(data);
         } catch (error) {

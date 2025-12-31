@@ -63,11 +63,14 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt =>
-          receipt.receiptNumber.includes('REC001') ||
-          receipt.supplier.name.includes('REC001') ||
-          receipt.operator.includes('REC001')
-        )).toBe(true);
+        expect(
+          result.current.receipts.every(
+            (receipt) =>
+              receipt.receiptNumber.includes('REC001') ||
+              receipt.supplier.name.includes('REC001') ||
+              receipt.operator.includes('REC001')
+          )
+        ).toBe(true);
       });
     });
 
@@ -80,7 +83,9 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt => receipt.status === 'completed')).toBe(true);
+        expect(result.current.receipts.every((receipt) => receipt.status === 'completed')).toBe(
+          true
+        );
       });
     });
 
@@ -93,7 +98,7 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt => receipt.priority === 'high')).toBe(true);
+        expect(result.current.receipts.every((receipt) => receipt.priority === 'high')).toBe(true);
       });
     });
 
@@ -106,7 +111,9 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt => receipt.supplier.id === 'supplier-1')).toBe(true);
+        expect(
+          result.current.receipts.every((receipt) => receipt.supplier.id === 'supplier-1')
+        ).toBe(true);
       });
     });
 
@@ -119,7 +126,9 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt => receipt.warehouse.id === 'warehouse-1')).toBe(true);
+        expect(
+          result.current.receipts.every((receipt) => receipt.warehouse.id === 'warehouse-1')
+        ).toBe(true);
       });
     });
 
@@ -133,9 +142,11 @@ describe('ReceiptStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.receipts.every(receipt =>
-          receipt.receiptDate >= dateRange[0] && receipt.receiptDate <= dateRange[1]
-        )).toBe(true);
+        expect(
+          result.current.receipts.every(
+            (receipt) => receipt.receiptDate >= dateRange[0] && receipt.receiptDate <= dateRange[1]
+          )
+        ).toBe(true);
       });
     });
 
@@ -145,7 +156,7 @@ describe('ReceiptStore', () => {
       await act(async () => {
         await result.current.fetchReceipts({
           sortBy: 'receiptDate',
-          sortOrder: 'desc'
+          sortOrder: 'desc',
         });
       });
 
@@ -154,7 +165,7 @@ describe('ReceiptStore', () => {
 
         const receipts = result.current.receipts;
         for (let i = 1; i < receipts.length; i++) {
-          expect(new Date(receipts[i-1].receiptDate).getTime()).toBeGreaterThanOrEqual(
+          expect(new Date(receipts[i - 1].receiptDate).getTime()).toBeGreaterThanOrEqual(
             new Date(receipts[i].receiptDate).getTime()
           );
         }
@@ -226,7 +237,7 @@ describe('ReceiptStore', () => {
         expect(result.current.loading).toBe(false);
         expect(result.current.receipts.length).toBeGreaterThan(0);
 
-        const newReceipt = result.current.receipts.find(r => r.supplier.id === 'supplier-1');
+        const newReceipt = result.current.receipts.find((r) => r.supplier.id === 'supplier-1');
         expect(newReceipt).toBeTruthy();
         expect(newReceipt?.status).toBe('draft');
         expect(newReceipt?.priority).toBe('high');
@@ -281,7 +292,7 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedReceipt = result.current.receipts.find(r => r.id === firstReceipt.id);
+        const updatedReceipt = result.current.receipts.find((r) => r.id === firstReceipt.id);
         expect(updatedReceipt?.priority).toBe('urgent');
         expect(updatedReceipt?.remarks).toContain('更新后的备注');
       });
@@ -320,7 +331,7 @@ describe('ReceiptStore', () => {
       const firstReceipt = result.current.receipts[0];
       const confirmData = {
         receiptId: firstReceipt.id,
-        items: firstReceipt.items.map(item => ({
+        items: firstReceipt.items.map((item) => ({
           id: item.id,
           receivedQuantity: item.orderedQuantity,
           qualifiedQuantity: item.orderedQuantity - 1,
@@ -339,10 +350,12 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedReceipt = result.current.receipts.find(r => r.id === firstReceipt.id);
+        const updatedReceipt = result.current.receipts.find((r) => r.id === firstReceipt.id);
         expect(updatedReceipt?.status).toBe('completed');
 
-        const updatedItem = updatedReceipt?.items.find(item => item.id === firstReceipt.items[0].id);
+        const updatedItem = updatedReceipt?.items.find(
+          (item) => item.id === firstReceipt.items[0].id
+        );
         expect(updatedItem?.receivedQuantity).toBe(firstReceipt.items[0].orderedQuantity);
         expect(updatedItem?.qualityStatus).toBe('passed');
       });
@@ -363,7 +376,7 @@ describe('ReceiptStore', () => {
       const firstReceipt = result.current.receipts[0];
       const confirmData = {
         receiptId: firstReceipt.id,
-        items: firstReceipt.items.map(item => ({
+        items: firstReceipt.items.map((item) => ({
           id: item.id,
           receivedQuantity: Math.floor(item.orderedQuantity / 2), // 只收一半
           qualifiedQuantity: Math.floor(item.orderedQuantity / 2),
@@ -381,7 +394,7 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedReceipt = result.current.receipts.find(r => r.id === firstReceipt.id);
+        const updatedReceipt = result.current.receipts.find((r) => r.id === firstReceipt.id);
         expect(updatedReceipt?.status).toBe('partial_received');
       });
     });
@@ -430,8 +443,10 @@ describe('ReceiptStore', () => {
         expect(result.current.loading).toBe(false);
         expect(result.current.isQualityCheckVisible).toBe(false);
 
-        const updatedReceipt = result.current.receipts.find(r => r.id === firstReceipt.id);
-        const updatedItem = updatedReceipt?.items.find(item => item.id === firstReceipt.items[0].id);
+        const updatedReceipt = result.current.receipts.find((r) => r.id === firstReceipt.id);
+        const updatedItem = updatedReceipt?.items.find(
+          (item) => item.id === firstReceipt.items[0].id
+        );
         expect(updatedItem?.qualityStatus).toBe('passed');
         expect(updatedItem?.qualifiedQuantity).toBe(100);
       });
@@ -462,8 +477,10 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedReceipt = result.current.receipts.find(r => r.id === firstReceipt.id);
-        const updatedItem = updatedReceipt?.items.find(item => item.id === firstReceipt.items[0].id);
+        const updatedReceipt = result.current.receipts.find((r) => r.id === firstReceipt.id);
+        const updatedItem = updatedReceipt?.items.find(
+          (item) => item.id === firstReceipt.items[0].id
+        );
         expect(updatedItem?.qualityStatus).toBe('passed');
       });
     });
@@ -545,7 +562,7 @@ describe('ReceiptStore', () => {
         expect(result.current.receipts.length).toBeGreaterThan(0);
       });
 
-      const receiptIds = result.current.receipts.map(r => r.id);
+      const receiptIds = result.current.receipts.map((r) => r.id);
 
       act(() => {
         result.current.selectAllReceipts(true);
@@ -574,7 +591,7 @@ describe('ReceiptStore', () => {
         expect(result.current.receipts.length).toBeGreaterThan(0);
       });
 
-      const receiptIds = result.current.receipts.slice(0, 2).map(r => r.id);
+      const receiptIds = result.current.receipts.slice(0, 2).map((r) => r.id);
       const initialCount = result.current.receipts.length;
 
       await act(async () => {
@@ -600,7 +617,7 @@ describe('ReceiptStore', () => {
         expect(result.current.receipts.length).toBeGreaterThan(0);
       });
 
-      const receiptIds = result.current.receipts.slice(0, 2).map(r => r.id);
+      const receiptIds = result.current.receipts.slice(0, 2).map((r) => r.id);
 
       await act(async () => {
         const success = await result.current.batchCancel(receiptIds, '批量取消测试');
@@ -610,10 +627,8 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const cancelledReceipts = result.current.receipts.filter(s =>
-          receiptIds.includes(s.id)
-        );
-        expect(cancelledReceipts.every(s => s.status === 'cancelled')).toBe(true);
+        const cancelledReceipts = result.current.receipts.filter((s) => receiptIds.includes(s.id));
+        expect(cancelledReceipts.every((s) => s.status === 'cancelled')).toBe(true);
       });
     });
 
@@ -629,7 +644,7 @@ describe('ReceiptStore', () => {
         expect(result.current.receipts.length).toBeGreaterThan(0);
       });
 
-      const receiptIds = result.current.receipts.slice(0, 2).map(r => r.id);
+      const receiptIds = result.current.receipts.slice(0, 2).map((r) => r.id);
 
       await act(async () => {
         const success = await result.current.batchApprove(receiptIds);
@@ -639,10 +654,8 @@ describe('ReceiptStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const approvedReceipts = result.current.receipts.filter(s =>
-          receiptIds.includes(s.id)
-        );
-        expect(approvedReceipts.every(s => s.status === 'completed')).toBe(true);
+        const approvedReceipts = result.current.receipts.filter((s) => receiptIds.includes(s.id));
+        expect(approvedReceipts.every((s) => s.status === 'completed')).toBe(true);
       });
     });
   });
@@ -719,20 +732,22 @@ describe('ReceiptStore', () => {
         totalAmount: 1000,
         taxAmount: 130,
         totalAmountWithTax: 1130,
-        items: [{
-          id: 'item-1',
-          productId: 'p1',
-          productCode: 'P001',
-          productName: '商品1',
-          unit: '个',
-          orderedQuantity: 100,
-          receivedQuantity: 0,
-          qualifiedQuantity: 0,
-          defectiveQuantity: 0,
-          unitPrice: 10,
-          totalPrice: 1000,
-          qualityStatus: 'pending' as const,
-        }],
+        items: [
+          {
+            id: 'item-1',
+            productId: 'p1',
+            productCode: 'P001',
+            productName: '商品1',
+            unit: '个',
+            orderedQuantity: 100,
+            receivedQuantity: 0,
+            qualifiedQuantity: 0,
+            defectiveQuantity: 0,
+            unitPrice: 10,
+            totalPrice: 1000,
+            qualityStatus: 'pending' as const,
+          },
+        ],
         createdById: 'user1',
         createdAt: '2024-01-01T00:00:00Z',
         updatedById: 'user1',

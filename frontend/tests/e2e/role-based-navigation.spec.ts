@@ -15,25 +15,22 @@ const ADMIN_USER = {
     '商品管理',
     '库存 & 仓店库存管理',
     '价格体系管理',
-    '运营 & 报表 / 指标看板'
-  ]
+    '运营 & 报表 / 指标看板',
+  ],
 };
 
 const OPERATOR_USER = {
   username: 'operator',
   password: 'operator',
   expectedMenuCount: 2, // 2个一级菜单
-  expectedMenus: [
-    '商品管理',
-    '库存 & 仓店库存管理'
-  ]
+  expectedMenus: ['商品管理', '库存 & 仓店库存管理'],
 };
 
 const LIMITED_USER = {
   username: 'viewer',
   password: 'viewer',
   expectedMenuCount: 0, // 无权限
-  expectedMenus: []
+  expectedMenus: [],
 };
 
 test.describe('基于角色的菜单可见性', () => {
@@ -222,7 +219,9 @@ test.describe('基于角色的菜单可见性', () => {
     await expect(page.locator('[data-testid="menu-item-商品管理"]')).toHaveClass(/active/);
 
     // 验证其他菜单不处于激活状态
-    await expect(page.locator('[data-testid="menu-item-库存 & 仓店库存管理"]')).not.toHaveClass(/active/);
+    await expect(page.locator('[data-testid="menu-item-库存 & 仓店库存管理"]')).not.toHaveClass(
+      /active/
+    );
 
     // 导航到SPU管理页面
     await page.click('[data-testid="submenu-item-SPU 管理"]');

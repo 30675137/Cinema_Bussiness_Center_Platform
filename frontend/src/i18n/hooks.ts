@@ -31,26 +31,35 @@ export const useTranslation = () => {
   }, []);
 
   // 格式化函数
-  const formatNumber = useCallback((value: number, options?: Intl.NumberFormatOptions, language?: Language) => {
-    return i18n.formatNumber(value, options, language);
-  }, []);
+  const formatNumber = useCallback(
+    (value: number, options?: Intl.NumberFormatOptions, language?: Language) => {
+      return i18n.formatNumber(value, options, language);
+    },
+    []
+  );
 
   const formatCurrency = useCallback((value: number, currency?: string, language?: Language) => {
     return i18n.formatCurrency(value, currency, language);
   }, []);
 
-  const formatDate = useCallback((date: Date | number | string, options?: Intl.DateTimeFormatOptions, language?: Language) => {
-    return i18n.formatDate(date, options, language);
-  }, []);
+  const formatDate = useCallback(
+    (date: Date | number | string, options?: Intl.DateTimeFormatOptions, language?: Language) => {
+      return i18n.formatDate(date, options, language);
+    },
+    []
+  );
 
-  const formatRelativeTime = useCallback((
-    value: number,
-    unit: Intl.RelativeTimeFormatUnit,
-    options?: Intl.RelativeTimeFormatOptions,
-    language?: Language
-  ) => {
-    return i18n.formatRelativeTime(value, unit, options, language);
-  }, []);
+  const formatRelativeTime = useCallback(
+    (
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions,
+      language?: Language
+    ) => {
+      return i18n.formatRelativeTime(value, unit, options, language);
+    },
+    []
+  );
 
   const formatList = useCallback((items: string[], language?: Language) => {
     return i18n.formatList(items, language);
@@ -69,7 +78,7 @@ export const useTranslation = () => {
     formatCurrency,
     formatDate,
     formatRelativeTime,
-    formatList
+    formatList,
   };
 };
 
@@ -99,7 +108,7 @@ export const useI18n = () => {
   }, [currentLanguage]);
 
   const supportedLanguageConfigs = useMemo(() => {
-    return supportedLanguages.map(lang => i18n.getLanguageConfig(lang));
+    return supportedLanguages.map((lang) => i18n.getLanguageConfig(lang));
   }, [supportedLanguages]);
 
   // 切换语言
@@ -125,7 +134,7 @@ export const useI18n = () => {
     supportedLanguageConfigs,
     changeLanguage,
     isSupported,
-    getSupportedLanguage
+    getSupportedLanguage,
   };
 };
 
@@ -138,17 +147,20 @@ export const useLanguageSelector = () => {
   // 切换到下一个语言
   const nextLanguage = useCallback(() => {
     const currentIndex = supportedLanguageConfigs.findIndex(
-      config => config.code === currentLanguage
+      (config) => config.code === currentLanguage
     );
     const nextIndex = (currentIndex + 1) % supportedLanguageConfigs.length;
     changeLanguage(supportedLanguageConfigs[nextIndex].code);
   }, [currentLanguage, changeLanguage, supportedLanguageConfigs]);
 
   // 切换语言并保存偏好
-  const changeLanguageWithPreference = useCallback((language: Language) => {
-    changeLanguage(language);
-    localStorage.setItem('i18n-language', language);
-  }, [changeLanguage]);
+  const changeLanguageWithPreference = useCallback(
+    (language: Language) => {
+      changeLanguage(language);
+      localStorage.setItem('i18n-language', language);
+    },
+    [changeLanguage]
+  );
 
   // 从浏览器语言自动设置
   const setFromBrowser = useCallback(() => {
@@ -162,7 +174,7 @@ export const useLanguageSelector = () => {
     supportedLanguages: supportedLanguageConfigs,
     changeLanguage: changeLanguageWithPreference,
     nextLanguage,
-    setFromBrowser
+    setFromBrowser,
   };
 };
 
@@ -172,37 +184,62 @@ export const useLanguageSelector = () => {
 export const useFormatter = (language?: Language) => {
   const targetLanguage = language || i18n.getCurrentLanguage();
 
-  const formatNumber = useCallback((value: number, options?: Intl.NumberFormatOptions) => {
-    return i18n.formatNumber(value, options, targetLanguage);
-  }, [targetLanguage]);
+  const formatNumber = useCallback(
+    (value: number, options?: Intl.NumberFormatOptions) => {
+      return i18n.formatNumber(value, options, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
-  const formatCurrency = useCallback((value: number, currency?: string) => {
-    return i18n.formatCurrency(value, currency, targetLanguage);
-  }, [targetLanguage]);
+  const formatCurrency = useCallback(
+    (value: number, currency?: string) => {
+      return i18n.formatCurrency(value, currency, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
-  const formatDate = useCallback((date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
-    return i18n.formatDate(date, options, targetLanguage);
-  }, [targetLanguage]);
+  const formatDate = useCallback(
+    (date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
+      return i18n.formatDate(date, options, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
-  const formatTime = useCallback((date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
-    return i18n.formatDate(date, { ...options, timeStyle: 'short' }, targetLanguage);
-  }, [targetLanguage]);
+  const formatTime = useCallback(
+    (date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
+      return i18n.formatDate(date, { ...options, timeStyle: 'short' }, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
-  const formatDateTime = useCallback((date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
-    return i18n.formatDate(date, { ...options, dateStyle: 'short', timeStyle: 'short' }, targetLanguage);
-  }, [targetLanguage]);
+  const formatDateTime = useCallback(
+    (date: Date | number | string, options?: Intl.DateTimeFormatOptions) => {
+      return i18n.formatDate(
+        date,
+        { ...options, dateStyle: 'short', timeStyle: 'short' },
+        targetLanguage
+      );
+    },
+    [targetLanguage]
+  );
 
-  const formatRelativeTime = useCallback((
-    value: number,
-    unit: Intl.RelativeTimeFormatUnit,
-    options?: Intl.RelativeTimeFormatOptions
-  ) => {
-    return i18n.formatRelativeTime(value, unit, options, targetLanguage);
-  }, [targetLanguage]);
+  const formatRelativeTime = useCallback(
+    (
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions
+    ) => {
+      return i18n.formatRelativeTime(value, unit, options, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
-  const formatList = useCallback((items: string[]) => {
-    return i18n.formatList(items, targetLanguage);
-  }, [targetLanguage]);
+  const formatList = useCallback(
+    (items: string[]) => {
+      return i18n.formatList(items, targetLanguage);
+    },
+    [targetLanguage]
+  );
 
   return {
     formatNumber,
@@ -211,6 +248,6 @@ export const useFormatter = (language?: Language) => {
     formatTime,
     formatDateTime,
     formatRelativeTime,
-    formatList
+    formatList,
   };
 };

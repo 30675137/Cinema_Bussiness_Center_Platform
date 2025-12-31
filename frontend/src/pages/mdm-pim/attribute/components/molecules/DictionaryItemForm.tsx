@@ -12,8 +12,14 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Form, Input, InputNumber, Switch, message } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createDictionaryItemSchema, updateDictionaryItemSchema } from '@/features/attribute-dictionary/utils/validators';
-import { generateCode, generateUniqueCode } from '@/features/attribute-dictionary/utils/codeGenerator';
+import {
+  createDictionaryItemSchema,
+  updateDictionaryItemSchema,
+} from '@/features/attribute-dictionary/utils/validators';
+import {
+  generateCode,
+  generateUniqueCode,
+} from '@/features/attribute-dictionary/utils/codeGenerator';
 import type { DictionaryItem } from '@/features/attribute-dictionary/types';
 import type { DictionaryItemFormValues, DrawerMode } from '../../types/attribute.types';
 import { useDictionaryItemsQuery } from '../../hooks/useDictionaryQueries';
@@ -50,22 +56,24 @@ const DictionaryItemForm: React.FC<DictionaryItemFormProps> = ({
   const existingCodes = useMemo(() => {
     return new Set(
       existingItems
-        .filter(item => !initialData || item.id !== initialData.id)
-        .map(item => item.code)
+        .filter((item) => !initialData || item.id !== initialData.id)
+        .map((item) => item.code)
     );
   }, [existingItems, initialData]);
 
   const existingNames = useMemo(() => {
     return new Set(
       existingItems
-        .filter(item => !initialData || item.id !== initialData.id)
-        .map(item => item.name.toLowerCase())
+        .filter((item) => !initialData || item.id !== initialData.id)
+        .map((item) => item.name.toLowerCase())
     );
   }, [existingItems, initialData]);
 
-  const schema = isEditMode ? updateDictionaryItemSchema : createDictionaryItemSchema.extend({
-    typeId: createDictionaryItemSchema.shape.typeId,
-  });
+  const schema = isEditMode
+    ? updateDictionaryItemSchema
+    : createDictionaryItemSchema.extend({
+        typeId: createDictionaryItemSchema.shape.typeId,
+      });
 
   const {
     control,
@@ -187,11 +195,7 @@ const DictionaryItemForm: React.FC<DictionaryItemFormProps> = ({
           errors.code?.message ||
           (autoGenerateCode && !isEditMode ? '编码将根据名称自动生成' : undefined)
         }
-        extra={
-          !isEditMode && autoGenerateCode
-            ? '编码将根据名称自动生成，可手动修改'
-            : undefined
-        }
+        extra={!isEditMode && autoGenerateCode ? '编码将根据名称自动生成，可手动修改' : undefined}
       >
         <Controller
           name="code"
@@ -279,5 +283,3 @@ const DictionaryItemForm: React.FC<DictionaryItemFormProps> = ({
 };
 
 export default DictionaryItemForm;
-
-

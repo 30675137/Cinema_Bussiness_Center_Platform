@@ -134,10 +134,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 验证模态框标题
       expect(screen.getByText('创建 SKU')).toBeInTheDocument();
@@ -184,10 +183,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写 SKU 名称
       const nameInput = screen.getByLabelText(/SKU 名称/);
@@ -222,10 +220,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 初始状态:标准成本字段不存在
       expect(screen.queryByLabelText(/标准成本/)).not.toBeInTheDocument();
@@ -254,10 +251,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 选择成品类型
       const typeSelect = screen.getByLabelText(/SKU 类型/);
@@ -276,7 +272,9 @@ describe('SKUCreateModal Component', () => {
       // BOM 配方提示应该显示
       await waitFor(() => {
         expect(screen.getByText(/BOM 配方/)).toBeInTheDocument();
-        expect(screen.getByText(/BOM 配方配置较复杂,建议创建 SKU 后通过"编辑"功能配置/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/BOM 配方配置较复杂,建议创建 SKU 后通过"编辑"功能配置/)
+        ).toBeInTheDocument();
       });
     });
 
@@ -289,10 +287,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 选择套餐类型
       const typeSelect = screen.getByLabelText(/SKU 类型/);
@@ -306,7 +303,9 @@ describe('SKUCreateModal Component', () => {
       // 套餐子项提示应该显示
       await waitFor(() => {
         expect(screen.getByText(/套餐子项/)).toBeInTheDocument();
-        expect(screen.getByText(/套餐子项配置较复杂,建议创建 SKU 后通过"编辑"功能配置/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/套餐子项配置较复杂,建议创建 SKU 后通过"编辑"功能配置/)
+        ).toBeInTheDocument();
       });
     });
   });
@@ -328,10 +327,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写必填字段
       await user.type(screen.getByLabelText(/SKU 名称/), '可口可乐 330ml');
@@ -356,10 +354,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 点击创建按钮 (不填写任何字段)
       const createButton = screen.getByRole('button', { name: '创建' });
@@ -380,10 +377,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写表单并提交
       // 注意: 实际测试中需要完整的表单填写流程
@@ -400,10 +396,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写 SKU 名称
       const nameInput = screen.getByLabelText(/SKU 名称/);
@@ -424,10 +419,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写 SKU 名称
       const nameInput = screen.getByLabelText(/SKU 名称/);
@@ -458,10 +452,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写并提交表单 (简化版)
       // 注意: 实际测试需要完整的表单填写和提交流程
@@ -482,10 +475,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       const cancelButton = screen.getByRole('button', { name: '取消' });
       await user.click(cancelButton);
@@ -502,10 +494,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 填写 SKU 名称
       const nameInput = screen.getByLabelText(/SKU 名称/) as HTMLInputElement;
@@ -532,10 +523,9 @@ describe('SKUCreateModal Component', () => {
         isPending: true, // 模拟提交中状态
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       const createButton = screen.getByRole('button', { name: '创建' });
       expect(createButton).toHaveClass('ant-btn-loading');
@@ -552,10 +542,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 点击 SPU 选择器
       const spuSelect = screen.getByLabelText(/关联 SPU/);
@@ -584,10 +573,9 @@ describe('SKUCreateModal Component', () => {
         error: null,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // SPU Select 应该显示 loading
       const spuSelect = screen.getByLabelText(/关联 SPU/);
@@ -604,10 +592,9 @@ describe('SKUCreateModal Component', () => {
         isPending: false,
       } as any);
 
-      render(
-        <SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />,
-        { wrapper: createWrapper() }
-      );
+      render(<SKUCreateModal visible={true} onCancel={mockOnCancel} onSuccess={mockOnSuccess} />, {
+        wrapper: createWrapper(),
+      });
 
       // 点击 Unit 选择器
       const unitSelect = screen.getByLabelText(/主单位/);

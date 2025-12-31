@@ -3,8 +3,17 @@ import { Modal, Form, Input, Select, InputNumber, message } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
-import type { CreateScheduleEventRequest, UpdateScheduleEventRequest, ScheduleEvent, EventType, EventStatus } from '@/pages/schedule/types/schedule.types';
-import { createScheduleEventSchema, updateScheduleEventSchema } from '@/features/schedule-management/utils/validators';
+import type {
+  CreateScheduleEventRequest,
+  UpdateScheduleEventRequest,
+  ScheduleEvent,
+  EventType,
+  EventStatus,
+} from '@/pages/schedule/types/schedule.types';
+import {
+  createScheduleEventSchema,
+  updateScheduleEventSchema,
+} from '@/features/schedule-management/utils/validators';
 import { useScheduleMutations } from '@/pages/schedule/hooks/useScheduleMutations';
 import { useScheduleStore } from '@/features/schedule-management/stores/scheduleStore';
 import { scheduleService } from '@/pages/schedule/services/scheduleService';
@@ -120,7 +129,16 @@ const EventForm: React.FC<EventFormProps> = ({
         details: '',
       });
     }
-  }, [isEditMode, event, selectedDate, defaultHallId, defaultStartHour, defaultDuration, defaultType, reset]);
+  }, [
+    isEditMode,
+    event,
+    selectedDate,
+    defaultHallId,
+    defaultStartHour,
+    defaultDuration,
+    defaultType,
+    reset,
+  ]);
 
   const type = watch('type');
   const hallId = watch('hallId');
@@ -175,23 +193,27 @@ const EventForm: React.FC<EventFormProps> = ({
       cancelText="取消"
     >
       <Form layout="vertical">
-        <Form.Item label="影厅" validateStatus={errors.hallId ? 'error' : undefined} help={errors.hallId?.message}>
+        <Form.Item
+          label="影厅"
+          validateStatus={errors.hallId ? 'error' : undefined}
+          help={errors.hallId?.message}
+        >
           <Controller
             name="hallId"
             control={control}
-            render={({ field }) => (
-              <Input placeholder="请输入影厅ID" {...field} />
-            )}
+            render={({ field }) => <Input placeholder="请输入影厅ID" {...field} />}
           />
         </Form.Item>
 
-        <Form.Item label="日期" validateStatus={errors.date ? 'error' : undefined} help={errors.date?.message}>
+        <Form.Item
+          label="日期"
+          validateStatus={errors.date ? 'error' : undefined}
+          help={errors.date?.message}
+        >
           <Controller
             name="date"
             control={control}
-            render={({ field }) => (
-              <Input {...field} placeholder="YYYY-MM-DD" />
-            )}
+            render={({ field }) => <Input {...field} placeholder="YYYY-MM-DD" />}
           />
         </Form.Item>
 
@@ -223,7 +245,11 @@ const EventForm: React.FC<EventFormProps> = ({
           />
         </Form.Item>
 
-        <Form.Item label="标题" validateStatus={errors.title ? 'error' : undefined} help={errors.title?.message}>
+        <Form.Item
+          label="标题"
+          validateStatus={errors.title ? 'error' : undefined}
+          help={errors.title?.message}
+        >
           <Controller
             name="title"
             control={control}
@@ -231,13 +257,15 @@ const EventForm: React.FC<EventFormProps> = ({
           />
         </Form.Item>
 
-        <Form.Item label="类型" validateStatus={errors.type ? 'error' : undefined} help={errors.type?.message}>
+        <Form.Item
+          label="类型"
+          validateStatus={errors.type ? 'error' : undefined}
+          help={errors.type?.message}
+        >
           <Controller
             name="type"
             control={control}
-            render={({ field }) => (
-              <Select {...field} options={EVENT_TYPE_OPTIONS} />
-            )}
+            render={({ field }) => <Select {...field} options={EVENT_TYPE_OPTIONS} />}
           />
         </Form.Item>
 
@@ -279,7 +307,11 @@ const EventForm: React.FC<EventFormProps> = ({
         )}
 
         {type === 'public' && (
-          <Form.Item label="上座率 (例如 85/120)" validateStatus={errors.occupancy ? 'error' : undefined} help={errors.occupancy?.message}>
+          <Form.Item
+            label="上座率 (例如 85/120)"
+            validateStatus={errors.occupancy ? 'error' : undefined}
+            help={errors.occupancy?.message}
+          >
             <Controller
               name="occupancy"
               control={control}
@@ -303,4 +335,3 @@ const EventForm: React.FC<EventFormProps> = ({
 };
 
 export default EventForm;
-

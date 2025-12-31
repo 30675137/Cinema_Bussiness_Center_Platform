@@ -32,12 +32,7 @@ import {
   Col,
   Statistic,
 } from 'antd';
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  SaveOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { SKUSelectorModal } from '@/components/molecules/SKUSelectorModal';
 import { useSKUDetail, useUpdateBom, useUnits } from '@/hooks/useSKUs';
@@ -204,9 +199,7 @@ export const BOMConfigurationPage: React.FC = () => {
    * 处理更新组件单位
    */
   const handleUpdateUnit = (tempId: string, unit: string) => {
-    const updated = bomComponents.map((c) =>
-      c.tempId === tempId ? { ...c, unit } : c
-    );
+    const updated = bomComponents.map((c) => (c.tempId === tempId ? { ...c, unit } : c));
     setBomComponents(updated);
   };
 
@@ -253,9 +246,7 @@ export const BOMConfigurationPage: React.FC = () => {
         wasteRate,
       });
 
-      message.success(
-        `BOM 配方保存成功!计算成本: ¥${(result.calculatedCost / 100).toFixed(2)}`
-      );
+      message.success(`BOM 配方保存成功!计算成本: ¥${(result.calculatedCost / 100).toFixed(2)}`);
     } catch (error) {
       message.error(`BOM 配方保存失败: ${error instanceof Error ? error.message : '未知错误'}`);
     }
@@ -466,12 +457,7 @@ export const BOMConfigurationPage: React.FC = () => {
                   />
                 </Col>
                 <Col span={6}>
-                  <Statistic
-                    title="损耗率"
-                    value={wasteRate * 100}
-                    precision={2}
-                    suffix="%"
-                  />
+                  <Statistic title="损耗率" value={wasteRate * 100} precision={2} suffix="%" />
                 </Col>
                 <Col span={6}>
                   <Statistic
@@ -513,9 +499,7 @@ export const BOMConfigurationPage: React.FC = () => {
         onSelect={isAddingComponent ? handleSelectComponent : handleSelectFinishedProduct}
         skuType={isAddingComponent ? 'raw_material' : 'finished_product'}
         title={isAddingComponent ? '选择 BOM 组件 (原料/包材)' : '选择成品 SKU'}
-        excludeSkuIds={
-          isAddingComponent ? bomComponents.map((c) => c.componentId) : []
-        }
+        excludeSkuIds={isAddingComponent ? bomComponents.map((c) => c.componentId) : []}
       />
     </div>
   );

@@ -60,62 +60,67 @@ export interface TD_BOM_COCKTAIL_001_Data {
  * ```
  */
 export const test = base.extend<{ TD_BOM_COCKTAIL_001: TD_BOM_COCKTAIL_001_Data }>({
-  TD_BOM_COCKTAIL_001: [async ({}, use) => {
-    // ========== Setup: Load seed data ==========
-    const seedPath = path.join(process.cwd(), 'testdata/seeds/bom-filter-skus.json');
+  TD_BOM_COCKTAIL_001: [
+    async ({}, use) => {
+      // ========== Setup: Load seed data ==========
+      // Go up one level from frontend/ to repository root
+      const seedPath = path.join(process.cwd(), '../testdata/seeds/bom-filter-skus.json');
 
-    // Read and parse seed file
-    const seedContent = fs.readFileSync(seedPath, 'utf-8');
-    const seedData = JSON.parse(seedContent);
+      // Read and parse seed file
+      const seedContent = fs.readFileSync(seedPath, 'utf-8');
+      const seedData = JSON.parse(seedContent);
 
-    // Find the specific seed item by key
-    const bomFilterData = seedData.find((item: any) => item.key === 'bom-filter-test');
+      // Find the specific seed item by key
+      const bomFilterData = seedData.find((item: any) => item.key === 'bom-filter-test');
 
-    if (!bomFilterData) {
-      throw new Error('Seed key "bom-filter-test" not found in testdata/seeds/bom-filter-skus.json');
-    }
-
-    // Map seed data to fixture interface
-    const fixtureData: TD_BOM_COCKTAIL_001_Data = {
-      expectedSkuCount: bomFilterData.expected_sku_count,
-      finishedProductSkus: bomFilterData.finished_product_skus.map((sku: any) => ({
-        code: sku.code,
-        name: sku.name,
-        type: sku.type,
-        category: sku.category,
-        price: sku.price,
-        unit: sku.unit
-      })),
-      packagingSkus: bomFilterData.packaging_skus.map((sku: any) => ({
-        code: sku.code,
-        name: sku.name,
-        type: sku.type,
-        category: sku.category,
-        price: sku.price,
-        unit: sku.unit
-      })),
-      rawMaterialSkus: bomFilterData.raw_material_skus.map((sku: any) => ({
-        code: sku.code,
-        name: sku.name,
-        type: sku.type,
-        category: sku.category,
-        price: sku.price,
-        unit: sku.unit
-      })),
-      adminCredentials: {
-        username: bomFilterData.admin_credentials.username,
-        password: bomFilterData.admin_credentials.password
+      if (!bomFilterData) {
+        throw new Error(
+          'Seed key "bom-filter-test" not found in testdata/seeds/bom-filter-skus.json'
+        );
       }
-    };
 
-    // Provide fixture data to test
-    await use(fixtureData);
+      // Map seed data to fixture interface
+      const fixtureData: TD_BOM_COCKTAIL_001_Data = {
+        expectedSkuCount: bomFilterData.expected_sku_count,
+        finishedProductSkus: bomFilterData.finished_product_skus.map((sku: any) => ({
+          code: sku.code,
+          name: sku.name,
+          type: sku.type,
+          category: sku.category,
+          price: sku.price,
+          unit: sku.unit,
+        })),
+        packagingSkus: bomFilterData.packaging_skus.map((sku: any) => ({
+          code: sku.code,
+          name: sku.name,
+          type: sku.type,
+          category: sku.category,
+          price: sku.price,
+          unit: sku.unit,
+        })),
+        rawMaterialSkus: bomFilterData.raw_material_skus.map((sku: any) => ({
+          code: sku.code,
+          name: sku.name,
+          type: sku.type,
+          category: sku.category,
+          price: sku.price,
+          unit: sku.unit,
+        })),
+        adminCredentials: {
+          username: bomFilterData.admin_credentials.username,
+          password: bomFilterData.admin_credentials.password,
+        },
+      };
 
-    // ========== Teardown ==========
-    // No teardown needed for seed strategy
-    // Seed data is static and doesn't require cleanup
+      // Provide fixture data to test
+      await use(fixtureData);
 
-  }, { scope: 'test' }]  // 每个测试独立加载数据
+      // ========== Teardown ==========
+      // No teardown needed for seed strategy
+      // Seed data is static and doesn't require cleanup
+    },
+    { scope: 'test' },
+  ], // 每个测试独立加载数据
 });
 
 export { expect } from '@playwright/test';

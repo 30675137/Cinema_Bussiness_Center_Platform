@@ -22,14 +22,14 @@ export const REGIONS = [
  * Cities mapped to regions
  */
 export const CITIES: Record<string, { label: string; value: string }[]> = {
-  '华北': [
+  华北: [
     { label: '北京', value: '北京' },
     { label: '天津', value: '天津' },
     { label: '石家庄', value: '石家庄' },
     { label: '太原', value: '太原' },
     { label: '呼和浩特', value: '呼和浩特' },
   ],
-  '华东': [
+  华东: [
     { label: '上海', value: '上海' },
     { label: '南京', value: '南京' },
     { label: '杭州', value: '杭州' },
@@ -42,7 +42,7 @@ export const CITIES: Record<string, { label: string; value: string }[]> = {
     { label: '福州', value: '福州' },
     { label: '厦门', value: '厦门' },
   ],
-  '华南': [
+  华南: [
     { label: '广州', value: '广州' },
     { label: '深圳', value: '深圳' },
     { label: '东莞', value: '东莞' },
@@ -51,28 +51,28 @@ export const CITIES: Record<string, { label: string; value: string }[]> = {
     { label: '南宁', value: '南宁' },
     { label: '海口', value: '海口' },
   ],
-  '华中': [
+  华中: [
     { label: '武汉', value: '武汉' },
     { label: '长沙', value: '长沙' },
     { label: '郑州', value: '郑州' },
     { label: '洛阳', value: '洛阳' },
     { label: '南昌', value: '南昌' },
   ],
-  '西南': [
+  西南: [
     { label: '成都', value: '成都' },
     { label: '重庆', value: '重庆' },
     { label: '昆明', value: '昆明' },
     { label: '贵阳', value: '贵阳' },
     { label: '拉萨', value: '拉萨' },
   ],
-  '西北': [
+  西北: [
     { label: '西安', value: '西安' },
     { label: '兰州', value: '兰州' },
     { label: '西宁', value: '西宁' },
     { label: '银川', value: '银川' },
     { label: '乌鲁木齐', value: '乌鲁木齐' },
   ],
-  '东北': [
+  东北: [
     { label: '沈阳', value: '沈阳' },
     { label: '大连', value: '大连' },
     { label: '长春', value: '长春' },

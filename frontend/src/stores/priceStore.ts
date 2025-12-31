@@ -13,7 +13,7 @@ import type {
   PriceHistory,
   PriceChangeRequest,
   PriceStatus,
-  PriceType
+  PriceType,
 } from '@/types/price';
 
 // 价格列表状态接口
@@ -164,7 +164,7 @@ export const usePriceListStore = create<PriceListStore>()(
           }),
         selectAllPrices: () =>
           set((state) => {
-            state.selectedPriceIds = state.prices.map(p => p.id);
+            state.selectedPriceIds = state.prices.map((p) => p.id);
           }),
         clearSelection: () =>
           set((state) => {
@@ -468,12 +468,15 @@ export const useRejectPriceChangeMutation = () => {
 };
 
 // 价格计算hooks
-export const useCalculatePriceQuery = (productId: string, params?: {
-  quantity?: number;
-  memberLevel?: string;
-  channel?: string;
-  date?: string;
-}) => {
+export const useCalculatePriceQuery = (
+  productId: string,
+  params?: {
+    quantity?: number;
+    memberLevel?: string;
+    channel?: string;
+    date?: string;
+  }
+) => {
   return useQuery({
     queryKey: ['calculate-price', productId, params],
     queryFn: () => priceService.calculatePrice(productId, params),
@@ -484,26 +487,32 @@ export const useCalculatePriceQuery = (productId: string, params?: {
 
 // 选择器函数
 export const useSelectedPrices = () => {
-  const selectedIds = usePriceListStore(state => state.selectedPriceIds);
-  const prices = usePriceListStore(state => state.prices);
+  const selectedIds = usePriceListStore((state) => state.selectedPriceIds);
+  const prices = usePriceListStore((state) => state.prices);
 
-  return prices.filter(price => selectedIds.includes(price.id));
+  return prices.filter((price) => selectedIds.includes(price.id));
 };
 
 export const usePriceCountByStatus = () => {
-  const prices = usePriceListStore(state => state.prices);
+  const prices = usePriceListStore((state) => state.prices);
 
-  return prices.reduce((acc, price) => {
-    acc[price.status] = (acc[price.status] || 0) + 1;
-    return acc;
-  }, {} as Record<PriceStatus, number>);
+  return prices.reduce(
+    (acc, price) => {
+      acc[price.status] = (acc[price.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<PriceStatus, number>
+  );
 };
 
 export const usePriceCountByType = () => {
-  const prices = usePriceListStore(state => state.prices);
+  const prices = usePriceListStore((state) => state.prices);
 
-  return prices.reduce((acc, price) => {
-    acc[price.priceType] = (acc[price.priceType] || 0) + 1;
-    return acc;
-  }, {} as Record<PriceType, number>);
+  return prices.reduce(
+    (acc, price) => {
+      acc[price.priceType] = (acc[price.priceType] || 0) + 1;
+      return acc;
+    },
+    {} as Record<PriceType, number>
+  );
 };

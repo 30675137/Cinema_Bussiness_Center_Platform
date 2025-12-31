@@ -12,7 +12,7 @@ import {
   DateFormatOptions,
   RelativeTimeFormatOptions,
   I18nEventType,
-  I18nEventListener
+  I18nEventListener,
 } from './types';
 
 // 语言配置
@@ -22,15 +22,15 @@ export const LANGUAGE_CONFIGS: Record<Language, LanguageConfig> = {
     name: 'Chinese',
     nativeName: '简体中文',
     flag: '🇨🇳',
-    rtl: false
+    rtl: false,
   },
   'en-US': {
     code: 'en-US',
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
-    rtl: false
-  }
+    rtl: false,
+  },
 };
 
 /**
@@ -45,7 +45,7 @@ export class I18n {
   constructor(config: I18nConfig) {
     this.config = {
       debug: false,
-      ...config
+      ...config,
     } as Required<I18nConfig>;
 
     this.currentLanguage = this.config.default;
@@ -104,11 +104,7 @@ export class I18n {
   /**
    * 格式化数字
    */
-  formatNumber(
-    value: number,
-    options: FormatOptions = {},
-    language?: Language
-  ): string {
+  formatNumber(value: number, options: FormatOptions = {}, language?: Language): string {
     const targetLanguage = language || this.currentLanguage;
     const locale = this.getLocaleFromLanguage(targetLanguage);
 
@@ -125,15 +121,15 @@ export class I18n {
   /**
    * 格式化货币
    */
-  formatCurrency(
-    value: number,
-    currency: string = 'CNY',
-    language?: Language
-  ): string {
-    return this.formatNumber(value, {
-      style: 'currency',
-      currency
-    }, language);
+  formatCurrency(value: number, currency: string = 'CNY', language?: Language): string {
+    return this.formatNumber(
+      value,
+      {
+        style: 'currency',
+        currency,
+      },
+      language
+    );
   }
 
   /**
@@ -148,9 +144,7 @@ export class I18n {
     const locale = this.getLocaleFromLanguage(targetLanguage);
 
     try {
-      const dateObj = typeof date === 'string' || typeof date === 'number'
-        ? new Date(date)
-        : date;
+      const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
       return new Intl.DateTimeFormat(locale, options).format(dateObj);
     } catch (error) {
@@ -194,7 +188,7 @@ export class I18n {
     try {
       return new Intl.ListFormat(locale, {
         style: 'long',
-        type: 'conjunction'
+        type: 'conjunction',
       }).format(items);
     } catch (error) {
       if (this.config.debug) {
@@ -297,7 +291,7 @@ export class I18n {
   private emit(event: I18nEventType, data: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => {
+      listeners.forEach((listener) => {
         try {
           listener(data);
         } catch (error) {
@@ -332,7 +326,11 @@ export class I18n {
 
     for (const key in source) {
       if (source.hasOwnProperty(key)) {
-        if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+        if (
+          typeof source[key] === 'object' &&
+          source[key] !== null &&
+          !Array.isArray(source[key])
+        ) {
           result[key] = this.deepMerge(result[key] || {}, source[key]);
         } else {
           result[key] = source[key];
@@ -346,7 +344,10 @@ export class I18n {
   /**
    * 获取嵌套翻译值
    */
-  private getTranslationValue(resources: ResourceBundle | undefined, key: string): string | undefined {
+  private getTranslationValue(
+    resources: ResourceBundle | undefined,
+    key: string
+  ): string | undefined {
     if (!resources) {
       return undefined;
     }

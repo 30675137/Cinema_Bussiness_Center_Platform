@@ -6,9 +6,9 @@ import { persist } from 'zustand/middleware';
  * 用户角色枚举
  */
 export enum UserRole {
-  VIEWER = 'viewer',           // 查看者
-  OPERATOR = 'operator',       // 操作员
-  ADMIN = 'admin',            // 管理员
+  VIEWER = 'viewer', // 查看者
+  OPERATOR = 'operator', // 操作员
+  ADMIN = 'admin', // 管理员
 }
 
 /**
@@ -18,20 +18,20 @@ export enum Permission {
   // 库存台账权限
   VIEW_INVENTORY = 'view_inventory',
   EXPORT_INVENTORY = 'export_inventory',
-  
+
   // 库存流水权限
   VIEW_MOVEMENTS = 'view_movements',
   EXPORT_MOVEMENTS = 'export_movements',
-  
+
   // 库存调整权限
   ADJUST_INVENTORY = 'adjust_inventory',
   APPROVE_ADJUSTMENT = 'approve_adjustment',
-  
+
   // 库存转移权限
   CREATE_TRANSFER = 'create_transfer',
   APPROVE_TRANSFER = 'approve_transfer',
   RECEIVE_TRANSFER = 'receive_transfer',
-  
+
   // 库存管理权限
   MANAGE_ALERTS = 'manage_alerts',
   MANAGE_BATCHES = 'manage_batches',
@@ -43,10 +43,7 @@ export enum Permission {
  * 根据规范定义三层权限体系
  */
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  [UserRole.VIEWER]: [
-    Permission.VIEW_INVENTORY,
-    Permission.VIEW_MOVEMENTS,
-  ],
+  [UserRole.VIEWER]: [Permission.VIEW_INVENTORY, Permission.VIEW_MOVEMENTS],
   [UserRole.OPERATOR]: [
     Permission.VIEW_INVENTORY,
     Permission.VIEW_MOVEMENTS,
@@ -92,61 +89,61 @@ export const usePermissionStore = create<PermissionStore>()(
  */
 export const usePermissions = () => {
   const { currentRole, setRole, resetRole } = usePermissionStore();
-  
+
   /**
    * 当前角色的所有权限
    */
   const permissions = useMemo(() => {
     return ROLE_PERMISSIONS[currentRole] || [];
   }, [currentRole]);
-  
+
   /**
    * 检查是否拥有指定权限
    */
   const hasPermission = (permission: Permission): boolean => {
     return permissions.includes(permission);
   };
-  
+
   /**
    * 检查是否拥有任意一个权限
    */
   const hasAnyPermission = (...permissionsToCheck: Permission[]): boolean => {
-    return permissionsToCheck.some(p => permissions.includes(p));
+    return permissionsToCheck.some((p) => permissions.includes(p));
   };
-  
+
   /**
    * 检查是否拥有所有权限
    */
   const hasAllPermissions = (...permissionsToCheck: Permission[]): boolean => {
-    return permissionsToCheck.every(p => permissions.includes(p));
+    return permissionsToCheck.every((p) => permissions.includes(p));
   };
-  
+
   /**
    * 是否为管理员
    */
   const isAdmin = currentRole === UserRole.ADMIN;
-  
+
   /**
    * 是否为操作员
    */
   const isOperator = currentRole === UserRole.OPERATOR;
-  
+
   /**
    * 是否为查看者
    */
   const isViewer = currentRole === UserRole.VIEWER;
-  
+
   /**
    * 是否可以调整库存
    */
   const canAdjustInventory = hasPermission(Permission.ADJUST_INVENTORY);
-  
+
   /**
    * 是否可以导出数据
    */
-  const canExportData = hasPermission(Permission.EXPORT_INVENTORY) || 
-                        hasPermission(Permission.EXPORT_MOVEMENTS);
-  
+  const canExportData =
+    hasPermission(Permission.EXPORT_INVENTORY) || hasPermission(Permission.EXPORT_MOVEMENTS);
+
   /**
    * 是否可以管理转移
    */
@@ -155,7 +152,7 @@ export const usePermissions = () => {
     Permission.APPROVE_TRANSFER,
     Permission.RECEIVE_TRANSFER
   );
-  
+
   return {
     // 角色信息
     currentRole,
@@ -164,15 +161,15 @@ export const usePermissions = () => {
     isAdmin,
     isOperator,
     isViewer,
-    
+
     // 权限列表
     permissions,
-    
+
     // 权限检查
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-    
+
     // 常用权限检查
     canAdjustInventory,
     canExportData,
@@ -208,7 +205,7 @@ export const ROLE_OPTIONS = [
  * 获取角色显示名称
  */
 export const getRoleLabel = (role: UserRole): string => {
-  const option = ROLE_OPTIONS.find(o => o.value === role);
+  const option = ROLE_OPTIONS.find((o) => o.value === role);
   return option?.label || role;
 };
 
@@ -230,6 +227,6 @@ export const getPermissionLabel = (permission: Permission): string => {
     [Permission.MANAGE_BATCHES]: '管理库存批次',
     [Permission.MANAGE_SETTINGS]: '管理系统设置',
   };
-  
+
   return labels[permission] || permission;
 };

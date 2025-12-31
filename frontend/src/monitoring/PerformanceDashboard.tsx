@@ -7,7 +7,7 @@ import {
   MonitorOutlined,
   ApiOutlined,
   DatabaseOutlined,
-  LineChartOutlined
+  LineChartOutlined,
 } from '@ant-design/icons';
 import { usePerformance } from './PerformanceProvider';
 import type { PerformanceMetrics, PerformanceAlert } from './types';
@@ -44,21 +44,31 @@ export const PerformanceDashboard: React.FC = () => {
 
   const getSeverityColor = (severity: string): string => {
     switch (severity) {
-      case 'critical': return '#ff4d4f';
-      case 'high': return '#ff7a45';
-      case 'medium': return '#ffa940';
-      case 'low': return '#52c41a';
-      default: return '#d9d9d9';
+      case 'critical':
+        return '#ff4d4f';
+      case 'high':
+        return '#ff7a45';
+      case 'medium':
+        return '#ffa940';
+      case 'low':
+        return '#52c41a';
+      default:
+        return '#d9d9d9';
     }
   };
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'page_load': return <ClockCircleOutlined />;
-      case 'api': return <ApiOutlined />;
-      case 'component': return <MonitorOutlined />;
-      case 'memory': return <DatabaseOutlined />;
-      default: return <WarningOutlined />;
+      case 'page_load':
+        return <ClockCircleOutlined />;
+      case 'api':
+        return <ApiOutlined />;
+      case 'component':
+        return <MonitorOutlined />;
+      case 'memory':
+        return <DatabaseOutlined />;
+      default:
+        return <WarningOutlined />;
     }
   };
 
@@ -98,7 +108,7 @@ export const PerformanceDashboard: React.FC = () => {
               suffix="ms"
               prefix={<ThunderboltOutlined />}
               valueStyle={{
-                color: metrics.pageLoad.loadComplete > 3000 ? '#ff4d4f' : '#3f8600'
+                color: metrics.pageLoad.loadComplete > 3000 ? '#ff4d4f' : '#3f8600',
               }}
             />
           </Card>
@@ -112,7 +122,7 @@ export const PerformanceDashboard: React.FC = () => {
               suffix="ms"
               prefix={<ApiOutlined />}
               valueStyle={{
-                color: getAverageAPITime() > 500 ? '#ff7a45' : '#3f8600'
+                color: getAverageAPITime() > 500 ? '#ff7a45' : '#3f8600',
               }}
             />
           </Card>
@@ -126,7 +136,7 @@ export const PerformanceDashboard: React.FC = () => {
               suffix="ms"
               prefix={<MonitorOutlined />}
               valueStyle={{
-                color: getAverageComponentRenderTime() > 100 ? '#ffa940' : '#3f8600'
+                color: getAverageComponentRenderTime() > 100 ? '#ffa940' : '#3f8600',
               }}
             />
           </Card>
@@ -140,7 +150,7 @@ export const PerformanceDashboard: React.FC = () => {
               suffix="%"
               prefix={<DatabaseOutlined />}
               valueStyle={{
-                color: calculateMemoryUsagePercent() > 80 ? '#ff4d4f' : '#3f8600'
+                color: calculateMemoryUsagePercent() > 80 ? '#ff4d4f' : '#3f8600',
               }}
             />
             <Progress
@@ -161,25 +171,13 @@ export const PerformanceDashboard: React.FC = () => {
               <Card title="核心网页指标" extra={<LineChartOutlined />}>
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
-                    <Statistic
-                      title="FCP (首次内容绘制)"
-                      value={webVitals?.fcp || 0}
-                      suffix="ms"
-                    />
+                    <Statistic title="FCP (首次内容绘制)" value={webVitals?.fcp || 0} suffix="ms" />
                   </Col>
                   <Col span={12}>
-                    <Statistic
-                      title="LCP (最大内容绘制)"
-                      value={webVitals?.lcp || 0}
-                      suffix="ms"
-                    />
+                    <Statistic title="LCP (最大内容绘制)" value={webVitals?.lcp || 0} suffix="ms" />
                   </Col>
                   <Col span={12}>
-                    <Statistic
-                      title="FID (首次输入延迟)"
-                      value={webVitals?.fid || 0}
-                      suffix="ms"
-                    />
+                    <Statistic title="FID (首次输入延迟)" value={webVitals?.fid || 0} suffix="ms" />
                   </Col>
                   <Col span={12}>
                     <Statistic
@@ -196,24 +194,13 @@ export const PerformanceDashboard: React.FC = () => {
               <Card title="网络信息">
                 <Row gutter={[16, 16]}>
                   <Col span={12}>
-                    <Statistic
-                      title="下行速度"
-                      value={metrics.network.downlink}
-                      suffix="Mbps"
-                    />
+                    <Statistic title="下行速度" value={metrics.network.downlink} suffix="Mbps" />
                   </Col>
                   <Col span={12}>
-                    <Statistic
-                      title="延迟"
-                      value={metrics.network.rtt}
-                      suffix="ms"
-                    />
+                    <Statistic title="延迟" value={metrics.network.rtt} suffix="ms" />
                   </Col>
                   <Col span={24}>
-                    <Statistic
-                      title="网络类型"
-                      value={metrics.network.effectiveType}
-                    />
+                    <Statistic title="网络类型" value={metrics.network.effectiveType} />
                   </Col>
                 </Row>
               </Card>
@@ -232,10 +219,7 @@ export const PerformanceDashboard: React.FC = () => {
                     title={item.endpoint}
                     description={`${item.duration}ms - ${item.success ? '成功' : '失败'}`}
                   />
-                  <Badge
-                    status={item.success ? 'success' : 'error'}
-                    text={item.status}
-                  />
+                  <Badge status={item.success ? 'success' : 'error'} text={item.status} />
                 </List.Item>
               )}
             />
@@ -262,36 +246,32 @@ export const PerformanceDashboard: React.FC = () => {
         <TabPane tab="性能警告" key="alerts">
           <Card title={`性能警告 (${alerts.length})`}>
             {alerts.length === 0 ? (
-              <Alert
-                message="没有性能警告"
-                type="success"
-                showIcon
-              />
+              <Alert message="没有性能警告" type="success" showIcon />
             ) : (
               <Timeline>
-                {alerts.slice(-10).reverse().map((alert) => (
-                  <Timeline.Item
-                    key={alert.id}
-                    dot={getAlertIcon(alert.type)}
-                    color={getSeverityColor(alert.severity)}
-                  >
-                    <div>
-                      <strong>{alert.message}</strong>
-                      <br />
-                      <small>
-                        当前值: {alert.value.toFixed(2)} | 阈值: {alert.threshold}
-                      </small>
-                      <br />
-                      <Badge
-                        color={getSeverityColor(alert.severity)}
-                        text={alert.severity}
-                      />
-                      <span style={{ marginLeft: '8px', color: '#999' }}>
-                        {new Date(alert.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </Timeline.Item>
-                ))}
+                {alerts
+                  .slice(-10)
+                  .reverse()
+                  .map((alert) => (
+                    <Timeline.Item
+                      key={alert.id}
+                      dot={getAlertIcon(alert.type)}
+                      color={getSeverityColor(alert.severity)}
+                    >
+                      <div>
+                        <strong>{alert.message}</strong>
+                        <br />
+                        <small>
+                          当前值: {alert.value.toFixed(2)} | 阈值: {alert.threshold}
+                        </small>
+                        <br />
+                        <Badge color={getSeverityColor(alert.severity)} text={alert.severity} />
+                        <span style={{ marginLeft: '8px', color: '#999' }}>
+                          {new Date(alert.timestamp).toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </Timeline.Item>
+                  ))}
               </Timeline>
             )}
           </Card>

@@ -80,7 +80,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
         remark: '测试库存项',
       };
 
@@ -108,7 +108,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       const createdInventory = await act(async () => {
@@ -120,7 +120,7 @@ describe('inventoryStore', () => {
         minStock: 25,
         maxStock: 600,
         safeStock: 40,
-        averageCost: 16.00,
+        averageCost: 16.0,
       };
 
       await act(async () => {
@@ -128,11 +128,11 @@ describe('inventoryStore', () => {
         expect(updatedInventory.minStock).toBe(25);
         expect(updatedInventory.maxStock).toBe(600);
         expect(updatedInventory.safeStock).toBe(40);
-        expect(updatedInventory.averageCost).toBe(16.00);
+        expect(updatedInventory.averageCost).toBe(16.0);
       });
 
       const { inventoryItems } = result.current;
-      const updatedItem = inventoryItems.find(item => item.id === createdInventory.id);
+      const updatedItem = inventoryItems.find((item) => item.id === createdInventory.id);
       expect(updatedItem.minStock).toBe(25);
     });
 
@@ -148,7 +148,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       const createdInventory = await act(async () => {
@@ -179,7 +179,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       const createdInventory = await act(async () => {
@@ -212,7 +212,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       testInventory = await act(async () => {
@@ -228,7 +228,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.STOCK_IN,
         quantity: 50,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '采购入库',
       };
 
@@ -252,7 +252,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.STOCK_OUT,
         quantity: 30,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '销售出库',
       };
 
@@ -275,7 +275,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.STOCK_OUT,
         quantity: 85, // 100 - 85 = 15 < minStock(20)
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '大量出库',
       };
 
@@ -298,7 +298,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.STOCK_OUT,
         quantity: 100, // 100 - 100 = 0
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '清空库存',
       };
 
@@ -320,7 +320,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.ADJUSTMENT,
         quantity: 10, // 盘盈10个
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '盘点调整',
       };
 
@@ -341,7 +341,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.TRANSFER_IN,
         quantity: 25,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '从其他仓库调入',
       };
 
@@ -362,7 +362,7 @@ describe('inventoryStore', () => {
         inventoryItemId: testInventory.id,
         operationType: InventoryOperationType.TRANSFER_OUT,
         quantity: 20,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '调拨到其他仓库',
       };
 
@@ -428,7 +428,7 @@ describe('inventoryStore', () => {
       });
 
       const { locations } = result.current;
-      const updatedLocation = locations.find(loc => loc.id === createdLocation.id);
+      const updatedLocation = locations.find((loc) => loc.id === createdLocation.id);
       expect(updatedLocation.capacity).toBe(1500);
       expect(updatedLocation.description).toBe('扩容后的货架');
     });
@@ -476,7 +476,7 @@ describe('inventoryStore', () => {
           minStock: 20,
           maxStock: 500,
           safeStock: 30,
-          averageCost: 15.50,
+          averageCost: 15.5,
         },
         {
           productId: 'PRD002',
@@ -485,7 +485,7 @@ describe('inventoryStore', () => {
           minStock: 10,
           maxStock: 200,
           safeStock: 15,
-          averageCost: 25.00,
+          averageCost: 25.0,
         },
         {
           productId: 'PRD003',
@@ -544,7 +544,13 @@ describe('inventoryStore', () => {
 
       const { inventoryItems } = result.current;
       expect(inventoryItems.length).toBeGreaterThan(0);
-      expect(inventoryItems.every(item => item.status === InventoryStatus.LOW_STOCK || item.status === InventoryStatus.OUT_OF_STOCK)).toBe(true);
+      expect(
+        inventoryItems.every(
+          (item) =>
+            item.status === InventoryStatus.LOW_STOCK ||
+            item.status === InventoryStatus.OUT_OF_STOCK
+        )
+      ).toBe(true);
     });
 
     it('应该能够按位置筛选', async () => {
@@ -557,7 +563,7 @@ describe('inventoryStore', () => {
       });
 
       const { inventoryItems } = result.current;
-      expect(inventoryItems.every(item => item.locationId === 'LOC001')).toBe(true);
+      expect(inventoryItems.every((item) => item.locationId === 'LOC001')).toBe(true);
     });
   });
 
@@ -575,7 +581,7 @@ describe('inventoryStore', () => {
           minStock: 20,
           maxStock: 500,
           safeStock: 30,
-          averageCost: 15.50,
+          averageCost: 15.5,
         },
         {
           productId: 'PRD002',
@@ -584,7 +590,7 @@ describe('inventoryStore', () => {
           minStock: 10,
           maxStock: 200,
           safeStock: 15,
-          averageCost: 25.00,
+          averageCost: 25.0,
         },
         {
           productId: 'PRD003',
@@ -615,7 +621,7 @@ describe('inventoryStore', () => {
       const { statistics } = result.current;
       expect(statistics).toBeDefined();
       expect(statistics.totalItems).toBe(3);
-      expect(statistics.totalValue).toBe(100 * 15.50 + 0 * 25.00 + 15 * 8.75);
+      expect(statistics.totalValue).toBe(100 * 15.5 + 0 * 25.0 + 15 * 8.75);
       expect(statistics.inStockCount).toBe(1); // 只有PRD001有库存
       expect(statistics.lowStockCount).toBe(1); // PRD003库存不足
       expect(statistics.outOfStockCount).toBe(1); // PRD002缺货
@@ -636,7 +642,7 @@ describe('inventoryStore', () => {
           minStock: 20,
           maxStock: 500,
           safeStock: 30,
-          averageCost: 15.50,
+          averageCost: 15.5,
         },
         {
           productId: 'PRD002',
@@ -645,7 +651,7 @@ describe('inventoryStore', () => {
           minStock: 10,
           maxStock: 200,
           safeStock: 15,
-          averageCost: 25.00,
+          averageCost: 25.0,
         },
       ];
 
@@ -704,7 +710,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       await act(async () => {
@@ -740,7 +746,7 @@ describe('inventoryStore', () => {
         inventoryItemId: 'non-existent-id',
         operationType: InventoryOperationType.STOCK_IN,
         quantity: 50,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '测试',
       } as InventoryOperationParams;
 
@@ -762,7 +768,7 @@ describe('inventoryStore', () => {
         minStock: 20,
         maxStock: 500,
         safeStock: 30,
-        averageCost: 15.50,
+        averageCost: 15.5,
       };
 
       await act(async () => {
@@ -777,16 +783,18 @@ describe('inventoryStore', () => {
       // 模拟 localStorage 中的数据
       const mockData = {
         state: {
-          inventoryItems: [{
-            id: 'test-id',
-            productCode: 'PRD001',
-            productId: 'PRD001',
-            productName: '测试商品',
-            currentStock: 100,
-            minStock: 20,
-            maxStock: 500,
-            status: InventoryStatus.IN_STOCK,
-          }],
+          inventoryItems: [
+            {
+              id: 'test-id',
+              productCode: 'PRD001',
+              productId: 'PRD001',
+              productName: '测试商品',
+              currentStock: 100,
+              minStock: 20,
+              maxStock: 500,
+              status: InventoryStatus.IN_STOCK,
+            },
+          ],
         },
       };
 

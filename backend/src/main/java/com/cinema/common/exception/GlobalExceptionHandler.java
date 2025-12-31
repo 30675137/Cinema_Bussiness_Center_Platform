@@ -1,3 +1,16 @@
+/**
+ * @spec S017,A005,U001,O004-beverage-sku-reuse
+ * Global Exception Handler
+ *
+ * Purpose: Centralized exception handling for all REST API controllers
+ * Handles exceptions from multiple modules:
+ *   - S017: Store Management
+ *   - A005: Scenario Package
+ *   - U001: Reservation
+ *   - O004: BOM/SKU Management
+ *
+ * Note: 此功能不包含权限与认证逻辑(详见宪法"认证与权限要求分层"原则)
+ */
 package com.cinema.common.exception;
 
 import com.cinema.common.dto.ErrorResponse;
@@ -12,6 +25,7 @@ import com.cinema.reservation.exception.ReservationNotFoundException;
 import com.cinema.scenariopackage.exception.ConcurrentModificationException;
 import com.cinema.scenariopackage.exception.PackageNotFoundException;
 import com.cinema.scenariopackage.exception.ValidationException;
+import com.cinema.product.exception.BomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -379,6 +393,45 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBeverageException(
             com.cinema.beverage.exception.BeverageException ex, WebRequest request) {
         logger.warn("Beverage exception: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
+        ErrorResponse error = ErrorResponse.of(
+                ex.getErrorCode().getCode(),
+                ex.getMessage(),
+                ex.getDetails()
+        );
+        return ResponseEntity
+                .status(ex.getErrorCode().getHttpStatus())
+                .body(error);
+    }
+
+    // ==================== BOM Management Exceptions (O004-beverage-sku-reuse) ====================
+
+    /**
+     * 处理BOM业务异常
+     * <p>
+     * 统一处理BOM配方管理模块的所有业务异常，包括：
+     * - BOM_VAL_001: BOM配方只能为成品类型SKU创建
+     * - BOM_VAL_002: BOM组件不能为空
+     * - BOM_VAL_003: BOM组件数量必须大于0
+     * - BOM_VAL_004: 损耗率必须在0-1之间
+     * - BOM_VAL_005: BOM组件不能包含成品本身（循环依赖）
+     * - BOM_NTF_001: BOM配方不存在
+     * - BOM_NTF_002: BOM组件SKU不存在
+     * - BOM_DUP_001: BOM配方已存在
+     * - BOM_BIZ_001: BOM深度超过最大限制（3层）
+     * - BOM_BIZ_002: 检测到BOM循环依赖
+     * - BOM_SYS_001: BOM配方保存失败
+     * - BOM_SYS_002: BOM配方删除失败
+     * </p>
+     *
+     * @param ex      BOM业务异常对象
+     * @param request Web 请求
+     * @return 对应 HTTP 状态码的 ErrorResponse
+     * @spec O004-beverage-sku-reuse
+     */
+    @ExceptionHandler(BomException.class)
+    public ResponseEntity<ErrorResponse> handleBomException(
+            BomException ex, WebRequest request) {
+        logger.warn("BOM exception: {} - {}", ex.getErrorCode().getCode(), ex.getMessage());
         ErrorResponse error = ErrorResponse.of(
                 ex.getErrorCode().getCode(),
                 ex.getMessage(),

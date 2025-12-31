@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: Zod 验证模式
- * 
+ *
  * 用于前端表单验证和 API 请求/响应验证
  */
 
@@ -37,19 +37,9 @@ export const CreateAdjustmentSchema = z.object({
     .number({ message: '调整数量必须为数字' })
     .int('调整数量必须为整数')
     .positive('调整数量必须大于0'),
-  reasonCode: z
-    .string({ message: '请选择调整原因' })
-    .min(1, '请选择调整原因'),
-  reasonText: z
-    .string()
-    .max(500, '原因说明不能超过500字符')
-    .optional()
-    .nullable(),
-  remarks: z
-    .string()
-    .max(500, '备注不能超过500字符')
-    .optional()
-    .nullable(),
+  reasonCode: z.string({ message: '请选择调整原因' }).min(1, '请选择调整原因'),
+  reasonText: z.string().max(500, '原因说明不能超过500字符').optional().nullable(),
+  remarks: z.string().max(500, '备注不能超过500字符').optional().nullable(),
 });
 
 export type CreateAdjustmentInput = z.infer<typeof CreateAdjustmentSchema>;
@@ -59,11 +49,7 @@ export type CreateAdjustmentInput = z.infer<typeof CreateAdjustmentSchema>;
  */
 export const ApprovalRequestSchema = z.object({
   action: ApprovalActionSchema,
-  comments: z
-    .string()
-    .max(1000, '审批意见不能超过1000字符')
-    .optional()
-    .nullable(),
+  comments: z.string().max(1000, '审批意见不能超过1000字符').optional().nullable(),
 });
 
 export type ApprovalRequestInput = z.infer<typeof ApprovalRequestSchema>;
@@ -76,10 +62,7 @@ export const UpdateSafetyStockSchema = z.object({
     .number({ message: '安全库存必须为数字' })
     .int('安全库存必须为整数')
     .nonnegative('安全库存不能为负数'),
-  version: z
-    .number()
-    .int()
-    .positive('版本号无效'),
+  version: z.number().int().positive('版本号无效'),
 });
 
 export type UpdateSafetyStockInput = z.infer<typeof UpdateSafetyStockSchema>;

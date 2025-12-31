@@ -26,7 +26,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
   targetStatus,
   onConfirm,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm();
   const [reason, setReason] = useState('');
@@ -65,7 +65,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
     const statusText = {
       [BrandStatus.ENABLED]: '启用',
       [BrandStatus.DISABLED]: '停用',
-      [BrandStatus.DRAFT]: '草稿'
+      [BrandStatus.DRAFT]: '草稿',
     }[targetStatus];
 
     return (
@@ -73,9 +73,13 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
         <div style={{ marginBottom: 16 }}>
           <Text>
             确定要将品牌
-            <Text strong style={{ margin: '0 4px' }}>{brand.name}</Text>
+            <Text strong style={{ margin: '0 4px' }}>
+              {brand.name}
+            </Text>
             的状态变更为
-            <Text strong style={{ margin: '0 4px' }}>{statusText}</Text>
+            <Text strong style={{ margin: '0 4px' }}>
+              {statusText}
+            </Text>
             吗？
           </Text>
         </div>
@@ -92,9 +96,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
                 <p style={{ margin: '8px 0 0 0' }}>
                   • 现有的关联商品<strong>不会受到影响</strong>，可继续正常销售
                 </p>
-                <p style={{ margin: '8px 0 0 0' }}>
-                  • 如需重新启用，可在品牌列表中操作
-                </p>
+                <p style={{ margin: '8px 0 0 0' }}>• 如需重新启用，可在品牌列表中操作</p>
               </div>
             }
             type="warning"
@@ -110,9 +112,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
             message="启用说明"
             description={
               <div>
-                <p style={{ margin: 0 }}>
-                  启用后，该品牌将可以正常用于创建新商品和各项业务操作。
-                </p>
+                <p style={{ margin: 0 }}>启用后，该品牌将可以正常用于创建新商品和各项业务操作。</p>
               </div>
             }
             type="info"
@@ -122,11 +122,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
 
         {/* 停用原因输入 */}
         {isDisabling && (
-          <Form
-            form={form}
-            layout="vertical"
-            data-testid="brand-status-form"
-          >
+          <Form form={form} layout="vertical" data-testid="brand-status-form">
             <Form.Item
               name="reason"
               label={
@@ -137,7 +133,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
               rules={[
                 { required: true, message: '请输入停用原因' },
                 { max: 500, message: '停用原因不能超过500个字符' },
-                { min: 2, message: '停用原因至少需要2个字符' }
+                { min: 2, message: '停用原因至少需要2个字符' },
               ]}
               data-testid="brand-status-reason-field"
             >
@@ -160,9 +156,7 @@ const BrandStatusConfirm: React.FC<BrandStatusConfirmProps> = ({
         {/* 启用确认（通常不需要原因） */}
         {!isDisabling && (
           <div style={{ marginBottom: 16 }}>
-            <Text type="secondary">
-              此操作将立即生效，请确认是否继续。
-            </Text>
+            <Text type="secondary">此操作将立即生效，请确认是否继续。</Text>
           </div>
         )}
       </div>

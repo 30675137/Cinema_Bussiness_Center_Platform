@@ -213,7 +213,7 @@ test.describe('Store Association in Package Edit Page (T012)', () => {
 
     // Setup API response listener
     const responsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes('/api/scenario-packages') &&
         response.request().method() === 'POST' &&
         response.status() === 201,
@@ -348,7 +348,7 @@ test.describe('Store Echo Back in Edit Mode (T012-EchoBack)', () => {
 
     // Save
     const responsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes('/api/scenario-packages') &&
         response.request().method() === 'POST' &&
         response.status() === 201
@@ -412,7 +412,7 @@ test.describe('Store Echo Back in Edit Mode (T012-EchoBack)', () => {
 
     // Save changes
     const responsePromise = page.waitForResponse(
-      response =>
+      (response) =>
         response.url().includes(`/api/scenario-packages/${createdPackageId}`) &&
         response.request().method() === 'PUT' &&
         response.status() === 200,

@@ -24,11 +24,7 @@ interface SkuFiltersProps {
 /**
  * SKU筛选器组件
  */
-export const SkuFilters: React.FC<SkuFiltersProps> = ({
-  onFilter,
-  onReset,
-  loading = false,
-}) => {
+export const SkuFilters: React.FC<SkuFiltersProps> = ({ onFilter, onReset, loading = false }) => {
   const [form] = Form.useForm();
   const { isMobile, isTablet } = useResponsive();
   const store = useSkuStore();
@@ -108,9 +104,9 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
   }));
 
   // 从SPU列表中提取唯一的品牌和类目
-  const brands = Array.from(new Set(spus.map(spu => spu.brand))).sort();
+  const brands = Array.from(new Set(spus.map((spu) => spu.brand))).sort();
   const categories = Array.from(
-    new Set(spus.map(spu => ({ id: spu.categoryId, name: spu.category })))
+    new Set(spus.map((spu) => ({ id: spu.categoryId, name: spu.category })))
   ).sort((a, b) => a.name.localeCompare(b.name));
 
   const formLayout = isMobile
@@ -129,11 +125,7 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: isMobile
-              ? '1fr'
-              : isTablet
-              ? 'repeat(2, 1fr)'
-              : 'repeat(4, 1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
             gap: 16,
             marginBottom: 16,
           }}
@@ -253,11 +245,7 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
             </Select>
           </Form.Item>
 
-          <Form.Item
-            label="是否管理库存"
-            name="manageInventory"
-            style={{ marginBottom: 0 }}
-          >
+          <Form.Item label="是否管理库存" name="manageInventory" style={{ marginBottom: 0 }}>
             <Select
               placeholder="选择选项"
               options={manageInventoryOptions}
@@ -267,12 +255,10 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
           </Form.Item>
         </div>
 
-        <Form.Item
-          style={{ marginBottom: 0, textAlign: isMobile ? 'center' : 'right' }}
-        >
+        <Form.Item style={{ marginBottom: 0, textAlign: isMobile ? 'center' : 'right' }}>
           <Space>
-            <Button 
-              onClick={handleReset} 
+            <Button
+              onClick={handleReset}
               icon={<ReloadOutlined />}
               data-testid="sku-filter-reset-button"
             >
@@ -295,4 +281,3 @@ export const SkuFilters: React.FC<SkuFiltersProps> = ({
 };
 
 export default SkuFilters;
-

@@ -14,23 +14,18 @@ import {
   MenuHierarchy,
   MenuGroup,
   MenuHierarchy as MenuHierarchyType,
-  SearchResult
+  SearchResult,
 } from '@/types';
 
 /**
  * 检查菜单权限
  */
-export const checkMenuPermission = (
-  menu: MenuItem,
-  userPermissions: string[]
-): boolean => {
+export const checkMenuPermission = (menu: MenuItem, userPermissions: string[]): boolean => {
   if (menu.requiredPermissions.length === 0) {
     return true; // 无权限要求的菜单默认可访问
   }
 
-  return menu.requiredPermissions.some(permission =>
-    userPermissions.includes(permission)
-  );
+  return menu.requiredPermissions.some((permission) => userPermissions.includes(permission));
 };
 
 /**
@@ -70,24 +65,21 @@ export const buildMenuFilterResult = (
 ): MenuFilterResult => {
   const visibleMenus = filterMenusByPermissions(menus, userPermissions);
   const allRequiredPermissions = menus
-    .flatMap(menu => menu.requiredPermissions)
+    .flatMap((menu) => menu.requiredPermissions)
     .filter((perm, index, arr) => arr.indexOf(perm) === index); // 去重
 
   return {
     visibleMenus,
     hasAccess: visibleMenus.length > 0,
     requiredPermissions: allRequiredPermissions,
-    userPermissions
+    userPermissions,
   };
 };
 
 /**
  * 根据路径查找菜单项
  */
-export const findMenuItemByPath = (
-  menus: MenuItem[],
-  path: string
-): MenuItem | null => {
+export const findMenuItemByPath = (menus: MenuItem[], path: string): MenuItem | null => {
   for (const menu of menus) {
     if (menu.path === path) {
       return menu;
@@ -107,10 +99,7 @@ export const findMenuItemByPath = (
 /**
  * 根据ID查找菜单项
  */
-export const findMenuItemById = (
-  menus: MenuItem[],
-  id: string
-): MenuItem | null => {
+export const findMenuItemById = (menus: MenuItem[], id: string): MenuItem | null => {
   for (const menu of menus) {
     if (menu.id === id) {
       return menu;
@@ -130,14 +119,15 @@ export const findMenuItemById = (
 /**
  * 获取菜单的面包屑路径
  */
-export const getMenuBreadcrumb = (
-  menus: MenuItem[],
-  targetMenu: MenuItem
-): BreadcrumbItem[] => {
+export const getMenuBreadcrumb = (menus: MenuItem[], targetMenu: MenuItem): BreadcrumbItem[] => {
   const breadcrumb: BreadcrumbItem[] = [];
 
   // 查找菜单的完整路径
-  const findPath = (items: MenuItem[], target: MenuItem, path: MenuItem[] = []): MenuItem[] | null => {
+  const findPath = (
+    items: MenuItem[],
+    target: MenuItem,
+    path: MenuItem[] = []
+  ): MenuItem[] | null => {
     for (const item of items) {
       const currentPath = [...path, item];
 
@@ -166,7 +156,7 @@ export const getMenuBreadcrumb = (
         path: menu.path,
         icon: menu.icon,
         isCurrent: index === menuPath.length - 1,
-        isClickable: index < menuPath.length - 1
+        isClickable: index < menuPath.length - 1,
       });
     });
   }
@@ -181,11 +171,11 @@ export const flattenMenus = (menus: MenuItem[]): MenuItem[] => {
   const result: MenuItem[] = [];
 
   const flatten = (items: MenuItem[]) => {
-    items.forEach(item => {
+    items.forEach((item) => {
       // 添加扁平化的菜单项（不包含子菜单）
       result.push({
         ...item,
-        children: [] // 扁平化时清空子菜单
+        children: [], // 扁平化时清空子菜单
       });
 
       // 递归处理子菜单
@@ -218,9 +208,9 @@ export const searchMenus = (
   const flattenedMenus = flattenMenus(searchableMenus);
   const lowerQuery = query.toLowerCase();
 
-  return flattenedMenus.filter(menu =>
-    menu.name.toLowerCase().includes(lowerQuery) ||
-    menu.code.toLowerCase().includes(lowerQuery)
+  return flattenedMenus.filter(
+    (menu) =>
+      menu.name.toLowerCase().includes(lowerQuery) || menu.code.toLowerCase().includes(lowerQuery)
   );
 };
 
@@ -251,7 +241,7 @@ export const groupMenusByFunctionalArea = (
 ): Record<FunctionalArea, MenuItem[]> => {
   const groups: Record<string, MenuItem[]> = {};
 
-  menus.forEach(menu => {
+  menus.forEach((menu) => {
     const area = menu.functionalArea;
     if (!groups[area]) {
       groups[area] = [];
@@ -277,7 +267,7 @@ export const getFunctionalAreaName = (area: FunctionalArea): string => {
     [FunctionalArea.SCHEDULING]: '档期/排期/资源预约管理',
     [FunctionalArea.ORDER_MANAGEMENT]: '订单与履约管理',
     [FunctionalArea.OPERATIONS]: '运营 & 报表 / 指标看板',
-    [FunctionalArea.SYSTEM_MANAGEMENT]: '系统管理 / 设置 /权限'
+    [FunctionalArea.SYSTEM_MANAGEMENT]: '系统管理 / 设置 /权限',
   };
 
   return areaNames[area] || area;
@@ -350,7 +340,7 @@ export const getNavigationActionName = (action: NavigationAction): string => {
     [NavigationAction.SEARCH_SELECT]: '搜索选择',
     [NavigationAction.FAVORITE_CLICK]: '点击收藏',
     [NavigationAction.PAGE_VIEW]: '页面浏览',
-    [NavigationAction.PAGE_EXIT]: '页面退出'
+    [NavigationAction.PAGE_EXIT]: '页面退出',
   };
 
   return actionNames[action] || action;
@@ -362,11 +352,11 @@ export const getNavigationActionName = (action: NavigationAction): string => {
 export const calculateMenuStats = (
   recentMenus: string[],
   menus: MenuItem[]
-): { mostAccessed: MenuItem[], accessCount: Record<string, number> } => {
+): { mostAccessed: MenuItem[]; accessCount: Record<string, number> } => {
   const accessCount: Record<string, number> = {};
 
   // 统计访问次数
-  recentMenus.forEach(menuId => {
+  recentMenus.forEach((menuId) => {
     accessCount[menuId] = (accessCount[menuId] || 0) + 1;
   });
 
@@ -381,17 +371,14 @@ export const calculateMenuStats = (
 
   return {
     mostAccessed,
-    accessCount
+    accessCount,
   };
 };
 
 /**
  * 检查菜单是否应该显示（考虑权限和活跃状态）
  */
-export const shouldShowMenu = (
-  menu: MenuItem,
-  userPermissions: string[]
-): boolean => {
+export const shouldShowMenu = (menu: MenuItem, userPermissions: string[]): boolean => {
   return menu.isActive && checkMenuPermission(menu, userPermissions);
 };
 
@@ -409,7 +396,7 @@ export const getMenuClassName = (
     `menu-level-${level}`,
     isActive ? 'menu-active' : '',
     isExpanded ? 'menu-expanded' : '',
-    !shouldShowMenu(menu, []) ? 'menu-hidden' : ''
+    !shouldShowMenu(menu, []) ? 'menu-hidden' : '',
   ];
 
   return classes.filter(Boolean).join(' ');
@@ -443,7 +430,7 @@ export const throttle = <T extends (...args: any[]) => any>(
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 };
@@ -451,34 +438,28 @@ export const throttle = <T extends (...args: any[]) => any>(
 /**
  * 获取菜单的层级信息
  */
-export const getMenuHierarchyInfo = (
-  menu: MenuItem,
-  menus: MenuItem[]
-): MenuHierarchyType => {
+export const getMenuHierarchyInfo = (menu: MenuItem, menus: MenuItem[]): MenuHierarchyType => {
   const path = getMenuPathList(menu, menus);
   const children = menu.children || [];
 
   return {
     depth: path.length,
     currentLevel: menu.level,
-    parentPath: path.slice(0, -1).map(m => m.id),
+    parentPath: path.slice(0, -1).map((m) => m.id),
     childrenCount: children.length,
     hasChildren: children.length > 0,
     levelTitles: {
       [MenuLevel.MAIN]: '主菜单',
       [MenuLevel.SUB]: '子菜单',
-      [MenuLevel.DETAIL]: '详情页面'
-    }
+      [MenuLevel.DETAIL]: '详情页面',
+    },
   };
 };
 
 /**
  * 获取从根菜单到指定菜单的完整路径列表
  */
-export const getMenuPathList = (
-  targetMenu: MenuItem,
-  menus: MenuItem[]
-): MenuItem[] => {
+export const getMenuPathList = (targetMenu: MenuItem, menus: MenuItem[]): MenuItem[] => {
   const path: MenuItem[] = [];
 
   const buildPath = (menu: MenuItem): boolean => {
@@ -514,10 +495,7 @@ export const getMenuPathList = (
 /**
  * 获取菜单的父菜单
  */
-export const getParentMenu = (
-  menu: MenuItem,
-  menus: MenuItem[]
-): MenuItem | null => {
+export const getParentMenu = (menu: MenuItem, menus: MenuItem[]): MenuItem | null => {
   if (!menu.parentId) {
     return null;
   }
@@ -540,7 +518,7 @@ export const getChildMenus = (
     return [];
   }
 
-  return menu.children.filter(child => {
+  return menu.children.filter((child) => {
     if (filters?.level !== undefined && child.level !== filters.level) {
       return false;
     }
@@ -557,15 +535,10 @@ export const getChildMenus = (
 /**
  * 获取菜单的同级菜单
  */
-export const getSiblingMenus = (
-  menu: MenuItem,
-  menus: MenuItem[]
-): MenuItem[] => {
+export const getSiblingMenus = (menu: MenuItem, menus: MenuItem[]): MenuItem[] => {
   if (!menu.parentId) {
     // 没有父菜单，返回同级的主菜单
-    return menus.filter(m =>
-      m.id !== menu.id && m.level === menu.level
-    );
+    return menus.filter((m) => m.id !== menu.id && m.level === menu.level);
   }
 
   const parent = findMenuItemById(menus, menu.parentId);
@@ -573,9 +546,7 @@ export const getSiblingMenus = (
     return [];
   }
 
-  return parent.children.filter(child =>
-    child.id !== menu.id && child.level === menu.level
-  );
+  return parent.children.filter((child) => child.id !== menu.id && child.level === menu.level);
 };
 
 /**
@@ -602,13 +573,13 @@ export const createMenuGroups = (
     FunctionalArea.SCHEDULING,
     FunctionalArea.ORDER_MANAGEMENT,
     FunctionalArea.OPERATIONS,
-    FunctionalArea.SYSTEM_MANAGEMENT
+    FunctionalArea.SYSTEM_MANAGEMENT,
   ];
 
   const groups: MenuGroup[] = [];
 
-  mainAreas.forEach(area => {
-    const areaMenus = menus.filter(menu => menu.functionalArea === area);
+  mainAreas.forEach((area) => {
+    const areaMenus = menus.filter((menu) => menu.functionalArea === area);
 
     // 如果不包含空分组且该区域没有菜单，则跳过
     if (!includeEmptyGroups && areaMenus.length === 0) {
@@ -622,7 +593,7 @@ export const createMenuGroups = (
       menus: areaMenus,
       sortOrder: getFunctionalAreaOrder(area),
       isExpanded: true,
-      isVisible: areaMenus.length > 0
+      isVisible: areaMenus.length > 0,
     });
   });
 
@@ -662,7 +633,7 @@ export const getFunctionalAreaDisplayName = (area: FunctionalArea): string => {
     [FunctionalArea.PRICING_PROMOTION]: '促销价格',
     [FunctionalArea.USER_MANAGEMENT]: '用户管理',
     [FunctionalArea.ROLE_MANAGEMENT]: '角色管理',
-    [FunctionalArea.PERMISSION_MANAGEMENT]: '权限管理'
+    [FunctionalArea.PERMISSION_MANAGEMENT]: '权限管理',
   };
   return nameMap[area] || area;
 };
@@ -693,7 +664,7 @@ export const getFunctionalAreaDescription = (area: FunctionalArea): string => {
     [FunctionalArea.PRICING_PROMOTION]: '促销活动价格管理',
     [FunctionalArea.USER_MANAGEMENT]: '用户账号管理',
     [FunctionalArea.ROLE_MANAGEMENT]: '角色权限管理',
-    [FunctionalArea.PERMISSION_MANAGEMENT]: '功能权限管理'
+    [FunctionalArea.PERMISSION_MANAGEMENT]: '功能权限管理',
   };
   return descMap[area] || '';
 };
@@ -724,7 +695,7 @@ export const getFunctionalAreaOrder = (area: FunctionalArea): number => {
     [FunctionalArea.PRICING_PROMOTION]: 52,
     [FunctionalArea.USER_MANAGEMENT]: 101,
     [FunctionalArea.ROLE_MANAGEMENT]: 102,
-    [FunctionalArea.PERMISSION_MANAGEMENT]: 103
+    [FunctionalArea.PERMISSION_MANAGEMENT]: 103,
   };
   return orderMap[area] || 999;
 };
@@ -744,12 +715,12 @@ export const buildMenuTree = (
   const rootMenus: MenuItem[] = [];
 
   // 创建菜单映射
-  flatMenus.forEach(menu => {
+  flatMenus.forEach((menu) => {
     menuMap.set(menu.id, { ...menu, children: [] });
   });
 
   // 构建树结构
-  flatMenus.forEach(menu => {
+  flatMenus.forEach((menu) => {
     const menuNode = menuMap.get(menu.id)!;
 
     if (menu.parentId && menuMap.has(menu.parentId)) {
@@ -764,12 +735,12 @@ export const buildMenuTree = (
   // 限制深度
   const limitDepth = (menus: MenuItem[], currentDepth: number = 1): MenuItem[] => {
     if (currentDepth >= maxDepth) {
-      return menus.map(menu => ({ ...menu, children: [] }));
+      return menus.map((menu) => ({ ...menu, children: [] }));
     }
 
-    return menus.map(menu => ({
+    return menus.map((menu) => ({
       ...menu,
-      children: menu.children ? limitDepth(menu.children, currentDepth + 1) : []
+      children: menu.children ? limitDepth(menu.children, currentDepth + 1) : [],
     }));
   };
 
@@ -779,16 +750,14 @@ export const buildMenuTree = (
 /**
  * 验证菜单树结构的完整性
  */
-export const validateMenuTree = (
-  menus: MenuItem[]
-): { isValid: boolean; errors: string[] } => {
+export const validateMenuTree = (menus: MenuItem[]): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   const menuIds = new Set<string>();
   const parentIds = new Set<string>();
 
   // 检查菜单ID唯一性
   const checkUniqueness = (menuList: MenuItem[]) => {
-    menuList.forEach(menu => {
+    menuList.forEach((menu) => {
       if (menuIds.has(menu.id)) {
         errors.push(`重复的菜单ID: ${menu.id}`);
       } else {
@@ -807,7 +776,7 @@ export const validateMenuTree = (
 
   // 检查父菜单存在性
   const checkParentExistence = (menuList: MenuItem[]) => {
-    menuList.forEach(menu => {
+    menuList.forEach((menu) => {
       if (menu.parentId && !menuIds.has(menu.parentId)) {
         errors.push(`菜单 ${menu.id} 的父菜单 ${menu.parentId} 不存在`);
       }
@@ -842,7 +811,7 @@ export const validateMenuTree = (
   checkParentExistence(menus);
 
   // 检查循环引用（从每个根菜单开始）
-  menus.forEach(menu => {
+  menus.forEach((menu) => {
     if (!menu.parentId) {
       checkCircularReference(menu, new Set());
     }
@@ -850,7 +819,7 @@ export const validateMenuTree = (
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
@@ -878,13 +847,11 @@ export const searchMenuItems = (
     userPermissions,
     includeInactive = false,
     searchFields = ['name', 'code', 'description'],
-    fuzzyMatch = true
+    fuzzyMatch = true,
   } = options || {};
 
   // 获取可搜索的菜单
-  let searchableMenus = userPermissions
-    ? filterMenusByPermissions(menus, userPermissions)
-    : menus;
+  let searchableMenus = userPermissions ? filterMenusByPermissions(menus, userPermissions) : menus;
 
   if (!includeInactive) {
     searchableMenus = filterActiveMenus(searchableMenus);
@@ -895,12 +862,12 @@ export const searchMenuItems = (
 
   // 计算匹配分数并生成搜索结果
   const results: SearchResult[] = flattenedMenus
-    .map(menu => {
+    .map((menu) => {
       let score = 0;
       let matchedFields: string[] = [];
 
       // 检查各个字段的匹配情况
-      searchFields.forEach(field => {
+      searchFields.forEach((field) => {
         const fieldValue = (menu as any)[field];
         if (fieldValue && typeof fieldValue === 'string') {
           const lowerFieldValue = fieldValue.toLowerCase();
@@ -935,13 +902,16 @@ export const searchMenuItems = (
       return {
         id: menu.id,
         title: menu.name,
-        description: menu.description || `${getFunctionalAreaName(menu.functionalArea)} - ${menu.code}`,
+        description:
+          menu.description || `${getFunctionalAreaName(menu.functionalArea)} - ${menu.code}`,
         path: menu.path,
         type: menu.level === 1 ? 'menu' : menu.level === 2 ? 'submenu' : 'page',
         menuItem: menu,
         score,
         highlightedTitle: highlightSearchTerm(menu.name, query),
-        highlightedDescription: menu.description ? highlightSearchTerm(menu.description, query) : undefined
+        highlightedDescription: menu.description
+          ? highlightSearchTerm(menu.description, query)
+          : undefined,
       };
     })
     .filter((result): result is SearchResult => result !== null)
@@ -976,7 +946,7 @@ export const calculateMatchScore = (query: string, text: string): number => {
   }
 
   // 计算编辑距离相似度
-  const similarity = 1 - (levenshteinDistance(query, text) / Math.max(queryLength, textLength));
+  const similarity = 1 - levenshteinDistance(query, text) / Math.max(queryLength, textLength);
   return Math.round(similarity * 40);
 };
 
@@ -984,7 +954,9 @@ export const calculateMatchScore = (query: string, text: string): number => {
  * 计算编辑距离（Levenshtein距离）
  */
 export const levenshteinDistance = (str1: string, str2: string): number => {
-  const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
+  const matrix = Array(str2.length + 1)
+    .fill(null)
+    .map(() => Array(str1.length + 1).fill(null));
 
   for (let i = 0; i <= str1.length; i++) {
     matrix[0][i] = i;
@@ -1048,13 +1020,13 @@ export const generateSearchSuggestions = (
   const lowerQuery = query.toLowerCase();
   const suggestions = new Set<string>();
 
-  flattenedMenus.forEach(menu => {
+  flattenedMenus.forEach((menu) => {
     // 检查菜单名称是否包含查询字符串
     const name = menu.name.toLowerCase();
     if (name.includes(lowerQuery)) {
       // 提取包含查询词的完整词语
       const words = menu.name.split(/\s+/);
-      words.forEach(word => {
+      words.forEach((word) => {
         if (word.toLowerCase().includes(lowerQuery)) {
           suggestions.add(word);
         }
@@ -1064,7 +1036,7 @@ export const generateSearchSuggestions = (
     // 检查描述
     if (menu.description) {
       const descWords = menu.description.split(/\s+/);
-      descWords.forEach(word => {
+      descWords.forEach((word) => {
         if (word.toLowerCase().includes(lowerQuery)) {
           suggestions.add(word);
         }

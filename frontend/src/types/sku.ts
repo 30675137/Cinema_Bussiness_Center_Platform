@@ -7,19 +7,19 @@
  * @since P001-sku-master-data
  */
 export enum SkuType {
-  RAW_MATERIAL = 'raw_material',        // 原料
-  PACKAGING = 'packaging',              // 包材
+  RAW_MATERIAL = 'raw_material', // 原料
+  PACKAGING = 'packaging', // 包材
   FINISHED_PRODUCT = 'finished_product', // 成品
-  COMBO = 'combo'                       // 套餐/组合
+  COMBO = 'combo', // 套餐/组合
 }
 
 /**
  * SKU状态枚举
  */
 export enum SkuStatus {
-  DRAFT = 'draft',       // 草稿
-  ENABLED = 'enabled',   // 启用
-  DISABLED = 'disabled'  // 停用
+  DRAFT = 'draft', // 草稿
+  ENABLED = 'enabled', // 启用
+  DISABLED = 'disabled', // 停用
 }
 
 /**
@@ -111,7 +111,7 @@ export interface SKU {
   wasteRate?: number;
   /** 零售价(元):仅成品/套餐类型有效 */
   price?: number;
-  
+
   // 关联信息
   /** 所属SPU ID */
   spuId: string;
@@ -457,7 +457,7 @@ export const SKU_TYPE_CONFIG: Record<SkuType, { color: string; text: string }> =
   [SkuType.RAW_MATERIAL]: { color: 'blue', text: '原料' },
   [SkuType.PACKAGING]: { color: 'green', text: '包材' },
   [SkuType.FINISHED_PRODUCT]: { color: 'orange', text: '成品' },
-  [SkuType.COMBO]: { color: 'purple', text: '套餐' }
+  [SkuType.COMBO]: { color: 'purple', text: '套餐' },
 };
 
 /**
@@ -466,7 +466,7 @@ export const SKU_TYPE_CONFIG: Record<SkuType, { color: string; text: string }> =
 export const SKU_STATUS_CONFIG: Record<SkuStatus, { color: string; text: string }> = {
   [SkuStatus.DRAFT]: { color: 'default', text: '草稿' },
   [SkuStatus.ENABLED]: { color: 'success', text: '启用' },
-  [SkuStatus.DISABLED]: { color: 'error', text: '停用' }
+  [SkuStatus.DISABLED]: { color: 'error', text: '停用' },
 };
 
 /**
@@ -483,4 +483,3 @@ export interface CostBreakdown {
   /** 标准成本总计 */
   standardCost: number;
 }
-

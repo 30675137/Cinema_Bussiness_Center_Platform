@@ -22,11 +22,7 @@ interface SpecAttrTabProps {
 /**
  * 规格属性步骤组件
  */
-export const SpecAttrTab: React.FC<SpecAttrTabProps> = ({
-  control,
-  errors,
-  mode,
-}) => {
+export const SpecAttrTab: React.FC<SpecAttrTabProps> = ({ control, errors, mode }) => {
   // 口味选项
   const flavorOptions = [
     '原味',
@@ -40,15 +36,7 @@ export const SpecAttrTab: React.FC<SpecAttrTabProps> = ({
   ];
 
   // 包装形式选项
-  const packagingOptions = [
-    '瓶装',
-    '听装',
-    '袋装',
-    '盒装',
-    '罐装',
-    '杯装',
-    '桶装',
-  ];
+  const packagingOptions = ['瓶装', '听装', '袋装', '盒装', '罐装', '杯装', '桶装'];
 
   return (
     <div data-testid="sku-form-spec-attr-tab">
@@ -90,9 +78,7 @@ export const SpecAttrTab: React.FC<SpecAttrTabProps> = ({
               allowClear
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
-                  .includes(input.toLowerCase())
+                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
               }
               data-testid="sku-form-flavor-select"
               id="flavor"
@@ -123,9 +109,7 @@ export const SpecAttrTab: React.FC<SpecAttrTabProps> = ({
               allowClear
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
-                  .includes(input.toLowerCase())
+                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
               }
               data-testid="sku-form-packaging-select"
               id="packaging"

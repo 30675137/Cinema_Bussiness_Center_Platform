@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 统一错误处理工具
- * 
+ *
  * 提供跨所有调整操作的一致性错误处理。
  * 实现 T063 任务。
- * 
+ *
  * @since Phase 8 - Polish
  */
 
@@ -188,7 +188,7 @@ export function isConflictError(error: unknown): boolean {
 
 /**
  * 统一错误处理函数
- * 
+ *
  * 根据错误类型执行不同的处理逻辑
  */
 export function handleApiError(

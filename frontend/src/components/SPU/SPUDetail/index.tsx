@@ -14,7 +14,7 @@ import {
   Spin,
   Empty,
   Tooltip,
-  Modal
+  Modal,
 } from 'antd';
 import {
   EditOutlined,
@@ -27,7 +27,7 @@ import {
   TagOutlined,
   InfoCircleOutlined,
   SettingOutlined,
-  FileTextOutlined
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -44,12 +44,7 @@ interface SPUDetailProps {
   onCopy?: (record: SPUItem) => void;
 }
 
-const SPUDetail: React.FC<SPUDetailProps> = ({
-  mode = 'view',
-  onEdit,
-  onDelete,
-  onCopy
-}) => {
+const SPUDetail: React.FC<SPUDetailProps> = ({ mode = 'view', onEdit, onDelete, onCopy }) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
@@ -57,7 +52,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
   const {
     data: spuData,
     isLoading,
-    error
+    error,
   } = useQuery({
     queryKey: ['spuDetail', id],
     queryFn: () => spuService.getSPUDetail(id),
@@ -66,17 +61,15 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
     onError: (error: any) => {
       message.error('获取SPU详情失败');
       console.error('Get SPU detail error:', error);
-    }
+    },
   });
 
   // 获取状态变更历史
-  const {
-    data: historyData
-  } = useQuery({
+  const { data: historyData } = useQuery({
     queryKey: ['spuStatusHistory', id],
     queryFn: () => spuService.getStatusHistory(id),
     enabled: !!id,
-    retry: 1
+    retry: 1,
   });
 
   const handleBack = () => {
@@ -118,7 +111,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
             message.error('删除失败');
             console.error('Delete SPU error:', error);
           }
-        }
+        },
       });
     }
   };
@@ -146,10 +139,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
   if (error || !spuData?.data) {
     return (
       <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Empty
-          description="加载SPU详情失败"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
+        <Empty description="加载SPU详情失败" image={Empty.PRESENTED_IMAGE_SIMPLE}>
           <Button type="primary" onClick={() => window.location.reload()}>
             重新加载
           </Button>
@@ -164,7 +154,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
   const statusConfig = {
     active: { text: '启用', color: 'success' },
     inactive: { text: '停用', color: 'error' },
-    draft: { text: '草稿', color: 'default' }
+    draft: { text: '草稿', color: 'default' },
   };
 
   return (
@@ -173,10 +163,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
       <Card className="mb-4">
         <div className="flex justify-between items-center">
           <Space>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
-            >
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
               返回列表
             </Button>
             <div>
@@ -196,10 +183,7 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
             >
               编辑
             </Button>
-            <Button
-              icon={<CopyOutlined />}
-              onClick={handleCopy}
-            >
+            <Button icon={<CopyOutlined />} onClick={handleCopy}>
               复制
             </Button>
             <Button
@@ -287,14 +271,12 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="商品描述" span={2}>
-                <div className="max-h-32 overflow-y-auto">
-                  {spu.description || '-'}
-                </div>
+                <div className="max-h-32 overflow-y-auto">{spu.description || '-'}</div>
               </Descriptions.Item>
               <Descriptions.Item label="标签" span={2}>
                 <div className="flex flex-wrap gap-2">
                   {spu.tags && spu.tags.length > 0 ? (
-                    spu.tags.map(tag => (
+                    spu.tags.map((tag) => (
                       <Tag key={tag} color="blue">
                         {tag}
                       </Tag>
@@ -373,19 +355,15 @@ const SPUDetail: React.FC<SPUDetailProps> = ({
                   children: (
                     <div>
                       <div className="font-medium">{history.description}</div>
-                      <div className="text-sm text-gray-600 mt-1">
-                        操作人: {history.operator}
-                      </div>
+                      <div className="text-sm text-gray-600 mt-1">操作人: {history.operator}</div>
                       <div className="text-xs text-gray-400">
                         {new Date(history.timestamp).toLocaleString('zh-CN')}
                       </div>
                       {history.reason && (
-                        <div className="text-sm text-gray-500 mt-1">
-                          原因: {history.reason}
-                        </div>
+                        <div className="text-sm text-gray-500 mt-1">原因: {history.reason}</div>
                       )}
                     </div>
-                  )
+                  ),
                 }))}
               />
             ) : (

@@ -1,6 +1,6 @@
 /**
  * P003-inventory-query: 库存状态标签组件
- * 
+ *
  * 根据库存状态显示对应颜色的标签。
  */
 
@@ -15,7 +15,7 @@ interface InventoryStatusTagProps {
 
 /**
  * 库存状态标签组件
- * 
+ *
  * 根据库存状态枚举值显示对应的中文标签和颜色：
  * - SUFFICIENT: 绿色 "充足"
  * - NORMAL: 蓝色 "正常"
@@ -25,7 +25,7 @@ interface InventoryStatusTagProps {
  */
 export function InventoryStatusTag({ status, className }: InventoryStatusTagProps) {
   const config = INVENTORY_STATUS_CONFIG[status];
-  
+
   if (!config) {
     return <Tag className={className}>未知</Tag>;
   }

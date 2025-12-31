@@ -58,8 +58,12 @@ export const SKUEditModal: React.FC<SKUEditModalProps> = ({
   onCancel,
   onSuccess,
 }) => {
-  const { editFormDraft, saveEditFormDraft, clearEditFormDraft } = useSkuManagementStore();
-  const { data: sku, isLoading: isLoadingSku, error: skuError } = useSKUDetail(skuId || '', {
+  const { saveEditFormDraft, clearEditFormDraft } = useSkuManagementStore();
+  const {
+    data: sku,
+    isLoading: isLoadingSku,
+    error: skuError,
+  } = useSKUDetail(skuId || '', {
     enabled: !!skuId && visible,
   });
   const form = useSkuEditForm(sku);
@@ -175,9 +179,15 @@ export const SKUEditModal: React.FC<SKUEditModalProps> = ({
             message="基本信息"
             description={
               <div>
-                <div><strong>SKU 编码:</strong> {sku.code}</div>
-                <div><strong>SKU 类型:</strong> {sku.skuType}</div>
-                <div><strong>关联 SPU:</strong> {sku.spuName || sku.spuId}</div>
+                <div>
+                  <strong>SKU 编码:</strong> {sku.code}
+                </div>
+                <div>
+                  <strong>SKU 类型:</strong> {sku.skuType}
+                </div>
+                <div>
+                  <strong>关联 SPU:</strong> {sku.spuName || sku.spuId}
+                </div>
                 <div style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
                   注意: SKU 类型和 SPU 关联在创建后不可修改
                 </div>

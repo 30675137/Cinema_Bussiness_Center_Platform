@@ -4,7 +4,7 @@
  *
  * US3: FR-022 - 订单数量和销售额可视化展示
  */
-import React from 'react'
+import React from 'react';
 import {
   BarChart,
   Bar,
@@ -14,11 +14,11 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts'
-import { Card, Typography, Spin } from 'antd'
-import type { OrderMetrics, SalesMetrics, DateRangeDTO } from '../types/statistics'
+} from 'recharts';
+import { Card, Typography, Spin } from 'antd';
+import type { OrderMetrics, SalesMetrics, DateRangeDTO } from '../types/statistics';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 /**
  * SalesChart 组件属性
@@ -27,22 +27,22 @@ interface SalesChartProps {
   /**
    * 时间范围信息
    */
-  dateRange: DateRangeDTO
+  dateRange: DateRangeDTO;
 
   /**
    * 订单指标数据
    */
-  orderMetrics: OrderMetrics
+  orderMetrics: OrderMetrics;
 
   /**
    * 销售指标数据
    */
-  salesMetrics: SalesMetrics
+  salesMetrics: SalesMetrics;
 
   /**
    * 加载状态
    */
-  loading?: boolean
+  loading?: boolean;
 }
 
 /**
@@ -70,14 +70,14 @@ export const SalesChart: React.FC<SalesChartProps> = ({
       已完成: orderMetrics.completedOrders,
       已取消: orderMetrics.cancelledOrders,
     },
-  ]
+  ];
 
   const rangeTypeLabel = {
     TODAY: '今日',
     WEEK: '本周',
     MONTH: '本月',
     CUSTOM: '自定义',
-  }[dateRange.rangeType]
+  }[dateRange.rangeType];
 
   if (loading) {
     return (
@@ -86,14 +86,16 @@ export const SalesChart: React.FC<SalesChartProps> = ({
           <Spin size="large" />
         </div>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <Title level={4}>
         {rangeTypeLabel}销售数据
-        <span style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '16px', color: '#8c8c8c' }}>
+        <span
+          style={{ fontSize: '14px', fontWeight: 'normal', marginLeft: '16px', color: '#8c8c8c' }}
+        >
           {dateRange.startDate} 至 {dateRange.endDate}
         </span>
       </Title>
@@ -169,7 +171,7 @@ export const SalesChart: React.FC<SalesChartProps> = ({
         }
       `}</style>
     </Card>
-  )
-}
+  );
+};
 
-export default SalesChart
+export default SalesChart;

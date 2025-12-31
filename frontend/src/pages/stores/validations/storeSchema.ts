@@ -24,27 +24,11 @@ export const createStoreSchema = z.object({
     .min(1, '门店名称不能为空')
     .max(100, '门店名称不能超过100字符')
     .transform((val) => val.trim()),
-  region: z
-    .string()
-    .min(1, '区域不能为空')
-    .max(50, '区域不能超过50字符'),
-  city: z
-    .string()
-    .min(1, '城市不能为空')
-    .max(50, '城市不能超过50字符'),
-  province: z
-    .string()
-    .max(50, '省份不能超过50字符')
-    .optional()
-    .or(z.literal('')),
-  district: z
-    .string()
-    .max(50, '区县不能超过50字符')
-    .optional()
-    .or(z.literal('')),
-  address: z
-    .string()
-    .min(1, '详细地址不能为空'),
+  region: z.string().min(1, '区域不能为空').max(50, '区域不能超过50字符'),
+  city: z.string().min(1, '城市不能为空').max(50, '城市不能超过50字符'),
+  province: z.string().max(50, '省份不能超过50字符').optional().or(z.literal('')),
+  district: z.string().max(50, '区县不能超过50字符').optional().or(z.literal('')),
+  address: z.string().min(1, '详细地址不能为空'),
   phone: z
     .string()
     .min(1, '电话号码不能为空')
@@ -86,30 +70,11 @@ export const updateStoreSchema = z.object({
     .max(100, '门店名称不能超过100字符')
     .transform((val) => val.trim())
     .optional(),
-  region: z
-    .string()
-    .min(1, '区域不能为空')
-    .max(50, '区域不能超过50字符')
-    .optional(),
-  city: z
-    .string()
-    .min(1, '城市不能为空')
-    .max(50, '城市不能超过50字符')
-    .optional(),
-  province: z
-    .string()
-    .max(50, '省份不能超过50字符')
-    .optional()
-    .or(z.literal('')),
-  district: z
-    .string()
-    .max(50, '区县不能超过50字符')
-    .optional()
-    .or(z.literal('')),
-  address: z
-    .string()
-    .min(1, '详细地址不能为空')
-    .optional(),
+  region: z.string().min(1, '区域不能为空').max(50, '区域不能超过50字符').optional(),
+  city: z.string().min(1, '城市不能为空').max(50, '城市不能超过50字符').optional(),
+  province: z.string().max(50, '省份不能超过50字符').optional().or(z.literal('')),
+  district: z.string().max(50, '区县不能超过50字符').optional().or(z.literal('')),
+  address: z.string().min(1, '详细地址不能为空').optional(),
   phone: z
     .string()
     .min(1, '电话号码不能为空')

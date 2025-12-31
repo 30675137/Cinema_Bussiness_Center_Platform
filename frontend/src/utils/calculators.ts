@@ -20,15 +20,12 @@ export const calculateOrderTotal = (items: any[]): number => {
 /**
  * 计算折扣金额
  */
-export const calculateDiscountedAmount = (
-  amount: number,
-  discountRate: number
-): number => {
+export const calculateDiscountedAmount = (amount: number, discountRate: number): number => {
   if (amount <= 0 || discountRate <= 0 || discountRate > 100) {
     return 0;
   }
 
-  return Math.round((amount * discountRate / 100) * 100) / 100;
+  return Math.round(((amount * discountRate) / 100) * 100) / 100;
 };
 
 /**
@@ -72,10 +69,7 @@ export const calculateInventoryTurnover = (
 /**
  * 计算毛利
  */
-export const calculateGrossMargin = (
-  revenue: number,
-  costOfGoodsSold: number
-): number => {
+export const calculateGrossMargin = (revenue: number, costOfGoodsSold: number): number => {
   return revenue - costOfGoodsSold;
 };
 
@@ -96,10 +90,7 @@ export const calculateGrossMarginPercentage = (
 /**
  * 计算净利率
  */
-export const calculateNetMargin = (
-  netIncome: number,
-  revenue: number
-): number => {
+export const calculateNetMargin = (netIncome: number, revenue: number): number => {
   if (revenue === 0) {
     return 0;
   }
@@ -110,10 +101,7 @@ export const calculateNetMargin = (
 /**
  * 计算投资回报率
  */
-export const calculateROI = (
-  netProfit: number,
-  investmentCost: number
-): number => {
+export const calculateROI = (netProfit: number, investmentCost: number): number => {
   if (investmentCost === 0) {
     return 0;
   }
@@ -124,10 +112,7 @@ export const calculateROI = (
 /**
  * 计算百分比变化
  */
-export const calculatePercentageChange = (
-  oldValue: number,
-  newValue: number
-): number => {
+export const calculatePercentageChange = (oldValue: number, newValue: number): number => {
   if (oldValue === 0) {
     return newValue > 0 ? Infinity : 0;
   }
@@ -144,9 +129,10 @@ export const calculateCompoundInterest = (
   time: number,
   compoundsPerYear = 1
 ): number => {
-  return Math.round(
-    principal * Math.pow(1 + rate / compoundsPerYear, compoundsPerYear * time) * 100
-  ) / 100;
+  return (
+    Math.round(principal * Math.pow(1 + rate / compoundsPerYear, compoundsPerYear * time) * 100) /
+    100
+  );
 };
 
 /**
@@ -168,7 +154,8 @@ export const calculateInstallmentAmount = (
     return Math.round((totalAmount / numberOfPayments) * 100) / 100;
   }
 
-  const installment = totalAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / denominator;
+  const installment =
+    (totalAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments))) / denominator;
   return Math.round(installment * 100) / 100;
 };
 
@@ -226,7 +213,7 @@ export const calculateStandardDeviation = (values: number[]): number => {
   }
 
   const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
-  const squaredDifferences = values.map(value => Math.pow(value - mean, 2));
+  const squaredDifferences = values.map((value) => Math.pow(value - mean, 2));
   const variance = squaredDifferences.reduce((sum, value) => sum + value, 0) / values.length;
 
   return Math.round(Math.sqrt(variance) * 100) / 100;
@@ -264,10 +251,7 @@ export const calculateMedian = (values: number[]): number => {
 /**
  * 计算加权平均值
  */
-export const calculateWeightedAverage = (
-  values: number[],
-  weights: number[]
-): number => {
+export const calculateWeightedAverage = (values: number[], weights: number[]): number => {
   if (values.length === 0 || values.length !== weights.length) {
     return 0;
   }
@@ -281,10 +265,7 @@ export const calculateWeightedAverage = (
 /**
  * 计算折扣率
  */
-export const calculateDiscountRate = (
-  originalPrice: number,
-  discountedPrice: number
-): number => {
+export const calculateDiscountRate = (originalPrice: number, discountedPrice: number): number => {
   if (originalPrice === 0) {
     return 0;
   }
@@ -295,10 +276,7 @@ export const calculateDiscountRate = (
 /**
  * 计算加价率
  */
-export const calculateMarkupRate = (
-  costPrice: number,
-  sellingPrice: number
-): number => {
+export const calculateMarkupRate = (costPrice: number, sellingPrice: number): number => {
   if (costPrice === 0) {
     return 0;
   }
@@ -309,10 +287,7 @@ export const calculateMarkupRate = (
 /**
  * 计算税前价格
  */
-export const calculatePreTaxPrice = (
-  totalPrice: number,
-  taxRate: number
-): number => {
+export const calculatePreTaxPrice = (totalPrice: number, taxRate: number): number => {
   if (taxRate === 0) {
     return totalPrice;
   }
@@ -323,11 +298,8 @@ export const calculatePreTaxPrice = (
 /**
  * 计算税后价格
  */
-export const calculatePostTaxPrice = (
-  preTaxPrice: number,
-  taxRate: number
-): number => {
-  return Math.round((preTaxPrice * (1 + taxRate / 100)) * 100) / 100;
+export const calculatePostTaxPrice = (preTaxPrice: number, taxRate: number): number => {
+  return Math.round(preTaxPrice * (1 + taxRate / 100) * 100) / 100;
 };
 
 /**
@@ -346,7 +318,7 @@ export const calculateDateDifference = (
     days: 1000 * 60 * 60 * 24,
     hours: 1000 * 60 * 60,
     minutes: 1000 * 60,
-    seconds: 1000
+    seconds: 1000,
   };
 
   return Math.round(difference / divisors[unit]);
@@ -355,10 +327,7 @@ export const calculateDateDifference = (
 /**
  * 计算工作日差（排除周末）
  */
-export const calculateBusinessDays = (
-  startDate: Date | string,
-  endDate: Date | string
-): number => {
+export const calculateBusinessDays = (startDate: Date | string, endDate: Date | string): number => {
   const start = new Date(startDate);
   const end = new Date(endDate);
   let businessDays = 0;
@@ -366,7 +335,8 @@ export const calculateBusinessDays = (
   const currentDate = new Date(start);
   while (currentDate <= end) {
     const dayOfWeek = currentDate.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 0=Sunday, 6=Saturday
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      // 0=Sunday, 6=Saturday
       businessDays++;
     }
     currentDate.setDate(currentDate.getDate() + 1);

@@ -4,45 +4,45 @@
  * 订单列表组件 - 使用 Ant Design Table 展示统一订单列表（包含商品订单和饮品订单）
  */
 
-import React from 'react'
-import { Table, type TableProps, Typography, Tag } from 'antd'
-import { Link } from 'react-router-dom'
-import type { UnifiedOrder, OrderType } from '../types/order'
-import { OrderStatusBadge } from './OrderStatusBadge'
-import dayjs from 'dayjs'
+import React from 'react';
+import { Table, type TableProps, Typography, Tag } from 'antd';
+import { Link } from 'react-router-dom';
+import type { UnifiedOrder, OrderType } from '../types/order';
+import { OrderStatusBadge } from './OrderStatusBadge';
+import dayjs from 'dayjs';
 
-const { Text } = Typography
+const { Text } = Typography;
 
 export interface OrderListProps {
   /**
    * 统一订单数据（包含商品订单和饮品订单）
    */
-  data: UnifiedOrder[]
+  data: UnifiedOrder[];
 
   /**
    * 总记录数
    */
-  total: number
+  total: number;
 
   /**
    * 当前页码
    */
-  page: number
+  page: number;
 
   /**
    * 每页记录数
    */
-  pageSize: number
+  pageSize: number;
 
   /**
    * 加载状态
    */
-  loading?: boolean
+  loading?: boolean;
 
   /**
    * 分页变化回调
    */
-  onPaginationChange?: (page: number, pageSize: number) => void
+  onPaginationChange?: (page: number, pageSize: number) => void;
 }
 
 /**
@@ -74,10 +74,10 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
     // 订单类型标签映射
     const getOrderTypeTag = (orderType: OrderType) => {
       if (orderType === 'BEVERAGE') {
-        return <Tag color="blue">饮品订单</Tag>
+        return <Tag color="blue">饮品订单</Tag>;
       }
-      return <Tag color="green">商品订单</Tag>
-    }
+      return <Tag color="green">商品订单</Tag>;
+    };
 
     const columns: TableProps<UnifiedOrder>['columns'] = [
       {
@@ -90,7 +90,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
           <Link to={`/orders/${record.id}`}>
             <Text strong>{orderNumber}</Text>
           </Link>
-        )
+        ),
       },
       {
         title: '订单类型',
@@ -98,7 +98,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
         key: 'orderType',
         width: 120,
         align: 'center',
-        render: (orderType: OrderType) => getOrderTypeTag(orderType)
+        render: (orderType: OrderType) => getOrderTypeTag(orderType),
       },
       {
         title: '用户ID',
@@ -110,7 +110,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
           <Text ellipsis={{ tooltip: userId }} type="secondary">
             {userId}
           </Text>
-        )
+        ),
       },
       {
         title: '订单金额',
@@ -118,9 +118,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
         key: 'totalPrice',
         width: 120,
         align: 'right',
-        render: (amount: number) => (
-          <Text strong>¥{amount.toFixed(2)}</Text>
-        )
+        render: (amount: number) => <Text strong>¥{amount.toFixed(2)}</Text>,
       },
       {
         title: '状态',
@@ -128,7 +126,7 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
         key: 'status',
         width: 120,
         align: 'center',
-        render: (status: string) => <OrderStatusBadge status={status} />
+        render: (status: string) => <OrderStatusBadge status={status} />,
       },
       {
         title: '创建时间',
@@ -137,9 +135,9 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
         width: 180,
         render: (createdAt: string) => (
           <Text>{dayjs(createdAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
-        )
-      }
-    ]
+        ),
+      },
+    ];
 
     return (
       <Table<UnifiedOrder>
@@ -155,15 +153,15 @@ export const OrderList: React.FC<OrderListProps> = React.memo(
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条记录`,
           pageSizeOptions: ['10', '20', '50', '100'],
-          onChange: onPaginationChange
+          onChange: onPaginationChange,
         }}
         scroll={{ x: 1200 }}
         bordered
       />
-    )
+    );
   }
-)
+);
 
-OrderList.displayName = 'OrderList'
+OrderList.displayName = 'OrderList';
 
-export default OrderList
+export default OrderList;

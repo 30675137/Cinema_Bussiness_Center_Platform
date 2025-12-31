@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 调整原因 Hook
- * 
+ *
  * 获取调整原因字典数据，支持按类型筛选。
  */
 
@@ -39,7 +39,7 @@ export function useAdjustmentReasons() {
 
 /**
  * 根据调整类型获取可用原因
- * 
+ *
  * @param adjustmentType 调整类型 (surplus/shortage/damage)
  */
 export function useAdjustmentReasonsByType(adjustmentType?: AdjustmentType) {
@@ -47,7 +47,7 @@ export function useAdjustmentReasonsByType(adjustmentType?: AdjustmentType) {
 
   // 根据调整类型筛选原因
   const filteredReasons = adjustmentType
-    ? reasons?.filter(reason => reason.category === adjustmentType)
+    ? reasons?.filter((reason) => reason.category === adjustmentType)
     : reasons;
 
   return {
@@ -59,17 +59,18 @@ export function useAdjustmentReasonsByType(adjustmentType?: AdjustmentType) {
 
 /**
  * 获取原因选项（用于 Select 组件）
- * 
+ *
  * @param adjustmentType 调整类型（可选，用于筛选）
  */
 export function useAdjustmentReasonOptions(adjustmentType?: AdjustmentType) {
   const { data: reasons, isLoading, error } = useAdjustmentReasonsByType(adjustmentType);
 
-  const options = reasons?.map(reason => ({
-    value: reason.code,
-    label: reason.name,
-    category: reason.category,
-  })) || [];
+  const options =
+    reasons?.map((reason) => ({
+      value: reason.code,
+      label: reason.name,
+      category: reason.category,
+    })) || [];
 
   return {
     options,
@@ -80,7 +81,7 @@ export function useAdjustmentReasonOptions(adjustmentType?: AdjustmentType) {
 
 /**
  * 根据代码获取原因信息
- * 
+ *
  * @param code 原因代码
  */
 export function useAdjustmentReasonByCode(code?: string) {
@@ -90,7 +91,7 @@ export function useAdjustmentReasonByCode(code?: string) {
     return undefined;
   }
 
-  return reasons.find(reason => reason.code === code);
+  return reasons.find((reason) => reason.code === code);
 }
 
 export default useAdjustmentReasons;

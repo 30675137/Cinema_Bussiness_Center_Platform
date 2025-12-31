@@ -55,8 +55,8 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   // 检查角色权限
   if (requiredRoles.length > 0) {
     const hasRequiredRoles = strict
-      ? requiredRoles.every(role => permissionService.hasRole(user, role))
-      : requiredRoles.some(role => permissionService.hasRole(user, role));
+      ? requiredRoles.every((role) => permissionService.hasRole(user, role))
+      : requiredRoles.some((role) => permissionService.hasRole(user, role));
 
     if (!hasRequiredRoles) {
       return <Navigate to={redirectTo} replace />;
@@ -74,11 +74,17 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
       }
 
       // 否则重定向到默认页面
-      return <Navigate to={redirectTo} state={{
-        from: location,
-        reason: 'insufficient_permissions',
-        missingPermissions: permissionResult.missingPermissions
-      }} replace />;
+      return (
+        <Navigate
+          to={redirectTo}
+          state={{
+            from: location,
+            reason: 'insufficient_permissions',
+            missingPermissions: permissionResult.missingPermissions,
+          }}
+          replace
+        />
+      );
     }
   }
 
@@ -116,8 +122,8 @@ export const useRoutePermission = (requiredPermissions: string[] = []) => {
           hasAccess: false,
           requiredPermissions,
           userPermissions: [],
-          missingPermissions: requiredPermissions
-        }
+          missingPermissions: requiredPermissions,
+        },
       };
     }
 
@@ -129,8 +135,8 @@ export const useRoutePermission = (requiredPermissions: string[] = []) => {
           hasAccess: false,
           requiredPermissions,
           userPermissions: user.permissions,
-          missingPermissions: requiredPermissions
-        }
+          missingPermissions: requiredPermissions,
+        },
       };
     }
 
@@ -139,7 +145,7 @@ export const useRoutePermission = (requiredPermissions: string[] = []) => {
     return {
       canAccess: result.hasAccess,
       reason: result.hasAccess ? 'allowed' : 'insufficient_permissions',
-      checkResult: result
+      checkResult: result,
     };
   }, [user, isAuthenticated, requiredPermissions]);
 
@@ -157,7 +163,7 @@ export const usePermissionRoutes = (routes: any[]) => {
       return [];
     }
 
-    return routes.filter(route => {
+    return routes.filter((route) => {
       // 如果路由没有权限要求，直接通过
       if (!route.requiredPermissions || route.requiredPermissions.length === 0) {
         return true;
@@ -173,20 +179,28 @@ export const usePermissionRoutes = (routes: any[]) => {
  * 默认无权限页面组件
  */
 export const DefaultUnauthorizedPage: React.FC<{ checkResult: PermissionCheckResult }> = ({
-  checkResult
+  checkResult,
 }) => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="text-center p-8 bg-white rounded-lg shadow-sm max-w-md">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+          <svg
+            className="w-8 h-8 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">访问被拒绝</h1>
-        <p className="text-gray-600 mb-4">
-          您没有访问此页面的权限。
-        </p>
+        <p className="text-gray-600 mb-4">您没有访问此页面的权限。</p>
 
         {checkResult.missingPermissions.length > 0 && (
           <div className="mb-4 text-left">
@@ -207,7 +221,7 @@ export const DefaultUnauthorizedPage: React.FC<{ checkResult: PermissionCheckRes
             返回上一页
           </button>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = '/')}
             className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition-colors"
           >
             回到首页
@@ -221,11 +235,14 @@ export const DefaultUnauthorizedPage: React.FC<{ checkResult: PermissionCheckRes
 /**
  * 路由配置守卫函数
  */
-export const createGuardedRoutes = (routes: any[], options: {
-  defaultFallback?: React.ComponentType<{ checkResult: PermissionCheckResult }>;
-  defaultRedirect?: string;
-} = {}) => {
-  return routes.map(route => {
+export const createGuardedRoutes = (
+  routes: any[],
+  options: {
+    defaultFallback?: React.ComponentType<{ checkResult: PermissionCheckResult }>;
+    defaultRedirect?: string;
+  } = {}
+) => {
+  return routes.map((route) => {
     if (route.requiredPermissions && route.requiredPermissions.length > 0) {
       return {
         ...route,
@@ -239,7 +256,7 @@ export const createGuardedRoutes = (routes: any[], options: {
           >
             {route.element}
           </PermissionGuard>
-        )
+        ),
       };
     }
     return route;
@@ -252,5 +269,5 @@ export default {
   useRoutePermission,
   usePermissionRoutes,
   DefaultUnauthorizedPage,
-  createGuardedRoutes
+  createGuardedRoutes,
 };

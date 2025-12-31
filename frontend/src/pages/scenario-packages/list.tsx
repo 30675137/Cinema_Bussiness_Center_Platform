@@ -11,7 +11,10 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-de
 import { useNavigate } from 'react-router-dom';
 import { usePackageList } from '../../features/scenario-package-management/hooks/usePackageList';
 import { useDeletePackage } from '../../features/scenario-package-management/hooks/usePackageMutations';
-import type { ScenarioPackageSummary, PackageStatus } from '../../features/scenario-package-management/types';
+import type {
+  ScenarioPackageSummary,
+  PackageStatus,
+} from '../../features/scenario-package-management/types';
 
 const ScenarioPackageListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +71,7 @@ const ScenarioPackageListPage: React.FC = () => {
       dataIndex: 'durationHours',
       key: 'durationHours',
       width: 100,
-      render: (hours: number) => hours ? `${hours}小时` : '-',
+      render: (hours: number) => (hours ? `${hours}小时` : '-'),
     },
     {
       title: '人数范围',

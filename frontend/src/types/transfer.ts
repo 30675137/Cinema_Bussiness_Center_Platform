@@ -6,46 +6,46 @@
  * 调拨状态枚举
  */
 export enum TransferStatus {
-  DRAFT = 'draft',                    // 草稿
+  DRAFT = 'draft', // 草稿
   PENDING_APPROVAL = 'pending_approval', // 待审批
-  APPROVED = 'approved',              // 已审批
-  REJECTED = 'rejected',              // 已拒绝
-  IN_TRANSIT = 'in_transit',          // 调拨中
+  APPROVED = 'approved', // 已审批
+  REJECTED = 'rejected', // 已拒绝
+  IN_TRANSIT = 'in_transit', // 调拨中
   PARTIAL_RECEIVED = 'partial_received', // 部分收货
-  COMPLETED = 'completed',            // 已完成
-  CANCELLED = 'cancelled',            // 已取消
-  EXCEPTION = 'exception'             // 异常
+  COMPLETED = 'completed', // 已完成
+  CANCELLED = 'cancelled', // 已取消
+  EXCEPTION = 'exception', // 异常
 }
 
 /**
  * 调拨类型枚举
  */
 export enum TransferType {
-  WAREHOUSE_TO_WAREHOUSE = 'warehouse_to_warehouse',   // 仓库间调拨
-  STORE_TO_STORE = 'store_to_store',                   // 门店间调拨
-  WAREHOUSE_TO_STORE = 'warehouse_to_store',           // 仓库到门店
-  STORE_TO_WAREHOUSE = 'store_to_warehouse',           // 门店到仓库
-  EMERGENCY = 'emergency'                              // 紧急调拨
+  WAREHOUSE_TO_WAREHOUSE = 'warehouse_to_warehouse', // 仓库间调拨
+  STORE_TO_STORE = 'store_to_store', // 门店间调拨
+  WAREHOUSE_TO_STORE = 'warehouse_to_store', // 仓库到门店
+  STORE_TO_WAREHOUSE = 'store_to_warehouse', // 门店到仓库
+  EMERGENCY = 'emergency', // 紧急调拨
 }
 
 /**
  * 调拨优先级枚举
  */
 export enum TransferPriority {
-  LOW = 'low',           // 低
-  NORMAL = 'normal',     // 普通
-  HIGH = 'high',         // 高
-  URGENT = 'urgent'      // 紧急
+  LOW = 'low', // 低
+  NORMAL = 'normal', // 普通
+  HIGH = 'high', // 高
+  URGENT = 'urgent', // 紧急
 }
 
 /**
  * 运输方式枚举
  */
 export enum ShippingMethod {
-  SELF_PICKUP = 'self_pickup',         // 自提
+  SELF_PICKUP = 'self_pickup', // 自提
   COMPANY_LOGISTICS = 'company_logistics', // 公司物流
   THIRD_PARTY_LOGISTICS = 'third_party_logistics', // 第三方物流
-  EXPRESS = 'express'                  // 快递
+  EXPRESS = 'express', // 快递
 }
 
 /**
@@ -61,15 +61,15 @@ export interface TransferItem {
   skuCode: string;
   skuName: string;
   unit: string;
-  plannedQuantity: number;        // 计划数量
-  actualQuantity?: number;        // 实际数量
-  receivedQuantity?: number;      // 已收货数量
-  unitPrice: number;              // 单价
-  totalPrice: number;             // 总价
-  batchNumber?: string;          // 批次号
-  productionDate?: string;       // 生产日期
-  expiryDate?: string;           // 过期日期
-  remarks?: string;              // 备注
+  plannedQuantity: number; // 计划数量
+  actualQuantity?: number; // 实际数量
+  receivedQuantity?: number; // 已收货数量
+  unitPrice: number; // 单价
+  totalPrice: number; // 总价
+  batchNumber?: string; // 批次号
+  productionDate?: string; // 生产日期
+  expiryDate?: string; // 过期日期
+  remarks?: string; // 备注
 }
 
 /**
@@ -77,14 +77,14 @@ export interface TransferItem {
  */
 export interface Transfer {
   id: string;
-  transferNumber: string;        // 调拨单号
+  transferNumber: string; // 调拨单号
   type: TransferType;
   status: TransferStatus;
   priority: TransferPriority;
 
   // 基本信息
-  title: string;                 // 调拨标题
-  description?: string;          // 调拨描述
+  title: string; // 调拨标题
+  description?: string; // 调拨描述
 
   // 位置信息
   fromLocation: {
@@ -107,20 +107,20 @@ export interface Transfer {
   };
 
   // 时间信息
-  plannedDate: string;           // 计划调拨日期
-  actualShipDate?: string;       // 实际发货日期
-  actualReceiveDate?: string;    // 实际收货日期
+  plannedDate: string; // 计划调拨日期
+  actualShipDate?: string; // 实际发货日期
+  actualReceiveDate?: string; // 实际收货日期
 
   // 运输信息
   shippingMethod: ShippingMethod;
-  trackingNumber?: string;       // 运输单号
-  carrier?: string;              // 承运商
+  trackingNumber?: string; // 运输单号
+  carrier?: string; // 承运商
   estimatedArrivalDate?: string; // 预计到达日期
 
   // 金额信息
-  totalAmount: number;           // 总金额
-  shippingCost?: number;         // 运费
-  insuranceCost?: number;        // 保险费
+  totalAmount: number; // 总金额
+  shippingCost?: number; // 运费
+  insuranceCost?: number; // 保险费
 
   // 申请人信息
   applicant: {
@@ -211,8 +211,8 @@ export interface TransferStatistics {
   averageAmount: number;
 
   // 时间统计
-  averageProcessingTime: number;  // 平均处理时间（小时）
-  averageTransitTime: number;     // 平均运输时间（小时）
+  averageProcessingTime: number; // 平均处理时间（小时）
+  averageTransitTime: number; // 平均运输时间（小时）
 }
 
 /**
@@ -298,7 +298,15 @@ export interface InventoryQueryResult {
 export interface TransferLog {
   id: string;
   transferId: string;
-  action: 'created' | 'submitted' | 'approved' | 'rejected' | 'shipped' | 'received' | 'cancelled' | 'modified';
+  action:
+    | 'created'
+    | 'submitted'
+    | 'approved'
+    | 'rejected'
+    | 'shipped'
+    | 'received'
+    | 'cancelled'
+    | 'modified';
   actionBy: {
     id: string;
     name: string;

@@ -24,7 +24,7 @@ export type {
   ZIndex,
   ThemeEventType,
   ThemeEventListener,
-  CSSVariableMap
+  CSSVariableMap,
 } from './types';
 
 // 导出React Hooks
@@ -34,7 +34,7 @@ export {
   useCustomThemes,
   useThemeToggle,
   useThemeCSSVariables,
-  useThemeAdapt
+  useThemeAdapt,
 } from './hooks';
 
 // 导出工具函数
@@ -46,7 +46,7 @@ export {
   applyCSSVariables,
   createBreakpointHelper,
   createColorHelper,
-  createSpacingHelper
+  createSpacingHelper,
 } from './utils';
 
 // 兼容旧的Ant Design主题配置
@@ -55,16 +55,16 @@ import { theme } from 'antd';
 
 // 耀莱影城品牌色彩配置（保持向后兼容）
 export const colors = {
-  primary: '#1890ff',      // 耀莱蓝
-  success: '#52c41a',      // 成功绿
-  warning: '#faad14',      // 警告橙
-  error: '#ff4d4f',        // 错误红
-  info: '#1890ff',         // 信息蓝
+  primary: '#1890ff', // 耀莱蓝
+  success: '#52c41a', // 成功绿
+  warning: '#faad14', // 警告橙
+  error: '#ff4d4f', // 错误红
+  info: '#1890ff', // 信息蓝
 
   // 扩展业务色彩
-  cinema: '#722ed1',       // 影院紫
-  food: '#fa8c16',         // 食品橙
-  ticket: '#13c2c2',       // 票务青
+  cinema: '#722ed1', // 影院紫
+  food: '#fa8c16', // 食品橙
+  ticket: '#13c2c2', // 票务青
 
   // 中性色彩
   textPrimary: '#262626',
@@ -86,7 +86,8 @@ export const antdTheme: AntdThemeConfig = {
     colorInfo: colors.info,
 
     // 字体
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
     fontSize: 14,
 
     // 圆角

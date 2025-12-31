@@ -1,11 +1,11 @@
-import '@testing-library/jest-dom'
-import { beforeAll, afterEach, afterAll, vi, expect } from 'vitest'
-import { cleanup } from '@testing-library/react'
-import { setupServer } from 'msw/node'
-import { handlers } from '../mocks/handlers'
+import '@testing-library/jest-dom';
+import { beforeAll, afterEach, afterAll, vi, expect } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import { setupServer } from 'msw/node';
+import { handlers } from '../mocks/handlers';
 
 // 设置MSW测试服务器
-export const server = setupServer(...handlers)
+export const server = setupServer(...handlers);
 
 // Mock localStorage
 const localStorageMock = {
@@ -14,11 +14,11 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
   length: 0,
-  key: vi.fn()
+  key: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
-  writable: true
+  writable: true,
 });
 
 // Mock sessionStorage
@@ -28,17 +28,17 @@ const sessionStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
   length: 0,
-  key: vi.fn()
+  key: vi.fn(),
 };
 Object.defineProperty(window, 'sessionStorage', {
   value: sessionStorageMock,
-  writable: true
+  writable: true,
 });
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -75,15 +75,12 @@ const originalError = console.error;
 beforeAll(() => {
   // 启动MSW服务器
   server.listen({
-    onUnhandledRequest: 'error'
+    onUnhandledRequest: 'error',
   });
 
   console.error = (...args: any[]) => {
     // Filter out specific React errors that are expected in tests
-    if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is deprecated')
-    ) {
+    if (typeof args[0] === 'string' && args[0].includes('Warning: ReactDOM.render is deprecated')) {
       return;
     }
     originalError.call(console, ...args);
@@ -93,9 +90,9 @@ beforeAll(() => {
 // 每个测试后清理
 afterEach(() => {
   // 清理React Testing Library状态
-  cleanup()
+  cleanup();
   // 重置MSW处理器
-  server.resetHandlers()
+  server.resetHandlers();
   // 清理mocks
   vi.clearAllMocks();
   localStorageMock.clear();
@@ -105,7 +102,7 @@ afterEach(() => {
 // 所有测试完成后关闭
 afterAll(() => {
   // 关闭MSW服务器
-  server.close()
+  server.close();
   // 恢复console.error
   console.error = originalError;
 });
@@ -142,9 +139,12 @@ expect.extend({
       };
     }
 
-    const styles = style.split(';').map(s => s.trim()).filter(Boolean);
-    const allMatch = styles.every(s => {
-      const [property, value] = s.split(':').map(p => p.trim());
+    const styles = style
+      .split(';')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const allMatch = styles.every((s) => {
+      const [property, value] = s.split(':').map((p) => p.trim());
       return received.style[property] === value;
     });
 
@@ -155,7 +155,7 @@ expect.extend({
           : `expected element to have style "${style}"`,
       pass: allMatch,
     };
-  }
+  },
 });
 
 // Mock React Query
@@ -198,14 +198,14 @@ vi.mock('antd', async () => {
 // 全局测试工具
 export const testUtils = {
   // 模拟等待
-  wait: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+  wait: (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)),
 
   // 创建模拟用户事件
   createMockEvent: (type: string, detail?: any) => new CustomEvent(type, { detail }),
 
   // 测试用例基础配置
   defaultTestConfig: {
-    wrapper: ({ children }: { children: React.ReactNode }) => children
+    wrapper: ({ children }: { children: React.ReactNode }) => children,
   },
 
   // 等待条件满足
@@ -234,5 +234,5 @@ export const testUtils = {
     json: () => Promise.resolve(data),
     text: () => Promise.resolve(JSON.stringify(data)),
     headers: new Headers(),
-  })
+  }),
 };

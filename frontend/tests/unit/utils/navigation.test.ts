@@ -14,7 +14,7 @@ import {
   filterMenuItemsByPermissions,
   sortMenuItemsByOrder,
   getMenuItemLevel,
-  isMenuItemActive
+  isMenuItemActive,
 } from '@/utils/navigation';
 import { MenuItem, FunctionalArea, MenuLevel, SearchResult } from '@/types/navigation';
 
@@ -47,7 +47,7 @@ describe('导航工具函数', () => {
             isActive: true,
             isVisible: true,
             functionalArea: FunctionalArea.BASIC_SETTINGS,
-            icon: 'SettingOutlined'
+            icon: 'SettingOutlined',
           },
           {
             id: 'menu-1-2',
@@ -60,9 +60,9 @@ describe('导航工具函数', () => {
             isActive: true,
             isVisible: true,
             functionalArea: FunctionalArea.BASIC_SETTINGS,
-            icon: 'DatabaseOutlined'
-          }
-        ]
+            icon: 'DatabaseOutlined',
+          },
+        ],
       },
       {
         id: 'menu-2',
@@ -88,9 +88,9 @@ describe('导航工具函数', () => {
             isActive: true,
             isVisible: true,
             functionalArea: FunctionalArea.PRODUCT_MANAGEMENT,
-            icon: 'UnorderedListOutlined'
-          }
-        ]
+            icon: 'UnorderedListOutlined',
+          },
+        ],
       },
       {
         id: 'menu-3',
@@ -103,8 +103,8 @@ describe('导航工具函数', () => {
         isVisible: true,
         functionalArea: FunctionalArea.INVENTORY,
         icon: 'InboxOutlined',
-        description: '库存信息管理'
-      }
+        description: '库存信息管理',
+      },
     ];
   });
 
@@ -146,7 +146,7 @@ describe('导航工具函数', () => {
 
     it('应该支持模糊搜索', () => {
       const results = searchMenuItems(mockMenus, '商品管', 20, {
-        fuzzyMatch: true
+        fuzzyMatch: true,
       });
 
       expect(results.length).toBeGreaterThan(0);
@@ -281,7 +281,7 @@ describe('导航工具函数', () => {
 
       debouncedFn();
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(mockFn).toHaveBeenCalledTimes(1);
     });
@@ -328,7 +328,7 @@ describe('导航工具函数', () => {
       const filtered = filterMenuItemsByPermissions(mockMenus, permissions);
 
       // menu-3是inventory相关的，但它是inactive，所以应该被排除
-      expect(filtered.filter(m => m.id === 'menu-3')).toHaveLength(0);
+      expect(filtered.filter((m) => m.id === 'menu-3')).toHaveLength(0);
     });
   });
 
@@ -384,7 +384,7 @@ describe('导航工具函数', () => {
       // 创建一个可见但不活跃的菜单
       const inactiveButVisibleMenu = {
         ...mockMenus[0],
-        isActive: false
+        isActive: false,
       };
 
       const result = isMenuItemActive(inactiveButVisibleMenu);
@@ -407,14 +407,14 @@ describe('导航工具函数', () => {
 
     it('应该为主菜单提供正确的类型', () => {
       const results = searchMenuItems(mockMenus, '商品管理');
-      const mainMenuResult = results.find(r => r.menuItem?.level === MenuLevel.MAIN);
+      const mainMenuResult = results.find((r) => r.menuItem?.level === MenuLevel.MAIN);
 
       expect(mainMenuResult?.type).toBe('menu');
     });
 
     it('应该为子菜单提供正确的类型', () => {
       const results = searchMenuItems(mockMenus, '系统配置');
-      const subMenuResult = results.find(r => r.menuItem?.level === MenuLevel.SUB);
+      const subMenuResult = results.find((r) => r.menuItem?.level === MenuLevel.SUB);
 
       expect(subMenuResult?.type).toBe('submenu');
     });
@@ -434,7 +434,7 @@ describe('导航工具函数', () => {
         sortOrder: index,
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       }));
 
       const results = searchMenuItems(largeMenuList, '菜单项 100');

@@ -12,7 +12,7 @@ import {
   UserOutlined,
   SettingOutlined,
   StarOutlined,
-  HistoryOutlined
+  HistoryOutlined,
 } from '@ant-design/icons';
 import { MenuItem } from '@/types/navigation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -59,7 +59,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const { navigateToMenuItem } = useNavigation();
 
   const favorites = getFavorites();
-  const favoriteMenus = menus.filter(menu => favorites.includes(menu.id));
+  const favoriteMenus = menus.filter((menu) => favorites.includes(menu.id));
 
   /**
    * 处理菜单点击
@@ -165,12 +165,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
     return (
       <div className="mobile-user-section">
         <div className="user-info">
-          <Avatar
-            size={48}
-            src={userInfo.avatar}
-            icon={<UserOutlined />}
-            className="user-avatar"
-          />
+          <Avatar size={48} src={userInfo.avatar} icon={<UserOutlined />} className="user-avatar" />
           <div className="user-details">
             <Title level={5} className="user-name">
               {userInfo.name}
@@ -242,7 +237,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
       styles={{
         body: { padding: 0 },
         header: { padding: 0 },
-        footer: { padding: 0 }
+        footer: { padding: 0 },
       }}
     >
       <div className="mobile-drawer-content">
@@ -255,12 +250,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 导航菜单
               </Title>
             </Space>
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              onClick={onClose}
-              className="close-btn"
-            />
+            <Button type="text" icon={<CloseOutlined />} onClick={onClose} className="close-btn" />
           </div>
         </div>
 
@@ -279,11 +269,7 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
             <MenuOutlined className="section-icon" />
             <span className="section-title">全部菜单</span>
           </div>
-          <List
-            className="main-menu-list"
-            dataSource={menus}
-            renderItem={renderMenuItem}
-          />
+          <List className="main-menu-list" dataSource={menus} renderItem={renderMenuItem} />
         </div>
 
         {/* 底部区域 */}

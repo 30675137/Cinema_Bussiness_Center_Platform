@@ -106,7 +106,7 @@ export abstract class BaseApiService {
    * 延迟函数
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -163,7 +163,7 @@ export abstract class BaseApiService {
       body,
       timeout = API_CONFIG.TIMEOUT,
       retries,
-      signal
+      signal,
     } = config;
 
     const url = `${this.baseUrl}${endpoint}`;
@@ -179,12 +179,16 @@ export abstract class BaseApiService {
     }
 
     try {
-      const response = await this.requestWithRetry<T>(url, {
-        method,
-        headers: requestHeaders,
-        body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      }, retries);
+      const response = await this.requestWithRetry<T>(
+        url,
+        {
+          method,
+          headers: requestHeaders,
+          body: body ? JSON.stringify(body) : undefined,
+          signal: controller.signal,
+        },
+        retries
+      );
 
       clearTimeout(timeoutId);
       return this.handleResponse<T>(response);
@@ -280,7 +284,12 @@ export abstract class BaseApiService {
     config?: Omit<RequestConfig, 'body' | 'method'>
   ): Promise<PaginationResponse<T>> {
     const response = await this.get<PaginationResponse<T>>(endpoint, params, config);
-    return response.data || { items: [], pagination: { current: 1, pageSize: 20, total: 0, totalPages: 0 } };
+    return (
+      response.data || {
+        items: [],
+        pagination: { current: 1, pageSize: 20, total: 0, totalPages: 0 },
+      }
+    );
   }
 
   /**
@@ -292,10 +301,14 @@ export abstract class BaseApiService {
     items: any[],
     config?: Omit<RequestConfig, 'body' | 'method'>
   ): Promise<ApiResponse<T[]>> {
-    return this.post<T[]>(`${endpoint}/batch`, {
-      operation,
-      items,
-    }, config);
+    return this.post<T[]>(
+      `${endpoint}/batch`,
+      {
+        operation,
+        items,
+      },
+      config
+    );
   }
 
   /**

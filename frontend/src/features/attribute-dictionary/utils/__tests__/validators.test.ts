@@ -1,15 +1,11 @@
 /**
  * Unit tests for validators - Attribute validation
- * 
+ *
  * Tests Zod schemas for Attribute, especially select type validation
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  attributeSchema,
-  createAttributeSchema,
-  updateAttributeSchema,
-} from '../validators';
+import { attributeSchema, createAttributeSchema, updateAttributeSchema } from '../validators';
 
 describe('validators - Attribute', () => {
   describe('createAttributeSchema', () => {
@@ -75,7 +71,11 @@ describe('validators - Attribute', () => {
       const result = createAttributeSchema.safeParse(invalidAttribute);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.errors.some(e => e.message.includes('字典类型') || e.message.includes('自定义值'))).toBe(true);
+        expect(
+          result.error.errors.some(
+            (e) => e.message.includes('字典类型') || e.message.includes('自定义值')
+          )
+        ).toBe(true);
       }
     });
 

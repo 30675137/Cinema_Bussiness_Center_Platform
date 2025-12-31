@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Card, List, Empty, Spin, Alert, Space } from 'antd';
-import { useHallsByStoreQuery, useStoresListQuery, useAllHallsQuery } from './hooks/useScheduleQueries';
+import {
+  useHallsByStoreQuery,
+  useStoresListQuery,
+  useAllHallsQuery,
+} from './hooks/useScheduleQueries';
 import HallCard from './components/atoms/HallCard';
 import StoreSelector from './components/StoreSelector';
 
@@ -16,20 +20,18 @@ const HallResources: React.FC = () => {
 
   // Compute store IDs that have halls (for filtering dropdown)
   const storeIdsWithHalls = React.useMemo(() => {
-    return new Set(allHalls.map(hall => hall.storeId));
+    return new Set(allHalls.map((hall) => hall.storeId));
   }, [allHalls]);
 
   // Filter stores to only show those with halls
   const storesWithHalls = React.useMemo(() => {
-    return (storesQuery.data || []).filter(store => storeIdsWithHalls.has(store.id));
+    return (storesQuery.data || []).filter((store) => storeIdsWithHalls.has(store.id));
   }, [storesQuery.data, storeIdsWithHalls]);
 
   // Fetch halls by store when a store is selected
-  const hallsByStoreQuery = useHallsByStoreQuery(
-    selectedStoreId,
-    undefined,
-    { enabled: !!selectedStoreId }
-  );
+  const hallsByStoreQuery = useHallsByStoreQuery(selectedStoreId, undefined, {
+    enabled: !!selectedStoreId,
+  });
 
   // Use the appropriate query based on selection
   const hallsQuery = selectedStoreId ? hallsByStoreQuery : allHallsQuery;
@@ -67,7 +69,7 @@ const HallResources: React.FC = () => {
       )}
 
       {!isLoading && !isError && halls.length === 0 && (
-        <Empty description={selectedStoreId ? "该门店暂无影厅资源" : "暂无影厅资源数据"} />
+        <Empty description={selectedStoreId ? '该门店暂无影厅资源' : '暂无影厅资源数据'} />
       )}
 
       {!isLoading && !isError && halls.length > 0 && (

@@ -14,13 +14,13 @@ export enum ChannelType {
   MINI_PROGRAM = 'mini_program',
   APP = 'app',
   WEBSITE = 'website',
-  OFFLINE = 'offline'
+  OFFLINE = 'offline',
 }
 
 export enum ChannelStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
-  TESTING = 'testing'
+  TESTING = 'testing',
 }
 
 export interface ChannelConfig {

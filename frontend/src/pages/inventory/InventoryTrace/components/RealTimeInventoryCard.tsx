@@ -15,7 +15,7 @@ import {
   Badge,
   Alert,
   Empty,
-  message
+  message,
 } from 'antd';
 import {
   ReloadOutlined,
@@ -27,7 +27,7 @@ import {
   WarningOutlined,
   StockOutlined,
   ShopOutlined,
-  BarcodeOutlined
+  BarcodeOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { debounce } from 'lodash-es';
@@ -60,7 +60,7 @@ const mockInventoryData: CurrentInventory[] = [
       skuCode: 'SKU001',
       category: '饮料',
       unit: '瓶',
-      isActive: true
+      isActive: true,
     },
     storeId: 'STORE001',
     store: {
@@ -68,7 +68,7 @@ const mockInventoryData: CurrentInventory[] = [
       name: '万达影城CBD店',
       code: 'WM001',
       address: '北京市朝阳区CBD',
-      isActive: true
+      isActive: true,
     },
     availableQty: 150,
     onHandQty: 180,
@@ -82,7 +82,7 @@ const mockInventoryData: CurrentInventory[] = [
     safetyStock: 20,
     totalValue: 600,
     averageCost: 4,
-    lastUpdated: dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss')
+    lastUpdated: dayjs().subtract(1, 'hour').format('YYYY-MM-DD HH:mm:ss'),
   },
   {
     id: '2',
@@ -94,7 +94,7 @@ const mockInventoryData: CurrentInventory[] = [
       skuCode: 'SKU002',
       category: '零食',
       unit: '份',
-      isActive: true
+      isActive: true,
     },
     storeId: 'STORE001',
     store: {
@@ -102,7 +102,7 @@ const mockInventoryData: CurrentInventory[] = [
       name: '万达影城CBD店',
       code: 'WM001',
       address: '北京市朝阳区CBD',
-      isActive: true
+      isActive: true,
     },
     availableQty: 25,
     onHandQty: 30,
@@ -116,7 +116,7 @@ const mockInventoryData: CurrentInventory[] = [
     safetyStock: 15,
     totalValue: 500,
     averageCost: 20,
-    lastUpdated: dayjs().subtract(30, 'minute').format('YYYY-MM-DD HH:mm:ss')
+    lastUpdated: dayjs().subtract(30, 'minute').format('YYYY-MM-DD HH:mm:ss'),
   },
   {
     id: '3',
@@ -128,7 +128,7 @@ const mockInventoryData: CurrentInventory[] = [
       skuCode: 'SKU003',
       category: '设备',
       unit: '副',
-      isActive: true
+      isActive: true,
     },
     storeId: 'STORE001',
     store: {
@@ -136,7 +136,7 @@ const mockInventoryData: CurrentInventory[] = [
       name: '万达影城CBD店',
       code: 'WM001',
       address: '北京市朝阳区CBD',
-      isActive: true
+      isActive: true,
     },
     availableQty: 80,
     onHandQty: 100,
@@ -150,14 +150,14 @@ const mockInventoryData: CurrentInventory[] = [
     safetyStock: 20,
     totalValue: 1600,
     averageCost: 20,
-    lastUpdated: dayjs().subtract(2, 'hour').format('YYYY-MM-DD HH:mm:ss')
-  }
+    lastUpdated: dayjs().subtract(2, 'hour').format('YYYY-MM-DD HH:mm:ss'),
+  },
 ];
 
 const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
   data,
   loading = false,
-  onRefresh
+  onRefresh,
 }) => {
   const [searchText, setSearchText] = useState<string>('');
   const [selectedStore, setSelectedStore] = useState<string | undefined>();
@@ -169,14 +169,15 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
   const inventoryData = data?.data || mockInventoryData;
 
   // 过滤数据
-  const filteredData = inventoryData.filter(item => {
+  const filteredData = inventoryData.filter((item) => {
     let match = true;
 
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      match = item.sku.name.toLowerCase().includes(searchLower) ||
-               item.sku.skuCode.toLowerCase().includes(searchLower) ||
-               item.store.name.toLowerCase().includes(searchLower);
+      match =
+        item.sku.name.toLowerCase().includes(searchLower) ||
+        item.sku.skuCode.toLowerCase().includes(searchLower) ||
+        item.store.name.toLowerCase().includes(searchLower);
     }
 
     if (selectedStore && item.storeId !== selectedStore) {
@@ -193,13 +194,23 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
   // 获取库存状态
   const getInventoryStatus = (item: CurrentInventory) => {
     if (item.availableQty === 0) {
-      return { status: 'out_of_stock', color: 'red', text: '缺货', icon: <ExclamationCircleOutlined /> };
+      return {
+        status: 'out_of_stock',
+        color: 'red',
+        text: '缺货',
+        icon: <ExclamationCircleOutlined />,
+      };
     }
     if (item.availableQty <= item.reorderPoint) {
       return { status: 'low_stock', color: 'orange', text: '低库存', icon: <WarningOutlined /> };
     }
     if (item.availableQty >= item.maxStock * 0.9) {
-      return { status: 'overstock', color: 'blue', text: '库存充足', icon: <CheckCircleOutlined /> };
+      return {
+        status: 'overstock',
+        color: 'blue',
+        text: '库存充足',
+        icon: <CheckCircleOutlined />,
+      };
     }
     return { status: 'normal', color: 'green', text: '正常', icon: <CheckCircleOutlined /> };
   };
@@ -231,7 +242,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
             </div>
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '门店',
@@ -242,12 +253,10 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
           <ShopOutlined />
           <div>
             <div style={{ fontWeight: 'bold' }}>{record.store.name}</div>
-            <div style={{ fontSize: '12px', color: '#999' }}>
-              {record.store.code}
-            </div>
+            <div style={{ fontSize: '12px', color: '#999' }}>{record.store.code}</div>
           </div>
         </Space>
-      )
+      ),
     },
     {
       title: '库存状态',
@@ -260,7 +269,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
             {status.text}
           </Tag>
         );
-      }
+      },
     },
     {
       title: '可用库存',
@@ -270,12 +279,14 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
       align: 'right',
       render: (value, record) => (
         <Space direction="vertical" size="small">
-          <Text strong style={{ fontSize: '16px' }}>{value}</Text>
+          <Text strong style={{ fontSize: '16px' }}>
+            {value}
+          </Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {record.sku.unit}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '库存明细',
@@ -288,7 +299,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
           <div>在途: {record.inTransitQty}</div>
           <div style={{ color: '#f5222d' }}>损坏: {record.damagedQty}</div>
         </Space>
-      )
+      ),
     },
     {
       title: '库存健康度',
@@ -304,12 +315,10 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
               size="small"
               format={() => `${health.score}%`}
             />
-            <Text style={{ fontSize: '12px', color: health.color }}>
-              {health.status}
-            </Text>
+            <Text style={{ fontSize: '12px', color: health.color }}>{health.status}</Text>
           </Space>
         );
-      }
+      },
     },
     {
       title: '库存阈值',
@@ -322,7 +331,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
           <div>最大: {record.maxStock}</div>
           <div>安全: {record.safetyStock}</div>
         </Space>
-      )
+      ),
     },
     {
       title: '库存价值',
@@ -337,7 +346,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
             均价: ¥{record.averageCost?.toFixed(2) || '0.00'}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '最后更新',
@@ -348,12 +357,10 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
         <Tooltip title={text}>
           <Space>
             <ClockCircleOutlined />
-            <Text style={{ fontSize: '12px' }}>
-              {dayjs(text).fromNow()}
-            </Text>
+            <Text style={{ fontSize: '12px' }}>{dayjs(text).fromNow()}</Text>
           </Space>
         </Tooltip>
-      )
+      ),
     },
     {
       title: '操作',
@@ -371,28 +378,32 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
         >
           详情
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   // 计算统计数据
   const statistics = {
-    totalSKUs: new Set(filteredData.map(item => item.skuId)).size,
-    totalStores: new Set(filteredData.map(item => item.storeId)).size,
+    totalSKUs: new Set(filteredData.map((item) => item.skuId)).size,
+    totalStores: new Set(filteredData.map((item) => item.storeId)).size,
     totalValue: filteredData.reduce((sum, item) => sum + (item.totalValue || 0), 0),
     totalAvailable: filteredData.reduce((sum, item) => sum + item.availableQty, 0),
-    lowStockItems: filteredData.filter(item => item.availableQty <= item.reorderPoint).length,
-    outOfStockItems: filteredData.filter(item => item.availableQty === 0).length
+    lowStockItems: filteredData.filter((item) => item.availableQty <= item.reorderPoint).length,
+    outOfStockItems: filteredData.filter((item) => item.availableQty === 0).length,
   };
 
   // 去重门店和分类选项
-  const storeOptions = Array.from(new Set(inventoryData.map(item => ({
-    value: item.storeId,
-    label: item.store.name,
-    code: item.store.code
-  }))));
+  const storeOptions = Array.from(
+    new Set(
+      inventoryData.map((item) => ({
+        value: item.storeId,
+        label: item.store.name,
+        code: item.store.code,
+      }))
+    )
+  );
 
-  const categoryOptions = Array.from(new Set(inventoryData.map(item => item.sku.category)));
+  const categoryOptions = Array.from(new Set(inventoryData.map((item) => item.sku.category)));
 
   return (
     <Card
@@ -405,11 +416,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
       }
       extra={
         <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            loading={loading}
-            onClick={onRefresh}
-          >
+          <Button icon={<ReloadOutlined />} loading={loading} onClick={onRefresh}>
             刷新数据
           </Button>
         </Space>
@@ -434,7 +441,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
             allowClear
             style={{ width: '100%' }}
           >
-            {storeOptions.map(store => (
+            {storeOptions.map((store) => (
               <Select.Option key={store.value} value={store.value}>
                 {store.label} ({store.code})
               </Select.Option>
@@ -449,7 +456,7 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
             allowClear
             style={{ width: '100%' }}
           >
-            {categoryOptions.map(category => (
+            {categoryOptions.map((category) => (
               <Select.Option key={category} value={category}>
                 {category}
               </Select.Option>
@@ -538,17 +545,14 @@ const RealTimeInventoryCard: React.FC<RealTimeInventoryCardProps> = ({
           showQuickJumper: true,
           showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           onChange: setCurrentPage,
-          onShowSizeChange: (_, size) => setPageSize(size)
+          onShowSizeChange: (_, size) => setPageSize(size),
         }}
         scroll={{ x: 1200 }}
         size="small"
       />
 
       {filteredData.length === 0 && !loading && (
-        <Empty
-          description="暂无库存数据"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
+        <Empty description="暂无库存数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
       )}
     </Card>
   );

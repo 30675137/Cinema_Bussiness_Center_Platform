@@ -41,16 +41,19 @@ const formatTime = (time: string): string => {
 /**
  * 格式化价格调整显示
  */
-const formatPriceAdjustment = (priceAdjustment?: { type?: string; value?: number }): string | null => {
+const formatPriceAdjustment = (priceAdjustment?: {
+  type?: string;
+  value?: number;
+}): string | null => {
   if (!priceAdjustment || priceAdjustment.value === undefined) return null;
-  
+
   const { type = 'fixed', value } = priceAdjustment;
-  
+
   if (type === 'percentage') {
     const sign = value >= 0 ? '+' : '';
     return `${sign}${value}%`;
   }
-  
+
   const sign = value >= 0 ? '+' : '';
   return `${sign}¥${value}`;
 };
@@ -67,7 +70,7 @@ export const TimeSlotTemplateItem: React.FC<TimeSlotTemplateItemProps> = ({
 }) => {
   const { startTime, endTime, capacity, priceAdjustment, isEnabled } = template;
   const priceText = formatPriceAdjustment(priceAdjustment as { type?: string; value?: number });
-  
+
   return (
     <Card
       size="small"
@@ -89,7 +92,7 @@ export const TimeSlotTemplateItem: React.FC<TimeSlotTemplateItemProps> = ({
               {formatTime(startTime)} - {formatTime(endTime)}
             </Text>
           </div>
-          
+
           <Space size={8} wrap>
             {capacity !== undefined && capacity !== null && (
               <Tooltip title="可预约容量">
@@ -98,21 +101,17 @@ export const TimeSlotTemplateItem: React.FC<TimeSlotTemplateItemProps> = ({
                 </Tag>
               </Tooltip>
             )}
-            
+
             {priceText && (
               <Tooltip title="价格调整">
-                <Tag color={priceText.startsWith('+') ? 'red' : 'green'}>
-                  {priceText}
-                </Tag>
+                <Tag color={priceText.startsWith('+') ? 'red' : 'green'}>{priceText}</Tag>
               </Tooltip>
             )}
-            
-            {!isEnabled && (
-              <Tag color="default">已禁用</Tag>
-            )}
+
+            {!isEnabled && <Tag color="default">已禁用</Tag>}
           </Space>
         </div>
-        
+
         {/* 右侧：操作按钮 */}
         <Space size={0}>
           <Tooltip title={isEnabled ? '禁用' : '启用'}>
@@ -123,27 +122,17 @@ export const TimeSlotTemplateItem: React.FC<TimeSlotTemplateItemProps> = ({
               style={{ marginRight: 8 }}
             />
           </Tooltip>
-          
+
           {onCopy && (
             <Tooltip title="复制到其他天">
-              <Button
-                type="text"
-                size="small"
-                icon={<CopyOutlined />}
-                onClick={onCopy}
-              />
+              <Button type="text" size="small" icon={<CopyOutlined />} onClick={onCopy} />
             </Tooltip>
           )}
-          
+
           <Tooltip title="编辑">
-            <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={onEdit}
-            />
+            <Button type="text" size="small" icon={<EditOutlined />} onClick={onEdit} />
           </Tooltip>
-          
+
           <Popconfirm
             title="确认删除"
             description="确定要删除这个时段吗？"
@@ -152,12 +141,7 @@ export const TimeSlotTemplateItem: React.FC<TimeSlotTemplateItemProps> = ({
             cancelText="取消"
           >
             <Tooltip title="删除">
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-              />
+              <Button type="text" size="small" danger icon={<DeleteOutlined />} />
             </Tooltip>
           </Popconfirm>
         </Space>

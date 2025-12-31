@@ -207,11 +207,7 @@ const TransferManagePage: React.FC = () => {
     return (
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={handleBack}
-            className="mr-4"
-          >
+          <Button icon={<ArrowLeftOutlined />} onClick={handleBack} className="mr-4">
             返回
           </Button>
           {renderBreadcrumb()}
@@ -232,19 +228,13 @@ const TransferManagePage: React.FC = () => {
                   <HomeOutlined />
                   <span className="ml-1">首页</span>
                 </Breadcrumb.Item>
-                <Breadcrumb.Item href="/procurement">
-                  采购管理
-                </Breadcrumb.Item>
+                <Breadcrumb.Item href="/procurement">采购管理</Breadcrumb.Item>
                 <Breadcrumb.Item>调拨管理</Breadcrumb.Item>
                 <Breadcrumb.Item>调拨列表</Breadcrumb.Item>
               </Breadcrumb>
             </div>
 
-            <TransferList
-              onView={handleView}
-              onEdit={handleEdit}
-              onCreate={handleCreate}
-            />
+            <TransferList onView={handleView} onEdit={handleEdit} onCreate={handleCreate} />
           </div>
         );
 
@@ -296,9 +286,7 @@ const TransferManagePage: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-full">
-        {renderContent()}
-      </div>
+      <div className="max-w-full">{renderContent()}</div>
     </div>
   );
 };

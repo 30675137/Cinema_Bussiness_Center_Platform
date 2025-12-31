@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整弹窗组件
- * 
+ *
  * 组合 AdjustmentForm 和 ConfirmAdjustmentModal，提供完整的调整录入流程。
  * 实现 T020 任务。
  */
@@ -36,12 +36,12 @@ type AdjustmentStep = 'form' | 'confirm';
 
 /**
  * 库存调整弹窗组件
- * 
+ *
  * 功能：
  * - 步骤1: 填写调整表单
  * - 步骤2: 确认调整详情（二次确认）
  * - 提交调整并处理结果
- * 
+ *
  * @example
  * ```tsx
  * <AdjustmentModal
@@ -108,7 +108,9 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
         const errors = getZodErrors(validationResult.error);
         // 设置表单错误
         const fieldErrors = Object.entries(errors)
-          .filter(([field]) => ['adjustmentType', 'quantity', 'reasonCode', 'reasonText', 'remarks'].includes(field))
+          .filter(([field]) =>
+            ['adjustmentType', 'quantity', 'reasonCode', 'reasonText', 'remarks'].includes(field)
+          )
           .map(([field, msg]) => ({
             name: field as keyof AdjustmentFormData,
             errors: [msg],
@@ -118,7 +120,7 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
       }
 
       // 获取原因名称
-      const reason = reasons?.find(r => r.code === values.reasonCode);
+      const reason = reasons?.find((r) => r.code === values.reasonCode);
 
       // 设置确认数据
       setConfirmData({
@@ -190,10 +192,7 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
         }
         data-testid="adjustment-form-modal"
       >
-        <AdjustmentForm
-          form={form}
-          inventory={inventory}
-        />
+        <AdjustmentForm form={form} inventory={inventory} />
       </Modal>
 
       {/* 步骤2: 确认调整 */}

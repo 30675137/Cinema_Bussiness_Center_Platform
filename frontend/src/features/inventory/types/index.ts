@@ -1,22 +1,25 @@
 /**
  * P003-inventory-query: 库存查询模块类型定义
- * 
+ *
  * 包含库存状态枚举、库存记录类型、查询参数等。
  */
 
 /** 库存状态枚举 */
 export type InventoryStatus =
-  | 'SUFFICIENT'      // 充足
-  | 'NORMAL'          // 正常
+  | 'SUFFICIENT' // 充足
+  | 'NORMAL' // 正常
   | 'BELOW_THRESHOLD' // 偏低
-  | 'LOW'             // 不足
-  | 'OUT_OF_STOCK';   // 缺货
+  | 'LOW' // 不足
+  | 'OUT_OF_STOCK'; // 缺货
 
 /** 库存状态配置 - 包含标签和颜色 */
-export const INVENTORY_STATUS_CONFIG: Record<InventoryStatus, {
-  label: string;
-  color: 'green' | 'blue' | 'gold' | 'orange' | 'red';
-}> = {
+export const INVENTORY_STATUS_CONFIG: Record<
+  InventoryStatus,
+  {
+    label: string;
+    color: 'green' | 'blue' | 'gold' | 'orange' | 'red';
+  }
+> = {
   SUFFICIENT: { label: '充足', color: 'green' },
   NORMAL: { label: '正常', color: 'blue' },
   BELOW_THRESHOLD: { label: '偏低', color: 'gold' },

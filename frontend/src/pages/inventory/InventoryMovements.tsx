@@ -83,11 +83,7 @@ export const InventoryMovements: React.FC = () => {
           title="库存流水追踪"
           extra={
             <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() => refetch()}
-                loading={isLoading}
-              >
+              <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
                 {!isMobile && '刷新'}
               </Button>
               <PermissionHide permissions={Permission.EXPORT_MOVEMENTS}>
@@ -119,11 +115,7 @@ export const InventoryMovements: React.FC = () => {
         />
 
         {/* 筛选器 */}
-        <MovementsFilters
-          onFilter={handleFilter}
-          onReset={handleReset}
-          loading={isLoading}
-        />
+        <MovementsFilters onFilter={handleFilter} onReset={handleReset} loading={isLoading} />
 
         {/* 数据表格 */}
         <Card>
@@ -149,20 +141,12 @@ export const InventoryMovements: React.FC = () => {
               <Descriptions.Item label="交易时间">
                 {formatDateTime(selectedRecord.transactionTime)}
               </Descriptions.Item>
-              <Descriptions.Item label="SKU编码">
-                {selectedRecord.sku?.skuCode}
-              </Descriptions.Item>
-              <Descriptions.Item label="SKU名称">
-                {selectedRecord.sku?.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="门店/仓库">
-                {selectedRecord.store?.name}
-              </Descriptions.Item>
+              <Descriptions.Item label="SKU编码">{selectedRecord.sku?.skuCode}</Descriptions.Item>
+              <Descriptions.Item label="SKU名称">{selectedRecord.sku?.name}</Descriptions.Item>
+              <Descriptions.Item label="门店/仓库">{selectedRecord.store?.name}</Descriptions.Item>
               <Descriptions.Item label="交易类型">
                 {(() => {
-                  const { label, color } = getTransactionTypeLabel(
-                    selectedRecord.transactionType
-                  );
+                  const { label, color } = getTransactionTypeLabel(selectedRecord.transactionType);
                   return <Tag color={color}>{label}</Tag>;
                 })()}
               </Descriptions.Item>
@@ -195,9 +179,7 @@ export const InventoryMovements: React.FC = () => {
               )}
               <Descriptions.Item label="来源类型">
                 {(() => {
-                  const { label, color } = getSourceTypeLabel(
-                    selectedRecord.sourceType
-                  );
+                  const { label, color } = getSourceTypeLabel(selectedRecord.sourceType);
                   return <Tag color={color}>{label}</Tag>;
                 })()}
               </Descriptions.Item>
@@ -206,18 +188,12 @@ export const InventoryMovements: React.FC = () => {
                   {selectedRecord.sourceDocument}
                 </Descriptions.Item>
               )}
-              <Descriptions.Item label="操作人">
-                {selectedRecord.operator?.name}
-              </Descriptions.Item>
+              <Descriptions.Item label="操作人">{selectedRecord.operator?.name}</Descriptions.Item>
               {selectedRecord.batchNumber && (
-                <Descriptions.Item label="批次号">
-                  {selectedRecord.batchNumber}
-                </Descriptions.Item>
+                <Descriptions.Item label="批次号">{selectedRecord.batchNumber}</Descriptions.Item>
               )}
               {selectedRecord.remarks && (
-                <Descriptions.Item label="备注">
-                  {selectedRecord.remarks}
-                </Descriptions.Item>
+                <Descriptions.Item label="备注">{selectedRecord.remarks}</Descriptions.Item>
               )}
               <Descriptions.Item label="创建时间">
                 {formatDateTime(selectedRecord.createdAt)}

@@ -51,10 +51,7 @@ interface PublishTabProps {
 /**
  * 发布设置标签页
  */
-const PublishTab: React.FC<PublishTabProps> = ({
-  packageId,
-  loading: parentLoading = false,
-}) => {
+const PublishTab: React.FC<PublishTabProps> = ({ packageId, loading: parentLoading = false }) => {
   const isDirty = useScenarioPackageStore((state) => state.dirtyTabs.publish);
   const setDirty = useScenarioPackageStore((state) => state.setDirty);
 
@@ -162,11 +159,7 @@ const PublishTab: React.FC<PublishTabProps> = ({
         <div style={{ display: 'flex', gap: 24 }}>
           {/* 左侧：设置表单 */}
           <div style={{ flex: 1 }}>
-            <Form
-              form={form}
-              layout="vertical"
-              onValuesChange={() => setDirty('publish', true)}
-            >
+            <Form form={form} layout="vertical" onValuesChange={() => setDirty('publish', true)}>
               <Form.Item name="effectiveStartDate" label="生效开始日期">
                 <DatePicker style={{ width: '100%' }} placeholder="选择开始日期" />
               </Form.Item>

@@ -13,10 +13,7 @@
     "metadata": {},
     "preserveOutput": "always",
     "reporter": [
-      [
-        "list",
-        null
-      ],
+      ["list", null],
       [
         "html",
         {
@@ -45,9 +42,7 @@
         "name": "chromium",
         "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -59,9 +54,7 @@
         "name": "firefox",
         "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -73,9 +66,7 @@
         "name": "webkit",
         "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -87,9 +78,7 @@
         "name": "Mobile Chrome",
         "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       },
       {
@@ -101,9 +90,7 @@
         "name": "Mobile Safari",
         "testDir": "/Users/randy/ycj_tools_box/cursor/Cinema_Bussiness_Center_Platform/frontend/tests/e2e",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
       }
     ],

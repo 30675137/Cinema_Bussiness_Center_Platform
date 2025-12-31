@@ -19,7 +19,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
   filters,
   onClearFilter,
   onClearAll,
-  className
+  className,
 }) => {
   // 获取筛选条件标签
   const getFilterTags = () => {
@@ -33,7 +33,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
       tags.push({
         key: 'keyword',
         label: '关键词',
-        value: filters.keyword
+        value: filters.keyword,
       });
     }
 
@@ -41,7 +41,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
       tags.push({
         key: 'brandType',
         label: '品牌类型',
-        value: BRAND_CONSTANTS.TYPE_LABELS[filters.brandType]
+        value: BRAND_CONSTANTS.TYPE_LABELS[filters.brandType],
       });
     }
 
@@ -49,7 +49,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
       tags.push({
         key: 'status',
         label: '状态',
-        value: BRAND_CONSTANTS.STATUS_COLORS[filters.status].text
+        value: BRAND_CONSTANTS.STATUS_COLORS[filters.status].text,
       });
     }
 
@@ -57,7 +57,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
       tags.push({
         key: 'category',
         label: '类目',
-        value: filters.category
+        value: filters.category,
       });
     }
 
@@ -89,11 +89,7 @@ const BrandFilters: React.FC<BrandFiltersProps> = ({
             </Tag>
           ))}
 
-          <Tag
-            onClick={onClearAll}
-            className="clear-all-tag"
-            data-testid="clear-all-filters"
-          >
+          <Tag onClick={onClearAll} className="clear-all-tag" data-testid="clear-all-filters">
             清除全部
           </Tag>
         </Space>

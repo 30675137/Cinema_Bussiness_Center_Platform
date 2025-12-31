@@ -18,20 +18,20 @@ const InventoryList: React.FC = () => {
           title: '库存总值',
           value: 2890567,
           prefix: null,
-          trend: { value: 8.2, isPositive: true }
+          trend: { value: 8.2, isPositive: true },
         },
         {
           title: '预警商品',
           value: 45,
           prefix: null,
-          trend: { value: -12.3, isPositive: false }
+          trend: { value: -12.3, isPositive: false },
         },
         {
           title: '今日出库',
           value: 1234,
           prefix: null,
-          trend: { value: 15.6, isPositive: true }
-        }
+          trend: { value: 15.6, isPositive: true },
+        },
       ]}
     >
       <div style={{ textAlign: 'center', padding: '48px' }}>

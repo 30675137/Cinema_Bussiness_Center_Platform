@@ -38,7 +38,12 @@ import {
   PrinterOutlined,
 } from '@ant-design/icons';
 import type { InventoryLedger, InventoryMovement } from '@/types/inventory';
-import { getStockStatusConfig, formatCurrency, formatDate, formatNumber } from '@/utils/inventoryHelpers';
+import {
+  getStockStatusConfig,
+  formatCurrency,
+  formatDate,
+  formatNumber,
+} from '@/utils/inventoryHelpers';
 import { useResponsive } from '@/hooks/useResponsive';
 import { usePermissions } from '@/hooks/usePermissions';
 
@@ -61,7 +66,7 @@ const generateMockMovements = (sku: string, locationId: string): InventoryMoveme
   const now = new Date();
 
   for (let i = 0; i < 10; i++) {
-    const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
+    const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
     const types = ['in', 'out', 'adjust_positive', 'adjust_negative'];
     const type = types[Math.floor(Math.random() * types.length)];
 
@@ -147,21 +152,11 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
               <Descriptions.Item label="商品名称">
                 <Text strong>{inventoryItem.productName}</Text>
               </Descriptions.Item>
-              <Descriptions.Item label="商品分类">
-                {inventoryItem.category}
-              </Descriptions.Item>
-              <Descriptions.Item label="品牌">
-                {inventoryItem.brand}
-              </Descriptions.Item>
-              <Descriptions.Item label="规格">
-                {inventoryItem.specification}
-              </Descriptions.Item>
-              <Descriptions.Item label="单位">
-                {inventoryItem.unit}
-              </Descriptions.Item>
-              <Descriptions.Item label="仓库">
-                {inventoryItem.locationName}
-              </Descriptions.Item>
+              <Descriptions.Item label="商品分类">{inventoryItem.category}</Descriptions.Item>
+              <Descriptions.Item label="品牌">{inventoryItem.brand}</Descriptions.Item>
+              <Descriptions.Item label="规格">{inventoryItem.specification}</Descriptions.Item>
+              <Descriptions.Item label="单位">{inventoryItem.unit}</Descriptions.Item>
+              <Descriptions.Item label="仓库">{inventoryItem.locationName}</Descriptions.Item>
               <Descriptions.Item label="是否可售">
                 <Tag color={inventoryItem.isSellable ? 'green' : 'red'}>
                   {inventoryItem.isSellable ? '可售' : '不可售'}
@@ -248,7 +243,7 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
               suffix={inventoryItem.unit}
               valueStyle={{
                 color: inventoryItem.physicalQuantity <= 0 ? '#f5222d' : '#1890ff',
-                fontSize: '20px'
+                fontSize: '20px',
               }}
             />
           </Card>
@@ -261,8 +256,11 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
               value={inventoryItem.availableQuantity}
               suffix={inventoryItem.unit}
               valueStyle={{
-                color: inventoryItem.availableQuantity <= inventoryItem.safetyStock ? '#fa8c16' : '#52c41a',
-                fontSize: '20px'
+                color:
+                  inventoryItem.availableQuantity <= inventoryItem.safetyStock
+                    ? '#fa8c16'
+                    : '#52c41a',
+                fontSize: '20px',
               }}
             />
           </Card>
@@ -307,14 +305,19 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
               <Text type="secondary">库存水位</Text>
               <div style={{ marginTop: 8 }}>
                 <Progress
-                  percent={Math.min((inventoryItem.physicalQuantity / (inventoryItem.safetyStock * 2)) * 100, 100)}
-                  format={() => `${inventoryItem.physicalQuantity} / ${inventoryItem.safetyStock * 2}`}
+                  percent={Math.min(
+                    (inventoryItem.physicalQuantity / (inventoryItem.safetyStock * 2)) * 100,
+                    100
+                  )}
+                  format={() =>
+                    `${inventoryItem.physicalQuantity} / ${inventoryItem.safetyStock * 2}`
+                  }
                   strokeColor={
                     inventoryItem.physicalQuantity <= inventoryItem.safetyStock
                       ? '#f5222d'
                       : inventoryItem.physicalQuantity <= inventoryItem.safetyStock * 1.5
-                      ? '#fa8c16'
-                      : '#52c41a'
+                        ? '#fa8c16'
+                        : '#52c41a'
                   }
                 />
               </div>
@@ -359,7 +362,8 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
         align: 'right',
         render: (quantity: number) => (
           <Text style={{ color: quantity >= 0 ? '#52c41a' : '#f5222d' }}>
-            {quantity >= 0 ? '+' : ''}{formatNumber(quantity)}
+            {quantity >= 0 ? '+' : ''}
+            {formatNumber(quantity)}
           </Text>
         ),
       },
@@ -414,13 +418,13 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
         color: 'blue',
         icon: <SettingOutlined />,
       },
-      ...(movements.slice(0, 5).map((movement, index) => ({
+      ...movements.slice(0, 5).map((movement, index) => ({
         time: movement.operationTime,
         title: movement.movementSubtype,
         description: `${movement.quantity > 0 ? '增加' : '减少'} ${Math.abs(movement.quantity)} ${inventoryItem?.unit}`,
         color: movement.quantity >= 0 ? 'green' : 'red',
         icon: movement.quantity >= 0 ? <PackageOutlined /> : <SwapOutlined />,
-      }))),
+      })),
     ];
 
     return (
@@ -432,15 +436,11 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
           dot: item.icon,
           children: (
             <div>
-              <div style={{ fontWeight: 'bold', marginBottom: 4 }}>
-                {item.title}
-              </div>
+              <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{item.title}</div>
               <div style={{ color: '#666', fontSize: '12px', marginBottom: 4 }}>
                 {formatDate(item.time, 'YYYY-MM-DD HH:mm')}
               </div>
-              <div style={{ fontSize: '14px' }}>
-                {item.description}
-              </div>
+              <div style={{ fontSize: '14px' }}>{item.description}</div>
             </div>
           ),
         }))}
@@ -464,27 +464,17 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
           </Button>
         )}
         {onAdjust && canAdjust && (
-          <Button
-            type="primary"
-            icon={<SettingOutlined />}
-            onClick={() => onAdjust(inventoryItem)}
-          >
+          <Button type="primary" icon={<SettingOutlined />} onClick={() => onAdjust(inventoryItem)}>
             库存调整
           </Button>
         )}
         {onTransfer && canTransfer && (
-          <Button
-            icon={<SwapOutlined />}
-            onClick={() => onTransfer(inventoryItem)}
-          >
+          <Button icon={<SwapOutlined />} onClick={() => onTransfer(inventoryItem)}>
             库存调拨
           </Button>
         )}
         {onPrint && canExport && (
-          <Button
-            icon={<PrinterOutlined />}
-            onClick={() => onPrint(inventoryItem)}
-          >
+          <Button icon={<PrinterOutlined />} onClick={() => onPrint(inventoryItem)}>
             打印详情
           </Button>
         )}
@@ -498,9 +488,7 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
         <Space>
           <InfoCircleOutlined />
           <span>库存详情</span>
-          {inventoryItem && (
-            <Text type="secondary">- {inventoryItem.productName}</Text>
-          )}
+          {inventoryItem && <Text type="secondary">- {inventoryItem.productName}</Text>}
         </Space>
       }
       open={visible}
@@ -557,7 +545,10 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
                 <Card title="安全库存状态" size="small">
                   <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                     <div>
-                      <Text>安全库存倍数: {(inventoryItem.physicalQuantity / inventoryItem.safetyStock).toFixed(1)}x</Text>
+                      <Text>
+                        安全库存倍数:{' '}
+                        {(inventoryItem.physicalQuantity / inventoryItem.safetyStock).toFixed(1)}x
+                      </Text>
                     </div>
                     <Progress
                       percent={stockUtilization}
@@ -566,9 +557,11 @@ const InventoryDetailModal: React.FC<InventoryDetailModalProps> = ({
                     />
                     <div>
                       <Text type="secondary">
-                        {stockUtilization <= 50 ? '库存充足' :
-                         stockUtilization <= 80 ? '库存正常' :
-                         '库存紧张，建议补货'}
+                        {stockUtilization <= 50
+                          ? '库存充足'
+                          : stockUtilization <= 80
+                            ? '库存正常'
+                            : '库存紧张，建议补货'}
                       </Text>
                     </div>
                   </Space>

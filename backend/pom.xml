@@ -201,7 +201,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>10.10.0</version>
                 <configuration>
-                    <url>jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0</url>
+                    <url>jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&amp;sslmode=require</url>
                     <user>postgres.fxhgyxceqrmnpezluaht</user>
                     <password>ppkZ8sGUEHB0qjFs</password>
                     <locations>

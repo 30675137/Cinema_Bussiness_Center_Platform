@@ -65,7 +65,7 @@ test.describe('商品工作台页面测试', () => {
   test('编辑面板默认隐藏', async ({ page }) => {
     // 验证 Drawer 面板默认是隐藏的
     const drawer = page.locator('.ant-drawer');
-    
+
     // Drawer 应该不存在或不可见
     const drawerCount = await drawer.count();
     if (drawerCount > 0) {
@@ -93,7 +93,7 @@ test.describe('商品工作台页面测试', () => {
 
   test('刷新按钮功能', async ({ page }) => {
     const refreshBtn = page.locator('[data-testid="refresh-btn"]');
-    
+
     // 点击刷新按钮
     await refreshBtn.click();
 
@@ -109,7 +109,7 @@ test.describe('商品工作台页面测试', () => {
 
   test('导出按钮功能', async ({ page }) => {
     const exportBtn = page.locator('[data-testid="export-btn"]');
-    
+
     // 点击导出按钮
     await exportBtn.click();
 
@@ -140,10 +140,10 @@ test.describe('商品工作台页面测试', () => {
 
   test('页面加载性能', async ({ page }) => {
     const startTime = Date.now();
-    
+
     await page.goto('/product/workspace');
     await page.waitForLoadState('networkidle');
-    
+
     const endTime = Date.now();
     const loadTime = endTime - startTime;
 

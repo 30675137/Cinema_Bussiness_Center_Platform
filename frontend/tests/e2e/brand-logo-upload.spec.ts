@@ -17,8 +17,12 @@ test.describe('品牌LOGO上传功能', () => {
     await expect(page.locator('[data-testid="logo-upload-text"]')).toBeVisible();
 
     // 验证上传提示信息
-    await expect(page.locator('[data-testid="logo-upload-text"]')).toContainText('点击或拖拽文件到此区域上传');
-    await expect(page.locator('[data-testid="logo-upload-hint"]')).toContainText('支持 JPG、PNG、GIF 格式，文件大小不超过 2MB');
+    await expect(page.locator('[data-testid="logo-upload-text"]')).toContainText(
+      '点击或拖拽文件到此区域上传'
+    );
+    await expect(page.locator('[data-testid="logo-upload-hint"]')).toContainText(
+      '支持 JPG、PNG、GIF 格式，文件大小不超过 2MB'
+    );
   });
 
   test('应该支持点击上传LOGO', async ({ page }) => {
@@ -48,7 +52,9 @@ test.describe('品牌LOGO上传功能', () => {
     });
 
     // 执行拖拽
-    await page.locator('[data-testid="logo-upload-area"]').dispatchEvent('dragover', { dataTransfer });
+    await page
+      .locator('[data-testid="logo-upload-area"]')
+      .dispatchEvent('dragover', { dataTransfer });
     await page.locator('[data-testid="logo-upload-area"]').dispatchEvent('drop', { dataTransfer });
 
     // 验证拖拽后显示上传状态
@@ -61,19 +67,27 @@ test.describe('品牌LOGO上传功能', () => {
     const invalidFile = Buffer.from('not-an-image');
 
     // 模拟上传无效格式文件
-    await page.evaluateHandle(() => {
-      const dt = new DataTransfer();
-      const file = new File(['not-an-image'], 'test.txt', { type: 'text/plain' });
-      dt.items.add(file);
-      return dt;
-    }).then(dataTransfer => {
-      return page.locator('[data-testid="logo-upload-area"]').dispatchEvent('drop', { dataTransfer });
-    });
+    await page
+      .evaluateHandle(() => {
+        const dt = new DataTransfer();
+        const file = new File(['not-an-image'], 'test.txt', { type: 'text/plain' });
+        dt.items.add(file);
+        return dt;
+      })
+      .then((dataTransfer) => {
+        return page
+          .locator('[data-testid="logo-upload-area"]')
+          .dispatchEvent('drop', { dataTransfer });
+      });
 
     // 验证格式错误提示
     await expect(page.locator('[data-testid="logo-format-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="logo-format-error"]')).toContainText('不支持的文件格式');
-    await expect(page.locator('[data-testid="logo-format-error"]')).toContainText('请上传 JPG、PNG 或 GIF 格式的图片');
+    await expect(page.locator('[data-testid="logo-format-error"]')).toContainText(
+      '不支持的文件格式'
+    );
+    await expect(page.locator('[data-testid="logo-format-error"]')).toContainText(
+      '请上传 JPG、PNG 或 GIF 格式的图片'
+    );
   });
 
   test('应该验证文件大小', async ({ page }) => {
@@ -87,27 +101,35 @@ test.describe('品牌LOGO上传功能', () => {
           success: false,
           error: {
             code: 'FILE_TOO_LARGE',
-            message: '文件大小超过限制'
+            message: '文件大小超过限制',
           },
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
     // 模拟上传大文件
-    await page.evaluateHandle(() => {
-      const dt = new DataTransfer();
-      // 创建一个表示大文件的文件对象
-      const largeFile = new File(['x'.repeat(3 * 1024 * 1024)], 'large-logo.png', { type: 'image/png' }); // 3MB
-      dt.items.add(largeFile);
-      return dt;
-    }).then(dataTransfer => {
-      return page.locator('[data-testid="logo-upload-area"]').dispatchEvent('drop', { dataTransfer });
-    });
+    await page
+      .evaluateHandle(() => {
+        const dt = new DataTransfer();
+        // 创建一个表示大文件的文件对象
+        const largeFile = new File(['x'.repeat(3 * 1024 * 1024)], 'large-logo.png', {
+          type: 'image/png',
+        }); // 3MB
+        dt.items.add(largeFile);
+        return dt;
+      })
+      .then((dataTransfer) => {
+        return page
+          .locator('[data-testid="logo-upload-area"]')
+          .dispatchEvent('drop', { dataTransfer });
+      });
 
     // 验证文件大小错误提示
     await expect(page.locator('[data-testid="logo-size-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="logo-size-error"]')).toContainText('文件大小超过 2MB 限制');
+    await expect(page.locator('[data-testid="logo-size-error"]')).toContainText(
+      '文件大小超过 2MB 限制'
+    );
   });
 
   test('应该显示上传进度', async ({ page }) => {
@@ -124,8 +146,8 @@ test.describe('品牌LOGO上传功能', () => {
             success: true,
             data: { progress: progressValue },
             message: 'Uploading...',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       } else {
         route.fulfill({
@@ -135,11 +157,11 @@ test.describe('品牌LOGO上传功能', () => {
             success: true,
             data: {
               logoUrl: 'https://example.com/uploaded-logo.png',
-              updatedAt: new Date().toISOString()
+              updatedAt: new Date().toISOString(),
             },
             message: 'Logo uploaded successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -163,11 +185,11 @@ test.describe('品牌LOGO上传功能', () => {
           success: true,
           data: {
             logoUrl: 'https://example.com/brand-logos/test-logo.png',
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           },
           message: 'Logo uploaded successfully',
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
@@ -180,7 +202,10 @@ test.describe('品牌LOGO上传功能', () => {
 
     // 验证成功状态
     await expect(page.locator('[data-testid="logo-upload-success"]')).toBeVisible();
-    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute('src', /test-logo\.png/);
+    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute(
+      'src',
+      /test-logo\.png/
+    );
 
     // 验证删除按钮出现
     await expect(page.locator('[data-testid="logo-delete-button"]')).toBeVisible();
@@ -196,8 +221,8 @@ test.describe('品牌LOGO上传功能', () => {
           body: JSON.stringify({
             success: true,
             message: 'Logo deleted successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       } else {
         route.fulfill({
@@ -207,11 +232,11 @@ test.describe('品牌LOGO上传功能', () => {
             success: true,
             data: {
               logoUrl: 'https://example.com/brand-logos/test-logo.png',
-              updatedAt: new Date().toISOString()
+              updatedAt: new Date().toISOString(),
             },
             message: 'Logo uploaded successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -226,7 +251,9 @@ test.describe('品牌LOGO上传功能', () => {
 
     // 验证删除确认对话框
     await expect(page.locator('[data-testid="logo-delete-confirm"]')).toBeVisible();
-    await expect(page.locator('[data-testid="logo-delete-confirm"]')).toContainText('确定要删除品牌LOGO吗？');
+    await expect(page.locator('[data-testid="logo-delete-confirm"]')).toContainText(
+      '确定要删除品牌LOGO吗？'
+    );
 
     // 确认删除
     await page.click('[data-testid="confirm-delete-button"]');
@@ -246,10 +273,10 @@ test.describe('品牌LOGO上传功能', () => {
           success: false,
           error: {
             code: 'UPLOAD_FAILED',
-            message: '服务器上传失败'
+            message: '服务器上传失败',
           },
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
@@ -276,11 +303,11 @@ test.describe('品牌LOGO上传功能', () => {
           success: true,
           data: {
             logoUrl: 'https://example.com/brand-logos/new-logo.png',
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           },
           message: 'Logo uploaded successfully',
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
@@ -290,7 +317,10 @@ test.describe('品牌LOGO上传功能', () => {
     await page.waitForTimeout(1000);
 
     // 验证第一个文件已上传
-    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute('src', /old-logo\.png/);
+    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute(
+      'src',
+      /old-logo\.png/
+    );
 
     // 点击重新上传按钮
     await page.click('[data-testid="logo-reupload-button"]');
@@ -300,7 +330,10 @@ test.describe('品牌LOGO上传功能', () => {
     await page.waitForTimeout(1000);
 
     // 验证新文件已上传
-    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute('src', /new-logo\.png/);
+    await expect(page.locator('[data-testid="logo-preview-image"]')).toHaveAttribute(
+      'src',
+      /new-logo\.png/
+    );
   });
 
   test('应该显示LOGO预览', async ({ page }) => {
@@ -313,11 +346,11 @@ test.describe('品牌LOGO上传功能', () => {
           success: true,
           data: {
             logoUrl: 'https://example.com/brand-logos/preview-logo.png',
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           },
           message: 'Logo uploaded successfully',
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
@@ -350,11 +383,11 @@ test.describe('品牌LOGO上传功能', () => {
             success: true,
             data: {
               logoUrl: 'https://example.com/brand-logos/slow-logo.png',
-              updatedAt: new Date().toISOString()
+              updatedAt: new Date().toISOString(),
             },
             message: 'Logo uploaded successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }, 2000);
     });

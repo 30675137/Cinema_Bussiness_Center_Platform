@@ -9,7 +9,7 @@ import type {
   DictionaryType,
   DictionaryItem,
   AttributeTemplate,
-  Attribute
+  Attribute,
 } from '@/features/attribute-dictionary/types';
 
 // ============================================================================
@@ -23,10 +23,12 @@ import type {
 export const dictionaryKeys = {
   all: ['dictionary'] as const,
   types: () => [...dictionaryKeys.all, 'types'] as const,
-  typesList: (params?: DictionaryTypeListParams) => [...dictionaryKeys.types(), 'list', params] as const,
+  typesList: (params?: DictionaryTypeListParams) =>
+    [...dictionaryKeys.types(), 'list', params] as const,
   typeDetail: (id: string) => [...dictionaryKeys.types(), 'detail', id] as const,
   items: (typeId: string) => [...dictionaryKeys.all, 'items', typeId] as const,
-  itemDetail: (typeId: string, id: string) => [...dictionaryKeys.items(typeId), 'detail', id] as const,
+  itemDetail: (typeId: string, id: string) =>
+    [...dictionaryKeys.items(typeId), 'detail', id] as const,
 } as const;
 
 /**
@@ -35,10 +37,13 @@ export const dictionaryKeys = {
 export const attributeTemplateKeys = {
   all: ['attribute-templates'] as const,
   lists: () => [...attributeTemplateKeys.all, 'list'] as const,
-  list: (params?: AttributeTemplateListParams) => [...attributeTemplateKeys.lists(), params] as const,
+  list: (params?: AttributeTemplateListParams) =>
+    [...attributeTemplateKeys.lists(), params] as const,
   detail: (id: string) => [...attributeTemplateKeys.all, 'detail', id] as const,
-  byCategory: (categoryId: string) => [...attributeTemplateKeys.all, 'byCategory', categoryId] as const,
-  attributes: (templateId: string) => [...attributeTemplateKeys.all, 'attributes', templateId] as const,
+  byCategory: (categoryId: string) =>
+    [...attributeTemplateKeys.all, 'byCategory', categoryId] as const,
+  attributes: (templateId: string) =>
+    [...attributeTemplateKeys.all, 'attributes', templateId] as const,
   attribute: (id: string) => [...attributeTemplateKeys.all, 'attribute', id] as const,
 } as const;
 

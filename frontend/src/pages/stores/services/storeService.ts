@@ -6,7 +6,13 @@
  * @updated 022-store-crud 添加CRUD操作方法
  */
 
-import type { Store, StoreQueryParams, CreateStoreDTO, UpdateStoreDTO, ToggleStatusDTO } from '../types/store.types';
+import type {
+  Store,
+  StoreQueryParams,
+  CreateStoreDTO,
+  UpdateStoreDTO,
+  ToggleStatusDTO,
+} from '../types/store.types';
 
 // API base URL from environment or default to localhost
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -67,7 +73,7 @@ export async function createStore(data: CreateStoreDTO): Promise<Store> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.message || `创建门店失败: ${response.statusText}`;
-    
+
     // 409 Conflict: 名称重复
     if (response.status === 409) {
       throw new Error(errorData.message || '门店名称已存在');
@@ -97,7 +103,7 @@ export async function updateStore(storeId: string, data: UpdateStoreDTO): Promis
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    
+
     // 409 Conflict: 名称重复或乐观锁冲突
     if (response.status === 409) {
       throw new Error(errorData.message || '门店信息已被他人修改，请刷新后重试');
@@ -154,7 +160,7 @@ export async function deleteStore(storeId: string): Promise<void> {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    
+
     // 409 Conflict: 存在依赖关系
     if (response.status === 409) {
       throw new Error(errorData.message || '无法删除门店，请先删除关联的影厅');

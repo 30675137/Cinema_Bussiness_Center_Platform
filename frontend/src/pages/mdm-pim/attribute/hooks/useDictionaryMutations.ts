@@ -56,11 +56,7 @@ export function useCreateDictionaryTypeMutation() {
 export function useUpdateDictionaryTypeMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    DictionaryType,
-    Error,
-    { id: string; data: UpdateDictionaryTypeRequest }
-  >({
+  return useMutation<DictionaryType, Error, { id: string; data: UpdateDictionaryTypeRequest }>({
     mutationFn: async ({ id, data }) => {
       const response = await attributeService.updateDictionaryType(id, data);
       if (!response.success) {

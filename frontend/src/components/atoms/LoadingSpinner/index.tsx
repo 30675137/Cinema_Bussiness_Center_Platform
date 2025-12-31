@@ -2,27 +2,27 @@
  * @spec O003-beverage-order
  * LoadingSpinner - 通用加载中组件
  */
-import React from 'react'
-import { Spin } from 'antd'
-import { LoadingOutlined } from '@ant-design/icons'
+import React from 'react';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export interface LoadingSpinnerProps {
   /**
    * 加载提示文字
    */
-  tip?: string
+  tip?: string;
   /**
    * 尺寸大小
    */
-  size?: 'small' | 'default' | 'large'
+  size?: 'small' | 'default' | 'large';
   /**
    * 是否全屏居中
    */
-  fullscreen?: boolean
+  fullscreen?: boolean;
   /**
    * 自定义类名
    */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -51,21 +51,26 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   fullscreen = false,
   className = '',
 }) => {
-  const antIcon = <LoadingOutlined style={{ fontSize: size === 'large' ? 48 : size === 'small' ? 16 : 24 }} spin />
+  const antIcon = (
+    <LoadingOutlined
+      style={{ fontSize: size === 'large' ? 48 : size === 'small' ? 16 : 24 }}
+      spin
+    />
+  );
 
   if (fullscreen) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${className}`}>
         <Spin indicator={antIcon} tip={tip} size={size} />
       </div>
-    )
+    );
   }
 
   return (
     <div className={`flex items-center justify-center p-8 ${className}`}>
       <Spin indicator={antIcon} tip={tip} size={size} />
     </div>
-  )
-}
+  );
+};
 
-export default LoadingSpinner
+export default LoadingSpinner;

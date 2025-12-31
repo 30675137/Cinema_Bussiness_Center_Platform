@@ -4,12 +4,12 @@
  *
  * US3: FR-022 - 热销饮品排行展示
  */
-import React from 'react'
-import { Card, Typography, List, Tag, Progress, Empty, Spin } from 'antd'
-import { TrophyOutlined } from '@ant-design/icons'
-import type { BestSellingItem } from '../types/statistics'
+import React from 'react';
+import { Card, Typography, List, Tag, Progress, Empty, Spin } from 'antd';
+import { TrophyOutlined } from '@ant-design/icons';
+import type { BestSellingItem } from '../types/statistics';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 /**
  * BestSellingList 组件属性
@@ -18,22 +18,22 @@ interface BestSellingListProps {
   /**
    * 热销商品数据列表
    */
-  items: BestSellingItem[]
+  items: BestSellingItem[];
 
   /**
    * 加载状态
    */
-  loading?: boolean
+  loading?: boolean;
 
   /**
    * 标题（默认"热销饮品排行"）
    */
-  title?: string
+  title?: string;
 
   /**
    * 显示数量限制（默认显示全部）
    */
-  limit?: number
+  limit?: number;
 }
 
 /**
@@ -54,23 +54,23 @@ export const BestSellingList: React.FC<BestSellingListProps> = ({
   limit,
 }) => {
   // 限制显示数量
-  const displayItems = limit ? items.slice(0, limit) : items
+  const displayItems = limit ? items.slice(0, limit) : items;
 
   // 排名徽章颜色
   const getRankColor = (rank: number): string => {
-    if (rank === 1) return 'gold'
-    if (rank === 2) return 'silver'
-    if (rank === 3) return '#cd7f32' // bronze
-    return '#8c8c8c'
-  }
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank === 3) return '#cd7f32'; // bronze
+    return '#8c8c8c';
+  };
 
   // 排名图标
   const getRankIcon = (rank: number) => {
     if (rank <= 3) {
-      return <TrophyOutlined style={{ color: getRankColor(rank), fontSize: '20px' }} />
+      return <TrophyOutlined style={{ color: getRankColor(rank), fontSize: '20px' }} />;
     }
-    return null
-  }
+    return null;
+  };
 
   if (loading) {
     return (
@@ -80,7 +80,7 @@ export const BestSellingList: React.FC<BestSellingListProps> = ({
           <Spin size="large" />
         </div>
       </Card>
-    )
+    );
   }
 
   if (items.length === 0) {
@@ -89,7 +89,7 @@ export const BestSellingList: React.FC<BestSellingListProps> = ({
         <Title level={4}>{title}</Title>
         <Empty description="暂无销售数据" />
       </Card>
-    )
+    );
   }
 
   return (
@@ -147,9 +147,7 @@ export const BestSellingList: React.FC<BestSellingListProps> = ({
                   {item.beverageName}
                 </Text>
 
-                <Tag color="blue">
-                  {item.percentage.toFixed(1)}% 占比
-                </Tag>
+                <Tag color="blue">{item.percentage.toFixed(1)}% 占比</Tag>
               </div>
 
               {/* 销量和销售额 */}
@@ -189,7 +187,7 @@ export const BestSellingList: React.FC<BestSellingListProps> = ({
         </div>
       )}
     </Card>
-  )
-}
+  );
+};
 
-export default BestSellingList
+export default BestSellingList;

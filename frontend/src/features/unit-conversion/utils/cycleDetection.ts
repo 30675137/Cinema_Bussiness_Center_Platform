@@ -10,10 +10,7 @@ import type { UnitConversion } from '../types';
 /**
  * 构建有向图
  */
-function buildGraph(
-  conversions: UnitConversion[],
-  excludeId?: string
-): Map<string, string[]> {
+function buildGraph(conversions: UnitConversion[], excludeId?: string): Map<string, string[]> {
   const graph = new Map<string, string[]>();
 
   for (const c of conversions) {

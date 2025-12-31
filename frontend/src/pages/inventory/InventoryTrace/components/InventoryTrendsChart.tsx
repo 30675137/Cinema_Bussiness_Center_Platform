@@ -1,16 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  Spin,
-  Empty,
-  Select,
-  Space,
-  Typography,
-  Tag,
-  Row,
-  Col,
-  Statistic
-} from 'antd';
+import { Card, Spin, Empty, Select, Space, Typography, Tag, Row, Col, Statistic } from 'antd';
 import {
   LineChart,
   Line,
@@ -23,7 +12,7 @@ import {
   AreaChart,
   Area,
   BarChart,
-  Bar
+  Bar,
 } from 'recharts';
 import {
   LineChartOutlined,
@@ -31,7 +20,7 @@ import {
   AreaChartOutlined,
   TrendingUpOutlined,
   TrendingDownOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -56,7 +45,7 @@ const mockTrendsData = {
       damagedInventory: 150,
       expiredInventory: 50,
       inventoryValue: 480000,
-      turnoverRate: 0.85
+      turnoverRate: 0.85,
     },
     {
       date: '2024-01-11',
@@ -67,7 +56,7 @@ const mockTrendsData = {
       damagedInventory: 130,
       expiredInventory: 50,
       inventoryValue: 492000,
-      turnoverRate: 0.87
+      turnoverRate: 0.87,
     },
     {
       date: '2024-01-12',
@@ -78,7 +67,7 @@ const mockTrendsData = {
       damagedInventory: 200,
       expiredInventory: 100,
       inventoryValue: 476000,
-      turnoverRate: 0.82
+      turnoverRate: 0.82,
     },
     {
       date: '2024-01-13',
@@ -89,7 +78,7 @@ const mockTrendsData = {
       damagedInventory: 80,
       expiredInventory: 20,
       inventoryValue: 500000,
-      turnoverRate: 0.90
+      turnoverRate: 0.9,
     },
     {
       date: '2024-01-14',
@@ -100,7 +89,7 @@ const mockTrendsData = {
       damagedInventory: 100,
       expiredInventory: 50,
       inventoryValue: 472000,
-      turnoverRate: 0.78
+      turnoverRate: 0.78,
     },
     {
       date: '2024-01-15',
@@ -111,7 +100,7 @@ const mockTrendsData = {
       damagedInventory: 150,
       expiredInventory: 50,
       inventoryValue: 488000,
-      turnoverRate: 0.86
+      turnoverRate: 0.86,
     },
     {
       date: '2024-01-16',
@@ -122,8 +111,8 @@ const mockTrendsData = {
       damagedInventory: 120,
       expiredInventory: 30,
       inventoryValue: 498000,
-      turnoverRate: 0.89
-    }
+      turnoverRate: 0.89,
+    },
   ],
   summary: {
     periodStart: '2024-01-10',
@@ -134,23 +123,23 @@ const mockTrendsData = {
     peakInventory: 12500,
     lowStockDays: 2,
     totalTransactions: 2847,
-    avgTurnoverRate: 0.85
-  }
+    avgTurnoverRate: 0.85,
+  },
 };
 
 const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
   data,
   loading = false,
-  title = '库存趋势分析'
+  title = '库存趋势分析',
 }) => {
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
   const [metricType, setMetricType] = useState<'quantity' | 'value' | 'distribution'>('quantity');
 
   const trendsData = data || mockTrendsData;
-  const chartData = trendsData.trends.map(item => ({
+  const chartData = trendsData.trends.map((item) => ({
     ...item,
     date: dayjs(item.date).format('MM-DD'),
-    displayDate: dayjs(item.date).format('YYYY-MM-DD')
+    displayDate: dayjs(item.date).format('YYYY-MM-DD'),
   }));
 
   // 格式化数值显示
@@ -166,16 +155,16 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          padding: '12px',
-          border: '1px solid #d9d9d9',
-          borderRadius: '6px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-        }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
-            {data.displayDate}
-          </p>
+        <div
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            padding: '12px',
+            border: '1px solid #d9d9d9',
+            borderRadius: '6px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{data.displayDate}</p>
           {metricType === 'quantity' && (
             <>
               <p style={{ margin: '4px 0', color: '#1890ff' }}>
@@ -215,7 +204,7 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
   const renderChart = () => {
     const commonProps = {
       data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 }
+      margin: { top: 5, right: 30, left: 20, bottom: 5 },
     };
 
     if (metricType === 'quantity') {
@@ -373,27 +362,18 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
           <LineChartOutlined />
           {title}
           <Tag color="blue">
-            {dayjs(trendsData.summary.periodStart).format('MM-DD')} - {dayjs(trendsData.summary.periodEnd).format('MM-DD')}
+            {dayjs(trendsData.summary.periodStart).format('MM-DD')} -{' '}
+            {dayjs(trendsData.summary.periodEnd).format('MM-DD')}
           </Tag>
         </Space>
       }
       extra={
         <Space>
-          <Select
-            value={metricType}
-            onChange={setMetricType}
-            style={{ width: 100 }}
-            size="small"
-          >
+          <Select value={metricType} onChange={setMetricType} style={{ width: 100 }} size="small">
             <Option value="quantity">库存量</Option>
             <Option value="value">价值</Option>
           </Select>
-          <Select
-            value={chartType}
-            onChange={setChartType}
-            style={{ width: 80 }}
-            size="small"
-          >
+          <Select value={chartType} onChange={setChartType} style={{ width: 80 }} size="small">
             <Option value="line">
               <LineChartOutlined />
             </Option>
@@ -453,18 +433,14 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
           <Col span={24}>
             <Space>
               <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
-              <Text type="danger">
-                {trendsData.summary.lowStockDays}天出现低库存情况，需要关注
-              </Text>
+              <Text type="danger">{trendsData.summary.lowStockDays}天出现低库存情况，需要关注</Text>
             </Space>
           </Col>
         </Row>
       )}
 
       {/* 图表区域 */}
-      <div style={{ minHeight: '300px' }}>
-        {renderChart()}
-      </div>
+      <div style={{ minHeight: '300px' }}>{renderChart()}</div>
 
       {/* 趋势分析 */}
       <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
@@ -487,7 +463,8 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
                           <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
                         )}
                         <Text style={{ color: change >= 0 ? '#52c41a' : '#ff4d4f' }}>
-                          {change >= 0 ? '+' : ''}{changePercent}%
+                          {change >= 0 ? '+' : ''}
+                          {changePercent}%
                         </Text>
                       </Space>
                     );
@@ -510,7 +487,8 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
                           <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
                         )}
                         <Text style={{ color: change >= 0 ? '#52c41a' : '#ff4d4f' }}>
-                          {change >= 0 ? '+' : ''}{changePercent}%
+                          {change >= 0 ? '+' : ''}
+                          {changePercent}%
                         </Text>
                       </Space>
                     );
@@ -521,7 +499,9 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
                 <Space direction="vertical" size="small">
                   <Text strong>周转效率</Text>
                   <Space>
-                    <Text>平均周转率: {(trendsData.summary.avgTurnoverRate * 100).toFixed(1)}%</Text>
+                    <Text>
+                      平均周转率: {(trendsData.summary.avgTurnoverRate * 100).toFixed(1)}%
+                    </Text>
                     {trendsData.summary.avgTurnoverRate >= 0.8 ? (
                       <Tag color="green">良好</Tag>
                     ) : trendsData.summary.avgTurnoverRate >= 0.6 ? (

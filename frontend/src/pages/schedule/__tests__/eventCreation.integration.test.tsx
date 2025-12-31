@@ -73,4 +73,3 @@ describe('Event Creation Integration Tests', () => {
     ).rejects.toThrow();
   });
 });
-

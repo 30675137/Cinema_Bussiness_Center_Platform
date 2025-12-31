@@ -51,12 +51,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // 记录错误信息
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     this.setState({ errorInfo });
-    
+
     // 调用自定义错误回调
     this.props.onError?.(error, errorInfo);
-    
+
     // TODO: 可以在这里发送错误到错误监控服务（如 Sentry）
     // if (typeof window !== 'undefined' && (window as any).Sentry) {
     //   (window as any).Sentry.captureException(error);
@@ -88,7 +88,15 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
       // 默认错误 UI
       return (
-        <div style={{ padding: 24, minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          style={{
+            padding: 24,
+            minHeight: 400,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Result
             status="error"
             title="页面出现问题"
@@ -124,10 +132,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                           <Paragraph>
                             <Text strong>错误信息：</Text>
                           </Paragraph>
-                          <Paragraph code style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                          <Paragraph
+                            code
+                            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                          >
                             {error.message}
                           </Paragraph>
-                          
+
                           {error.stack && (
                             <>
                               <Paragraph>
@@ -147,7 +158,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                               </Paragraph>
                             </>
                           )}
-                          
+
                           {errorInfo?.componentStack && (
                             <>
                               <Paragraph>

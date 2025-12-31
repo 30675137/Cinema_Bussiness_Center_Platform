@@ -213,7 +213,7 @@ export const scenarioPackageEditorHandlers = [
 
   // PUT /scenario-packages/:id/basic-info
   http.put(`${BASE_URL}/scenario-packages/:id/basic-info`, async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
+    const body = (await request.json()) as Record<string, unknown>;
     return HttpResponse.json({
       success: true,
       data: {
@@ -240,7 +240,7 @@ export const scenarioPackageEditorHandlers = [
   // POST /scenario-packages/:id/tiers
   http.post(`${BASE_URL}/scenario-packages/:id/tiers`, async ({ params, request }) => {
     const { id } = params;
-    const body = await request.json() as Record<string, unknown>;
+    const body = (await request.json()) as Record<string, unknown>;
     const newTier: PackageTier = {
       id: `tier-${Date.now()}`,
       scenarioPackageId: id as string,
@@ -264,7 +264,7 @@ export const scenarioPackageEditorHandlers = [
   // PUT /scenario-packages/:id/tiers/:tierId
   http.put(`${BASE_URL}/scenario-packages/:id/tiers/:tierId`, async ({ params, request }) => {
     const { tierId } = params;
-    const body = await request.json() as Record<string, unknown>;
+    const body = (await request.json()) as Record<string, unknown>;
     const tierIndex = mockTiers.findIndex((t) => t.id === tierId);
     if (tierIndex === -1) {
       return HttpResponse.json(
@@ -300,7 +300,7 @@ export const scenarioPackageEditorHandlers = [
 
   // POST /scenario-packages/:id/tiers/reorder
   http.post(`${BASE_URL}/scenario-packages/:id/tiers/reorder`, async ({ request }) => {
-    const body = await request.json() as { tierIds: string[] };
+    const body = (await request.json()) as { tierIds: string[] };
     body.tierIds.forEach((id, index) => {
       const tier = mockTiers.find((t) => t.id === id);
       if (tier) {
@@ -339,7 +339,9 @@ export const scenarioPackageEditorHandlers = [
   // PUT /scenario-packages/:id/addons
   http.put(`${BASE_URL}/scenario-packages/:id/addons`, async ({ params, request }) => {
     const { id } = params;
-    const body = await request.json() as { addons: Array<{ addOnItemId: string; sortOrder: number; isRequired: boolean }> };
+    const body = (await request.json()) as {
+      addons: Array<{ addOnItemId: string; sortOrder: number; isRequired: boolean }>;
+    };
     // 清空并重建关联
     mockPackageAddOns.length = 0;
     body.addons.forEach((addon, index) => {
@@ -372,51 +374,57 @@ export const scenarioPackageEditorHandlers = [
   }),
 
   // POST /scenario-packages/:id/time-slot-templates
-  http.post(`${BASE_URL}/scenario-packages/:id/time-slot-templates`, async ({ params, request }) => {
-    const { id } = params;
-    const body = await request.json() as Record<string, unknown>;
-    const newTemplate: TimeSlotTemplate = {
-      id: `tst-${Date.now()}`,
-      scenarioPackageId: id as string,
-      dayOfWeek: body.dayOfWeek as DayOfWeek,
-      startTime: body.startTime as string,
-      endTime: body.endTime as string,
-      capacity: (body.capacity as number) || null,
-      priceAdjustment: body.priceAdjustment as TimeSlotTemplate['priceAdjustment'],
-      isEnabled: body.isEnabled !== false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    mockTimeSlotTemplates.push(newTemplate);
-    return HttpResponse.json({
-      success: true,
-      data: newTemplate,
-      timestamp: new Date().toISOString(),
-    });
-  }),
+  http.post(
+    `${BASE_URL}/scenario-packages/:id/time-slot-templates`,
+    async ({ params, request }) => {
+      const { id } = params;
+      const body = (await request.json()) as Record<string, unknown>;
+      const newTemplate: TimeSlotTemplate = {
+        id: `tst-${Date.now()}`,
+        scenarioPackageId: id as string,
+        dayOfWeek: body.dayOfWeek as DayOfWeek,
+        startTime: body.startTime as string,
+        endTime: body.endTime as string,
+        capacity: (body.capacity as number) || null,
+        priceAdjustment: body.priceAdjustment as TimeSlotTemplate['priceAdjustment'],
+        isEnabled: body.isEnabled !== false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      mockTimeSlotTemplates.push(newTemplate);
+      return HttpResponse.json({
+        success: true,
+        data: newTemplate,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  ),
 
   // PUT /scenario-packages/:id/time-slot-templates/:templateId
-  http.put(`${BASE_URL}/scenario-packages/:id/time-slot-templates/:templateId`, async ({ params, request }) => {
-    const { templateId } = params;
-    const body = await request.json() as Record<string, unknown>;
-    const templateIndex = mockTimeSlotTemplates.findIndex((t) => t.id === templateId);
-    if (templateIndex === -1) {
-      return HttpResponse.json(
-        { success: false, error: 'NOT_FOUND', message: '时段模板不存在' },
-        { status: 404 }
-      );
+  http.put(
+    `${BASE_URL}/scenario-packages/:id/time-slot-templates/:templateId`,
+    async ({ params, request }) => {
+      const { templateId } = params;
+      const body = (await request.json()) as Record<string, unknown>;
+      const templateIndex = mockTimeSlotTemplates.findIndex((t) => t.id === templateId);
+      if (templateIndex === -1) {
+        return HttpResponse.json(
+          { success: false, error: 'NOT_FOUND', message: '时段模板不存在' },
+          { status: 404 }
+        );
+      }
+      mockTimeSlotTemplates[templateIndex] = {
+        ...mockTimeSlotTemplates[templateIndex],
+        ...body,
+        updatedAt: new Date().toISOString(),
+      };
+      return HttpResponse.json({
+        success: true,
+        data: mockTimeSlotTemplates[templateIndex],
+        timestamp: new Date().toISOString(),
+      });
     }
-    mockTimeSlotTemplates[templateIndex] = {
-      ...mockTimeSlotTemplates[templateIndex],
-      ...body,
-      updatedAt: new Date().toISOString(),
-    };
-    return HttpResponse.json({
-      success: true,
-      data: mockTimeSlotTemplates[templateIndex],
-      timestamp: new Date().toISOString(),
-    });
-  }),
+  ),
 
   // DELETE /scenario-packages/:id/time-slot-templates/:templateId
   http.delete(`${BASE_URL}/scenario-packages/:id/time-slot-templates/:templateId`, ({ params }) => {
@@ -445,28 +453,31 @@ export const scenarioPackageEditorHandlers = [
   }),
 
   // POST /scenario-packages/:id/time-slot-overrides
-  http.post(`${BASE_URL}/scenario-packages/:id/time-slot-overrides`, async ({ params, request }) => {
-    const { id } = params;
-    const body = await request.json() as Record<string, unknown>;
-    const newOverride: TimeSlotOverride = {
-      id: `tso-${Date.now()}`,
-      scenarioPackageId: id as string,
-      date: body.date as string,
-      overrideType: body.overrideType as OverrideType,
-      startTime: (body.startTime as string) || null,
-      endTime: (body.endTime as string) || null,
-      capacity: (body.capacity as number) || null,
-      reason: (body.reason as string) || null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    mockTimeSlotOverrides.push(newOverride);
-    return HttpResponse.json({
-      success: true,
-      data: newOverride,
-      timestamp: new Date().toISOString(),
-    });
-  }),
+  http.post(
+    `${BASE_URL}/scenario-packages/:id/time-slot-overrides`,
+    async ({ params, request }) => {
+      const { id } = params;
+      const body = (await request.json()) as Record<string, unknown>;
+      const newOverride: TimeSlotOverride = {
+        id: `tso-${Date.now()}`,
+        scenarioPackageId: id as string,
+        date: body.date as string,
+        overrideType: body.overrideType as OverrideType,
+        startTime: (body.startTime as string) || null,
+        endTime: (body.endTime as string) || null,
+        capacity: (body.capacity as number) || null,
+        reason: (body.reason as string) || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      mockTimeSlotOverrides.push(newOverride);
+      return HttpResponse.json({
+        success: true,
+        data: newOverride,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  ),
 
   // DELETE /scenario-packages/:id/time-slot-overrides/:overrideId
   http.delete(`${BASE_URL}/scenario-packages/:id/time-slot-overrides/:overrideId`, ({ params }) => {
@@ -486,7 +497,7 @@ export const scenarioPackageEditorHandlers = [
 
   // PUT /scenario-packages/:id/publish-settings
   http.put(`${BASE_URL}/scenario-packages/:id/publish-settings`, async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
+    const body = (await request.json()) as Record<string, unknown>;
     return HttpResponse.json({
       success: true,
       data: {

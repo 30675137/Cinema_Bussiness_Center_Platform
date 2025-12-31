@@ -15,10 +15,7 @@ import { createLazyComponent, LazyConfigPresets } from './LazyWrapper';
  * />
  * ```
  */
-export default createLazyComponent(
-  () => import('../ui/DataTable'),
-  LazyConfigPresets.table
-);
+export default createLazyComponent(() => import('../ui/DataTable'), LazyConfigPresets.table);
 
 // 重导出类型
 export type {

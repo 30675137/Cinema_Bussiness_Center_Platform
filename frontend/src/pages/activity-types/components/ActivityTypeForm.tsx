@@ -6,10 +6,7 @@ import React from 'react';
 import { Form, Input, InputNumber, Button, Space, message } from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createActivityTypeSchema,
-  updateActivityTypeSchema,
-} from '../types/activity-type.schema';
+import { createActivityTypeSchema, updateActivityTypeSchema } from '../types/activity-type.schema';
 import type {
   CreateActivityTypeInput,
   UpdateActivityTypeInput,
@@ -59,7 +56,11 @@ export const ActivityTypeForm: React.FC<ActivityTypeFormProps> = ({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : '操作失败，请重试';
       // 检查是否是名称唯一性错误
-      if (errorMessage.includes('已存在') || errorMessage.includes('409') || errorMessage.includes('CONFLICT')) {
+      if (
+        errorMessage.includes('已存在') ||
+        errorMessage.includes('409') ||
+        errorMessage.includes('CONFLICT')
+      ) {
         // 提取具体的名称（如果有）
         const nameMatch = errorMessage.match(/已存在[：:]\s*([^，,。.]+)/);
         const existingName = nameMatch ? nameMatch[1] : data.name;
@@ -180,11 +181,7 @@ export const ActivityTypeForm: React.FC<ActivityTypeFormProps> = ({
           <Button onClick={onCancel} disabled={loading || isSubmitting}>
             取消
           </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={loading || isSubmitting}
-          >
+          <Button type="primary" htmlType="submit" loading={loading || isSubmitting}>
             {initialData ? '更新' : '创建'}
           </Button>
         </Space>
@@ -192,4 +189,3 @@ export const ActivityTypeForm: React.FC<ActivityTypeFormProps> = ({
     </form>
   );
 };
-

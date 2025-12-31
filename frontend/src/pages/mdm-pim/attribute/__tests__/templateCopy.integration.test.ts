@@ -50,7 +50,7 @@ describe('Template Copy Integration Tests', () => {
 
   it('should handle name conflicts with _copy suffix', async () => {
     const categoryId = `conflict-test-${Date.now()}`;
-    
+
     // Create first template
     const firstResponse = await attributeService.createAttributeTemplate({
       categoryId,
@@ -74,5 +74,3 @@ describe('Template Copy Integration Tests', () => {
     }
   });
 });
-
-

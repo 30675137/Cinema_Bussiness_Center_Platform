@@ -62,12 +62,14 @@ export class TransactionLogPage {
   /**
    * 获取事务记录列表
    */
-  async getTransactionList(): Promise<Array<{
-    skuName: string;
-    quantity: number;
-    type: string;
-    orderId: string;
-  }>> {
+  async getTransactionList(): Promise<
+    Array<{
+      skuName: string;
+      quantity: number;
+      type: string;
+      orderId: string;
+    }>
+  > {
     const rows = this.page.locator('.ant-table-tbody tr');
     const count = await rows.count();
     const transactions = [];
@@ -75,10 +77,10 @@ export class TransactionLogPage {
     for (let i = 0; i < count; i++) {
       const cells = rows.nth(i).locator('td');
       transactions.push({
-        skuName: await cells.nth(0).textContent() || '',
-        quantity: parseFloat(await cells.nth(1).textContent() || '0'),
-        type: await cells.nth(2).textContent() || '',
-        orderId: await cells.nth(3).textContent() || ''
+        skuName: (await cells.nth(0).textContent()) || '',
+        quantity: parseFloat((await cells.nth(1).textContent()) || '0'),
+        type: (await cells.nth(2).textContent()) || '',
+        orderId: (await cells.nth(3).textContent()) || '',
       });
     }
 
@@ -97,17 +99,17 @@ export class TransactionLogPage {
   /**
    * 验证BOM组件列表
    */
-  async verifyBomComponents(expectedComponents: Array<{
-    skuName: string;
-    quantity: number;
-    unit: string;
-  }>) {
+  async verifyBomComponents(
+    expectedComponents: Array<{
+      skuName: string;
+      quantity: number;
+      unit: string;
+    }>
+  ) {
     await this.bomComponentsList.waitFor({ state: 'visible' });
 
     for (const component of expectedComponents) {
-      const componentRow = this.page.locator(
-        `.ant-list-item:has-text("${component.skuName}")`
-      );
+      const componentRow = this.page.locator(`.ant-list-item:has-text("${component.skuName}")`);
       await expect(componentRow).toBeVisible();
       await expect(componentRow).toContainText(`${component.quantity}`);
       await expect(componentRow).toContainText(component.unit);

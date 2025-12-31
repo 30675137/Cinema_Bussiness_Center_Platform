@@ -9,7 +9,10 @@ import type { DataTableProps, VirtualScrollConfig, PerformanceConfig } from './t
 const { Text } = Typography;
 
 // 性能监控Hook
-const usePerformanceMonitor = (config: PerformanceConfig = {}, componentName: string = 'DataTable') => {
+const usePerformanceMonitor = (
+  config: PerformanceConfig = {},
+  componentName: string = 'DataTable'
+) => {
   const renderCountRef = useRef(0);
   const renderTimeRef = useRef<number>(0);
 
@@ -22,11 +25,15 @@ const usePerformanceMonitor = (config: PerformanceConfig = {}, componentName: st
       renderTimeRef.current = endTime - startTime;
 
       if (config.enabled && renderTimeRef.current > (config.renderThreshold || 16)) {
-        console.warn(`[Performance] ${componentName} render took ${renderTimeRef.current.toFixed(2)}ms (render #${renderCountRef.current})`);
+        console.warn(
+          `[Performance] ${componentName} render took ${renderTimeRef.current.toFixed(2)}ms (render #${renderCountRef.current})`
+        );
       }
 
       if (config.logRerenders) {
-        console.log(`[Performance] ${componentName} rendered ${renderCountRef.current} times, last render: ${renderTimeRef.current.toFixed(2)}ms`);
+        console.log(
+          `[Performance] ${componentName} rendered ${renderCountRef.current} times, last render: ${renderTimeRef.current.toFixed(2)}ms`
+        );
       }
     };
   });
@@ -67,11 +74,11 @@ const MoreActionsButton = React.memo<{
   index: number;
 }>(({ actions, record, index }) => {
   const visibleActions = useMemo(() => {
-    return actions.filter(action => !action.disabled || !action.disabled(record));
+    return actions.filter((action) => !action.disabled || !action.disabled(record));
   }, [actions, record]);
 
   const handleMoreClick = useCallback(() => {
-    visibleActions.slice(2).forEach(action => {
+    visibleActions.slice(2).forEach((action) => {
       action.onClick(record, index);
     });
   }, [visibleActions, record, index]);
@@ -124,12 +131,15 @@ function DataTable<T extends Record<string, any>>({
   usePerformanceMonitor(performance, 'DataTable');
 
   // 虚拟滚动配置
-  const virtualConfig = useMemo(() => ({
-    enabled: virtualScroll?.enabled || false,
-    itemHeight: virtualScroll?.itemHeight || 54,
-    bufferSize: virtualScroll?.bufferSize || 5,
-    overscan: virtualScroll?.overscan || 10,
-  }), [virtualScroll]);
+  const virtualConfig = useMemo(
+    () => ({
+      enabled: virtualScroll?.enabled || false,
+      itemHeight: virtualScroll?.itemHeight || 54,
+      bufferSize: virtualScroll?.bufferSize || 5,
+      overscan: virtualScroll?.overscan || 10,
+    }),
+    [virtualScroll]
+  );
 
   // 检查是否应该启用虚拟滚动
   const shouldUseVirtualScroll = useMemo(() => {
@@ -170,7 +180,7 @@ function DataTable<T extends Record<string, any>>({
                   const currentKeys = (selection.defaultSelectedRowKeys || []) as string[];
                   const checkedKeys = e.target.checked
                     ? [...currentKeys, key as string]
-                    : currentKeys.filter(k => k !== key);
+                    : currentKeys.filter((k) => k !== key);
                   selection.onChange(checkedKeys, [record]);
                 }
               }}
@@ -181,27 +191,31 @@ function DataTable<T extends Record<string, any>>({
     }
 
     // 处理业务列
-    columns.filter(col => col.visible !== false).forEach((column) => {
-      const antColumn: any = {
-        title: column.title,
-        dataIndex: column.dataIndex,
-        key: column.key,
-        width: column.width,
-        align: column.align || 'left',
-        fixed: column.fixed,
-        sorter: column.sortable ? (a: any, b: any) => {
-          const aVal = a[column.dataIndex];
-          const bVal = b[column.dataIndex];
-          if (typeof aVal === 'number' && typeof bVal === 'number') {
-            return aVal - bVal;
-          }
-          return String(aVal || '').localeCompare(String(bVal || ''));
-        } : false,
-        render: column.render,
-      };
+    columns
+      .filter((col) => col.visible !== false)
+      .forEach((column) => {
+        const antColumn: any = {
+          title: column.title,
+          dataIndex: column.dataIndex,
+          key: column.key,
+          width: column.width,
+          align: column.align || 'left',
+          fixed: column.fixed,
+          sorter: column.sortable
+            ? (a: any, b: any) => {
+                const aVal = a[column.dataIndex];
+                const bVal = b[column.dataIndex];
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                  return aVal - bVal;
+                }
+                return String(aVal || '').localeCompare(String(bVal || ''));
+              }
+            : false,
+          render: column.render,
+        };
 
-      resultColumns.push(antColumn);
-    });
+        resultColumns.push(antColumn);
+      });
 
     // 添加操作列
     if (actions?.actions && actions.actions.length > 0) {
@@ -213,7 +227,7 @@ function DataTable<T extends Record<string, any>>({
         render: React.memo((_, record: T, index: number) => {
           // 缓存可见操作
           const visibleActions = useMemo(() => {
-            return actions.actions.filter(action =>
+            return actions.actions.filter((action) =>
               action.visible ? action.visible(record) : true
             );
           }, [actions.actions, record]);
@@ -243,11 +257,7 @@ function DataTable<T extends Record<string, any>>({
                 />
               ))}
               {visibleActions.length > 2 && (
-                <MoreActionsButton
-                  actions={visibleActions}
-                  record={record}
-                  index={index}
-                />
+                <MoreActionsButton actions={visibleActions} record={record} index={index} />
               )}
             </Space>
           );
@@ -268,8 +278,10 @@ function DataTable<T extends Record<string, any>>({
       total: pagination?.total || dataSource.length,
       showSizeChanger: true,
       showQuickJumper: pagination?.showQuickJumper !== false,
-      showTotal: pagination?.showTotal !== false ? (total, range) =>
-        `第 ${range[0]}-${range[1]} 条，共 ${total} 条` : undefined,
+      showTotal:
+        pagination?.showTotal !== false
+          ? (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+          : undefined,
       pageSizeOptions: pagination?.pageSizeOptions || [10, 20, 50, 100],
       onChange: pagination?.onChange,
       onShowSizeChange: pagination?.onShowSizeChange,
@@ -279,32 +291,37 @@ function DataTable<T extends Record<string, any>>({
   }, [pagination, dataSource.length]);
 
   // 处理行属性
-  const rowProps = useCallback((record: T, index?: number) => {
-    const baseProps = onRow ? onRow(record, index) : {};
+  const rowProps = useCallback(
+    (record: T, index?: number) => {
+      const baseProps = onRow ? onRow(record, index) : {};
 
-    return {
-      ...baseProps,
-      className: cn(
-        baseProps.className,
-        striped && index !== undefined && index % 2 === 1 && 'ant-table-row-striped'
-      ),
-    };
-  }, [onRow, striped]);
+      return {
+        ...baseProps,
+        className: cn(
+          baseProps.className,
+          striped && index !== undefined && index % 2 === 1 && 'ant-table-row-striped'
+        ),
+      };
+    },
+    [onRow, striped]
+  );
 
   // 表格性能优化配置
   const tablePerformanceConfig = useMemo(() => {
     if (strictMode || shouldUseVirtualScroll) {
       return {
         // 启用行虚拟化
-        components: shouldUseVirtualScroll ? {
-          body: {
-            row: ({ children, ...props }: any) => (
-              <div {...props} style={{ height: virtualConfig.itemHeight }}>
-                {children}
-              </div>
-            )
-          }
-        } : undefined,
+        components: shouldUseVirtualScroll
+          ? {
+              body: {
+                row: ({ children, ...props }: any) => (
+                  <div {...props} style={{ height: virtualConfig.itemHeight }}>
+                    {children}
+                  </div>
+                ),
+              },
+            }
+          : undefined,
         // 其他性能优化
         rowClassName: (record: T, index: number) => {
           const baseClass = strictMode ? 'ant-table-row-optimized' : '';
@@ -319,56 +336,60 @@ function DataTable<T extends Record<string, any>>({
   }, [strictMode, shouldUseVirtualScroll, striped, virtualConfig.itemHeight]);
 
   // 表格内容
-  const tableContent = React.useMemo(() => (
-    <Table
-      columns={tableColumns}
-      dataSource={dataSource}
-      rowKey={rowKey}
-      bordered={bordered}
-      size={size}
-      showHeader={showHeader}
-      scroll={optimizedScroll}
-      loading={loading}
-      emptyText={emptyText}
-      pagination={false} // 我们使用自定义分页
-      className={cn(
-        'data-table',
-        tw(tailwindPreset('transition-fast')),
-        striped && 'data-table-striped',
-        shouldUseVirtualScroll && 'data-table-virtual',
-        strictMode && 'data-table-strict',
-        className
-      )}
-      style={{
-        ...style,
-        ...(shouldUseVirtualScroll && {
-          '--virtual-item-height': `${virtualConfig.itemHeight}px`
-        } as React.CSSProperties)
-      }}
-      onRow={rowProps}
-      {...tablePerformanceConfig}
-      {...restProps}
-    />
-  ), [
-    tableColumns,
-    dataSource,
-    rowKey,
-    bordered,
-    size,
-    showHeader,
-    optimizedScroll,
-    loading,
-    emptyText,
-    striped,
-    shouldUseVirtualScroll,
-    strictMode,
-    className,
-    style,
-    rowProps,
-    tablePerformanceConfig,
-    virtualConfig.itemHeight,
-    restProps
-  ]);
+  const tableContent = React.useMemo(
+    () => (
+      <Table
+        columns={tableColumns}
+        dataSource={dataSource}
+        rowKey={rowKey}
+        bordered={bordered}
+        size={size}
+        showHeader={showHeader}
+        scroll={optimizedScroll}
+        loading={loading}
+        emptyText={emptyText}
+        pagination={false} // 我们使用自定义分页
+        className={cn(
+          'data-table',
+          tw(tailwindPreset('transition-fast')),
+          striped && 'data-table-striped',
+          shouldUseVirtualScroll && 'data-table-virtual',
+          strictMode && 'data-table-strict',
+          className
+        )}
+        style={{
+          ...style,
+          ...(shouldUseVirtualScroll &&
+            ({
+              '--virtual-item-height': `${virtualConfig.itemHeight}px`,
+            } as React.CSSProperties)),
+        }}
+        onRow={rowProps}
+        {...tablePerformanceConfig}
+        {...restProps}
+      />
+    ),
+    [
+      tableColumns,
+      dataSource,
+      rowKey,
+      bordered,
+      size,
+      showHeader,
+      optimizedScroll,
+      loading,
+      emptyText,
+      striped,
+      shouldUseVirtualScroll,
+      strictMode,
+      className,
+      style,
+      rowProps,
+      tablePerformanceConfig,
+      virtualConfig.itemHeight,
+      restProps,
+    ]
+  );
 
   // 如果有标题或描述，使用Card包装
   if (title || description || headerExtra || footerExtra) {
@@ -383,7 +404,9 @@ function DataTable<T extends Record<string, any>>({
                 <Text strong>{title}</Text>
                 {description && (
                   <div className="mt-1">
-                    <Text type="secondary" className="text-sm">{description}</Text>
+                    <Text type="secondary" className="text-sm">
+                      {description}
+                    </Text>
                   </div>
                 )}
               </div>
@@ -399,33 +422,21 @@ function DataTable<T extends Record<string, any>>({
             <Pagination {...paginationConfig} />
           </div>
         )}
-        {footerExtra && (
-          <div className="mt-4">
-            {footerExtra}
-          </div>
-        )}
+        {footerExtra && <div className="mt-4">{footerExtra}</div>}
       </Card>
     );
   }
 
   return (
     <div className={cn('data-table-wrapper', className)}>
-      {headerExtra && (
-        <div className="mb-4">
-          {headerExtra}
-        </div>
-      )}
+      {headerExtra && <div className="mb-4">{headerExtra}</div>}
       {tableContent}
       {paginationConfig && (
         <div className="mt-4 flex justify-end">
           <Pagination {...paginationConfig} />
         </div>
       )}
-      {footerExtra && (
-        <div className="mt-4">
-          {footerExtra}
-        </div>
-      )}
+      {footerExtra && <div className="mt-4">{footerExtra}</div>}
     </div>
   );
 }

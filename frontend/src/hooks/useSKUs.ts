@@ -99,9 +99,7 @@ export function useSKUDetail(
  * const { data: spus } = useSPUs();
  * ```
  */
-export function useSPUs(
-  options?: Omit<UseQueryOptions<SPU[]>, 'queryKey' | 'queryFn'>
-) {
+export function useSPUs(options?: Omit<UseQueryOptions<SPU[]>, 'queryKey' | 'queryFn'>) {
   return useQuery<SPU[]>({
     queryKey: skuQueryKeys.spus(),
     queryFn: () => skuService.getSpus(),
@@ -121,9 +119,7 @@ export function useSPUs(
  * const { data: units } = useUnits();
  * ```
  */
-export function useUnits(
-  options?: Omit<UseQueryOptions<Unit[]>, 'queryKey' | 'queryFn'>
-) {
+export function useUnits(options?: Omit<UseQueryOptions<Unit[]>, 'queryKey' | 'queryFn'>) {
   return useQuery<Unit[]>({
     queryKey: skuQueryKeys.units(),
     queryFn: () => skuService.getUnits(),

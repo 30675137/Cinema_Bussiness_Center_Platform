@@ -5,17 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
-import {
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Button,
-  Space,
-  message,
-  Modal,
-  Divider
-} from 'antd';
+import { Form, Input, InputNumber, Select, Button, Space, message, Modal, Divider } from 'antd';
 // 临时定义以避免模块导入问题
 type CategoryLevel = 1 | 2 | 3;
 type CategoryStatus = 'enabled' | 'disabled';
@@ -49,7 +39,7 @@ type UpdateCategoryRequest = {
 // Hooks和Store导入
 import {
   useCreateCategoryMutation,
-  useUpdateCategoryMutation
+  useUpdateCategoryMutation,
 } from '../../../../services/category/categoryMutations';
 
 const { Option } = Select;
@@ -85,7 +75,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   visible,
   onCancel,
   onSuccess,
-  loading = false
+  loading = false,
 }) => {
   const [form] = Form.useForm();
 
@@ -100,13 +90,13 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         form.setFieldsValue({
           name: category.name,
           sortOrder: category.sortOrder,
-          status: category.status
+          status: category.status,
         });
       } else {
         form.setFieldsValue({
           name: '',
           sortOrder: 0,
-          status: 'enabled'
+          status: 'enabled',
         });
       }
     }
@@ -130,17 +120,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       const values = await form.validateFields();
 
       // 构建请求数据
-      const requestData = mode === 'create'
-        ? {
-            ...values,
-            parentId: parentId,
-            status: values.status || 'enabled'
-          } as CreateCategoryRequest
-        : {
-            name: values.name,
-            sortOrder: values.sortOrder,
-            status: values.status
-          } as UpdateCategoryRequest;
+      const requestData =
+        mode === 'create'
+          ? ({
+              ...values,
+              parentId: parentId,
+              status: values.status || 'enabled',
+            } as CreateCategoryRequest)
+          : ({
+              name: values.name,
+              sortOrder: values.sortOrder,
+              status: values.status,
+            } as UpdateCategoryRequest);
 
       // 调用API提交数据
       if (mode === 'create') {
@@ -150,7 +141,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       } else if (category) {
         const updatedCategory = await updateMutation.mutateAsync({
           id: category.id,
-          data: requestData
+          data: requestData,
         });
         message.success('更新类目成功');
         onSuccess?.(updatedCategory);
@@ -181,11 +172,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       width={600}
       destroyOnHidden
     >
-      <Form
-        form={form}
-        layout="vertical"
-        style={{ marginTop: 16 }}
-      >
+      <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
         <Form.Item
           label="类目名称"
           name="name"
@@ -193,7 +180,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             { required: true, message: '请输入类目名称' },
             { min: 2, message: '类目名称至少需要2个字符' },
             { max: 50, message: '类目名称不能超过50个字符' },
-            { pattern: /^[\u4e00-\u9fa5a-zA-Z0-9\-_\/\s]+$/, message: '类目名称只能包含中文、英文、数字、连字符、下划线和斜杠' }
+            {
+              pattern: /^[\u4e00-\u9fa5a-zA-Z0-9\-_\/\s]+$/,
+              message: '类目名称只能包含中文、英文、数字、连字符、下划线和斜杠',
+            },
           ]}
         >
           <Input placeholder="请输入类目名称" />
@@ -204,7 +194,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           name="sortOrder"
           rules={[
             { type: 'number', min: 0, message: '排序序号必须为非负整数' },
-            { type: 'number', max: 999999, message: '排序序号不能大于999999' }
+            { type: 'number', max: 999999, message: '排序序号不能大于999999' },
           ]}
           tooltip="数值越小，排序越靠前"
         >
@@ -243,10 +233,16 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
         <Form.Item label="类目层级">
           <Input
-            value={mode === 'edit' && category
-              ? category.level === 1 ? '一级类目' :
-                category.level === 2 ? '二级类目' : '三级类目'
-              : parentId ? '二级类目' : '一级类目'
+            value={
+              mode === 'edit' && category
+                ? category.level === 1
+                  ? '一级类目'
+                  : category.level === 2
+                    ? '二级类目'
+                    : '三级类目'
+                : parentId
+                  ? '二级类目'
+                  : '一级类目'
             }
             disabled
           />
@@ -260,18 +256,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
             <Form.Item label="创建时间">
               <Input
-                value={category?.createdAt ?
-                  new Date(category.createdAt).toLocaleString('zh-CN') : '-'
+                value={
+                  category?.createdAt ? new Date(category.createdAt).toLocaleString('zh-CN') : '-'
                 }
                 disabled
               />
             </Form.Item>
 
             <Form.Item label="更新时间">
-              <Input
-                value={new Date().toLocaleString('zh-CN')}
-                disabled
-              />
+              <Input value={new Date().toLocaleString('zh-CN')} disabled />
             </Form.Item>
           </>
         )}
@@ -280,7 +273,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
           <div style={{ textAlign: 'right' }}>
             <Space>
-              <Button onClick={handleCancel} disabled={createMutation.isPending || updateMutation.isPending}>
+              <Button
+                onClick={handleCancel}
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
                 取消
               </Button>
               <Button

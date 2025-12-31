@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整类型定义
- * 
+ *
  * 包含库存调整管理所需的全部类型定义
  */
 
@@ -18,11 +18,11 @@ export type AdjustmentType = 'surplus' | 'shortage' | 'damage';
  * 调整状态
  */
 export type AdjustmentStatus =
-  | 'draft'              // 草稿
-  | 'pending_approval'   // 待审批
-  | 'approved'           // 已审批通过
-  | 'rejected'           // 已拒绝
-  | 'withdrawn';         // 已撤回
+  | 'draft' // 草稿
+  | 'pending_approval' // 待审批
+  | 'approved' // 已审批通过
+  | 'rejected' // 已拒绝
+  | 'withdrawn'; // 已撤回
 
 /**
  * 审批操作类型
@@ -237,10 +237,10 @@ export const ADJUSTMENT_TYPE_OPTIONS: Array<{
   color: string;
   effect: 'increase' | 'decrease';
 }> = [
-    { value: 'surplus', label: '盘盈', color: 'green', effect: 'increase' },
-    { value: 'shortage', label: '盘亏', color: 'orange', effect: 'decrease' },
-    { value: 'damage', label: '报损', color: 'red', effect: 'decrease' },
-  ];
+  { value: 'surplus', label: '盘盈', color: 'green', effect: 'increase' },
+  { value: 'shortage', label: '盘亏', color: 'orange', effect: 'decrease' },
+  { value: 'damage', label: '报损', color: 'red', effect: 'decrease' },
+];
 
 /**
  * 调整状态选项
@@ -250,12 +250,12 @@ export const ADJUSTMENT_STATUS_OPTIONS: Array<{
   label: string;
   color: string;
 }> = [
-    { value: 'draft', label: '草稿', color: 'default' },
-    { value: 'pending_approval', label: '待审批', color: 'processing' },
-    { value: 'approved', label: '已审批', color: 'success' },
-    { value: 'rejected', label: '已拒绝', color: 'error' },
-    { value: 'withdrawn', label: '已撤回', color: 'warning' },
-  ];
+  { value: 'draft', label: '草稿', color: 'default' },
+  { value: 'pending_approval', label: '待审批', color: 'processing' },
+  { value: 'approved', label: '已审批', color: 'success' },
+  { value: 'rejected', label: '已拒绝', color: 'error' },
+  { value: 'withdrawn', label: '已撤回', color: 'warning' },
+];
 
 /**
  * 审批操作选项
@@ -265,10 +265,10 @@ export const APPROVAL_ACTION_OPTIONS: Array<{
   label: string;
   color: string;
 }> = [
-    { value: 'approve', label: '通过', color: 'green' },
-    { value: 'reject', label: '拒绝', color: 'red' },
-    { value: 'withdraw', label: '撤回', color: 'orange' },
-  ];
+  { value: 'approve', label: '通过', color: 'green' },
+  { value: 'reject', label: '拒绝', color: 'red' },
+  { value: 'withdraw', label: '撤回', color: 'orange' },
+];
 
 // ==================== 工具函数 ====================
 
@@ -303,23 +303,21 @@ export function calculateStockAfter(
   quantity: number
 ): number {
   const direction = getStockChangeDirection(adjustmentType);
-  return direction === 'increase'
-    ? currentStock + quantity
-    : currentStock - quantity;
+  return direction === 'increase' ? currentStock + quantity : currentStock - quantity;
 }
 
 /**
  * 获取调整类型标签
  */
 export function getAdjustmentTypeLabel(type: AdjustmentType): string {
-  return ADJUSTMENT_TYPE_OPTIONS.find(opt => opt.value === type)?.label || type;
+  return ADJUSTMENT_TYPE_OPTIONS.find((opt) => opt.value === type)?.label || type;
 }
 
 /**
  * 获取调整状态标签
  */
 export function getAdjustmentStatusLabel(status: AdjustmentStatus): string {
-  return ADJUSTMENT_STATUS_OPTIONS.find(opt => opt.value === status)?.label || status;
+  return ADJUSTMENT_STATUS_OPTIONS.find((opt) => opt.value === status)?.label || status;
 }
 
 /**

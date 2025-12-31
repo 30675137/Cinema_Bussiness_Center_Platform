@@ -1,6 +1,11 @@
 import React from 'react';
 import { Card, Table, Button, Space, Input, Select, Tag, Progress } from 'antd';
-import { PlusOutlined, EditOutlined, SearchOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  EditOutlined,
+  SearchOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -47,7 +52,7 @@ const InventoryList: React.FC = () => {
       lowStockThreshold: 100,
       warehouse: '配件仓库',
       lastUpdate: '2025-12-10 12:20',
-    }
+    },
   ];
 
   const getStockStatus = (available: number, threshold: number) => {
@@ -113,11 +118,7 @@ const InventoryList: React.FC = () => {
       key: 'stockStatus',
       render: (_, record: any) => {
         const status = getStockStatus(record.availableStock, record.lowStockThreshold);
-        return (
-          <Tag color={status.color}>
-            {status.text}
-          </Tag>
-        );
+        return <Tag color={status.color}>{status.text}</Tag>;
       },
     },
     {
@@ -153,7 +154,7 @@ const InventoryList: React.FC = () => {
     total: dataSource.reduce((sum, item) => sum + item.totalStock, 0),
     available: dataSource.reduce((sum, item) => sum + item.availableStock, 0),
     reserved: dataSource.reduce((sum, item) => sum + item.reservedStock, 0),
-    lowStock: dataSource.filter(item => item.availableStock <= item.lowStockThreshold).length,
+    lowStock: dataSource.filter((item) => item.availableStock <= item.lowStockThreshold).length,
   };
 
   return (
@@ -225,8 +226,7 @@ const InventoryList: React.FC = () => {
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
           }}
         />
       </Card>

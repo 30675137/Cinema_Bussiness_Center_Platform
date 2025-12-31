@@ -14,9 +14,9 @@ import type { UnitCategory } from '../types';
  * 各单位类别的默认精度配置
  */
 export const DEFAULT_PRECISION: Record<UnitCategory, number> = {
-  VOLUME: 1,  // 容量: 1位小数
-  WEIGHT: 0,  // 重量: 整数
-  COUNT: 0,   // 数量: 整数
+  VOLUME: 1, // 容量: 1位小数
+  WEIGHT: 0, // 重量: 整数
+  COUNT: 0, // 数量: 整数
 };
 
 /**

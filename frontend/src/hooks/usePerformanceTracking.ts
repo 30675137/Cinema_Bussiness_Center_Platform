@@ -60,45 +60,54 @@ export const usePerformanceTracking = (
   });
 
   // 性能指标Hook
-  const onRender = useCallback((id: string, phase: string, actualDuration: number) => {
-    if (!enableProfiler || Math.random() > samplingRate) return;
+  const onRender = useCallback(
+    (id: string, phase: string, actualDuration: number) => {
+      if (!enableProfiler || Math.random() > samplingRate) return;
 
-    const now = performance.now();
+      const now = performance.now();
 
-    if (phase === 'mount') {
-      mountTimeRef.current = actualDuration;
-      isMountedRef.current = true;
+      if (phase === 'mount') {
+        mountTimeRef.current = actualDuration;
+        isMountedRef.current = true;
 
-      if (trackMountTime) {
-        recordComponentRender(componentName, actualDuration, actualDuration);
+        if (trackMountTime) {
+          recordComponentRender(componentName, actualDuration, actualDuration);
+        }
+      } else if (phase === 'update') {
+        renderCountRef.current += 1;
+        totalRenderTimeRef.current += actualDuration;
+        lastRenderTimeRef.current = actualDuration;
+
+        if (trackReRenders) {
+          recordComponentRender(componentName, actualDuration, mountTimeRef.current);
+        }
       }
-    } else if (phase === 'update') {
-      renderCountRef.current += 1;
-      totalRenderTimeRef.current += actualDuration;
-      lastRenderTimeRef.current = actualDuration;
 
-      if (trackReRenders) {
-        recordComponentRender(componentName, actualDuration, mountTimeRef.current);
+      // 避免在onRender中更新状态以防止无限循环
+      // 状态更新可以通过useEffect来处理
+
+      // 警告渲染时间过长
+      if (actualDuration > 16) {
+        // 超过一帧的时间
+        console.warn(
+          `⚠️ ${componentName} ${phase} took ${actualDuration.toFixed(2)}ms (超过16ms阈值)`
+        );
       }
-    }
 
-    // 避免在onRender中更新状态以防止无限循环
-    // 状态更新可以通过useEffect来处理
-
-    // 警告渲染时间过长
-    if (actualDuration > 16) { // 超过一帧的时间
-      console.warn(
-        `⚠️ ${componentName} ${phase} took ${actualDuration.toFixed(2)}ms (超过16ms阈值)`
-      );
-    }
-
-    // 警告重渲染次数过多
-    if (renderCountRef.current > 10) {
-      console.warn(
-        `⚠️ ${componentName} has re-rendered ${renderCountRef.current} times`
-      );
-    }
-  }, [componentName, enableProfiler, trackMountTime, trackReRenders, recordComponentRender, samplingRate]);
+      // 警告重渲染次数过多
+      if (renderCountRef.current > 10) {
+        console.warn(`⚠️ ${componentName} has re-rendered ${renderCountRef.current} times`);
+      }
+    },
+    [
+      componentName,
+      enableProfiler,
+      trackMountTime,
+      trackReRenders,
+      recordComponentRender,
+      samplingRate,
+    ]
+  );
 
   // 内存使用跟踪
   useEffect(() => {
@@ -116,16 +125,12 @@ export const usePerformanceTracking = (
     return () => {
       if (isMountedRef.current && trackUpdateTime) {
         // 组件卸载时记录最终性能数据
-        console.debug(
-          `📊 ${componentName} 性能统计:`,
-          {
-            renderCount: renderCountRef.current,
-            averageRenderTime: renderCountRef.current > 0
-              ? totalRenderTimeRef.current / renderCountRef.current
-              : 0,
-            mountTime: mountTimeRef.current,
-          }
-        );
+        console.debug(`📊 ${componentName} 性能统计:`, {
+          renderCount: renderCountRef.current,
+          averageRenderTime:
+            renderCountRef.current > 0 ? totalRenderTimeRef.current / renderCountRef.current : 0,
+          mountTime: mountTimeRef.current,
+        });
       }
     };
   }, [componentName, trackUpdateTime]);
@@ -181,7 +186,8 @@ export const useListPerformance = (itemName: string, itemCount: number) => {
 
       // 计算每项渲染时间
       const timePerItem = duration / itemCount;
-      if (timePerItem > 1) { // 每项超过1ms
+      if (timePerItem > 1) {
+        // 每项超过1ms
         console.warn(
           `⚠️ ${itemName}List: 每项渲染时间 ${timePerItem.toFixed(2)}ms (总计: ${duration.toFixed(2)}ms)`
         );
@@ -220,10 +226,9 @@ export const useAnimationPerformance = (animationName: string) => {
     if (frameCountRef.current % 60 === 0) {
       const dropRate = (droppedFramesRef.current / frameCountRef.current) * 100;
 
-      if (dropRate > 5) { // 掉帧率超过5%
-        console.warn(
-          `⚠️ ${animationName} Animation: 掉帧率 ${dropRate.toFixed(1)}%`
-        );
+      if (dropRate > 5) {
+        // 掉帧率超过5%
+        console.warn(`⚠️ ${animationName} Animation: 掉帧率 ${dropRate.toFixed(1)}%`);
       }
 
       // 重置计数器
@@ -235,9 +240,8 @@ export const useAnimationPerformance = (animationName: string) => {
     return {
       totalFrames: frameCountRef.current,
       droppedFrames: droppedFramesRef.current,
-      dropRate: frameCountRef.current > 0
-        ? (droppedFramesRef.current / frameCountRef.current) * 100
-        : 0,
+      dropRate:
+        frameCountRef.current > 0 ? (droppedFramesRef.current / frameCountRef.current) * 100 : 0,
     };
   }, []);
 
@@ -252,34 +256,29 @@ export const useAnimationPerformance = (animationName: string) => {
 export const useAPIPerformance = (apiName: string) => {
   const { performanceData } = usePerformanceTracking(`${apiName}API`);
 
-  const trackAPICall = useCallback(async <T>(
-    apiCall: () => Promise<T>,
-    operation: string = 'call'
-  ): Promise<T> => {
-    const startTime = performance.now();
+  const trackAPICall = useCallback(
+    async <T>(apiCall: () => Promise<T>, operation: string = 'call'): Promise<T> => {
+      const startTime = performance.now();
 
-    try {
-      const result = await apiCall();
-      const duration = performance.now() - startTime;
+      try {
+        const result = await apiCall();
+        const duration = performance.now() - startTime;
 
-      // 记录成功调用
-      console.debug(
-        `✅ ${apiName} ${operation}: ${duration.toFixed(2)}ms`
-      );
+        // 记录成功调用
+        console.debug(`✅ ${apiName} ${operation}: ${duration.toFixed(2)}ms`);
 
-      return result;
-    } catch (error) {
-      const duration = performance.now() - startTime;
+        return result;
+      } catch (error) {
+        const duration = performance.now() - startTime;
 
-      // 记录失败调用
-      console.error(
-        `❌ ${apiName} ${operation}: ${duration.toFixed(2)}ms`,
-        error
-      );
+        // 记录失败调用
+        console.error(`❌ ${apiName} ${operation}: ${duration.toFixed(2)}ms`, error);
 
-      throw error;
-    }
-  }, [apiName]);
+        throw error;
+      }
+    },
+    [apiName]
+  );
 
   return {
     trackAPICall,

@@ -27,10 +27,7 @@ interface AddonsTabProps {
 /**
  * 加购项关联标签页
  */
-const AddonsTab: React.FC<AddonsTabProps> = ({
-  packageId,
-  loading: parentLoading = false,
-}) => {
+const AddonsTab: React.FC<AddonsTabProps> = ({ packageId, loading: parentLoading = false }) => {
   const isDirty = useScenarioPackageStore((state) => state.dirtyTabs.addons);
   const setDirty = useScenarioPackageStore((state) => state.setDirty);
 
@@ -156,10 +153,7 @@ const AddonsTab: React.FC<AddonsTabProps> = ({
       {loading ? (
         <Skeleton active paragraph={{ rows: 4 }} />
       ) : filteredItems.length === 0 ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="暂无可用加购项"
-        />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无可用加购项" />
       ) : (
         <Row gutter={[16, 16]}>
           {filteredItems.map((item) => (

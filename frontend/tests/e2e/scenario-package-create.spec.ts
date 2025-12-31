@@ -67,7 +67,7 @@ async function fillPackageForm(page: Page, data: typeof TEST_PACKAGE) {
  */
 async function waitForApiResponse(page: Page, urlPattern: string | RegExp) {
   return await page.waitForResponse(
-    response => {
+    (response) => {
       const url = response.url();
       const pattern = typeof urlPattern === 'string' ? new RegExp(urlPattern) : urlPattern;
       return pattern.test(url) && response.status() === 201;
@@ -128,7 +128,7 @@ test.describe('Scenario Package Creation Flow', () => {
     await test.step('Submit package creation', async () => {
       // Setup request interception to capture created package ID
       const responsePromise = page.waitForResponse(
-        response =>
+        (response) =>
           response.url().includes('/api/scenario-packages') &&
           response.request().method() === 'POST' &&
           response.status() === 201
@@ -195,7 +195,7 @@ test.describe('Scenario Package Creation Flow', () => {
 
       // Submit update
       const updateResponsePromise = page.waitForResponse(
-        response =>
+        (response) =>
           response.url().includes(`/api/scenario-packages/${createdPackageId}`) &&
           response.request().method() === 'PUT' &&
           response.status() === 200
@@ -238,13 +238,11 @@ test.describe('Scenario Package Creation Flow', () => {
       await page.waitForSelector('.ant-popconfirm', { timeout: 5000 });
 
       // Verify confirmation message
-      await expect(page.locator('.ant-popconfirm')).toContainText(
-        '确定要删除这个场景包吗？'
-      );
+      await expect(page.locator('.ant-popconfirm')).toContainText('确定要删除这个场景包吗？');
 
       // Click confirm button
       const deleteResponsePromise = page.waitForResponse(
-        response =>
+        (response) =>
           response.url().includes(`/api/scenario-packages/${createdPackageId}`) &&
           response.request().method() === 'DELETE' &&
           response.status() === 204
@@ -302,10 +300,7 @@ test.describe('Scenario Package Creation Flow', () => {
     await expect(page.locator('text=描述长度不能超过500个字符')).toBeVisible();
   });
 
-  test('should handle concurrent edit conflict (optimistic locking)', async ({
-    page,
-    context,
-  }) => {
+  test('should handle concurrent edit conflict (optimistic locking)', async ({ page, context }) => {
     // This test requires creating a package first
     // For simplicity, we'll skip this in the initial implementation
     // In a real scenario, we'd:
@@ -363,7 +358,9 @@ test.describe('Scenario Package List Features', () => {
     await page.waitForSelector('table', { timeout: 10000 });
 
     // Look for status filter dropdown (if exists)
-    const statusFilter = page.locator('select[placeholder*="状态"], .ant-select[placeholder*="状态"]');
+    const statusFilter = page.locator(
+      'select[placeholder*="状态"], .ant-select[placeholder*="状态"]'
+    );
     if (await statusFilter.isVisible()) {
       await statusFilter.click();
       await page.click('text=草稿');

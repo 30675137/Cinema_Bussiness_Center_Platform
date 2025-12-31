@@ -44,16 +44,26 @@ export interface TD_INVENTORY_LOW_STOCK_ALERT_Data {
   };
 }
 
-export const test = base.extend<{ TD_INVENTORY_LOW_STOCK_ALERT: TD_INVENTORY_LOW_STOCK_ALERT_Data }>({
+export const test = base.extend<{
+  TD_INVENTORY_LOW_STOCK_ALERT: TD_INVENTORY_LOW_STOCK_ALERT_Data;
+}>({
   TD_INVENTORY_LOW_STOCK_ALERT: async ({}, use) => {
     // Setup: Load seed data
-    const seedPath = path.join(process.cwd(), '..', 'testdata', 'seeds', 'inventory-low-stock-alert.json');
+    const seedPath = path.join(
+      process.cwd(),
+      '..',
+      'testdata',
+      'seeds',
+      'inventory-low-stock-alert.json'
+    );
     const seedContent = await fs.readFile(seedPath, 'utf-8');
     const seedData = JSON.parse(seedContent);
     const testData = seedData.find((item: any) => item.key === 'low-stock-alert-scenario');
 
     if (!testData) {
-      throw new Error('Seed key "low-stock-alert-scenario" not found in testdata/seeds/inventory-low-stock-alert.json');
+      throw new Error(
+        'Seed key "low-stock-alert-scenario" not found in testdata/seeds/inventory-low-stock-alert.json'
+      );
     }
 
     // Remove the 'key' property before using

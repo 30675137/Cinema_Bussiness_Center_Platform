@@ -94,23 +94,29 @@ const SearchInput: React.FC<SearchInputProps> = ({
   /**
    * 处理输入变化
    */
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setInputValue(newValue);
-    onChange?.(newValue);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value;
+      setInputValue(newValue);
+      onChange?.(newValue);
 
-    // 触发防抖搜索
-    debouncedSearch(newValue);
-  }, [onChange, debouncedSearch]);
+      // 触发防抖搜索
+      debouncedSearch(newValue);
+    },
+    [onChange, debouncedSearch]
+  );
 
   /**
    * 处理搜索确认
    */
-  const handleSearch = useCallback((searchValue: string) => {
-    // 取消防抖搜索，立即执行
-    debouncedSearch.cancel();
-    onSearch?.(searchValue);
-  }, [onSearch, debouncedSearch]);
+  const handleSearch = useCallback(
+    (searchValue: string) => {
+      // 取消防抖搜索，立即执行
+      debouncedSearch.cancel();
+      onSearch?.(searchValue);
+    },
+    [onSearch, debouncedSearch]
+  );
 
   /**
    * 处理清除操作
@@ -130,28 +136,37 @@ const SearchInput: React.FC<SearchInputProps> = ({
   /**
    * 处理焦点事件
    */
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(true);
-    onFocus?.(e);
-  }, [onFocus]);
+  const handleFocus = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      onFocus?.(e);
+    },
+    [onFocus]
+  );
 
-  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
-    setIsFocused(false);
-    onBlur?.(e);
-  }, [onBlur]);
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    },
+    [onBlur]
+  );
 
   /**
    * 处理键盘事件
    */
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    // ESC键清除输入
-    if (e.key === 'Escape') {
-      handleClear();
-      return;
-    }
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // ESC键清除输入
+      if (e.key === 'Escape') {
+        handleClear();
+        return;
+      }
 
-    onKeyDown?.(e);
-  }, [onKeyDown, handleClear]);
+      onKeyDown?.(e);
+    },
+    [onKeyDown, handleClear]
+  );
 
   /**
    * 获取后缀图标
@@ -161,13 +176,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
 
     // 加载图标
     if (loading) {
-      icons.push(
-        <LoadingOutlined key="loading" className="search-loading-icon" spin />
-      );
+      icons.push(<LoadingOutlined key="loading" className="search-loading-icon" spin />);
     } else if (inputValue) {
-      icons.push(
-        <SearchOutlined key="search" className="search-icon" />
-      );
+      icons.push(<SearchOutlined key="search" className="search-icon" />);
     }
 
     // 清除按钮
@@ -191,11 +202,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
    * 获取前缀图标
    */
   const getPrefix = () => {
-    return (
-      <SearchOutlined
-        className={`search-prefix-icon ${isFocused ? 'focused' : ''}`}
-      />
-    );
+    return <SearchOutlined className={`search-prefix-icon ${isFocused ? 'focused' : ''}`} />;
   };
 
   // 自动聚焦

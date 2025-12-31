@@ -30,10 +30,7 @@ interface PackagesTabProps {
 /**
  * 套餐配置标签页
  */
-const PackagesTab: React.FC<PackagesTabProps> = ({
-  packageId,
-  loading: parentLoading = false,
-}) => {
+const PackagesTab: React.FC<PackagesTabProps> = ({ packageId, loading: parentLoading = false }) => {
   const isDirty = useScenarioPackageStore((state) => state.dirtyTabs.packages);
   const setDirty = useScenarioPackageStore((state) => state.setDirty);
 
@@ -119,10 +116,7 @@ const PackagesTab: React.FC<PackagesTabProps> = ({
         {loading ? (
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : tiers.length === 0 ? (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="暂无套餐，请添加第一个套餐"
-          >
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无套餐，请添加第一个套餐">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               添加套餐
             </Button>

@@ -370,12 +370,14 @@ export const validators: Record<string, ValidatorFunction> = {
     const { maxSize, unit = 'B' } = rule as any;
 
     // 转换为字节
-    const sizeInBytes = maxSize * {
-      B: 1,
-      KB: 1024,
-      MB: 1024 * 1024,
-      GB: 1024 * 1024 * 1024,
-    }[unit];
+    const sizeInBytes =
+      maxSize *
+      {
+        B: 1,
+        KB: 1024,
+        MB: 1024 * 1024,
+        GB: 1024 * 1024 * 1024,
+      }[unit];
 
     if (value && value.size > sizeInBytes) {
       return rule?.message || `文件大小不能超过${maxSize}${unit}`;
@@ -462,7 +464,7 @@ export const validateField = (
 
   return {
     valid: validation.valid,
-    error: validation.errors.value?.[0] || ''
+    error: validation.errors.value?.[0] || '',
   };
 };
 

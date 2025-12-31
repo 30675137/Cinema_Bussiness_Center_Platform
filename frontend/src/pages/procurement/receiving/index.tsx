@@ -33,7 +33,6 @@ const ReceivingManagePage: React.FC = () => {
     cancelReceipt,
   } = useReceiptStore();
 
-  
   // 初始化数据
   useEffect(() => {
     fetchReceipts();
@@ -94,7 +93,7 @@ const ReceivingManagePage: React.FC = () => {
       dataIndex: 'actualDate',
       key: 'actualDate',
       width: 120,
-      render: (date?: string) => date ? dayjs(date).format('YYYY-MM-DD') : '-',
+      render: (date?: string) => (date ? dayjs(date).format('YYYY-MM-DD') : '-'),
     },
     {
       title: '总金额',
@@ -182,17 +181,19 @@ const ReceivingManagePage: React.FC = () => {
   };
 
   // 过滤数据
-  const filteredData = receipts.filter(receipt => {
-    const matchesSearch = !searchText ||
+  const filteredData = receipts.filter((receipt) => {
+    const matchesSearch =
+      !searchText ||
       receipt.receiptNumber.toLowerCase().includes(searchText.toLowerCase()) ||
       receipt.purchaseOrderNumber.toLowerCase().includes(searchText.toLowerCase()) ||
       receipt.supplierName.toLowerCase().includes(searchText.toLowerCase());
 
     const matchesStatus = !statusFilter || receipt.status === statusFilter;
 
-    const matchesDate = !dateRange ||
+    const matchesDate =
+      !dateRange ||
       (dayjs(receipt.plannedDate).isAfter(dateRange[0]) &&
-       dayjs(receipt.plannedDate).isBefore(dateRange[1]));
+        dayjs(receipt.plannedDate).isBefore(dateRange[1]));
 
     return matchesSearch && matchesStatus && matchesDate;
   });
@@ -234,9 +235,7 @@ const ReceivingManagePage: React.FC = () => {
           </Card>
           <Card>
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-600">
-                {statistics?.totalCount || 0}
-              </div>
+              <div className="text-2xl font-bold text-gray-600">{statistics?.totalCount || 0}</div>
               <div className="text-gray-600">总收货单</div>
             </div>
           </Card>

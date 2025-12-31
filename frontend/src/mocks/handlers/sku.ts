@@ -27,10 +27,7 @@ const calculateFinishedProductCost = (
   components: BomComponent[],
   wasteRate: number = 0
 ): number => {
-  const componentCost = components.reduce(
-    (sum, comp) => sum + (comp.totalCost || 0),
-    0
-  );
+  const componentCost = components.reduce((sum, comp) => sum + (comp.totalCost || 0), 0);
   return componentCost * (1 + wasteRate / 100);
 };
 
@@ -94,7 +91,7 @@ export const skuHandlers = [
       total,
       page,
       pageSize,
-      message: '查询成功'
+      message: '查询成功',
     });
   }),
 
@@ -109,7 +106,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -118,13 +115,13 @@ export const skuHandlers = [
     const detail: SKUDetail = {
       ...sku,
       bomComponents: bomStore.get(id as string),
-      comboItems: comboStore.get(id as string)
+      comboItems: comboStore.get(id as string),
     };
 
     return HttpResponse.json({
       success: true,
       data: detail,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }),
 
@@ -146,7 +143,7 @@ export const skuHandlers = [
             success: false,
             error: 'DUPLICATE_BARCODE',
             message: '主条码已存在',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 409 }
         );
@@ -185,7 +182,7 @@ export const skuHandlers = [
       createdBy: 'mock-user',
       createdByName: 'Mock User',
       updatedBy: 'mock-user',
-      updatedByName: 'Mock User'
+      updatedByName: 'Mock User',
     };
 
     // 处理BOM组件（成品类型）
@@ -195,7 +192,7 @@ export const skuHandlers = [
         id: generateId(),
         finishedProductId: newSku.id,
         sortOrder: comp.sortOrder ?? index,
-        createdAt: now
+        createdAt: now,
       }));
       bomStore.set(newSku.id, bom);
 
@@ -210,7 +207,7 @@ export const skuHandlers = [
         id: generateId(),
         comboId: newSku.id,
         sortOrder: item.sortOrder ?? index,
-        createdAt: now
+        createdAt: now,
       }));
       comboStore.set(newSku.id, items);
 
@@ -225,7 +222,7 @@ export const skuHandlers = [
         success: true,
         data: newSku,
         message: 'SKU创建成功',
-        timestamp: now
+        timestamp: now,
       },
       { status: 201 }
     );
@@ -242,7 +239,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -258,7 +255,7 @@ export const skuHandlers = [
       code: sku.code, // 编码不可修改
       updatedAt: now,
       updatedBy: 'mock-user',
-      updatedByName: 'Mock User'
+      updatedByName: 'Mock User',
     };
 
     skuStore.set(updatedSku.id, updatedSku);
@@ -267,7 +264,7 @@ export const skuHandlers = [
       success: true,
       data: updatedSku,
       message: 'SKU更新成功',
-      timestamp: now
+      timestamp: now,
     });
   }),
 
@@ -282,7 +279,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -299,7 +296,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_REFERENCED',
           message: '该SKU被其他成品的BOM引用，无法删除',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 400 }
       );
@@ -316,7 +313,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_REFERENCED',
           message: '该SKU被套餐引用，无法删除',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 400 }
       );
@@ -330,7 +327,7 @@ export const skuHandlers = [
     return HttpResponse.json({
       success: true,
       message: 'SKU删除成功',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }),
 
@@ -345,7 +342,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -357,7 +354,7 @@ export const skuHandlers = [
           success: false,
           error: 'INVALID_SKU_TYPE',
           message: '仅成品类型可配置BOM',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 400 }
       );
@@ -377,22 +374,19 @@ export const skuHandlers = [
             success: false,
             error: 'COMPONENT_NOT_FOUND',
             message: `组件SKU ${comp.componentId} 不存在`,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 400 }
         );
       }
 
-      if (
-        componentSku.skuType !== 'raw_material' &&
-        componentSku.skuType !== 'packaging'
-      ) {
+      if (componentSku.skuType !== 'raw_material' && componentSku.skuType !== 'packaging') {
         return HttpResponse.json(
           {
             success: false,
             error: 'INVALID_COMPONENT_TYPE',
             message: 'BOM组件必须是原料或包材类型',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 400 }
         );
@@ -407,7 +401,7 @@ export const skuHandlers = [
       id: comp.id || generateId(),
       finishedProductId: id as string,
       sortOrder: comp.sortOrder ?? index,
-      createdAt: now
+      createdAt: now,
     }));
 
     bomStore.set(id as string, bom);
@@ -426,10 +420,10 @@ export const skuHandlers = [
       data: {
         bom,
         standardCost: sku.standardCost,
-        wasteRate: sku.wasteRate
+        wasteRate: sku.wasteRate,
       },
       message: 'BOM配置更新成功',
-      timestamp: now
+      timestamp: now,
     });
   }),
 
@@ -444,7 +438,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -456,7 +450,7 @@ export const skuHandlers = [
           success: false,
           error: 'INVALID_SKU_TYPE',
           message: '仅套餐类型可配置子项',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 400 }
       );
@@ -475,7 +469,7 @@ export const skuHandlers = [
             success: false,
             error: 'SUB_ITEM_NOT_FOUND',
             message: `子项SKU ${item.subItemId} 不存在`,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 400 }
         );
@@ -487,7 +481,7 @@ export const skuHandlers = [
             success: false,
             error: 'INVALID_SUB_ITEM_TYPE',
             message: '套餐子项不能是套餐类型',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 400 }
         );
@@ -499,7 +493,7 @@ export const skuHandlers = [
             success: false,
             error: 'SELF_REFERENCE',
             message: '套餐不能包含自己',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           },
           { status: 400 }
         );
@@ -514,7 +508,7 @@ export const skuHandlers = [
       id: item.id || generateId(),
       comboId: id as string,
       sortOrder: item.sortOrder ?? index,
-      createdAt: now
+      createdAt: now,
     }));
 
     comboStore.set(id as string, items);
@@ -529,10 +523,10 @@ export const skuHandlers = [
       success: true,
       data: {
         items,
-        standardCost: sku.standardCost
+        standardCost: sku.standardCost,
       },
       message: '套餐子项更新成功',
-      timestamp: now
+      timestamp: now,
     });
   }),
 
@@ -547,7 +541,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -573,10 +567,10 @@ export const skuHandlers = [
       data: {
         oldCost,
         newCost,
-        changedAt: sku.updatedAt
+        changedAt: sku.updatedAt,
       },
       message: '成本重新计算成功',
-      timestamp: sku.updatedAt
+      timestamp: sku.updatedAt,
     });
   }),
 
@@ -591,7 +585,7 @@ export const skuHandlers = [
           success: false,
           error: 'SKU_NOT_FOUND',
           message: `未找到ID为 ${id} 的SKU`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         { status: 404 }
       );
@@ -655,11 +649,11 @@ export const skuHandlers = [
       data: {
         valid: errors.length === 0,
         errors,
-        warnings
+        warnings,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-  })
+  }),
 ];
 
 // 导出清空存储函数（用于测试）
@@ -674,5 +668,5 @@ export const clearSkuStore = () => {
 export const getSkuStore = () => ({
   skus: skuStore,
   bom: bomStore,
-  combo: comboStore
+  combo: comboStore,
 });

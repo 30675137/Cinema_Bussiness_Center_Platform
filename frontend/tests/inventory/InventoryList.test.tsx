@@ -22,12 +22,11 @@ vi.mock('@/components/inventory/InventoryForm', () => ({
         <button onClick={onCancel}>取消</button>
         <button onClick={onSuccess}>确认</button>
       </div>
-    ) : null
+    ) : null,
 }));
 
 vi.mock('@/components/inventory/InventoryDetail', () => ({
-  default: ({ inventoryId }: any) =>
-    <div data-testid="inventory-detail">{inventoryId}</div>
+  default: ({ inventoryId }: any) => <div data-testid="inventory-detail">{inventoryId}</div>,
 }));
 
 const mockInventoryStore = vi.mocked(useInventoryStore);
@@ -48,7 +47,7 @@ describe('InventoryList', () => {
       minStock: 20,
       maxStock: 500,
       safeStock: 30,
-      averageCost: 15.50,
+      averageCost: 15.5,
       totalValue: 1550,
       status: InventoryStatus.IN_STOCK,
       lastInboundDate: '2024-01-01',
@@ -69,8 +68,8 @@ describe('InventoryList', () => {
       minStock: 20,
       maxStock: 200,
       safeStock: 25,
-      averageCost: 3.50,
-      totalValue: 52.50,
+      averageCost: 3.5,
+      totalValue: 52.5,
       status: InventoryStatus.LOW_STOCK,
       lastInboundDate: '2024-01-02',
       lastOutboundDate: '2024-01-06',
@@ -126,7 +125,7 @@ describe('InventoryList', () => {
 
   const mockStatistics = {
     totalItems: 3,
-    totalValue: 1602.50,
+    totalValue: 1602.5,
     totalCategories: 3,
     totalLocations: 3,
     inStockCount: 1,
@@ -686,7 +685,7 @@ describe('InventoryList', () => {
 
       // 验证状态标签的可访问性
       const statusTags = screen.getAllByRole('button');
-      statusTags.forEach(tag => {
+      statusTags.forEach((tag) => {
         expect(tag).toHaveAttribute('aria-label');
       });
     });

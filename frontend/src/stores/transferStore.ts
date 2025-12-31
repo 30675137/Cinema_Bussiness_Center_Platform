@@ -18,7 +18,7 @@ import {
   InventoryQueryResult,
   TransferLog,
   LocationTransferHistory,
-  TransferReportData
+  TransferReportData,
 } from '@/types/transfer';
 import { generateId, generateOrderNumber, deepClone } from '@/utils/helpers';
 
@@ -83,7 +83,10 @@ interface TransferActions {
   approveTransfer: (id: string, remarks?: string) => Promise<boolean>;
   rejectTransfer: (id: string, reason: string) => Promise<boolean>;
   startTransfer: (id: string, trackingNumber?: string) => Promise<boolean>;
-  completeTransfer: (id: string, items: Array<{ itemId: string; actualQuantity: number }>) => Promise<boolean>;
+  completeTransfer: (
+    id: string,
+    items: Array<{ itemId: string; actualQuantity: number }>
+  ) => Promise<boolean>;
   cancelTransfer: (id: string, reason: string) => Promise<boolean>;
 
   // 批量操作
@@ -123,13 +126,19 @@ interface TransferActions {
 
   // 位置操作
   fetchLocations: () => Promise<void>;
-  getInventoryByLocation: (locationId: string, productId?: string) => Promise<InventoryQueryResult[]>;
+  getInventoryByLocation: (
+    locationId: string,
+    productId?: string
+  ) => Promise<InventoryQueryResult[]>;
 
   // 日志操作
   fetchTransferLogs: (transferId: string) => Promise<void>;
 
   // 历史操作
-  fetchLocationHistory: (params?: { locationId?: string; dateRange?: [string, string] }) => Promise<void>;
+  fetchLocationHistory: (params?: {
+    locationId?: string;
+    dateRange?: [string, string];
+  }) => Promise<void>;
 
   // 报表操作
   fetchReportData: (period: string) => Promise<void>;
@@ -179,12 +188,14 @@ const generateMockTransfers = (): Transfer[] => {
     const priority = priorities[Math.floor(Math.random() * priorities.length)];
 
     const plannedDate = new Date(2024, 0, 1 + Math.floor(Math.random() * 365));
-    const actualShipDate = status === TransferStatus.IN_TRANSIT || status === TransferStatus.COMPLETED
-      ? new Date(plannedDate.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000)
-      : undefined;
-    const actualReceiveDate = status === TransferStatus.COMPLETED
-      ? new Date(actualShipDate!.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000)
-      : undefined;
+    const actualShipDate =
+      status === TransferStatus.IN_TRANSIT || status === TransferStatus.COMPLETED
+        ? new Date(plannedDate.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000)
+        : undefined;
+    const actualReceiveDate =
+      status === TransferStatus.COMPLETED
+        ? new Date(actualShipDate!.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000)
+        : undefined;
 
     const items = Array.from({ length: Math.floor(Math.random() * 5) + 1 }, (_, itemIndex) => {
       const plannedQuantity = Math.floor(Math.random() * 100) + 10;
@@ -201,15 +212,23 @@ const generateMockTransfers = (): Transfer[] => {
         skuName: `规格${itemIndex + 1}`,
         unit: ['个', '箱', '件', '套'][Math.floor(Math.random() * 4)],
         plannedQuantity,
-        actualQuantity: status === TransferStatus.COMPLETED ? Math.floor(Math.random() * plannedQuantity) : undefined,
-        receivedQuantity: status === TransferStatus.COMPLETED || status === TransferStatus.PARTIAL_RECEIVED
-          ? Math.floor(Math.random() * plannedQuantity)
-          : undefined,
+        actualQuantity:
+          status === TransferStatus.COMPLETED
+            ? Math.floor(Math.random() * plannedQuantity)
+            : undefined,
+        receivedQuantity:
+          status === TransferStatus.COMPLETED || status === TransferStatus.PARTIAL_RECEIVED
+            ? Math.floor(Math.random() * plannedQuantity)
+            : undefined,
         unitPrice,
         totalPrice: plannedQuantity * unitPrice,
         batchNumber: `B${String(Math.floor(Math.random() * 10000) + 1).padStart(5, '0')}`,
-        productionDate: new Date(2024, 0, 1 + Math.floor(Math.random() * 180)).toISOString().split('T')[0],
-        expiryDate: new Date(2025, 0, 1 + Math.floor(Math.random() * 180)).toISOString().split('T')[0],
+        productionDate: new Date(2024, 0, 1 + Math.floor(Math.random() * 180))
+          .toISOString()
+          .split('T')[0],
+        expiryDate: new Date(2025, 0, 1 + Math.floor(Math.random() * 180))
+          .toISOString()
+          .split('T')[0],
         remarks: Math.random() > 0.7 ? `备注信息${itemIndex + 1}` : undefined,
       };
     });
@@ -246,9 +265,14 @@ const generateMockTransfers = (): Transfer[] => {
       actualShipDate: actualShipDate?.toISOString().split('T')[0],
       actualReceiveDate: actualReceiveDate?.toISOString().split('T')[0],
       shippingMethod: 'company_logistics',
-      trackingNumber: Math.random() > 0.5 ? `TRK${String(Math.floor(Math.random() * 1000000000) + 1).padStart(10, '0')}` : undefined,
+      trackingNumber:
+        Math.random() > 0.5
+          ? `TRK${String(Math.floor(Math.random() * 1000000000) + 1).padStart(10, '0')}`
+          : undefined,
       carrier: Math.random() > 0.5 ? '顺丰快递' : undefined,
-      estimatedArrivalDate: actualShipDate ? new Date(actualShipDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+      estimatedArrivalDate: actualShipDate
+        ? new Date(actualShipDate.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        : undefined,
       totalAmount,
       shippingCost: Math.random() > 0.5 ? Math.floor(Math.random() * 500) + 50 : undefined,
       insuranceCost: Math.random() > 0.8 ? Math.floor(Math.random() * 200) + 20 : undefined,
@@ -257,25 +281,39 @@ const generateMockTransfers = (): Transfer[] => {
         name: `申请人${Math.floor(Math.random() * 50) + 1}`,
         department: `部门${Math.floor(Math.random() * 10) + 1}`,
       },
-      approver: status === TransferStatus.APPROVED || status === TransferStatus.COMPLETED || status === TransferStatus.IN_TRANSIT ? {
-        id: `approver-${Math.floor(Math.random() * 20) + 1}`,
-        name: `审批人${Math.floor(Math.random() * 20) + 1}`,
-        position: '经理',
-        approveTime: new Date(plannedDate.getTime() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
-        remarks: Math.random() > 0.7 ? `审批意见${index + 1}` : undefined,
-      } : undefined,
-      operator: status === TransferStatus.IN_TRANSIT || status === TransferStatus.COMPLETED ? {
-        id: `operator-${Math.floor(Math.random() * 30) + 1}`,
-        name: `操作员${Math.floor(Math.random() * 30) + 1}`,
-        position: '仓管员',
-      } : undefined,
+      approver:
+        status === TransferStatus.APPROVED ||
+        status === TransferStatus.COMPLETED ||
+        status === TransferStatus.IN_TRANSIT
+          ? {
+              id: `approver-${Math.floor(Math.random() * 20) + 1}`,
+              name: `审批人${Math.floor(Math.random() * 20) + 1}`,
+              position: '经理',
+              approveTime: new Date(
+                plannedDate.getTime() - Math.random() * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              remarks: Math.random() > 0.7 ? `审批意见${index + 1}` : undefined,
+            }
+          : undefined,
+      operator:
+        status === TransferStatus.IN_TRANSIT || status === TransferStatus.COMPLETED
+          ? {
+              id: `operator-${Math.floor(Math.random() * 30) + 1}`,
+              name: `操作员${Math.floor(Math.random() * 30) + 1}`,
+              position: '仓管员',
+            }
+          : undefined,
       items,
       attachments: [],
       remarks: Math.random() > 0.6 ? `备注信息${index + 1}` : undefined,
       createdBy: `user-${Math.floor(Math.random() * 50) + 1}`,
-      createdAt: new Date(plannedDate.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: new Date(
+        plannedDate.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000
+      ).toISOString(),
       updatedBy: `user-${Math.floor(Math.random() * 50) + 1}`,
-      updatedAt: new Date(plannedDate.getTime() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(
+        plannedDate.getTime() - Math.random() * 24 * 60 * 60 * 1000
+      ).toISOString(),
     };
   });
 };
@@ -301,33 +339,36 @@ const generateMockLocations = (): Location[] => {
  */
 const generateMockStatistics = (transfers: Transfer[]): TransferStatistics => {
   const totalTransfers = transfers.length;
-  const draftTransfers = transfers.filter(t => t.status === TransferStatus.DRAFT).length;
-  const pendingApprovalTransfers = transfers.filter(t => t.status === TransferStatus.PENDING_APPROVAL).length;
-  const inTransitTransfers = transfers.filter(t => t.status === TransferStatus.IN_TRANSIT).length;
-  const completedTransfers = transfers.filter(t => t.status === TransferStatus.COMPLETED).length;
-  const cancelledTransfers = transfers.filter(t => t.status === TransferStatus.CANCELLED).length;
+  const draftTransfers = transfers.filter((t) => t.status === TransferStatus.DRAFT).length;
+  const pendingApprovalTransfers = transfers.filter(
+    (t) => t.status === TransferStatus.PENDING_APPROVAL
+  ).length;
+  const inTransitTransfers = transfers.filter((t) => t.status === TransferStatus.IN_TRANSIT).length;
+  const completedTransfers = transfers.filter((t) => t.status === TransferStatus.COMPLETED).length;
+  const cancelledTransfers = transfers.filter((t) => t.status === TransferStatus.CANCELLED).length;
 
   const transfersByType = {
-    warehouseToWarehouse: transfers.filter(t => t.type === TransferType.WAREHOUSE_TO_WAREHOUSE).length,
-    storeToStore: transfers.filter(t => t.type === TransferType.STORE_TO_STORE).length,
-    warehouseToStore: transfers.filter(t => t.type === TransferType.WAREHOUSE_TO_STORE).length,
-    storeToWarehouse: transfers.filter(t => t.type === TransferType.STORE_TO_WAREHOUSE).length,
-    emergency: transfers.filter(t => t.type === TransferType.EMERGENCY).length,
+    warehouseToWarehouse: transfers.filter((t) => t.type === TransferType.WAREHOUSE_TO_WAREHOUSE)
+      .length,
+    storeToStore: transfers.filter((t) => t.type === TransferType.STORE_TO_STORE).length,
+    warehouseToStore: transfers.filter((t) => t.type === TransferType.WAREHOUSE_TO_STORE).length,
+    storeToWarehouse: transfers.filter((t) => t.type === TransferType.STORE_TO_WAREHOUSE).length,
+    emergency: transfers.filter((t) => t.type === TransferType.EMERGENCY).length,
   };
 
   const transfersByStatus = {
-    draft: transfers.filter(t => t.status === TransferStatus.DRAFT).length,
-    pendingApproval: transfers.filter(t => t.status === TransferStatus.PENDING_APPROVAL).length,
-    approved: transfers.filter(t => t.status === TransferStatus.APPROVED).length,
-    inTransit: transfers.filter(t => t.status === TransferStatus.IN_TRANSIT).length,
-    completed: transfers.filter(t => t.status === TransferStatus.COMPLETED).length,
-    cancelled: transfers.filter(t => t.status === TransferStatus.CANCELLED).length,
+    draft: transfers.filter((t) => t.status === TransferStatus.DRAFT).length,
+    pendingApproval: transfers.filter((t) => t.status === TransferStatus.PENDING_APPROVAL).length,
+    approved: transfers.filter((t) => t.status === TransferStatus.APPROVED).length,
+    inTransit: transfers.filter((t) => t.status === TransferStatus.IN_TRANSIT).length,
+    completed: transfers.filter((t) => t.status === TransferStatus.COMPLETED).length,
+    cancelled: transfers.filter((t) => t.status === TransferStatus.CANCELLED).length,
   };
 
   const totalAmount = transfers.reduce((sum, t) => sum + t.totalAmount, 0);
   const currentMonth = new Date().getMonth();
   const monthAmount = transfers
-    .filter(t => new Date(t.createdAt).getMonth() === currentMonth)
+    .filter((t) => new Date(t.createdAt).getMonth() === currentMonth)
     .reduce((sum, t) => sum + t.totalAmount, 0);
   const averageAmount = totalTransfers > 0 ? totalAmount / totalTransfers : 0;
 
@@ -358,14 +399,14 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 获取调拨列表
       fetchTransfers: async (params?: TransferQueryParams) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
           // 模拟API调用
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           let transfers = generateMockTransfers();
 
@@ -374,42 +415,43 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             const { search, status, type, priority, dateRange } = params;
 
             if (search) {
-              transfers = transfers.filter(t =>
-                t.transferNumber.toLowerCase().includes(search.toLowerCase()) ||
-                t.title.toLowerCase().includes(search.toLowerCase()) ||
-                t.fromLocation.name.toLowerCase().includes(search.toLowerCase()) ||
-                t.toLocation.name.toLowerCase().includes(search.toLowerCase())
+              transfers = transfers.filter(
+                (t) =>
+                  t.transferNumber.toLowerCase().includes(search.toLowerCase()) ||
+                  t.title.toLowerCase().includes(search.toLowerCase()) ||
+                  t.fromLocation.name.toLowerCase().includes(search.toLowerCase()) ||
+                  t.toLocation.name.toLowerCase().includes(search.toLowerCase())
               );
             }
 
             if (status) {
               if (Array.isArray(status)) {
-                transfers = transfers.filter(t => status.includes(t.status));
+                transfers = transfers.filter((t) => status.includes(t.status));
               } else {
-                transfers = transfers.filter(t => t.status === status);
+                transfers = transfers.filter((t) => t.status === status);
               }
             }
 
             if (type) {
               if (Array.isArray(type)) {
-                transfers = transfers.filter(t => type.includes(t.type));
+                transfers = transfers.filter((t) => type.includes(t.type));
               } else {
-                transfers = transfers.filter(t => t.type === type);
+                transfers = transfers.filter((t) => t.type === type);
               }
             }
 
             if (priority) {
               if (Array.isArray(priority)) {
-                transfers = transfers.filter(t => priority.includes(t.priority));
+                transfers = transfers.filter((t) => priority.includes(t.priority));
               } else {
-                transfers = transfers.filter(t => t.priority === priority);
+                transfers = transfers.filter((t) => t.priority === priority);
               }
             }
 
             if (dateRange) {
               const [startDate, endDate] = dateRange;
-              transfers = transfers.filter(t =>
-                t.plannedDate >= startDate && t.plannedDate <= endDate
+              transfers = transfers.filter(
+                (t) => t.plannedDate >= startDate && t.plannedDate <= endDate
               );
             }
           }
@@ -435,13 +477,13 @@ export const useTransferStore = create<TransferState & TransferActions>()(
           const endIndex = startIndex + pageSize;
           transfers = transfers.slice(startIndex, endIndex);
 
-          set(state => {
+          set((state) => {
             state.transfers = transfers;
             state.queryParams = { ...state.queryParams, ...params };
             state.loading = false;
           });
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '获取调拨列表失败';
             state.loading = false;
           });
@@ -450,30 +492,30 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 获取调拨详情
       fetchTransferById: async (id: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const transfers = generateMockTransfers();
-          const transfer = transfers.find(t => t.id === id);
+          const transfer = transfers.find((t) => t.id === id);
 
           if (transfer) {
-            set(state => {
+            set((state) => {
               state.currentTransfer = transfer;
               state.loading = false;
             });
           } else {
-            set(state => {
+            set((state) => {
               state.error = '调拨不存在';
               state.loading = false;
             });
           }
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '获取调拨详情失败';
             state.loading = false;
           });
@@ -482,20 +524,20 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 创建调拨
       createTransfer: async (data: TransferFormData) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const id = generateId();
           const transferNumber = generateOrderNumber('TR');
 
           const locations = get().locations;
-          const fromLocation = locations.find(l => l.id === data.fromLocationId);
-          const toLocation = locations.find(l => l.id === data.toLocationId);
+          const fromLocation = locations.find((l) => l.id === data.fromLocationId);
+          const toLocation = locations.find((l) => l.id === data.toLocationId);
 
           if (!fromLocation || !toLocation) {
             throw new Error('位置信息无效');
@@ -554,14 +596,14 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             updatedAt: new Date().toISOString(),
           };
 
-          set(state => {
+          set((state) => {
             state.transfers.unshift(newTransfer);
             state.loading = false;
           });
 
           return id;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '创建调拨失败';
             state.loading = false;
           });
@@ -571,21 +613,21 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 更新调拨
       updateTransfer: async (id: string, data: Partial<TransferFormData>) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          set(state => {
-            const index = state.transfers.findIndex(t => t.id === id);
+          set((state) => {
+            const index = state.transfers.findIndex((t) => t.id === id);
             if (index !== -1) {
               const transfer = state.transfers[index];
 
               if (data.fromLocationId) {
-                const location = state.locations.find(l => l.id === data.fromLocationId);
+                const location = state.locations.find((l) => l.id === data.fromLocationId);
                 if (location) {
                   transfer.fromLocation = {
                     type: location.type,
@@ -600,7 +642,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
               }
 
               if (data.toLocationId) {
-                const location = state.locations.find(l => l.id === data.toLocationId);
+                const location = state.locations.find((l) => l.id === data.toLocationId);
                 if (location) {
                   transfer.toLocation = {
                     type: location.type,
@@ -635,7 +677,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '更新调拨失败';
             state.loading = false;
           });
@@ -645,23 +687,25 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 删除调拨
       deleteTransfer: async (id: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            state.transfers = state.transfers.filter(t => t.id !== id);
-            state.selectedTransferIds = state.selectedTransferIds.filter(selectedId => selectedId !== id);
+          set((state) => {
+            state.transfers = state.transfers.filter((t) => t.id !== id);
+            state.selectedTransferIds = state.selectedTransferIds.filter(
+              (selectedId) => selectedId !== id
+            );
             state.loading = false;
           });
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '删除调拨失败';
             state.loading = false;
           });
@@ -671,16 +715,16 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 提交调拨审批
       submitTransfer: async (id: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               transfer.status = TransferStatus.PENDING_APPROVAL;
               transfer.updatedAt = new Date().toISOString();
@@ -690,7 +734,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '提交调拨失败';
             state.loading = false;
           });
@@ -700,16 +744,16 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 审批通过
       approveTransfer: async (id: string, remarks?: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               transfer.status = TransferStatus.APPROVED;
               transfer.approver = {
@@ -726,7 +770,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '审批调拨失败';
             state.loading = false;
           });
@@ -736,16 +780,16 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 审批拒绝
       rejectTransfer: async (id: string, reason: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               transfer.status = TransferStatus.REJECTED;
               transfer.approver = {
@@ -762,7 +806,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '拒绝调拨失败';
             state.loading = false;
           });
@@ -772,16 +816,16 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 开始调拨
       startTransfer: async (id: string, trackingNumber?: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               transfer.status = TransferStatus.IN_TRANSIT;
               transfer.actualShipDate = new Date().toISOString().split('T')[0];
@@ -798,7 +842,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '开始调拨失败';
             state.loading = false;
           });
@@ -807,21 +851,24 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       },
 
       // 完成调拨
-      completeTransfer: async (id: string, items: Array<{ itemId: string; actualQuantity: number }>) => {
-        set(state => {
+      completeTransfer: async (
+        id: string,
+        items: Array<{ itemId: string; actualQuantity: number }>
+      ) => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               // 更新实际收货数量
               items.forEach(({ itemId, actualQuantity }) => {
-                const item = transfer.items.find(i => i.id === itemId);
+                const item = transfer.items.find((i) => i.id === itemId);
                 if (item) {
                   item.actualQuantity = actualQuantity;
                   item.receivedQuantity = actualQuantity;
@@ -837,7 +884,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '完成调拨失败';
             state.loading = false;
           });
@@ -847,16 +894,16 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 取消调拨
       cancelTransfer: async (id: string, reason: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          set(state => {
-            const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            const transfer = state.transfers.find((t) => t.id === id);
             if (transfer) {
               transfer.status = TransferStatus.CANCELLED;
               transfer.remarks = reason;
@@ -867,7 +914,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '取消调拨失败';
             state.loading = false;
           });
@@ -877,23 +924,23 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 批量删除
       batchDelete: async (ids: string[]) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          set(state => {
-            state.transfers = state.transfers.filter(t => !ids.includes(t.id));
+          set((state) => {
+            state.transfers = state.transfers.filter((t) => !ids.includes(t.id));
             state.selectedTransferIds = [];
             state.loading = false;
           });
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '批量删除失败';
             state.loading = false;
           });
@@ -903,17 +950,17 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 批量审批
       batchApprove: async (ids: string[]) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          set(state => {
-            ids.forEach(id => {
-              const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            ids.forEach((id) => {
+              const transfer = state.transfers.find((t) => t.id === id);
               if (transfer) {
                 transfer.status = TransferStatus.APPROVED;
                 transfer.approver = {
@@ -931,7 +978,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '批量审批失败';
             state.loading = false;
           });
@@ -941,17 +988,17 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 批量拒绝
       batchReject: async (ids: string[], reason: string) => {
-        set(state => {
+        set((state) => {
           state.loading = true;
           state.error = null;
         });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          set(state => {
-            ids.forEach(id => {
-              const transfer = state.transfers.find(t => t.id === id);
+          set((state) => {
+            ids.forEach((id) => {
+              const transfer = state.transfers.find((t) => t.id === id);
               if (transfer) {
                 transfer.status = TransferStatus.REJECTED;
                 transfer.approver = {
@@ -970,7 +1017,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
           return true;
         } catch (error) {
-          set(state => {
+          set((state) => {
             state.error = '批量拒绝失败';
             state.loading = false;
           });
@@ -980,7 +1027,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 选择调拨
       selectTransfer: (id: string) => {
-        set(state => {
+        set((state) => {
           const index = state.selectedTransferIds.indexOf(id);
           if (index === -1) {
             state.selectedTransferIds.push(id);
@@ -992,35 +1039,35 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 全选
       selectAllTransfers: () => {
-        set(state => {
-          state.selectedTransferIds = state.transfers.map(t => t.id);
+        set((state) => {
+          state.selectedTransferIds = state.transfers.map((t) => t.id);
         });
       },
 
       // 清空选择
       clearSelection: () => {
-        set(state => {
+        set((state) => {
           state.selectedTransferIds = [];
         });
       },
 
       // 设置过滤条件
       setFilters: (filters: TransferFilters) => {
-        set(state => {
+        set((state) => {
           Object.assign(state.queryParams, filters);
         });
       },
 
       // 设置查询参数
       setQueryParams: (params: Partial<TransferQueryParams>) => {
-        set(state => {
+        set((state) => {
           Object.assign(state.queryParams, params);
         });
       },
 
       // 清空过滤条件
       clearFilters: () => {
-        set(state => {
+        set((state) => {
           state.queryParams = {
             page: 1,
             pageSize: 10,
@@ -1032,21 +1079,21 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 设置加载状态
       setLoading: (loading: boolean) => {
-        set(state => {
+        set((state) => {
           state.loading = loading;
         });
       },
 
       // 设置错误信息
       setError: (error: string | null) => {
-        set(state => {
+        set((state) => {
           state.error = error;
         });
       },
 
       // 显示创建表单
       showCreateForm: () => {
-        set(state => {
+        set((state) => {
           state.showForm = true;
           state.formMode = 'create';
           state.formInitialData = null;
@@ -1055,7 +1102,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 显示编辑表单
       showEditForm: (transfer: Transfer) => {
-        set(state => {
+        set((state) => {
           state.showForm = true;
           state.formMode = 'edit';
           state.formInitialData = {
@@ -1068,7 +1115,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             plannedDate: transfer.plannedDate,
             shippingMethod: transfer.shippingMethod,
             estimatedArrivalDate: transfer.estimatedArrivalDate,
-            items: transfer.items.map(item => ({
+            items: transfer.items.map((item) => ({
               productId: item.productId,
               productName: item.productName,
               productCode: item.productCode,
@@ -1090,7 +1137,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 隐藏表单
       hideForm: () => {
-        set(state => {
+        set((state) => {
           state.showForm = false;
           state.formMode = 'create';
           state.formInitialData = null;
@@ -1099,7 +1146,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 显示详情
       showDetail: (transferId: string) => {
-        set(state => {
+        set((state) => {
           state.showDetail = true;
           state.detailTransferId = transferId;
         });
@@ -1107,7 +1154,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 隐藏详情
       hideDetail: () => {
-        set(state => {
+        set((state) => {
           state.showDetail = false;
           state.detailTransferId = null;
           state.currentTransfer = null;
@@ -1116,7 +1163,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 显示审批对话框
       showApprovalDialog: (transferId: string) => {
-        set(state => {
+        set((state) => {
           state.showApproval = true;
           state.approvalTransferId = transferId;
         });
@@ -1124,7 +1171,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
 
       // 隐藏审批对话框
       hideApprovalDialog: () => {
-        set(state => {
+        set((state) => {
           state.showApproval = false;
           state.approvalTransferId = null;
         });
@@ -1133,12 +1180,12 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       // 获取统计数据
       fetchStatistics: async () => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const transfers = generateMockTransfers();
           const statistics = generateMockStatistics(transfers);
 
-          set(state => {
+          set((state) => {
             state.statistics = statistics;
           });
         } catch (error) {
@@ -1149,11 +1196,11 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       // 获取位置列表
       fetchLocations: async () => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
           const locations = generateMockLocations();
 
-          set(state => {
+          set((state) => {
             state.locations = locations;
           });
         } catch (error) {
@@ -1164,7 +1211,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       // 根据位置获取库存
       getInventoryByLocation: async (locationId: string, productId?: string) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const inventoryData: InventoryQueryResult[] = Array.from({ length: 20 }, (_, index) => ({
             productId: `product-${index + 1}`,
@@ -1180,11 +1227,13 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             unit: ['个', '箱', '件', '套'][Math.floor(Math.random() * 4)],
             location: locationId,
             batchNumber: `B${String(index + 1).padStart(5, '0')}`,
-            expiryDate: new Date(2025, 0, 1 + Math.floor(Math.random() * 180)).toISOString().split('T')[0],
+            expiryDate: new Date(2025, 0, 1 + Math.floor(Math.random() * 180))
+              .toISOString()
+              .split('T')[0],
           }));
 
           if (productId) {
-            return inventoryData.filter(item => item.productId === productId);
+            return inventoryData.filter((item) => item.productId === productId);
           }
 
           return inventoryData;
@@ -1197,7 +1246,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       // 获取操作日志
       fetchTransferLogs: async (transferId: string) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 300));
 
           const logs: TransferLog[] = [
             {
@@ -1218,7 +1267,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             },
           ];
 
-          set(state => {
+          set((state) => {
             state.transferLogs = logs;
           });
         } catch (error) {
@@ -1227,9 +1276,12 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       },
 
       // 获取位置变更历史
-      fetchLocationHistory: async (params?: { locationId?: string; dateRange?: [string, string] }) => {
+      fetchLocationHistory: async (params?: {
+        locationId?: string;
+        dateRange?: [string, string];
+      }) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const history: LocationTransferHistory[] = Array.from({ length: 50 }, (_, index) => ({
             id: `history-${index + 1}`,
@@ -1239,20 +1291,22 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             transferId: `transfer-${Math.floor(Math.random() * 100) + 1}`,
             transferNumber: generateOrderNumber('TR'),
             quantity: Math.floor(Math.random() * 100) + 10,
-            transferDate: new Date(2024, 0, 1 + Math.floor(Math.random() * 365)).toISOString().split('T')[0],
+            transferDate: new Date(2024, 0, 1 + Math.floor(Math.random() * 365))
+              .toISOString()
+              .split('T')[0],
             operator: `操作员${Math.floor(Math.random() * 50) + 1}`,
           }));
 
           if (params?.locationId) {
-            const filtered = history.filter(h =>
-              h.fromLocation === params.locationId || h.toLocation === params.locationId
+            const filtered = history.filter(
+              (h) => h.fromLocation === params.locationId || h.toLocation === params.locationId
             );
 
-            set(state => {
+            set((state) => {
               state.locationHistory = filtered;
             });
           } else {
-            set(state => {
+            set((state) => {
               state.locationHistory = history;
             });
           }
@@ -1264,7 +1318,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
       // 获取报表数据
       fetchReportData: async (period: string) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 800));
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
           const reportData: TransferReportData = {
             period,
@@ -1296,7 +1350,7 @@ export const useTransferStore = create<TransferState & TransferActions>()(
             completionRate: 87.5,
           };
 
-          set(state => {
+          set((state) => {
             state.reportData = reportData;
           });
         } catch (error) {
@@ -1321,45 +1375,48 @@ export const useTransferStore = create<TransferState & TransferActions>()(
  */
 export const useTransferSelectors = {
   // 获取过滤后的调拨列表
-  filteredTransfers: () => useTransferStore(state => state.transfers),
+  filteredTransfers: () => useTransferStore((state) => state.transfers),
 
   // 获取选中的调拨
-  selectedTransfers: () => useTransferStore(state =>
-    state.transfers.filter(t => state.selectedTransferIds.includes(t.id))
-  ),
+  selectedTransfers: () =>
+    useTransferStore((state) =>
+      state.transfers.filter((t) => state.selectedTransferIds.includes(t.id))
+    ),
 
   // 获取统计信息
-  statistics: () => useTransferStore(state => state.statistics),
+  statistics: () => useTransferStore((state) => state.statistics),
 
   // 获取加载状态
-  isLoading: () => useTransferStore(state => state.loading),
+  isLoading: () => useTransferStore((state) => state.loading),
 
   // 获取错误信息
-  error: () => useTransferStore(state => state.error),
+  error: () => useTransferStore((state) => state.error),
 
   // 获取表单状态
-  formState: () => useTransferStore(state => ({
-    showForm: state.showForm,
-    formMode: state.formMode,
-    formInitialData: state.formInitialData,
-  })),
+  formState: () =>
+    useTransferStore((state) => ({
+      showForm: state.showForm,
+      formMode: state.formMode,
+      formInitialData: state.formInitialData,
+    })),
 
   // 获取详情状态
-  detailState: () => useTransferStore(state => ({
-    showDetail: state.showDetail,
-    detailTransferId: state.detailTransferId,
-    currentTransfer: state.currentTransfer,
-  })),
+  detailState: () =>
+    useTransferStore((state) => ({
+      showDetail: state.showDetail,
+      detailTransferId: state.detailTransferId,
+      currentTransfer: state.currentTransfer,
+    })),
 
   // 获取位置列表
-  locations: () => useTransferStore(state => state.locations),
+  locations: () => useTransferStore((state) => state.locations),
 
   // 获取操作日志
-  transferLogs: () => useTransferStore(state => state.transferLogs),
+  transferLogs: () => useTransferStore((state) => state.transferLogs),
 
   // 获取位置变更历史
-  locationHistory: () => useTransferStore(state => state.locationHistory),
+  locationHistory: () => useTransferStore((state) => state.locationHistory),
 
   // 获取报表数据
-  reportData: () => useTransferStore(state => state.reportData),
+  reportData: () => useTransferStore((state) => state.reportData),
 };

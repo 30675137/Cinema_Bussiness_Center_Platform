@@ -9,29 +9,32 @@
 
 ## 执行概要
 
-| 指标 | 结果 |
-|------|------|
-| 总测试用例数 | 8 |
-| 通过 | 7 |
-| 失败 | 1 |
-| 成功率 | 87.5% |
+| 指标         | 结果  |
+| ------------ | ----- |
+| 总测试用例数 | 8     |
+| 通过         | 7     |
+| 失败         | 1     |
+| 成功率       | 87.5% |
 
 ---
 
 ## 测试环境配置
 
 ### 后端服务
+
 - **框架**: Spring Boot 3.3.5
 - **端口**: 8080
 - **状态**: ✅ 运行正常
 - **API响应**: 可访问，但部分端点返回 500 错误
 
 ### 前端服务
+
 - **框架**: React 19.2.0 + Vite 7.2.7
 - **端口**: 3000
 - **状态**: ⚠️ 部分页面异常
 
 ### 浏览器
+
 - **Chromium**: Desktop Chrome
 
 ---
@@ -39,29 +42,35 @@
 ## 测试用例详情
 
 ### ✅ TC-UI-002: 库存预占管理页面 - 预占概览
+
 **状态**: 通过
 **测试路径**: `/inventory/reservation`
 **验证点**:
+
 - 统计卡片渲染
 - 预占概览数据展示
 
 ---
 
 ### ✅ TC-UI-003: 订单出品确认（模拟）
+
 **状态**: 通过
 **测试路径**: `/orders/pending`
 **验证点**:
+
 - 页面可访问性
 - 页面标题验证
 
 ---
 
 ### ❌ TC-UI-001: 查看库存预占状态
+
 **状态**: 失败
 **测试路径**: `/inventory/trace`
 **失败原因**: 页面渲染错误 - 表格元素未找到
 
 **错误详情**:
+
 ```
 TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
 =========================== logs ===========================
@@ -70,6 +79,7 @@ waiting for locator('table.ant-table') to be visible
 
 **根因分析**:
 页面抛出 JavaScript 运行时错误，导致页面无法正常渲染：
+
 ```
 SyntaxError: The requested module '/src/types/inventory.ts' does not provide an export named 'CurrentInventory'
 ```
@@ -77,9 +87,11 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ---
 
 ### ✅ TC-UI-005: 库存流水查询
+
 **状态**: 通过
 **测试路径**: `/inventory/trace`
 **验证点**:
+
 - Tab标签切换
 - 流水表格渲染
 
@@ -88,9 +100,11 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ---
 
 ### ✅ TC-UI-API-001: 测试库存API响应
+
 **状态**: 通过
 **API**: `GET /api/inventory?limit=5`
 **验证点**:
+
 - HTTP 200 响应
 - JSON 格式正确
 - 数据结构验证
@@ -99,9 +113,11 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ---
 
 ### ✅ TC-UI-API-002: 测试BOM扣减API（模拟）
+
 **状态**: 通过（记录模式）
 **API**: `POST /api/inventory/deductions`
 **测试数据**:
+
 ```json
 {
   "orderId": "playwright-test-order-001",
@@ -120,23 +136,28 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ---
 
 ### ✅ TC-UI-ERROR-001: 测试库存不足错误提示
+
 **状态**: 通过（记录模式）
 **API**: `POST /api/inventory/deductions`
 **测试数据**: 超大数量 (999999)
 **验证点**:
+
 - 错误状态码 (4xx)
 - 错误消息格式
 
 ---
 
 ### ✅ TC-UI-NAVIGATION-001: 测试页面导航
+
 **状态**: 通过
 **测试页面**:
+
 - `/` - 首页
 - `/inventory/trace` - 库存追溯
 - `/inventory/reservation` - 库存预占
 
 **验证点**:
+
 - 页面标题
 - JavaScript 错误监控
 
@@ -151,16 +172,19 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 **复现路径**: 访问 `/inventory/trace`
 
 **错误信息**:
+
 ```
 SyntaxError: The requested module '/src/types/inventory.ts' does not provide an export named 'CurrentInventory'
 ```
 
 **根本原因**:
+
 1. **错误的类型导入源**: 多个文件尝试从 `@/services/inventoryService` 导入类型，但这些类型应该从 `@/types/inventory` 导入
 2. **错误的导入语法**: `import { createQueries, createQuery }` - 这些不是 `@tanstack/react-query` 的正确导出
 3. **Vite 缓存问题**: 即使修复了导入，Vite 缓存仍然可能保留旧的错误状态
 
 **已尝试的修复**:
+
 1. ✅ 修复 `/src/store/inventoryStore.ts` 的类型导入
 2. ✅ 修复 `/src/stores/inventoryStore.ts` 的类型导入
 3. ✅ 移除错误的 `createQueries` 和 `createQuery` 导入
@@ -168,6 +192,7 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 5. ❌ 页面仍然报错（可能还有其他文件未修复）
 
 **待完成的修复步骤**:
+
 1. 搜索所有使用 `@/services/inventoryService` 导入类型的文件
 2. 将类型导入改为从 `@/types/inventory`
 3. 确保所有 hooks 文件（`useInventoryMovements.ts`, `useInventoryData.ts`, `useInventoryAdjustment.ts`）也正确导入
@@ -184,6 +209,7 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 **已修复**: ✅
 **修复内容**:
 在 `App.tsx` 中添加了缺失的路由配置:
+
 ```typescript
 <Route path="/inventory/trace" element={<InventoryTrace />} />
 <Route path="/inventory/reservation" element={<InventoryReservation />} />
@@ -198,6 +224,7 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 **API**: `POST /api/inventory/deductions`
 
 **响应示例**:
+
 ```json
 {
   "success": false,
@@ -214,10 +241,12 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ## 测试artifacts
 
 ### 截图
+
 - ✅ `test-results/tc-ui-001-inventory-list.png` - 失败用例截图
 - ✅ 其他测试用例截图已生成
 
 ### 日志
+
 - 后端日志: `/tmp/backend-p005.log`
 - 前端日志: `/tmp/frontend-p005-clean.log`
 
@@ -226,15 +255,18 @@ SyntaxError: The requested module '/src/types/inventory.ts' does not provide an 
 ## 结论与建议
 
 ### 通过的功能
+
 1. ✅ 库存 API 查询功能正常
 2. ✅ 订单页面导航正常
 3. ✅ 库存预占页面路由已修复
 
 ### 阻塞问题
+
 1. 🔴 **库存追溯页面完全不可用** - 由于类型导入错误，页面无法渲染
 2. 🟡 **BOM扣减API异常** - 后端返回500错误
 
 ### 下一步行动
+
 1. **高优先级**: 修复 BUG-001 - 库存追溯页面类型导入错误
    - 系统性检查所有库存相关文件的类型导入
    - 清理重复的 store 文件（`/store/` vs `/stores/`）

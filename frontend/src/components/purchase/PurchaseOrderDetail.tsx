@@ -21,7 +21,7 @@ import {
   Statistic,
   Progress,
   List,
-  Avatar
+  Avatar,
 } from 'antd';
 import {
   EditOutlined,
@@ -35,7 +35,7 @@ import {
   UserOutlined,
   ShopOutlined,
   CalendarOutlined,
-  DollarOutlined
+  DollarOutlined,
 } from '@ant-design/icons';
 import { PurchaseOrder, PurchaseOrderStatus } from '@/types/purchase';
 import { formatCurrency, formatDate, formatDateTime } from '@/utils/formatters';
@@ -55,7 +55,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
   orderId,
   onEdit,
   onBack,
-  showActions = true
+  showActions = true,
 }) => {
   const [order, setOrder] = useState<PurchaseOrder | null>(null);
   const [loading, setLoading] = useState(false);
@@ -83,8 +83,8 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         orderDate: '2024-01-15T10:30:00Z',
         expectedDeliveryDate: '2024-01-25T00:00:00Z',
         approvedAt: '2024-01-16T14:20:00Z',
-        totalAmount: 15680.00,
-        budgetAmount: 20000.00,
+        totalAmount: 15680.0,
+        budgetAmount: 20000.0,
         items: [
           {
             id: 'item_001',
@@ -94,13 +94,13 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             specifications: '50kg/袋， premium grade',
             unit: '袋',
             quantity: 20,
-            unitPrice: 280.00,
+            unitPrice: 280.0,
             discountRate: 5,
             taxRate: 0.13,
-            discountAmount: 280.00,
-            taxAmount: 672.00,
-            subtotal: 5320.00,
-            remarks: '优质原料，生产日期2024年1月'
+            discountAmount: 280.0,
+            taxAmount: 672.0,
+            subtotal: 5320.0,
+            remarks: '优质原料，生产日期2024年1月',
           },
           {
             id: 'item_002',
@@ -110,13 +110,13 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             specifications: '20L/桶，食品级',
             unit: '桶',
             quantity: 15,
-            unitPrice: 180.00,
+            unitPrice: 180.0,
             discountRate: 3,
             taxRate: 0.13,
-            discountAmount: 81.00,
+            discountAmount: 81.0,
             taxAmount: 341.46,
-            subtotal: 2619.00,
-            remarks: '耐高温，适合连续爆制'
+            subtotal: 2619.0,
+            remarks: '耐高温，适合连续爆制',
           },
           {
             id: 'item_003',
@@ -126,13 +126,13 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             specifications: '10kg/箱，甜味适中',
             unit: '箱',
             quantity: 30,
-            unitPrice: 150.00,
+            unitPrice: 150.0,
             discountRate: 0,
             taxRate: 0.13,
             discountAmount: 0,
-            taxAmount: 585.00,
-            subtotal: 4500.00,
-            remarks: '经典焦糖口味'
+            taxAmount: 585.0,
+            subtotal: 4500.0,
+            remarks: '经典焦糖口味',
           },
           {
             id: 'item_004',
@@ -142,14 +142,14 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             specifications: '5kg/袋，细颗粒',
             unit: '袋',
             quantity: 25,
-            unitPrice: 80.00,
+            unitPrice: 80.0,
             discountRate: 0,
             taxRate: 0.13,
             discountAmount: 0,
-            taxAmount: 260.00,
-            subtotal: 2000.00,
-            remarks: '低钠健康配方'
-          }
+            taxAmount: 260.0,
+            subtotal: 2000.0,
+            remarks: '低钠健康配方',
+          },
         ],
         supplier: {
           id: 'supplier_002',
@@ -157,41 +157,41 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
           contactPerson: '李经理',
           phone: '13800138002',
           email: 'li.manager@shanghai-food.com',
-          address: '上海市浦东新区食品工业园区88号'
+          address: '上海市浦东新区食品工业园区88号',
         },
         department: {
           id: 'dept_001',
           name: '采购部',
-          manager: '王经理'
+          manager: '王经理',
         },
         requester: {
           id: 'user_001',
           name: '张采购员',
           email: 'zhang.caigou@cinema.com',
-          phone: '13900139001'
+          phone: '13900139001',
         },
         approver: {
           id: 'user_002',
           name: '刘总监',
-          email: 'liuzongjian@cinema.com'
+          email: 'liuzongjian@cinema.com',
         },
         attachments: [
           {
             name: '供应商资质证书.pdf',
             url: '/files/supplier-cert.pdf',
             size: 2048576,
-            type: 'application/pdf'
+            type: 'application/pdf',
           },
           {
             name: '产品报价单.xlsx',
             url: '/files/quotation.xlsx',
             size: 1024000,
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          }
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          },
         ],
         remarks: '请在预期交付日期前完成配送，确保产品质量符合标准。配送时请提供产品质检报告。',
         createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-16T14:20:00Z'
+        updatedAt: '2024-01-16T14:20:00Z',
       };
 
       setOrder(mockOrder);
@@ -210,17 +210,11 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
       width: 300,
       render: (record: PurchaseOrder['items'][0]) => (
         <div>
-          <div style={{ fontWeight: 600, marginBottom: '4px' }}>
-            {record.productName}
-          </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            编码: {record.productCode}
-          </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            规格: {record.specifications}
-          </div>
+          <div style={{ fontWeight: 600, marginBottom: '4px' }}>{record.productName}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>编码: {record.productCode}</div>
+          <div style={{ fontSize: '12px', color: '#666' }}>规格: {record.specifications}</div>
         </div>
-      )
+      ),
     },
     {
       title: '数量',
@@ -232,14 +226,14 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
           <div>{quantity}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>{record.unit}</div>
         </div>
-      )
+      ),
     },
     {
       title: '单价',
       dataIndex: 'unitPrice',
       key: 'unitPrice',
       width: 120,
-      render: (price: number) => formatCurrency(price)
+      render: (price: number) => formatCurrency(price),
     },
     {
       title: '折扣',
@@ -252,7 +246,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             -{formatCurrency(record.discountAmount)}
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '税额',
@@ -266,7 +260,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             {((record: any) => record.taxRate * 100).toFixed(0)}%
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '小计',
@@ -277,8 +271,8 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         <Text strong style={{ color: '#1890ff' }}>
           {formatCurrency(subtotal)}
         </Text>
-      )
-    }
+      ),
+    },
   ];
 
   // 操作记录时间线
@@ -292,7 +286,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
           </div>
         </div>
       ),
-      dot: <ClockCircleOutlined style={{ fontSize: '16px' }} />
+      dot: <ClockCircleOutlined style={{ fontSize: '16px' }} />,
     },
     {
       children: (
@@ -307,19 +301,14 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         </div>
       ),
       dot: <CheckCircleOutlined style={{ fontSize: '16px', color: '#52c41a' }} />,
-      color: 'green'
-    }
+      color: 'green',
+    },
   ];
 
   if (!order) {
     return (
       <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Alert
-          message="订单不存在"
-          description="未找到指定的采购订单信息"
-          type="error"
-          showIcon
-        />
+        <Alert message="订单不存在" description="未找到指定的采购订单信息" type="error" showIcon />
         {onBack && (
           <Button
             type="primary"
@@ -340,7 +329,14 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
   return (
     <div style={{ padding: '24px' }}>
       {/* 头部操作栏 */}
-      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
           {onBack && (
             <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
@@ -354,16 +350,10 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
 
         {showActions && (
           <Space>
-            <Button
-              icon={<ClockCircleOutlined />}
-              onClick={() => setTimelineVisible(true)}
-            >
+            <Button icon={<ClockCircleOutlined />} onClick={() => setTimelineVisible(true)}>
               操作记录
             </Button>
-            <Button
-              icon={<PrinterOutlined />}
-              onClick={() => window.print()}
-            >
+            <Button icon={<PrinterOutlined />} onClick={() => window.print()}>
               打印
             </Button>
             {onEdit && (
@@ -387,12 +377,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
             <Statistic
               title="订单状态"
               value={order.status}
-              formatter={() => (
-                <StatusTag
-                  status={order.status}
-                  type="purchase"
-                />
-              )}
+              formatter={() => <StatusTag status={order.status} type="purchase" />}
             />
           </Card>
         </Col>
@@ -409,9 +394,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         <Col span={6}>
           <Card>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ marginBottom: '8px', fontSize: '14px', color: '#666' }}>
-                交付进度
-              </div>
+              <div style={{ marginBottom: '8px', fontSize: '14px', color: '#666' }}>交付进度</div>
               <Progress
                 percent={progressPercentage}
                 status={remainingDays <= 0 ? 'exception' : remainingDays <= 2 ? 'active' : 'normal'}
@@ -421,8 +404,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
                   ? `剩余 ${remainingDays} 天`
                   : remainingDays === 0
                     ? '今日到期'
-                    : `已逾期 ${Math.abs(remainingDays)} 天`
-                }
+                    : `已逾期 ${Math.abs(remainingDays)} 天`}
               </div>
             </div>
           </Card>
@@ -431,11 +413,11 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
           <Card>
             <Statistic
               title="预算使用率"
-              value={((order.totalAmount / order.budgetAmount) * 100)}
+              value={(order.totalAmount / order.budgetAmount) * 100}
               precision={1}
               suffix="%"
               valueStyle={{
-                color: order.totalAmount > order.budgetAmount ? '#cf1322' : '#3f8600'
+                color: order.totalAmount > order.budgetAmount ? '#cf1322' : '#3f8600',
               }}
             />
           </Card>
@@ -447,23 +429,17 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         <Row gutter={24}>
           <Col span={12}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="订单编号">
-                {order.orderNumber}
-              </Descriptions.Item>
-              <Descriptions.Item label="订单标题">
-                {order.title}
-              </Descriptions.Item>
-              <Descriptions.Item label="订单描述">
-                {order.description}
-              </Descriptions.Item>
-              <Descriptions.Item label="订单日期">
-                {formatDate(order.orderDate)}
-              </Descriptions.Item>
+              <Descriptions.Item label="订单编号">{order.orderNumber}</Descriptions.Item>
+              <Descriptions.Item label="订单标题">{order.title}</Descriptions.Item>
+              <Descriptions.Item label="订单描述">{order.description}</Descriptions.Item>
+              <Descriptions.Item label="订单日期">{formatDate(order.orderDate)}</Descriptions.Item>
               <Descriptions.Item label="预期交付日期">
                 <span style={{ color: remainingDays <= 0 ? '#ff4d4f' : undefined }}>
                   {formatDate(order.expectedDeliveryDate)}
                   {remainingDays <= 0 && (
-                    <Tag color="red" style={{ marginLeft: '8px' }}>逾期</Tag>
+                    <Tag color="red" style={{ marginLeft: '8px' }}>
+                      逾期
+                    </Tag>
                   )}
                 </span>
               </Descriptions.Item>
@@ -472,19 +448,27 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
           <Col span={12}>
             <Descriptions column={1} size="small">
               <Descriptions.Item label="优先级">
-                <Tag color={
-                  order.priority === 'URGENT' ? 'magenta' :
-                  order.priority === 'HIGH' ? 'red' :
-                  order.priority === 'MEDIUM' ? 'orange' : 'blue'
-                }>
-                  {order.priority === 'URGENT' ? '紧急' :
-                   order.priority === 'HIGH' ? '高' :
-                   order.priority === 'MEDIUM' ? '中' : '低'}
+                <Tag
+                  color={
+                    order.priority === 'URGENT'
+                      ? 'magenta'
+                      : order.priority === 'HIGH'
+                        ? 'red'
+                        : order.priority === 'MEDIUM'
+                          ? 'orange'
+                          : 'blue'
+                  }
+                >
+                  {order.priority === 'URGENT'
+                    ? '紧急'
+                    : order.priority === 'HIGH'
+                      ? '高'
+                      : order.priority === 'MEDIUM'
+                        ? '中'
+                        : '低'}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="采购部门">
-                {order.department?.name}
-              </Descriptions.Item>
+              <Descriptions.Item label="采购部门">{order.department?.name}</Descriptions.Item>
               <Descriptions.Item label="申请人员">
                 <Space>
                   <Avatar size="small" icon={<UserOutlined />} />
@@ -522,35 +506,22 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         <Row gutter={24}>
           <Col span={12}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="供应商名称">
-                {order.supplier?.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="联系人">
-                {order.supplier?.contactPerson}
-              </Descriptions.Item>
-              <Descriptions.Item label="联系电话">
-                {order.supplier?.phone}
-              </Descriptions.Item>
+              <Descriptions.Item label="供应商名称">{order.supplier?.name}</Descriptions.Item>
+              <Descriptions.Item label="联系人">{order.supplier?.contactPerson}</Descriptions.Item>
+              <Descriptions.Item label="联系电话">{order.supplier?.phone}</Descriptions.Item>
             </Descriptions>
           </Col>
           <Col span={12}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="邮箱地址">
-                {order.supplier?.email}
-              </Descriptions.Item>
-              <Descriptions.Item label="地址">
-                {order.supplier?.address}
-              </Descriptions.Item>
+              <Descriptions.Item label="邮箱地址">{order.supplier?.email}</Descriptions.Item>
+              <Descriptions.Item label="地址">{order.supplier?.address}</Descriptions.Item>
             </Descriptions>
           </Col>
         </Row>
       </Card>
 
       {/* 订单明细 */}
-      <Card
-        title="订单明细"
-        style={{ marginBottom: '16px' }}
-      >
+      <Card title="订单明细" style={{ marginBottom: '16px' }}>
         <Table
           dataSource={order.items}
           columns={itemColumns}
@@ -608,7 +579,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
                     onClick={() => window.open(item.url)}
                   >
                     下载
-                  </Button>
+                  </Button>,
                 ]}
               >
                 <List.Item.Meta
@@ -636,7 +607,7 @@ const PurchaseOrderDetail: React.FC<PurchaseOrderDetailProps> = ({
         footer={[
           <Button key="close" onClick={() => setTimelineVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={600}
       >

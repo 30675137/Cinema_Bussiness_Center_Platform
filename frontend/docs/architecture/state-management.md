@@ -128,11 +128,14 @@ const usePersistentSettings = () => {
     return saved ? JSON.parse(saved) : defaultSettings;
   });
 
-  const updateSettings = useCallback((newSettings: Partial<UserSettings>) => {
-    const updated = { ...settings, ...newSettings };
-    setSettings(updated);
-    localStorage.setItem('userSettings', JSON.stringify(updated));
-  }, [settings]);
+  const updateSettings = useCallback(
+    (newSettings: Partial<UserSettings>) => {
+      const updated = { ...settings, ...newSettings };
+      setSettings(updated);
+      localStorage.setItem('userSettings', JSON.stringify(updated));
+    },
+    [settings]
+  );
 
   return { settings, updateSettings };
 };
@@ -144,10 +147,13 @@ const useFormDraft = (formKey: string) => {
     return saved ? JSON.parse(saved) : {};
   });
 
-  const saveDraft = useCallback((data: any) => {
-    setDraft(data);
-    localStorage.setItem(`formDraft_${formKey}`, JSON.stringify(data));
-  }, [formKey]);
+  const saveDraft = useCallback(
+    (data: any) => {
+      setDraft(data);
+      localStorage.setItem(`formDraft_${formKey}`, JSON.stringify(data));
+    },
+    [formKey]
+  );
 
   const clearDraft = useCallback(() => {
     setDraft({});
@@ -202,7 +208,7 @@ export const useProducts = (params?: ProductQueryParams) => {
     select: (data) => ({
       ...data,
       // 数据转换
-      data: data.data.map(product => ({
+      data: data.data.map((product) => ({
         ...product,
         // 计算属性
         statusText: getStatusText(product.status),
@@ -315,9 +321,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // 侧边栏
   sidebarCollapsed: false,
-  toggleSidebar: () => set((state) => ({
-    sidebarCollapsed: !state.sidebarCollapsed
-  })),
+  toggleSidebar: () =>
+    set((state) => ({
+      sidebarCollapsed: !state.sidebarCollapsed,
+    })),
 
   // 加载状态
   globalLoading: false,
@@ -325,12 +332,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // 消息通知
   notifications: [],
-  addNotification: (notification) => set((state) => ({
-    notifications: [...state.notifications, { ...notification, id: Date.now() }],
-  })),
-  removeNotification: (id) => set((state) => ({
-    notifications: state.notifications.filter(n => n.id !== id),
-  })),
+  addNotification: (notification) =>
+    set((state) => ({
+      notifications: [...state.notifications, { ...notification, id: Date.now() }],
+    })),
+  removeNotification: (id) =>
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id),
+    })),
 }));
 
 // 商品状态
@@ -505,21 +514,15 @@ const useProductOperations = () => {
     mutationFn: productService.updateProduct,
     onSuccess: (updatedProduct) => {
       // 更新单个商品缓存
-      queryClient.setQueryData(
-        ['product', updatedProduct.id],
-        updatedProduct
-      );
+      queryClient.setQueryData(['product', updatedProduct.id], updatedProduct);
 
       // 更新列表中的商品
-      queryClient.setQueriesData(
-        { queryKey: ['products'] },
-        (old: any) => ({
-          ...old,
-          data: old.data.map((product: Product) =>
-            product.id === updatedProduct.id ? updatedProduct : product
-          ),
-        })
-      );
+      queryClient.setQueriesData({ queryKey: ['products'] }, (old: any) => ({
+        ...old,
+        data: old.data.map((product: Product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        ),
+      }));
     },
   });
 
@@ -563,13 +566,15 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 export const useErrorStore = create<ErrorStore>((set) => ({
   errors: [],
 
-  addError: (error) => set((state) => ({
-    errors: [...state.errors, { ...error, id: Date.now() }],
-  })),
+  addError: (error) =>
+    set((state) => ({
+      errors: [...state.errors, { ...error, id: Date.now() }],
+    })),
 
-  removeError: (id) => set((state) => ({
-    errors: state.errors.filter(e => e.id !== id),
-  })),
+  removeError: (id) =>
+    set((state) => ({
+      errors: state.errors.filter((e) => e.id !== id),
+    })),
 
   clearErrors: () => set({ errors: [] }),
 }));
@@ -578,18 +583,21 @@ export const useErrorStore = create<ErrorStore>((set) => ({
 export const useErrorHandler = () => {
   const { addError } = useErrorStore();
 
-  const handleError = useCallback((error: unknown) => {
-    const errorObj = {
-      message: error instanceof Error ? error.message : '未知错误',
-      type: error instanceof Error ? error.constructor.name : 'UnknownError',
-      timestamp: new Date().toISOString(),
-    };
+  const handleError = useCallback(
+    (error: unknown) => {
+      const errorObj = {
+        message: error instanceof Error ? error.message : '未知错误',
+        type: error instanceof Error ? error.constructor.name : 'UnknownError',
+        timestamp: new Date().toISOString(),
+      };
 
-    addError(errorObj);
+      addError(errorObj);
 
-    // 控制台输出
-    console.error('Error handled:', error);
-  }, [addError]);
+      // 控制台输出
+      console.error('Error handled:', error);
+    },
+    [addError]
+  );
 
   return { handleError };
 };
@@ -622,15 +630,18 @@ const useCacheCleanup = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      // 清理过期的查询缓存
-      queryClient.removeQueries({
-        predicate: (query) => {
-          const age = Date.now() - query.state.dataUpdatedAt;
-          return age > 60 * 60 * 1000; // 1小时
-        },
-      });
-    }, 30 * 60 * 1000); // 每30分钟清理一次
+    const interval = setInterval(
+      () => {
+        // 清理过期的查询缓存
+        queryClient.removeQueries({
+          predicate: (query) => {
+            const age = Date.now() - query.state.dataUpdatedAt;
+            return age > 60 * 60 * 1000; // 1小时
+          },
+        });
+      },
+      30 * 60 * 1000
+    ); // 每30分钟清理一次
 
     return () => clearInterval(interval);
   }, [queryClient]);

@@ -12,14 +12,21 @@ import React, { useState, useMemo } from 'react';
 import { Card, Typography, Space, message } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import { useStoresQuery } from '../stores/hooks/useStoresQuery';
-import { useAllStoresReservationSettings, useUpdateStoreReservationSettings, useBatchUpdateStoreReservationSettings } from './hooks/useReservationSettingsQuery';
+import {
+  useAllStoresReservationSettings,
+  useUpdateStoreReservationSettings,
+  useBatchUpdateStoreReservationSettings,
+} from './hooks/useReservationSettingsQuery';
 import ReservationSettingsTable from './components/ReservationSettingsTable';
 import ReservationSettingsModal from './components/ReservationSettingsModal';
 import BatchReservationSettingsModal from './components/BatchReservationSettingsModal';
 import StoreSearch from '../stores/components/StoreSearch';
 import StatusFilter from '../stores/components/StatusFilter';
 import type { Store } from '../stores/types/store.types';
-import type { StoreReservationSettings, BatchUpdateResult } from './types/reservation-settings.types';
+import type {
+  StoreReservationSettings,
+  BatchUpdateResult,
+} from './types/reservation-settings.types';
 import type { ReservationSettingsFormData } from './types/reservation-settings.schema';
 
 const { Title } = Typography;
@@ -40,7 +47,9 @@ const StoreReservationSettingsPage: React.FC = () => {
   // State for edit modal
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingStore, setEditingStore] = useState<Store | null>(null);
-  const [editingSettings, setEditingSettings] = useState<StoreReservationSettings | undefined>(undefined);
+  const [editingSettings, setEditingSettings] = useState<StoreReservationSettings | undefined>(
+    undefined
+  );
 
   // State for batch edit modal
   const [batchModalVisible, setBatchModalVisible] = useState(false);
@@ -48,13 +57,11 @@ const StoreReservationSettingsPage: React.FC = () => {
   const [batchUpdateResult, setBatchUpdateResult] = useState<BatchUpdateResult | null>(null);
 
   // Fetch stores data with status filter
-  const { 
-    data: stores = [], 
+  const {
+    data: stores = [],
     isLoading: storesLoading,
     error: storesError,
-  } = useStoresQuery(
-    statusFilter ? { status: statusFilter } : undefined
-  );
+  } = useStoresQuery(statusFilter ? { status: statusFilter } : undefined);
 
   // Extract store IDs for fetching reservation settings
   const storeIds = useMemo(() => stores.map((store) => store.id), [stores]);
@@ -81,9 +88,7 @@ const StoreReservationSettingsPage: React.FC = () => {
   }, [storesError, settingsError]);
 
   // Mutation hook for updating settings
-  const updateMutation = useUpdateStoreReservationSettings(
-    editingStore?.id || ''
-  );
+  const updateMutation = useUpdateStoreReservationSettings(editingStore?.id || '');
 
   // Mutation hook for batch updating settings
   const batchUpdateMutation = useBatchUpdateStoreReservationSettings();
@@ -94,9 +99,7 @@ const StoreReservationSettingsPage: React.FC = () => {
       return stores;
     }
     const lowerSearchName = searchName.toLowerCase();
-    return stores.filter((store: Store) =>
-      store.name.toLowerCase().includes(lowerSearchName)
-    );
+    return stores.filter((store: Store) => store.name.toLowerCase().includes(lowerSearchName));
   }, [stores, searchName]);
 
   // Apply frontend pagination
@@ -148,12 +151,12 @@ const StoreReservationSettingsPage: React.FC = () => {
     }
 
     await updateMutation.mutateAsync(data);
-    
+
     // Close modal and refresh data
     setEditModalVisible(false);
     setEditingStore(null);
     setEditingSettings(undefined);
-    
+
     // Refetch settings to update the table
     await refetchSettings();
   };
@@ -193,7 +196,9 @@ const StoreReservationSettingsPage: React.FC = () => {
           refetchSettings();
         }, 2000);
       } else if (result.successCount > 0) {
-        message.warning(`批量更新完成：成功 ${result.successCount} 个，失败 ${result.failureCount} 个`);
+        message.warning(
+          `批量更新完成：成功 ${result.successCount} 个，失败 ${result.failureCount} 个`
+        );
         // Keep modal open to show failure details
       } else {
         message.error(`批量更新失败：所有 ${result.failureCount} 个门店更新失败`);
@@ -214,9 +219,7 @@ const StoreReservationSettingsPage: React.FC = () => {
 
   // Get selected store names for display
   const selectedStoreNames = useMemo(() => {
-    return stores
-      .filter((store) => selectedStoreIds.includes(store.id))
-      .map((store) => store.name);
+    return stores.filter((store) => selectedStoreIds.includes(store.id)).map((store) => store.name);
   }, [stores, selectedStoreIds]);
 
   return (
@@ -234,15 +237,8 @@ const StoreReservationSettingsPage: React.FC = () => {
       {/* Search and Filter Section */}
       <Card style={{ marginBottom: 16 }}>
         <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <StoreSearch
-            onSearch={handleSearch}
-            onReset={handleReset}
-            loading={isLoading}
-          />
-          <StatusFilter
-            value={statusFilter}
-            onChange={handleStatusChange}
-          />
+          <StoreSearch onSearch={handleSearch} onReset={handleReset} loading={isLoading} />
+          <StatusFilter value={statusFilter} onChange={handleStatusChange} />
         </Space>
       </Card>
 
@@ -291,4 +287,3 @@ const StoreReservationSettingsPage: React.FC = () => {
 };
 
 export default StoreReservationSettingsPage;
-

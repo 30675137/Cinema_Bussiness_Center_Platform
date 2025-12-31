@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Cascader, Spin, TreeSelect } from 'antd'
-import type { CascaderProps, TreeSelectProps } from 'antd'
-import type { Category } from '@/types/spu'
+import React, { useState, useEffect, useMemo } from 'react';
+import { Cascader, Spin, TreeSelect } from 'antd';
+import type { CascaderProps, TreeSelectProps } from 'antd';
+import type { Category } from '@/types/spu';
 
 interface CategorySelectorProps extends Omit<CascaderProps, 'options' | 'children'> {
-  categories?: Category[]
-  loading?: boolean
-  placeholder?: string
-  allowClear?: boolean
-  showSearch?: boolean
-  changeOnSelect?: boolean
-  maxLevel?: number
+  categories?: Category[];
+  loading?: boolean;
+  placeholder?: string;
+  allowClear?: boolean;
+  showSearch?: boolean;
+  changeOnSelect?: boolean;
+  maxLevel?: number;
   fieldNames?: {
-    label?: string
-    value?: string
-    children?: string
-  }
+    label?: string;
+    value?: string;
+    children?: string;
+  };
 }
 
 /**
@@ -38,51 +38,51 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   onChange,
   ...restProps
 }) => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   // 构建级联数据结构
   const cascaderOptions = useMemo(() => {
     const buildOptions = (categories: Category[], level = 1): any[] => {
-      return categories.map(category => {
+      return categories.map((category) => {
         const option: any = {
           [fieldNames.label!]: category.name,
           [fieldNames.value!]: category.id,
           isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
-        }
+        };
 
         // 添加额外信息
-        option.disabled = category.status === 'inactive'
-        option.category = category
+        option.disabled = category.status === 'inactive';
+        option.category = category;
 
         if (category.children && category.children.length > 0 && level < maxLevel) {
-          option[fieldNames.children!] = buildOptions(category.children, level + 1)
+          option[fieldNames.children!] = buildOptions(category.children, level + 1);
         }
 
-        return option
-      })
-    }
+        return option;
+      });
+    };
 
-    return buildOptions(categories)
-  }, [categories, maxLevel, fieldNames])
+    return buildOptions(categories);
+  }, [categories, maxLevel, fieldNames]);
 
   // 自定义显示渲染
   const displayRender = (labels: string[], selectedOptions: any[]) => {
-    return labels.join(' / ')
-  }
+    return labels.join(' / ');
+  };
 
   // 处理值变化
   const handleChange = (value: (string | number)[], selectedOptions: any[]) => {
     if (onChange) {
-      onChange(value, selectedOptions)
+      onChange(value, selectedOptions);
     }
-  }
+  };
 
   // 自定义过滤函数
   const filter = (inputValue: string, path: any[]) => {
-    return path.some(option =>
+    return path.some((option) =>
       option[fieldNames.label].toLowerCase().includes(inputValue.toLowerCase())
-    )
-  }
+    );
+  };
 
   return (
     <Cascader
@@ -96,27 +96,27 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       displayRender={displayRender}
       filter={filter}
       loading={externalLoading || loading}
-      notFoundContent={(externalLoading || loading) ? <Spin size="small" /> : '暂无分类数据'}
+      notFoundContent={externalLoading || loading ? <Spin size="small" /> : '暂无分类数据'}
       expandIcon={(props) => {
-        return <span {...props}>{props.isLeaf ? '' : '▶'}</span>
+        return <span {...props}>{props.isLeaf ? '' : '▶'}</span>;
       }}
       {...restProps}
     />
-  )
-}
+  );
+};
 
 /**
  * 分类树形选择器
  */
 interface CategoryTreeSelectorProps extends Omit<TreeSelectProps, 'treeData' | 'children'> {
-  categories?: Category[]
-  loading?: boolean
-  placeholder?: string
-  allowClear?: boolean
-  showSearch?: boolean
-  multiple?: boolean
-  maxLevel?: number
-  checkStrictly?: boolean
+  categories?: Category[];
+  loading?: boolean;
+  placeholder?: string;
+  allowClear?: boolean;
+  showSearch?: boolean;
+  multiple?: boolean;
+  maxLevel?: number;
+  checkStrictly?: boolean;
 }
 
 export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
@@ -135,32 +135,33 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
   // 构建树形数据结构
   const treeData = useMemo(() => {
     const buildTreeData = (categories: Category[], level = 1): any[] => {
-      return categories.map(category => ({
+      return categories.map((category) => ({
         title: category.name,
         value: category.id,
         key: category.id,
         disabled: category.status === 'inactive',
         isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
         category,
-        children: category.children && category.children.length > 0 && level < maxLevel
-          ? buildTreeData(category.children, level + 1)
-          : undefined,
-      }))
-    }
+        children:
+          category.children && category.children.length > 0 && level < maxLevel
+            ? buildTreeData(category.children, level + 1)
+            : undefined,
+      }));
+    };
 
-    return buildTreeData(categories)
-  }, [categories, maxLevel])
+    return buildTreeData(categories);
+  }, [categories, maxLevel]);
 
   // 处理值变化
   const handleChange = (value: any, label: any, extra: any) => {
     if (onChange) {
-      onChange(value, label, extra)
+      onChange(value, label, extra);
     }
-  }
+  };
 
   // 自定义节点渲染
   const treeNodeRender = (nodeData: any) => {
-    const category = nodeData.category
+    const category = nodeData.category;
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>{nodeData.title}</span>
@@ -178,8 +179,8 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
           </span>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <TreeSelect
@@ -201,18 +202,18 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
       titleRender={treeNodeRender}
       {...restProps}
     />
-  )
-}
+  );
+};
 
 /**
  * 分类路径显示组件
  */
 interface CategoryPathProps {
-  categoryId?: string
-  categories?: Category[]
-  separator?: string
-  showCode?: boolean
-  maxLength?: number
+  categoryId?: string;
+  categories?: Category[];
+  separator?: string;
+  showCode?: boolean;
+  maxLength?: number;
 }
 
 export const CategoryPath: React.FC<CategoryPathProps> = ({
@@ -220,77 +221,83 @@ export const CategoryPath: React.FC<CategoryPathProps> = ({
   categories = [],
   separator = ' / ',
   showCode = false,
-  maxLength
+  maxLength,
 }) => {
   const categoryPath = useMemo(() => {
-    const findPath = (categories: Category[], targetId: string, path: Category[] = []): Category[] | null => {
+    const findPath = (
+      categories: Category[],
+      targetId: string,
+      path: Category[] = []
+    ): Category[] | null => {
       for (const category of categories) {
         if (category.id === targetId) {
-          return [...path, category]
+          return [...path, category];
         }
         if (category.children && category.children.length > 0) {
-          const result = findPath(category.children, targetId, [...path, category])
+          const result = findPath(category.children, targetId, [...path, category]);
           if (result) {
-            return result
+            return result;
           }
         }
       }
-      return null
-    }
+      return null;
+    };
 
-    return findPath(categories, categoryId!)
-  }, [categories, categoryId])
+    return findPath(categories, categoryId!);
+  }, [categories, categoryId]);
 
   if (!categoryId || !categoryPath || categoryPath.length === 0) {
-    return <span style={{ color: '#999' }}>未选择分类</span>
+    return <span style={{ color: '#999' }}>未选择分类</span>;
   }
 
-  const pathText = categoryPath.map((category, index) => {
-    let text = category.name
-    if (showCode && category.code) {
-      text += ` (${category.code})`
-    }
-    return text
-  }).join(separator)
+  const pathText = categoryPath
+    .map((category, index) => {
+      let text = category.name;
+      if (showCode && category.code) {
+        text += ` (${category.code})`;
+      }
+      return text;
+    })
+    .join(separator);
 
   if (maxLength && pathText.length > maxLength) {
-    return (
-      <span title={pathText}>
-        {pathText.substring(0, maxLength - 3)}...
-      </span>
-    )
+    return <span title={pathText}>{pathText.substring(0, maxLength - 3)}...</span>;
   }
 
-  return <span>{pathText}</span>
-}
+  return <span>{pathText}</span>;
+};
 
 /**
  * 分类面包屑组件
  */
 export const CategoryBreadcrumb: React.FC<CategoryPathProps> = (props) => {
-  const { categoryId, categories = [], separator = ' / ' } = props
+  const { categoryId, categories = [], separator = ' / ' } = props;
 
   const categoryPath = useMemo(() => {
-    const findPath = (categories: Category[], targetId: string, path: Category[] = []): Category[] | null => {
+    const findPath = (
+      categories: Category[],
+      targetId: string,
+      path: Category[] = []
+    ): Category[] | null => {
       for (const category of categories) {
         if (category.id === targetId) {
-          return [...path, category]
+          return [...path, category];
         }
         if (category.children && category.children.length > 0) {
-          const result = findPath(category.children, targetId, [...path, category])
+          const result = findPath(category.children, targetId, [...path, category]);
           if (result) {
-            return result
+            return result;
           }
         }
       }
-      return null
-    }
+      return null;
+    };
 
-    return categoryId ? findPath(categories, categoryId) : null
-  }, [categories, categoryId])
+    return categoryId ? findPath(categories, categoryId) : null;
+  }, [categories, categoryId]);
 
   if (!categoryPath || categoryPath.length === 0) {
-    return <span style={{ color: '#999' }}>未选择分类</span>
+    return <span style={{ color: '#999' }}>未选择分类</span>;
   }
 
   return (
@@ -313,7 +320,7 @@ export const CategoryBreadcrumb: React.FC<CategoryPathProps> = (props) => {
         </React.Fragment>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default CategorySelector
+export default CategorySelector;

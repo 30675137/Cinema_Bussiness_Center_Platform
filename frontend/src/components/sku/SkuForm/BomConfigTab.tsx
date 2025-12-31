@@ -5,7 +5,13 @@
  */
 import React, { useMemo } from 'react';
 import { Alert, Divider, Typography } from 'antd';
-import type { Control, FieldErrors, UseFormSetValue, UseFormGetValues, UseFormWatch } from 'react-hook-form';
+import type {
+  Control,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormGetValues,
+  UseFormWatch,
+} from 'react-hook-form';
 import { BomConfiguration, type AvailableComponent } from '@/components/shared/BomConfiguration';
 import { SkuType, SkuStatus } from '@/types/sku';
 import type { SkuFormValues } from './schema';
@@ -47,11 +53,7 @@ export const BomConfigTab: React.FC<BomConfigTabProps> = ({
   // 筛选出原料和包材类型的SKU作为可选组件
   const availableComponents: AvailableComponent[] = useMemo(() => {
     return allSkus
-      .filter(
-        (sku) =>
-          sku.skuType === SkuType.RAW_MATERIAL ||
-          sku.skuType === SkuType.PACKAGING
-      )
+      .filter((sku) => sku.skuType === SkuType.RAW_MATERIAL || sku.skuType === SkuType.PACKAGING)
       .map((sku) => ({
         id: sku.id,
         name: sku.name,

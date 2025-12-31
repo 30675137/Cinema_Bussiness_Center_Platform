@@ -50,7 +50,12 @@ const PackageTierForm: React.FC<PackageTierFormProps> = ({
     mode: 'onChange',
   });
 
-  const { control, handleSubmit, reset, formState: { errors, isValid } } = form;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = form;
 
   // 编辑时同步数据
   useEffect(() => {
@@ -123,11 +128,7 @@ const PackageTierForm: React.FC<PackageTierFormProps> = ({
             name="name"
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="如：标准套餐、豪华套餐"
-                maxLength={50}
-              />
+              <Input {...field} placeholder="如：标准套餐、豪华套餐" maxLength={50} />
             )}
           />
         </Form.Item>

@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 审批工具函数
- * 
+ *
  * 提供库存调整审批相关的工具函数。
  * 实现 T045 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
@@ -17,7 +17,7 @@ export const APPROVAL_THRESHOLD = 1000;
 
 /**
  * 判断是否需要审批
- * 
+ *
  * @param quantity 调整数量
  * @param unitPrice 单价
  * @returns 是否需要审批
@@ -29,7 +29,7 @@ export function requiresApproval(quantity: number, unitPrice: number): boolean {
 
 /**
  * 计算调整金额
- * 
+ *
  * @param quantity 调整数量
  * @param unitPrice 单价
  * @returns 调整金额

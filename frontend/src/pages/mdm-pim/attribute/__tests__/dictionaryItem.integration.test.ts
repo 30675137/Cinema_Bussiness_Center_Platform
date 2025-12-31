@@ -1,6 +1,6 @@
 /**
  * Integration tests for dictionary item CRUD operations via MSW
- * 
+ *
  * Tests the full flow from API calls through service layer
  */
 
@@ -64,7 +64,7 @@ describe('Dictionary Item Integration Tests', () => {
 
       expect(activeResponse.success).toBe(true);
       if (activeResponse.success) {
-        const allActive = activeResponse.data.every(item => item.status === 'active');
+        const allActive = activeResponse.data.every((item) => item.status === 'active');
         expect(allActive).toBe(true);
       }
     });
@@ -272,5 +272,3 @@ describe('Dictionary Item Integration Tests', () => {
     });
   });
 });
-
-

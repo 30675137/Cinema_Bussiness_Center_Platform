@@ -27,7 +27,12 @@ import {
   CoffeeOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAppStore, useCurrentUser, useSidebarCollapsed, useBreadcrumbs } from '@/stores/appStore';
+import {
+  useAppStore,
+  useCurrentUser,
+  useSidebarCollapsed,
+  useBreadcrumbs,
+} from '@/stores/appStore';
 
 const { Header, Sider, Content } = Layout;
 
@@ -98,7 +103,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           key: '/products/spu',
           label: 'P001-SPU 管理',
         },
-        
+
         {
           key: '/products/sku',
           label: 'P001-SKU 管理',
@@ -270,7 +275,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           key: '/inventory/approvals',
           label: 'I005-库存调整审批',
         },
-        
+
         {
           key: '/inventory/operations',
           label: '入库/出库/报损/退库操作',
@@ -487,11 +492,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     const pathname = location.pathname;
     const openKeys: string[] = [];
 
-    menuItems.forEach(item => {
+    menuItems.forEach((item) => {
       if (item.children) {
-        const hasActiveChild = item.children.some(child =>
-          pathname.startsWith(child.key)
-        );
+        const hasActiveChild = item.children.some((child) => pathname.startsWith(child.key));
         if (hasActiveChild) {
           openKeys.push(item.key);
         }
@@ -650,11 +653,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               arrow
             >
               <Space style={{ cursor: 'pointer' }}>
-                <Avatar
-                  size="small"
-                  icon={<UserOutlined />}
-                  src={currentUser?.avatar}
-                />
+                <Avatar size="small" icon={<UserOutlined />} src={currentUser?.avatar} />
                 <span>{currentUser?.name || '用户'}</span>
               </Space>
             </Dropdown>

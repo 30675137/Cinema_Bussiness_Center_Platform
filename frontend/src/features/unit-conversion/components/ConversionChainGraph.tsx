@@ -39,9 +39,7 @@ interface ConversionChainGraphProps {
   title?: string;
 }
 
-const ConversionChainGraph: React.FC<ConversionChainGraphProps> = ({
-  title = '换算路径计算',
-}) => {
+const ConversionChainGraph: React.FC<ConversionChainGraphProps> = ({ title = '换算路径计算' }) => {
   const [fromUnit, setFromUnit] = useState('');
   const [toUnit, setToUnit] = useState('');
   const [roundingCategory, setRoundingCategory] = useState<UnitCategory>('VOLUME');
@@ -86,11 +84,7 @@ const ConversionChainGraph: React.FC<ConversionChainGraphProps> = ({
           onKeyPress={handleKeyPress}
           style={{ width: 120 }}
         />
-        <Button
-          icon={<SwapOutlined />}
-          onClick={handleSwap}
-          title="交换单位"
-        />
+        <Button icon={<SwapOutlined />} onClick={handleSwap} title="交换单位" />
         <Input
           placeholder="目标单位"
           value={toUnit}
@@ -134,8 +128,8 @@ const ConversionChainGraph: React.FC<ConversionChainGraphProps> = ({
                           index === 0
                             ? 'green'
                             : index === result.path.length - 1
-                            ? 'blue'
-                            : 'default'
+                              ? 'blue'
+                              : 'default'
                         }
                         style={{ fontSize: 14, padding: '4px 8px' }}
                       >

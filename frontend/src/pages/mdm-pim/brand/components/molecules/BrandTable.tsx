@@ -17,7 +17,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
   loading = false,
   onView,
   onEdit,
-  onStatusChange
+  onStatusChange,
 }) => {
   // 格式化时间
   const formatDate = (dateString: string) => {
@@ -41,17 +41,8 @@ const BrandTable: React.FC<BrandTableProps> = ({
       className: 'brand-name-column',
       render: (text: string, record: Brand) => (
         <div className="brand-name-cell">
-          <BrandLogo
-            src={record.logoUrl}
-            alt={record.name}
-            size="small"
-            className="brand-logo"
-          />
-          <span
-            className="brand-name-text"
-            data-testid="brand-name"
-            title={text}
-          >
+          <BrandLogo src={record.logoUrl} alt={record.name} size="small" className="brand-logo" />
+          <span className="brand-name-text" data-testid="brand-name" title={text}>
             {text}
           </span>
         </div>
@@ -65,11 +56,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       width: 120,
       className: 'english-name-column',
       render: (text: string) => (
-        <span
-          className="english-name-text"
-          data-testid="english-name"
-          title={text}
-        >
+        <span className="english-name-text" data-testid="english-name" title={text}>
           {text || '-'}
         </span>
       ),
@@ -82,10 +69,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       width: 120,
       className: 'brand-code-column',
       render: (text: string) => (
-        <span
-          className="brand-code-text"
-          data-testid="brand-code"
-        >
+        <span className="brand-code-text" data-testid="brand-code">
           {text}
         </span>
       ),
@@ -97,9 +81,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       key: 'brandType',
       width: 100,
       className: 'brand-type-column',
-      render: (type: string) => (
-        <BrandTypeTag type={type as any} />
-      ),
+      render: (type: string) => <BrandTypeTag type={type as any} />,
       filters: [
         { text: '自有品牌', value: 'own' },
         { text: '代理品牌', value: 'agency' },
@@ -116,10 +98,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       className: 'primary-category-column',
       render: (categories: string[]) => (
         <Tooltip title={formatCategories(categories)}>
-          <span
-            className="primary-category-text"
-            data-testid="primary-category"
-          >
+          <span className="primary-category-text" data-testid="primary-category">
             {formatCategories(categories)}
           </span>
         </Tooltip>
@@ -131,9 +110,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       key: 'status',
       width: 80,
       className: 'status-column',
-      render: (status: string) => (
-        <BrandStatusTag status={status as any} />
-      ),
+      render: (status: string) => <BrandStatusTag status={status as any} />,
       filters: [
         { text: '启用', value: 'enabled' },
         { text: '停用', value: 'disabled' },
@@ -148,10 +125,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
       width: 150,
       className: 'created-time-column',
       render: (date: string) => (
-        <span
-          className="created-time-text"
-          data-testid="created-time"
-        >
+        <span className="created-time-text" data-testid="created-time">
           {formatDate(date)}
         </span>
       ),
@@ -168,11 +142,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
         const rowKey = `brand-${record.id}`;
 
         return (
-          <div
-            className="brand-table-row"
-            data-testid="brand-table-row"
-            data-row-key={rowKey}
-          >
+          <div className="brand-table-row" data-testid="brand-table-row" data-row-key={rowKey}>
             <Space size="small" className="brand-actions" data-testid="brand-actions">
               <Tooltip title="查看详情">
                 <Button
@@ -186,13 +156,13 @@ const BrandTable: React.FC<BrandTableProps> = ({
 
               <Tooltip title="编辑">
                 <Button
-              type="text"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)}
-              data-testid="edit-button"
-            />
-          </Tooltip>
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => onEdit(record)}
+                  data-testid="edit-button"
+                />
+              </Tooltip>
 
               {/* 状态管理按钮 */}
               <BrandStatusActions
@@ -213,10 +183,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
   if (!loading && brands.length === 0) {
     return (
       <div className="brand-table-empty" data-testid="brand-empty-state">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="暂无品牌数据"
-        >
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无品牌数据">
           <Button type="primary">创建品牌</Button>
         </Empty>
       </div>

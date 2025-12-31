@@ -95,9 +95,7 @@ export const CategoryCascader: React.FC<CategoryCascaderProps> = ({
    */
   const filter: CascaderProps<CategoryOption>['showSearch'] = {
     filter: (inputValue, path) =>
-      path.some((option) =>
-        option.label.toLowerCase().includes(inputValue.toLowerCase())
-      ),
+      path.some((option) => option.label.toLowerCase().includes(inputValue.toLowerCase())),
   };
 
   return (

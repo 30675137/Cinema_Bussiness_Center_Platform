@@ -3,26 +3,26 @@
  * 订单状态徽章组件 - 使用 Ant Design Tag 展示订单状态
  */
 
-import React from 'react'
-import { Tag } from 'antd'
-import { OrderStatus } from '../types/order'
-import { formatOrderStatus, getOrderStatusColor } from '../utils/formatOrderStatus'
+import React from 'react';
+import { Tag } from 'antd';
+import { OrderStatus } from '../types/order';
+import { formatOrderStatus, getOrderStatusColor } from '../utils/formatOrderStatus';
 
 export interface OrderStatusBadgeProps {
   /**
    * 订单状态
    */
-  status: OrderStatus
+  status: OrderStatus;
 
   /**
    * 额外的 CSS 类名
    */
-  className?: string
+  className?: string;
 
   /**
    * 是否显示描述信息（Tooltip）
    */
-  showDescription?: boolean
+  showDescription?: boolean;
 }
 
 /**
@@ -37,17 +37,17 @@ export interface OrderStatusBadgeProps {
  */
 export const OrderStatusBadge: React.FC<OrderStatusBadgeProps> = React.memo(
   ({ status, className, showDescription = false }) => {
-    const label = formatOrderStatus(status)
-    const color = getOrderStatusColor(status)
+    const label = formatOrderStatus(status);
+    const color = getOrderStatusColor(status);
 
     return (
       <Tag color={color} className={className}>
         {label}
       </Tag>
-    )
+    );
   }
-)
+);
 
-OrderStatusBadge.displayName = 'OrderStatusBadge'
+OrderStatusBadge.displayName = 'OrderStatusBadge';
 
-export default OrderStatusBadge
+export default OrderStatusBadge;

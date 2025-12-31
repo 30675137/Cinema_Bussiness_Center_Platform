@@ -27,7 +27,7 @@ interface EditableCardProps extends Omit<CardProps, 'title'> {
 
 /**
  * 可编辑卡片组件
- * 
+ *
  * @example
  * <EditableCard
  *   title="套餐信息"

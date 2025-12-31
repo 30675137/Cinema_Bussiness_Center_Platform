@@ -42,7 +42,9 @@ test.describe('收藏菜单功能', () => {
     if (itemCount > 0) {
       // 检查第一个菜单项是否有收藏按钮
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 收藏按钮可能默认隐藏，只在悬停时显示
       await firstMenuItem.hover();
@@ -52,7 +54,9 @@ test.describe('收藏菜单功能', () => {
         await expect(favoriteButton).toBeVisible();
 
         // 检查收藏按钮的图标（应该是空心的星星）
-        const favoriteIcon = favoriteButton.locator('.anticon-star, .anticon-star-o, [class*="star"]');
+        const favoriteIcon = favoriteButton.locator(
+          '.anticon-star, .anticon-star-o, [class*="star"]'
+        );
         if (await favoriteIcon.isVisible()) {
           await expect(favoriteIcon).toBeVisible();
         }
@@ -69,7 +73,9 @@ test.describe('收藏菜单功能', () => {
 
     if (itemCount > 0) {
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 悬停显示收藏按钮
       await firstMenuItem.hover();
@@ -109,7 +115,9 @@ test.describe('收藏菜单功能', () => {
 
     if (itemCount > 0) {
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 悬停并点击收藏
       await firstMenuItem.hover();
@@ -121,7 +129,8 @@ test.describe('收藏菜单功能', () => {
 
         // 检查localStorage中的收藏数据
         const favoritesData = await page.evaluate(() => {
-          const data = localStorage.getItem('user-preferences') || localStorage.getItem('favorites');
+          const data =
+            localStorage.getItem('user-preferences') || localStorage.getItem('favorites');
           return data ? JSON.parse(data) : null;
         });
 
@@ -132,14 +141,15 @@ test.describe('收藏菜单功能', () => {
 
           if (hasFavorites.length > 0) {
             // 验证收藏的菜单项ID
-            const menuItemId = await firstMenuItem.getAttribute('data-menu-id') ||
-                              await firstMenuItem.getAttribute('key') ||
-                              await firstMenuItem.evaluate(el => el.textContent);
-            expect(hasFavorites.some((fav: any) =>
-              fav.id === menuItemId ||
-              fav.name === menuItemId ||
-              fav === menuItemId
-            )).toBeTruthy();
+            const menuItemId =
+              (await firstMenuItem.getAttribute('data-menu-id')) ||
+              (await firstMenuItem.getAttribute('key')) ||
+              (await firstMenuItem.evaluate((el) => el.textContent));
+            expect(
+              hasFavorites.some(
+                (fav: any) => fav.id === menuItemId || fav.name === menuItemId || fav === menuItemId
+              )
+            ).toBeTruthy();
           }
         }
       }
@@ -155,7 +165,9 @@ test.describe('收藏菜单功能', () => {
 
     if (itemCount > 0) {
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 添加收藏
       await firstMenuItem.hover();
@@ -172,10 +184,14 @@ test.describe('收藏菜单功能', () => {
 
         // 验证收藏状态保持
         const refreshedMenuItem = page.locator('.sidebar-menu .ant-menu-item').first();
-        const refreshedFavoriteButton = refreshedMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+        const refreshedFavoriteButton = refreshedMenuItem.locator(
+          '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+        );
 
         if (await refreshedFavoriteButton.isVisible()) {
-          const favoriteIcon = refreshedFavoriteButton.locator('.favorited, .anticon-star, [class*="star"]');
+          const favoriteIcon = refreshedFavoriteButton.locator(
+            '.favorited, .anticon-star, [class*="star"]'
+          );
           if (await favoriteIcon.isVisible()) {
             const isFavorited = await favoriteIcon.getAttribute('class');
             expect(isFavorited).toContain('favorited') || expect(isFavorited).toContain('star');
@@ -196,7 +212,9 @@ test.describe('收藏菜单功能', () => {
       // 添加多个收藏
       for (let i = 0; i < Math.min(3, itemCount); i++) {
         const menuItem = menuItems.nth(i);
-        const favoriteButton = menuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+        const favoriteButton = menuItem.locator(
+          '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+        );
 
         await menuItem.hover();
         await page.waitForTimeout(200);
@@ -210,7 +228,9 @@ test.describe('收藏菜单功能', () => {
       // 检查收藏区域
       const favoriteSection = page.locator('.sidebar-favorites');
       if (await favoriteSection.isVisible()) {
-        const favoriteItems = favoriteSection.locator('.favorite-item, .ant-menu-item, [class*="item"]');
+        const favoriteItems = favoriteSection.locator(
+          '.favorite-item, .ant-menu-item, [class*="item"]'
+        );
         const favoriteCount = await favoriteItems.count();
 
         // 应该显示收藏的菜单项
@@ -238,7 +258,9 @@ test.describe('收藏菜单功能', () => {
 
     if (itemCount > 0) {
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       // 先添加收藏
       await firstMenuItem.hover();
@@ -258,12 +280,14 @@ test.describe('收藏菜单功能', () => {
         const favoriteIcon = favoriteButton.locator('.favorited, .anticon-star, [class*="star"]');
         if (await favoriteIcon.isVisible()) {
           const isNotFavorited = await favoriteIcon.getAttribute('class');
-          expect(isNotFavorited).not.toContain('favorited') || expect(isNotFavorited).toContain('star-o');
+          expect(isNotFavorited).not.toContain('favorited') ||
+            expect(isNotFavorited).toContain('star-o');
         }
 
         // 检查localStorage中的收藏数据是否被移除
         const favoritesData = await page.evaluate(() => {
-          const data = localStorage.getItem('user-preferences') || localStorage.getItem('favorites');
+          const data =
+            localStorage.getItem('user-preferences') || localStorage.getItem('favorites');
           return data ? JSON.parse(data) : null;
         });
 
@@ -287,7 +311,9 @@ test.describe('收藏菜单功能', () => {
 
       for (let i = 0; i < Math.min(maxFavorites + 2, itemCount); i++) {
         const menuItem = menuItems.nth(i);
-        const favoriteButton = menuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+        const favoriteButton = menuItem.locator(
+          '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+        );
 
         await menuItem.hover();
         await page.waitForTimeout(200);
@@ -301,7 +327,9 @@ test.describe('收藏菜单功能', () => {
       // 检查收藏区域
       const favoriteSection = page.locator('.sidebar-favorites');
       if (await favoriteSection.isVisible()) {
-        const favoriteItems = favoriteSection.locator('.favorite-item, .ant-menu-item, [class*="item"]');
+        const favoriteItems = favoriteSection.locator(
+          '.favorite-item, .ant-menu-item, [class*="item"]'
+        );
         const favoriteCount = await favoriteItems.count();
 
         // 收藏数量应该在限制范围内
@@ -352,7 +380,9 @@ test.describe('收藏菜单功能', () => {
     if (itemCount > 0) {
       // 添加一个收藏
       const firstMenuItem = menuItems.first();
-      const favoriteButton = firstMenuItem.locator('.menu-item-favorite, .favorite-button, [class*="favorite"]');
+      const favoriteButton = firstMenuItem.locator(
+        '.menu-item-favorite, .favorite-button, [class*="favorite"]'
+      );
 
       await firstMenuItem.hover();
       await page.waitForTimeout(200);
