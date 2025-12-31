@@ -1,69 +1,53 @@
-# Implementation Plan: Lark MCP 项目管理系统
+# Implementation Plan: [FEATURE]
 
-**Branch**: `T004-lark-project-management` | **Date**: 2025-12-31 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/T004-lark-project-management/spec.md`
+**Branch**: `[X###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[X###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-通过飞书 MCP 服务实现项目管理系统,作为 Claude Code skill 提供任务跟踪、技术债记录、Bug 管理、产品功能矩阵和测试记录管理功能。采用 `/lark-pm` 命令调用,扁平化子命令结构,所有数据存储在单个飞书 Base App 的 5 个数据表中,采用指数退避重试策略处理 API 失败,Last Write Wins 策略处理并发冲突。
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
 **Language/Version**:
-- TypeScript 5.9.3+ (Claude Code skill implementation)
-- Node.js 18+ (runtime environment)
+- B端（管理后台）: TypeScript 5.9.3 + React 19.2.0 (frontend), Java 21 + Spring Boot 3.x (backend)
+- C端（客户端/小程序）: TypeScript 5.9.3 + Taro 3.x + React (multi-platform mini-program/H5)
 
 **Primary Dependencies**:
-- **Claude Code SDK**: 用于 skill 注册和命令处理
-- **Lark MCP Client**: 飞书 MCP 服务客户端
-  - `@larksuiteoapi/node-sdk` 或直接 HTTP 调用
-- **Command Line Interface**:
-  - `commander` 或 `yargs` - CLI 参数解析
-  - `chalk` - 终端输出着色
-  - `ora` - Loading 动画
-- **Data Export**:
-  - `xlsx` 或 `exceljs` - Excel 导出
-  - `json2csv` - CSV 导出
-- **Error Handling**:
-  - 自定义 retry 工具(指数退避)
-  - 结构化日志记录
+- B端: Ant Design 6.1.0, Zustand 5.0.9, TanStack Query 5.90.12, React Router 7.10.1, MSW 2.12.4, Spring Boot Web, Supabase Java/HTTP client
+- C端: Taro 3.x, Taro UI / NutUI, Zustand / Redux, Taro.request wrapper, Supabase client SDK
 
-**Storage**:
-- 飞书多维表格 (Lark Base/Bitable) 作为唯一数据源
-- 单个 Base App 包含 5 个数据表: Tasks, TechnicalDebt, Bugs, Features, TestRecords
-- 无本地数据库,所有数据通过飞书 MCP API 读写
+**Storage**: Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
 
 **Testing**:
-- Vitest - 单元测试
-- 手动 E2E 测试 - 通过实际调用 `/lark-pm` 命令验证
+- B端: Vitest (unit tests) + Playwright (e2e tests) + Testing Library
+- C端: Taro 官方测试工具 + 微信开发者工具 / H5 浏览器测试
 
 **Target Platform**:
-- 命令行工具,运行在 Claude Code CLI 环境中
-- 跨平台支持: macOS, Linux, Windows (通过 Node.js)
+- B端: Web browser (Chrome, Firefox, Safari, Edge) + Spring Boot backend API
+- C端: 微信小程序 + 支付宝小程序 + H5 + React Native (Taro 支持的多端平台)
 
 **Project Type**:
-- Claude Code Skill (技术基础设施工具)
-- 命令行界面应用 (CLI tool)
-- 飞书 MCP 服务集成
+- Full-stack web application (Spring Boot backend + React frontend for B端 admin interface)
+- Multi-platform client application (Taro framework for C端 user-facing apps)
 
 **Performance Goals**:
-- 命令响应时间 < 2秒 (不含网络延迟)
-- 支持查询 500+ 条记录,响应时间 < 3秒
-- 导出数据(所有记录)< 10秒
+- B端: <3s app startup, <500ms page transitions, support 1000+ list items with virtual scrolling
+- C端: <1.5s first screen render, <2MB main package size, FPS ≥ 50 for list scrolling
 
-**Constraints**:
-- 必须遵循 Claude Code Skills 开发规范(见 `.claude/rules/10-claude-code-skills.md`)
-- 必须包含完整的 `skill.md` 文件(含 YAML frontmatter)
-- 必须使用 T### 模块前缀(Tool/Infrastructure)
-- API 调用失败必须采用指数退避重试策略
-- 并发冲突采用 Last Write Wins 策略
+**Constraints**: Must comply with Feature Branch Binding (specId alignment), Test-Driven Development, Component-Based Architecture, Frontend Tech Stack Layering (B端 vs C端 separation), and Backend Architecture (Spring Boot + Supabase as unified backend stack)
 
 **Scale/Scope**:
-- 支持管理 10000 条记录以内的项目数据
-- 5 类数据实体: 任务、技术债、Bug、功能矩阵、测试记录
-- 15+ 子命令覆盖 CRUD 操作
+- B端: Enterprise admin interface, 50+ screens, complex data management workflows
+- C端: User-facing mini-program/H5, booking flows, product browsing, user profile management
 
 ## Constitution Check
 
@@ -71,152 +55,84 @@
 
 ### 必须满足的宪法原则检查：
 
-- [x] **功能分支绑定**: 当前分支 `T004-lark-project-management`,使用 T### 模块前缀(Tool/Infrastructure),符合 Claude Code skills 编码要求
-- [x] **测试驱动开发**: 关键业务流程(API 调用、重试逻辑、数据转换)必须先编写测试,确保核心逻辑测试覆盖率 100%
-- [x] **代码质量工程化**: 必须通过 TypeScript 严格类型检查、ESLint 检查、所有质量门禁
-- [x] **Claude Code Skills 规范**:
-  - 必须包含 `skill.md` 文件,含 YAML frontmatter(name, description, version)
-  - 必须包含 spec.md, data-model.md, quickstart.md 三个文档
-  - 必须包含 `@spec T004` 归属标识
-- [x] **模块化架构**: 代码必须按功能模块组织(command handlers, lark client, retry logic, export utilities)
+- [ ] **功能分支绑定**: 当前分支名中的specId必须等于active_spec指向路径中的specId
+- [ ] **测试驱动开发**: 关键业务流程必须先编写测试，确保测试覆盖率100%
+- [ ] **组件化架构**: 必须遵循原子设计理念，组件必须清晰分层和可复用
+- [ ] **前端技术栈分层**: B端必须使用React+Ant Design，C端必须使用Taro框架，不得混用
+- [ ] **数据驱动状态管理**: 必须使用Zustand + TanStack Query，状态变更可预测
+- [ ] **代码质量工程化**: 必须通过TypeScript/Java类型检查、ESLint/后端静态检查、所有质量门禁
+- [ ] **后端技术栈约束**: 后端必须使用Spring Boot集成Supabase，Supabase为主要数据源与认证/存储提供方
 
 ### 性能与标准检查：
-- [x] **性能标准**: 命令响应 <2秒, 查询 500+ 记录 <3秒, 导出数据 <10秒
-- [x] **安全标准**:
-  - 飞书 API Token 通过环境变量或配置文件管理,不得硬编码
-  - 用户输入必须验证,防止注入攻击
-- [x] **错误处理标准**: API 调用失败采用指数退避重试(3次,间隔 1s/2s/4s),记录详细日志
-
-### 不适用的检查项（N/A for Claude Code Skill）：
-- **组件化架构** (N/A) - CLI 工具不涉及 UI 组件
-- **前端技术栈分层** (N/A) - 非前端项目
-- **数据驱动状态管理** (N/A) - CLI 工具无状态管理需求
-- **后端技术栈约束** (N/A) - 使用飞书 MCP 服务,不涉及自建后端
-- **可访问性标准** (N/A) - CLI 工具无 UI 可访问性要求
+- [ ] **性能标准**: 应用启动<3秒，页面切换<500ms，大数据列表使用虚拟滚动
+- [ ] **安全标准**: 使用Zod数据验证，防止XSS，适当的认证授权机制
+- [ ] **可访问性标准**: 遵循WCAG 2.1 AA级别，支持键盘导航和屏幕阅读器
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/T004-lark-project-management/
-├── spec.md              # Feature specification
+specs/[###-feature]/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output - Lark API contract definitions
-│   └── lark-mcp-api.md  # 飞书 MCP API 接口定义
-├── checklists/          # Quality checklists
-│   └── requirements.md  # Requirements checklist
+├── contracts/           # Phase 1 output (/speckit.plan command)
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
-### Source Code (Claude Code Skill)
+### Source Code (repository root)
 
 ```text
-.claude/skills/lark-pm/
-├── skill.md                    # Skill definition (YAML frontmatter + documentation)
-├── index.ts                    # Main entry point, skill registration
+frontend/
 ├── src/
-│   ├── commands/               # Command handlers (扁平化结构)
-│   │   ├── task-create.ts     # /lark-pm task-create
-│   │   ├── task-list.ts       # /lark-pm task-list
-│   │   ├── task-update.ts     # /lark-pm task-update
-│   │   ├── bug-create.ts      # /lark-pm bug-create
-│   │   ├── bug-list.ts        # /lark-pm bug-list
-│   │   ├── debt-create.ts     # /lark-pm debt-create
-│   │   ├── feature-create.ts  # /lark-pm feature-create
-│   │   ├── test-create.ts     # /lark-pm test-create
-│   │   └── export.ts          # /lark-pm export
-│   ├── lark/                   # Lark MCP client
-│   │   ├── client.ts          # 飞书 API 客户端封装
-│   │   ├── base-app.ts        # Base App 管理
-│   │   ├── table.ts           # 数据表操作
-│   │   ├── record.ts          # 记录 CRUD
-│   │   └── notification.ts    # 通知发送
-│   ├── models/                 # Data models (TypeScript interfaces)
-│   │   ├── task.ts            # Task 实体
-│   │   ├── debt.ts            # TechnicalDebt 实体
-│   │   ├── bug.ts             # Bug 实体
-│   │   ├── feature.ts         # FeatureModule 实体
-│   │   └── test-record.ts     # TestRecord 实体
-│   ├── utils/                  # Utility functions
-│   │   ├── retry.ts           # 指数退避重试工具
-│   │   ├── logger.ts          # 日志工具
-│   │   ├── validator.ts       # 数据验证
-│   │   └── export.ts          # Excel/CSV 导出
-│   ├── config/                 # Configuration
-│   │   └── lark-config.ts     # 飞书配置(token, app_id 等)
-│   └── types/                  # TypeScript type definitions
-│       └── lark-api.ts        # 飞书 API 类型定义
-├── tests/                      # Test files
-│   ├── commands/              # Command tests
-│   ├── lark/                  # Lark client tests
-│   ├── utils/                 # Utility tests
-│   └── fixtures/              # Test data
-├── assets/                     # Static assets
-│   └── templates/             # 模板文件(如 Excel 模板)
-└── references/                 # Reference documentation
-    └── lark-mcp-api.md        # 飞书 MCP API 参考
+│   ├── components/          # Reusable UI components (Atomic Design)
+│   │   ├── atoms/          # Basic UI elements (Button, Input, etc.)
+│   │   ├── molecules/      # Component combinations (SearchForm, etc.)
+│   │   ├── organisms/      # Complex components (ProductList, etc.)
+│   │   └── templates/      # Layout templates (MainLayout, etc.)
+│   ├── features/           # Feature-specific modules
+│   │   ├── product-management/
+│   │   │   ├── components/ # Feature-specific components
+│   │   │   ├── hooks/      # Custom hooks
+│   │   │   ├── services/   # API services
+│   │   │   ├── types/      # TypeScript types
+│   │   │   └── utils/      # Utility functions
+│   │   └── [other-features]/
+│   ├── pages/              # Page components (route-level)
+│   ├── hooks/              # Global custom hooks
+│   ├── services/           # Global API services
+│   ├── stores/             # Zustand stores
+│   ├── types/              # Global TypeScript types
+│   ├── utils/              # Global utility functions
+│   ├── constants/          # Application constants
+│   └── assets/             # Static assets
+├── public/                 # Public assets and MSW worker
+├── tests/                  # Test files
+│   ├── __mocks__/         # Mock files
+│   ├── fixtures/          # Test data
+│   └── utils/             # Test utilities
+└── docs/                  # Feature documentation
+
+specs/                      # Feature specifications
+├── [###-feature-name]/
+│   ├── spec.md           # Feature specification
+│   ├── plan.md           # Implementation plan (this file)
+│   ├── research.md       # Research findings
+│   ├── data-model.md     # Data model design
+│   ├── quickstart.md     # Development quickstart
+│   └── tasks.md          # Development tasks
+└── [other-features]/
 ```
 
-**Structure Decision**: Claude Code skill 采用模块化架构,命令处理器扁平化组织(符合子命令结构),飞书 MCP 客户端独立封装,工具函数模块化,完整的类型定义和测试覆盖。
+**Structure Decision**: Frontend-only web application using React with feature-based modular architecture. Components follow Atomic Design principles, business logic is organized by feature modules, and comprehensive testing is maintained at all levels.
 
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-N/A - All constitution checks passed. No violations to justify.
-
----
-
-## Phase 0: Research (COMPLETED ✅)
-
-**Output**: [research.md](./research.md)
-
-**Key Decisions**:
-- **API 调用方式**: 使用 `@larksuiteoapi/node-sdk` 代替 execSync
-- **认证方式**: User Access Token (用户身份)
-- **命令结构**: 扁平化子命令 (`/lark-pm task-create`)
-- **CLI 参数解析**: commander
-- **数据验证**: Zod
-- **重试策略**: 指数退避 (1s, 2s, 4s)
-- **冲突处理**: Last Write Wins
-- **数据组织**: 单 Base App + 5 表
-- **Excel 导出**: xlsx
-- **日志记录**: pino
-
----
-
-## Phase 1: Design (COMPLETED ✅)
-
-**Outputs**:
-- [data-model.md](./data-model.md) - 5 个实体的完整字段定义、TypeScript 类型、Zod schema
-- [contracts/lark-mcp-api.md](./contracts/lark-mcp-api.md) - 飞书 MCP API 契约文档
-- [quickstart.md](./quickstart.md) - 快速上手指南
-
-**Data Model Summary**:
-- **Task**: 12 字段 (任务管理)
-- **TechnicalDebt**: 10 字段 (技术债)
-- **Bug**: 11 字段 (缺陷管理)
-- **FeatureModule**: 9 字段 (功能矩阵)
-- **TestRecord**: 10 字段 (测试记录)
-
-**API Contract Summary**:
-- Base App 管理: 创建、列出
-- 数据表管理: 创建、列出、列出字段
-- 记录 CRUD: 创建、查询、更新、删除、批量创建
-- 错误处理: 重试策略、错误码映射
-- 性能优化: 批量操作、字段缓存、分页查询
-
----
-
-## Phase 2: Implementation
-
-**Next Step**: 运行 `/speckit.tasks` 生成任务分解文档 (tasks.md)
-
-**Pre-requisites**:
-- ✅ Phase 0 research completed
-- ✅ Phase 1 design artifacts completed
-- ⏸️ Pending: Update agent context (run update-agent-context.sh)
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |

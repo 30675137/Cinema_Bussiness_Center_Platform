@@ -12,14 +12,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'dist/',
-        'tests/',
-        '**/*.test.ts',
-        '**/*.spec.ts',
-        'vitest.config.ts',
-      ],
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'tests/**/*'],
       thresholds: {
         lines: 80,
         functions: 80,
@@ -27,8 +21,7 @@ export default defineConfig({
         statements: 80,
       },
     },
-  },
-  css: {
-    postcss: false,
+    include: ['tests/**/*.test.ts'],
+    exclude: ['node_modules', 'dist'],
   },
 })

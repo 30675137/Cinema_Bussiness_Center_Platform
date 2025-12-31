@@ -1,6 +1,10 @@
 /**
  * @spec T004-lark-project-management
  * Lark API client wrapper with retry logic
+ *
+ * Updated based on clarifications:
+ * - Enhanced permission error handling (403 errors)
+ * - User-friendly error messages for common permission issues
  */
 
 import * as lark from '@larksuiteoapi/node-sdk'
@@ -16,6 +20,16 @@ import { loadLarkConfig } from '../config/lark-config.js'
 import { withRetry } from '../utils/retry.js'
 import logger from '../utils/logger.js'
 
+/**
+ * Custom error for permission issues
+ */
+export class LarkPermissionError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'LarkPermissionError'
+  }
+}
+
 export class LarkClient {
   private client: lark.Client
 
@@ -27,6 +41,25 @@ export class LarkClient {
       appType: lark.AppType.SelfBuild,
       domain: lark.Domain.Feishu,
     })
+  }
+
+  /**
+   * Handle Lark API errors with user-friendly messages
+   */
+  private handleLarkError(response: any, operation: string): void {
+    // Check for permission errors (code 99991663 or HTTP 403)
+    if (response.code === 99991663 || response.code === 403) {
+      throw new LarkPermissionError(
+        `权限不足：无法${operation}。请检查以下事项：\n` +
+          `1. 确认 Base App Token 是否正确\n` +
+          `2. 确认您的飞书应用是否有访问该 Base 的权限\n` +
+          `3. 在飞书 Base 中，进入「设置」->「权限管理」，添加应用的访问权限\n` +
+          `4. 如果问题持续，请联系 Base 管理员授予权限`
+      )
+    }
+
+    // Generic error
+    throw new Error(`${operation}失败: ${response.msg || '未知错误'}`)
   }
 
   /**
@@ -44,7 +77,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to create Base App: ${response.msg}`)
+          this.handleLarkError(response, '创建 Base App')
         }
 
         logger.info({ appToken: response.data?.app?.app_token }, 'Base App created')
@@ -80,7 +113,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to create table: ${response.msg}`)
+          this.handleLarkError(response, '创建数据表')
         }
 
         logger.info({ tableId: response.data?.table_id }, 'Table created')
@@ -106,7 +139,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to list tables: ${response.msg}`)
+          this.handleLarkError(response, '列出数据表')
         }
 
         return (response.data?.items || []) as LarkTable[]
@@ -131,7 +164,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to list fields: ${response.msg}`)
+          this.handleLarkError(response, '列出字段')
         }
 
         return (response.data?.items || []) as LarkField[]
@@ -161,7 +194,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to search records: ${response.msg}`)
+          this.handleLarkError(response, '查询记录')
         }
 
         return {
@@ -196,7 +229,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to create record: ${response.msg}`)
+          this.handleLarkError(response, '创建记录')
         }
 
         logger.info({ recordId: response.data?.record?.record_id }, 'Record created')
@@ -228,7 +261,7 @@ export class LarkClient {
         })
 
         if (response.code !== 0) {
-          throw new Error(`Failed to update record: ${response.msg}`)
+          this.handleLarkError(response, '更新记录')
         }
 
         logger.info({ recordId }, 'Record updated')

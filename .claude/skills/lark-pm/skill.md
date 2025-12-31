@@ -1,6 +1,6 @@
 ---
 name: lark-pm
-description: Lark MCP project management tool. Create, track, and manage tasks, technical debt, bugs, feature matrix, and test records using Feishu/Lark Base (multidimensional tables). Supports CRUD operations, filtering, data export (Excel/CSV), and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, 飞书项目管理, 任务跟踪, Bug管理, 技术债.
+description: Lark MCP project management tool for Cinema Business Center Platform. Manage tasks, technical debt, bugs, features, and test records through Feishu/Lark Base. Supports CRUD operations, filtering, data export (Excel/CSV), and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, 飞书项目管理, 任务跟踪, Bug管理, 技术债.
 version: 1.0.0
 ---
 

@@ -1,6 +1,6 @@
 /**
  * @spec T004-lark-project-management
- * List tasks command with filtering and formatting
+ * List bugs command with filtering and formatting
  *
  * Updated based on clarifications:
  * - Force pagination (default 20 per page, max 100)
@@ -8,32 +8,31 @@
  * - Display pagination info and navigation hints
  */
 
-import { TaskRepository, TaskFilter } from '../../repositories/task-repository.js'
+import { BugRepository, BugFilter } from '../../repositories/bug-repository.js'
 import { LarkClient } from '../../lark/client.js'
 import { loadConfig } from '../../config/config-manager.js'
-import { TaskStatus, TaskPriority } from '../../models/task.js'
+import { BugStatus, BugSeverity } from '../../models/bug.js'
 import logger from '../../utils/logger.js'
 import chalk from 'chalk'
 import ora from 'ora'
 
-export interface ListTaskOptions {
+export interface ListBugOptions {
   status?: string
-  priority?: string
+  severity?: string
   specId?: string
   assignee?: string
-  tags?: string[]
   limit?: number
   page?: number
   pageSize?: number
 }
 
-export async function listTasksCommand(options: ListTaskOptions): Promise<void> {
-  const spinner = ora('加载任务列表...').start()
+export async function listBugsCommand(options: ListBugOptions): Promise<void> {
+  const spinner = ora('加载 Bug 列表...').start()
 
   try {
     const config = await loadConfig()
 
-    if (!config.baseAppToken || !config.tableIds?.tasks) {
+    if (!config.baseAppToken || !config.tableIds?.bugs) {
       spinner.fail(chalk.red('未找到配置，请先运行 init 命令'))
       return
     }
@@ -43,58 +42,53 @@ export async function listTasksCommand(options: ListTaskOptions): Promise<void> 
     const pageSize = Math.min(options.pageSize || 20, 100) // Max 100 per page
 
     const client = new LarkClient()
-    const repository = new TaskRepository(
-      client,
-      config.baseAppToken,
-      config.tableIds.tasks
-    )
+    const repository = new BugRepository(client, config.baseAppToken, config.tableIds.bugs)
 
     // Build filter
-    const filter: TaskFilter = {}
-    if (options.status) filter.status = options.status as TaskStatus
-    if (options.priority) filter.priority = options.priority as TaskPriority
+    const filter: BugFilter = {}
+    if (options.status) filter.status = options.status as BugStatus
+    if (options.severity) filter.severity = options.severity as BugSeverity
     if (options.specId) filter.specId = options.specId
     if (options.assignee) filter.assignee = options.assignee
-    if (options.tags) filter.tags = options.tags
 
-    // Fetch all matching tasks to calculate total count
-    const allTasks = await repository.list({ filter })
-    const totalCount = allTasks.length
+    // Fetch all matching bugs to calculate total count
+    const allBugs = await repository.list({ filter })
+    const totalCount = allBugs.length
 
     // Calculate pagination
     const totalPages = Math.ceil(totalCount / pageSize)
     const startIndex = (page - 1) * pageSize
     const endIndex = Math.min(startIndex + pageSize, totalCount)
-    const paginatedTasks = allTasks.slice(startIndex, endIndex)
+    const paginatedBugs = allBugs.slice(startIndex, endIndex)
 
-    spinner.succeed(chalk.green(`找到 ${totalCount} 个任务`))
+    spinner.succeed(chalk.green(`找到 ${totalCount} 个 Bug`))
 
     if (totalCount === 0) {
-      console.log(chalk.gray('\n暂无任务\n'))
+      console.log(chalk.gray('\n暂无 Bug\n'))
       return
     }
 
-    // Print tasks table
+    // Print bugs table
     console.log()
     console.log(
       chalk.bold(
-        `${'ID'.padEnd(20)} ${'标题'.padEnd(30)} ${'状态'.padEnd(12)} ${'优先级'.padEnd(10)} ${'规格ID'.padEnd(10)}`
+        `${'ID'.padEnd(20)} ${'标题'.padEnd(30)} ${'状态'.padEnd(12)} ${'严重程度'.padEnd(10)} ${'规格ID'.padEnd(10)}`
       )
     )
     console.log(chalk.gray('─'.repeat(100)))
 
-    paginatedTasks.forEach(task => {
-      const statusColor = getStatusColor(task.status)
-      const priorityColor = getPriorityColor(task.priority)
+    paginatedBugs.forEach((bug) => {
+      const statusColor = getStatusColor(bug.status)
+      const severityColor = getSeverityColor(bug.severity)
 
-      const title = String(task.title || '')
-      const specId = String(task.specId || '-')
+      const title = String(bug.title || '')
+      const specId = String(bug.specId || '-')
 
       console.log(
-        `${task.id.substring(0, 18).padEnd(20)} ` +
+        `${bug.id.substring(0, 18).padEnd(20)} ` +
           `${title.substring(0, 28).padEnd(30)} ` +
-          `${statusColor(task.status.padEnd(12))} ` +
-          `${priorityColor(task.priority.padEnd(10))} ` +
+          `${statusColor(bug.status.padEnd(12))} ` +
+          `${severityColor(bug.severity.padEnd(10))} ` +
           `${chalk.cyan(specId.padEnd(10))}`
       )
     })
@@ -118,32 +112,32 @@ export async function listTasksCommand(options: ListTaskOptions): Promise<void> 
     console.log(chalk.gray(`使用 --page-size <数量> 调整每页显示数量 (最大100)`))
     console.log()
 
-    logger.info({ count: paginatedTasks.length, totalCount, page, pageSize, filter }, 'Listed tasks')
+    logger.info({ count: paginatedBugs.length, totalCount, page, pageSize, filter }, 'Listed bugs')
   } catch (error) {
-    spinner.fail(chalk.red('获取任务列表失败'))
-    logger.error({ error }, 'List tasks command failed')
+    spinner.fail(chalk.red('获取 Bug 列表失败'))
+    logger.error({ error }, 'List bugs command failed')
     throw error
   }
 }
 
-function getStatusColor(status: TaskStatus): (text: string) => string {
+function getStatusColor(status: BugStatus): (text: string) => string {
   switch (status) {
-    case TaskStatus.Done:
+    case BugStatus.Fixed:
       return chalk.green
-    case TaskStatus.InProgress:
+    case BugStatus.InProgress:
       return chalk.blue
-    case TaskStatus.Cancelled:
+    case BugStatus.WontFix:
       return chalk.gray
     default:
       return chalk.yellow
   }
 }
 
-function getPriorityColor(priority: TaskPriority): (text: string) => string {
-  switch (priority) {
-    case TaskPriority.High:
+function getSeverityColor(severity: BugSeverity): (text: string) => string {
+  switch (severity) {
+    case BugSeverity.Critical:
       return chalk.red
-    case TaskPriority.Medium:
+    case BugSeverity.Medium:
       return chalk.yellow
     default:
       return chalk.green

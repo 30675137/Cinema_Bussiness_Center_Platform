@@ -241,19 +241,31 @@ export class TaskRepository {
   private mapRecordToTask(record: any): Task {
     const fields = record.fields
 
+    // Helper to extract value from Lark field (might be object or array)
+    const getValue = (field: any): any => {
+      if (!field) return undefined
+      if (Array.isArray(field)) {
+        return field.length > 0 ? field[0]?.text || field[0] : undefined
+      }
+      if (typeof field === 'object' && field.text !== undefined) {
+        return field.text
+      }
+      return field
+    }
+
     return {
       id: record.record_id,
-      title: fields['标题'] || '',
-      priority: fields['优先级'] || TaskPriority.Medium,
-      status: fields['状态'] || TaskStatus.Todo,
+      title: getValue(fields['标题']) || '',
+      priority: getValue(fields['优先级']) || TaskPriority.Medium,
+      status: getValue(fields['状态']) || TaskStatus.Todo,
       assignees: fields['负责人'],
-      specId: fields['规格ID'],
+      specId: getValue(fields['规格ID']),
       dueDate: fields['截止日期'],
       tags: fields['标签'],
       progress: fields['进度'],
       estimatedHours: fields['预计工时'],
       actualHours: fields['实际工时'],
-      notes: fields['备注'],
+      notes: getValue(fields['备注']),
       createdTime: record.created_time,
     }
   }
