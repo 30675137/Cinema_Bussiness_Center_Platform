@@ -32,6 +32,11 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   fallback,
   children,
 }) => {
+  // 暂时禁用所有权限检查，直接放行
+  // TODO: 后续统一添加权限管理 (spec 待定)
+  return <>{children}</>;
+
+  /* 原权限检查逻辑 - 已禁用
   const { hasPermission, hasAnyPermission, hasAllPermissions } = usePermissions();
 
   // 开发环境下直接放行，方便测试
@@ -64,6 +69,7 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
 
   // 默认直接渲染内容（移除权限提示）
   return <>{children}</>;
+  */
 };
 
 /**

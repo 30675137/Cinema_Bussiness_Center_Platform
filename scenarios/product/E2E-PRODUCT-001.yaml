@@ -1,0 +1,146 @@
+# @spec P006-fix-sku-edit-data
+# E2E Test Scenario: SKU编辑页面显示SPU信息
+# User Story 1 - Priority: P1
+
+scenario_id: E2E-PRODUCT-001
+spec_ref: P006
+title: SKU编辑页面应正确加载并显示关联的SPU完整信息
+description: |
+  验证运营人员在编辑已关联SPU的SKU时，页面能正确显示SPU的完整信息（产品名称、分类、品牌、描述等），
+  并确保SPU字段为只读状态。
+
+tags:
+  module: [product]
+  channel: [web]
+  deploy: [saas]
+  priority: p1
+  smoke: true
+  user_story: [US1]
+
+preconditions:
+  role: admin
+  testdata_ref: skuTestData.scenario_001
+  description: |
+    - 系统中存在编码为 "FIN-COCKTAIL" 的SKU
+    - 该SKU已关联到某个SPU（ID: spu-whiskey-cola）
+    - SPU状态为 "valid"
+
+steps:
+  # Step 1: 管理员登录B端系统
+  - action: login
+    system: b-end
+    description: 运营人员使用管理员账号登录B端系统
+    params:
+      testdata_ref: skuTestData.adminCredentials
+
+  # Step 2: 导航到SKU管理页面
+  - action: navigate
+    system: b-end
+    description: 导航到商品管理 > SKU管理列表页面
+    params:
+      testdata_ref: skuTestData.skuListPageUrl
+
+  # Step 3: 搜索目标SKU
+  - action: search
+    system: b-end
+    description: 在搜索框中输入SKU编码 "FIN-COCKTAIL"
+    params:
+      testdata_ref: skuTestData.targetSkuCode
+
+  # Step 4: 点击编辑按钮
+  - action: click
+    system: b-end
+    description: 点击搜索结果中的"编辑"按钮
+    params:
+      testdata_ref: skuTestData.editButtonSelector
+
+  # Step 5: 等待页面加载完成
+  - action: wait_for_load
+    system: b-end
+    description: 等待SKU编辑页面数据加载完成（≤2秒）
+    params:
+      timeout: 2000
+
+assertions:
+  # Assertion 1: SPU信息区域可见
+  - type: ui
+    check: element_visible
+    description: SPU信息区域应该可见
+    params:
+      selector: '[data-testid="spu-info-section"]'
+
+  # Assertion 2: SPU产品名称正确显示
+  - type: ui
+    check: element_text_equals
+    description: SPU产品名称应为"威士忌可乐鸡尾酒"
+    params:
+      selector: '[data-testid="spu-name"]'
+      expected: '威士忌可乐鸡尾酒'
+
+  # Assertion 3: SPU分类正确显示
+  - type: ui
+    check: element_visible
+    description: SPU产品分类应该显示
+    params:
+      selector: '[data-testid="spu-category"]'
+
+  # Assertion 4: SPU品牌正确显示（如果有）
+  - type: ui
+    check: element_visible
+    description: SPU品牌信息应该显示
+    params:
+      selector: '[data-testid="spu-brand"]'
+
+  # Assertion 5: SPU描述正确显示
+  - type: ui
+    check: element_visible
+    description: SPU产品描述应该显示
+    params:
+      selector: '[data-testid="spu-description"]'
+
+  # Assertion 6: SPU字段为只读状态
+  - type: ui
+    check: element_readonly
+    description: SPU信息字段应为只读状态（不可编辑）
+    params:
+      selector: '[data-testid="spu-info-section"] input, [data-testid="spu-info-section"] textarea'
+
+  # Assertion 7: API响应成功
+  - type: api
+    check: response_status_is
+    description: SKU详情API应返回200状态码
+    params:
+      endpoint: '/api/skus/{id}/details'
+      expected: 200
+
+edge_cases:
+  # Edge Case 1: SKU未关联SPU
+  - scenario: SKU未关联任何SPU
+    testdata_ref: skuTestData.scenario_no_spu
+    expected_behavior: SPU信息区域应显示"未关联SPU"提示
+
+  # Edge Case 2: SPU已失效（脏数据）
+  - scenario: SKU关联的SPU已被删除
+    testdata_ref: skuTestData.scenario_invalid_spu
+    expected_behavior: 页面应显示"SPU已失效"提示，而不是报错
+
+  # Edge Case 3: 网络错误导致SPU加载失败
+  - scenario: SPU数据加载失败
+    testdata_ref: skuTestData.scenario_spu_load_failure
+    expected_behavior: 页面应显示"SPU信息加载失败，请刷新重试"，并允许查看SKU基本信息
+
+success_criteria:
+  - SPU信息区域在页面上正确显示
+  - SPU字段为只读状态，无法编辑
+  - 页面加载时间≤2秒（P95）
+  - 所有SPU信息字段（名称、分类、品牌、描述）正确显示
+
+test_data_requirements:
+  - SKU编码: FIN-COCKTAIL
+  - SKU名称: 威士忌可乐鸡尾酒
+  - SPU ID: spu-whiskey-cola
+  - SPU名称: 威士忌可乐鸡尾酒
+  - SPU分类: 饮品 > 鸡尾酒
+  - SPU品牌: 自制
+  - SPU描述: 经典威士忌可乐鸡尾酒，清爽解腻
+  - 管理员账号: admin / admin123

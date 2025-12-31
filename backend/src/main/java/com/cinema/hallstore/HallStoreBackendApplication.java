@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.config", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.security", "com.cinema.beverage", "com.cinema.auth"})
-@EnableJpaRepositories(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage"})
-@EntityScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage"})
+@ComponentScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.config", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.security", "com.cinema.beverage", "com.cinema.auth", "com.cinema.product"})
+@EnableJpaRepositories(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product"})
+@EntityScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product"})
 public class HallStoreBackendApplication {
 
     public static void main(String[] args) {

@@ -131,6 +131,15 @@ public class Sku {
     private LocalDateTime updatedAt;
 
     /**
+     * 乐观锁版本号 (@spec P006-fix-sku-edit-data)
+     * 用于并发冲突检测，每次更新时自动递增
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    @Builder.Default
+    private Long version = 0L;
+
+    /**
      * 业务规则验证: 原料和包材必须有标准成本
      */
     @JsonIgnore

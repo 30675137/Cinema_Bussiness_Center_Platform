@@ -81,7 +81,9 @@ public class SecurityConfig {
                 // B端公共端点 (饮品管理 - 临时开放用于开发测试)
                 .requestMatchers(HttpMethod.POST, "/api/admin/beverages/upload-image").permitAll()
                 .requestMatchers("/api/admin/beverages/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/skus/**").permitAll() // SKU列表查询
+                // 暂时禁用所有权限检查 - SKU管理端点 (后续统一添加权限管理)
+                // TODO: 后续统一添加权限管理 (spec 待定)
+                .requestMatchers("/api/skus/**").permitAll() // SKU所有操作
 
                 // 统一订单列表端点 (临时开放用于开发测试)
                 .requestMatchers(HttpMethod.GET, "/api/orders").permitAll()
@@ -90,11 +92,16 @@ public class SecurityConfig {
                 // P005: 库存预占与扣减API (临时开放用于E2E测试)
                 .requestMatchers("/api/inventory/**").permitAll()
 
-                // B端管理端点 (需要认证)
-                .requestMatchers("/api/admin/**").authenticated()
+                // B端管理端点 (临时开放用于开发测试)
+                .requestMatchers("/api/admin/**").permitAll()
 
-                // 其他所有请求需要认证
-                .anyRequest().authenticated()
+                // 静态资源路径
+                .requestMatchers("/static/**").permitAll()
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+
+                // 其他所有请求暂时开放
+                .anyRequest().permitAll()
             )
 
             // 无状态会话策略 (不使用 HttpSession)

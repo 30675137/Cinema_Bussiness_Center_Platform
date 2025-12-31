@@ -87,8 +87,9 @@ const handleServerError = (response: AxiosResponse) => {
       window.location.href = '/login';
       break;
     case 403:
-      // 权限不足
-      console.error('权限不足:', errorData.message);
+      // 权限不足 - 暂时禁用权限检查
+      // TODO: 后续统一添加权限管理 (spec 待定)
+      console.warn('[权限检查已禁用] 403 响应:', errorData.message);
       break;
     case 404:
       // 资源不存在

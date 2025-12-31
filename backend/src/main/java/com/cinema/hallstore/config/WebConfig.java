@@ -8,7 +8,10 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 /**
  * Web MVC 配置
@@ -27,6 +30,23 @@ public class WebConfig implements WebMvcConfigurer {
         //         .allowedHeaders("*")
         //         .allowCredentials(true)
         //         .maxAge(3600);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 配置静态资源处理，避免NoResourceFoundException
+        registry.addResourceHandler("/static/**", "/public/**", "/favicon.ico")
+                .addResourceLocations("classpath:/static/", "classpath:/public/")
+                .setCachePeriod(3600)
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // 处理根路径请求，避免NoResourceFoundException
+        registry.addRedirectViewController("/", "/api");
+        registry.addViewController("/skus").setViewName("forward:/api/skus");
     }
 
     @Override
