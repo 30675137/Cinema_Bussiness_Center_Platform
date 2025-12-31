@@ -10,12 +10,12 @@ import { useState, useEffect, useMemo } from 'react';
  * 断点定义（与 Ant Design 保持一致）
  */
 export const BREAKPOINTS = {
-  xs: 480,    // 手机竖屏
-  sm: 576,    // 手机横屏
-  md: 768,    // 平板竖屏
-  lg: 992,    // 平板横屏 / 小屏笔记本
-  xl: 1200,   // 桌面
-  xxl: 1600,  // 大屏桌面
+  xs: 480, // 手机竖屏
+  sm: 576, // 手机横屏
+  md: 768, // 平板竖屏
+  lg: 992, // 平板横屏 / 小屏笔记本
+  xl: 1200, // 桌面
+  xxl: 1600, // 大屏桌面
 } as const;
 
 export type Breakpoint = keyof typeof BREAKPOINTS;
@@ -30,7 +30,7 @@ export const MEDIA_QUERIES = {
   lg: `(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`,
   xl: `(min-width: ${BREAKPOINTS.lg}px) and (max-width: ${BREAKPOINTS.xl - 1}px)`,
   xxl: `(min-width: ${BREAKPOINTS.xl}px)`,
-  
+
   // 常用组合
   mobile: `(max-width: ${BREAKPOINTS.md - 1}px)`,
   tablet: `(min-width: ${BREAKPOINTS.md}px) and (max-width: ${BREAKPOINTS.lg - 1}px)`,
@@ -42,9 +42,9 @@ export const MEDIA_QUERIES = {
  */
 export function getCurrentBreakpoint(): Breakpoint {
   if (typeof window === 'undefined') return 'lg';
-  
+
   const width = window.innerWidth;
-  
+
   if (width < BREAKPOINTS.xs) return 'xs';
   if (width < BREAKPOINTS.sm) return 'sm';
   if (width < BREAKPOINTS.md) return 'md';
@@ -94,13 +94,13 @@ export function useMediaQuery(query: string): boolean {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const mediaQueryList = window.matchMedia(query);
     const listener = (event: MediaQueryListEvent) => setMatches(event.matches);
-    
+
     // 初始检查
     setMatches(mediaQueryList.matches);
-    
+
     // 监听变化
     mediaQueryList.addEventListener('change', listener);
     return () => mediaQueryList.removeEventListener('change', listener);
@@ -113,23 +113,21 @@ export function useMediaQuery(query: string): boolean {
  * 响应式值 Hook
  * 根据当前断点返回对应的值
  */
-export function useResponsiveValue<T>(
-  values: Partial<Record<Breakpoint, T>> & { default: T }
-): T {
+export function useResponsiveValue<T>(values: Partial<Record<Breakpoint, T>> & { default: T }): T {
   const { breakpoint } = useBreakpoint();
-  
+
   return useMemo(() => {
     // 按优先级查找：当前断点 -> 更小的断点 -> default
     const breakpointOrder: Breakpoint[] = ['xxl', 'xl', 'lg', 'md', 'sm', 'xs'];
     const currentIndex = breakpointOrder.indexOf(breakpoint);
-    
+
     for (let i = currentIndex; i < breakpointOrder.length; i++) {
       const bp = breakpointOrder[i];
       if (values[bp] !== undefined) {
         return values[bp] as T;
       }
     }
-    
+
     return values.default;
   }, [breakpoint, values]);
 }
@@ -158,7 +156,7 @@ export const editorLayoutConfig = {
       centered: false,
     },
   },
-  
+
   /**
    * 表单布局
    */
@@ -179,7 +177,7 @@ export const editorLayoutConfig = {
       wrapperCol: { span: 20 },
     },
   },
-  
+
   /**
    * 卡片网格
    */
@@ -188,7 +186,7 @@ export const editorLayoutConfig = {
     tablet: { gutter: [16, 16] as [number, number], column: 2 },
     desktop: { gutter: [24, 24] as [number, number], column: 3 },
   },
-  
+
   /**
    * 模态框宽度
    */
@@ -197,7 +195,7 @@ export const editorLayoutConfig = {
     tablet: 600,
     desktop: 800,
   },
-  
+
   /**
    * 表格滚动配置
    */
@@ -213,10 +211,10 @@ export const editorLayoutConfig = {
  */
 export function useEditorLayout() {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
-  
+
   return useMemo(() => {
     const deviceType = isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop';
-    
+
     return {
       deviceType,
       tabs: editorLayoutConfig.tabs[deviceType],
@@ -238,7 +236,7 @@ export const responsiveStyles = {
   containerPadding: (isMobile: boolean, isTablet: boolean): React.CSSProperties => ({
     padding: isMobile ? 12 : isTablet ? 16 : 24,
   }),
-  
+
   /**
    * 标题字体大小
    */
@@ -246,14 +244,14 @@ export const responsiveStyles = {
     fontSize: isMobile ? 16 : 20,
     fontWeight: 500,
   }),
-  
+
   /**
    * 间距
    */
   spacing: (isMobile: boolean, isTablet: boolean): number => {
     return isMobile ? 8 : isTablet ? 12 : 16;
   },
-  
+
   /**
    * 按钮大小
    */

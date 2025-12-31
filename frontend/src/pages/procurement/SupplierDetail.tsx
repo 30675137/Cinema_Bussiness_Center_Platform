@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Descriptions, Button, Space, Tag, Table, Tabs, Statistic, Row, Col, Timeline } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, PrinterOutlined, PhoneOutlined, MailOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Descriptions,
+  Button,
+  Space,
+  Tag,
+  Table,
+  Tabs,
+  Statistic,
+  Row,
+  Col,
+  Timeline,
+} from 'antd';
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  PrinterOutlined,
+  PhoneOutlined,
+  MailOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -205,10 +223,10 @@ const SupplierDetail: React.FC = () => {
   // 信用评级映射
   const creditRatingMap: Record<string, { label: string; color: string }> = {
     'A+': { label: 'A+', color: 'gold' },
-    'A': { label: 'A', color: 'green' },
-    'B': { label: 'B', color: 'blue' },
-    'C': { label: 'C', color: 'orange' },
-    'D': { label: 'D', color: 'red' },
+    A: { label: 'A', color: 'green' },
+    B: { label: 'B', color: 'blue' },
+    C: { label: 'C', color: 'orange' },
+    D: { label: 'D', color: 'red' },
   };
 
   // 采购订单状态映射
@@ -227,10 +245,13 @@ const SupplierDetail: React.FC = () => {
     received: { label: '已收货', color: 'success' },
   };
 
-  const statusInfo = statusMap[supplierData.status] || { label: supplierData.status, color: 'default' };
-  const creditInfo = creditRatingMap[supplierData.creditRating] || { 
-    label: supplierData.creditRating, 
-    color: 'default' 
+  const statusInfo = statusMap[supplierData.status] || {
+    label: supplierData.status,
+    color: 'default',
+  };
+  const creditInfo = creditRatingMap[supplierData.creditRating] || {
+    label: supplierData.creditRating,
+    color: 'default',
   };
 
   // 采购订单表格列
@@ -377,22 +398,26 @@ const SupplierDetail: React.FC = () => {
               <Statistic title="累计订单数" value={supplierData.totalOrders} suffix="个" />
             </Col>
             <Col span={6}>
-              <Statistic 
-                title="累计采购金额" 
-                value={supplierData.totalAmount} 
-                prefix="¥" 
-                precision={2} 
+              <Statistic
+                title="累计采购金额"
+                value={supplierData.totalAmount}
+                prefix="¥"
+                precision={2}
               />
             </Col>
             <Col span={6}>
               <Statistic title="供应商品数" value={productsSupplied.length} suffix="个" />
             </Col>
             <Col span={6}>
-              <Statistic 
-                title="平均订单金额" 
-                value={supplierData.totalOrders > 0 ? supplierData.totalAmount / supplierData.totalOrders : 0} 
-                prefix="¥" 
-                precision={2} 
+              <Statistic
+                title="平均订单金额"
+                value={
+                  supplierData.totalOrders > 0
+                    ? supplierData.totalAmount / supplierData.totalOrders
+                    : 0
+                }
+                prefix="¥"
+                precision={2}
               />
             </Col>
           </Row>
@@ -404,15 +429,9 @@ const SupplierDetail: React.FC = () => {
             <Descriptions.Item label="工商注册号">
               {supplierData.registrationNumber}
             </Descriptions.Item>
-            <Descriptions.Item label="税务登记号">
-              {supplierData.taxNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="开户银行">
-              {supplierData.bankName}
-            </Descriptions.Item>
-            <Descriptions.Item label="银行账号">
-              {supplierData.bankAccount}
-            </Descriptions.Item>
+            <Descriptions.Item label="税务登记号">{supplierData.taxNumber}</Descriptions.Item>
+            <Descriptions.Item label="开户银行">{supplierData.bankName}</Descriptions.Item>
+            <Descriptions.Item label="银行账号">{supplierData.bankAccount}</Descriptions.Item>
           </Descriptions>
         </Card>
 

@@ -3,11 +3,7 @@
  * 提供调整记录的展示、排序和操作功能
  */
 
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Table,
   Button,
@@ -23,11 +19,7 @@ import {
   Form,
   Radio,
 } from 'antd';
-import type {
-  ColumnsType,
-  TableProps,
-  TablePaginationConfig,
-} from 'antd/es/table';
+import type { ColumnsType, TableProps, TablePaginationConfig } from 'antd/es/table';
 import {
   EyeOutlined,
   CheckOutlined,
@@ -90,25 +82,27 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
   const [executeModalVisible, setExecuteModalVisible] = useState(false);
 
   // 排序处理
-  const handleTableChange = useCallback((
-    newPagination: TablePaginationConfig,
-    filters: any,
-    sorter: any,
-  ) => {
-    if (sorter.field) {
-      onSortChange({
-        sortBy: sorter.field,
-        sortOrder: sorter.order === 'ascend' ? 'asc' : 'desc',
-      });
-    }
+  const handleTableChange = useCallback(
+    (newPagination: TablePaginationConfig, filters: any, sorter: any) => {
+      if (sorter.field) {
+        onSortChange({
+          sortBy: sorter.field,
+          sortOrder: sorter.order === 'ascend' ? 'asc' : 'desc',
+        });
+      }
 
-    if (newPagination.current !== pagination.current || newPagination.pageSize !== pagination.pageSize) {
-      onPaginationChange({
-        current: newPagination.current,
-        pageSize: newPagination.pageSize,
-      });
-    }
-  }, [sort, pagination, onSortChange, onPaginationChange]);
+      if (
+        newPagination.current !== pagination.current ||
+        newPagination.pageSize !== pagination.pageSize
+      ) {
+        onPaginationChange({
+          current: newPagination.current,
+          pageSize: newPagination.pageSize,
+        });
+      }
+    },
+    [sort, pagination, onSortChange, onPaginationChange]
+  );
 
   // 渲染调整类型标签
   const renderAdjustmentType = useCallback((type: string) => {
@@ -135,17 +129,19 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
     const isPositive = quantity > 0;
     return (
       <Text strong style={{ color: isPositive ? '#52c41a' : '#f5222d' }}>
-        {isPositive ? '+' : ''}{formatNumber(quantity)}
+        {isPositive ? '+' : ''}
+        {formatNumber(quantity)}
       </Text>
     );
   }, []);
 
   // 渲染时间
-  const renderDateTime = useCallback((dateString: string) => (
-    <Text style={{ fontSize: '12px' }}>
-      {formatDate(dateString, 'MM-DD HH:mm')}
-    </Text>
-  ), []);
+  const renderDateTime = useCallback(
+    (dateString: string) => (
+      <Text style={{ fontSize: '12px' }}>{formatDate(dateString, 'MM-DD HH:mm')}</Text>
+    ),
+    []
+  );
 
   // 处理审批
   const handleApprove = useCallback((adjustment: InventoryAdjustment) => {
@@ -154,18 +150,21 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
   }, []);
 
   // 处理审批提交
-  const handleApprovalSubmit = useCallback(async (values: any) => {
-    if (!selectedAdjustment || !onApprove) return;
+  const handleApprovalSubmit = useCallback(
+    async (values: any) => {
+      if (!selectedAdjustment || !onApprove) return;
 
-    try {
-      await onApprove(selectedAdjustment, values.approved, values.remark);
-      setApprovalModalVisible(false);
-      setSelectedAdjustment(null);
-      approvalForm.resetFields();
-    } catch (error) {
-      console.error('审批失败:', error);
-    }
-  }, [selectedAdjustment, onApprove, approvalForm]);
+      try {
+        await onApprove(selectedAdjustment, values.approved, values.remark);
+        setApprovalModalVisible(false);
+        setSelectedAdjustment(null);
+        approvalForm.resetFields();
+      } catch (error) {
+        console.error('审批失败:', error);
+      }
+    },
+    [selectedAdjustment, onApprove, approvalForm]
+  );
 
   // 处理审批取消
   const handleApprovalCancel = useCallback(() => {
@@ -200,102 +199,97 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
   }, []);
 
   // 操作列配置
-  const renderActions = useCallback((record: InventoryAdjustment) => {
-    const items = [
-      {
-        key: 'view',
-        label: '查看详情',
-        icon: <EyeOutlined />,
-        onClick: () => onViewDetails(record),
-      },
-    ];
+  const renderActions = useCallback(
+    (record: InventoryAdjustment) => {
+      const items = [
+        {
+          key: 'view',
+          label: '查看详情',
+          icon: <EyeOutlined />,
+          onClick: () => onViewDetails(record),
+        },
+      ];
 
-    if (canAdmin) {
-      if (record.status === 'pending') {
-        items.push(
-          {
-            key: 'approve',
-            label: '批准',
-            icon: <CheckOutlined />,
-            onClick: () => handleApprove(record),
-          },
-          {
-            key: 'reject',
-            label: '拒绝',
-            icon: <CloseOutlined />,
-            onClick: () => handleApprove(record),
-          }
-        );
+      if (canAdmin) {
+        if (record.status === 'pending') {
+          items.push(
+            {
+              key: 'approve',
+              label: '批准',
+              icon: <CheckOutlined />,
+              onClick: () => handleApprove(record),
+            },
+            {
+              key: 'reject',
+              label: '拒绝',
+              icon: <CloseOutlined />,
+              onClick: () => handleApprove(record),
+            }
+          );
+        }
+
+        if (record.status === 'approved') {
+          items.push({
+            key: 'execute',
+            label: '执行',
+            icon: <PlayCircleOutlined />,
+            onClick: () => handleExecute(record),
+          });
+        }
       }
 
-      if (record.status === 'approved') {
-        items.push({
-          key: 'execute',
-          label: '执行',
-          icon: <PlayCircleOutlined />,
-          onClick: () => handleExecute(record),
-        });
-      }
-    }
-
-    return (
-      <Space>
-        <Tooltip title="查看详情">
-          <Button
-            type="link"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => onViewDetails(record)}
-          />
-        </Tooltip>
-        {canAdmin && record.status === 'pending' && (
-          <>
-            <Tooltip title="批准">
-              <Button
-                type="link"
-                size="small"
-                icon={<CheckOutlined />}
-                onClick={() => handleApprove(record)}
-                loading={isApproving}
-              />
-            </Tooltip>
-            <Tooltip title="拒绝">
-              <Button
-                type="link"
-                size="small"
-                danger
-                icon={<CloseOutlined />}
-                onClick={() => handleApprove(record)}
-                loading={isApproving}
-              />
-            </Tooltip>
-          </>
-        )}
-        {canAdmin && record.status === 'approved' && (
-          <Tooltip title="执行">
+      return (
+        <Space>
+          <Tooltip title="查看详情">
             <Button
               type="link"
               size="small"
-              icon={<PlayCircleOutlined />}
-              onClick={() => handleExecute(record)}
-              loading={isExecuting}
+              icon={<EyeOutlined />}
+              onClick={() => onViewDetails(record)}
             />
           </Tooltip>
-        )}
-        <Dropdown
-          menu={{ items }}
-          trigger={['click']}
-          placement="bottomRight"
-        >
-          <Button
-            type="link"
-            size="small"
-            icon={<MoreOutlined />}
-          />
-        </Dropdown>
-      </Space>
-    );
-  }, [canAdmin, onViewDetails, handleApprove, handleExecute, isApproving, isExecuting]);
+          {canAdmin && record.status === 'pending' && (
+            <>
+              <Tooltip title="批准">
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<CheckOutlined />}
+                  onClick={() => handleApprove(record)}
+                  loading={isApproving}
+                />
+              </Tooltip>
+              <Tooltip title="拒绝">
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<CloseOutlined />}
+                  onClick={() => handleApprove(record)}
+                  loading={isApproving}
+                />
+              </Tooltip>
+            </>
+          )}
+          {canAdmin && record.status === 'approved' && (
+            <Tooltip title="执行">
+              <Button
+                type="link"
+                size="small"
+                icon={<PlayCircleOutlined />}
+                onClick={() => handleExecute(record)}
+                loading={isExecuting}
+              />
+            </Tooltip>
+          )}
+          <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+            <Button type="link" size="small" icon={<MoreOutlined />} />
+          </Dropdown>
+        </Space>
+      );
+    },
+    [canAdmin, onViewDetails, handleApprove, handleExecute, isApproving, isExecuting]
+  );
 
   // 基础列配置
   const baseColumns: ColumnsType<InventoryAdjustment> = [
@@ -403,24 +397,26 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
   const columns = useMemo(() => {
     if (isMobile) {
       // 移动端只显示关键列
-      return baseColumns.filter(col => [
-        'adjustmentNo',
-        'productName',
-        'adjustmentType',
-        'adjustmentQuantity',
-        'status',
-        'actions',
-      ].includes(col.key as string));
+      return baseColumns.filter((col) =>
+        [
+          'adjustmentNo',
+          'productName',
+          'adjustmentType',
+          'adjustmentQuantity',
+          'status',
+          'actions',
+        ].includes(col.key as string)
+      );
     }
 
     if (isTablet) {
       // 平板端隐藏部分列
-      return baseColumns.filter(col => ![
-        'locationName',
-        'originalQuantity',
-        'adjustedQuantity',
-        'requestedBy',
-      ].includes(col.key as string));
+      return baseColumns.filter(
+        (col) =>
+          !['locationName', 'originalQuantity', 'adjustedQuantity', 'requestedBy'].includes(
+            col.key as string
+          )
+      );
     }
 
     return baseColumns;
@@ -431,18 +427,11 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
     <Space>
       {refreshData && (
         <Tooltip title="刷新数据">
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refreshData}
-            loading={loading}
-          />
+          <Button icon={<ReloadOutlined />} onClick={refreshData} loading={loading} />
         </Tooltip>
       )}
       {onExport && (
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={onExport}
-        >
+        <Button icon={<ReloadOutlined />} onClick={onExport}>
           导出
         </Button>
       )}
@@ -492,11 +481,7 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
         footer={null}
         width={600}
       >
-        <Form
-          form={approvalForm}
-          layout="vertical"
-          onFinish={handleApprovalSubmit}
-        >
+        <Form form={approvalForm} layout="vertical" onFinish={handleApprovalSubmit}>
           {selectedAdjustment && (
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <div>
@@ -546,13 +531,39 @@ const AdjustmentTable: React.FC<AdjustmentTableProps> = ({
             <div>
               <Text strong>即将执行以下库存调整：</Text>
             </div>
-            <div style={{ padding: 12, background: '#fff7e6', borderRadius: 6, border: '1px solid #ffd591' }}>
-              <div>商品：<Text strong>{selectedAdjustment.productName}</Text></div>
-              <div>调整类型：<Text strong>{getAdjustmentTypeConfig(selectedAdjustment.adjustmentType).text}</Text></div>
-              <div>调整数量：<Text strong style={{ color: selectedAdjustment.adjustmentQuantity > 0 ? '#52c41a' : '#f5222d' }}>
-                {selectedAdjustment.adjustmentQuantity > 0 ? '+' : ''}{selectedAdjustment.adjustmentQuantity}
-              </Text></div>
-              <div>当前库存：<Text strong>{selectedAdjustment.originalQuantity}</Text> → <Text strong>{selectedAdjustment.adjustedQuantity}</Text></div>
+            <div
+              style={{
+                padding: 12,
+                background: '#fff7e6',
+                borderRadius: 6,
+                border: '1px solid #ffd591',
+              }}
+            >
+              <div>
+                商品：<Text strong>{selectedAdjustment.productName}</Text>
+              </div>
+              <div>
+                调整类型：
+                <Text strong>
+                  {getAdjustmentTypeConfig(selectedAdjustment.adjustmentType).text}
+                </Text>
+              </div>
+              <div>
+                调整数量：
+                <Text
+                  strong
+                  style={{
+                    color: selectedAdjustment.adjustmentQuantity > 0 ? '#52c41a' : '#f5222d',
+                  }}
+                >
+                  {selectedAdjustment.adjustmentQuantity > 0 ? '+' : ''}
+                  {selectedAdjustment.adjustmentQuantity}
+                </Text>
+              </div>
+              <div>
+                当前库存：<Text strong>{selectedAdjustment.originalQuantity}</Text> →{' '}
+                <Text strong>{selectedAdjustment.adjustedQuantity}</Text>
+              </div>
             </div>
             <div style={{ color: '#fa8c16' }}>
               <ExclamationCircleOutlined style={{ marginRight: 8 }} />

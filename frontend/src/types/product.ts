@@ -272,7 +272,7 @@ export const SKU_ERROR_CODES = {
   SKU_SYS_002: 'SKU_SYS_002', // Supabase调用超时
 } as const;
 
-export type SKUErrorCode = typeof SKU_ERROR_CODES[keyof typeof SKU_ERROR_CODES];
+export type SKUErrorCode = (typeof SKU_ERROR_CODES)[keyof typeof SKU_ERROR_CODES];
 
 /**
  * Type guard: 检查是否为API错误响应

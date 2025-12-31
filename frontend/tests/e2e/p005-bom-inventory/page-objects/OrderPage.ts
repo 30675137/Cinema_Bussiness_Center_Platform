@@ -25,10 +25,14 @@ export class OrderPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.createOrderButton = page.locator('button:has-text("创建订单"), button:has-text("新建订单")');
+    this.createOrderButton = page.locator(
+      'button:has-text("创建订单"), button:has-text("新建订单")'
+    );
     this.productSelect = page.locator('[data-testid="product-select"], [placeholder*="选择商品"]');
     this.quantityInput = page.locator('input[type="number"], [data-testid="quantity-input"]');
-    this.submitOrderButton = page.locator('button:has-text("提交订单"), button:has-text("确认下单")');
+    this.submitOrderButton = page.locator(
+      'button:has-text("提交订单"), button:has-text("确认下单")'
+    );
     this.orderTable = page.locator('.ant-table');
     this.searchInput = page.locator('[placeholder*="订单号"], [placeholder*="搜索"]');
     this.searchButton = page.locator('button:has-text("搜索"), button:has-text("查询")');
@@ -74,21 +78,28 @@ export class OrderPage {
   /**
    * 通过API创建订单（更可靠）
    */
-  async createOrderViaAPI(orderId: string, storeId: string, items: Array<{
-    skuId: string;
-    quantity: number;
-    unit: string;
-  }>): Promise<{ success: boolean; data?: any; error?: string }> {
-    const response = await this.page.request.post('http://localhost:8080/api/inventory/reservations', {
-      data: {
-        orderId,
-        storeId,
-        items
-      },
-      headers: {
-        'Content-Type': 'application/json'
+  async createOrderViaAPI(
+    orderId: string,
+    storeId: string,
+    items: Array<{
+      skuId: string;
+      quantity: number;
+      unit: string;
+    }>
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
+    const response = await this.page.request.post(
+      'http://localhost:8080/api/inventory/reservations',
+      {
+        data: {
+          orderId,
+          storeId,
+          items,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     return await response.json();
   }
@@ -131,16 +142,22 @@ export class OrderPage {
   /**
    * 通过API履约订单
    */
-  async fulfillOrderViaAPI(orderId: string, storeId: string): Promise<{ success: boolean; data?: any; error?: string }> {
-    const response = await this.page.request.post('http://localhost:8080/api/inventory/deductions', {
-      data: {
-        orderId,
-        storeId
-      },
-      headers: {
-        'Content-Type': 'application/json'
+  async fulfillOrderViaAPI(
+    orderId: string,
+    storeId: string
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
+    const response = await this.page.request.post(
+      'http://localhost:8080/api/inventory/deductions',
+      {
+        data: {
+          orderId,
+          storeId,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     return await response.json();
   }
@@ -164,12 +181,17 @@ export class OrderPage {
   /**
    * 通过API取消订单
    */
-  async cancelOrderViaAPI(orderId: string): Promise<{ success: boolean; data?: any; error?: string }> {
-    const response = await this.page.request.delete(`http://localhost:8080/api/inventory/reservations/${orderId}`, {
-      headers: {
-        'Content-Type': 'application/json'
+  async cancelOrderViaAPI(
+    orderId: string
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
+    const response = await this.page.request.delete(
+      `http://localhost:8080/api/inventory/reservations/${orderId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     return await response.json();
   }
@@ -197,6 +219,6 @@ export class OrderPage {
     await this.searchOrder(orderNumber);
     const firstRow = this.page.locator('.ant-table-tbody tr').first();
     const statusBadge = firstRow.locator('.ant-badge, .ant-tag');
-    return await statusBadge.textContent() || '';
+    return (await statusBadge.textContent()) || '';
   }
 }

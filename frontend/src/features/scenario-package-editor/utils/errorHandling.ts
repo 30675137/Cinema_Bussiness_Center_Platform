@@ -74,33 +74,33 @@ const ERROR_MESSAGES: Record<ErrorType, { title: string; description: string }> 
  */
 const SCENARIO_PACKAGE_ERROR_MESSAGES: Record<string, string> = {
   // 基础信息相关
-  'BASIC_INFO_INCOMPLETE': '请完成基础信息的填写（名称、分类、主图）',
-  'NAME_REQUIRED': '场景包名称不能为空',
-  'NAME_TOO_LONG': '场景包名称不能超过100个字符',
-  'CATEGORY_REQUIRED': '请选择场景包分类',
-  'MAIN_IMAGE_REQUIRED': '请上传场景包主图',
-  
+  BASIC_INFO_INCOMPLETE: '请完成基础信息的填写（名称、分类、主图）',
+  NAME_REQUIRED: '场景包名称不能为空',
+  NAME_TOO_LONG: '场景包名称不能超过100个字符',
+  CATEGORY_REQUIRED: '请选择场景包分类',
+  MAIN_IMAGE_REQUIRED: '请上传场景包主图',
+
   // 套餐相关
-  'NO_PACKAGES': '请至少添加一个套餐',
-  'PACKAGE_PRICE_INVALID': '套餐价格必须大于0',
-  'ORIGINAL_PRICE_LESS_THAN_PRICE': '原价必须大于或等于售价',
-  'PACKAGE_NAME_DUPLICATE': '套餐名称不能重复',
-  
+  NO_PACKAGES: '请至少添加一个套餐',
+  PACKAGE_PRICE_INVALID: '套餐价格必须大于0',
+  ORIGINAL_PRICE_LESS_THAN_PRICE: '原价必须大于或等于售价',
+  PACKAGE_NAME_DUPLICATE: '套餐名称不能重复',
+
   // 加购项相关
-  'ADDON_NOT_FOUND': '加购项不存在或已下架',
-  'ADDON_ALREADY_ASSOCIATED': '该加购项已关联',
-  
+  ADDON_NOT_FOUND: '加购项不存在或已下架',
+  ADDON_ALREADY_ASSOCIATED: '该加购项已关联',
+
   // 时段相关
-  'NO_TIME_SLOTS': '请至少配置一个时段模板',
-  'TIME_SLOT_CONFLICT': '时段存在冲突，请检查时间范围',
-  'END_TIME_BEFORE_START': '结束时间必须晚于开始时间',
-  
+  NO_TIME_SLOTS: '请至少配置一个时段模板',
+  TIME_SLOT_CONFLICT: '时段存在冲突，请检查时间范围',
+  END_TIME_BEFORE_START: '结束时间必须晚于开始时间',
+
   // 发布相关
-  'PUBLISH_VALIDATION_FAILED': '发布验证失败，请检查必填项',
-  'ALREADY_PUBLISHED': '场景包已发布',
-  'ALREADY_ARCHIVED': '场景包已下架',
-  'EFFECTIVE_DATE_INVALID': '生效日期设置无效',
-  'END_DATE_BEFORE_START': '结束日期必须晚于开始日期',
+  PUBLISH_VALIDATION_FAILED: '发布验证失败，请检查必填项',
+  ALREADY_PUBLISHED: '场景包已发布',
+  ALREADY_ARCHIVED: '场景包已下架',
+  EFFECTIVE_DATE_INVALID: '生效日期设置无效',
+  END_DATE_BEFORE_START: '结束日期必须晚于开始日期',
 };
 
 /**
@@ -108,12 +108,12 @@ const SCENARIO_PACKAGE_ERROR_MESSAGES: Record<string, string> = {
  */
 export function getErrorType(error: unknown): ErrorType {
   if (!error) return ErrorType.UNKNOWN;
-  
+
   // 网络错误
   if (error instanceof TypeError && error.message === 'Failed to fetch') {
     return ErrorType.NETWORK;
   }
-  
+
   // Axios 错误
   const axiosError = error as AxiosError<ApiErrorResponse>;
   if (axiosError.response) {
@@ -139,12 +139,12 @@ export function getErrorType(error: unknown): ErrorType {
         return ErrorType.UNKNOWN;
     }
   }
-  
+
   // 网络错误（无响应）
   if (axiosError.code === 'ECONNABORTED' || axiosError.code === 'ERR_NETWORK') {
     return ErrorType.NETWORK;
   }
-  
+
   return ErrorType.UNKNOWN;
 }
 
@@ -153,21 +153,21 @@ export function getErrorType(error: unknown): ErrorType {
  */
 export function getErrorMessage(error: unknown): string {
   const axiosError = error as AxiosError<ApiErrorResponse>;
-  
+
   // 尝试获取后端返回的错误信息
   if (axiosError.response?.data) {
     const data = axiosError.response.data;
-    
+
     // 检查是否有特定错误码
     if (data.code && SCENARIO_PACKAGE_ERROR_MESSAGES[data.code]) {
       return SCENARIO_PACKAGE_ERROR_MESSAGES[data.code];
     }
-    
+
     // 返回后端消息
     if (data.message) {
       return data.message;
     }
-    
+
     // 处理验证错误详情
     if (data.details) {
       const messages = Object.values(data.details).flat();
@@ -175,13 +175,13 @@ export function getErrorMessage(error: unknown): string {
         return messages.join('；');
       }
     }
-    
+
     // 处理发布验证错误
     if (data.missingItems && data.missingItems.length > 0) {
       return `缺少必填项：${data.missingItems.join('、')}`;
     }
   }
-  
+
   // 使用默认错误消息
   const errorType = getErrorType(error);
   return ERROR_MESSAGES[errorType].description;
@@ -194,7 +194,7 @@ export function showErrorNotification(error: unknown, customTitle?: string): voi
   const errorType = getErrorType(error);
   const { title, description } = ERROR_MESSAGES[errorType];
   const errorMessage = getErrorMessage(error);
-  
+
   notification.error({
     message: customTitle || title,
     description: errorMessage || description,
@@ -243,7 +243,7 @@ export function handleMutationError(
 ): void {
   const errorType = getErrorType(error);
   const axiosError = error as AxiosError<ApiErrorResponse>;
-  
+
   // 特殊处理
   switch (errorType) {
     case ErrorType.UNAUTHORIZED:
@@ -258,10 +258,10 @@ export function handleMutationError(
       }
       break;
   }
-  
+
   // 显示通知
   showErrorNotification(error, `${context.operation}失败`);
-  
+
   // 开发环境下打印详细错误
   if (import.meta.env.DEV) {
     console.error(`[${context.operation}] 错误详情:`, error);
@@ -303,12 +303,12 @@ export function logError(
     errorMessage: getErrorMessage(error),
     ...context,
   };
-  
+
   // 开发环境下打印
   if (import.meta.env.DEV) {
     console.error('[Error Log]', errorInfo, error);
   }
-  
+
   // TODO: 生产环境对接 Sentry
   // if (import.meta.env.PROD && typeof Sentry !== 'undefined') {
   //   Sentry.captureException(error, { extra: errorInfo });

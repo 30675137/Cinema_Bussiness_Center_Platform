@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect } from 'react';
 import {
   Form,
   Input,
@@ -9,25 +9,27 @@ import {
   Card,
   Typography,
   Divider,
-  message
-} from 'antd'
-import {
-  SaveOutlined,
-  CloseOutlined
-} from '@ant-design/icons'
-import type { Category, CreateCategoryRequest, UpdateCategoryRequest, CategoryStatus } from '@/types/category'
+  message,
+} from 'antd';
+import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import type {
+  Category,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CategoryStatus,
+} from '@/types/category';
 
-const { TextArea } = Input
-const { Option } = Select
-const { Title } = Typography
+const { TextArea } = Input;
+const { Option } = Select;
+const { Title } = Typography;
 
 interface CategoryFormProps {
-  mode: 'create' | 'edit'
-  initialValues?: Category
-  parentCategory?: Category
-  onSubmit: (values: CreateCategoryRequest | UpdateCategoryRequest) => Promise<void>
-  onCancel: () => void
-  loading?: boolean
+  mode: 'create' | 'edit';
+  initialValues?: Category;
+  parentCategory?: Category;
+  onSubmit: (values: CreateCategoryRequest | UpdateCategoryRequest) => Promise<void>;
+  onCancel: () => void;
+  loading?: boolean;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
@@ -36,14 +38,12 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   parentCategory,
   onSubmit,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
 
   // 确定类目等级
-  const categoryLevel = parentCategory 
-    ? ((parentCategory.level + 1) as 1 | 2 | 3)
-    : 1
+  const categoryLevel = parentCategory ? ((parentCategory.level + 1) as 1 | 2 | 3) : 1;
 
   // 初始化表单值
   useEffect(() => {
@@ -53,20 +53,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         description: initialValues.description,
         sortOrder: initialValues.sortOrder,
         status: initialValues.status,
-      })
+      });
     } else if (mode === 'create') {
       form.setFieldsValue({
         status: 'active',
         sortOrder: 0,
-      })
+      });
     }
-  }, [mode, initialValues, form])
+  }, [mode, initialValues, form]);
 
   // 处理表单提交
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields()
-      
+      const values = await form.validateFields();
+
       if (mode === 'create') {
         const createData: CreateCategoryRequest = {
           name: values.name,
@@ -74,8 +74,8 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           description: values.description,
           sortOrder: values.sortOrder || 0,
           status: values.status || 'active',
-        }
-        await onSubmit(createData)
+        };
+        await onSubmit(createData);
       } else {
         const updateData: UpdateCategoryRequest = {
           id: initialValues!.id,
@@ -83,18 +83,18 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           description: values.description,
           sortOrder: values.sortOrder,
           status: values.status,
-        }
-        await onSubmit(updateData)
+        };
+        await onSubmit(updateData);
       }
     } catch (error) {
-      console.error('Form validation error:', error)
+      console.error('Form validation error:', error);
     }
-  }
+  };
 
   // 格式化路径显示
   const formatPath = (path: string[]): string => {
-    return path.length > 0 ? path.join(' / ') : '根类目'
-  }
+    return path.length > 0 ? path.join(' / ') : '根类目';
+  };
 
   return (
     <Card
@@ -104,11 +104,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         </Title>
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         {/* 只读字段显示 */}
         {mode === 'edit' && initialValues && (
           <>
@@ -117,9 +113,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             </Form.Item>
 
             <Form.Item label="类目等级">
-              <Input 
-                value={initialValues.level === 1 ? '一级类目' : initialValues.level === 2 ? '二级类目' : '三级类目'} 
-                disabled 
+              <Input
+                value={
+                  initialValues.level === 1
+                    ? '一级类目'
+                    : initialValues.level === 2
+                      ? '二级类目'
+                      : '三级类目'
+                }
+                disabled
               />
             </Form.Item>
 
@@ -144,10 +146,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             </Form.Item>
 
             <Form.Item label="类目等级">
-              <Input 
-                value={categoryLevel === 2 ? '二级类目' : '三级类目'} 
-                disabled 
-              />
+              <Input value={categoryLevel === 2 ? '二级类目' : '三级类目'} disabled />
             </Form.Item>
 
             <Divider />
@@ -169,39 +168,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         <Form.Item
           label="类目描述"
           name="description"
-          rules={[
-            { max: 200, message: '类目描述不能超过200个字符' },
-          ]}
+          rules={[{ max: 200, message: '类目描述不能超过200个字符' }]}
         >
-          <TextArea 
-            rows={3} 
-            placeholder="请输入类目描述（可选）"
-            showCount
-            maxLength={200}
-          />
+          <TextArea rows={3} placeholder="请输入类目描述（可选）" showCount maxLength={200} />
         </Form.Item>
 
         <Form.Item
           label="排序序号"
           name="sortOrder"
-          rules={[
-            { type: 'number', min: 0, message: '排序序号必须大于等于0' },
-          ]}
+          rules={[{ type: 'number', min: 0, message: '排序序号必须大于等于0' }]}
         >
-          <InputNumber 
-            min={0}
-            placeholder="请输入排序序号"
-            style={{ width: '100%' }}
-          />
+          <InputNumber min={0} placeholder="请输入排序序号" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item
-          label="状态"
-          name="status"
-          rules={[
-            { required: true, message: '请选择状态' },
-          ]}
-        >
+        <Form.Item label="状态" name="status" rules={[{ required: true, message: '请选择状态' }]}>
           <Select placeholder="请选择状态">
             <Option value="active">启用</Option>
             <Option value="inactive">停用</Option>
@@ -210,25 +190,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
         <Form.Item>
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Button onClick={onCancel}>
-              取消
-            </Button>
-            <Button 
-              type="primary" 
-              htmlType="submit"
-              icon={<SaveOutlined />}
-              loading={loading}
-            >
+            <Button onClick={onCancel}>取消</Button>
+            <Button type="primary" htmlType="submit" icon={<SaveOutlined />} loading={loading}>
               {mode === 'create' ? '创建' : '保存'}
             </Button>
           </Space>
         </Form.Item>
       </Form>
     </Card>
-  )
-}
+  );
+};
 
-export default CategoryForm
-
-
-
+export default CategoryForm;

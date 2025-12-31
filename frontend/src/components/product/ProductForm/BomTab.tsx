@@ -15,14 +15,14 @@ import {
   message,
   Divider,
   Tag,
-  Alert
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -68,7 +68,7 @@ const BomTab: React.FC<BomTabProps> = ({
   touched,
   materialType,
   setValue,
-  getValues
+  getValues,
 }) => {
   const [editingComponent, setEditingComponent] = useState<BomComponent | null>(null);
   const [componentFormVisible, setComponentFormVisible] = useState(false);
@@ -77,10 +77,10 @@ const BomTab: React.FC<BomTabProps> = ({
     fields: componentFields,
     append: appendComponent,
     remove: removeComponent,
-    update: updateComponent
+    update: updateComponent,
   } = useFieldArray({
     control,
-    name: 'bom.components'
+    name: 'bom.components',
   });
 
   // 如果不是成品，显示提示信息
@@ -117,7 +117,7 @@ const BomTab: React.FC<BomTabProps> = ({
       unitCost: 0,
       totalCost: 0,
       isOptional: false,
-      sortOrder: componentFields.length
+      sortOrder: componentFields.length,
     };
     setEditingComponent(newComponent);
     setComponentFormVisible(true);
@@ -133,9 +133,9 @@ const BomTab: React.FC<BomTabProps> = ({
   const handleSaveComponent = (component: BomComponent) => {
     component.totalCost = (component.unitCost || 0) * component.quantity;
 
-    if (editingComponent && componentFields.find(field => field.id === editingComponent.id)) {
+    if (editingComponent && componentFields.find((field) => field.id === editingComponent.id)) {
       // 更新现有物料
-      const index = componentFields.findIndex(field => field.id === component.id);
+      const index = componentFields.findIndex((field) => field.id === component.id);
       if (index !== -1) {
         updateComponent(index, component);
       }
@@ -168,7 +168,20 @@ const BomTab: React.FC<BomTabProps> = ({
 
   // 单位选项
   const unitOptions = [
-    '个', '件', '盒', '袋', '瓶', '罐', '份', '套', '千克', '克', '升', '毫升', '米', '厘米'
+    '个',
+    '件',
+    '盒',
+    '袋',
+    '瓶',
+    '罐',
+    '份',
+    '套',
+    '千克',
+    '克',
+    '升',
+    '毫升',
+    '米',
+    '厘米',
   ];
 
   // 表格列定义
@@ -180,9 +193,9 @@ const BomTab: React.FC<BomTabProps> = ({
       render: (text: string, record: BomComponent) => (
         <Space>
           <span>{text || record.materialId || '-'}</span>
-          {record.isOptional && <Tag color="orange" >可选</Tag>}
+          {record.isOptional && <Tag color="orange">可选</Tag>}
         </Space>
-      )
+      ),
     },
     {
       title: '数量',
@@ -190,55 +203,43 @@ const BomTab: React.FC<BomTabProps> = ({
       key: 'quantity',
       width: 100,
       render: (quantity: number, record: BomComponent) => (
-        <Text>{quantity} {record.unit}</Text>
-      )
+        <Text>
+          {quantity} {record.unit}
+        </Text>
+      ),
     },
     {
       title: '单位成本',
       dataIndex: 'unitCost',
       key: 'unitCost',
       width: 120,
-      render: (cost: number) => (
-        <Text>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '总成本',
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: 120,
-      render: (cost: number) => (
-        <Text strong>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text strong>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '操作',
       key: 'actions',
       width: 100,
       render: (_: any, record: BomComponent, index: number) => (
-        <Space >
-          <Button
-            type="text"
-            
-            icon={<EditOutlined />}
-            onClick={() => handleEditComponent(record)}
-          />
+        <Space>
+          <Button type="text" icon={<EditOutlined />} onClick={() => handleEditComponent(record)} />
           <Popconfirm
             title="确定删除此物料吗？"
             onConfirm={() => handleDeleteComponent(index)}
             okText="确定"
             cancelText="取消"
           >
-            <Button
-              type="text"
-              
-              danger
-              icon={<DeleteOutlined />}
-            />
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -254,7 +255,7 @@ const BomTab: React.FC<BomTabProps> = ({
         />
 
         {/* 基础信息 */}
-        <Card title="配方基础信息" >
+        <Card title="配方基础信息">
           <Row gutter={[16, 0]}>
             <Col span={8}>
               <Form.Item
@@ -323,11 +324,7 @@ const BomTab: React.FC<BomTabProps> = ({
             <Title level={4} style={{ margin: 0 }}>
               物料清单
             </Title>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddComponent}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddComponent}>
               添加物料
             </Button>
           </div>
@@ -355,7 +352,6 @@ const BomTab: React.FC<BomTabProps> = ({
                 columns={columns}
                 rowKey="id"
                 pagination={false}
-                
                 bordered
                 summary={() => (
                   <Table.Summary>
@@ -375,7 +371,7 @@ const BomTab: React.FC<BomTabProps> = ({
               />
 
               {/* 成本分析 */}
-              <Card  style={{ marginTop: 16, backgroundColor: '#fafafa' }}>
+              <Card style={{ marginTop: 16, backgroundColor: '#fafafa' }}>
                 <Row gutter={16}>
                   <Col span={8}>
                     <Text type="secondary">物料总数：</Text>
@@ -389,9 +385,7 @@ const BomTab: React.FC<BomTabProps> = ({
                   </Col>
                   <Col span={8}>
                     <Text type="secondary">成品率：</Text>
-                    <Text strong>
-                      {getValues('bom.yieldRate') || 100}%
-                    </Text>
+                    <Text strong>{getValues('bom.yieldRate') || 100}%</Text>
                   </Col>
                 </Row>
               </Card>
@@ -431,12 +425,12 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
     { id: 'mat002', name: '纯净水', unit: '升', cost: 0.5 },
     { id: 'mat003', name: '冰块', unit: '千克', cost: 2.0 },
     { id: 'mat004', name: '柠檬片', unit: '片', cost: 0.3 },
-    { id: 'mat005', name: '杯子', unit: '个', cost: 0.8 }
+    { id: 'mat005', name: '杯子', unit: '个', cost: 0.8 },
   ];
 
   // 物料选择
   const handleMaterialSelect = (materialId: string) => {
-    const material = materialOptions.find(m => m.id === materialId);
+    const material = materialOptions.find((m) => m.id === materialId);
     if (material) {
       setFormComponent({
         ...formComponent,
@@ -444,7 +438,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
         materialName: material.name,
         unit: material.unit,
         unitCost: material.cost,
-        totalCost: material.cost * formComponent.quantity
+        totalCost: material.cost * formComponent.quantity,
       });
     }
   };
@@ -455,7 +449,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
     setFormComponent({
       ...formComponent,
       quantity,
-      totalCost
+      totalCost,
     });
   };
 
@@ -465,7 +459,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
     setFormComponent({
       ...formComponent,
       unitCost,
-      totalCost
+      totalCost,
     });
   };
 
@@ -498,7 +492,7 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
                 option?.children?.toString().toLowerCase().includes(input.toLowerCase()) || false
               }
             >
-              {materialOptions.map(material => (
+              {materialOptions.map((material) => (
                 <Option key={material.id} value={material.id}>
                   {material.name} (¥{material.cost}/{material.unit})
                 </Option>
@@ -557,10 +551,12 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
           <Form.Item label="是否可选">
             <Select
               value={formComponent.isOptional ? 'optional' : 'required'}
-              onChange={(value) => setFormComponent({
-                ...formComponent,
-                isOptional: value === 'optional'
-              })}
+              onChange={(value) =>
+                setFormComponent({
+                  ...formComponent,
+                  isOptional: value === 'optional',
+                })
+              }
             >
               <Option value="required">必需</Option>
               <Option value="optional">可选</Option>
@@ -574,10 +570,12 @@ const ComponentForm: React.FC<ComponentFormProps> = ({ component, onSave, onCanc
               placeholder="0"
               min={0}
               value={formComponent.sortOrder}
-              onChange={(value) => setFormComponent({
-                ...formComponent,
-                sortOrder: value || 0
-              })}
+              onChange={(value) =>
+                setFormComponent({
+                  ...formComponent,
+                  sortOrder: value || 0,
+                })
+              }
             />
           </Form.Item>
         </Col>

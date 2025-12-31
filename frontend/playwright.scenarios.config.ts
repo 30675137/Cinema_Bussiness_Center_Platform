@@ -10,7 +10,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report-scenarios', open: 'never' }],
-    ['json', { outputFile: 'test-results-scenarios.json' }]
+    ['json', { outputFile: 'test-results-scenarios.json' }],
   ],
   use: {
     baseURL: 'http://localhost:3000',

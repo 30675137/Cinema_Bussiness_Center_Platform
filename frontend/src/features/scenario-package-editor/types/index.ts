@@ -10,9 +10,9 @@
  * 发布状态
  */
 export enum PublishStatus {
-  DRAFT = 'DRAFT',           // 草稿
-  PUBLISHED = 'PUBLISHED',   // 已发布
-  ARCHIVED = 'ARCHIVED'      // 已下架
+  DRAFT = 'DRAFT', // 草稿
+  PUBLISHED = 'PUBLISHED', // 已发布
+  ARCHIVED = 'ARCHIVED', // 已下架
 }
 
 /**
@@ -24,19 +24,19 @@ export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
  * 覆盖类型
  */
 export enum OverrideType {
-  ADD = 'ADD',       // 新增时段
+  ADD = 'ADD', // 新增时段
   MODIFY = 'MODIFY', // 修改时段
-  CANCEL = 'CANCEL'  // 取消时段
+  CANCEL = 'CANCEL', // 取消时段
 }
 
 /**
  * 加购项分类
  */
 export enum AddOnCategory {
-  CATERING = 'CATERING',       // 餐饮
-  BEVERAGE = 'BEVERAGE',       // 饮品
-  SERVICE = 'SERVICE',         // 服务
-  DECORATION = 'DECORATION'    // 布置
+  CATERING = 'CATERING', // 餐饮
+  BEVERAGE = 'BEVERAGE', // 饮品
+  SERVICE = 'SERVICE', // 服务
+  DECORATION = 'DECORATION', // 布置
 }
 
 // ========== 核心实体 ==========
@@ -45,8 +45,8 @@ export enum AddOnCategory {
  * 价格调整规则
  */
 export interface PriceAdjustment {
-  type: 'PERCENTAGE' | 'FIXED';  // 百分比调整或固定金额调整
-  value: number;                  // 调整值
+  type: 'PERCENTAGE' | 'FIXED'; // 百分比调整或固定金额调整
+  value: number; // 调整值
 }
 
 /**
@@ -54,18 +54,18 @@ export interface PriceAdjustment {
  */
 export interface ScenarioPackage {
   id: string;
-  name: string;                           // 必填,最大100字符
-  description?: string | null;            // 可选,最大500字符
-  category: string;                       // 必填,从预定义分类列表选择
-  mainImage: string;                      // 必填,Supabase Storage URL
-  status: PublishStatus;                  // 发布状态
-  effectiveStartDate?: string | null;     // 生效开始日期,YYYY-MM-DD格式
-  effectiveEndDate?: string | null;       // 生效结束日期,YYYY-MM-DD格式
-  advanceBookingDays?: number | null;     // 提前预订天数
-  createdAt: string;                      // ISO 8601 timestamp
-  updatedAt: string;                      // ISO 8601 timestamp
-  createdBy: string;                      // 创建人ID
-  updatedBy: string;                      // 最后修改人ID
+  name: string; // 必填,最大100字符
+  description?: string | null; // 可选,最大500字符
+  category: string; // 必填,从预定义分类列表选择
+  mainImage: string; // 必填,Supabase Storage URL
+  status: PublishStatus; // 发布状态
+  effectiveStartDate?: string | null; // 生效开始日期,YYYY-MM-DD格式
+  effectiveEndDate?: string | null; // 生效结束日期,YYYY-MM-DD格式
+  advanceBookingDays?: number | null; // 提前预订天数
+  createdAt: string; // ISO 8601 timestamp
+  updatedAt: string; // ISO 8601 timestamp
+  createdBy: string; // 创建人ID
+  updatedBy: string; // 最后修改人ID
 }
 
 /**
@@ -74,12 +74,12 @@ export interface ScenarioPackage {
 export interface PackageTier {
   id: string;
   scenarioPackageId: string;
-  name: string;                           // 必填,如"豪华套餐"、"标准套餐"
-  price: number;                          // 必填,单位:元
-  originalPrice?: number | null;          // 可选,原价,必须 >= price
-  tags?: string[] | null;                 // 可选,标签数组
-  serviceDescription?: string | null;     // 可选,服务内容描述
-  sortOrder: number;                      // 排序顺序
+  name: string; // 必填,如"豪华套餐"、"标准套餐"
+  price: number; // 必填,单位:元
+  originalPrice?: number | null; // 可选,原价,必须 >= price
+  tags?: string[] | null; // 可选,标签数组
+  serviceDescription?: string | null; // 可选,服务内容描述
+  sortOrder: number; // 排序顺序
   createdAt: string;
   updatedAt: string;
 }
@@ -89,12 +89,12 @@ export interface PackageTier {
  */
 export interface AddOnItem {
   id: string;
-  name: string;                           // 必填
-  price: number;                          // 必填,单位:分
-  category: AddOnCategory;                // 分类
-  imageUrl?: string | null;               // 可选,图片URL
-  inventory?: number | null;              // 可选,库存数量,null表示无限制
-  isActive: boolean;                      // 是否上架
+  name: string; // 必填
+  price: number; // 必填,单位:分
+  category: AddOnCategory; // 分类
+  imageUrl?: string | null; // 可选,图片URL
+  inventory?: number | null; // 可选,库存数量,null表示无限制
+  isActive: boolean; // 是否上架
   createdAt: string;
   updatedAt: string;
 }
@@ -106,8 +106,8 @@ export interface ScenarioPackageAddOn {
   id: string;
   scenarioPackageId: string;
   addOnItemId: string;
-  sortOrder: number;                      // 排序顺序
-  isRequired: boolean;                    // 是否必选
+  sortOrder: number; // 排序顺序
+  isRequired: boolean; // 是否必选
   createdAt: string;
 }
 
@@ -117,12 +117,12 @@ export interface ScenarioPackageAddOn {
 export interface TimeSlotTemplate {
   id: string;
   scenarioPackageId: string;
-  dayOfWeek: DayOfWeek;                   // 星期几
-  startTime: string;                      // HH:mm格式
-  endTime: string;                        // HH:mm格式
-  capacity?: number | null;               // 可选,容量限制
-  priceAdjustment?: PriceAdjustment | null;  // 可选,价格调整规则
-  isEnabled: boolean;                     // 是否启用
+  dayOfWeek: DayOfWeek; // 星期几
+  startTime: string; // HH:mm格式
+  endTime: string; // HH:mm格式
+  capacity?: number | null; // 可选,容量限制
+  priceAdjustment?: PriceAdjustment | null; // 可选,价格调整规则
+  isEnabled: boolean; // 是否启用
   createdAt: string;
   updatedAt: string;
 }
@@ -133,12 +133,12 @@ export interface TimeSlotTemplate {
 export interface TimeSlotOverride {
   id: string;
   scenarioPackageId: string;
-  date: string;                           // YYYY-MM-DD格式
+  date: string; // YYYY-MM-DD格式
   overrideType: OverrideType;
-  startTime?: string | null;              // overrideType=ADD/MODIFY时必填
-  endTime?: string | null;                // overrideType=ADD/MODIFY时必填
-  capacity?: number | null;               // overrideType=MODIFY时可选
-  reason?: string | null;                 // 可选,覆盖原因说明
+  startTime?: string | null; // overrideType=ADD/MODIFY时必填
+  endTime?: string | null; // overrideType=ADD/MODIFY时必填
+  capacity?: number | null; // overrideType=MODIFY时可选
+  reason?: string | null; // 可选,覆盖原因说明
   createdAt: string;
   updatedAt: string;
 }
@@ -149,11 +149,11 @@ export interface TimeSlotOverride {
 export interface TimeSlotInventory {
   id: string;
   scenarioPackageId: string;
-  date: string;                           // YYYY-MM-DD
-  timeSlot: string;                       // HH:mm-HH:mm格式
-  totalCapacity: number;                  // 总容量
-  bookedCount: number;                    // 已预订数量
-  availableCount: number;                 // 剩余可预订数量
+  date: string; // YYYY-MM-DD
+  timeSlot: string; // HH:mm-HH:mm格式
+  totalCapacity: number; // 总容量
+  bookedCount: number; // 已预订数量
+  availableCount: number; // 剩余可预订数量
   updatedAt: string;
 }
 
@@ -303,7 +303,7 @@ export const SCENARIO_CATEGORIES = [
   { value: 'PARTY', label: '派对策划' },
 ] as const;
 
-export type ScenarioCategory = typeof SCENARIO_CATEGORIES[number]['value'];
+export type ScenarioCategory = (typeof SCENARIO_CATEGORIES)[number]['value'];
 
 // ========== 星期几工具 ==========
 

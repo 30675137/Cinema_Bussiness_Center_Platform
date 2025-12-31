@@ -1,0 +1,44 @@
+[
+  {
+    "key": "mojito-cocktail",
+    "code": "FIN-MOJITO-001",
+    "name": "薄荷威士忌鸡尾酒",
+    "type": "finished_product",
+    "category": "饮品 > 鸡尾酒",
+    "price": "3500",
+    "unit": "份",
+    "status": "enabled",
+    "admin_credentials": {
+      "username": "admin",
+      "password": "admin123"
+    }
+  },
+  {
+    "key": "whiskey-cola-cocktail",
+    "code": "FIN-WHISKEY-COLA-001",
+    "name": "威士忌可乐鸡尾酒",
+    "type": "finished_product",
+    "category": "饮品 > 鸡尾酒",
+    "price": "3200",
+    "unit": "份",
+    "status": "enabled",
+    "admin_credentials": {
+      "username": "admin",
+      "password": "admin123"
+    }
+  },
+  {
+    "key": "cola-ice",
+    "code": "FIN-COLA-ICE-001",
+    "name": "冰镇可乐",
+    "type": "finished_product",
+    "category": "饮品 > 软饮",
+    "price": "1500",
+    "unit": "份",
+    "status": "enabled",
+    "admin_credentials": {
+      "username": "admin",
+      "password": "admin123"
+    }
+  }
+]

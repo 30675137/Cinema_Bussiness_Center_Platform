@@ -1,16 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Button,
-  Space,
-  Row,
-  Col,
-  Card,
-  Tooltip,
-} from 'antd';
+import { Form, Input, Select, DatePicker, Button, Space, Row, Col, Card, Tooltip } from 'antd';
 import { SearchOutlined, ReloadOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import type { RangePickerProps } from 'antd/es/date-picker';
 
@@ -89,11 +78,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
       case 'numberRange':
         return (
           <Input.Group compact style={{ width: width || 200 }}>
-            <Input
-              style={{ width: '45%' }}
-              placeholder="最小值"
-              type="number"
-            />
+            <Input style={{ width: '45%' }} placeholder="最小值" type="number" />
             <Input
               style={{
                 width: '10%',
@@ -105,11 +90,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
               placeholder="~"
               disabled
             />
-            <Input
-              style={{ width: '45%' }}
-              placeholder="最大值"
-              type="number"
-            />
+            <Input style={{ width: '45%' }} placeholder="最大值" type="number" />
           </Input.Group>
         );
 
@@ -123,7 +104,7 @@ const SearchForm: React.FC<SearchFormProps> = ({
     // 处理日期范围字段
     const processedValues = { ...values };
 
-    fields.forEach(field => {
+    fields.forEach((field) => {
       if (field.type === 'dateRange' && processedValues[field.name]) {
         const [startDate, endDate] = processedValues[field.name];
         processedValues[`${field.name}Start`] = startDate?.format('YYYY-MM-DD');

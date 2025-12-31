@@ -13,14 +13,9 @@ import {
   Divider,
   Tooltip,
   Tag,
-  Switch
+  Switch,
 } from 'antd';
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  InfoCircleOutlined,
-  CopyOutlined
-} from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, InfoCircleOutlined, CopyOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Option } = Select;
@@ -63,15 +58,13 @@ interface PricingStrategyFormProps {
 const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
   initialValues,
   onSubmit,
-  onCancel
+  onCancel,
 }) => {
   const [form] = Form.useForm();
   const [strategyType, setStrategyType] = useState<'fixed' | 'percentage' | 'tiered' | 'dynamic'>(
     initialValues?.type || 'fixed'
   );
-  const [tierRules, setTierRules] = useState<TierRule[]>(
-    initialValues?.tierRules || []
-  );
+  const [tierRules, setTierRules] = useState<TierRule[]>(initialValues?.tierRules || []);
   const [dynamicRules, setDynamicRules] = useState<DynamicRule[]>(
     initialValues?.dynamicRules || []
   );
@@ -81,7 +74,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
       type: strategyType,
       ...values,
       tierRules: strategyType === 'tiered' ? tierRules : undefined,
-      dynamicRules: strategyType === 'dynamic' ? dynamicRules : undefined
+      dynamicRules: strategyType === 'dynamic' ? dynamicRules : undefined,
     };
 
     onSubmit(config);
@@ -91,23 +84,22 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
   const addTierRule = () => {
     const newRule: TierRule = {
       id: Date.now().toString(),
-      minQuantity: tierRules.length > 0 ? Math.max(...tierRules.map(r => r.maxQuantity || 0)) + 1 : 1,
+      minQuantity:
+        tierRules.length > 0 ? Math.max(...tierRules.map((r) => r.maxQuantity || 0)) + 1 : 1,
       discount: 0.1,
-      price: 100
+      price: 100,
     };
     setTierRules([...tierRules, newRule]);
   };
 
   // 更新阶梯规则
   const updateTierRule = (id: string, field: keyof TierRule, value: any) => {
-    setTierRules(tierRules.map(rule =>
-      rule.id === id ? { ...rule, [field]: value } : rule
-    ));
+    setTierRules(tierRules.map((rule) => (rule.id === id ? { ...rule, [field]: value } : rule)));
   };
 
   // 删除阶梯规则
   const removeTierRule = (id: string) => {
-    setTierRules(tierRules.filter(rule => rule.id !== id));
+    setTierRules(tierRules.filter((rule) => rule.id !== id));
   };
 
   // 添加动态规则
@@ -118,21 +110,21 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
       operator: 'eq',
       value: 'vip',
       adjustment: 0.15,
-      adjustmentType: 'percentage'
+      adjustmentType: 'percentage',
     };
     setDynamicRules([...dynamicRules, newRule]);
   };
 
   // 更新动态规则
   const updateDynamicRule = (id: string, field: keyof DynamicRule, value: any) => {
-    setDynamicRules(dynamicRules.map(rule =>
-      rule.id === id ? { ...rule, [field]: value } : rule
-    ));
+    setDynamicRules(
+      dynamicRules.map((rule) => (rule.id === id ? { ...rule, [field]: value } : rule))
+    );
   };
 
   // 删除动态规则
   const removeDynamicRule = (id: string) => {
-    setDynamicRules(dynamicRules.filter(rule => rule.id !== id));
+    setDynamicRules(dynamicRules.filter((rule) => rule.id !== id));
   };
 
   // 阶梯规则表格列
@@ -148,7 +140,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           onChange={(val) => updateTierRule(record.id, 'minQuantity', val || 1)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '最大数量',
@@ -162,7 +154,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           onChange={(val) => updateTierRule(record.id, 'maxQuantity', val)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '折扣率',
@@ -176,13 +168,13 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           value={value}
           formatter={(value) => `${((value || 0) * 100).toFixed(1)}%`}
           parser={(value) => {
-              const parsed = parseFloat((value || '').replace('%', '')) / 100;
-              return isNaN(parsed) ? 0 : parsed;
-            }}
+            const parsed = parseFloat((value || '').replace('%', '')) / 100;
+            return isNaN(parsed) ? 0 : parsed;
+          }}
           onChange={(val) => updateTierRule(record.id, 'discount', val || 0)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '单价',
@@ -198,7 +190,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           onChange={(val) => updateTierRule(record.id, 'price', val || 0)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '操作',
@@ -212,8 +204,8 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
         >
           删除
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   // 动态规则表格列
@@ -235,7 +227,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           <Option value="season">季节</Option>
           <Option value="location">地区</Option>
         </Select>
-      )
+      ),
     },
     {
       title: '操作符',
@@ -254,7 +246,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           <Option value="lte">小于等于</Option>
           <Option value="between">介于</Option>
         </Select>
-      )
+      ),
     },
     {
       title: '比较值',
@@ -266,7 +258,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           onChange={(e) => updateDynamicRule(record.id, 'value', e.target.value)}
           placeholder="输入比较值"
         />
-      )
+      ),
     },
     {
       title: '调整类型',
@@ -281,7 +273,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           <Option value="percentage">百分比</Option>
           <Option value="fixed">固定金额</Option>
         </Select>
-      )
+      ),
     },
     {
       title: '调整值',
@@ -293,12 +285,14 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           max={1}
           step={0.01}
           value={value}
-          formatter={(val) => record.adjustmentType === 'percentage' ? `${((val || 0) * 100).toFixed(1)}%` : `¥${val}`}
+          formatter={(val) =>
+            record.adjustmentType === 'percentage' ? `${((val || 0) * 100).toFixed(1)}%` : `¥${val}`
+          }
           parser={(val) => parseFloat((val || '').replace(/[¥%]/g, '')) as 0}
           onChange={(val) => updateDynamicRule(record.id, 'adjustment', val || 0)}
           style={{ width: '100%' }}
         />
-      )
+      ),
     },
     {
       title: '操作',
@@ -312,28 +306,19 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
         >
           删除
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      initialValues={initialValues}
-      onFinish={handleSubmit}
-    >
+    <Form form={form} layout="vertical" initialValues={initialValues} onFinish={handleSubmit}>
       <Card title="基础配置" size="small" style={{ marginBottom: 16 }}>
         <Form.Item
           name="type"
           label="策略类型"
           rules={[{ required: true, message: '请选择策略类型' }]}
         >
-          <Select
-            value={strategyType}
-            onChange={setStrategyType}
-            placeholder="请选择策略类型"
-          >
+          <Select value={strategyType} onChange={setStrategyType} placeholder="请选择策略类型">
             <Option value="fixed">固定价格</Option>
             <Option value="percentage">百分比折扣</Option>
             <Option value="tiered">阶梯定价</Option>
@@ -372,9 +357,9 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
               max={1}
               formatter={(value) => `${((1 - (value || 0)) * 100).toFixed(1)}%`}
               parser={(value) => {
-              const parsed = parseFloat((value || '').replace('%', '')) / 100;
-              return isNaN(parsed) ? 1 as 0 | 1 : (1 - parsed) as 0 | 1;
-            }}
+                const parsed = parseFloat((value || '').replace('%', '')) / 100;
+                return isNaN(parsed) ? (1 as 0 | 1) : ((1 - parsed) as 0 | 1);
+              }}
             />
           </Form.Item>
         )}
@@ -394,12 +379,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           style={{ marginBottom: 16 }}
         >
           <div style={{ marginBottom: 16 }}>
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={addTierRule}
-              block
-            >
+            <Button type="dashed" icon={<PlusOutlined />} onClick={addTierRule} block>
               添加阶梯规则
             </Button>
           </div>
@@ -428,12 +408,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
           style={{ marginBottom: 16 }}
         >
           <div style={{ marginBottom: 16 }}>
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={addDynamicRule}
-              block
-            >
+            <Button type="dashed" icon={<PlusOutlined />} onClick={addDynamicRule} block>
               添加动态规则
             </Button>
           </div>
@@ -449,11 +424,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
       )}
 
       <Card title="高级配置" size="small" style={{ marginBottom: 16 }}>
-        <Form.Item
-          name="roundTo"
-          label="价格舍入到"
-          tooltip="最终价格将舍入到指定的小数位"
-        >
+        <Form.Item name="roundTo" label="价格舍入到" tooltip="最终价格将舍入到指定的小数位">
           <InputNumber
             min={0}
             max={2}
@@ -461,16 +432,12 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
             formatter={(value) => `${value} 位小数`}
             parser={(value) => {
               const parsed = parseInt((value || '').replace(/[^\d]/g, ''));
-              return isNaN(parsed) ? 0 as 0 | 2 : parsed as 0 | 2;
+              return isNaN(parsed) ? (0 as 0 | 2) : (parsed as 0 | 2);
             }}
           />
         </Form.Item>
 
-        <Form.Item
-          name="applyTax"
-          label="应用税费"
-          valuePropName="checked"
-        >
+        <Form.Item name="applyTax" label="应用税费" valuePropName="checked">
           <Switch /> 是否应用税费计算
         </Form.Item>
 
@@ -494,9 +461,9 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
                   placeholder="0.13"
                   formatter={(value) => `${((value || 0) * 100).toFixed(1)}%`}
                   parser={(value) => {
-              const parsed = parseFloat((value || '').replace('%', '')) / 100;
-              return isNaN(parsed) ? 0 as 0 | 1 : parsed as 0 | 1;
-            }}
+                    const parsed = parseFloat((value || '').replace('%', '')) / 100;
+                    return isNaN(parsed) ? (0 as 0 | 1) : (parsed as 0 | 1);
+                  }}
                 />
               </Form.Item>
             ) : null
@@ -506,9 +473,7 @@ const PricingStrategyForm: React.FC<PricingStrategyFormProps> = ({
 
       <div style={{ textAlign: 'right' }}>
         <Space>
-          <Button onClick={onCancel}>
-            取消
-          </Button>
+          <Button onClick={onCancel}>取消</Button>
           <Button type="primary" htmlType="submit">
             保存策略
           </Button>

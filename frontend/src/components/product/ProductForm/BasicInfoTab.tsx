@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Row,
-  Col,
-  Typography,
-  Space,
-  Divider
-} from 'antd';
+import { Form, Input, Select, InputNumber, Row, Col, Typography, Space, Divider } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
@@ -32,7 +22,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
   errors,
   touched,
   materialType,
-  setValue
+  setValue,
 }) => {
   return (
     <div className="basic-info-tab">
@@ -54,11 +44,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   name="name"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id="field-name"
-                      placeholder="请输入商品名称"
-                    />
+                    <Input {...field} id="field-name" placeholder="请输入商品名称" />
                   )}
                 />
               </Form.Item>
@@ -72,12 +58,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 <Controller
                   name="shortTitle"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="请输入短标题（可选）"
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} placeholder="请输入短标题（可选）" />}
                 />
               </Form.Item>
             </Col>
@@ -95,16 +76,12 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   name="categoryId"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      id="field-categoryId"
-                      placeholder="请选择商品类目"
-                    >
-                  <Option value="food">食品</Option>
-                  <Option value="beverage">饮料</Option>
-                  <Option value="merchandise">商品</Option>
-                  <Option value="ticket">票券</Option>
-                  <Option value="service">服务</Option>
+                    <Select {...field} id="field-categoryId" placeholder="请选择商品类目">
+                      <Option value="food">食品</Option>
+                      <Option value="beverage">饮料</Option>
+                      <Option value="merchandise">商品</Option>
+                      <Option value="ticket">票券</Option>
+                      <Option value="service">服务</Option>
                     </Select>
                   )}
                 />
@@ -121,15 +98,12 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   name="materialType"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择物料类型"
-                    >
-                  <Option value="raw_material">原材料</Option>
-                  <Option value="semi_finished">半成品</Option>
-                  <Option value="finished_goods">成品</Option>
-                  <Option value="consumable">消耗品</Option>
-                  <Option value="packaging">包装材料</Option>
+                    <Select {...field} placeholder="请选择物料类型">
+                      <Option value="raw_material">原材料</Option>
+                      <Option value="semi_finished">半成品</Option>
+                      <Option value="finished_goods">成品</Option>
+                      <Option value="consumable">消耗品</Option>
+                      <Option value="packaging">包装材料</Option>
                     </Select>
                   )}
                 />
@@ -146,11 +120,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
               name="description"
               control={control}
               render={({ field }) => (
-                <TextArea
-                  {...field}
-                  rows={3}
-                  placeholder="请输入商品描述（可选）"
-                />
+                <TextArea {...field} rows={3} placeholder="请输入商品描述（可选）" />
               )}
             />
           </Form.Item>
@@ -203,23 +173,19 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   name="unit"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择单位"
-                      allowClear
-                    >
-                  <Option value="个">个</Option>
-                  <Option value="件">件</Option>
-                  <Option value="盒">盒</Option>
-                  <Option value="袋">袋</Option>
-                  <Option value="瓶">瓶</Option>
-                  <Option value="罐">罐</Option>
-                  <Option value="份">份</Option>
-                  <Option value="套">套</Option>
-                  <Option value="千克">千克</Option>
-                  <Option value="克">克</Option>
-                  <Option value="升">升</Option>
-                  <Option value="毫升">毫升</Option>
+                    <Select {...field} placeholder="请选择单位" allowClear>
+                      <Option value="个">个</Option>
+                      <Option value="件">件</Option>
+                      <Option value="盒">盒</Option>
+                      <Option value="袋">袋</Option>
+                      <Option value="瓶">瓶</Option>
+                      <Option value="罐">罐</Option>
+                      <Option value="份">份</Option>
+                      <Option value="套">套</Option>
+                      <Option value="千克">千克</Option>
+                      <Option value="克">克</Option>
+                      <Option value="升">升</Option>
+                      <Option value="毫升">毫升</Option>
                     </Select>
                   )}
                 />
@@ -234,12 +200,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 <Controller
                   name="brand"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="请输入品牌（可选）"
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} placeholder="请输入品牌（可选）" />}
                 />
               </Form.Item>
             </Col>
@@ -346,12 +307,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                 <Controller
                   name="barcode"
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="请输入条形码"
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} placeholder="请输入条形码" />}
                 />
               </Form.Item>
             </Col>
@@ -365,12 +321,7 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
             <Controller
               name="storageCondition"
               control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="请输入储存条件（可选）"
-                />
-              )}
+              render={({ field }) => <Input {...field} placeholder="请输入储存条件（可选）" />}
             />
           </Form.Item>
         </div>
@@ -394,16 +345,13 @@ const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
                   name="status"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择商品状态"
-                    >
-                  <Option value="draft">草稿</Option>
-                  <Option value="active">上架</Option>
-                  <Option value="inactive">下架</Option>
-                  <Option value="pending">待审核</Option>
-                  <Option value="rejected">已驳回</Option>
-                  <Option value="discontinued">已停产</Option>
+                    <Select {...field} placeholder="请选择商品状态">
+                      <Option value="draft">草稿</Option>
+                      <Option value="active">上架</Option>
+                      <Option value="inactive">下架</Option>
+                      <Option value="pending">待审核</Option>
+                      <Option value="rejected">已驳回</Option>
+                      <Option value="discontinued">已停产</Option>
                     </Select>
                   )}
                 />

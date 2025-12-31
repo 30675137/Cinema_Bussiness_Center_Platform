@@ -73,14 +73,14 @@ test.describe('菜单层次和展开功能', () => {
     await expect(expandIcon).toBeVisible();
 
     // 展开前的状态
-    const beforeExpandIconClass = await expandIcon.getAttribute('class') || '';
+    const beforeExpandIconClass = (await expandIcon.getAttribute('class')) || '';
 
     // 点击展开
     await mainMenu.click();
     await page.waitForTimeout(300);
 
     // 验证指示器状态变化
-    const afterExpandIconClass = await expandIcon.getAttribute('class') || '';
+    const afterExpandIconClass = (await expandIcon.getAttribute('class')) || '';
     expect(afterExpandIconClass).not.toBe(beforeExpandIconClass);
   });
 
@@ -109,29 +109,31 @@ test.describe('菜单层次和展开功能', () => {
     const subMenuItem = page.locator('text="组织/门店/仓库管理"');
 
     // 获取一级菜单和二级菜单的样式属性
-    const mainMenuStyles = await mainMenu.evaluate(el => {
-      const styles = window.getComputedStyle(el);
-      return {
-        fontSize: styles.fontSize,
-        fontWeight: styles.fontWeight,
-        backgroundColor: styles.backgroundColor,
-        color: styles.color
-      };
-    });
-
-    const subMenuStyles = await subMenuItem.evaluate(el => {
+    const mainMenuStyles = await mainMenu.evaluate((el) => {
       const styles = window.getComputedStyle(el);
       return {
         fontSize: styles.fontSize,
         fontWeight: styles.fontWeight,
         backgroundColor: styles.backgroundColor,
         color: styles.color,
-        paddingLeft: styles.paddingLeft
+      };
+    });
+
+    const subMenuStyles = await subMenuItem.evaluate((el) => {
+      const styles = window.getComputedStyle(el);
+      return {
+        fontSize: styles.fontSize,
+        fontWeight: styles.fontWeight,
+        backgroundColor: styles.backgroundColor,
+        color: styles.color,
+        paddingLeft: styles.paddingLeft,
       };
     });
 
     // 验证二级菜单有缩进或不同的样式
-    expect(parseInt(subMenuStyles.paddingLeft)).toBeGreaterThan(parseInt(mainMenuStyles.paddingLeft) || 0);
+    expect(parseInt(subMenuStyles.paddingLeft)).toBeGreaterThan(
+      parseInt(mainMenuStyles.paddingLeft) || 0
+    );
   });
 
   test('应该在移动端有适配的菜单行为', async ({ page }) => {

@@ -9,7 +9,12 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import InventoryManagePage from '@/pages/inventory/InventoryManagePage';
 import { useInventoryStore } from '@/stores/inventoryStore';
-import { InventoryItem, InventoryStatus, Location, InventoryOperationType } from '@/types/inventory';
+import {
+  InventoryItem,
+  InventoryStatus,
+  Location,
+  InventoryOperationType,
+} from '@/types/inventory';
 
 // Mock the store
 vi.mock('@/stores/inventoryStore');
@@ -32,7 +37,7 @@ describe('库存管理集成测试', () => {
       minStock: 20,
       maxStock: 500,
       safeStock: 30,
-      averageCost: 15.50,
+      averageCost: 15.5,
       totalValue: 1550,
       status: InventoryStatus.IN_STOCK,
       lastInboundDate: '2024-01-01',
@@ -53,8 +58,8 @@ describe('库存管理集成测试', () => {
       minStock: 20,
       maxStock: 200,
       safeStock: 25,
-      averageCost: 3.50,
-      totalValue: 52.50,
+      averageCost: 3.5,
+      totalValue: 52.5,
       status: InventoryStatus.LOW_STOCK,
       lastInboundDate: '2024-01-02',
       lastOutboundDate: '2024-01-06',
@@ -89,7 +94,7 @@ describe('库存管理集成测试', () => {
 
   const mockStatistics = {
     totalItems: 2,
-    totalValue: 1602.50,
+    totalValue: 1602.5,
     totalCategories: 2,
     totalLocations: 2,
     inStockCount: 1,
@@ -110,7 +115,7 @@ describe('库存管理集成测试', () => {
         categoryId: 'CAT002',
         categoryName: '饮料',
         itemCount: 1,
-        totalValue: 52.50,
+        totalValue: 52.5,
         lowStockCount: 1,
       },
     ],
@@ -126,7 +131,7 @@ describe('库存管理集成测试', () => {
         locationId: 'LOC002',
         locationName: '仓库B-货架2',
         itemCount: 1,
-        totalValue: 52.50,
+        totalValue: 52.5,
         utilizationRate: 1.94,
       },
     ],
@@ -238,7 +243,7 @@ describe('库存管理集成测试', () => {
           minStock: 10,
           maxStock: 200,
           safeStock: 15,
-          averageCost: 12.50,
+          averageCost: 12.5,
         });
       });
 
@@ -259,7 +264,7 @@ describe('库存管理集成测试', () => {
           minStock: 25,
           maxStock: 600,
           safeStock: 35,
-          averageCost: 16.00,
+          averageCost: 16.0,
         });
       });
 
@@ -267,13 +272,14 @@ describe('库存管理集成测试', () => {
         minStock: 25,
         maxStock: 600,
         safeStock: 35,
-        averageCost: 16.00,
+        averageCost: 16.0,
       });
       expect(fetchInventoryItems).toHaveBeenCalled();
     });
 
     it('应该能够查看库存详情', async () => {
-      const { fetchInventoryById, fetchInventoryOperations, fetchInventoryAlerts } = mockInventoryStore();
+      const { fetchInventoryById, fetchInventoryOperations, fetchInventoryAlerts } =
+        mockInventoryStore();
       const { result } = renderComponent(['/inventory/1']);
 
       fetchInventoryById.mockResolvedValue(mockInventoryItems[0]);
@@ -302,7 +308,7 @@ describe('库存管理集成测试', () => {
         operationType: InventoryOperationType.STOCK_IN,
         quantity: 50,
         unit: '个',
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         totalPrice: 775,
         beforeStock: 100,
         afterStock: 150,
@@ -317,7 +323,7 @@ describe('库存管理集成测试', () => {
           inventoryItemId: '1',
           operationType: InventoryOperationType.STOCK_IN,
           quantity: 50,
-          unitPrice: 15.50,
+          unitPrice: 15.5,
           reason: '采购入库',
         });
         await fetchInventoryById('1');
@@ -327,7 +333,7 @@ describe('库存管理集成测试', () => {
         inventoryItemId: '1',
         operationType: InventoryOperationType.STOCK_IN,
         quantity: 50,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '采购入库',
       });
       expect(result.current.location.pathname).toBe('/inventory/1');
@@ -343,7 +349,7 @@ describe('库存管理集成测试', () => {
         operationType: InventoryOperationType.STOCK_OUT,
         quantity: -30,
         unit: '个',
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         totalPrice: 465,
         beforeStock: 100,
         afterStock: 70,
@@ -358,7 +364,7 @@ describe('库存管理集成测试', () => {
           inventoryItemId: '1',
           operationType: InventoryOperationType.STOCK_OUT,
           quantity: -30,
-          unitPrice: 15.50,
+          unitPrice: 15.5,
           reason: '销售出库',
         });
         await fetchInventoryById('1');
@@ -368,7 +374,7 @@ describe('库存管理集成测试', () => {
         inventoryItemId: '1',
         operationType: InventoryOperationType.STOCK_OUT,
         quantity: -30,
-        unitPrice: 15.50,
+        unitPrice: 15.5,
         reason: '销售出库',
       });
       expect(result.current.location.pathname).toBe('/inventory/1');
@@ -597,7 +603,7 @@ describe('库存管理集成测试', () => {
           minStock: 10,
           maxStock: 200,
           safeStock: 15,
-          averageCost: 12.50,
+          averageCost: 12.5,
         });
       });
 

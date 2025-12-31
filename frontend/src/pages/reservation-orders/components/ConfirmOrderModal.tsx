@@ -6,14 +6,14 @@
  * - 直接完成(无需支付): 状态变更为 COMPLETED
  */
 
-import React, { useState, useCallback, memo } from 'react'
-import { Modal, Radio, Input, Space, Typography, Alert } from 'antd'
-import type { RadioChangeEvent } from 'antd'
-import { useConfirmReservation } from '../hooks/useOrderOperations'
-import type { ConfirmOrderModalProps } from '../types/reservation-order.types'
+import React, { useState, useCallback, memo } from 'react';
+import { Modal, Radio, Input, Space, Typography, Alert } from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import { useConfirmReservation } from '../hooks/useOrderOperations';
+import type { ConfirmOrderModalProps } from '../types/reservation-order.types';
 
-const { TextArea } = Input
-const { Text } = Typography
+const { TextArea } = Input;
+const { Text } = Typography;
 
 /**
  * 确认预约对话框组件
@@ -25,19 +25,19 @@ const ConfirmOrderModal: React.FC<ConfirmOrderModalProps> = ({
   onSuccess,
 }) => {
   // 是否要求支付，默认为 true
-  const [requiresPayment, setRequiresPayment] = useState<boolean>(true)
+  const [requiresPayment, setRequiresPayment] = useState<boolean>(true);
   // 备注
-  const [remark, setRemark] = useState<string>('')
+  const [remark, setRemark] = useState<string>('');
 
   // 确认预约 mutation
-  const confirmMutation = useConfirmReservation()
+  const confirmMutation = useConfirmReservation();
 
   /**
    * 处理支付选项变更
    */
   const handlePaymentChange = useCallback((e: RadioChangeEvent) => {
-    setRequiresPayment(e.target.value)
-  }, [])
+    setRequiresPayment(e.target.value);
+  }, []);
 
   /**
    * 处理确认
@@ -50,27 +50,27 @@ const ConfirmOrderModal: React.FC<ConfirmOrderModalProps> = ({
           requiresPayment,
           remark: remark.trim() || undefined,
         },
-      })
+      });
       // 重置状态
-      setRequiresPayment(true)
-      setRemark('')
+      setRequiresPayment(true);
+      setRemark('');
       // 触发成功回调
-      onSuccess()
-      onClose()
+      onSuccess();
+      onClose();
     } catch {
       // 错误已在 mutation 中处理
     }
-  }, [orderId, requiresPayment, remark, confirmMutation, onSuccess, onClose])
+  }, [orderId, requiresPayment, remark, confirmMutation, onSuccess, onClose]);
 
   /**
    * 处理取消
    */
   const handleCancel = useCallback(() => {
     // 重置状态
-    setRequiresPayment(true)
-    setRemark('')
-    onClose()
-  }, [onClose])
+    setRequiresPayment(true);
+    setRemark('');
+    onClose();
+  }, [onClose]);
 
   return (
     <Modal
@@ -140,7 +140,7 @@ const ConfirmOrderModal: React.FC<ConfirmOrderModalProps> = ({
         </div>
       </Space>
     </Modal>
-  )
-}
+  );
+};
 
-export default memo(ConfirmOrderModal)
+export default memo(ConfirmOrderModal);

@@ -4,20 +4,20 @@ import type {
   AttributeTemplateQueryParams,
   AttributeTemplateListResponse,
   AttributeTemplateOperationResponse,
-  AttributeTemplateForm
-} from '@/types/spu'
-import type { 
-  AttributeTemplate as CategoryAttributeTemplate, 
-  CategoryAttribute 
-} from '@/types/category'
+  AttributeTemplateForm,
+} from '@/types/spu';
+import type {
+  AttributeTemplate as CategoryAttributeTemplate,
+  CategoryAttribute,
+} from '@/types/category';
 
 // API 响应类型定义
 interface ApiResponse<T = any> {
-  success: boolean
-  data: T
-  message: string
-  code: number
-  timestamp?: number
+  success: boolean;
+  data: T;
+  message: string;
+  code: number;
+  timestamp?: number;
 }
 
 // 模拟数据
@@ -47,11 +47,11 @@ const generateMockTemplates = (): AttributeTemplate[] => {
             { id: 'opt_003', label: 'M', value: 'm', sort: 3, status: 'active' },
             { id: 'opt_004', label: 'L', value: 'l', sort: 4, status: 'active' },
             { id: 'opt_005', label: 'XL', value: 'xl', sort: 5, status: 'active' },
-            { id: 'opt_006', label: 'XXL', value: 'xxl', sort: 6, status: 'active' }
+            { id: 'opt_006', label: 'XXL', value: 'xxl', sort: 6, status: 'active' },
           ],
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_002',
@@ -65,11 +65,11 @@ const generateMockTemplates = (): AttributeTemplate[] => {
             { id: 'opt_008', label: '蓝色', value: 'blue', sort: 2, status: 'active' },
             { id: 'opt_009', label: '黑色', value: 'black', sort: 3, status: 'active' },
             { id: 'opt_010', label: '白色', value: 'white', sort: 4, status: 'active' },
-            { id: 'opt_011', label: '灰色', value: 'gray', sort: 5, status: 'active' }
+            { id: 'opt_011', label: '灰色', value: 'gray', sort: 5, status: 'active' },
           ],
           group: '基础属性',
           sort: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_003',
@@ -83,17 +83,17 @@ const generateMockTemplates = (): AttributeTemplate[] => {
             { id: 'opt_013', label: '涤纶', value: 'polyester', sort: 2, status: 'active' },
             { id: 'opt_014', label: '混纺', value: 'blend', sort: 3, status: 'active' },
             { id: 'opt_015', label: '羊毛', value: 'wool', sort: 4, status: 'active' },
-            { id: 'opt_016', label: '丝绸', value: 'silk', sort: 5, status: 'active' }
+            { id: 'opt_016', label: '丝绸', value: 'silk', sort: 5, status: 'active' },
           ],
           group: '材质属性',
           sort: 3,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-15T10:30:00Z',
       updatedAt: '2024-01-20T15:45:00Z',
       createdBy: 'admin',
-      updatedBy: 'admin'
+      updatedBy: 'admin',
     },
     {
       id: 'template_002',
@@ -115,7 +115,7 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           validation: { minLength: 1, maxLength: 50 },
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_005',
@@ -128,7 +128,7 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           validation: { min: 1, max: 60 },
           group: '服务属性',
           sort: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_006',
@@ -140,7 +140,7 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           description: '是否支持防水',
           group: '特性属性',
           sort: 3,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_007',
@@ -153,17 +153,17 @@ const generateMockTemplates = (): AttributeTemplate[] => {
             { id: 'opt_017', label: '220V', value: '220v', sort: 1, status: 'active' },
             { id: 'opt_018', label: '110V', value: '110v', sort: 2, status: 'active' },
             { id: 'opt_019', label: '12V', value: '12v', sort: 3, status: 'active' },
-            { id: 'opt_020', label: '5V', value: '5v', sort: 4, status: 'active' }
+            { id: 'opt_020', label: '5V', value: '5v', sort: 4, status: 'active' },
           ],
           group: '技术参数',
           sort: 4,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-16T09:20:00Z',
       updatedAt: '2024-01-18T14:30:00Z',
       createdBy: 'admin',
-      updatedBy: 'admin'
+      updatedBy: 'admin',
     },
     {
       id: 'template_003',
@@ -185,7 +185,7 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           validation: { min: 1 },
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_009',
@@ -197,7 +197,7 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           validation: { minLength: 2, maxLength: 50 },
           group: '基础属性',
           sort: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_010',
@@ -209,71 +209,76 @@ const generateMockTemplates = (): AttributeTemplate[] => {
           validation: { min: 1 },
           group: '规格属性',
           sort: 3,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-10T08:15:00Z',
       updatedAt: '2024-01-10T08:15:00Z',
       createdBy: 'system',
-      updatedBy: 'system'
-    }
-  ]
-}
+      updatedBy: 'system',
+    },
+  ];
+};
 
 class AttributeTemplateService {
-  private templates: AttributeTemplate[] = generateMockTemplates()
+  private templates: AttributeTemplate[] = generateMockTemplates();
 
   /**
    * 获取属性模板列表
    */
-  async getTemplateList(params?: AttributeTemplateQueryParams): Promise<AttributeTemplateListResponse> {
+  async getTemplateList(
+    params?: AttributeTemplateQueryParams
+  ): Promise<AttributeTemplateListResponse> {
     try {
       // 模拟API延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      let filteredTemplates = [...this.templates]
+      let filteredTemplates = [...this.templates];
 
       // 关键词搜索
       if (params?.keyword) {
-        const keyword = params.keyword.toLowerCase()
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.name.toLowerCase().includes(keyword) ||
-          template.code.toLowerCase().includes(keyword) ||
-          template.description?.toLowerCase().includes(keyword)
-        )
+        const keyword = params.keyword.toLowerCase();
+        filteredTemplates = filteredTemplates.filter(
+          (template) =>
+            template.name.toLowerCase().includes(keyword) ||
+            template.code.toLowerCase().includes(keyword) ||
+            template.description?.toLowerCase().includes(keyword)
+        );
       }
 
       // 分类筛选
       if (params?.categoryId) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.categoryId === params.categoryId
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.categoryId === params.categoryId
+        );
       }
 
       // 状态筛选
       if (params?.status) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.status === params.status
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.status === params.status
+        );
       }
 
       // 系统模板筛选
       if (params?.isSystem !== undefined) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.isSystem === params.isSystem
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.isSystem === params.isSystem
+        );
       }
 
       // 排序
-      filteredTemplates.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      filteredTemplates.sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
 
       // 分页处理
-      const page = params?.page || 1
-      const pageSize = params?.pageSize || 20
-      const total = filteredTemplates.length
-      const totalPages = Math.ceil(total / pageSize)
-      const startIndex = (page - 1) * pageSize
-      const list = filteredTemplates.slice(startIndex, startIndex + pageSize)
+      const page = params?.page || 1;
+      const pageSize = params?.pageSize || 20;
+      const total = filteredTemplates.length;
+      const totalPages = Math.ceil(total / pageSize);
+      const startIndex = (page - 1) * pageSize;
+      const list = filteredTemplates.slice(startIndex, startIndex + pageSize);
 
       return {
         list,
@@ -281,12 +286,12 @@ class AttributeTemplateService {
           current: page,
           pageSize,
           total,
-          totalPages
-        }
-      }
+          totalPages,
+        },
+      };
     } catch (error) {
-      console.error('Get template list error:', error)
-      throw new Error('获取属性模板列表失败')
+      console.error('Get template list error:', error);
+      throw new Error('获取属性模板列表失败');
     }
   }
 
@@ -295,17 +300,17 @@ class AttributeTemplateService {
    */
   async getTemplateById(id: string): Promise<AttributeTemplate> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const template = this.templates.find(t => t.id === id)
+      const template = this.templates.find((t) => t.id === id);
       if (!template) {
-        throw new Error('属性模板不存在')
+        throw new Error('属性模板不存在');
       }
 
-      return template
+      return template;
     } catch (error) {
-      console.error('Get template by ID error:', error)
-      throw new Error('获取属性模板详情失败')
+      console.error('Get template by ID error:', error);
+      throw new Error('获取属性模板详情失败');
     }
   }
 
@@ -314,13 +319,13 @@ class AttributeTemplateService {
    */
   async getTemplateByCode(code: string): Promise<AttributeTemplate | null> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const template = this.templates.find(t => t.code === code)
-      return template || null
+      const template = this.templates.find((t) => t.code === code);
+      return template || null;
     } catch (error) {
-      console.error('Get template by code error:', error)
-      throw new Error('根据编码获取属性模板失败')
+      console.error('Get template by code error:', error);
+      throw new Error('根据编码获取属性模板失败');
     }
   }
 
@@ -329,14 +334,14 @@ class AttributeTemplateService {
    */
   async getTemplatesByCategory(categoryId: string): Promise<AttributeTemplate[]> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      return this.templates.filter(template =>
-        template.categoryId === categoryId && template.status === 'active'
-      )
+      return this.templates.filter(
+        (template) => template.categoryId === categoryId && template.status === 'active'
+      );
     } catch (error) {
-      console.error('Get templates by category error:', error)
-      throw new Error('根据分类获取属性模板失败')
+      console.error('Get templates by category error:', error);
+      throw new Error('根据分类获取属性模板失败');
     }
   }
 
@@ -345,15 +350,15 @@ class AttributeTemplateService {
    */
   async createTemplate(data: AttributeTemplateForm): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // 检查编码唯一性
-      const existingTemplate = this.templates.find(t => t.code === data.code)
+      const existingTemplate = this.templates.find((t) => t.code === data.code);
       if (existingTemplate) {
         return {
           success: false,
-          message: '模板编码已存在'
-        }
+          message: '模板编码已存在',
+        };
       }
 
       const newTemplate: AttributeTemplate = {
@@ -362,28 +367,28 @@ class AttributeTemplateService {
         attributes: data.attributes.map((attr, index) => ({
           ...attr,
           id: `attr_${Date.now()}_${index}`,
-          sort: index + 1
+          sort: index + 1,
         })),
         isSystem: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         createdBy: 'current_user',
-        updatedBy: 'current_user'
-      }
+        updatedBy: 'current_user',
+      };
 
-      this.templates.push(newTemplate)
+      this.templates.push(newTemplate);
 
       return {
         success: true,
         data: newTemplate,
-        message: '创建属性模板成功'
-      }
+        message: '创建属性模板成功',
+      };
     } catch (error) {
-      console.error('Create template error:', error)
+      console.error('Create template error:', error);
       return {
         success: false,
-        message: '创建属性模板失败'
-      }
+        message: '创建属性模板失败',
+      };
     }
   }
 
@@ -395,34 +400,34 @@ class AttributeTemplateService {
     data: Partial<AttributeTemplateForm>
   ): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const templateIndex = this.templates.findIndex(t => t.id === id)
+      const templateIndex = this.templates.findIndex((t) => t.id === id);
       if (templateIndex === -1) {
         return {
           success: false,
-          message: '属性模板不存在'
-        }
+          message: '属性模板不存在',
+        };
       }
 
-      const template = this.templates[templateIndex]
+      const template = this.templates[templateIndex];
 
       // 检查系统模板是否可编辑
       if (template.isSystem) {
         return {
           success: false,
-          message: '系统模板不能编辑'
-        }
+          message: '系统模板不能编辑',
+        };
       }
 
       // 检查编码唯一性（如果编码有变化）
       if (data.code && data.code !== template.code) {
-        const existingTemplate = this.templates.find(t => t.code === data.code)
+        const existingTemplate = this.templates.find((t) => t.code === data.code);
         if (existingTemplate) {
           return {
             success: false,
-            message: '模板编码已存在'
-          }
+            message: '模板编码已存在',
+          };
         }
       }
 
@@ -430,22 +435,22 @@ class AttributeTemplateService {
         ...template,
         ...data,
         updatedAt: new Date().toISOString(),
-        updatedBy: 'current_user'
-      }
+        updatedBy: 'current_user',
+      };
 
-      this.templates[templateIndex] = updatedTemplate
+      this.templates[templateIndex] = updatedTemplate;
 
       return {
         success: true,
         data: updatedTemplate,
-        message: '更新属性模板成功'
-      }
+        message: '更新属性模板成功',
+      };
     } catch (error) {
-      console.error('Update template error:', error)
+      console.error('Update template error:', error);
       return {
         success: false,
-        message: '更新属性模板失败'
-      }
+        message: '更新属性模板失败',
+      };
     }
   }
 
@@ -454,38 +459,38 @@ class AttributeTemplateService {
    */
   async deleteTemplate(id: string): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const templateIndex = this.templates.findIndex(t => t.id === id)
+      const templateIndex = this.templates.findIndex((t) => t.id === id);
       if (templateIndex === -1) {
         return {
           success: false,
-          message: '属性模板不存在'
-        }
+          message: '属性模板不存在',
+        };
       }
 
-      const template = this.templates[templateIndex]
+      const template = this.templates[templateIndex];
 
       // 检查系统模板是否可删除
       if (template.isSystem) {
         return {
           success: false,
-          message: '系统模板不能删除'
-        }
+          message: '系统模板不能删除',
+        };
       }
 
-      this.templates.splice(templateIndex, 1)
+      this.templates.splice(templateIndex, 1);
 
       return {
         success: true,
-        message: '删除属性模板成功'
-      }
+        message: '删除属性模板成功',
+      };
     } catch (error) {
-      console.error('Delete template error:', error)
+      console.error('Delete template error:', error);
       return {
         success: false,
-        message: '删除属性模板失败'
-      }
+        message: '删除属性模板失败',
+      };
     }
   }
 
@@ -494,14 +499,14 @@ class AttributeTemplateService {
    */
   async copyTemplate(id: string, newName?: string): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      const originalTemplate = this.templates.find(t => t.id === id)
+      const originalTemplate = this.templates.find((t) => t.id === id);
       if (!originalTemplate) {
         return {
           success: false,
-          message: '源属性模板不存在'
-        }
+          message: '源属性模板不存在',
+        };
       }
 
       const newTemplate: AttributeTemplate = {
@@ -513,22 +518,22 @@ class AttributeTemplateService {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         createdBy: 'current_user',
-        updatedBy: 'current_user'
-      }
+        updatedBy: 'current_user',
+      };
 
-      this.templates.push(newTemplate)
+      this.templates.push(newTemplate);
 
       return {
         success: true,
         data: newTemplate,
-        message: '复制属性模板成功'
-      }
+        message: '复制属性模板成功',
+      };
     } catch (error) {
-      console.error('Copy template error:', error)
+      console.error('Copy template error:', error);
       return {
         success: false,
-        message: '复制属性模板失败'
-      }
+        message: '复制属性模板失败',
+      };
     }
   }
 
@@ -537,43 +542,43 @@ class AttributeTemplateService {
    */
   async toggleTemplateStatus(id: string): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const templateIndex = this.templates.findIndex(t => t.id === id)
+      const templateIndex = this.templates.findIndex((t) => t.id === id);
       if (templateIndex === -1) {
         return {
           success: false,
-          message: '属性模板不存在'
-        }
+          message: '属性模板不存在',
+        };
       }
 
-      const template = this.templates[templateIndex]
+      const template = this.templates[templateIndex];
 
       // 系统模板不能停用
       if (template.isSystem && template.status === 'active') {
         return {
           success: false,
-          message: '系统模板不能停用'
-        }
+          message: '系统模板不能停用',
+        };
       }
 
       this.templates[templateIndex] = {
         ...template,
         status: template.status === 'active' ? 'inactive' : 'active',
         updatedAt: new Date().toISOString(),
-        updatedBy: 'current_user'
-      }
+        updatedBy: 'current_user',
+      };
 
       return {
         success: true,
-        message: `${template.status === 'active' ? '停用' : '启用'}属性模板成功`
-      }
+        message: `${template.status === 'active' ? '停用' : '启用'}属性模板成功`,
+      };
     } catch (error) {
-      console.error('Toggle template status error:', error)
+      console.error('Toggle template status error:', error);
       return {
         success: false,
-        message: '切换属性模板状态失败'
-      }
+        message: '切换属性模板状态失败',
+      };
     }
   }
 
@@ -582,45 +587,45 @@ class AttributeTemplateService {
    */
   async batchDeleteTemplates(ids: string[]): Promise<AttributeTemplateOperationResponse> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      const results: string[] = []
-      const errors: string[] = []
+      const results: string[] = [];
+      const errors: string[] = [];
 
       for (const id of ids) {
-        const template = this.templates.find(t => t.id === id)
+        const template = this.templates.find((t) => t.id === id);
         if (!template) {
-          errors.push(`模板 ${id} 不存在`)
-          continue
+          errors.push(`模板 ${id} 不存在`);
+          continue;
         }
 
         if (template.isSystem) {
-          errors.push(`系统模板 "${template.name}" 不能删除`)
-          continue
+          errors.push(`系统模板 "${template.name}" 不能删除`);
+          continue;
         }
 
-        const templateIndex = this.templates.findIndex(t => t.id === id)
-        this.templates.splice(templateIndex, 1)
-        results.push(template.name)
+        const templateIndex = this.templates.findIndex((t) => t.id === id);
+        this.templates.splice(templateIndex, 1);
+        results.push(template.name);
       }
 
       if (errors.length > 0) {
         return {
           success: false,
-          message: `部分删除失败：${errors.join(', ')}`
-        }
+          message: `部分删除失败：${errors.join(', ')}`,
+        };
       }
 
       return {
         success: true,
-        message: `成功删除 ${results.length} 个属性模板`
-      }
+        message: `成功删除 ${results.length} 个属性模板`,
+      };
     } catch (error) {
-      console.error('Batch delete templates error:', error)
+      console.error('Batch delete templates error:', error);
       return {
         success: false,
-        message: '批量删除属性模板失败'
-      }
+        message: '批量删除属性模板失败',
+      };
     }
   }
 
@@ -629,12 +634,12 @@ class AttributeTemplateService {
    */
   async getActiveTemplates(): Promise<AttributeTemplate[]> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      return this.templates.filter(template => template.status === 'active')
+      return this.templates.filter((template) => template.status === 'active');
     } catch (error) {
-      console.error('Get active templates error:', error)
-      throw new Error('获取活跃属性模板失败')
+      console.error('Get active templates error:', error);
+      throw new Error('获取活跃属性模板失败');
     }
   }
 
@@ -643,15 +648,13 @@ class AttributeTemplateService {
    */
   async checkCodeAvailable(code: string, excludeId?: string): Promise<boolean> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const existingTemplate = this.templates.find(t =>
-        t.code === code && t.id !== excludeId
-      )
-      return !existingTemplate
+      const existingTemplate = this.templates.find((t) => t.code === code && t.id !== excludeId);
+      return !existingTemplate;
     } catch (error) {
-      console.error('Check code available error:', error)
-      return false
+      console.error('Check code available error:', error);
+      return false;
     }
   }
 
@@ -659,37 +662,37 @@ class AttributeTemplateService {
    * 获取模板统计信息
    */
   async getTemplateStats(): Promise<{
-    total: number
-    active: number
-    inactive: number
-    system: number
-    custom: number
+    total: number;
+    active: number;
+    inactive: number;
+    system: number;
+    custom: number;
   }> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const total = this.templates.length
-      const active = this.templates.filter(t => t.status === 'active').length
-      const inactive = total - active
-      const system = this.templates.filter(t => t.isSystem).length
-      const custom = total - system
+      const total = this.templates.length;
+      const active = this.templates.filter((t) => t.status === 'active').length;
+      const inactive = total - active;
+      const system = this.templates.filter((t) => t.isSystem).length;
+      const custom = total - system;
 
       return {
         total,
         active,
         inactive,
         system,
-        custom
-      }
+        custom,
+      };
     } catch (error) {
-      console.error('Get template stats error:', error)
-      throw new Error('获取模板统计信息失败')
+      console.error('Get template stats error:', error);
+      throw new Error('获取模板统计信息失败');
     }
   }
 }
 
 // 创建服务实例
-export const attributeService = new AttributeTemplateService()
+export const attributeService = new AttributeTemplateService();
 
 // 类型已在 @/types/spu 中导出，无需重复导出
 
@@ -698,34 +701,36 @@ export const attributeService = new AttributeTemplateService()
  * 基于 CategoryAttribute 和 AttributeTemplate 类型（data-model.md 规范）
  */
 class CategoryAttributeTemplateService {
-  private baseUrl = '/api/attribute-templates'
-  private templates: Map<string, CategoryAttributeTemplate> = new Map()
+  private baseUrl = '/api/attribute-templates';
+  private templates: Map<string, CategoryAttributeTemplate> = new Map();
 
   /**
    * 获取类目的属性模板
    * @param categoryId 类目ID
    * @returns 属性模板
    */
-  async getAttributeTemplate(categoryId: string): Promise<ApiResponse<CategoryAttributeTemplate | null>> {
+  async getAttributeTemplate(
+    categoryId: string
+  ): Promise<ApiResponse<CategoryAttributeTemplate | null>> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       // 从 Mock 数据中获取
-      const template = this.templates.get(categoryId) || null
-      
+      const template = this.templates.get(categoryId) || null;
+
       return {
         success: true,
         data: template,
         message: template ? '获取成功' : '属性模板不存在',
         code: template ? 200 : 404,
-      }
+      };
     } catch (error) {
       return {
         success: false,
         data: null,
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
-      }
+      };
     }
   }
 
@@ -740,52 +745,54 @@ class CategoryAttributeTemplateService {
     attributes: CategoryAttribute[]
   ): Promise<ApiResponse<CategoryAttributeTemplate>> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // 验证属性
       for (const attr of attributes) {
         if (!attr.name || attr.name.trim() === '') {
-          throw new Error('属性名称不能为空')
+          throw new Error('属性名称不能为空');
         }
         if (!attr.displayName || attr.displayName.trim() === '') {
-          throw new Error('显示名称不能为空')
+          throw new Error('显示名称不能为空');
         }
-        if ((attr.type === 'single-select' || attr.type === 'multi-select') && 
-            (!attr.optionalValues || attr.optionalValues.length === 0)) {
-          throw new Error(`${attr.type} 类型必须提供可选值`)
+        if (
+          (attr.type === 'single-select' || attr.type === 'multi-select') &&
+          (!attr.optionalValues || attr.optionalValues.length === 0)
+        ) {
+          throw new Error(`${attr.type} 类型必须提供可选值`);
         }
       }
 
-      const now = new Date().toISOString()
-      const existingTemplate = this.templates.get(categoryId)
-      
+      const now = new Date().toISOString();
+      const existingTemplate = this.templates.get(categoryId);
+
       const template: CategoryAttributeTemplate = {
         id: existingTemplate?.id || `template-${Date.now()}`,
         categoryId,
-        attributes: attributes.map(attr => ({
+        attributes: attributes.map((attr) => ({
           ...attr,
           createdAt: attr.createdAt || now,
           updatedAt: now,
         })),
         createdAt: existingTemplate?.createdAt || now,
         updatedAt: now,
-      }
-      
-      this.templates.set(categoryId, template)
-      
+      };
+
+      this.templates.set(categoryId, template);
+
       return {
         success: true,
         data: template,
         message: '保存成功',
         code: 200,
-      }
+      };
     } catch (error) {
       return {
         success: false,
         data: null as any,
         message: error instanceof Error ? error.message : '保存失败',
         code: 500,
-      }
+      };
     }
   }
 
@@ -800,8 +807,8 @@ class CategoryAttributeTemplateService {
     attribute: Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<ApiResponse<CategoryAttributeTemplate>> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 400))
-      
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
       // 验证属性
       if (!attribute.name || attribute.name.trim() === '') {
         return {
@@ -809,68 +816,70 @@ class CategoryAttributeTemplateService {
           data: null as any,
           message: '属性名称不能为空',
           code: 400,
-        }
+        };
       }
-      
-      if ((attribute.type === 'single-select' || attribute.type === 'multi-select') && 
-          (!attribute.optionalValues || attribute.optionalValues.length === 0)) {
+
+      if (
+        (attribute.type === 'single-select' || attribute.type === 'multi-select') &&
+        (!attribute.optionalValues || attribute.optionalValues.length === 0)
+      ) {
         return {
           success: false,
           data: null as any,
           message: `${attribute.type} 类型必须提供可选值`,
           code: 400,
-        }
+        };
       }
 
-      const template = this.templates.get(categoryId)
+      const template = this.templates.get(categoryId);
       if (!template) {
         return {
           success: false,
           data: null as any,
           message: '属性模板不存在，请先创建模板',
           code: 404,
-        }
+        };
       }
 
       // 检查属性名称是否重复
-      if (template.attributes.some(attr => attr.name === attribute.name)) {
+      if (template.attributes.some((attr) => attr.name === attribute.name)) {
         return {
           success: false,
           data: null as any,
           message: '属性名称已存在',
           code: 400,
-        }
+        };
       }
 
-      const now = new Date().toISOString()
+      const now = new Date().toISOString();
       const newAttribute: CategoryAttribute = {
         ...attribute,
         id: `attr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: now,
         updatedAt: now,
-      }
+      };
 
       const updatedTemplate: CategoryAttributeTemplate = {
         ...template,
         attributes: [...template.attributes, newAttribute],
         updatedAt: now,
-      }
+      };
 
-      this.templates.set(categoryId, updatedTemplate)
+      this.templates.set(categoryId, updatedTemplate);
 
       return {
         success: true,
         data: updatedTemplate,
         message: '添加成功',
         code: 200,
-      }
+      };
     } catch (error) {
       return {
         success: false,
         data: null as any,
         message: error instanceof Error ? error.message : '添加失败',
         code: 500,
-      }
+      };
     }
   }
 
@@ -887,68 +896,68 @@ class CategoryAttributeTemplateService {
     attribute: Partial<Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>>
   ): Promise<ApiResponse<CategoryAttributeTemplate>> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 400))
-      
-      const template = this.templates.get(categoryId)
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      const template = this.templates.get(categoryId);
       if (!template) {
         return {
           success: false,
           data: null as any,
           message: '属性模板不存在',
           code: 404,
-        }
+        };
       }
 
-      const attributeIndex = template.attributes.findIndex(attr => attr.id === attributeId)
+      const attributeIndex = template.attributes.findIndex((attr) => attr.id === attributeId);
       if (attributeIndex === -1) {
         return {
           success: false,
           data: null as any,
           message: '属性不存在',
           code: 404,
-        }
+        };
       }
 
       // 验证更新后的属性
-      const updatedAttribute = { ...template.attributes[attributeIndex], ...attribute }
+      const updatedAttribute = { ...template.attributes[attributeIndex], ...attribute };
       if (updatedAttribute.name && updatedAttribute.name.trim() === '') {
         return {
           success: false,
           data: null as any,
           message: '属性名称不能为空',
           code: 400,
-        }
+        };
       }
 
-      const now = new Date().toISOString()
-      const updatedAttributes = [...template.attributes]
+      const now = new Date().toISOString();
+      const updatedAttributes = [...template.attributes];
       updatedAttributes[attributeIndex] = {
         ...updatedAttribute,
         id: attributeId,
         updatedAt: now,
-      }
+      };
 
       const updatedTemplate: CategoryAttributeTemplate = {
         ...template,
         attributes: updatedAttributes,
         updatedAt: now,
-      }
+      };
 
-      this.templates.set(categoryId, updatedTemplate)
+      this.templates.set(categoryId, updatedTemplate);
 
       return {
         success: true,
         data: updatedTemplate,
         message: '更新成功',
         code: 200,
-      }
+      };
     } catch (error) {
       return {
         success: false,
         data: null as any,
         message: error instanceof Error ? error.message : '更新失败',
         code: 500,
-      }
+      };
     }
   }
 
@@ -963,56 +972,56 @@ class CategoryAttributeTemplateService {
     attributeId: string
   ): Promise<ApiResponse<CategoryAttributeTemplate>> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 400))
-      
-      const template = this.templates.get(categoryId)
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      const template = this.templates.get(categoryId);
       if (!template) {
         return {
           success: false,
           data: null as any,
           message: '属性模板不存在',
           code: 404,
-        }
+        };
       }
 
-      const attribute = template.attributes.find(attr => attr.id === attributeId)
+      const attribute = template.attributes.find((attr) => attr.id === attributeId);
       if (!attribute) {
         return {
           success: false,
           data: null as any,
           message: '属性不存在',
           code: 404,
-        }
+        };
       }
 
       // 检查属性是否被SPU使用（Mock数据中暂时跳过此检查）
       // 在实际实现中，需要检查 SPU 是否使用了该属性
 
-      const now = new Date().toISOString()
+      const now = new Date().toISOString();
       const updatedTemplate: CategoryAttributeTemplate = {
         ...template,
-        attributes: template.attributes.filter(attr => attr.id !== attributeId),
+        attributes: template.attributes.filter((attr) => attr.id !== attributeId),
         updatedAt: now,
-      }
+      };
 
-      this.templates.set(categoryId, updatedTemplate)
+      this.templates.set(categoryId, updatedTemplate);
 
       return {
         success: true,
         data: updatedTemplate,
         message: '删除成功',
         code: 200,
-      }
+      };
     } catch (error) {
       return {
         success: false,
         data: null as any,
         message: error instanceof Error ? error.message : '删除失败',
         code: 500,
-      }
+      };
     }
   }
 }
 
 // 创建类目属性模板服务实例
-export const categoryAttributeTemplateService = new CategoryAttributeTemplateService()
+export const categoryAttributeTemplateService = new CategoryAttributeTemplateService();

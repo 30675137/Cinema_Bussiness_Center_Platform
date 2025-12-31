@@ -59,10 +59,7 @@ const InventoryOperations: React.FC = () => {
       children: (
         <>
           {/* 今日统计 */}
-          <Card 
-            title="今日操作统计" 
-            style={{ marginBottom: 16 }}
-          >
+          <Card title="今日操作统计" style={{ marginBottom: 16 }}>
             <Row gutter={16}>
               <Col span={6}>
                 <Card bordered={false} style={{ textAlign: 'center' }}>
@@ -135,7 +132,7 @@ const InventoryOperations: React.FC = () => {
                   <Card
                     hoverable
                     onClick={op.onClick}
-                    style={{ 
+                    style={{
                       textAlign: 'center',
                       transition: 'all 0.3s',
                     }}
@@ -153,9 +150,7 @@ const InventoryOperations: React.FC = () => {
                         margin: '0 auto 16px',
                       }}
                     >
-                      <div style={{ fontSize: 32, color: op.color }}>
-                        {op.icon}
-                      </div>
+                      <div style={{ fontSize: 32, color: op.color }}>{op.icon}</div>
                     </div>
                     <Title level={5} style={{ marginBottom: 8 }}>
                       {op.title}

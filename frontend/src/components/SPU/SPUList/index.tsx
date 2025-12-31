@@ -6,7 +6,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   CopyOutlined,
-  ExportOutlined
+  ExportOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -26,11 +26,7 @@ interface SPUListProps {
   onCopy?: (record: SPUItem) => void;
 }
 
-const SPUList: React.FC<SPUListProps> = ({
-  onEdit,
-  onView,
-  onCopy
-}) => {
+const SPUList: React.FC<SPUListProps> = ({ onEdit, onView, onCopy }) => {
   const navigate = useNavigate();
 
   // Zustand stores
@@ -46,7 +42,7 @@ const SPUList: React.FC<SPUListProps> = ({
     setPagination,
     setFilters,
     setSelectedRowKeys,
-    removeItems
+    removeItems,
   } = useSPUStore();
 
   const { items: categories, setItems: setCategories } = useCategoryStore();
@@ -60,7 +56,7 @@ const SPUList: React.FC<SPUListProps> = ({
     onError: (error: any) => {
       console.error('加载分类失败:', error);
       message.error('加载分类数据失败');
-    }
+    },
   });
 
   const { data: brandsData } = useQuery({
@@ -70,32 +66,30 @@ const SPUList: React.FC<SPUListProps> = ({
     onError: (error: any) => {
       console.error('加载品牌失败:', error);
       message.error('加载品牌数据失败');
-    }
+    },
   });
 
   // 加载 SPU 列表
-  const {
-    data: spuData,
-    refetch: refetchSPUList
-  } = useQuery({
+  const { data: spuData, refetch: refetchSPUList } = useQuery({
     queryKey: ['spuList', pagination.current, pagination.pageSize, filters],
-    queryFn: () => spuAPI.getSPUList({
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-      filters
-    }),
+    queryFn: () =>
+      spuAPI.getSPUList({
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        filters,
+      }),
     onSuccess: (data) => {
       setItems(data.data.list);
       setPagination({
         current: data.data.pagination.current,
         pageSize: data.data.pagination.pageSize,
-        total: data.data.pagination.total
+        total: data.data.pagination.total,
       });
     },
     onError: (error: any) => {
       setError('list', error.message || '加载列表失败');
       message.error('加载SPU列表失败');
-    }
+    },
   });
 
   // 生成表格列
@@ -104,7 +98,7 @@ const SPUList: React.FC<SPUListProps> = ({
     onView: onView || ((record) => navigate(`/spu/detail/${record.id}`)),
     onCopy: onCopy || ((record) => navigate(`/spu/create?copyId=${record.id}`)),
     categories: categoriesData?.data || [],
-    brands: brandsData?.data || []
+    brands: brandsData?.data || [],
   });
 
   // 搜索处理
@@ -123,7 +117,7 @@ const SPUList: React.FC<SPUListProps> = ({
   const handleTableChange = (page: number, pageSize?: number) => {
     setPagination({
       current: page,
-      ...(pageSize && { pageSize })
+      ...(pageSize && { pageSize }),
     });
   };
 
@@ -160,7 +154,7 @@ const SPUList: React.FC<SPUListProps> = ({
     try {
       const blob = await spuAPI.exportSPU({
         filters,
-        format: 'excel'
+        format: 'excel',
       });
 
       const url = window.URL.createObjectURL(blob);
@@ -197,11 +191,7 @@ const SPUList: React.FC<SPUListProps> = ({
       <Card className="mb-4">
         <div className="flex justify-between items-center">
           <Space>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreate}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新建 SPU
             </Button>
 
@@ -213,20 +203,14 @@ const SPUList: React.FC<SPUListProps> = ({
                 okText="确认"
                 cancelText="取消"
               >
-                <Button
-                  danger
-                  loading={loading.delete}
-                >
+                <Button danger loading={loading.delete}>
                   批量删除 ({selectedRowKeys.length})
                 </Button>
               </Popconfirm>
             )}
           </Space>
 
-          <Button
-            icon={<ExportOutlined />}
-            onClick={handleExport}
-          >
+          <Button icon={<ExportOutlined />} onClick={handleExport}>
             导出数据
           </Button>
         </div>
@@ -245,16 +229,15 @@ const SPUList: React.FC<SPUListProps> = ({
             total: pagination.total,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
             pageSizeOptions: ['10', '20', '50', '100'],
             onChange: handleTableChange,
-            onShowSizeChange: (current, size) => handleTableChange(1, size)
+            onShowSizeChange: (current, size) => handleTableChange(1, size),
           }}
           rowSelection={{
             selectedRowKeys,
             onChange: handleRowSelect,
-            preserveSelectedRowKeys: true
+            preserveSelectedRowKeys: true,
           }}
           scroll={{ x: 1400 }}
           size="middle"

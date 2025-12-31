@@ -163,7 +163,9 @@ test.describe('导航搜索功能', () => {
     }
 
     // 检查移动端搜索框
-    const mobileSearchInput = page.locator('.ant-drawer-open .sidebar-search input[placeholder*="搜索"]');
+    const mobileSearchInput = page.locator(
+      '.ant-drawer-open .sidebar-search input[placeholder*="搜索"]'
+    );
 
     if (await mobileSearchInput.isVisible()) {
       await expect(mobileSearchInput).toBeVisible();
@@ -252,7 +254,9 @@ test.describe('导航搜索功能', () => {
     if (hasEmptyState) {
       // 验证无结果状态的文本内容
       const emptyText = await emptyState.textContent();
-      expect(emptyText).toContain('暂无') || expect(emptyText).toContain('没有') || expect(emptyText).toContain('空');
+      expect(emptyText).toContain('暂无') ||
+        expect(emptyText).toContain('没有') ||
+        expect(emptyText).toContain('空');
     }
   });
 });

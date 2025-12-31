@@ -83,15 +83,15 @@ interface ErrorResponse {
 
 ### 错误代码
 
-| 代码 | 说明 | HTTP状态码 |
-|------|------|------------|
-| `NETWORK_ERROR` | 网络连接失败 | 0 |
-| `UNAUTHORIZED` | 未授权访问 | 401 |
-| `FORBIDDEN` | 权限不足 | 403 |
-| `NOT_FOUND` | 资源不存在 | 404 |
-| `VALIDATION_ERROR` | 数据验证失败 | 400 |
-| `SERVER_ERROR` | 服务器内部错误 | 500 |
-| `TIMEOUT` | 请求超时 | 408 |
+| 代码               | 说明           | HTTP状态码 |
+| ------------------ | -------------- | ---------- |
+| `NETWORK_ERROR`    | 网络连接失败   | 0          |
+| `UNAUTHORIZED`     | 未授权访问     | 401        |
+| `FORBIDDEN`        | 权限不足       | 403        |
+| `NOT_FOUND`        | 资源不存在     | 404        |
+| `VALIDATION_ERROR` | 数据验证失败   | 400        |
+| `SERVER_ERROR`     | 服务器内部错误 | 500        |
+| `TIMEOUT`          | 请求超时       | 408        |
 
 ### 错误处理示例
 
@@ -529,8 +529,8 @@ const uploadConfig = {
     'image/gif',
     'application/pdf',
     'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  ]
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ],
 };
 ```
 
@@ -595,26 +595,27 @@ enum Status {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   PENDING = 'pending',
-  DRAFT = 'draft'
+  DRAFT = 'draft',
 }
 
 enum AuditStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
-  REJECTED = 'rejected'
+  REJECTED = 'rejected',
 }
 
 enum Priority {
   LOW = 'low',
   NORMAL = 'normal',
   HIGH = 'high',
-  URGENT = 'urgent'
+  URGENT = 'urgent',
 }
 ```
 
 ### 时间格式
 
 所有时间字段均使用 ISO 8601 格式：
+
 ```
 2025-12-12T10:30:00.000Z
 ```
@@ -623,8 +624,8 @@ enum Priority {
 
 ```typescript
 interface PaginationParams {
-  current: number;    // 当前页码，从 1 开始
-  pageSize: number;   // 每页数量，默认 20
+  current: number; // 当前页码，从 1 开始
+  pageSize: number; // 每页数量，默认 20
 }
 
 interface PaginationResult {
@@ -645,7 +646,7 @@ import { api } from '@/services/api';
 // 获取商品列表
 const getProducts = async (params: GetProductsParams) => {
   const response = await api.get<GetProductsResponse>('/inventory/products', {
-    params
+    params,
   });
   return response.data;
 };
@@ -653,7 +654,7 @@ const getProducts = async (params: GetProductsParams) => {
 // 创建入库记录
 const createStockIn = async (data: CreateStockInRequest) => {
   const response = await api.post<StockInRecord>('/inventory/stock-in', {
-    data
+    data,
   });
   return response.data;
 };
@@ -685,4 +686,4 @@ const apiCall = async () => {
 
 ---
 
-*文档最后更新：2025年12月12日*
+_文档最后更新：2025年12月12日_

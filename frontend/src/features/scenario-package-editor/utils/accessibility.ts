@@ -74,7 +74,7 @@ export function useAriaAnnounce() {
   const announce = useCallback((message: string, type: 'polite' | 'assertive' = 'polite') => {
     // 查找或创建 live region
     let liveRegion = document.getElementById('aria-live-region');
-    
+
     if (!liveRegion) {
       liveRegion = document.createElement('div');
       liveRegion.id = 'aria-live-region';
@@ -257,7 +257,7 @@ export const ariaProps = {
    */
   alert: (type: 'success' | 'error' | 'warning' | 'info') => ({
     role: 'alert' as const,
-    'aria-live': type === 'error' ? 'assertive' : 'polite' as const,
+    'aria-live': type === 'error' ? 'assertive' : ('polite' as const),
   }),
 
   /**

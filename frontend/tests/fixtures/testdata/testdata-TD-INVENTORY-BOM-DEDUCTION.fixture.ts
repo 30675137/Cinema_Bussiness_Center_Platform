@@ -43,13 +43,21 @@ export interface TD_INVENTORY_BOM_DEDUCTION_Data {
 export const test = base.extend<{ TD_INVENTORY_BOM_DEDUCTION: TD_INVENTORY_BOM_DEDUCTION_Data }>({
   TD_INVENTORY_BOM_DEDUCTION: async ({}, use) => {
     // Setup: Load seed data
-    const seedPath = path.join(process.cwd(), '..', 'testdata', 'seeds', 'inventory-bom-deduction.json');
+    const seedPath = path.join(
+      process.cwd(),
+      '..',
+      'testdata',
+      'seeds',
+      'inventory-bom-deduction.json'
+    );
     const seedContent = await fs.readFile(seedPath, 'utf-8');
     const seedData = JSON.parse(seedContent);
     const testData = seedData.find((item: any) => item.key === 'bom-deduction-scenario');
 
     if (!testData) {
-      throw new Error('Seed key "bom-deduction-scenario" not found in testdata/seeds/inventory-bom-deduction.json');
+      throw new Error(
+        'Seed key "bom-deduction-scenario" not found in testdata/seeds/inventory-bom-deduction.json'
+      );
     }
 
     // Remove the 'key' property before using

@@ -11,13 +11,13 @@
 export const TEST_SKUS = {
   // 成品SKU
   WHISKEY_COLA_COCKTAIL: '22222222-0000-0000-0000-000000000001', // 威士忌可乐鸡尾酒
-  COMBO_SET: '22222222-0000-0000-0000-000000000002',             // 套餐组合
+  COMBO_SET: '22222222-0000-0000-0000-000000000002', // 套餐组合
 
   // 原料SKU
-  WHISKEY: '11111111-0000-0000-0000-000000000001',  // 威士忌（45ml per cocktail）
-  COLA: '11111111-0000-0000-0000-000000000002',     // 可乐（150ml per cocktail）
+  WHISKEY: '11111111-0000-0000-0000-000000000001', // 威士忌（45ml per cocktail）
+  COLA: '11111111-0000-0000-0000-000000000002', // 可乐（150ml per cocktail）
   ICE_CUBE: '11111111-0000-0000-0000-000000000003', // 冰块（1个 per cocktail）
-  LEMON_SLICE: '11111111-0000-0000-0000-000000000004' // 柠檬片（1个 per cocktail）
+  LEMON_SLICE: '11111111-0000-0000-0000-000000000004', // 柠檬片（1个 per cocktail）
 };
 
 /**
@@ -42,7 +42,7 @@ export const SKU_NAMES = {
   [TEST_SKUS.WHISKEY]: '威士忌',
   [TEST_SKUS.COLA]: '可乐',
   [TEST_SKUS.ICE_CUBE]: '冰块',
-  [TEST_SKUS.LEMON_SLICE]: '柠檬片'
+  [TEST_SKUS.LEMON_SLICE]: '柠檬片',
 };
 
 /**
@@ -53,44 +53,49 @@ export const BOM_RECIPES = {
     { skuId: TEST_SKUS.WHISKEY, quantity: 45, unit: 'ml', name: '威士忌' },
     { skuId: TEST_SKUS.COLA, quantity: 150, unit: 'ml', name: '可乐' },
     { skuId: TEST_SKUS.ICE_CUBE, quantity: 1, unit: '个', name: '冰块' },
-    { skuId: TEST_SKUS.LEMON_SLICE, quantity: 1, unit: '个', name: '柠檬片' }
-  ]
+    { skuId: TEST_SKUS.LEMON_SLICE, quantity: 1, unit: '个', name: '柠檬片' },
+  ],
 };
 
 /**
  * 订单创建请求体模板
  */
-export const createOrderRequest = (orderId: string, items: Array<{
-  skuId: string;
-  quantity: number;
-  unit: string;
-}>) => ({
+export const createOrderRequest = (
+  orderId: string,
+  items: Array<{
+    skuId: string;
+    quantity: number;
+    unit: string;
+  }>
+) => ({
   orderId,
   storeId: TEST_STORE_ID,
-  items
+  items,
 });
 
 /**
  * 单杯鸡尾酒订单
  */
-export const SINGLE_COCKTAIL_ORDER = (orderId: string) => createOrderRequest(orderId, [
-  {
-    skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
-    quantity: 1,
-    unit: '杯'
-  }
-]);
+export const SINGLE_COCKTAIL_ORDER = (orderId: string) =>
+  createOrderRequest(orderId, [
+    {
+      skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
+      quantity: 1,
+      unit: '杯',
+    },
+  ]);
 
 /**
  * 多杯鸡尾酒订单
  */
-export const MULTIPLE_COCKTAIL_ORDER = (orderId: string, quantity: number) => createOrderRequest(orderId, [
-  {
-    skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
-    quantity,
-    unit: '杯'
-  }
-]);
+export const MULTIPLE_COCKTAIL_ORDER = (orderId: string, quantity: number) =>
+  createOrderRequest(orderId, [
+    {
+      skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
+      quantity,
+      unit: '杯',
+    },
+  ]);
 
 /**
  * 预期的库存预占结果（1杯鸡尾酒）
@@ -99,24 +104,24 @@ export const EXPECTED_RESERVATION_COMPONENTS = [
   { skuId: TEST_SKUS.WHISKEY, quantity: 45, unit: 'ml' },
   { skuId: TEST_SKUS.COLA, quantity: 150, unit: 'ml' },
   { skuId: TEST_SKUS.ICE_CUBE, quantity: 1, unit: '个' },
-  { skuId: TEST_SKUS.LEMON_SLICE, quantity: 1, unit: '个' }
+  { skuId: TEST_SKUS.LEMON_SLICE, quantity: 1, unit: '个' },
 ];
 
 /**
  * 事务类型枚举
  */
 export enum TransactionType {
-  BOM_DEDUCTION = 'BOM_DEDUCTION',           // BOM扣减
+  BOM_DEDUCTION = 'BOM_DEDUCTION', // BOM扣减
   RESERVATION_RELEASE = 'RESERVATION_RELEASE', // 预占释放
-  MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT'      // 手动调整
+  MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT', // 手动调整
 }
 
 /**
  * 订单状态枚举
  */
 export enum OrderStatus {
-  PENDING = 'PENDING',       // 待处理
-  CONFIRMED = 'CONFIRMED',   // 已确认
-  FULFILLED = 'FULFILLED',   // 已履约
-  CANCELLED = 'CANCELLED'    // 已取消
+  PENDING = 'PENDING', // 待处理
+  CONFIRMED = 'CONFIRMED', // 已确认
+  FULFILLED = 'FULFILLED', // 已履约
+  CANCELLED = 'CANCELLED', // 已取消
 }

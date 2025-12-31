@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: AdjustmentForm 组件单元测试
- * 
+ *
  * 测试调整表单验证和交互。
  * 实现 T014 和 T036 任务。
- * 
+ *
  * @since US1 - 录入库存调整
  */
 
@@ -52,25 +52,25 @@ describe('AdjustmentForm', () => {
   describe('表单渲染', () => {
     it('应该显示SKU信息', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText('测试商品')).toBeInTheDocument();
     });
 
     it('应该显示调整类型选择', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByLabelText(/调整类型/i)).toBeInTheDocument();
     });
 
     it('应该显示调整数量输入', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByLabelText(/调整数量/i)).toBeInTheDocument();
     });
 
     it('应该显示调整原因选择', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByLabelText(/调整原因/i)).toBeInTheDocument();
     });
   });
@@ -78,10 +78,10 @@ describe('AdjustmentForm', () => {
   describe('表单验证', () => {
     it('调整数量为空时应该显示错误', async () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       const submitButton = screen.getByRole('button', { name: /确认/i });
       await userEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/请输入调整数量/i)).toBeInTheDocument();
       });
@@ -89,14 +89,14 @@ describe('AdjustmentForm', () => {
 
     it('调整数量为0时应该显示错误', async () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       const quantityInput = screen.getByLabelText(/调整数量/i);
       await userEvent.clear(quantityInput);
       await userEvent.type(quantityInput, '0');
-      
+
       const submitButton = screen.getByRole('button', { name: /确认/i });
       await userEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/调整数量不能为0/i)).toBeInTheDocument();
       });
@@ -105,14 +105,14 @@ describe('AdjustmentForm', () => {
     // T036: 原因必填验证
     it('未选择调整原因时应该显示错误', async () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       // 填写数量但不选择原因
       const quantityInput = screen.getByLabelText(/调整数量/i);
       await userEvent.type(quantityInput, '10');
-      
+
       const submitButton = screen.getByRole('button', { name: /确认/i });
       await userEvent.click(submitButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/请选择调整原因/i)).toBeInTheDocument();
       });
@@ -122,10 +122,10 @@ describe('AdjustmentForm', () => {
   describe('表单交互', () => {
     it('点击取消按钮应该调用onCancel', async () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       const cancelButton = screen.getByRole('button', { name: /取消/i });
       await userEvent.click(cancelButton);
-      
+
       expect(defaultProps.onCancel).toHaveBeenCalled();
     });
   });
@@ -133,19 +133,19 @@ describe('AdjustmentForm', () => {
   describe('调整类型', () => {
     it('应该有盘盈选项', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText(/盘盈/i)).toBeInTheDocument();
     });
 
     it('应该有盘亏选项', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText(/盘亏/i)).toBeInTheDocument();
     });
 
     it('应该有报损选项', () => {
       render(<AdjustmentForm {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText(/报损/i)).toBeInTheDocument();
     });
   });

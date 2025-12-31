@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Modal,
-  Form,
-  Select,
-  InputNumber,
-  Input,
-  Alert,
-  Space,
-  Typography,
-  Divider,
-} from 'antd';
+import { Modal, Form, Select, InputNumber, Input, Alert, Space, Typography, Divider } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import type { CurrentInventory } from '@/types/inventory';
 import {
@@ -42,7 +32,7 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
   const [form] = Form.useForm();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [adjustmentData, setAdjustmentData] = useState<AdjustmentParams | null>(null);
-  
+
   const adjustmentMutation = useInventoryAdjustment();
 
   const adjustmentTypeOptions: { label: string; value: AdjustmentType }[] = [
@@ -115,7 +105,9 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
               message="当前库存信息"
               description={
                 <Space direction="vertical" style={{ width: '100%' }}>
-                  <Text>SKU: {inventory.sku?.skuCode} - {inventory.sku?.name}</Text>
+                  <Text>
+                    SKU: {inventory.sku?.skuCode} - {inventory.sku?.name}
+                  </Text>
                   <Text>门店: {inventory.store?.name}</Text>
                   <Text strong>
                     现存数量: {formatQuantity(inventory.onHandQty, inventory.sku?.unit)}
@@ -174,19 +166,17 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
                   placeholder="请选择调整原因"
                   options={
                     watchedType
-                      ? reasonOptions[watchedType as AdjustmentType].map((r: string) => ({ label: r, value: r }))
+                      ? reasonOptions[watchedType as AdjustmentType].map((r: string) => ({
+                          label: r,
+                          value: r,
+                        }))
                       : []
                   }
                 />
               </Form.Item>
 
               <Form.Item label="备注说明" name="remarks">
-                <TextArea
-                  rows={3}
-                  placeholder="请输入备注说明（选填）"
-                  maxLength={200}
-                  showCount
-                />
+                <TextArea rows={3} placeholder="请输入备注说明（选填）" maxLength={200} showCount />
               </Form.Item>
             </Form>
 
@@ -234,10 +224,7 @@ export const AdjustmentModal: React.FC<AdjustmentModalProps> = ({
             </Text>
             <Text>
               <Text strong>调整类型:</Text>{' '}
-              <Text
-                type={adjustmentData.adjustmentType === '盘盈' ? 'success' : 'danger'}
-                strong
-              >
+              <Text type={adjustmentData.adjustmentType === '盘盈' ? 'success' : 'danger'} strong>
                 {adjustmentData.adjustmentType}
               </Text>
             </Text>

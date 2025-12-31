@@ -1,13 +1,5 @@
 import React, { ReactNode } from 'react';
-import {
-  Breadcrumb,
-  Card,
-  Space,
-  Button,
-  Typography,
-  Row,
-  Col,
-} from 'antd';
+import { Breadcrumb, Card, Space, Button, Typography, Row, Col } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -67,11 +59,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
       <Breadcrumb className="mb-4">
         {breadcrumb.map((item, index) => (
           <Breadcrumb.Item key={index}>
-            {item.path ? (
-              <a onClick={() => navigate(item.path!)}>{item.title}</a>
-            ) : (
-              item.title
-            )}
+            {item.path ? <a onClick={() => navigate(item.path!)}>{item.title}</a> : item.title}
           </Breadcrumb.Item>
         ))}
       </Breadcrumb>
@@ -142,11 +130,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
       </Card>
 
       {/* 页面底部 */}
-      {footer && (
-        <div className="page-footer mt-4">
-          {footer}
-        </div>
-      )}
+      {footer && <div className="page-footer mt-4">{footer}</div>}
     </div>
   );
 };

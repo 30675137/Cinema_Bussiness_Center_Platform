@@ -1,6 +1,6 @@
 /**
  * Unit tests for validators
- * 
+ *
  * Tests Zod validation schemas for schedule management
  */
 
@@ -134,7 +134,7 @@ describe('validators', () => {
       const result = scheduleEventSchema.safeParse(invalidEvent);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some(issue => issue.path.includes('customer'))).toBe(true);
+        expect(result.error.issues.some((issue) => issue.path.includes('customer'))).toBe(true);
       }
     });
 
@@ -155,7 +155,7 @@ describe('validators', () => {
       const result = scheduleEventSchema.safeParse(invalidEvent);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some(issue => issue.path.includes('status'))).toBe(true);
+        expect(result.error.issues.some((issue) => issue.path.includes('status'))).toBe(true);
       }
     });
 
@@ -233,4 +233,3 @@ describe('validators', () => {
     });
   });
 });
-

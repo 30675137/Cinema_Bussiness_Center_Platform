@@ -1,6 +1,6 @@
 /**
  * Zustand Store for Attribute Template Management
- * 
+ *
  * Manages attribute templates and attributes with localStorage persistence
  */
 
@@ -83,7 +83,7 @@ export const useAttributeTemplateStore = create<AttributeTemplateStore>()(
         set((state) => {
           const newTemplatesMap = new Map(state.attributeTemplates);
           const newAttributesMap = new Map(state.attributes);
-          
+
           // Find and remove template
           for (const [categoryId, template] of newTemplatesMap.entries()) {
             if (template.id === id) {
@@ -93,7 +93,7 @@ export const useAttributeTemplateStore = create<AttributeTemplateStore>()(
               break;
             }
           }
-          
+
           return {
             attributeTemplates: newTemplatesMap,
             attributes: newAttributesMap,
@@ -214,4 +214,3 @@ export const useAttributeTemplateStore = create<AttributeTemplateStore>()(
     }
   )
 );
-

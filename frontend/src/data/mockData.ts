@@ -50,7 +50,8 @@ export const generateRandomDate = (
 ): string => {
   const startDate = new Date(start);
   const endDate = new Date(end);
-  const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+  const randomTime =
+    startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
   return dayjs(randomTime).format('YYYY-MM-DD');
 };
 
@@ -67,10 +68,7 @@ export const generateRandomTime = (): string => {
 /**
  * 生成随机日期时间
  */
-export const generateRandomDateTime = (
-  start?: Date | string,
-  end?: Date | string
-): string => {
+export const generateRandomDateTime = (start?: Date | string, end?: Date | string): string => {
   const date = generateRandomDate(start || dayjs().subtract(1, 'year'), end || new Date());
   const time = generateRandomTime();
   return `${date} ${time}`;
@@ -104,8 +102,46 @@ export const generateCompanyName = (): string => {
  * 生成随机人名
  */
 export const generateRandomName = (): string => {
-  const surnames = ['张', '王', '李', '刘', '陈', '杨', '黄', '赵', '吴', '周', '徐', '孙', '马', '朱', '胡', '郭', '何', '高', '林'];
-  const names = ['伟', '芳', '娜', '敏', '静', '丽', '强', '磊', '军', '洋', '勇', '艳', '杰', '娟', '涛', '明', '超'];
+  const surnames = [
+    '张',
+    '王',
+    '李',
+    '刘',
+    '陈',
+    '杨',
+    '黄',
+    '赵',
+    '吴',
+    '周',
+    '徐',
+    '孙',
+    '马',
+    '朱',
+    '胡',
+    '郭',
+    '何',
+    '高',
+    '林',
+  ];
+  const names = [
+    '伟',
+    '芳',
+    '娜',
+    '敏',
+    '静',
+    '丽',
+    '强',
+    '磊',
+    '军',
+    '洋',
+    '勇',
+    '艳',
+    '杰',
+    '娟',
+    '涛',
+    '明',
+    '超',
+  ];
 
   return `${generateRandomChoice(surnames)}${generateRandomChoice(names)}`;
 };
@@ -114,9 +150,33 @@ export const generateRandomName = (): string => {
  * 生成随机手机号
  */
 export const generateRandomPhone = (): string => {
-  const prefixes = ['138', '139', '150', '151', '152', '153', '155', '156', '157', '158', '159', '180', '181', '182', '183', '184', '185', '186', '187', '188', '189'];
+  const prefixes = [
+    '138',
+    '139',
+    '150',
+    '151',
+    '152',
+    '153',
+    '155',
+    '156',
+    '157',
+    '158',
+    '159',
+    '180',
+    '181',
+    '182',
+    '183',
+    '184',
+    '185',
+    '186',
+    '187',
+    '188',
+    '189',
+  ];
   const prefix = generateRandomChoice(prefixes);
-  const suffix = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+  const suffix = Math.floor(Math.random() * 100000000)
+    .toString()
+    .padStart(8, '0');
   return `${prefix}${suffix}`;
 };
 
@@ -124,8 +184,18 @@ export const generateRandomPhone = (): string => {
  * 生成随机邮箱
  */
 export const generateRandomEmail = (name?: string): string => {
-  const domains = ['qq.com', '163.com', 'gmail.com', 'outlook.com', '126.com', 'sina.com', 'sohu.com'];
-  const username = name ? `${name.toLowerCase()}${generateRandomNumber(1, 99)}` : `user${generateRandomNumber(100, 999)}`;
+  const domains = [
+    'qq.com',
+    '163.com',
+    'gmail.com',
+    'outlook.com',
+    '126.com',
+    'sina.com',
+    'sohu.com',
+  ];
+  const username = name
+    ? `${name.toLowerCase()}${generateRandomNumber(1, 99)}`
+    : `user${generateRandomNumber(100, 999)}`;
   const domain = generateRandomChoice(domains);
   return `${username}@${domain}`;
 };
@@ -134,9 +204,42 @@ export const generateRandomEmail = (name?: string): string => {
  * 生成随机地址
  */
 export const generateRandomAddress = () => {
-  const provinces = ['北京市', '上海市', '广东省', '浙江省', '江苏省', '四川省', '湖北省', '湖南省', '河南省', '山东省'];
-  const cities = ['北京市', '上海市', '广州市', '深圳市', '杭州市', '成都市', '武汉市', '西安市', '南京市', '重庆市'];
-  const districts = ['朝阳区', '海淀区', '西城区', '东城区', '丰台区', '石景山区', '通州区', '昌平区', '大兴区', '顺义区'];
+  const provinces = [
+    '北京市',
+    '上海市',
+    '广东省',
+    '浙江省',
+    '江苏省',
+    '四川省',
+    '湖北省',
+    '湖南省',
+    '河南省',
+    '山东省',
+  ];
+  const cities = [
+    '北京市',
+    '上海市',
+    '广州市',
+    '深圳市',
+    '杭州市',
+    '成都市',
+    '武汉市',
+    '西安市',
+    '南京市',
+    '重庆市',
+  ];
+  const districts = [
+    '朝阳区',
+    '海淀区',
+    '西城区',
+    '东城区',
+    '丰台区',
+    '石景山区',
+    '通州区',
+    '昌平区',
+    '大兴区',
+    '顺义区',
+  ];
 
   return {
     country: '中国',
@@ -144,7 +247,7 @@ export const generateRandomAddress = () => {
     city: generateRandomChoice(cities),
     district: generateRandomChoice(districts),
     detail: `${generateRandomNumber(1, 200)}号${generateRandomChoice(1, 20)}单元${generateRandomNumber(1, 6)}号`,
-    zipCode: generateRandomNumber(100000, 999999).toString()
+    zipCode: generateRandomNumber(100000, 999999).toString(),
   };
 };
 
@@ -204,7 +307,7 @@ export class MockDataManager {
    */
   addItems<T>(key: string, items: T[]): T[] {
     const data = this.getData<T>(key);
-    items.forEach(item => this.addItem(key, item));
+    items.forEach((item) => this.addItem(key, item));
     return items;
   }
 
@@ -213,7 +316,7 @@ export class MockDataManager {
    */
   updateItem<T>(key: string, id: string, updates: Partial<T>): T | null {
     const data = this.getData<T>(key);
-    const index = data.findIndex(item => (item as any).id === id);
+    const index = data.findIndex((item) => (item as any).id === id);
 
     if (index === -1) {
       return null;
@@ -231,7 +334,7 @@ export class MockDataManager {
    */
   removeItem(key: string, id: string): boolean {
     const data = this.getData<T>(key);
-    const index = data.findIndex(item => (item as any).id === id);
+    const index = data.findIndex((item) => (item as any).id === id);
 
     if (index === -1) {
       return false;
@@ -289,10 +392,10 @@ export class MockDataManager {
       'suppliers',
       'products',
       'warehouses',
-      'users'
+      'users',
     ];
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       if (!this.storage.has(key)) {
         const data = this.loadFromLocalStorage(key);
         this.storage.set(key, data);
@@ -314,7 +417,7 @@ export const initializeMockData = (): void => {
 
   // 如果没有数据，创建初始数据
   const keys = ['purchaseOrders', 'goodsReceipts', 'suppliers', 'products', 'warehouses', 'users'];
-  const needsInitialization = keys.some(key => mockDataManager.getData(key).length === 0);
+  const needsInitialization = keys.some((key) => mockDataManager.getData(key).length === 0);
 
   if (needsInitialization) {
     console.log('Initializing mock data...');
@@ -368,17 +471,15 @@ export const getPaginatedData = <T>(
       current: page,
       pageSize,
       total,
-      totalPages
-    }
+      totalPages,
+    },
   };
 };
 
 /**
  * 创建Mock数据生成器
  */
-export const createMockDataGenerator = <T>(
-  generator: (index: number) => T
-) => {
+export const createMockDataGenerator = <T>(generator: (index: number) => T) => {
   return (count: number): T[] => {
     return Array.from({ length: count }, (_, index) => generator(index));
   };

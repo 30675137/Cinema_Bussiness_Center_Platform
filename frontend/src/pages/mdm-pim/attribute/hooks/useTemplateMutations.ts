@@ -128,11 +128,7 @@ export function useCopyAttributeTemplateMutation() {
 export function useCreateAttributeMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    Attribute,
-    Error,
-    { templateId: string; data: CreateAttributeRequest }
-  >({
+  return useMutation<Attribute, Error, { templateId: string; data: CreateAttributeRequest }>({
     mutationFn: async ({ templateId, data }) => {
       const response = await attributeService.createAttribute(templateId, data);
       if (!response.success) {
@@ -203,5 +199,3 @@ export function useDeleteAttributeMutation() {
     },
   });
 }
-
-

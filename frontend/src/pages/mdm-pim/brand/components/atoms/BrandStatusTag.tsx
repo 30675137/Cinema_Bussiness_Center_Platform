@@ -15,11 +15,7 @@ const BrandStatusTag: React.FC<BrandStatusTagProps> = ({ status, className }) =>
   const { color, text } = BRAND_CONSTANTS.STATUS_COLORS[status];
 
   return (
-    <Tag
-      color={color}
-      className={`brand-status-tag ${className || ''}`}
-      data-testid="brand-status"
-    >
+    <Tag color={color} className={`brand-status-tag ${className || ''}`} data-testid="brand-status">
       {text}
     </Tag>
   );

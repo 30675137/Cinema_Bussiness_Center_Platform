@@ -20,14 +20,14 @@ import {
   Divider,
   Tag,
   Alert,
-  Select
+  Select,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   InfoCircleOutlined,
-  ShoppingOutlined
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, UseFormSetValue, UseFormGetValues } from 'react-hook-form';
 import { Controller, useFieldArray } from 'react-hook-form';
@@ -101,7 +101,7 @@ export const ComboConfiguration = <T extends Record<string, any>>({
   availableSubItems,
   labels = {},
   readOnly = false,
-  onCostChange
+  onCostChange,
 }: ComboConfigurationProps<T>) => {
   const [editingItem, setEditingItem] = useState<ComboItem | null>(null);
   const [itemFormVisible, setItemFormVisible] = useState(false);
@@ -113,10 +113,10 @@ export const ComboConfiguration = <T extends Record<string, any>>({
     fields: itemFields,
     append: appendItem,
     remove: removeItem,
-    update: updateItem
+    update: updateItem,
   } = useFieldArray({
     control,
-    name: fieldPath as any
+    name: fieldPath as any,
   });
 
   // 计算总成本
@@ -144,7 +144,7 @@ export const ComboConfiguration = <T extends Record<string, any>>({
       unitCost: 0,
       totalCost: 0,
       isOptional: false,
-      sortOrder: itemFields.length
+      sortOrder: itemFields.length,
     };
     setEditingItem(newItem);
     setItemFormVisible(true);
@@ -160,7 +160,7 @@ export const ComboConfiguration = <T extends Record<string, any>>({
   const handleSaveItem = (item: ComboItem) => {
     item.totalCost = (item.unitCost || 0) * item.quantity;
 
-    const existingIndex = itemFields.findIndex(field => (field as ComboItem).id === item.id);
+    const existingIndex = itemFields.findIndex((field) => (field as ComboItem).id === item.id);
 
     if (existingIndex !== -1) {
       // 更新现有子项
@@ -192,7 +192,7 @@ export const ComboConfiguration = <T extends Record<string, any>>({
           <span>{text || record.subItemId || '-'}</span>
           {record.isOptional && <Tag color="orange">可选</Tag>}
         </Space>
-      )
+      ),
     },
     {
       title: '数量',
@@ -200,26 +200,24 @@ export const ComboConfiguration = <T extends Record<string, any>>({
       key: 'quantity',
       width: 120,
       render: (quantity: number, record: ComboItem) => (
-        <Text>{quantity} {record.unit}</Text>
-      )
+        <Text>
+          {quantity} {record.unit}
+        </Text>
+      ),
     },
     {
       title: '单位成本',
       dataIndex: 'unitCost',
       key: 'unitCost',
       width: 120,
-      render: (cost: number) => (
-        <Text>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '总成本',
       dataIndex: 'totalCost',
       key: 'totalCost',
       width: 120,
-      render: (cost: number) => (
-        <Text strong>¥{(cost || 0).toFixed(2)}</Text>
-      )
+      render: (cost: number) => <Text strong>¥{(cost || 0).toFixed(2)}</Text>,
     },
     {
       title: '操作',
@@ -241,17 +239,11 @@ export const ComboConfiguration = <T extends Record<string, any>>({
             cancelText="取消"
             disabled={readOnly}
           >
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              disabled={readOnly}
-            />
+            <Button type="text" size="small" danger icon={<DeleteOutlined />} disabled={readOnly} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -273,11 +265,7 @@ export const ComboConfiguration = <T extends Record<string, any>>({
               {subItemLabel}清单
             </Title>
             {!readOnly && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAddItem}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddItem}>
                 添加{subItemLabel}
               </Button>
             )}
@@ -378,13 +366,13 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
   availableSubItems,
   subItemLabel,
   onSave,
-  onCancel
+  onCancel,
 }) => {
   const [formItem, setFormItem] = useState<ComboItem>(item);
 
   // 选择子项
   const handleSubItemSelect = (subItemId: string) => {
-    const selected = availableSubItems.find(s => s.id === subItemId);
+    const selected = availableSubItems.find((s) => s.id === subItemId);
     if (selected) {
       setFormItem({
         ...formItem,
@@ -392,7 +380,7 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
         subItemName: selected.name,
         unit: selected.unit,
         unitCost: selected.cost,
-        totalCost: selected.cost * formItem.quantity
+        totalCost: selected.cost * formItem.quantity,
       });
     }
   };
@@ -404,7 +392,7 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
     setFormItem({
       ...formItem,
       quantity: qty,
-      totalCost
+      totalCost,
     });
   };
 
@@ -415,7 +403,7 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
     setFormItem({
       ...formItem,
       unitCost: cost,
-      totalCost
+      totalCost,
     });
   };
 
@@ -448,10 +436,14 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
                 option?.children?.toString().toLowerCase().includes(input.toLowerCase()) || false
               }
             >
-              {availableSubItems.map(subItem => (
+              {availableSubItems.map((subItem) => (
                 <Option key={subItem.id} value={subItem.id}>
                   {subItem.name}
-                  {subItem.type && <Tag color="blue" style={{ marginLeft: 8 }}>{subItem.type}</Tag>}
+                  {subItem.type && (
+                    <Tag color="blue" style={{ marginLeft: 8 }}>
+                      {subItem.type}
+                    </Tag>
+                  )}
                   (¥{subItem.cost.toFixed(2)}/{subItem.unit})
                 </Option>
               ))}
@@ -509,10 +501,12 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
           <Form.Item label="是否可选">
             <Select
               value={formItem.isOptional ? 'optional' : 'required'}
-              onChange={(value) => setFormItem({
-                ...formItem,
-                isOptional: value === 'optional'
-              })}
+              onChange={(value) =>
+                setFormItem({
+                  ...formItem,
+                  isOptional: value === 'optional',
+                })
+              }
             >
               <Option value="required">必需</Option>
               <Option value="optional">可选</Option>
@@ -526,10 +520,12 @@ const SubItemForm: React.FC<SubItemFormProps> = ({
               placeholder="0"
               min={0}
               value={formItem.sortOrder}
-              onChange={(value) => setFormItem({
-                ...formItem,
-                sortOrder: value || 0
-              })}
+              onChange={(value) =>
+                setFormItem({
+                  ...formItem,
+                  sortOrder: value || 0,
+                })
+              }
             />
           </Form.Item>
         </Col>

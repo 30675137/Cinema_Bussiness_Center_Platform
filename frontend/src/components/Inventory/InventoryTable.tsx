@@ -3,11 +3,7 @@ import { Table, Tag, Space, Button, Tooltip, Typography } from 'antd';
 import { EyeOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { CurrentInventory } from '@/types/inventory';
-import {
-  formatQuantity,
-  formatDateTime,
-  calculateInventoryStatus,
-} from '@/utils/inventoryHelpers';
+import { formatQuantity, formatDateTime, calculateInventoryStatus } from '@/utils/inventoryHelpers';
 import { useResponsive, useResponsiveTableScroll } from '@/hooks/useResponsive';
 
 const { Text } = Typography;
@@ -41,7 +37,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   const columns: ColumnsType<CurrentInventory> = [
     {
       title: 'SKU编码',
-      dataIndex: 'skuCode',  // 后端返回扁平结构
+      dataIndex: 'skuCode', // 后端返回扁平结构
       key: 'skuCode',
       width: 120,
       fixed: isMobile ? undefined : 'left',
@@ -49,7 +45,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     },
     {
       title: 'SKU名称',
-      dataIndex: 'skuName',  // 后端返回扁平结构
+      dataIndex: 'skuName', // 后端返回扁平结构
       key: 'skuName',
       width: 200,
       ellipsis: {
@@ -66,7 +62,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     },
     {
       title: '门店/仓库',
-      dataIndex: 'storeName',  // 后端返回扁平结构
+      dataIndex: 'storeName', // 后端返回扁平结构
       key: 'storeName',
       width: 150,
       render: (name: string, record) => name || record.store?.name,
@@ -91,7 +87,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       width: 110,
       align: 'right',
       sorter: (a, b) => a.availableQty - b.availableQty,
-      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
+      render: (qty: number, record) =>
+        formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '预占数量',
@@ -99,7 +96,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'reservedQty',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
+      render: (qty: number, record) =>
+        formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '在途数量',
@@ -107,7 +105,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'inTransitQty',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
+      render: (qty: number, record) =>
+        formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '安全库存',
@@ -115,7 +114,8 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       key: 'safetyStock',
       width: 110,
       align: 'right',
-      render: (qty: number, record) => formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
+      render: (qty: number, record) =>
+        formatQuantity(qty, (record as any).mainUnit || record.sku?.unit),
     },
     {
       title: '库存状态',
@@ -138,7 +138,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     },
     {
       title: '最后更新',
-      dataIndex: 'updatedAt',  // 后端返回 updatedAt
+      dataIndex: 'updatedAt', // 后端返回 updatedAt
       key: 'lastUpdated',
       width: 160,
       sorter: (a, b) => {

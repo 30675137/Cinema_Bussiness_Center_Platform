@@ -11,7 +11,7 @@
 export const adminCredentials = {
   username: 'admin',
   password: 'password',
-  role: 'admin'
+  role: 'admin',
 };
 
 export const skuListPageUrl = 'http://localhost:3000/product/sku-management';
@@ -31,7 +31,7 @@ export const scenario_001 = {
   adminCredentials: {
     username: 'admin',
     password: 'password',
-    role: 'admin'
+    role: 'admin',
   },
 
   // SKU列表页面URL
@@ -44,7 +44,7 @@ export const scenario_001 = {
     name: '威士忌可乐', // 实际数据库中的SKU名称
     price: 3500, // 单位：分
     status: 'ENABLED',
-    spuId: '00000000-0000-0000-0000-000000000003' // 实际数据库中的SPU ID
+    spuId: '00000000-0000-0000-0000-000000000003', // 实际数据库中的SPU ID
   },
 
   // 关联的SPU信息（预期显示在编辑页面）
@@ -56,7 +56,7 @@ export const scenario_001 = {
     brandId: '550e8400-e29b-41d4-a716-446655440200',
     brandName: '自制',
     description: '经典威士忌可乐鸡尾酒，清爽解腻',
-    status: 'active'
+    status: 'active',
   },
 
   // 关联的BOM配方（可选，用于扩展测试）
@@ -76,7 +76,7 @@ export const scenario_001 = {
         unit: 'ml',
         standardCost: 800, // 单位：分
         status: 'REQUIRED',
-        sortOrder: 1
+        sortOrder: 1,
       },
       {
         id: '550e8400-e29b-41d4-a716-446655440052',
@@ -87,9 +87,9 @@ export const scenario_001 = {
         unit: 'ml',
         standardCost: 200, // 单位：分
         status: 'REQUIRED',
-        sortOrder: 2
-      }
-    ]
+        sortOrder: 2,
+      },
+    ],
   },
 
   // 搜索相关选择器
@@ -103,7 +103,7 @@ export const scenario_001 = {
   loadTimeout: 2000, // 2秒
 
   // API端点（用于API测试验证）
-  apiEndpoint: '/api/skus/{id}/details'
+  apiEndpoint: '/api/skus/{id}/details',
 };
 
 /**
@@ -113,7 +113,7 @@ export const scenario_no_spu = {
   adminBaseUrl: 'http://localhost:3000',
   adminCredentials: {
     username: 'admin',
-    password: 'password'
+    password: 'password',
   },
 
   targetSku: {
@@ -122,11 +122,11 @@ export const scenario_no_spu = {
     name: '白砂糖',
     price: 500,
     status: 'ENABLED',
-    spuId: null // 未关联SPU
+    spuId: null, // 未关联SPU
   },
 
   expectedMessage: '未关联SPU',
-  expectedSpuStatus: 'not_linked'
+  expectedSpuStatus: 'not_linked',
 };
 
 /**
@@ -136,7 +136,7 @@ export const scenario_invalid_spu = {
   adminBaseUrl: 'http://localhost:3000',
   adminCredentials: {
     username: 'admin',
-    password: 'password'
+    password: 'password',
   },
 
   targetSku: {
@@ -145,11 +145,11 @@ export const scenario_invalid_spu = {
     name: '已下架产品',
     price: 1000,
     status: 'DISABLED',
-    spuId: '550e8400-e29b-41d4-a716-446655440999' // SPU已被删除
+    spuId: '550e8400-e29b-41d4-a716-446655440999', // SPU已被删除
   },
 
   expectedMessage: 'SPU已失效',
-  expectedSpuStatus: 'invalid'
+  expectedSpuStatus: 'invalid',
 };
 
 // 默认导出所有场景
@@ -160,5 +160,5 @@ export const skuTestData = {
   editButtonSelector,
   scenario_001,
   scenario_no_spu,
-  scenario_invalid_spu
+  scenario_invalid_spu,
 };

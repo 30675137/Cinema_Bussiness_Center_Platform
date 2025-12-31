@@ -55,10 +55,7 @@ interface InventoryDetailProps {
   onEdit?: (record: InventoryItem) => void;
 }
 
-const InventoryDetail: React.FC<InventoryDetailProps> = ({
-  inventoryId,
-  onEdit,
-}) => {
+const InventoryDetail: React.FC<InventoryDetailProps> = ({ inventoryId, onEdit }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('info');
@@ -76,7 +73,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
     createInventoryOperation,
   } = useInventoryStore();
 
-  const inventoryItem = inventoryItems.find(item => item.id === inventoryId) || currentInventory;
+  const inventoryItem = inventoryItems.find((item) => item.id === inventoryId) || currentInventory;
 
   // 组件挂载时获取数据
   useEffect(() => {
@@ -126,7 +123,8 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
         try {
           await createInventoryOperation({
             inventoryItemId: inventoryItem.id,
-            operationType: type === 'in' ? InventoryOperationType.STOCK_IN : InventoryOperationType.STOCK_OUT,
+            operationType:
+              type === 'in' ? InventoryOperationType.STOCK_IN : InventoryOperationType.STOCK_OUT,
             quantity: type === 'in' ? quantity : -quantity,
             unitPrice: inventoryItem.averageCost,
             reason: type === 'in' ? '手动入库' : '手动出库',
@@ -233,7 +231,8 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
       align: 'right',
       render: (quantity: number, record: InventoryOperation) => (
         <Text strong type={quantity > 0 ? 'success' : 'danger'}>
-          {quantity > 0 ? '+' : ''}{quantity} {record.unit}
+          {quantity > 0 ? '+' : ''}
+          {quantity} {record.unit}
         </Text>
       ),
     },
@@ -390,10 +389,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
-              <Button
-                icon={<ArrowLeftOutlined />}
-                onClick={handleBack}
-              >
+              <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
                 返回列表
               </Button>
               <Title level={4} style={{ margin: 0 }}>
@@ -404,23 +400,13 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
           </Col>
           <Col>
             <Space>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEdit}
-              >
+              <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
                 编辑
               </Button>
-              <Button
-                icon={<PlusOutlined />}
-                onClick={() => handleQuickAdjust('in', 10)}
-              >
+              <Button icon={<PlusOutlined />} onClick={() => handleQuickAdjust('in', 10)}>
                 快速入库
               </Button>
-              <Button
-                icon={<MinusCircleOutlined />}
-                onClick={() => handleQuickAdjust('out', 10)}
-              >
+              <Button icon={<MinusCircleOutlined />} onClick={() => handleQuickAdjust('out', 10)}>
                 快速出库
               </Button>
             </Space>
@@ -444,12 +430,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
-            <Statistic
-              title="库存价值"
-              value={inventoryItem.totalValue}
-              prefix="¥"
-              precision={2}
-            />
+            <Statistic title="库存价值" value={inventoryItem.totalValue} prefix="¥" precision={2} />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
@@ -459,7 +440,8 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
               value={stockUtilization}
               suffix="%"
               valueStyle={{
-                color: stockUtilization > 90 ? '#cf1322' : stockUtilization > 70 ? '#fa8c16' : '#3f8600',
+                color:
+                  stockUtilization > 90 ? '#cf1322' : stockUtilization > 70 ? '#fa8c16' : '#3f8600',
               }}
             />
             <Progress
@@ -484,10 +466,10 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
       </Row>
 
       {/* 库存预警 */}
-      {alerts.filter(alert => !alert.isRead).length > 0 && (
+      {alerts.filter((alert) => !alert.isRead).length > 0 && (
         <Alert
           message="库存预警"
-          description={`当前有 ${alerts.filter(alert => !alert.isRead).length} 个未处理预警，请及时关注！`}
+          description={`当前有 ${alerts.filter((alert) => !alert.isRead).length} 个未处理预警，请及时关注！`}
           type="warning"
           showIcon
           closable
@@ -499,24 +481,14 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
           <TabPane tab="基本信息" key="info">
             <Descriptions title="商品信息" bordered column={2}>
-              <Descriptions.Item label="商品编码">
-                {inventoryItem.productCode}
-              </Descriptions.Item>
-              <Descriptions.Item label="商品名称">
-                {inventoryItem.productName}
-              </Descriptions.Item>
+              <Descriptions.Item label="商品编码">{inventoryItem.productCode}</Descriptions.Item>
+              <Descriptions.Item label="商品名称">{inventoryItem.productName}</Descriptions.Item>
               <Descriptions.Item label="商品分类">
                 {inventoryItem.productCategory}
               </Descriptions.Item>
-              <Descriptions.Item label="商品规格">
-                {inventoryItem.productSpec}
-              </Descriptions.Item>
-              <Descriptions.Item label="计量单位">
-                {inventoryItem.unit}
-              </Descriptions.Item>
-              <Descriptions.Item label="存储位置">
-                {inventoryItem.locationName}
-              </Descriptions.Item>
+              <Descriptions.Item label="商品规格">{inventoryItem.productSpec}</Descriptions.Item>
+              <Descriptions.Item label="计量单位">{inventoryItem.unit}</Descriptions.Item>
+              <Descriptions.Item label="存储位置">{inventoryItem.locationName}</Descriptions.Item>
             </Descriptions>
 
             <Descriptions title="库存配置" bordered column={2} style={{ marginTop: 24 }}>
@@ -545,11 +517,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
               </Descriptions.Item>
               <Descriptions.Item label="库存利用率">
                 <Space>
-                  <Progress
-                    percent={stockUtilization}
-                    size="small"
-                    style={{ width: 100 }}
-                  />
+                  <Progress percent={stockUtilization} size="small" style={{ width: 100 }} />
                   <Text>{stockUtilization.toFixed(1)}%</Text>
                 </Space>
               </Descriptions.Item>
@@ -569,9 +537,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
 
             {inventoryItem.remark && (
               <Descriptions title="备注信息" bordered column={1} style={{ marginTop: 24 }}>
-                <Descriptions.Item label="备注">
-                  {inventoryItem.remark}
-                </Descriptions.Item>
+                <Descriptions.Item label="备注">{inventoryItem.remark}</Descriptions.Item>
               </Descriptions>
             )}
           </TabPane>
@@ -605,7 +571,7 @@ const InventoryDetail: React.FC<InventoryDetailProps> = ({
               <Space>
                 <AlertOutlined />
                 预警记录
-                <Badge count={alerts.filter(a => !a.isRead).length} />
+                <Badge count={alerts.filter((a) => !a.isRead).length} />
               </Space>
             }
             key="alerts"

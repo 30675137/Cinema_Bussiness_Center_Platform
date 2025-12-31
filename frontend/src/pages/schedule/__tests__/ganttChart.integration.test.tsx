@@ -89,9 +89,7 @@ const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
     <ConfigProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </QueryClientProvider>
     </ConfigProvider>
   );
@@ -187,7 +185,8 @@ describe('Gantt Chart Integration Tests', () => {
 
       await waitFor(() => {
         // Check if the main container is rendered
-        const ganttChart = screen.getByTestId('gantt-chart') || document.querySelector('[class*="gantt"]');
+        const ganttChart =
+          screen.getByTestId('gantt-chart') || document.querySelector('[class*="gantt"]');
         expect(ganttChart || document.body).toBeInTheDocument();
       });
     });
@@ -214,10 +213,13 @@ describe('Gantt Chart Integration Tests', () => {
     it('should display data after successful load', async () => {
       render(<ScheduleManagement />, { wrapper: createWrapper() });
 
-      await waitFor(() => {
-        // After loading, halls and events should be visible
-        expect(screen.getByText(/1号厅|流浪地球|生日派对/)).toBeInTheDocument();
-      }, { timeout: 3000 });
+      await waitFor(
+        () => {
+          // After loading, halls and events should be visible
+          expect(screen.getByText(/1号厅|流浪地球|生日派对/)).toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
     });
 
     it('should handle empty state when no events exist', async () => {
@@ -326,10 +328,46 @@ describe('Gantt Chart - New Store/Hall API Integration', () => {
       server.use(
         http.get('/api/stores/store-1/halls', () => {
           const allTypeHalls: Hall[] = [
-            { id: '1', name: 'VIP厅', capacity: 50, type: 'VIP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-            { id: '2', name: '公众厅', capacity: 100, type: 'Public', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-            { id: '3', name: 'CP厅', capacity: 80, type: 'CP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-            { id: '4', name: '派对厅', capacity: 60, type: 'Party', tags: [], status: 'active', createdAt: '', updatedAt: '' },
+            {
+              id: '1',
+              name: 'VIP厅',
+              capacity: 50,
+              type: 'VIP',
+              tags: [],
+              status: 'active',
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: '2',
+              name: '公众厅',
+              capacity: 100,
+              type: 'Public',
+              tags: [],
+              status: 'active',
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: '3',
+              name: 'CP厅',
+              capacity: 80,
+              type: 'CP',
+              tags: [],
+              status: 'active',
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: '4',
+              name: '派对厅',
+              capacity: 60,
+              type: 'Party',
+              tags: [],
+              status: 'active',
+              createdAt: '',
+              updatedAt: '',
+            },
           ];
           return HttpResponse.json({ data: allTypeHalls, total: 4 });
         })
@@ -352,9 +390,36 @@ describe('Gantt Chart - New Store/Hall API Integration', () => {
       server.use(
         http.get('/api/stores/store-1/halls', () => {
           const allStatusHalls: Hall[] = [
-            { id: '1', name: '活动厅', capacity: 50, type: 'VIP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-            { id: '2', name: '停用厅', capacity: 100, type: 'Public', tags: [], status: 'inactive', createdAt: '', updatedAt: '' },
-            { id: '3', name: '维护厅', capacity: 80, type: 'CP', tags: [], status: 'maintenance', createdAt: '', updatedAt: '' },
+            {
+              id: '1',
+              name: '活动厅',
+              capacity: 50,
+              type: 'VIP',
+              tags: [],
+              status: 'active',
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: '2',
+              name: '停用厅',
+              capacity: 100,
+              type: 'Public',
+              tags: [],
+              status: 'inactive',
+              createdAt: '',
+              updatedAt: '',
+            },
+            {
+              id: '3',
+              name: '维护厅',
+              capacity: 80,
+              type: 'CP',
+              tags: [],
+              status: 'maintenance',
+              createdAt: '',
+              updatedAt: '',
+            },
           ];
           return HttpResponse.json({ data: allStatusHalls, total: 3 });
         })
@@ -394,9 +459,18 @@ describe('Gantt Chart - New Store/Hall API Integration', () => {
 
       // Then: 字段名与前端 Hall 类型完全一致，无需转换
       // 以下是前端 Hall 类型的必需字段
-      const frontendHallFields = ['id', 'name', 'capacity', 'type', 'tags', 'status', 'createdAt', 'updatedAt'];
+      const frontendHallFields = [
+        'id',
+        'name',
+        'capacity',
+        'type',
+        'tags',
+        'status',
+        'createdAt',
+        'updatedAt',
+      ];
 
-      frontendHallFields.forEach(field => {
+      frontendHallFields.forEach((field) => {
         expect(hall).toHaveProperty(field);
       });
 
@@ -408,4 +482,3 @@ describe('Gantt Chart - New Store/Hall API Integration', () => {
     });
   });
 });
-

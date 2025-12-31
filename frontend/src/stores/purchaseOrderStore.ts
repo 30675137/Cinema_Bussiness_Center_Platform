@@ -2,7 +2,14 @@
  * 采购订单Store
  */
 import { createStore, createModalStore, createAsyncAction } from './baseStore';
-import { PurchaseOrder, PurchaseOrderStatus, PurchaseOrderPriority, PurchaseOrderQueryParams, PurchaseOrderFormData, PurchaseStatistics } from '../types/purchase';
+import {
+  PurchaseOrder,
+  PurchaseOrderStatus,
+  PurchaseOrderPriority,
+  PurchaseOrderQueryParams,
+  PurchaseOrderFormData,
+  PurchaseStatistics,
+} from '../types/purchase';
 
 // 采购订单状态类型
 export type PurchaseOrderStoreState = {
@@ -80,30 +87,27 @@ export type PurchaseOrderStoreActions = {
 };
 
 // 创建采购订单Store
-export const usePurchaseOrderStore = createStore<PurchaseOrder>(
-  'purchase-order',
-  {
-    // 初始数据状态
-    orders: [],
-    currentOrder: null,
-    statistics: null,
+export const usePurchaseOrderStore = createStore<PurchaseOrder>('purchase-order', {
+  // 初始数据状态
+  orders: [],
+  currentOrder: null,
+  statistics: null,
 
-    // 过滤器初始状态
-    statusFilters: [],
-    priorityFilter: undefined,
-    supplierFilter: undefined,
-    dateRange: null,
+  // 过滤器初始状态
+  statusFilters: [],
+  priorityFilter: undefined,
+  supplierFilter: undefined,
+  dateRange: null,
 
-    // 编辑状态
-    editingOrder: null,
-    editingItems: [],
+  // 编辑状态
+  editingOrder: null,
+  editingItems: [],
 
-    // 批量操作状态
-    selectedOrderIds: [],
-    isBatchDeleting: false,
-    isBatchApproving: false,
-  }
-);
+  // 批量操作状态
+  selectedOrderIds: [],
+  isBatchDeleting: false,
+  isBatchApproving: false,
+});
 
 // 扩展store以添加采购订单特定的动作
 export const purchaseOrderStore = {
@@ -111,13 +115,14 @@ export const purchaseOrderStore = {
 
   // 获取过滤后的订单
   get filteredOrders() {
-    const { orders, statusFilters, priorityFilter, supplierFilter, dateRange } = usePurchaseOrderStore.getState();
+    const { orders, statusFilters, priorityFilter, supplierFilter, dateRange } =
+      usePurchaseOrderStore.getState();
 
     if (!orders || !Array.isArray(orders)) {
       return [];
     }
 
-    return orders.filter(order => {
+    return orders.filter((order) => {
       // 状态过滤
       if (statusFilters.length > 0 && !statusFilters.includes(order.status)) {
         return false;
@@ -154,14 +159,16 @@ export const purchaseOrderStore = {
     if (!orders || !Array.isArray(orders) || !selectedOrderIds) {
       return [];
     }
-    return orders.filter(order => selectedOrderIds.includes(order.id));
+    return orders.filter((order) => selectedOrderIds.includes(order.id));
   },
 
   // 检查是否全选
   get isAllSelected() {
     const { filteredOrders, selectedOrderIds } = this as any;
-    return filteredOrders.length > 0 &&
-           filteredOrders.every((order: PurchaseOrder) => selectedOrderIds.includes(order.id));
+    return (
+      filteredOrders.length > 0 &&
+      filteredOrders.every((order: PurchaseOrder) => selectedOrderIds.includes(order.id))
+    );
   },
 
   // 获取订单状态统计
@@ -172,11 +179,14 @@ export const purchaseOrderStore = {
       return {};
     }
 
-    return orders.reduce((stats, order) => {
-      const status = order.status;
-      stats[status] = (stats[status] || 0) + 1;
-      return stats;
-    }, {} as Record<PurchaseOrderStatus, number>);
+    return orders.reduce(
+      (stats, order) => {
+        const status = order.status;
+        stats[status] = (stats[status] || 0) + 1;
+        return stats;
+      },
+      {} as Record<PurchaseOrderStatus, number>
+    );
   },
 
   // 获取订单金额统计
@@ -194,9 +204,12 @@ export const purchaseOrderStore = {
 
     return {
       totalAmount: orders.reduce((sum, order) => sum + order.totalAmount, 0),
-      averageAmount: orders.length > 0 ? orders.reduce((sum, order) => sum + order.totalAmount, 0) / orders.length : 0,
-      maxAmount: orders.length > 0 ? Math.max(...orders.map(order => order.totalAmount)) : 0,
-      minAmount: orders.length > 0 ? Math.min(...orders.map(order => order.totalAmount)) : 0,
+      averageAmount:
+        orders.length > 0
+          ? orders.reduce((sum, order) => sum + order.totalAmount, 0) / orders.length
+          : 0,
+      maxAmount: orders.length > 0 ? Math.max(...orders.map((order) => order.totalAmount)) : 0,
+      minAmount: orders.length > 0 ? Math.min(...orders.map((order) => order.totalAmount)) : 0,
     };
   },
 };
@@ -306,7 +319,7 @@ const actions: PurchaseOrderStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: PurchaseOrderStatus.APPROVED,
-          approvedAt: new Date().toISOString()
+          approvedAt: new Date().toISOString(),
         });
         return true;
       },
@@ -328,7 +341,7 @@ const actions: PurchaseOrderStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: PurchaseOrderStatus.REJECTED,
-          remarks
+          remarks,
         });
         return true;
       },
@@ -369,7 +382,7 @@ const actions: PurchaseOrderStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: PurchaseOrderStatus.CANCELLED,
-          remarks: reason
+          remarks: reason,
         });
         return true;
       },
@@ -390,10 +403,10 @@ const actions: PurchaseOrderStoreActions = {
         // await purchaseOrderService.batchApprove(orderIds, remarks);
 
         // 乐观更新
-        orderIds.forEach(id => {
+        orderIds.forEach((id) => {
           updateItem(id, {
             status: PurchaseOrderStatus.APPROVED,
-            approvedAt: new Date().toISOString()
+            approvedAt: new Date().toISOString(),
           });
         });
         return true;
@@ -414,7 +427,7 @@ const actions: PurchaseOrderStoreActions = {
         // await purchaseOrderService.batchDelete(orderIds);
 
         // 乐观更新
-        orderIds.forEach(id => removeItem(id));
+        orderIds.forEach((id) => removeItem(id));
         return true;
       },
       setLoading,
@@ -433,10 +446,10 @@ const actions: PurchaseOrderStoreActions = {
         // await purchaseOrderService.batchCancel(orderIds, reason);
 
         // 乐观更新
-        orderIds.forEach(id => {
+        orderIds.forEach((id) => {
           updateItem(id, {
             status: PurchaseOrderStatus.CANCELLED,
-            remarks: reason
+            remarks: reason,
           });
         });
         return true;
@@ -490,7 +503,7 @@ const actions: PurchaseOrderStoreActions = {
 
   updateOrderItem(itemId: string, updates: Partial<PurchaseOrder['items'][0]>) {
     const { editingItems } = usePurchaseOrderStore.getState();
-    const newItems = editingItems.map(item =>
+    const newItems = editingItems.map((item) =>
       item.id === itemId ? { ...item, ...updates } : item
     );
     usePurchaseOrderStore.setState({ editingItems: newItems });
@@ -498,7 +511,7 @@ const actions: PurchaseOrderStoreActions = {
 
   removeOrderItem(itemId: string) {
     const { editingItems } = usePurchaseOrderStore.getState();
-    const newItems = editingItems.filter(item => item.id !== itemId);
+    const newItems = editingItems.filter((item) => item.id !== itemId);
     usePurchaseOrderStore.setState({ editingItems: newItems });
   },
 
@@ -533,7 +546,7 @@ const actions: PurchaseOrderStoreActions = {
     const { selectedOrderIds } = usePurchaseOrderStore.getState();
     const newSelection = selected
       ? [...selectedOrderIds, orderId]
-      : selectedOrderIds.filter(id => id !== orderId);
+      : selectedOrderIds.filter((id) => id !== orderId);
     usePurchaseOrderStore.setState({ selectedOrderIds: newSelection });
   },
 
@@ -551,14 +564,14 @@ const actions: PurchaseOrderStoreActions = {
   startEditing(order: PurchaseOrder) {
     usePurchaseOrderStore.setState({
       editingOrder: { ...order },
-      editingItems: [...order.items]
+      editingItems: [...order.items],
     });
   },
 
   cancelEditing() {
     usePurchaseOrderStore.setState({
       editingOrder: null,
-      editingItems: []
+      editingItems: [],
     });
   },
 
@@ -569,7 +582,7 @@ const actions: PurchaseOrderStoreActions = {
     return this.updateOrder(editingOrder.id, {
       title: editingOrder.title,
       description: editingOrder.description,
-      items: editingOrder.items
+      items: editingOrder.items,
     });
   },
 

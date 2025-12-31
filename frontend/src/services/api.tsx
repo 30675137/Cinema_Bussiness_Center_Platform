@@ -1,4 +1,9 @@
-import { QueryClient, QueryClientProvider, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  UseQueryOptions,
+  UseMutationOptions,
+} from '@tanstack/react-query';
 import { message, notification } from 'antd';
 import { ReactNode } from 'react';
 
@@ -56,10 +61,7 @@ class HttpClient {
     this.timeout = config.timeout;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -262,11 +264,7 @@ export const createMutationOptions = <TVariables extends unknown, TData extends 
  * QueryClient Provider 组件
  */
 export const ApiProvider = ({ children }: { children: ReactNode }) => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
 /**

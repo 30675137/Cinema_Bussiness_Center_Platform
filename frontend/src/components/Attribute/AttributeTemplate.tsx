@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Table,
@@ -17,8 +17,8 @@ import {
   Row,
   Col,
   Divider,
-  Badge
-} from 'antd'
+  Badge,
+} from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -29,21 +29,25 @@ import {
   AppstoreOutlined,
   CodeOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined
-} from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
-import type { AttributeTemplate, AttributeTemplateItem, AttributeTemplateQueryParams } from '@/types/spu'
+  CloseCircleOutlined,
+} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import type {
+  AttributeTemplate,
+  AttributeTemplateItem,
+  AttributeTemplateQueryParams,
+} from '@/types/spu';
 
-const { Title, Text, Paragraph } = Typography
-const { Option } = Select
-const { TextArea } = Input
+const { Title, Text, Paragraph } = Typography;
+const { Option } = Select;
+const { TextArea } = Input;
 
 interface AttributeTemplateProps {
-  mode?: 'manage' | 'select'
-  categoryId?: string
-  onTemplateSelect?: (template: AttributeTemplate) => void
-  showActions?: boolean
-  height?: number
+  mode?: 'manage' | 'select';
+  categoryId?: string;
+  onTemplateSelect?: (template: AttributeTemplate) => void;
+  showActions?: boolean;
+  height?: number;
 }
 
 const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
@@ -51,16 +55,16 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
   categoryId,
   onTemplateSelect,
   showActions = true,
-  height = 600
+  height = 600,
 }) => {
-  const [templates, setTemplates] = useState<AttributeTemplate[]>([])
-  const [loading, setLoading] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<AttributeTemplate | null>(null)
-  const [isModalVisible, setIsModalVisible] = useState(false)
-  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create')
-  const [form] = Form.useForm()
-  const [previewVisible, setPreviewVisible] = useState(false)
-  const [previewTemplate, setPreviewTemplate] = useState<AttributeTemplate | null>(null)
+  const [templates, setTemplates] = useState<AttributeTemplate[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<AttributeTemplate | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+  const [form] = Form.useForm();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<AttributeTemplate | null>(null);
 
   // 模拟数据
   const mockTemplates: AttributeTemplate[] = [
@@ -88,11 +92,11 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
             { id: 'opt_3', label: 'M', value: 'M', sort: 3, status: 'active' },
             { id: 'opt_4', label: 'L', value: 'L', sort: 4, status: 'active' },
             { id: 'opt_5', label: 'XL', value: 'XL', sort: 5, status: 'active' },
-            { id: 'opt_6', label: 'XXL', value: 'XXL', sort: 6, status: 'active' }
+            { id: 'opt_6', label: 'XXL', value: 'XXL', sort: 6, status: 'active' },
           ],
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_2',
@@ -105,11 +109,11 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
             { id: 'opt_7', label: '红色', value: 'red', sort: 1, status: 'active' },
             { id: 'opt_8', label: '蓝色', value: 'blue', sort: 2, status: 'active' },
             { id: 'opt_9', label: '黑色', value: 'black', sort: 3, status: 'active' },
-            { id: 'opt_10', label: '白色', value: 'white', sort: 4, status: 'active' }
+            { id: 'opt_10', label: '白色', value: 'white', sort: 4, status: 'active' },
           ],
           group: '基础属性',
           sort: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_3',
@@ -122,17 +126,17 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
             { id: 'opt_11', label: '纯棉', value: 'cotton', sort: 1, status: 'active' },
             { id: 'opt_12', label: '涤纶', value: 'polyester', sort: 2, status: 'active' },
             { id: 'opt_13', label: '混纺', value: 'blend', sort: 3, status: 'active' },
-            { id: 'opt_14', label: '羊毛', value: 'wool', sort: 4, status: 'active' }
+            { id: 'opt_14', label: '羊毛', value: 'wool', sort: 4, status: 'active' },
           ],
           group: '材质属性',
           sort: 3,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-15T10:30:00Z',
       updatedAt: '2024-01-20T15:45:00Z',
       createdBy: 'admin',
-      updatedBy: 'admin'
+      updatedBy: 'admin',
     },
     {
       id: '2',
@@ -153,7 +157,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           description: '产品型号',
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_5',
@@ -166,7 +170,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           validation: { min: 1, max: 60 },
           group: '服务属性',
           sort: 2,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_6',
@@ -178,13 +182,13 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           description: '是否支持防水',
           group: '特性属性',
           sort: 3,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-16T09:20:00Z',
       updatedAt: '2024-01-18T14:30:00Z',
       createdBy: 'admin',
-      updatedBy: 'admin'
+      updatedBy: 'admin',
     },
     {
       id: '3',
@@ -206,7 +210,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           validation: { min: 1 },
           group: '基础属性',
           sort: 1,
-          status: 'active'
+          status: 'active',
         },
         {
           id: 'attr_8',
@@ -217,154 +221,158 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           description: '商品产地',
           group: '基础属性',
           sort: 2,
-          status: 'active'
-        }
+          status: 'active',
+        },
       ],
       createdAt: '2024-01-10T08:15:00Z',
       updatedAt: '2024-01-10T08:15:00Z',
       createdBy: 'system',
-      updatedBy: 'system'
-    }
-  ]
+      updatedBy: 'system',
+    },
+  ];
 
   // 加载模板数据
   const loadTemplates = async (params?: AttributeTemplateQueryParams) => {
-    setLoading(true)
+    setLoading(true);
     try {
       // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-      let filteredTemplates = mockTemplates
+      let filteredTemplates = mockTemplates;
 
       if (params?.keyword) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.name.toLowerCase().includes(params.keyword!.toLowerCase()) ||
-          template.code.toLowerCase().includes(params.keyword!.toLowerCase()) ||
-          template.description?.toLowerCase().includes(params.keyword!.toLowerCase())
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) =>
+            template.name.toLowerCase().includes(params.keyword!.toLowerCase()) ||
+            template.code.toLowerCase().includes(params.keyword!.toLowerCase()) ||
+            template.description?.toLowerCase().includes(params.keyword!.toLowerCase())
+        );
       }
 
       if (params?.categoryId) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.categoryId === params.categoryId
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.categoryId === params.categoryId
+        );
       }
 
       if (params?.status) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.status === params.status
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.status === params.status
+        );
       }
 
       if (params?.isSystem !== undefined) {
-        filteredTemplates = filteredTemplates.filter(template =>
-          template.isSystem === params.isSystem
-        )
+        filteredTemplates = filteredTemplates.filter(
+          (template) => template.isSystem === params.isSystem
+        );
       }
 
-      setTemplates(filteredTemplates)
+      setTemplates(filteredTemplates);
     } catch (error) {
-      message.error('加载属性模板失败')
-      console.error('Load templates error:', error)
+      message.error('加载属性模板失败');
+      console.error('Load templates error:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadTemplates({ categoryId })
-  }, [categoryId])
+    loadTemplates({ categoryId });
+  }, [categoryId]);
 
   // 处理添加模板
   const handleAddTemplate = () => {
-    setSelectedTemplate(null)
-    setModalMode('create')
-    form.resetFields()
-    setIsModalVisible(true)
-  }
+    setSelectedTemplate(null);
+    setModalMode('create');
+    form.resetFields();
+    setIsModalVisible(true);
+  };
 
   // 处理编辑模板
   const handleEditTemplate = (template: AttributeTemplate) => {
-    setSelectedTemplate(template)
-    setModalMode('edit')
+    setSelectedTemplate(template);
+    setModalMode('edit');
     form.setFieldsValue({
       name: template.name,
       code: template.code,
       description: template.description,
       categoryId: template.categoryId,
-      status: template.status
-    })
-    setIsModalVisible(true)
-  }
+      status: template.status,
+    });
+    setIsModalVisible(true);
+  };
 
   // 处理查看模板
   const handleViewTemplate = (template: AttributeTemplate) => {
-    setPreviewTemplate(template)
-    setPreviewVisible(true)
-  }
+    setPreviewTemplate(template);
+    setPreviewVisible(true);
+  };
 
   // 处理复制模板
   const handleCopyTemplate = (template: AttributeTemplate) => {
-    setSelectedTemplate({ ...template, id: '', name: `${template.name}_副本`, code: `${template.code}_copy` })
-    setModalMode('create')
+    setSelectedTemplate({
+      ...template,
+      id: '',
+      name: `${template.name}_副本`,
+      code: `${template.code}_copy`,
+    });
+    setModalMode('create');
     form.setFieldsValue({
       name: `${template.name}_副本`,
       code: `${template.code}_copy`,
       description: template.description,
       categoryId: template.categoryId,
-      status: 'inactive'
-    })
-    setIsModalVisible(true)
-    message.success('模板已复制，请修改后保存')
-  }
+      status: 'inactive',
+    });
+    setIsModalVisible(true);
+    message.success('模板已复制，请修改后保存');
+  };
 
   // 处理删除模板
   const handleDeleteTemplate = async (templateId: string) => {
     try {
       // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setTemplates(prev => prev.filter(template => template.id !== templateId))
-      message.success('删除成功')
+      setTemplates((prev) => prev.filter((template) => template.id !== templateId));
+      message.success('删除成功');
     } catch (error) {
-      message.error('删除失败')
-      console.error('Delete template error:', error)
+      message.error('删除失败');
+      console.error('Delete template error:', error);
     }
-  }
+  };
 
   // 处理选择模板（选择模式下）
   const handleSelectTemplate = (template: AttributeTemplate) => {
     if (mode === 'select' && onTemplateSelect) {
-      onTemplateSelect(template)
+      onTemplateSelect(template);
     }
-  }
+  };
 
   // 处理模板状态切换
   const handleToggleStatus = async (template: AttributeTemplate) => {
     try {
-      const newStatus = template.status === 'active' ? 'inactive' : 'active'
+      const newStatus = template.status === 'active' ? 'inactive' : 'active';
 
       // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      setTemplates(prev =>
-        prev.map(t =>
-          t.id === template.id ? { ...t, status: newStatus } : t
-        )
-      )
+      setTemplates((prev) =>
+        prev.map((t) => (t.id === template.id ? { ...t, status: newStatus } : t))
+      );
 
-      message.success(`${newStatus === 'active' ? '启用' : '停用'}成功`)
+      message.success(`${newStatus === 'active' ? '启用' : '停用'}成功`);
     } catch (error) {
-      message.error('状态切换失败')
-      console.error('Toggle status error:', error)
+      message.error('状态切换失败');
+      console.error('Toggle status error:', error);
     }
-  }
+  };
 
   // 处理表单提交
   const handleSubmit = async (values: any) => {
     try {
       // 模拟API调用
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (modalMode === 'create') {
         const newTemplate: AttributeTemplate = {
@@ -375,30 +383,35 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           createdBy: 'current_user',
-          updatedBy: 'current_user'
-        }
+          updatedBy: 'current_user',
+        };
 
-        setTemplates(prev => [...prev, newTemplate])
-        message.success('创建成功')
+        setTemplates((prev) => [...prev, newTemplate]);
+        message.success('创建成功');
       } else if (modalMode === 'edit' && selectedTemplate) {
-        setTemplates(prev =>
-          prev.map(template =>
+        setTemplates((prev) =>
+          prev.map((template) =>
             template.id === selectedTemplate.id
-              ? { ...template, ...values, updatedAt: new Date().toISOString(), updatedBy: 'current_user' }
+              ? {
+                  ...template,
+                  ...values,
+                  updatedAt: new Date().toISOString(),
+                  updatedBy: 'current_user',
+                }
               : template
           )
-        )
-        message.success('更新成功')
+        );
+        message.success('更新成功');
       }
 
-      setIsModalVisible(false)
-      form.resetFields()
-      setSelectedTemplate(null)
+      setIsModalVisible(false);
+      form.resetFields();
+      setSelectedTemplate(null);
     } catch (error) {
-      message.error(`${modalMode === 'create' ? '创建' : '更新'}失败`)
-      console.error('Submit template error:', error)
+      message.error(`${modalMode === 'create' ? '创建' : '更新'}失败`);
+      console.error('Submit template error:', error);
     }
-  }
+  };
 
   // 表格列定义
   const columns: ColumnsType<AttributeTemplate> = [
@@ -411,27 +424,31 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
         <div>
           <div style={{ fontWeight: 500, marginBottom: 4 }}>
             {text}
-            {record.isSystem && <Tag color="blue" size="small" style={{ marginLeft: 8 }}>系统</Tag>}
+            {record.isSystem && (
+              <Tag color="blue" size="small" style={{ marginLeft: 8 }}>
+                系统
+              </Tag>
+            )}
           </div>
           <div style={{ fontSize: '12px', color: '#666' }}>
             <CodeOutlined /> {record.code}
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
-      render: (text) => text || '-'
+      render: (text) => text || '-',
     },
     {
       title: '所属分类',
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 120,
-      render: (text) => text || '通用'
+      render: (text) => text || '通用',
     },
     {
       title: '属性数量',
@@ -439,29 +456,32 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
       width: 100,
       render: (_, record) => (
         <Badge count={record.attributes.length} style={{ backgroundColor: '#52c41a' }} />
-      )
+      ),
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 80,
-      render: (status) => (
+      render: (status) =>
         status === 'active' ? (
-          <Tag color="success" icon={<CheckCircleOutlined />}>启用</Tag>
+          <Tag color="success" icon={<CheckCircleOutlined />}>
+            启用
+          </Tag>
         ) : (
-          <Tag color="warning" icon={<CloseCircleOutlined />}>停用</Tag>
-        )
-      )
+          <Tag color="warning" icon={<CloseCircleOutlined />}>
+            停用
+          </Tag>
+        ),
     },
     {
       title: '更新时间',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 160,
-      render: (date) => new Date(date).toLocaleString('zh-CN')
-    }
-  ]
+      render: (date) => new Date(date).toLocaleString('zh-CN'),
+    },
+  ];
 
   // 操作列
   if (showActions && mode === 'manage') {
@@ -524,8 +544,8 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
             </Popconfirm>
           </Tooltip>
         </Space>
-      )
-    })
+      ),
+    });
   }
 
   return (
@@ -534,11 +554,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
       {showActions && mode === 'manage' && (
         <div style={{ marginBottom: 16 }}>
           <Space>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddTemplate}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddTemplate}>
               新建模板
             </Button>
           </Space>
@@ -556,12 +572,16 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: (total) => `共 ${total} 条记录`,
-          pageSizeOptions: ['10', '20', '50', '100']
+          pageSizeOptions: ['10', '20', '50', '100'],
         }}
-        onRow={mode === 'select' ? (record) => ({
-          style: { cursor: 'pointer' },
-          onClick: () => handleSelectTemplate(record)
-        }) : undefined}
+        onRow={
+          mode === 'select'
+            ? (record) => ({
+                style: { cursor: 'pointer' },
+                onClick: () => handleSelectTemplate(record),
+              })
+            : undefined
+        }
       />
 
       {/* 新建/编辑模板弹窗 */}
@@ -577,12 +597,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
         width={600}
         destroyOnClose
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          preserve={false}
-        >
+        <Form form={form} layout="vertical" onFinish={handleSubmit} preserve={false}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -599,7 +614,10 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
                 name="code"
                 rules={[
                   { required: true, message: '请输入模板编码' },
-                  { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '编码只能包含字母、数字和下划线，且以字母开头' }
+                  {
+                    pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+                    message: '编码只能包含字母、数字和下划线，且以字母开头',
+                  },
                 ]}
               >
                 <Input placeholder="请输入模板编码" />
@@ -607,24 +625,13 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
             </Col>
           </Row>
 
-          <Form.Item
-            label="模板描述"
-            name="description"
-          >
-            <TextArea
-              rows={3}
-              placeholder="请输入模板描述（选填）"
-              maxLength={200}
-              showCount
-            />
+          <Form.Item label="模板描述" name="description">
+            <TextArea rows={3} placeholder="请输入模板描述（选填）" maxLength={200} showCount />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label="所属分类"
-                name="categoryId"
-              >
+              <Form.Item label="所属分类" name="categoryId">
                 <Select placeholder="请选择所属分类（选填）" allowClear>
                   <Option value="cat_001">服装</Option>
                   <Option value="cat_002">电子产品</Option>
@@ -634,11 +641,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="状态"
-                name="status"
-                initialValue="active"
-              >
+              <Form.Item label="状态" name="status" initialValue="active">
                 <Select>
                   <Option value="active">启用</Option>
                   <Option value="inactive">停用</Option>
@@ -649,9 +652,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
 
           <div style={{ textAlign: 'right', marginTop: 24 }}>
             <Space>
-              <Button onClick={() => setIsModalVisible(false)}>
-                取消
-              </Button>
+              <Button onClick={() => setIsModalVisible(false)}>取消</Button>
               <Button type="primary" htmlType="submit">
                 {modalMode === 'create' ? '创建' : '更新'}
               </Button>
@@ -672,7 +673,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
         footer={[
           <Button key="close" onClick={() => setPreviewVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
         destroyOnClose
@@ -727,9 +728,15 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
                       <Row gutter={16}>
                         <Col span={6}>
                           <Text strong>{attr.name}</Text>
-                          {attr.required && <Tag color="red" size="small" style={{ marginLeft: 4 }}>必填</Tag>}
+                          {attr.required && (
+                            <Tag color="red" size="small" style={{ marginLeft: 4 }}>
+                              必填
+                            </Tag>
+                          )}
                           <br />
-                          <Text type="secondary" style={{ fontSize: '12px' }}>{attr.code}</Text>
+                          <Text type="secondary" style={{ fontSize: '12px' }}>
+                            {attr.code}
+                          </Text>
                         </Col>
                         <Col span={4}>
                           <Text type="secondary">类型：</Text>
@@ -750,9 +757,11 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
                       </Row>
                       {attr.options && attr.options.length > 0 && (
                         <div style={{ marginTop: 8, paddingLeft: 12 }}>
-                          <Text type="secondary" style={{ fontSize: '12px' }}>可选项：</Text>
+                          <Text type="secondary" style={{ fontSize: '12px' }}>
+                            可选项：
+                          </Text>
                           <div style={{ marginTop: 4 }}>
-                            {attr.options.map(option => (
+                            {attr.options.map((option) => (
                               <Tag key={option.id} size="small" style={{ marginBottom: 4 }}>
                                 {option.label} ({option.value})
                               </Tag>
@@ -769,7 +778,7 @@ const AttributeTemplateManager: React.FC<AttributeTemplateProps> = ({
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default AttributeTemplateManager
+export default AttributeTemplateManager;

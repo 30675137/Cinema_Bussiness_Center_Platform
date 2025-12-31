@@ -130,9 +130,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
     };
 
     // 检查是否已存在
-    const existingIndex = items.findIndex(
-      item => item.skuId === newItem.skuId
-    );
+    const existingIndex = items.findIndex((item) => item.skuId === newItem.skuId);
 
     if (existingIndex >= 0) {
       const newItems = [...items];
@@ -178,7 +176,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
         ...values,
         plannedDate: values.plannedDate?.format('YYYY-MM-DD'),
         estimatedArrivalDate: values.estimatedArrivalDate?.format('YYYY-MM-DD'),
-        items: items.map(item => ({
+        items: items.map((item) => ({
           ...item,
           totalPrice: item.plannedQuantity * item.unitPrice,
         })),
@@ -199,7 +197,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
 
     try {
       const inventory = await getInventoryByLocation(selectedLocationId);
-      return inventory.filter(item => item.availableStock > 0);
+      return inventory.filter((item) => item.availableStock > 0);
     } catch (error) {
       message.error('获取库存信息失败');
       return [];
@@ -374,12 +372,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
         <Button key="cancel" onClick={onCancel}>
           取消
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleSubmit}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleSubmit}>
           {mode === 'create' ? '创建' : '更新'}
         </Button>,
       ]}
@@ -442,10 +435,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
                 name="plannedDate"
                 rules={[{ required: true, message: '请选择计划调拨日期' }]}
               >
-                <DatePicker
-                  style={{ width: '100%' }}
-                  placeholder="请选择计划调拨日期"
-                />
+                <DatePicker style={{ width: '100%' }} placeholder="请选择计划调拨日期" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={8}>
@@ -464,22 +454,14 @@ const TransferForm: React.FC<TransferFormProps> = ({
             </Col>
             <Col xs={24} sm={12} md={8}>
               <Form.Item label="预计到达日期" name="estimatedArrivalDate">
-                <DatePicker
-                  style={{ width: '100%' }}
-                  placeholder="请选择预计到达日期"
-                />
+                <DatePicker style={{ width: '100%' }} placeholder="请选择预计到达日期" />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item label="调拨描述" name="description">
-                <TextArea
-                  rows={3}
-                  placeholder="请输入调拨描述"
-                  maxLength={500}
-                  showCount
-                />
+                <TextArea rows={3} placeholder="请输入调拨描述" maxLength={500} showCount />
               </Form.Item>
             </Col>
           </Row>
@@ -499,12 +481,14 @@ const TransferForm: React.FC<TransferFormProps> = ({
                   onChange={(value) => setSelectedLocationId(value)}
                   showSearch
                   filterOption={(input, option) =>
-                    (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                    (option?.children as unknown as string)
+                      ?.toLowerCase()
+                      .includes(input.toLowerCase())
                   }
                 >
                   {locations
-                    .filter(location => location.isActive)
-                    .map(location => (
+                    .filter((location) => location.isActive)
+                    .map((location) => (
                       <Option key={location.id} value={location.id}>
                         {location.name} ({location.code})
                       </Option>
@@ -522,12 +506,14 @@ const TransferForm: React.FC<TransferFormProps> = ({
                   placeholder="请选择调入位置"
                   showSearch
                   filterOption={(input, option) =>
-                    (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                    (option?.children as unknown as string)
+                      ?.toLowerCase()
+                      .includes(input.toLowerCase())
                   }
                 >
                   {locations
-                    .filter(location => location.isActive)
-                    .map(location => (
+                    .filter((location) => location.isActive)
+                    .map((location) => (
                       <Option key={location.id} value={location.id}>
                         {location.name} ({location.code})
                       </Option>
@@ -583,12 +569,7 @@ const TransferForm: React.FC<TransferFormProps> = ({
         {/* 备注信息 */}
         <Card title="备注信息">
           <Form.Item label="备注" name="remarks">
-            <TextArea
-              rows={3}
-              placeholder="请输入备注信息"
-              maxLength={500}
-              showCount
-            />
+            <TextArea rows={3} placeholder="请输入备注信息" maxLength={500} showCount />
           </Form.Item>
 
           <Form.Item label="附件" name="attachments">
@@ -657,7 +638,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
     setLoading(true);
     try {
       const items = await getInventoryByLocation(locationId);
-      setInventoryItems(items.filter(item => item.availableStock > 0));
+      setInventoryItems(items.filter((item) => item.availableStock > 0));
     } catch (error) {
       console.error('加载库存失败:', error);
     } finally {
@@ -665,10 +646,11 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
     }
   };
 
-  const filteredItems = inventoryItems.filter(item =>
-    item.productName.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.productCode.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.skuCode.toLowerCase().includes(searchText.toLowerCase())
+  const filteredItems = inventoryItems.filter(
+    (item) =>
+      item.productName.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.productCode.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.skuCode.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const columns: ColumnsType<InventoryQueryResult> = [

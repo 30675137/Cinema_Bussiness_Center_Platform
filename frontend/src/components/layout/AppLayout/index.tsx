@@ -12,12 +12,17 @@ import {
   SettingOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  BellOutlined
+  BellOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar';
 import BreadcrumbNavigation from '../Breadcrumb';
-import { useUserStore, useUserPreferenceActions, useCurrentUser, useUserRoles } from '@/stores/userStore';
+import {
+  useUserStore,
+  useUserPreferenceActions,
+  useCurrentUser,
+  useUserRoles,
+} from '@/stores/userStore';
 import { useNavigation } from '@/hooks/useNavigation';
 import './styles.css';
 
@@ -62,7 +67,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   className,
   style,
   onLogout,
-  userMenuItems
+  userMenuItems,
 }) => {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
@@ -121,22 +126,22 @@ const AppLayout: React.FC<AppLayoutProps> = ({
     {
       key: 'profile',
       label: '个人资料',
-      icon: <UserOutlined />
+      icon: <UserOutlined />,
     },
     {
       key: 'settings',
       label: '系统设置',
-      icon: <SettingOutlined />
+      icon: <SettingOutlined />,
     },
     {
-      type: 'divider' as const
+      type: 'divider' as const,
     },
     {
       key: 'logout',
       label: '退出登录',
       icon: <LogoutOutlined />,
-      danger: true
-    }
+      danger: true,
+    },
   ];
 
   const menuItems = userMenuItems || defaultUserMenuItems;
@@ -149,7 +154,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       <Dropdown
         menu={{
           items: menuItems,
-          onClick: handleUserMenuClick
+          onClick: handleUserMenuClick,
         }}
         placement="bottomRight"
         trigger={['click']}
@@ -159,7 +164,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             src={currentUser.avatar}
             icon={<UserOutlined />}
             classNames={{
-              root: 'user-avatar'
+              root: 'user-avatar',
             }}
           />
           <div className="user-info">
@@ -176,10 +181,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   return (
     <Layout
       classNames={{
-        root: cn('app-layout', className)
+        root: cn('app-layout', className),
       }}
       styles={{
-        root: style
+        root: style,
       }}
     >
       {/* 侧边栏 */}
@@ -188,13 +193,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({
       {/* 主内容区域 */}
       <Layout
         classNames={{
-          root: 'main-layout'
+          root: 'main-layout',
         }}
       >
         {/* 头部 */}
         <Header
           classNames={{
-            root: 'app-header'
+            root: 'app-header',
           }}
         >
           <div className="header-left">
@@ -203,23 +208,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={toggleSidebarCollapsed}
               classNames={{
-                root: 'sidebar-toggle'
+                root: 'sidebar-toggle',
               }}
             />
           </div>
 
           <div className="header-center">
-            <Text strong className="app-title">{title}</Text>
+            <Text strong className="app-title">
+              {title}
+            </Text>
           </div>
 
           <div className="header-right">
             <Space size="middle">
               {/* 通知铃铛 */}
-              <Button
-                type="text"
-                icon={<BellOutlined />}
-                className="notification-button"
-              />
+              <Button type="text" icon={<BellOutlined />} className="notification-button" />
 
               {/* 用户信息 */}
               {renderUserDropdown()}
@@ -227,11 +230,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
 
           {/* 自定义头部内容 */}
-          {headerExtra && (
-            <div className="header-extra">
-              {headerExtra}
-            </div>
-          )}
+          {headerExtra && <div className="header-extra">{headerExtra}</div>}
         </Header>
 
         {/* 面包屑导航 */}
@@ -242,7 +241,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         {/* 内容区域 */}
         <Content
           classNames={{
-            root: 'app-content'
+            root: 'app-content',
           }}
         >
           <div className="content-wrapper">
@@ -251,11 +250,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         </Content>
 
         {/* 底部 */}
-        {footer && (
-          <div className="app-footer">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="app-footer">{footer}</div>}
       </Layout>
     </Layout>
   );

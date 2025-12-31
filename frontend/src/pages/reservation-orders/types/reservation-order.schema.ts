@@ -4,15 +4,15 @@
  * 用于表单验证，与后端 Bean Validation 规则一致
  */
 
-import { z } from 'zod'
+import { z } from 'zod';
 
 // ============== 正则表达式 ==============
 
 /** 手机号正则 */
-const phoneRegex = /^1[3-9]\d{9}$/
+const phoneRegex = /^1[3-9]\d{9}$/;
 
 /** 日期格式正则 yyyy-MM-dd */
-const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 // ============== 确认预约 Schema ==============
 
@@ -31,12 +31,12 @@ export const confirmReservationSchema = z.object({
    * 操作备注 (可选)
    */
   remark: z.string().max(200, '备注不能超过200个字符').optional(),
-})
+});
 
 /**
  * 确认预约表单类型
  */
-export type ConfirmReservationFormData = z.infer<typeof confirmReservationSchema>
+export type ConfirmReservationFormData = z.infer<typeof confirmReservationSchema>;
 
 // ============== 取消预约 Schema ==============
 
@@ -48,7 +48,7 @@ export const cancelReasonTypeEnum = z.enum([
   'CUSTOMER_REQUEST',
   'TIME_ADJUSTMENT',
   'OTHER',
-])
+]);
 
 /**
  * 取消预约表单 Schema
@@ -66,12 +66,12 @@ export const cancelReservationSchema = z.object({
     .string({ message: '取消原因不能为空' })
     .min(1, '取消原因不能为空')
     .max(200, '取消原因不能超过200个字符'),
-})
+});
 
 /**
  * 取消预约表单类型
  */
-export type CancelReservationFormData = z.infer<typeof cancelReservationSchema>
+export type CancelReservationFormData = z.infer<typeof cancelReservationSchema>;
 
 // ============== 修改预约 Schema ==============
 
@@ -91,21 +91,18 @@ export const updateReservationSchema = z.object({
   /**
    * 联系人手机号
    */
-  contactPhone: z
-    .string()
-    .regex(phoneRegex, '手机号格式不正确')
-    .optional(),
+  contactPhone: z.string().regex(phoneRegex, '手机号格式不正确').optional(),
 
   /**
    * 备注
    */
   remark: z.string().max(200, '备注不能超过200个字符').optional(),
-})
+});
 
 /**
  * 修改预约表单类型
  */
-export type UpdateReservationFormData = z.infer<typeof updateReservationSchema>
+export type UpdateReservationFormData = z.infer<typeof updateReservationSchema>;
 
 // ============== 创建预约 Schema (C端) ==============
 
@@ -122,7 +119,7 @@ export const addonItemSchema = z.object({
    * 数量
    */
   quantity: z.number().int().min(1, '数量至少为1'),
-})
+});
 
 /**
  * 创建预约表单 Schema
@@ -161,9 +158,7 @@ export const createReservationSchema = z.object({
   /**
    * 联系人手机号
    */
-  contactPhone: z
-    .string({ message: '联系人手机号不能为空' })
-    .regex(phoneRegex, '手机号格式不正确'),
+  contactPhone: z.string({ message: '联系人手机号不能为空' }).regex(phoneRegex, '手机号格式不正确'),
 
   /**
    * 备注 (可选)
@@ -174,24 +169,19 @@ export const createReservationSchema = z.object({
    * 加购项列表
    */
   addonItems: z.array(addonItemSchema).optional(),
-})
+});
 
 /**
  * 创建预约表单类型
  */
-export type CreateReservationFormData = z.infer<typeof createReservationSchema>
+export type CreateReservationFormData = z.infer<typeof createReservationSchema>;
 
 // ============== 列表查询 Schema ==============
 
 /**
  * 预约单状态枚举
  */
-export const reservationStatusEnum = z.enum([
-  'PENDING',
-  'CONFIRMED',
-  'CANCELLED',
-  'COMPLETED',
-])
+export const reservationStatusEnum = z.enum(['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED']);
 
 /**
  * 列表查询筛选 Schema
@@ -256,9 +246,9 @@ export const reservationListQuerySchema = z.object({
    * 排序方向
    */
   sortDirection: z.enum(['asc', 'desc']).optional().default('desc'),
-})
+});
 
 /**
  * 列表查询筛选类型
  */
-export type ReservationListQueryFormData = z.infer<typeof reservationListQuerySchema>
+export type ReservationListQueryFormData = z.infer<typeof reservationListQuerySchema>;

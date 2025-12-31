@@ -6,7 +6,13 @@ import React, { useState } from 'react';
 import { Form, Input, Select, InputNumber, Tag, Button, Alert, Space } from 'antd';
 import { CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import { Controller } from 'react-hook-form';
-import type { Control, FieldErrors, UseFormSetValue, UseFormWatch, UseFormGetValues } from 'react-hook-form';
+import type {
+  Control,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormWatch,
+  UseFormGetValues,
+} from 'react-hook-form';
 import type { SPU } from '@/types/sku';
 import { SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
 import { useSpusQuery } from '@/hooks/useSku';
@@ -60,7 +66,7 @@ export const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
     try {
       // 模拟 API 调用验证门店范围
       // TODO: 替换为真实 API 调用 POST /api/skus/{id}/validate-store-scope
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const bomComponents = getValues('bomComponents') || [];
       const comboItems = getValues('comboItems') || [];
@@ -156,9 +162,7 @@ export const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
               placeholder="请选择SPU"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)
-                  ?.toLowerCase()
-                  .includes(input.toLowerCase())
+                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
               }
               disabled={mode === 'edit'}
               data-testid="sku-form-spu-select"
@@ -322,9 +326,7 @@ export const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
             value="自动计算"
             disabled
             placeholder={
-              skuType === SkuType.FINISHED_PRODUCT
-                ? '根据BOM配置自动计算'
-                : '根据套餐子项自动计算'
+              skuType === SkuType.FINISHED_PRODUCT ? '根据BOM配置自动计算' : '根据套餐子项自动计算'
             }
           />
         </Form.Item>

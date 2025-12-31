@@ -15,14 +15,14 @@ import {
   Popconfirm,
   message,
   Divider,
-  Tag
+  Tag,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   DragOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -52,11 +52,7 @@ interface SpecsTabProps {
   touched: Record<string, boolean>;
 }
 
-const SpecsTab: React.FC<SpecsTabProps> = ({
-  control,
-  errors,
-  touched
-}) => {
+const SpecsTab: React.FC<SpecsTabProps> = ({ control, errors, touched }) => {
   const [editingSpec, setEditingSpec] = useState<SpecItem | null>(null);
   const [specFormVisible, setSpecFormVisible] = useState(false);
 
@@ -64,10 +60,10 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
     fields: specFields,
     append: appendSpec,
     remove: removeSpec,
-    move: moveSpec
+    move: moveSpec,
   } = useFieldArray({
     control,
-    name: 'specifications'
+    name: 'specifications',
   });
 
   // 规格类型选项
@@ -77,7 +73,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
     { value: 'select', label: '单选' },
     { value: 'multi_select', label: '多选' },
     { value: 'boolean', label: '布尔' },
-    { value: 'date', label: '日期' }
+    { value: 'date', label: '日期' },
   ];
 
   // 添加新规格
@@ -88,7 +84,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
       type: 'text',
       values: [],
       required: false,
-      sortOrder: specFields.length
+      sortOrder: specFields.length,
     };
     setEditingSpec(newSpec);
     setSpecFormVisible(true);
@@ -102,7 +98,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
 
   // 保存规格
   const handleSaveSpec = (spec: SpecItem) => {
-    if (editingSpec && specFields.find(field => field.id === editingSpec.id)) {
+    if (editingSpec && specFields.find((field) => field.id === editingSpec.id)) {
       // 更新现有规格
       const specs = control.getValues('specifications') || [];
       const index = specs.findIndex((s: SpecItem) => s.id === spec.id);
@@ -140,7 +136,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
         <span className="drag-handle" style={{ cursor: 'grab' }}>
           <DragOutlined />
         </span>
-      )
+      ),
     },
     {
       title: '规格名称',
@@ -149,9 +145,9 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
       render: (text: string, record: SpecItem) => (
         <Space>
           <span>{text || '-'}</span>
-          {record.required && <Tag color="red" >必填</Tag>}
+          {record.required && <Tag color="red">必填</Tag>}
         </Space>
-      )
+      ),
     },
     {
       title: '规格类型',
@@ -159,9 +155,9 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
       key: 'type',
       width: 120,
       render: (type: string) => {
-        const option = specTypeOptions.find(opt => opt.value === type);
+        const option = specTypeOptions.find((opt) => opt.value === type);
         return option ? option.label : type;
-      }
+      },
     },
     {
       title: '规格值',
@@ -173,47 +169,33 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
             <Text type="secondary">-</Text>
           ) : (
             <Space wrap size={4}>
-              {values.slice(0, 3).map(value => (
-                <Tag key={value.id} >
-                  {value.label || value.value}
-                </Tag>
+              {values.slice(0, 3).map((value) => (
+                <Tag key={value.id}>{value.label || value.value}</Tag>
               ))}
-              {values.length > 3 && (
-                <Tag >+{values.length - 3}</Tag>
-              )}
+              {values.length > 3 && <Tag>+{values.length - 3}</Tag>}
             </Space>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '操作',
       key: 'actions',
       width: 120,
       render: (_: any, record: SpecItem, index: number) => (
-        <Space >
-          <Button
-            type="text"
-            
-            icon={<EditOutlined />}
-            onClick={() => handleEditSpec(record)}
-          />
+        <Space>
+          <Button type="text" icon={<EditOutlined />} onClick={() => handleEditSpec(record)} />
           <Popconfirm
             title="确定删除此规格吗？"
             onConfirm={() => handleDeleteSpec(index)}
             okText="确定"
             cancelText="取消"
           >
-            <Button
-              type="text"
-              
-              danger
-              icon={<DeleteOutlined />}
-            />
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -224,8 +206,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
           <Space>
             <InfoCircleOutlined style={{ color: '#52c41a' }} />
             <Text>
-              商品规格用于定义商品的属性变化，如颜色、尺寸、口味等。
-              规格值可以影响价格和库存管理。
+              商品规格用于定义商品的属性变化，如颜色、尺寸、口味等。 规格值可以影响价格和库存管理。
             </Text>
           </Space>
         </div>
@@ -236,11 +217,7 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
             <Title level={4} style={{ margin: 0 }}>
               规格属性
             </Title>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAddSpec}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddSpec}>
               添加规格
             </Button>
           </div>
@@ -267,7 +244,6 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
               columns={columns}
               rowKey="id"
               pagination={false}
-              
               bordered
             />
           )}
@@ -281,11 +257,13 @@ const SpecsTab: React.FC<SpecsTabProps> = ({
             <Title level={4} style={{ marginBottom: 16 }}>
               SKU生成预览
             </Title>
-            <Card  style={{ backgroundColor: '#fafafa' }}>
+            <Card style={{ backgroundColor: '#fafafa' }}>
               <Text type="secondary">
-                基于当前规格将生成 {control.getValues('specifications').reduce((acc: number, spec: SpecItem) => {
+                基于当前规格将生成{' '}
+                {control.getValues('specifications').reduce((acc: number, spec: SpecItem) => {
                   return acc * Math.max(1, spec.values.length);
-                }, 1)} 个SKU
+                }, 1)}{' '}
+                个SKU
               </Text>
             </Card>
           </div>
@@ -326,12 +304,12 @@ const SpecForm: React.FC<SpecFormProps> = ({ spec, onSave, onCancel }) => {
       id: Date.now().toString(),
       value: newSpecValue.trim(),
       label: newSpecValue.trim(),
-      price: 0
+      price: 0,
     };
 
     setFormSpec({
       ...formSpec,
-      values: [...formSpec.values, newValue]
+      values: [...formSpec.values, newValue],
     });
     setNewSpecValue('');
   };
@@ -340,7 +318,7 @@ const SpecForm: React.FC<SpecFormProps> = ({ spec, onSave, onCancel }) => {
   const handleDeleteSpecValue = (valueId: string) => {
     setFormSpec({
       ...formSpec,
-      values: formSpec.values.filter(v => v.id !== valueId)
+      values: formSpec.values.filter((v) => v.id !== valueId),
     });
   };
 
@@ -348,9 +326,7 @@ const SpecForm: React.FC<SpecFormProps> = ({ spec, onSave, onCancel }) => {
   const handleUpdateSpecValue = (valueId: string, field: keyof SpecValue, value: any) => {
     setFormSpec({
       ...formSpec,
-      values: formSpec.values.map(v =>
-        v.id === valueId ? { ...v, [field]: value } : v
-      )
+      values: formSpec.values.map((v) => (v.id === valueId ? { ...v, [field]: value } : v)),
     });
   };
 
@@ -361,11 +337,7 @@ const SpecForm: React.FC<SpecFormProps> = ({ spec, onSave, onCancel }) => {
       extra={
         <Space>
           <Button onClick={onCancel}>取消</Button>
-          <Button
-            type="primary"
-            onClick={() => onSave(formSpec)}
-            disabled={!formSpec.name.trim()}
-          >
+          <Button type="primary" onClick={() => onSave(formSpec)} disabled={!formSpec.name.trim()}>
             保存
           </Button>
         </Space>
@@ -431,11 +403,7 @@ const SpecForm: React.FC<SpecFormProps> = ({ spec, onSave, onCancel }) => {
                   onChange={(e) => setNewSpecValue(e.target.value)}
                   onPressEnter={handleAddSpecValue}
                 />
-                <Button
-                  type="primary"
-                  onClick={handleAddSpecValue}
-                  disabled={!newSpecValue.trim()}
-                >
+                <Button type="primary" onClick={handleAddSpecValue} disabled={!newSpecValue.trim()}>
                   添加
                 </Button>
               </Input.Group>

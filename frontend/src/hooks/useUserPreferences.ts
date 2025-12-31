@@ -85,20 +85,20 @@ const defaultPreferences: UserPreference = {
   searchHistory: [],
   theme: {
     mode: 'light',
-    primaryColor: '#1890ff'
+    primaryColor: '#1890ff',
   },
   navigation: {
     showBreadcrumb: true,
     enableSearch: true,
     recentItemsLimit: 10,
-    searchHistoryLimit: 20
+    searchHistoryLimit: 20,
   },
   ui: {
     compactMode: false,
     fixedSidebar: true,
-    enableAnimation: true
+    enableAnimation: true,
   },
-  lastUpdated: new Date().toISOString()
+  lastUpdated: new Date().toISOString(),
 };
 
 /**
@@ -138,7 +138,7 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
     try {
       const data = {
         ...preferences,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
@@ -160,48 +160,57 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 更新用户偏好
    */
-  const updatePreferences = useCallback((updates: Partial<UserPreference>): void => {
-    const current = getCurrentPreferences();
-    const updated = {
-      ...current,
-      ...updates,
-      lastUpdated: new Date().toISOString()
-    };
-    savePreferences(updated);
-  }, [getCurrentPreferences, savePreferences]);
+  const updatePreferences = useCallback(
+    (updates: Partial<UserPreference>): void => {
+      const current = getCurrentPreferences();
+      const updated = {
+        ...current,
+        ...updates,
+        lastUpdated: new Date().toISOString(),
+      };
+      savePreferences(updated);
+    },
+    [getCurrentPreferences, savePreferences]
+  );
 
   /**
    * 切换侧边栏展开状态
    */
   const toggleSidebar = useCallback((): void => {
     updatePreferences({
-      sidebarExpanded: !preferences.sidebarExpanded
+      sidebarExpanded: !preferences.sidebarExpanded,
     });
   }, [preferences.sidebarExpanded, updatePreferences]);
 
   /**
    * 设置主题
    */
-  const setTheme = useCallback((theme: 'light' | 'dark' | 'auto'): void => {
-    updatePreferences({
-      theme: {
-        ...preferences.theme,
-        mode: theme
-      }
-    });
-  }, [preferences.theme, updatePreferences]);
+  const setTheme = useCallback(
+    (theme: 'light' | 'dark' | 'auto'): void => {
+      updatePreferences({
+        theme: {
+          ...preferences.theme,
+          mode: theme,
+        },
+      });
+    },
+    [preferences.theme, updatePreferences]
+  );
 
   /**
    * 设置主色调
    */
-  const setPrimaryColor = useCallback((color: string): void => {
-    updatePreferences({
-      theme: {
-        ...preferences.theme,
-        primaryColor: color
-      }
-    });
-  }, [preferences.theme, updatePreferences]);
+  const setPrimaryColor = useCallback(
+    (color: string): void => {
+      updatePreferences({
+        theme: {
+          ...preferences.theme,
+          primaryColor: color,
+        },
+      });
+    },
+    [preferences.theme, updatePreferences]
+  );
 
   /**
    * 切换紧凑模式
@@ -210,8 +219,8 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
     updatePreferences({
       ui: {
         ...preferences.ui,
-        compactMode: !preferences.ui.compactMode
-      }
+        compactMode: !preferences.ui.compactMode,
+      },
     });
   }, [preferences.ui, updatePreferences]);
 
@@ -222,8 +231,8 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
     updatePreferences({
       ui: {
         ...preferences.ui,
-        fixedSidebar: !preferences.ui.fixedSidebar
-      }
+        fixedSidebar: !preferences.ui.fixedSidebar,
+      },
     });
   }, [preferences.ui, updatePreferences]);
 
@@ -234,39 +243,48 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
     updatePreferences({
       ui: {
         ...preferences.ui,
-        enableAnimation: !preferences.ui.enableAnimation
-      }
+        enableAnimation: !preferences.ui.enableAnimation,
+      },
     });
   }, [preferences.ui, updatePreferences]);
 
   /**
    * 添加到收藏
    */
-  const addToFavorites = useCallback((menuId: string): void => {
-    const favorites = preferences.favoriteMenuIds || [];
-    if (!favorites.includes(menuId)) {
-      updatePreferences({
-        favoriteMenuIds: [...favorites, menuId]
-      });
-    }
-  }, [preferences.favoriteMenuIds, updatePreferences]);
+  const addToFavorites = useCallback(
+    (menuId: string): void => {
+      const favorites = preferences.favoriteMenuIds || [];
+      if (!favorites.includes(menuId)) {
+        updatePreferences({
+          favoriteMenuIds: [...favorites, menuId],
+        });
+      }
+    },
+    [preferences.favoriteMenuIds, updatePreferences]
+  );
 
   /**
    * 从收藏中移除
    */
-  const removeFromFavorites = useCallback((menuId: string): void => {
-    const favorites = preferences.favoriteMenuIds || [];
-    updatePreferences({
-      favoriteMenuIds: favorites.filter(id => id !== menuId)
-    });
-  }, [preferences.favoriteMenuIds, updatePreferences]);
+  const removeFromFavorites = useCallback(
+    (menuId: string): void => {
+      const favorites = preferences.favoriteMenuIds || [];
+      updatePreferences({
+        favoriteMenuIds: favorites.filter((id) => id !== menuId),
+      });
+    },
+    [preferences.favoriteMenuIds, updatePreferences]
+  );
 
   /**
    * 检查是否已收藏
    */
-  const isFavorite = useCallback((menuId: string): boolean => {
-    return (preferences.favoriteMenuIds || []).includes(menuId);
-  }, [preferences.favoriteMenuIds]);
+  const isFavorite = useCallback(
+    (menuId: string): boolean => {
+      return (preferences.favoriteMenuIds || []).includes(menuId);
+    },
+    [preferences.favoriteMenuIds]
+  );
 
   /**
    * 获取收藏列表
@@ -278,31 +296,40 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 展开菜单
    */
-  const expandMenu = useCallback((menuId: string): void => {
-    const expanded = preferences.expandedMenuIds || [];
-    if (!expanded.includes(menuId)) {
-      updatePreferences({
-        expandedMenuIds: [...expanded, menuId]
-      });
-    }
-  }, [preferences.expandedMenuIds, updatePreferences]);
+  const expandMenu = useCallback(
+    (menuId: string): void => {
+      const expanded = preferences.expandedMenuIds || [];
+      if (!expanded.includes(menuId)) {
+        updatePreferences({
+          expandedMenuIds: [...expanded, menuId],
+        });
+      }
+    },
+    [preferences.expandedMenuIds, updatePreferences]
+  );
 
   /**
    * 收起菜单
    */
-  const collapseMenu = useCallback((menuId: string): void => {
-    const expanded = preferences.expandedMenuIds || [];
-    updatePreferences({
-      expandedMenuIds: expanded.filter(id => id !== menuId)
-    });
-  }, [preferences.expandedMenuIds, updatePreferences]);
+  const collapseMenu = useCallback(
+    (menuId: string): void => {
+      const expanded = preferences.expandedMenuIds || [];
+      updatePreferences({
+        expandedMenuIds: expanded.filter((id) => id !== menuId),
+      });
+    },
+    [preferences.expandedMenuIds, updatePreferences]
+  );
 
   /**
    * 检查菜单是否展开
    */
-  const isExpanded = useCallback((menuId: string): boolean => {
-    return (preferences.expandedMenuIds || []).includes(menuId);
-  }, [preferences.expandedMenuIds]);
+  const isExpanded = useCallback(
+    (menuId: string): boolean => {
+      return (preferences.expandedMenuIds || []).includes(menuId);
+    },
+    [preferences.expandedMenuIds]
+  );
 
   /**
    * 获取展开的菜单列表
@@ -314,28 +341,34 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 添加到最近访问
    */
-  const addToRecent = useCallback((menuId: string): void => {
-    const recent = (preferences.recentMenuIds || []).filter(id => id !== menuId);
-    recent.unshift(menuId);
+  const addToRecent = useCallback(
+    (menuId: string): void => {
+      const recent = (preferences.recentMenuIds || []).filter((id) => id !== menuId);
+      recent.unshift(menuId);
 
-    // 限制数量
-    const limit = preferences.navigation?.recentItemsLimit || 10;
-    const limited = recent.slice(0, limit);
+      // 限制数量
+      const limit = preferences.navigation?.recentItemsLimit || 10;
+      const limited = recent.slice(0, limit);
 
-    updatePreferences({
-      recentMenuIds: limited
-    });
-  }, [preferences.recentMenuIds, preferences.navigation?.recentItemsLimit, updatePreferences]);
+      updatePreferences({
+        recentMenuIds: limited,
+      });
+    },
+    [preferences.recentMenuIds, preferences.navigation?.recentItemsLimit, updatePreferences]
+  );
 
   /**
    * 从最近访问中移除
    */
-  const removeFromRecent = useCallback((menuId: string): void => {
-    const recent = preferences.recentMenuIds || [];
-    updatePreferences({
-      recentMenuIds: recent.filter(id => id !== menuId)
-    });
-  }, [preferences.recentMenuIds, updatePreferences]);
+  const removeFromRecent = useCallback(
+    (menuId: string): void => {
+      const recent = preferences.recentMenuIds || [];
+      updatePreferences({
+        recentMenuIds: recent.filter((id) => id !== menuId),
+      });
+    },
+    [preferences.recentMenuIds, updatePreferences]
+  );
 
   /**
    * 获取最近访问列表
@@ -347,26 +380,29 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 添加到搜索历史
    */
-  const addToSearchHistory = useCallback((query: string): void => {
-    if (!query.trim()) return;
+  const addToSearchHistory = useCallback(
+    (query: string): void => {
+      if (!query.trim()) return;
 
-    const history = preferences.searchHistory.filter(item => item !== query);
-    history.unshift(query.trim());
+      const history = preferences.searchHistory.filter((item) => item !== query);
+      history.unshift(query.trim());
 
-    // 限制数量
-    const limited = history.slice(0, preferences.navigation.searchHistoryLimit);
+      // 限制数量
+      const limited = history.slice(0, preferences.navigation.searchHistoryLimit);
 
-    updatePreferences({
-      searchHistory: limited
-    });
-  }, [preferences.searchHistory, preferences.navigation.searchHistoryLimit, updatePreferences]);
+      updatePreferences({
+        searchHistory: limited,
+      });
+    },
+    [preferences.searchHistory, preferences.navigation.searchHistoryLimit, updatePreferences]
+  );
 
   /**
    * 清空搜索历史
    */
   const clearSearchHistory = useCallback((): void => {
     updatePreferences({
-      searchHistory: []
+      searchHistory: [],
     });
   }, [updatePreferences]);
 
@@ -380,11 +416,14 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 从搜索历史中移除
    */
-  const removeFromSearchHistory = useCallback((query: string): void => {
-    updatePreferences({
-      searchHistory: preferences.searchHistory.filter(item => item !== query)
-    });
-  }, [preferences.searchHistory, updatePreferences]);
+  const removeFromSearchHistory = useCallback(
+    (query: string): void => {
+      updatePreferences({
+        searchHistory: preferences.searchHistory.filter((item) => item !== query),
+      });
+    },
+    [preferences.searchHistory, updatePreferences]
+  );
 
   /**
    * 重置为默认设置
@@ -392,7 +431,7 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   const resetToDefaults = useCallback((): void => {
     savePreferences({
       ...defaultPreferences,
-      userId: preferences.userId // 保留用户ID
+      userId: preferences.userId, // 保留用户ID
     });
   }, [preferences.userId, savePreferences]);
 
@@ -406,26 +445,29 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
   /**
    * 导入用户偏好设置
    */
-  const importPreferences = useCallback((preferencesData: string): boolean => {
-    try {
-      const data = JSON.parse(preferencesData);
+  const importPreferences = useCallback(
+    (preferencesData: string): boolean => {
+      try {
+        const data = JSON.parse(preferencesData);
 
-      // 验证数据结构
-      if (!data.userId || !data.theme || !data.navigation || !data.ui) {
+        // 验证数据结构
+        if (!data.userId || !data.theme || !data.navigation || !data.ui) {
+          return false;
+        }
+
+        updatePreferences({
+          ...data,
+          userId: preferences.userId, // 保持当前用户ID
+        });
+
+        return true;
+      } catch (error) {
+        console.error('Failed to import preferences:', error);
         return false;
       }
-
-      updatePreferences({
-        ...data,
-        userId: preferences.userId // 保持当前用户ID
-      });
-
-      return true;
-    } catch (error) {
-      console.error('Failed to import preferences:', error);
-      return false;
-    }
-  }, [preferences.userId, updatePreferences]);
+    },
+    [preferences.userId, updatePreferences]
+  );
 
   // 监听主题变化并应用到document
   useEffect(() => {
@@ -506,6 +548,6 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
 
     resetToDefaults,
     exportPreferences,
-    importPreferences
+    importPreferences,
   };
 };

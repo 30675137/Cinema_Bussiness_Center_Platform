@@ -87,12 +87,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
 
   // 空列表状态
   if (stores.length === 0) {
-    return (
-      <Empty
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-        description="暂无可用门店，请先添加门店"
-      />
-    );
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无可用门店，请先添加门店" />;
   }
 
   return (
@@ -121,9 +116,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
                 padding: '4px 12px',
                 border: '1px solid #d9d9d9',
                 borderRadius: 16,
-                backgroundColor: value.includes(store.id)
-                  ? '#1890ff'
-                  : 'transparent',
+                backgroundColor: value.includes(store.id) ? '#1890ff' : 'transparent',
                 color: value.includes(store.id) ? '#fff' : 'inherit',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 opacity: disabled ? 0.6 : 1,
@@ -132,9 +125,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
               <ShopOutlined style={{ marginRight: 4 }} />
               {store.name}
               {store.region && (
-                <span style={{ opacity: 0.7, marginLeft: 4 }}>
-                  ({store.region})
-                </span>
+                <span style={{ opacity: 0.7, marginLeft: 4 }}>({store.region})</span>
               )}
             </Tag.CheckableTag>
           ))
@@ -149,9 +140,7 @@ export const StoreSelector: React.FC<StoreSelectorProps> = ({
 
       {/* 必填验证提示 */}
       {required && value.length === 0 && (
-        <div style={{ color: '#ff4d4f', marginTop: 8, fontSize: 14 }}>
-          请至少选择一个门店
-        </div>
+        <div style={{ color: '#ff4d4f', marginTop: 8, fontSize: 14 }}>请至少选择一个门店</div>
       )}
 
       {/* 已选数量提示 */}

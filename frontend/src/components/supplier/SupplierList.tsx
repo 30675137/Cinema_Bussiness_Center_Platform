@@ -16,7 +16,7 @@ import {
   Row,
   Col,
   Statistic,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -32,7 +32,7 @@ import {
   PhoneOutlined,
   MailOutlined,
   StarOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useSupplierStore } from '@/stores/supplierStore';
 import { Supplier, SupplierStatus, SupplierLevel, SupplierType } from '@/types/supplier';
@@ -49,11 +49,7 @@ interface SupplierListProps {
   onCreate?: () => void;
 }
 
-const SupplierList: React.FC<SupplierListProps> = ({
-  onView,
-  onEdit,
-  onCreate
-}) => {
+const SupplierList: React.FC<SupplierListProps> = ({ onView, onEdit, onCreate }) => {
   const {
     suppliers,
     loading,
@@ -78,7 +74,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
     selectSupplier,
     selectAllSuppliers,
     clearSelection,
-    exportSuppliers
+    exportSuppliers,
   } = useSupplierStore();
 
   const [localSearchQuery, setLocalSearchQuery] = useState('');
@@ -91,7 +87,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
       search: searchQuery,
       status: statusFilter,
       level: levelFilter,
-      type: typeFilter
+      type: typeFilter,
     });
   }, [currentPage, pageSize, searchQuery, statusFilter, levelFilter, typeFilter]);
 
@@ -101,7 +97,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
     [SupplierStatus.SUSPENDED]: { color: 'orange', text: '暂停合作' },
     [SupplierStatus.TERMINATED]: { color: 'red', text: '终止合作' },
     [SupplierStatus.PENDING_APPROVAL]: { color: 'blue', text: '待审批' },
-    [SupplierStatus.UNDER_REVIEW]: { color: 'purple', text: '复核中' }
+    [SupplierStatus.UNDER_REVIEW]: { color: 'purple', text: '复核中' },
   };
 
   // 供应商等级配置
@@ -109,7 +105,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
     [SupplierLevel.STRATEGIC]: { color: 'gold', text: '战略供应商', icon: '⭐⭐⭐' },
     [SupplierLevel.PREFERRED]: { color: 'blue', text: '优选供应商', icon: '⭐⭐' },
     [SupplierLevel.STANDARD]: { color: 'green', text: '标准供应商', icon: '⭐' },
-    [SupplierLevel.TRIAL]: { color: 'gray', text: '试用供应商', icon: '📋' }
+    [SupplierLevel.TRIAL]: { color: 'gray', text: '试用供应商', icon: '📋' },
   };
 
   // 供应商类型配置
@@ -118,7 +114,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
     [SupplierType.WHOLESALER]: '批发商',
     [SupplierType.DISTRIBUTOR]: '经销商',
     [SupplierType.SERVICE_PROVIDER]: '服务提供商',
-    [SupplierType.OTHER]: '其他'
+    [SupplierType.OTHER]: '其他',
   };
 
   // 处理搜索
@@ -128,7 +124,11 @@ const SupplierList: React.FC<SupplierListProps> = ({
   };
 
   // 处理状态变更
-  const handleStatusChange = async (supplierId: string, newStatus: SupplierStatus, remarks?: string) => {
+  const handleStatusChange = async (
+    supplierId: string,
+    newStatus: SupplierStatus,
+    remarks?: string
+  ) => {
     setActionLoading(supplierId);
     try {
       let success = false;
@@ -182,7 +182,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
         } finally {
           setActionLoading(null);
         }
-      }
+      },
     });
   };
 
@@ -216,11 +216,9 @@ const SupplierList: React.FC<SupplierListProps> = ({
             <span className="mr-4">编号: {record.code}</span>
             {record.shortName && <span>简称: {record.shortName}</span>}
           </div>
-          <div className="text-xs text-gray-400 mt-1">
-            {typeConfig[record.type]}
-          </div>
+          <div className="text-xs text-gray-400 mt-1">{typeConfig[record.type]}</div>
         </div>
-      )
+      ),
     },
     {
       title: '联系方式',
@@ -235,7 +233,9 @@ const SupplierList: React.FC<SupplierListProps> = ({
           {record.email && (
             <div className="flex items-center text-sm">
               <MailOutlined className="mr-1 text-gray-400" />
-              <span className="truncate" title={record.email}>{record.email}</span>
+              <span className="truncate" title={record.email}>
+                {record.email}
+              </span>
             </div>
           )}
           <div className="flex items-center text-xs text-gray-500">
@@ -243,7 +243,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
             {record.contacts.length > 0 ? `${record.contacts.length}个联系人` : '无联系人'}
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '供应品类',
@@ -253,10 +253,14 @@ const SupplierList: React.FC<SupplierListProps> = ({
         <div>
           <div className="space-y-1">
             {record.productCategories.slice(0, 2).map((category, index) => (
-              <Tag key={index} size="small">{category}</Tag>
+              <Tag key={index} size="small">
+                {category}
+              </Tag>
             ))}
             {record.productCategories.length > 2 && (
-              <Tag size="small" color="default">+{record.productCategories.length - 2}</Tag>
+              <Tag size="small" color="default">
+                +{record.productCategories.length - 2}
+              </Tag>
             )}
           </div>
           {record.mainProducts && (
@@ -266,7 +270,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
             </div>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '采购统计',
@@ -280,16 +284,14 @@ const SupplierList: React.FC<SupplierListProps> = ({
             准时率: {record.purchaseStats.onTimeDeliveryRate}%
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status: SupplierStatus) => (
-        <StatusTag status={status} config={statusConfig} />
-      )
+      render: (status: SupplierStatus) => <StatusTag status={status} config={statusConfig} />,
     },
     {
       title: '评价',
@@ -306,9 +308,13 @@ const SupplierList: React.FC<SupplierListProps> = ({
             <Tag
               size="small"
               color={
-                latestEvaluation.grade === 'A' ? 'green' :
-                latestEvaluation.grade === 'B' ? 'blue' :
-                latestEvaluation.grade === 'C' ? 'orange' : 'red'
+                latestEvaluation.grade === 'A'
+                  ? 'green'
+                  : latestEvaluation.grade === 'B'
+                    ? 'blue'
+                    : latestEvaluation.grade === 'C'
+                      ? 'orange'
+                      : 'red'
               }
             >
               {latestEvaluation.grade}
@@ -317,7 +323,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
         ) : (
           <span className="text-gray-400 text-xs">暂无评价</span>
         );
-      }
+      },
     },
     {
       title: '合作时间',
@@ -332,7 +338,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
             </div>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '操作',
@@ -366,31 +372,31 @@ const SupplierList: React.FC<SupplierListProps> = ({
                   key: 'activate',
                   label: '激活',
                   disabled: record.status === SupplierStatus.ACTIVE,
-                  onClick: () => handleStatusChange(record, SupplierStatus.ACTIVE)
+                  onClick: () => handleStatusChange(record, SupplierStatus.ACTIVE),
                 },
                 {
                   key: 'suspend',
                   label: '暂停合作',
                   disabled: record.status !== SupplierStatus.ACTIVE,
-                  onClick: () => handleStatusChange(record, SupplierStatus.SUSPENDED)
+                  onClick: () => handleStatusChange(record, SupplierStatus.SUSPENDED),
                 },
                 {
                   key: 'terminate',
                   label: '终止合作',
                   disabled: record.status === SupplierStatus.TERMINATED,
                   onClick: () => handleStatusChange(record, SupplierStatus.TERMINATED),
-                  danger: true
+                  danger: true,
                 },
                 {
-                  type: 'divider'
+                  type: 'divider',
                 },
                 {
                   key: 'delete',
                   label: '删除',
                   danger: true,
-                  onClick: () => handleDelete(record)
-                }
-              ]
+                  onClick: () => handleDelete(record),
+                },
+              ],
             }}
           >
             <Button
@@ -401,8 +407,8 @@ const SupplierList: React.FC<SupplierListProps> = ({
             />
           </Dropdown>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 搜索表单配置
@@ -420,7 +426,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
           onChange={(e) => setLocalSearchQuery(e.target.value)}
         />
       ),
-      span: 8
+      span: 8,
     },
     {
       name: 'status',
@@ -440,7 +446,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
           ))}
         </Select>
       ),
-      span: 4
+      span: 4,
     },
     {
       name: 'level',
@@ -455,12 +461,14 @@ const SupplierList: React.FC<SupplierListProps> = ({
         >
           {Object.entries(levelConfig).map(([key, config]) => (
             <Option key={key} value={key}>
-              <span>{config.icon} {config.text}</span>
+              <span>
+                {config.icon} {config.text}
+              </span>
             </Option>
           ))}
         </Select>
       ),
-      span: 4
+      span: 4,
     },
     {
       name: 'type',
@@ -474,12 +482,14 @@ const SupplierList: React.FC<SupplierListProps> = ({
           style={{ width: '100%' }}
         >
           {Object.entries(typeConfig).map(([key, label]) => (
-            <Option key={key} value={key}>{label}</Option>
+            <Option key={key} value={key}>
+              {label}
+            </Option>
           ))}
         </Select>
       ),
-      span: 4
-    }
+      span: 4,
+    },
   ];
 
   // 工具栏操作
@@ -488,20 +498,20 @@ const SupplierList: React.FC<SupplierListProps> = ({
       key: 'create',
       label: '新建供应商',
       icon: <PlusOutlined />,
-      onClick: onCreate
+      onClick: onCreate,
     },
     {
       key: 'import',
       label: '导入',
       icon: <ImportOutlined />,
-      onClick: () => message.info('导入功能开发中')
+      onClick: () => message.info('导入功能开发中'),
     },
     {
       key: 'export',
       label: '导出',
       icon: <ExportOutlined />,
-      onClick: () => handleExport(selectedSupplierIds.length > 0 ? selectedSupplierIds : undefined)
-    }
+      onClick: () => handleExport(selectedSupplierIds.length > 0 ? selectedSupplierIds : undefined),
+    },
   ];
 
   return (
@@ -509,18 +519,14 @@ const SupplierList: React.FC<SupplierListProps> = ({
       <Row gutter={16} className="mb-4">
         <Col span={6}>
           <Card size="small">
-            <Statistic
-              title="总供应商"
-              value={suppliers.length}
-              prefix={<UserOutlined />}
-            />
+            <Statistic title="总供应商" value={suppliers.length} prefix={<UserOutlined />} />
           </Card>
         </Col>
         <Col span={6}>
           <Card size="small">
             <Statistic
               title="活跃供应商"
-              value={suppliers.filter(s => s.status === SupplierStatus.ACTIVE).length}
+              value={suppliers.filter((s) => s.status === SupplierStatus.ACTIVE).length}
               valueStyle={{ color: '#3f8600' }}
             />
           </Card>
@@ -529,7 +535,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
           <Card size="small">
             <Statistic
               title="战略供应商"
-              value={suppliers.filter(s => s.level === SupplierLevel.STRATEGIC).length}
+              value={suppliers.filter((s) => s.level === SupplierLevel.STRATEGIC).length}
               valueStyle={{ color: '#cf1322' }}
             />
           </Card>
@@ -591,17 +597,15 @@ const SupplierList: React.FC<SupplierListProps> = ({
             </Col>
             <Col span={8}>
               <Space>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={onCreate}
-                >
+                <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
                   新建供应商
                 </Button>
                 <Button icon={<ImportOutlined />}>导入</Button>
                 <Button
                   icon={<ExportOutlined />}
-                  onClick={() => handleExport(selectedSupplierIds.length > 0 ? selectedSupplierIds : undefined)}
+                  onClick={() =>
+                    handleExport(selectedSupplierIds.length > 0 ? selectedSupplierIds : undefined)
+                  }
                 >
                   导出
                 </Button>
@@ -625,7 +629,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
             },
             onSelectAll: (selected, selectedRows, changeRows) => {
               selectAllSuppliers(selected);
-            }
+            },
           }}
           pagination={{
             current: currentPage,
@@ -636,7 +640,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
             showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
             onChange: (page, size) => {
               useSupplierStore.setState({ currentPage: page, pageSize: size });
-            }
+            },
           }}
           scroll={{ x: 1200 }}
         />

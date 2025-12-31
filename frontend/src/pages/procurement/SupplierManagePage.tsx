@@ -83,7 +83,9 @@ const SupplierManagePage: React.FC = () => {
     try {
       if (viewMode === 'create') {
         // 创建供应商
-        const supplierId = await useSupplierStore.getState().createSupplier(data as CreateSupplierParams);
+        const supplierId = await useSupplierStore
+          .getState()
+          .createSupplier(data as CreateSupplierParams);
         if (supplierId) {
           message.success('供应商创建成功');
           handleViewChange('list');
@@ -111,7 +113,14 @@ const SupplierManagePage: React.FC = () => {
     }
 
     return (
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
           <Button icon={<ArrowLeftOutlined />} onClick={handleBackToList}>
             返回列表
@@ -124,11 +133,7 @@ const SupplierManagePage: React.FC = () => {
         </Space>
 
         {viewMode === 'detail' && currentSupplier && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreateSupplier}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateSupplier}>
             新建供应商
           </Button>
         )}

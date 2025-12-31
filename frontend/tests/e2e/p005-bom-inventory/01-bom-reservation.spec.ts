@@ -20,13 +20,13 @@ import {
   generateTestOrderId,
   SKU_NAMES,
   SINGLE_COCKTAIL_ORDER,
-  EXPECTED_RESERVATION_COMPONENTS
+  EXPECTED_RESERVATION_COMPONENTS,
 } from './fixtures/test-data';
 import {
   resetTestData,
   getInventoryQuantities,
   verifyReservationRecord,
-  verifyBomSnapshot
+  verifyBomSnapshot,
 } from './helpers/database-helper';
 
 test.describe('P005 BOM库存预占 - UI测试', () => {
@@ -47,7 +47,9 @@ test.describe('P005 BOM库存预占 - UI测试', () => {
     // Step 1: 查询初始库存（UI）
     console.log('Step 1: 查询初始库存');
     await inventoryPage.goto();
-    const initialInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const initialInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('初始库存:', initialInventory);
 
@@ -70,7 +72,9 @@ test.describe('P005 BOM库存预占 - UI测试', () => {
     await inventoryPage.refresh();
 
     // 验证威士忌预占库存增加
-    const updatedInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const updatedInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('更新后库存:', updatedInventory);
 
@@ -104,15 +108,13 @@ test.describe('P005 BOM库存预占 - UI测试', () => {
 
     // Step 2: 创建多杯订单
     console.log(`Step 2: 创建${quantity}杯订单`);
-    const reservationResponse = await orderPage.createOrderViaAPI(
-      testOrderId,
-      TEST_STORE_ID,
-      [{
+    const reservationResponse = await orderPage.createOrderViaAPI(testOrderId, TEST_STORE_ID, [
+      {
         skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
         quantity,
-        unit: '杯'
-      }]
-    );
+        unit: '杯',
+      },
+    ]);
 
     expect(reservationResponse.success).toBe(true);
 
@@ -136,15 +138,13 @@ test.describe('P005 BOM库存预占 - UI测试', () => {
     // Step 1: 先下单消耗大部分库存
     console.log('Step 1: 消耗大部分库存');
     const firstOrderId = generateTestOrderId('03a');
-    await orderPage.createOrderViaAPI(
-      firstOrderId,
-      TEST_STORE_ID,
-      [{
+    await orderPage.createOrderViaAPI(firstOrderId, TEST_STORE_ID, [
+      {
         skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
         quantity: 100, // 下单100杯，消耗大量库存
-        unit: '杯'
-      }]
-    );
+        unit: '杯',
+      },
+    ]);
 
     // Step 2: 尝试再次下单
     console.log('Step 2: 尝试下单触发库存不足');

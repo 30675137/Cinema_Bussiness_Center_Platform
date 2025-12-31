@@ -1,25 +1,21 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.12.0 → 1.13.0 -->
+<!-- Version change: 1.14.0 → 1.14.1 -->
 <!-- Modified principles:
-  - 一、功能分支绑定 (Feature Branch Binding) - 强化技术基础设施模块(T, F)的编码优先级 (v1.13.0)
+  - 七、代码质量与工程化 (Code Quality & Engineering Excellence) - 明确要求使用 Java 17,禁止使用其他版本 (v1.14.1)
 -->
-<!-- Added sections:
-  - 技术基础设施模块强制编码要求 (v1.13.0)
-  - 模块选择优先级规则 (业务功能优先,技术设施同样强制) (v1.13.0)
--->
+<!-- Added sections: None -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (v1.13.0 - 强化技术模块编码规则)
-  ✅ .claude/rules/01-branch-spec-binding.md (已更新完整的16模块映射表)
-  ✅ .claude/rules/MODULE_PREFIXES.md (已创建快速参考文档)
-  ✅ frontend/src/components/layout/AppLayout.tsx (已修正错误的模块前缀: P→I库存, P→B品牌)
-  ⚠ .specify/templates/spec-template.md (需更新模块选择优先级说明)
+  ✅ .specify/memory/constitution.md (v1.14.1 - 强制要求 Java 17)
+  ⚠ backend/pom.xml (需验证 Java 17 配置)
+  ⚠ backend/.mvn/jvm.config (需创建文件锁定 Java 17)
+  ⚠ .claude/rules/07-backend-architecture.md (需更新 Java 版本要求)
 -->
 <!-- Follow-up TODOs:
-  1. ✅ 更新 AppLayout.tsx 菜单配置中的错误模块前缀 (已完成: I003, I004, I005, B001)
-  2. 检查现有代码中 @spec 标识的模块前缀是否正确
-  3. 更新 spec-template.md 添加模块选择优先级规则
-  4. 在代码审查清单中强调技术基础设施模块(T, F)的编码强制性
+  1. 验证 backend/pom.xml 中 <java.version> 为 17
+  2. 创建 backend/.mvn/jvm.config 文件指定 JAVA_HOME
+  3. 更新 .claude/rules/07-backend-architecture.md 中的 Java 版本要求
+  4. 在 CI/CD 流水线中强制验证 Java 17
 -->
 
 # 影院商品管理中台宪法
@@ -251,17 +247,21 @@ public class StoreAssociationService {
 
 遵循严格的代码规范和质量标准。使用 TypeScript 5.9.3 确保前端类型安全,
 ESLint + Prettier 确保代码风格一致性,Husky + lint-staged 确保提交质量。
-后端必须使用现代 Java 版本与 Spring Boot 框架,并遵循一致的编码规范、
-日志规范和异常处理规范。所有 Java 代码在关键领域类、公共方法以及复杂业
-务分支处必须编写**清晰、准确且有意义的注释**,说明领域含义、边界条件以及
-与 Supabase 或外部系统交互的意图,禁止堆砌无信息量的"废话注释"。所有代码
-必须通过静态分析、单元测试和集成测试。遵循 Git 提交规范(Conventional
-Commits),使用语义化版本控制。代码审查必须检查功能实现、边界情况处理、
-性能考虑、测试覆盖、安全考虑、代码归属标识(`@spec`)的完整性以及关键
-Java 代码是否具备足够的注释可读性。
+后端必须使用 **Java 17** 与 Spring Boot 3.x 框架,并遵循一致的编码规范、
+日志规范和异常处理规范。项目必须配置使用 Java 17 进行编译和运行,禁止
+使用其他 Java 版本(如 Java 21、Java 23)以确保环境一致性和依赖兼容性。
+所有 Java 代码在关键领域类、公共方法以及复杂业务分支处必须编写**清晰、
+准确且有意义的注释**,说明领域含义、边界条件以及与 Supabase 或外部系统
+交互的意图,禁止堆砌无信息量的"废话注释"。所有代码必须通过静态分析、
+单元测试和集成测试。遵循 Git 提交规范(Conventional Commits),使用语义化
+版本控制。代码审查必须检查功能实现、边界情况处理、性能考虑、测试覆盖、
+安全考虑、代码归属标识(`@spec`)的完整性以及关键 Java 代码是否具备足够
+的注释可读性。
 
 **基本原理**: 高标准的工程化实践确保代码质量、团队协作效率和项目的长期
-可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。
+可维护性,通过自动化工具和规范流程减少人为错误,提升开发效率。统一使用
+Java 17 避免不同 Java 版本之间的兼容性问题、SSL/TLS 协议差异和运行时
+行为不一致,确保开发、测试和生产环境的一致性。
 
 ### 八、Claude Code Skills 开发规范 (Claude Code Skills Development Standards)
 
@@ -356,6 +356,86 @@ Java 代码是否具备足够的注释可读性。
 - ❌ 禁止 skill 功能变更后不同步更新文档
 
 **基本原理**: Claude Code skills 作为开发工作流的自动化扩展,必须有完整的规格文档确保可维护性和可发现性。通过强制文档要求和标准化规范,团队成员可以快速理解 skill 功能、正确使用 skill 命令、贡献改进建议。明确的数据模型定义和 quickstart 指南降低 skill 的学习成本,提高开发效率。
+
+### 九、认证与权限要求分层 (Authentication & Authorization Layering)
+
+**核心规定**: 系统在开发阶段对认证与权限的实现要求进行分层管理,以平衡开发效率和实际业务需求。
+
+**B端(管理后台)认证与权限策略**:
+
+1. **当前阶段要求**:
+   - B端功能开发**暂不考虑认证与权限逻辑**
+   - API 接口无需实现 Token 验证、用户身份校验、角色权限控制
+   - 前端组件无需实现登录状态检查、权限按钮隐藏/禁用逻辑
+   - 数据访问无需基于用户身份进行过滤和限制
+
+2. **设计考虑**:
+   - 代码设计应预留权限扩展点,但无需实现具体逻辑
+   - 避免硬编码"无权限"假设,使用可配置的安全策略
+   - 数据模型可包含 `createdBy`、`updatedBy` 等字段,但无需强制填充
+
+3. **后续演进**:
+   - 认证与权限功能将在后续独立 spec 中统一实现
+   - 届时通过 AOP、拦截器、装饰器等机制全局注入认证授权逻辑
+   - 现有功能代码无需大规模重构,仅需配置权限规则
+
+**C端(客户端/小程序)认证与权限策略**:
+
+1. **按实际需求实现**:
+   - C端功能必须根据业务实际需求实现认证与权限逻辑
+   - 用户登录、身份验证、会话管理等功能按规格要求实现
+   - 敏感数据访问、操作权限控制按业务规则实现
+
+2. **实现标准**:
+   - 使用平台推荐的认证方案(微信小程序登录、H5 手机号验证等)
+   - Token 管理遵循平台安全规范和最佳实践
+   - 敏感数据存储加密,避免明文传输用户隐私信息
+
+3. **规格明确性**:
+   - 每个 C端 功能 spec 必须明确说明认证授权需求
+   - 登录流程、权限边界、会话过期处理必须在规格中定义
+   - 验收标准必须包含认证授权场景的测试
+
+**代码标识与文档要求**:
+
+1. **B端代码注释**: 涉及权限相关逻辑的代码位置应添加注释说明"当前不实现认证授权,预留扩展点"
+2. **C端规格文档**: spec.md 必须包含"认证与权限需求"专门章节
+3. **API 契约**: contracts/api.yaml 应标注哪些接口需要认证(C端)或暂不需要(B端)
+
+**示例说明**:
+
+```typescript
+// B端示例 - 暂不实现权限校验
+/**
+ * @spec P001-product-management
+ * 商品列表查询接口
+ * 注意: 当前不实现认证与权限校验,后续通过全局拦截器统一注入
+ */
+export async function fetchProducts(params: ProductQueryParams) {
+  // 无需 Token 验证,直接调用后端 API
+  return apiService.get('/api/products', { params });
+}
+```
+
+```typescript
+// C端示例 - 按实际需求实现认证
+/**
+ * @spec U001-reservation-orders
+ * 用户预约订单查询接口
+ * 需要用户登录态,使用微信小程序 Token
+ */
+export async function fetchUserReservations(userId: string) {
+  const token = Taro.getStorageSync('userToken');
+  if (!token) {
+    throw new Error('用户未登录');
+  }
+  return apiService.get(`/api/reservations/user/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+```
+
+**基本原理**: 分层的认证与权限策略允许开发团队在早期阶段专注于核心业务功能的实现,避免权限系统的复杂性阻塞功能开发进度。B端管理后台作为内部工具,可在原型验证阶段暂不考虑权限控制,待业务逻辑稳定后统一补充。C端面向最终用户,涉及数据安全和隐私保护,必须从一开始按实际需求实现认证授权。这种策略平衡了开发效率和安全需求,确保项目按优先级有序推进。
 
 ## 后端架构与技术栈
 
@@ -612,9 +692,21 @@ Java 代码是否具备足够的注释可读性。
 
 ### 安全标准 (Security Standards)
 
-前端必须有完善的输入验证和数据清理机制,使用 Zod 进行数据验证。防止 XSS 攻击,避免在前端存储敏感信息。API 请求必须包含适当的认证和授权机制,处理 Token 过期和刷新逻辑。
+**通用安全要求**(B端与C端均适用):
+- 前端必须有完善的输入验证和数据清理机制,使用 Zod 进行数据验证
+- 防止 XSS 攻击,避免在前端存储敏感信息(如密码、密钥等)
+- 使用 HTTPS 进行数据传输(生产环境)
 
-C端 项目还需注意:
+**B端(管理后台)安全策略**:
+- 当前阶段**暂不实现认证与权限逻辑**(详见"认证与权限要求分层"原则)
+- API 请求无需包含 Token 验证和用户身份校验
+- 数据模型可预留 `createdBy`、`updatedBy` 字段,但无需强制填充
+- 后续通过全局拦截器、AOP 等机制统一注入认证授权逻辑
+
+**C端(客户端/小程序)安全策略**:
+- **必须**根据业务实际需求实现认证与权限逻辑
+- API 请求必须包含 Token 验证(如微信小程序 Token、手机验证码)
+- 处理 Token 过期和刷新逻辑,确保会话安全
 - 敏感数据不得存储在本地存储(使用加密或服务端存储)
 - 小程序中避免明文传输用户隐私信息
 - 遵守平台安全规范(微信小程序、支付宝小程序等)
@@ -633,4 +725,4 @@ C端 项目还需注意:
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.13.0 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31
+**版本**: 1.14.1 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31

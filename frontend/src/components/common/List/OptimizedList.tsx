@@ -90,11 +90,7 @@ const VirtualListItem: React.FC<{
   renderItem: (item: any, index: number) => React.ReactNode;
   style: React.CSSProperties;
 }> = React.memo(({ item, index, renderItem, style }) => {
-  return (
-    <div style={style}>
-      {renderItem(item, index)}
-    </div>
-  );
+  return <div style={style}>{renderItem(item, index)}</div>;
 });
 
 VirtualListItem.displayName = 'VirtualListItem';
@@ -151,12 +147,7 @@ export const OptimizedList = <T extends any>({
   const listRef = useRef<HTMLDivElement>(null);
 
   // 性能监控
-  const {
-    metrics,
-    startMeasure,
-    endMeasure,
-    recordCustomMetric
-  } = usePerformance({
+  const { metrics, startMeasure, endMeasure, recordCustomMetric } = usePerformance({
     enabled: performance?.enabled,
     componentName: 'OptimizedList',
     renderThreshold: performance?.renderThreshold || 16,
@@ -207,82 +198,100 @@ export const OptimizedList = <T extends any>({
         top: (startIndex + index) * itemHeight,
         height: itemHeight,
         width: '100%',
-      }
+      },
     }));
   }, [isVirtualEnabled, paginatedData, scrollTop, virtualConfig]);
 
   // 分页变化处理
-  const handlePageChange = useCallback((page: number, size: number) => {
-    startMeasure('pagination-change');
+  const handlePageChange = useCallback(
+    (page: number, size: number) => {
+      startMeasure('pagination-change');
 
-    setCurrentPage(page);
-    setPageSize(size);
+      setCurrentPage(page);
+      setPageSize(size);
 
-    if (pagination?.onChange) {
-      pagination.onChange(page, size);
-    }
-
-    // 重置滚动位置
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
-
-    endMeasure('pagination-change');
-    recordCustomMetric('currentPage', page);
-    recordCustomMetric('pageSize', size);
-  }, [pagination, startMeasure, endMeasure, recordCustomMetric]);
-
-  // 滚动处理（虚拟滚动）
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    if (!isVirtualEnabled) return;
-
-    const newScrollTop = e.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    recordCustomMetric('scrollTop', newScrollTop);
-  }, [isVirtualEnabled, recordCustomMetric]);
-
-  // 获取项目键值
-  const getItemKey = useCallback((item: T, index: number) => {
-    if (itemKey) {
-      return itemKey(item, index);
-    }
-
-    // 默认键值策略
-    if (item && typeof item === 'object' && 'id' in item) {
-      return item.id;
-    }
-
-    return `list-item-${index}`;
-  }, [itemKey]);
-
-  // 渲染项目
-  const renderItems = useCallback((items: T[], startIndex = 0) => {
-    return items.map((item, index) => {
-      const actualIndex = startIndex + index;
-      const key = getItemKey(item, actualIndex);
-
-      if (performance?.useMemo) {
-        return React.createElement(
-          React.memo(() => renderItem(item, actualIndex)),
-          { key }
-        );
+      if (pagination?.onChange) {
+        pagination.onChange(page, size);
       }
 
-      return (
-        <React.Fragment key={key}>
-          {renderItem(item, actualIndex)}
-        </React.Fragment>
-      );
-    });
-  }, [getItemKey, performance?.useMemo, renderItem]);
+      // 重置滚动位置
+      if (containerRef.current) {
+        containerRef.current.scrollTop = 0;
+      }
+
+      endMeasure('pagination-change');
+      recordCustomMetric('currentPage', page);
+      recordCustomMetric('pageSize', size);
+    },
+    [pagination, startMeasure, endMeasure, recordCustomMetric]
+  );
+
+  // 滚动处理（虚拟滚动）
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (!isVirtualEnabled) return;
+
+      const newScrollTop = e.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      recordCustomMetric('scrollTop', newScrollTop);
+    },
+    [isVirtualEnabled, recordCustomMetric]
+  );
+
+  // 获取项目键值
+  const getItemKey = useCallback(
+    (item: T, index: number) => {
+      if (itemKey) {
+        return itemKey(item, index);
+      }
+
+      // 默认键值策略
+      if (item && typeof item === 'object' && 'id' in item) {
+        return item.id;
+      }
+
+      return `list-item-${index}`;
+    },
+    [itemKey]
+  );
+
+  // 渲染项目
+  const renderItems = useCallback(
+    (items: T[], startIndex = 0) => {
+      return items.map((item, index) => {
+        const actualIndex = startIndex + index;
+        const key = getItemKey(item, actualIndex);
+
+        if (performance?.useMemo) {
+          return React.createElement(
+            React.memo(() => renderItem(item, actualIndex)),
+            { key }
+          );
+        }
+
+        return <React.Fragment key={key}>{renderItem(item, actualIndex)}</React.Fragment>;
+      });
+    },
+    [getItemKey, performance?.useMemo, renderItem]
+  );
 
   // 性能指标收集
   useEffect(() => {
     recordCustomMetric('dataSourceLength', dataSource.length);
-    recordCustomMetric('renderedItemsCount', isVirtualEnabled ? virtualizedData.length : paginatedData.length);
+    recordCustomMetric(
+      'renderedItemsCount',
+      isVirtualEnabled ? virtualizedData.length : paginatedData.length
+    );
     recordCustomMetric('isVirtualEnabled', isVirtualEnabled);
     recordCustomMetric('isPaginationEnabled', isPaginationEnabled);
-  }, [dataSource.length, virtualizedData.length, paginatedData.length, isVirtualEnabled, isPaginationEnabled, recordCustomMetric]);
+  }, [
+    dataSource.length,
+    virtualizedData.length,
+    paginatedData.length,
+    isVirtualEnabled,
+    isPaginationEnabled,
+    recordCustomMetric,
+  ]);
 
   // 总数和分页信息
   const totalItems = dataSource.length;
@@ -291,19 +300,12 @@ export const OptimizedList = <T extends any>({
   return (
     <div className={cn('optimized-list-container', className)}>
       {/* 顶部区域 */}
-      {header && (
-        <div className={cn('list-header', tailwindPreset('mb-4'))}>
-          {header}
-        </div>
-      )}
+      {header && <div className={cn('list-header', tailwindPreset('mb-4'))}>{header}</div>}
 
       {/* 列表容器 */}
       <div
         ref={containerRef}
-        className={cn(
-          'list-scroll-container',
-          isVirtualEnabled && 'virtual-scroll-container'
-        )}
+        className={cn('list-scroll-container', isVirtualEnabled && 'virtual-scroll-container')}
         style={{
           height: isVirtualEnabled ? '600px' : 'auto',
           overflow: isVirtualEnabled ? 'auto' : 'visible',
@@ -342,11 +344,7 @@ export const OptimizedList = <T extends any>({
               <AntList
                 {...listProps}
                 dataSource={paginatedData}
-                renderItem={(item, index) => (
-                  <AntList.Item>
-                    {renderItem(item, index)}
-                  </AntList.Item>
-                )}
+                renderItem={(item, index) => <AntList.Item>{renderItem(item, index)}</AntList.Item>}
               />
             )}
           </>
@@ -363,9 +361,10 @@ export const OptimizedList = <T extends any>({
             onChange={handlePageChange}
             showSizeChanger={pagination?.showSizeChanger}
             showQuickJumper={pagination?.showQuickJumper}
-            showTotal={pagination?.showTotal ?
-              (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条` :
-              undefined
+            showTotal={
+              pagination?.showTotal
+                ? (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+                : undefined
             }
             pageSizeOptions={pagination?.pageSizeOptions || [10, 20, 50, 100]}
           />
@@ -373,11 +372,7 @@ export const OptimizedList = <T extends any>({
       )}
 
       {/* 底部区域 */}
-      {footer && (
-        <div className={cn('list-footer-extra', tailwindPreset('mt-4'))}>
-          {footer}
-        </div>
-      )}
+      {footer && <div className={cn('list-footer-extra', tailwindPreset('mt-4'))}>{footer}</div>}
 
       {/* 性能调试信息（仅开发环境） */}
       {performance?.enabled && process.env.NODE_ENV === 'development' && (
@@ -390,11 +385,10 @@ export const OptimizedList = <T extends any>({
             color: '#999',
             background: 'rgba(0,0,0,0.05)',
             padding: '2px 4px',
-            borderRadius: 2
+            borderRadius: 2,
           }}
         >
-          渲染: {metrics.renderCount} |
-          项目: {virtualizedData.length}/{paginatedData.length} |
+          渲染: {metrics.renderCount} | 项目: {virtualizedData.length}/{paginatedData.length} |
           虚拟: {isVirtualEnabled ? '✓' : '✗'}
         </div>
       )}

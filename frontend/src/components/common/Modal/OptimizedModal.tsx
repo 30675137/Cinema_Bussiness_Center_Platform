@@ -128,29 +128,43 @@ export const OptimizedModal: React.FC<OptimizedModalProps> = ({
         clearTimeout(cleanupTimerRef.current);
       }
     };
-  }, [open, startMeasure, endMeasure, recordCustomMetric, memoryOptimization, cleanupDelay, resetScrollOnOpen]);
+  }, [
+    open,
+    startMeasure,
+    endMeasure,
+    recordCustomMetric,
+    memoryOptimization,
+    cleanupDelay,
+    resetScrollOnOpen,
+  ]);
 
   // 优化的取消处理
-  const handleCancel = useCallback((e: React.MouseEvent) => {
-    startMeasure('modal-cancel');
+  const handleCancel = useCallback(
+    (e: React.MouseEvent) => {
+      startMeasure('modal-cancel');
 
-    if (onCancel) {
-      onCancel(e);
-    }
+      if (onCancel) {
+        onCancel(e);
+      }
 
-    endMeasure('modal-cancel');
-  }, [onCancel, startMeasure, endMeasure]);
+      endMeasure('modal-cancel');
+    },
+    [onCancel, startMeasure, endMeasure]
+  );
 
   // 优化的确认处理
-  const handleOk = useCallback((e: React.MouseEvent) => {
-    startMeasure('modal-ok');
+  const handleOk = useCallback(
+    (e: React.MouseEvent) => {
+      startMeasure('modal-ok');
 
-    if (onOk) {
-      onOk(e);
-    }
+      if (onOk) {
+        onOk(e);
+      }
 
-    endMeasure('modal-ok');
-  }, [onOk, startMeasure, endMeasure]);
+      endMeasure('modal-ok');
+    },
+    [onOk, startMeasure, endMeasure]
+  );
 
   // 监听滚动性能（仅在开发环境）
   useEffect(() => {
@@ -235,7 +249,7 @@ export const OptimizedModal: React.FC<OptimizedModalProps> = ({
             color: '#999',
             background: 'rgba(0,0,0,0.05)',
             padding: '2px 4px',
-            borderRadius: 2
+            borderRadius: 2,
           }}
         >
           渲染: {metrics.renderCount} | 最后: {metrics.lastRenderTime.toFixed(1)}ms

@@ -171,14 +171,11 @@ class AttributeService {
     typeId: string,
     data: Omit<CreateDictionaryItemRequest, 'typeId'>
   ): Promise<ApiResponse<DictionaryItem>> {
-    const response = await fetch(
-      `${this.baseUrl}/dictionary-types/${typeId}/items`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, typeId }),
-      }
-    );
+    const response = await fetch(`${this.baseUrl}/dictionary-types/${typeId}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...data, typeId }),
+    });
     return response.json();
   }
 
@@ -210,17 +207,12 @@ class AttributeService {
   /**
    * Batch update sort order for dictionary items
    */
-  async batchUpdateDictionaryItemSort(
-    data: BatchUpdateSortRequest
-  ): Promise<ApiResponse<void>> {
-    const response = await fetch(
-      `${this.baseUrl}/dictionary-items/batch-update-sort`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      }
-    );
+  async batchUpdateDictionaryItemSort(data: BatchUpdateSortRequest): Promise<ApiResponse<void>> {
+    const response = await fetch(`${this.baseUrl}/dictionary-items/batch-update-sort`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
     return response.json();
   }
 
@@ -270,9 +262,7 @@ class AttributeService {
   async getAttributeTemplateByCategory(
     categoryId: string
   ): Promise<ApiResponse<(AttributeTemplate & { attributes: Attribute[] }) | null>> {
-    const response = await fetch(
-      `${this.baseUrl}/attribute-templates/by-category/${categoryId}`
-    );
+    const response = await fetch(`${this.baseUrl}/attribute-templates/by-category/${categoryId}`);
     return response.json();
   }
 
@@ -323,14 +313,11 @@ class AttributeService {
     targetCategoryId: string,
     newName: string
   ): Promise<ApiResponse<AttributeTemplate & { attributes: Attribute[] }>> {
-    const response = await fetch(
-      `${this.baseUrl}/attribute-templates/${id}/copy`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetCategoryId, newName }),
-      }
-    );
+    const response = await fetch(`${this.baseUrl}/attribute-templates/${id}/copy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetCategoryId, newName }),
+    });
     return response.json();
   }
 
@@ -342,18 +329,14 @@ class AttributeService {
    * Get list of attributes for a template
    */
   async getAttributes(templateId: string): Promise<ApiResponse<Attribute[]>> {
-    const response = await fetch(
-      `${this.baseUrl}/attribute-templates/${templateId}/attributes`
-    );
+    const response = await fetch(`${this.baseUrl}/attribute-templates/${templateId}/attributes`);
     return response.json();
   }
 
   /**
    * Create a new attribute
    */
-  async createAttribute(
-    data: CreateAttributeRequest
-  ): Promise<ApiResponse<Attribute>> {
+  async createAttribute(data: CreateAttributeRequest): Promise<ApiResponse<Attribute>> {
     const response = await fetch(`${this.baseUrl}/attributes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -365,10 +348,7 @@ class AttributeService {
   /**
    * Update an existing attribute
    */
-  async updateAttribute(
-    id: string,
-    data: UpdateAttributeRequest
-  ): Promise<ApiResponse<Attribute>> {
+  async updateAttribute(id: string, data: UpdateAttributeRequest): Promise<ApiResponse<Attribute>> {
     const response = await fetch(`${this.baseUrl}/attributes/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

@@ -179,8 +179,7 @@ export const conversionHandlers = [
       const keyword = search.toLowerCase();
       conversions = conversions.filter(
         (c) =>
-          c.fromUnit.toLowerCase().includes(keyword) ||
-          c.toUnit.toLowerCase().includes(keyword)
+          c.fromUnit.toLowerCase().includes(keyword) || c.toUnit.toLowerCase().includes(keyword)
       );
     }
 
@@ -343,12 +342,7 @@ export const conversionHandlers = [
     };
     const conversions = getConversions();
 
-    const cycle = detectCycle(
-      conversions,
-      body.fromUnit,
-      body.toUnit,
-      body.excludeId
-    );
+    const cycle = detectCycle(conversions, body.fromUnit, body.toUnit, body.excludeId);
 
     if (cycle) {
       return HttpResponse.json(

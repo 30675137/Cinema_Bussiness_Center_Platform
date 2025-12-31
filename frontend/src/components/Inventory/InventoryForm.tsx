@@ -51,11 +51,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
 
-  const {
-    createInventoryItem,
-    updateInventoryItem,
-    fetchLocations,
-  } = useInventoryStore();
+  const { createInventoryItem, updateInventoryItem, fetchLocations } = useInventoryStore();
 
   // 获取位置数据
   useEffect(() => {
@@ -207,9 +203,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
       title={
         <Space>
           <span>{editingRecord ? '编辑库存项' : '新建库存项'}</span>
-          {editingRecord && (
-            <Tag color="blue">商品编码: {editingRecord.productCode}</Tag>
-          )}
+          {editingRecord && <Tag color="blue">商品编码: {editingRecord.productCode}</Tag>}
         </Space>
       }
       open={visible}
@@ -219,22 +213,13 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
         <Button key="cancel" onClick={handleCancel}>
           取消
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleSubmit}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleSubmit}>
           {editingRecord ? '更新' : '创建'}
         </Button>,
       ]}
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onValuesChange={handleStockChange}
-      >
+      <Form form={form} layout="vertical" onValuesChange={handleStockChange}>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -274,7 +259,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
                   option?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
               >
-                {locations.map(location => (
+                {locations.map((location) => (
                   <Option key={location.id} value={location.id}>
                     <Space>
                       <span>{location.name}</span>
@@ -370,14 +355,10 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
               <Space>
                 <Tag color={stockStatus.color}>{stockStatus.text}</Tag>
                 {stockStatus.status === 'low_stock' && (
-                  <Text type="warning">
-                    当前库存已低于警戒线，建议及时补货
-                  </Text>
+                  <Text type="warning">当前库存已低于警戒线，建议及时补货</Text>
                 )}
                 {stockStatus.status === 'overstock' && (
-                  <Text type="secondary">
-                    当前库存已超过最大容量，注意仓储管理
-                  </Text>
+                  <Text type="secondary">当前库存已超过最大容量，注意仓储管理</Text>
                 )}
               </Space>
             }
@@ -449,12 +430,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             </Text>
           }
         >
-          <Input.TextArea
-            placeholder="请输入备注信息..."
-            rows={3}
-            maxLength={500}
-            showCount
-          />
+          <Input.TextArea placeholder="请输入备注信息..." rows={3} maxLength={500} showCount />
         </Form.Item>
 
         {/* 库存管理提示 */}

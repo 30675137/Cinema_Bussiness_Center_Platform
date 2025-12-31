@@ -12,12 +12,18 @@ import {
   saveAttributeTemplate,
   addAttributeToTemplate,
   updateAttributeInTemplate,
-  deleteAttributeFromTemplate
+  deleteAttributeFromTemplate,
 } from '../data/categoryMockData';
-import type { Category, CategoryTree, CreateCategoryRequest, UpdateCategoryRequest, CategoryAttribute } from '@/types/category';
+import type {
+  Category,
+  CategoryTree,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+  CategoryAttribute,
+} from '@/types/category';
 
 // 基础API延迟模拟
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * 类目相关API处理器
@@ -30,7 +36,7 @@ export const categoryHandlers = [
       await delay(300);
       const url = new URL(request.url);
       const lazy = url.searchParams.get('lazy') !== 'false';
-      
+
       console.log('[MSW] Getting category tree, lazy:', lazy);
       const tree = generateCategoryTree(lazy);
       console.log('[MSW] Generated tree:', tree);
@@ -76,13 +82,13 @@ export const categoryHandlers = [
       filtered = searchCategories(params.keyword);
     }
     if (params.status) {
-      filtered = filtered.filter(cat => cat.status === params.status);
+      filtered = filtered.filter((cat) => cat.status === params.status);
     }
     if (params.level) {
-      filtered = filtered.filter(cat => cat.level === params.level);
+      filtered = filtered.filter((cat) => cat.level === params.level);
     }
     if (params.parentId) {
-      filtered = filtered.filter(cat => cat.parentId === params.parentId);
+      filtered = filtered.filter((cat) => cat.parentId === params.parentId);
     }
 
     // 分页
@@ -132,8 +138,8 @@ export const categoryHandlers = [
   http.post('/api/categories', async ({ request }) => {
     await delay(600);
     try {
-      const data = await request.json() as CreateCategoryRequest;
-      
+      const data = (await request.json()) as CreateCategoryRequest;
+
       // 验证必填字段
       if (!data.name || data.name.trim() === '') {
         return HttpResponse.json(
@@ -202,7 +208,7 @@ export const categoryHandlers = [
   http.put('/api/categories/:id', async ({ params, request }) => {
     await delay(500);
     try {
-      const data = await request.json() as UpdateCategoryRequest;
+      const data = (await request.json()) as UpdateCategoryRequest;
       const id = params.id as string;
 
       if (!getCategoryById(id)) {
@@ -355,7 +361,7 @@ export const categoryHandlers = [
     await delay(400);
     try {
       const id = params.id as string;
-      const data = await request.json() as { status: 'active' | 'inactive' };
+      const data = (await request.json()) as { status: 'active' | 'inactive' };
 
       if (!data.status) {
         return HttpResponse.json(
@@ -428,7 +434,7 @@ export const categoryHandlers = [
     await delay(500);
     try {
       const categoryId = params.categoryId as string;
-      const data = await request.json() as { attributes: CategoryAttribute[] };
+      const data = (await request.json()) as { attributes: CategoryAttribute[] };
 
       if (!data.attributes || !Array.isArray(data.attributes)) {
         return HttpResponse.json(
@@ -453,8 +459,10 @@ export const categoryHandlers = [
             { status: 400 }
           );
         }
-        if ((attr.type === 'single-select' || attr.type === 'multi-select') && 
-            (!attr.optionalValues || attr.optionalValues.length === 0)) {
+        if (
+          (attr.type === 'single-select' || attr.type === 'multi-select') &&
+          (!attr.optionalValues || attr.optionalValues.length === 0)
+        ) {
           return HttpResponse.json(
             {
               success: false,
@@ -491,7 +499,10 @@ export const categoryHandlers = [
     await delay(400);
     try {
       const categoryId = params.categoryId as string;
-      const attribute = await request.json() as Omit<CategoryAttribute, 'id' | 'createdAt' | 'updatedAt'>;
+      const attribute = (await request.json()) as Omit<
+        CategoryAttribute,
+        'id' | 'createdAt' | 'updatedAt'
+      >;
 
       if (!attribute.name || attribute.name.trim() === '') {
         return HttpResponse.json(
@@ -525,58 +536,63 @@ export const categoryHandlers = [
   }),
 
   // 更新模板中的属性
-  http.put('/api/attribute-templates/:categoryId/attributes/:attributeId', async ({ params, request }) => {
-    await delay(400);
-    try {
-      const categoryId = params.categoryId as string;
-      const attributeId = params.attributeId as string;
-      const updates = await request.json() as Partial<CategoryAttribute>;
+  http.put(
+    '/api/attribute-templates/:categoryId/attributes/:attributeId',
+    async ({ params, request }) => {
+      await delay(400);
+      try {
+        const categoryId = params.categoryId as string;
+        const attributeId = params.attributeId as string;
+        const updates = (await request.json()) as Partial<CategoryAttribute>;
 
-      const template = updateAttributeInTemplate(categoryId, attributeId, updates);
+        const template = updateAttributeInTemplate(categoryId, attributeId, updates);
 
-      return HttpResponse.json({
-        success: true,
-        data: template,
-        message: '更新成功',
-        code: 200,
-      });
-    } catch (error) {
-      return HttpResponse.json(
-        {
-          success: false,
-          message: error instanceof Error ? error.message : '更新失败',
-          code: 500,
-        },
-        { status: 500 }
-      );
+        return HttpResponse.json({
+          success: true,
+          data: template,
+          message: '更新成功',
+          code: 200,
+        });
+      } catch (error) {
+        return HttpResponse.json(
+          {
+            success: false,
+            message: error instanceof Error ? error.message : '更新失败',
+            code: 500,
+          },
+          { status: 500 }
+        );
+      }
     }
-  }),
+  ),
 
   // 从模板中删除属性
-  http.delete('/api/attribute-templates/:categoryId/attributes/:attributeId', async ({ params }) => {
-    await delay(400);
-    try {
-      const categoryId = params.categoryId as string;
-      const attributeId = params.attributeId as string;
+  http.delete(
+    '/api/attribute-templates/:categoryId/attributes/:attributeId',
+    async ({ params }) => {
+      await delay(400);
+      try {
+        const categoryId = params.categoryId as string;
+        const attributeId = params.attributeId as string;
 
-      const template = deleteAttributeFromTemplate(categoryId, attributeId);
+        const template = deleteAttributeFromTemplate(categoryId, attributeId);
 
-      return HttpResponse.json({
-        success: true,
-        data: template,
-        message: '删除成功',
-        code: 200,
-      });
-    } catch (error) {
-      return HttpResponse.json(
-        {
-          success: false,
-          message: error instanceof Error ? error.message : '删除失败',
-          code: 500,
-        },
-        { status: 500 }
-      );
+        return HttpResponse.json({
+          success: true,
+          data: template,
+          message: '删除成功',
+          code: 200,
+        });
+      } catch (error) {
+        return HttpResponse.json(
+          {
+            success: false,
+            message: error instanceof Error ? error.message : '删除失败',
+            code: 500,
+          },
+          { status: 500 }
+        );
+      }
     }
-  }),
+  ),
 ];
-

@@ -32,7 +32,7 @@ const DictionaryTypeList: React.FC = () => {
   const [typeDrawerVisible, setTypeDrawerVisible] = useState(false);
   const [typeDrawerMode, setTypeDrawerMode] = useState<DrawerMode>('create');
   const [editingType, setEditingType] = useState<DictionaryType | undefined>();
-  
+
   const [itemDrawerVisible, setItemDrawerVisible] = useState(false);
   const [itemDrawerMode, setItemDrawerMode] = useState<DrawerMode>('create');
   const [editingItem, setEditingItem] = useState<DictionaryItem | undefined>();
@@ -100,7 +100,7 @@ const DictionaryTypeList: React.FC = () => {
           await deleteTypeMutation.mutateAsync(type.id);
           // If deleted type was active, switch to first available type
           if (activeTypeId === type.id && types.length > 1) {
-            const remainingTypes = types.filter(t => t.id !== type.id);
+            const remainingTypes = types.filter((t) => t.id !== type.id);
             if (remainingTypes.length > 0) {
               setActiveTypeId(remainingTypes[0].id);
             } else {
@@ -185,18 +185,11 @@ const DictionaryTypeList: React.FC = () => {
     children: (
       <div style={{ padding: '16px 0' }}>
         <div style={{ marginBottom: 16 }}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreateItem}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateItem}>
             新增字典项
           </Button>
         </div>
-        <DictionaryItemTable
-          typeId={type.id}
-          onEdit={handleEditItem}
-        />
+        <DictionaryItemTable typeId={type.id} onEdit={handleEditItem} />
       </div>
     ),
   }));
@@ -204,11 +197,7 @@ const DictionaryTypeList: React.FC = () => {
   return (
     <div className="dictionary-type-list">
       <div style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleCreateType}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateType}>
           新增字典类型
         </Button>
       </div>
@@ -275,4 +264,3 @@ const DictionaryTypeList: React.FC = () => {
 };
 
 export default DictionaryTypeList;
-

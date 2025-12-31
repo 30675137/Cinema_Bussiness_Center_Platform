@@ -1,12 +1,7 @@
 import React from 'react';
 import { Select, Tag, Space, Typography, Divider } from 'antd';
 import { UserOutlined, SafetyOutlined, CrownOutlined } from '@ant-design/icons';
-import {
-  usePermissions,
-  UserRole,
-  ROLE_OPTIONS,
-  getPermissionLabel,
-} from '@/hooks/usePermissions';
+import { usePermissions, UserRole, ROLE_OPTIONS, getPermissionLabel } from '@/hooks/usePermissions';
 
 const { Text } = Typography;
 
@@ -30,7 +25,7 @@ export const UserRoleSelector: React.FC = () => {
   };
 
   const getRoleColor = (role: UserRole) => {
-    const option = ROLE_OPTIONS.find(o => o.value === role);
+    const option = ROLE_OPTIONS.find((o) => o.value === role);
     return option?.color || 'default';
   };
 
@@ -42,7 +37,7 @@ export const UserRoleSelector: React.FC = () => {
           value={currentRole}
           onChange={setRole}
           style={{ width: 200 }}
-          options={ROLE_OPTIONS.map(option => ({
+          options={ROLE_OPTIONS.map((option) => ({
             value: option.value,
             label: (
               <Space>
@@ -53,13 +48,13 @@ export const UserRoleSelector: React.FC = () => {
           }))}
         />
         <Tag color={getRoleColor(currentRole)} icon={getRoleIcon(currentRole)}>
-          {ROLE_OPTIONS.find(o => o.value === currentRole)?.label}
+          {ROLE_OPTIONS.find((o) => o.value === currentRole)?.label}
         </Tag>
       </div>
 
       <div>
         <Text type="secondary" style={{ fontSize: 12 }}>
-          {ROLE_OPTIONS.find(o => o.value === currentRole)?.description}
+          {ROLE_OPTIONS.find((o) => o.value === currentRole)?.description}
         </Text>
       </div>
 
@@ -70,7 +65,7 @@ export const UserRoleSelector: React.FC = () => {
           当前权限 ({permissions.length}):
         </Text>
         <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-          {permissions.map(permission => (
+          {permissions.map((permission) => (
             <Tag key={permission} color="blue">
               {getPermissionLabel(permission)}
             </Tag>

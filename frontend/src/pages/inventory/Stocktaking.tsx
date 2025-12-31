@@ -117,11 +117,7 @@ const Stocktaking: React.FC = () => {
           <Card title="快捷操作" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -145,11 +141,7 @@ const Stocktaking: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -173,11 +165,7 @@ const Stocktaking: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -201,11 +189,7 @@ const Stocktaking: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -257,7 +241,9 @@ const Stocktaking: React.FC = () => {
               <div>
                 <Title level={5}>
                   <Badge status="warning" />
-                  <CheckCircleOutlined style={{ color: '#faad14', marginLeft: 8, marginRight: 8 }} />
+                  <CheckCircleOutlined
+                    style={{ color: '#faad14', marginLeft: 8, marginRight: 8 }}
+                  />
                   3. 盘点审核
                 </Title>
                 <Text type="secondary">

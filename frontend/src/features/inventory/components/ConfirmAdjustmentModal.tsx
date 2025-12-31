@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整确认弹窗组件
- * 
+ *
  * 显示调整前后库存对比，用于二次确认调整操作。
  * 实现 T019 任务。
  */
@@ -70,13 +70,13 @@ export interface ConfirmAdjustmentModalProps {
 
 /**
  * 库存调整确认弹窗组件
- * 
+ *
  * 功能：
  * - 展示调整前后库存对比
  * - 显示调整详情（类型、数量、原因等）
  * - 展示调整金额和审批提示
  * - 提供确认/取消操作
- * 
+ *
  * @example
  * ```tsx
  * <ConfirmAdjustmentModal
@@ -113,7 +113,7 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
   const needsApproval = requiresApproval(data.quantity, unitPrice);
 
   // 获取调整类型配置
-  const typeConfig = ADJUSTMENT_TYPE_OPTIONS.find(opt => opt.value === data.adjustmentType);
+  const typeConfig = ADJUSTMENT_TYPE_OPTIONS.find((opt) => opt.value === data.adjustmentType);
   const isIncrease = data.adjustmentType === 'surplus';
 
   return (
@@ -131,14 +131,18 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
       data-testid="confirm-adjustment-modal"
     >
       {/* 商品信息 */}
-      <div style={{ 
-        background: '#f5f5f5', 
-        padding: 12, 
-        borderRadius: 6, 
-        marginBottom: 16 
-      }}>
+      <div
+        style={{
+          background: '#f5f5f5',
+          padding: 12,
+          borderRadius: 6,
+          marginBottom: 16,
+        }}
+      >
         <Space direction="vertical" size={2}>
-          <Text strong style={{ fontSize: 16 }}>{inventory.skuName}</Text>
+          <Text strong style={{ fontSize: 16 }}>
+            {inventory.skuName}
+          </Text>
           <Space split={<Text type="secondary">|</Text>}>
             <Text type="secondary">SKU: {inventory.skuCode}</Text>
             <Text type="secondary">门店: {inventory.storeName || '-'}</Text>
@@ -147,17 +151,19 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
       </div>
 
       {/* 库存变化对比 */}
-      <div 
-        style={{ 
-          background: '#fafafa', 
-          padding: 20, 
-          borderRadius: 8, 
+      <div
+        style={{
+          background: '#fafafa',
+          padding: 20,
+          borderRadius: 8,
           marginBottom: 16,
           border: '1px solid #e8e8e8',
         }}
         data-testid="stock-comparison"
       >
-        <Title level={5} style={{ marginBottom: 16 }}>库存变化</Title>
+        <Title level={5} style={{ marginBottom: 16 }}>
+          库存变化
+        </Title>
         <Row gutter={16} align="middle" justify="center">
           {/* 调整前 */}
           <Col span={8}>
@@ -168,21 +174,22 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
               valueStyle={{ color: '#1890ff' }}
             />
           </Col>
-          
+
           {/* 箭头和变化值 */}
           <Col span={8} style={{ textAlign: 'center' }}>
             <Space direction="vertical" align="center">
               <ArrowRightOutlined style={{ fontSize: 24, color: '#8c8c8c' }} />
-              <Tag 
-                color={isIncrease ? 'green' : 'red'} 
+              <Tag
+                color={isIncrease ? 'green' : 'red'}
                 icon={isIncrease ? <PlusCircleOutlined /> : <MinusCircleOutlined />}
                 style={{ fontSize: 14, padding: '4px 12px' }}
               >
-                {isIncrease ? '+' : ''}{stockChange} {inventory.mainUnit}
+                {isIncrease ? '+' : ''}
+                {stockChange} {inventory.mainUnit}
               </Tag>
             </Space>
           </Col>
-          
+
           {/* 调整后 */}
           <Col span={8}>
             <Statistic
@@ -200,7 +207,10 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
           <Col span={12} style={{ textAlign: 'center' }}>
             <Text type="secondary">可用库存变化: </Text>
             <Text>
-              {currentAvailable} → <Text strong style={{ color: isIncrease ? '#52c41a' : '#ff4d4f' }}>{availableAfter}</Text>
+              {currentAvailable} →{' '}
+              <Text strong style={{ color: isIncrease ? '#52c41a' : '#ff4d4f' }}>
+                {availableAfter}
+              </Text>
             </Text>
             <Text type="secondary"> {inventory.mainUnit}</Text>
           </Col>
@@ -208,17 +218,9 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
       </div>
 
       {/* 调整详情 */}
-      <Descriptions 
-        title="调整详情" 
-        column={2} 
-        bordered 
-        size="small"
-        style={{ marginBottom: 16 }}
-      >
+      <Descriptions title="调整详情" column={2} bordered size="small" style={{ marginBottom: 16 }}>
         <Descriptions.Item label="调整类型">
-          <Tag color={typeConfig?.color}>
-            {getAdjustmentTypeLabel(data.adjustmentType)}
-          </Tag>
+          <Tag color={typeConfig?.color}>{getAdjustmentTypeLabel(data.adjustmentType)}</Tag>
         </Descriptions.Item>
         <Descriptions.Item label="调整数量">
           <Text strong>{data.quantity}</Text> {inventory.mainUnit}
@@ -253,9 +255,7 @@ export const ConfirmAdjustmentModal: React.FC<ConfirmAdjustmentModalProps> = ({
               <Text>
                 调整金额 ¥{adjustmentAmount.toFixed(2)} 已达到审批阈值 ¥{APPROVAL_THRESHOLD}。
               </Text>
-              <Text>
-                提交后将进入待审批状态，审批通过后库存才会更新。
-              </Text>
+              <Text>提交后将进入待审批状态，审批通过后库存才会更新。</Text>
             </Space>
           }
           icon={<WarningOutlined />}

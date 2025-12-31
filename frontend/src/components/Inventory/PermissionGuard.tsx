@@ -81,11 +81,7 @@ export const PermissionHide: React.FC<Omit<PermissionGuardProps, 'fallback'>> = 
   children,
 }) => {
   return (
-    <PermissionGuard
-      permissions={permissions}
-      requireAll={requireAll}
-      fallback={null}
-    >
+    <PermissionGuard permissions={permissions} requireAll={requireAll} fallback={null}>
       {children}
     </PermissionGuard>
   );

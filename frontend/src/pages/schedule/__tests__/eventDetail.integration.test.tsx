@@ -1,6 +1,6 @@
 /**
  * Integration tests for event detail view
- * 
+ *
  * Tests clicking event, viewing details, editing event, updating event
  */
 
@@ -30,9 +30,7 @@ const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
     <ConfigProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </QueryClientProvider>
     </ConfigProvider>
   );
@@ -159,4 +157,3 @@ describe('Event Detail Integration Tests', () => {
     });
   });
 });
-

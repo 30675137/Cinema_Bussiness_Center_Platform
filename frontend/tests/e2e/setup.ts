@@ -32,18 +32,18 @@ test.beforeEach(async ({ page }) => {
 test.afterEach(async ({ page }) => {
   // 清理可能的弹窗或通知
   const notifications = page.locator('.ant-notification');
-  if (await notifications.count() > 0) {
+  if ((await notifications.count()) > 0) {
     await page.evaluate(() => {
       const notifications = document.querySelectorAll('.ant-notification');
-      notifications.forEach(n => n.remove());
+      notifications.forEach((n) => n.remove());
     });
   }
 
   const messages = page.locator('.ant-message');
-  if (await messages.count() > 0) {
+  if ((await messages.count()) > 0) {
     await page.evaluate(() => {
       const messages = document.querySelectorAll('.ant-message');
-      messages.forEach(m => m.remove());
+      messages.forEach((m) => m.remove());
     });
   }
 });

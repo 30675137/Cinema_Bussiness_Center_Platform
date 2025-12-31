@@ -22,7 +22,7 @@ export type DurationUnit = 1 | 2 | 4;
 export interface TimeSlot {
   dayOfWeek: DayOfWeek;
   startTime: string; // HH:mm 格式
-  endTime: string;   // HH:mm 格式
+  endTime: string; // HH:mm 格式
 }
 
 /** 预约设置 */
@@ -86,47 +86,52 @@ export interface DepositFormData {
 const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** 时间段验证 */
-export const TimeSlotSchema = z.object({
-  dayOfWeek: z.number().min(1).max(7) as z.ZodType<DayOfWeek>,
-  startTime: z.string().regex(timeRegex, '时间格式必须为 HH:mm'),
-  endTime: z.string().regex(timeRegex, '时间格式必须为 HH:mm'),
-}).refine(
-  (data) => data.startTime < data.endTime,
-  { message: '结束时间必须晚于开始时间', path: ['endTime'] }
-);
+export const TimeSlotSchema = z
+  .object({
+    dayOfWeek: z.number().min(1).max(7) as z.ZodType<DayOfWeek>,
+    startTime: z.string().regex(timeRegex, '时间格式必须为 HH:mm'),
+    endTime: z.string().regex(timeRegex, '时间格式必须为 HH:mm'),
+  })
+  .refine((data) => data.startTime < data.endTime, {
+    message: '结束时间必须晚于开始时间',
+    path: ['endTime'],
+  });
 
 /** 时间段数组验证 */
 export const TimeSlotsSchema = z.array(TimeSlotSchema);
 
 /** 预约设置更新验证 */
-export const ReservationSettingsUpdateSchema = z.object({
-  timeSlots: TimeSlotsSchema.optional(),
-  minAdvanceHours: z.number().int().positive().optional(),
-  maxAdvanceDays: z.number().int().positive().optional(),
-  durationUnit: z.union([z.literal(1), z.literal(2), z.literal(4)]).optional(),
-  depositRequired: z.boolean().optional(),
-  depositAmount: z.number().nonnegative().optional(),
-  depositPercentage: z.number().int().min(0).max(100).optional(),
-  isActive: z.boolean().optional(),
-}).refine(
-  (data) => {
-    // 验证提前量逻辑
-    if (data.minAdvanceHours !== undefined && data.maxAdvanceDays !== undefined) {
-      return data.maxAdvanceDays * 24 > data.minAdvanceHours;
-    }
-    return true;
-  },
-  { message: '最大提前天数*24必须大于最小提前小时数', path: ['maxAdvanceDays'] }
-).refine(
-  (data) => {
-    // 押金验证：如果需要押金，必须设置金额或比例
-    if (data.depositRequired) {
-      return data.depositAmount !== undefined || data.depositPercentage !== undefined;
-    }
-    return true;
-  },
-  { message: '开启押金时必须设置押金金额或比例', path: ['depositAmount'] }
-);
+export const ReservationSettingsUpdateSchema = z
+  .object({
+    timeSlots: TimeSlotsSchema.optional(),
+    minAdvanceHours: z.number().int().positive().optional(),
+    maxAdvanceDays: z.number().int().positive().optional(),
+    durationUnit: z.union([z.literal(1), z.literal(2), z.literal(4)]).optional(),
+    depositRequired: z.boolean().optional(),
+    depositAmount: z.number().nonnegative().optional(),
+    depositPercentage: z.number().int().min(0).max(100).optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      // 验证提前量逻辑
+      if (data.minAdvanceHours !== undefined && data.maxAdvanceDays !== undefined) {
+        return data.maxAdvanceDays * 24 > data.minAdvanceHours;
+      }
+      return true;
+    },
+    { message: '最大提前天数*24必须大于最小提前小时数', path: ['maxAdvanceDays'] }
+  )
+  .refine(
+    (data) => {
+      // 押金验证：如果需要押金，必须设置金额或比例
+      if (data.depositRequired) {
+        return data.depositAmount !== undefined || data.depositPercentage !== undefined;
+      }
+      return true;
+    },
+    { message: '开启押金时必须设置押金金额或比例', path: ['depositAmount'] }
+  );
 
 /** 时间段配置表单验证 */
 export const TimeSlotFormSchema = z.object({
@@ -134,13 +139,15 @@ export const TimeSlotFormSchema = z.object({
 });
 
 /** 提前量配置表单验证 */
-export const AdvanceTimeFormSchema = z.object({
-  minAdvanceHours: z.number().int().positive('最小提前小时数必须大于0'),
-  maxAdvanceDays: z.number().int().positive('最大提前天数必须大于0'),
-}).refine(
-  (data) => data.maxAdvanceDays * 24 > data.minAdvanceHours,
-  { message: '最大提前天数*24必须大于最小提前小时数', path: ['maxAdvanceDays'] }
-);
+export const AdvanceTimeFormSchema = z
+  .object({
+    minAdvanceHours: z.number().int().positive('最小提前小时数必须大于0'),
+    maxAdvanceDays: z.number().int().positive('最大提前天数必须大于0'),
+  })
+  .refine((data) => data.maxAdvanceDays * 24 > data.minAdvanceHours, {
+    message: '最大提前天数*24必须大于最小提前小时数',
+    path: ['maxAdvanceDays'],
+  });
 
 /** 时长单位配置表单验证 */
 export const DurationUnitFormSchema = z.object({
@@ -148,19 +155,21 @@ export const DurationUnitFormSchema = z.object({
 });
 
 /** 押金规则配置表单验证 */
-export const DepositFormSchema = z.object({
-  depositRequired: z.boolean(),
-  depositAmount: z.number().nonnegative().optional(),
-  depositPercentage: z.number().int().min(0).max(100).optional(),
-}).refine(
-  (data) => {
-    if (data.depositRequired) {
-      return data.depositAmount !== undefined || data.depositPercentage !== undefined;
-    }
-    return true;
-  },
-  { message: '开启押金时必须设置押金金额或比例', path: ['depositAmount'] }
-);
+export const DepositFormSchema = z
+  .object({
+    depositRequired: z.boolean(),
+    depositAmount: z.number().nonnegative().optional(),
+    depositPercentage: z.number().int().min(0).max(100).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.depositRequired) {
+        return data.depositAmount !== undefined || data.depositPercentage !== undefined;
+      }
+      return true;
+    },
+    { message: '开启押金时必须设置押金金额或比例', path: ['depositAmount'] }
+  );
 
 // ============================================================================
 // 类型推断
@@ -207,7 +216,10 @@ export const generateDefaultTimeSlots = (): TimeSlot[] => {
 };
 
 /** 默认预约设置 */
-export const DEFAULT_RESERVATION_SETTINGS: Omit<ReservationSettings, 'id' | 'storeId' | 'createdAt' | 'updatedAt'> = {
+export const DEFAULT_RESERVATION_SETTINGS: Omit<
+  ReservationSettings,
+  'id' | 'storeId' | 'createdAt' | 'updatedAt'
+> = {
   timeSlots: generateDefaultTimeSlots(),
   minAdvanceHours: 1,
   maxAdvanceDays: 30,

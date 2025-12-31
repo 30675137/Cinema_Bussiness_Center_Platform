@@ -1,6 +1,6 @@
 /**
  * Time Calculation Utilities
- * 
+ *
  * Utilities for calculating event block positions and formatting time
  */
 
@@ -40,13 +40,13 @@ export function getWidthStyle(duration: number, totalHours: number): string {
 export function formatTime(hour: number, format: '12h' | '24h' = '24h'): string {
   const hours = Math.floor(hour);
   const minutes = hour % 1 === 0.5 ? 30 : 0;
-  
+
   if (format === '12h') {
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
     return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
   }
-  
+
   return `${hours}:${minutes.toString().padStart(2, '0')}`;
 }
 
@@ -81,12 +81,11 @@ export function generateTimeSlots(
 ): number[] {
   const slots: number[] = [];
   let current = startHour;
-  
+
   while (current < endHour) {
     slots.push(current);
     current += interval;
   }
-  
+
   return slots;
 }
-

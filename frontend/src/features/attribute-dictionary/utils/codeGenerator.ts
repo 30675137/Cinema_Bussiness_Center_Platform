@@ -1,6 +1,6 @@
 /**
  * Code Generation Utility
- * 
+ *
  * Generates unique codes from Chinese names using pinyin conversion
  * with conflict resolution.
  */
@@ -47,10 +47,7 @@ function resolveConflict(baseCode: string, existingCodes: Set<string>): string {
  * @param existingCodes - Set of existing codes to check against
  * @returns Unique code
  */
-export function generateUniqueCode(
-  chineseName: string,
-  existingCodes: Set<string>
-): string {
+export function generateUniqueCode(chineseName: string, existingCodes: Set<string>): string {
   const baseCode = generateBaseCode(chineseName);
   return resolveConflict(baseCode, existingCodes);
 }
@@ -87,4 +84,3 @@ export function normalizeCode(code: string): string {
     .replace(/\s+/g, '_')
     .replace(/[^A-Z0-9_]/g, '');
 }
-

@@ -25,11 +25,11 @@ test.describe('品牌停用确认功能', () => {
               oldStatus: 'enabled',
               reason: requestData.reason,
               updatedAt: new Date().toISOString(),
-              updatedBy: 'admin'
+              updatedBy: 'admin',
             },
             message: '品牌停用成功',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -37,11 +37,14 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该显示停用确认对话框', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
@@ -50,7 +53,9 @@ test.describe('品牌停用确认功能', () => {
     const brandName = await enabledBrandRow.locator('[data-testid="brand-name"]').textContent();
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -72,17 +77,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该要求输入停用原因', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -108,17 +118,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该在未输入原因时禁用确认按钮', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -148,17 +163,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该在输入有效原因后启用确认按钮', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -183,17 +203,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该显示停用影响范围说明', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -217,17 +242,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该验证停用原因字符限制', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -266,17 +296,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该在成功停用后更新品牌状态', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -313,11 +348,14 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该支持取消停用操作', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
@@ -327,7 +365,9 @@ test.describe('品牌停用确认功能', () => {
     const originalStatus = await originalStatusBadge.textContent();
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -360,26 +400,31 @@ test.describe('品牌停用确认功能', () => {
             success: false,
             error: {
               code: 'BRAND_HAS_ACTIVE_PRODUCTS',
-              message: '该品牌下还有活跃的商品，无法停用'
+              message: '该品牌下还有活跃的商品，无法停用',
             },
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
 
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -416,17 +461,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该支持键盘操作', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -463,17 +513,22 @@ test.describe('品牌停用确认功能', () => {
 
   test('应该按ESC键关闭对话框', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       test.skip();
       return;
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项

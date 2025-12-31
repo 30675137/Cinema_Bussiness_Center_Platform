@@ -7,7 +7,7 @@ import {
   SettingOutlined,
   LineChartOutlined,
   ThunderboltOutlined,
-  DatabaseOutlined
+  DatabaseOutlined,
 } from '@ant-design/icons';
 import LazyImage from '../optimization/LazyImage';
 import VirtualScroll from '../optimization/VirtualScroll';
@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
         'test-api',
         async () => {
           // 模拟API调用
-          await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+          await new Promise((resolve) => setTimeout(resolve, Math.random() * 1000));
           return { data: 'API调用成功', timestamp: Date.now() };
         },
         5000 // 5秒缓存
@@ -107,9 +107,7 @@ const HomePage: React.FC = () => {
                   textAlign: 'center',
                 }}
               >
-                <div style={{ marginBottom: '16px' }}>
-                  {feature.icon}
-                </div>
+                <div style={{ marginBottom: '16px' }}>{feature.icon}</div>
                 <Title level={4}>{feature.title}</Title>
                 <Paragraph type="secondary" style={{ margin: 0 }}>
                   {feature.description}
@@ -143,12 +141,7 @@ const HomePage: React.FC = () => {
           <Col xs={24} md={12}>
             <Card title="API性能测试" style={{ height: '400px' }}>
               <Space direction="vertical" style={{ width: '100%' }}>
-                <Button
-                  type="primary"
-                  block
-                  onClick={testAPICall}
-                  icon={<ThunderboltOutlined />}
-                >
+                <Button type="primary" block onClick={testAPICall} icon={<ThunderboltOutlined />}>
                   测试API调用（带缓存）
                 </Button>
                 <Paragraph>
@@ -183,16 +176,16 @@ const HomePage: React.FC = () => {
                   >
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                      <div style={{ color: '#666', fontSize: '12px' }}>
-                        {item.description}
-                      </div>
+                      <div style={{ color: '#666', fontSize: '12px' }}>{item.description}</div>
                     </div>
-                    <div style={{
-                      padding: '4px 8px',
-                      background: '#1890ff',
-                      color: 'white',
-                      borderRadius: '4px'
-                    }}>
+                    <div
+                      style={{
+                        padding: '4px 8px',
+                        background: '#1890ff',
+                        color: 'white',
+                        borderRadius: '4px',
+                      }}
+                    >
                       {item.value}
                     </div>
                   </div>

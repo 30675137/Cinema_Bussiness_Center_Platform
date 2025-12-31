@@ -13,7 +13,7 @@ import {
   Card,
   Divider,
   Alert,
-  Tag
+  Tag,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
@@ -24,7 +24,7 @@ import {
   PriceRuleInput,
   PriceRuleSchema,
   PriceRuleType,
-  PriceRuleTypeConfig
+  PriceRuleTypeConfig,
 } from '@/types/price';
 import PriceRuleConfig from '../PriceForm/PriceRuleConfig';
 
@@ -38,11 +38,7 @@ interface PriceRuleFormProps {
   onSuccess?: () => void;
 }
 
-const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
-  mode,
-  rule,
-  onSuccess
-}) => {
+const PriceRuleForm: React.FC<PriceRuleFormProps> = ({ mode, rule, onSuccess }) => {
   const form = useForm<PriceRuleInput>({
     resolver: zodResolver(PriceRuleSchema),
     mode: 'onChange',
@@ -54,11 +50,11 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
         discountType: 'percentage',
         discountValue: 0,
         minOrderValue: undefined,
-        maxDiscountAmount: undefined
+        maxDiscountAmount: undefined,
       },
       isActive: true,
-      priority: 1
-    }
+      priority: 1,
+    },
   });
 
   const {
@@ -67,13 +63,13 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
     setValue,
     getValues,
     watch,
-    formState: { errors, touched, isValid }
+    formState: { errors, touched, isValid },
   } = form;
 
   // 编辑模式加载数据
   useEffect(() => {
     if (mode === 'edit' && rule) {
-      Object.keys(rule).forEach(key => {
+      Object.keys(rule).forEach((key) => {
         if (key in getValues()) {
           setValue(key as keyof PriceRuleInput, rule[key as any]);
         }
@@ -109,7 +105,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
       discountType: 'percentage',
       discountValue: 0,
       minOrderValue: undefined,
-      maxDiscountAmount: undefined
+      maxDiscountAmount: undefined,
     });
   };
 
@@ -117,64 +113,69 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
   const discountTypeConfig = {
     percentage: { label: '百分比折扣', placeholder: '0-100', suffix: '%' },
     fixed: { label: '固定金额', placeholder: '0.00', suffix: '元' },
-    fixed_amount: { label: '固定金额', placeholder: '0.00', suffix: '元' }
+    fixed_amount: { label: '固定金额', placeholder: '0.00', suffix: '元' },
   };
 
   // 条件类型配置
   const conditionTypeConfig = {
     product_category: { label: '商品类目', options: [] },
-    member_level: { label: '会员等级', options: ['青铜会员', '白银会员', '黄金会员', '铂金会员', '钻石会员'] },
+    member_level: {
+      label: '会员等级',
+      options: ['青铜会员', '白银会员', '黄金会员', '铂金会员', '钻石会员'],
+    },
     quantity_range: { label: '购买数量', options: [] },
     date_range: { label: '日期范围', options: [] },
-    channel: { label: '销售渠道', options: ['线上渠道', '线下门店', '微信小程序', 'APP应用'] }
+    channel: { label: '销售渠道', options: ['线上渠道', '线下门店', '微信小程序', 'APP应用'] },
   };
 
   // 添加条件
   const [conditions, setConditions] = useState<any[]>([]);
 
   const addCondition = () => {
-    setConditions([...conditions, {
-      id: Date.now().toString(),
-      type: 'product_category',
-      operator: 'equals',
-      field: '',
-      value: '',
-      logic: 'and'
-    }]);
+    setConditions([
+      ...conditions,
+      {
+        id: Date.now().toString(),
+        type: 'product_category',
+        operator: 'equals',
+        field: '',
+        value: '',
+        logic: 'and',
+      },
+    ]);
   };
 
   const removeCondition = (id: string) => {
-    setConditions(conditions.filter(c => c.id !== id));
+    setConditions(conditions.filter((c) => c.id !== id));
   };
 
   const updateCondition = (id: string, field: string, value: any) => {
-    setConditions(conditions.map(c =>
-      c.id === id ? { ...c, [field]: value } : c
-    ));
+    setConditions(conditions.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
   };
 
   // 添加动作
   const [actions, setActions] = useState<any[]>([]);
 
   const addAction = () => {
-    setActions([...actions, {
-      id: Date.now().toString(),
-      type: 'discount',
-      config: {
-        discountType: 'percentage',
-        discountValue: 0
-      }
-    }]);
+    setActions([
+      ...actions,
+      {
+        id: Date.now().toString(),
+        type: 'discount',
+        config: {
+          discountType: 'percentage',
+          discountValue: 0,
+        },
+      },
+    ]);
   };
 
   const removeAction = (id: string) => {
-    setActions(actions.filter(a => a.id !== id));
+    setActions(actions.filter((a) => a.id !== id));
   };
 
   const updateAction = (id: string, field: string, value: any) => {
-    setActions(actions.map(a =>
-      a.id === id ? { ...a, [field]: value } : a
-    ));
+    setActions(actions.map((a) => (a.id === id ? { ...a, [field]: value } : a)));
   };
 
   return (
@@ -194,11 +195,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
                   name="name"
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="请输入规则名称"
-                      maxLength={100}
-                    />
+                    <Input {...field} placeholder="请输入规则名称" maxLength={100} />
                   )}
                 />
               </Form.Item>
@@ -214,11 +211,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
                   name="type"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择规则类型"
-                      onChange={handleRuleTypeChange}
-                    >
+                    <Select {...field} placeholder="请选择规则类型" onChange={handleRuleTypeChange}>
                       {Object.entries(PriceRuleTypeConfig).map(([value, config]) => (
                         <Option key={value} value={value}>
                           <Tag color="blue">{config.text}</Tag>
@@ -283,11 +276,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
                   name="isActive"
                   control={control}
                   render={({ field }) => (
-                    <Switch
-                      {...field}
-                      checkedChildren="启用"
-                      unCheckedChildren="停用"
-                    />
+                    <Switch {...field} checkedChildren="启用" unCheckedChildren="停用" />
                   )}
                 />
               </Form.Item>
@@ -304,10 +293,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
                   name="config.discountType"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      style={{ width: '100%' }}
-                    >
+                    <Select {...field} style={{ width: '100%' }}>
                       <Option value="percentage">百分比折扣</Option>
                       <Option value="fixed">固定金额</Option>
                       <Option value="fixed_amount">固定金额</Option>
@@ -317,16 +303,14 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="折扣值"
-                required
-              >
+              <Form.Item label="折扣值" required>
                 <Controller
                   name="config.discountValue"
                   control={control}
                   render={({ field }) => {
                     const discountType = watch('config.discountType');
-                    const config = discountTypeConfig[discountType as keyof typeof discountTypeConfig];
+                    const config =
+                      discountTypeConfig[discountType as keyof typeof discountTypeConfig];
 
                     return (
                       <InputNumber
@@ -402,7 +386,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
           {conditions.length === 0 ? (
             <Alert
               message="暂无触发条件"
-              description="点击&quot;添加条件&quot;按钮来创建触发条件，当满足条件时将应用此价格规则。"
+              description='点击"添加条件"按钮来创建触发条件，当满足条件时将应用此价格规则。'
               type="info"
               style={{ marginBottom: 16 }}
             />
@@ -479,7 +463,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
           {actions.length === 0 ? (
             <Alert
               message="暂无执行动作"
-            description="点击添加动作按钮来创建执行动作，当规则触发时将执行这些动作。"
+              description="点击添加动作按钮来创建执行动作，当规则触发时将执行这些动作。"
               type="info"
               style={{ marginBottom: 16 }}
             />
@@ -492,12 +476,7 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
                   style={{ marginBottom: 8 }}
                   title={`动作 ${index + 1}`}
                   extra={
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      onClick={() => removeAction(action.id)}
-                    >
+                    <Button type="text" danger size="small" onClick={() => removeAction(action.id)}>
                       删除
                     </Button>
                   }
@@ -550,14 +529,8 @@ const PriceRuleForm: React.FC<PriceRuleFormProps> = ({
         <Row justify="end">
           <Col>
             <Space>
-              <Button onClick={handleReset}>
-                重置
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={!isValid}
-              >
+              <Button onClick={handleReset}>重置</Button>
+              <Button type="primary" htmlType="submit" disabled={!isValid}>
                 {mode === 'create' ? '创建规则' : '保存修改'}
               </Button>
             </Space>

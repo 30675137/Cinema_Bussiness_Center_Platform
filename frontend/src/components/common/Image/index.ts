@@ -17,10 +17,7 @@ export {
 } from './OptimizedImage';
 
 // 类型定义
-export type {
-  OptimizedImageProps,
-  ImageLoadingState,
-} from './OptimizedImage';
+export type { OptimizedImageProps, ImageLoadingState } from './OptimizedImage';
 
 /**
  * 使用指南：

@@ -1,48 +1,48 @@
-import type { Category, CategoryTree } from '@/types/category'
+import type { Category, CategoryTree } from '@/types/category';
 
 // API 响应类型定义
 export interface ApiResponse<T = any> {
-  success: boolean
-  data: T
-  message: string
-  code: number
-  timestamp: number
+  success: boolean;
+  data: T;
+  message: string;
+  code: number;
+  timestamp: number;
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<{
-  list: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }> {}
 
 // 分类创建请求参数
 export interface CreateCategoryRequest {
-  name: string
-  code: string
-  level: number
-  parentId?: string
-  status: 'active' | 'inactive'
-  description?: string
-  sortOrder?: number
+  name: string;
+  code: string;
+  level: number;
+  parentId?: string;
+  status: 'active' | 'inactive';
+  description?: string;
+  sortOrder?: number;
 }
 
 // 分类更新请求参数
 export interface UpdateCategoryRequest extends Partial<CreateCategoryRequest> {
-  id: string
+  id: string;
 }
 
 // 分类查询参数
 export interface CategoryQueryParams {
-  page?: number
-  pageSize?: number
-  keyword?: string
-  status?: 'active' | 'inactive'
-  level?: number
-  parentId?: string
-  sortBy?: 'name' | 'code' | 'sortOrder' | 'createdAt'
-  sortOrder?: 'asc' | 'desc'
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  status?: 'active' | 'inactive';
+  level?: number;
+  parentId?: string;
+  sortBy?: 'name' | 'code' | 'sortOrder' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
@@ -50,7 +50,7 @@ export interface CategoryQueryParams {
  * 提供分类相关的API服务，使用Mock数据实现
  */
 class CategoryService {
-  private baseUrl = '/api/categories'
+  private baseUrl = '/api/categories';
 
   /**
    * 获取分类列表
@@ -60,30 +60,31 @@ class CategoryService {
   async getCategoryList(params: CategoryQueryParams = {}): Promise<PaginatedResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // 生成Mock数据
-      const allCategories = this.generateMockCategories()
+      const allCategories = this.generateMockCategories();
 
       // 应用筛选条件
-      let filteredData = allCategories.filter(category => {
+      let filteredData = allCategories.filter((category) => {
         // 关键词搜索
         if (params.keyword) {
-          const keyword = params.keyword.toLowerCase()
-          const searchableText = `${category.name} ${category.code} ${category.description || ''}`.toLowerCase()
+          const keyword = params.keyword.toLowerCase();
+          const searchableText =
+            `${category.name} ${category.code} ${category.description || ''}`.toLowerCase();
           if (!searchableText.includes(keyword)) {
-            return false
+            return false;
           }
         }
 
         // 状态筛选
         if (params.status && category.status !== params.status) {
-          return false
+          return false;
         }
 
         // 级别筛选
         if (params.level && category.level !== params.level) {
-          return false
+          return false;
         }
 
         // 父级筛选
@@ -91,39 +92,39 @@ class CategoryService {
           if (params.parentId === 'root') {
             // 根级别筛选
             if (category.parentId) {
-              return false
+              return false;
             }
           } else if (category.parentId !== params.parentId) {
-            return false
+            return false;
           }
         }
 
-        return true
-      })
+        return true;
+      });
 
       // 排序
       if (params.sortBy) {
         filteredData.sort((a, b) => {
-          let aValue: any = a[params.sortBy as keyof Category]
-          let bValue: any = b[params.sortBy as keyof Category]
+          let aValue: any = a[params.sortBy as keyof Category];
+          let bValue: any = b[params.sortBy as keyof Category];
 
           if (params.sortBy === 'createdAt' || params.sortBy === 'updatedAt') {
-            aValue = new Date(aValue || '1970-01-01').getTime()
-            bValue = new Date(bValue || '1970-01-01').getTime()
+            aValue = new Date(aValue || '1970-01-01').getTime();
+            bValue = new Date(bValue || '1970-01-01').getTime();
           }
 
-          if (aValue === bValue) return 0
-          const comparison = aValue > bValue ? 1 : -1
-          return params.sortOrder === 'asc' ? comparison : -comparison
-        })
+          if (aValue === bValue) return 0;
+          const comparison = aValue > bValue ? 1 : -1;
+          return params.sortOrder === 'asc' ? comparison : -comparison;
+        });
       }
 
       // 分页处理
-      const page = params.page || 1
-      const pageSize = params.pageSize || 20
-      const startIndex = (page - 1) * pageSize
-      const endIndex = startIndex + pageSize
-      const paginatedData = filteredData.slice(startIndex, endIndex)
+      const page = params.page || 1;
+      const pageSize = params.pageSize || 20;
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginatedData = filteredData.slice(startIndex, endIndex);
 
       return {
         success: true,
@@ -137,7 +138,7 @@ class CategoryService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -151,7 +152,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -163,11 +164,11 @@ class CategoryService {
   async getCategoryDetail(id: string): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // 使用新的 Mock 数据生成器
-      const { getCategoryById } = await import('@/mocks/data/categoryMockData')
-      const category = getCategoryById(id)
+      const { getCategoryById } = await import('@/mocks/data/categoryMockData');
+      const category = getCategoryById(id);
 
       if (!category) {
         return {
@@ -176,7 +177,7 @@ class CategoryService {
           message: '分类不存在',
           code: 404,
           timestamp: Date.now(),
-        }
+        };
       }
 
       return {
@@ -185,7 +186,7 @@ class CategoryService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -193,7 +194,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -205,11 +206,11 @@ class CategoryService {
   async getCategoryChildren(parentId: string): Promise<ApiResponse<Category[]>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // 使用新的 Mock 数据生成器
-      const { getCategoryChildren } = await import('@/mocks/data/categoryMockData')
-      const children = getCategoryChildren(parentId)
+      const { getCategoryChildren } = await import('@/mocks/data/categoryMockData');
+      const children = getCategoryChildren(parentId);
 
       return {
         success: true,
@@ -217,7 +218,7 @@ class CategoryService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -225,7 +226,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -237,7 +238,7 @@ class CategoryService {
   async searchCategories(keyword: string): Promise<ApiResponse<Category[]>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       if (!keyword || keyword.trim() === '') {
         return {
@@ -246,12 +247,12 @@ class CategoryService {
           message: '搜索关键词不能为空',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 使用新的 Mock 数据生成器
-      const { searchCategories } = await import('@/mocks/data/categoryMockData')
-      const results = searchCategories(keyword)
+      const { searchCategories } = await import('@/mocks/data/categoryMockData');
+      const results = searchCategories(keyword);
 
       return {
         success: true,
@@ -259,7 +260,7 @@ class CategoryService {
         message: '搜索成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -267,7 +268,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '搜索失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -279,7 +280,7 @@ class CategoryService {
   async createCategory(data: CreateCategoryRequest): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // 验证必填字段
       if (!data.name || data.name.trim() === '') {
@@ -289,17 +290,18 @@ class CategoryService {
           message: '类目名称不能为空',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 使用新的 Mock 数据生成器
-      const { createCategory: createCategoryData, getCategoryById } = await import('@/mocks/data/categoryMockData')
-      
+      const { createCategory: createCategoryData, getCategoryById } =
+        await import('@/mocks/data/categoryMockData');
+
       // 确定层级
-      let level: 1 | 2 | 3 = 1
-      let parentName: string | undefined
+      let level: 1 | 2 | 3 = 1;
+      let parentName: string | undefined;
       if (data.parentId) {
-        const parent = getCategoryById(data.parentId)
+        const parent = getCategoryById(data.parentId);
         if (!parent) {
           return {
             success: false,
@@ -307,9 +309,9 @@ class CategoryService {
             message: '父类目不存在',
             code: 400,
             timestamp: Date.now(),
-          }
+          };
         }
-        level = (parent.level + 1) as 1 | 2 | 3
+        level = (parent.level + 1) as 1 | 2 | 3;
         if (level > 3) {
           return {
             success: false,
@@ -317,20 +319,20 @@ class CategoryService {
             message: '类目层级不能超过三级',
             code: 400,
             timestamp: Date.now(),
-          }
+          };
         }
-        parentName = parent.name
+        parentName = parent.name;
       }
 
       // 构建路径
-      const path: string[] = []
+      const path: string[] = [];
       if (data.parentId) {
-        const parent = getCategoryById(data.parentId)
+        const parent = getCategoryById(data.parentId);
         if (parent) {
-          path.push(...parent.path)
+          path.push(...parent.path);
         }
       }
-      path.push(data.name)
+      path.push(data.name);
 
       const newCategory = createCategoryData({
         ...data,
@@ -339,7 +341,7 @@ class CategoryService {
         path,
         status: data.status || 'active',
         sortOrder: data.sortOrder || 0,
-      })
+      });
 
       return {
         success: true,
@@ -347,7 +349,7 @@ class CategoryService {
         message: '类目创建成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -355,7 +357,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '创建失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -367,7 +369,7 @@ class CategoryService {
   async updateCategory(data: UpdateCategoryRequest): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       if (!data.id) {
         return {
@@ -376,7 +378,7 @@ class CategoryService {
           message: '类目ID不能为空',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 验证必填字段
@@ -387,13 +389,14 @@ class CategoryService {
           message: '类目名称不能为空',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 使用新的 Mock 数据生成器
-      const { updateCategory: updateCategoryData, getCategoryById } = await import('@/mocks/data/categoryMockData')
-      
-      const existingCategory = getCategoryById(data.id)
+      const { updateCategory: updateCategoryData, getCategoryById } =
+        await import('@/mocks/data/categoryMockData');
+
+      const existingCategory = getCategoryById(data.id);
       if (!existingCategory) {
         return {
           success: false,
@@ -401,7 +404,7 @@ class CategoryService {
           message: '类目不存在',
           code: 404,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 使用新的 Mock 数据生成器更新
@@ -410,7 +413,7 @@ class CategoryService {
         description: data.description,
         sortOrder: data.sortOrder,
         status: data.status,
-      })
+      });
 
       return {
         success: true,
@@ -418,7 +421,7 @@ class CategoryService {
         message: '类目更新成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -426,7 +429,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '更新失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -438,12 +441,16 @@ class CategoryService {
   async deleteCategory(id: string): Promise<ApiResponse<null>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // 使用新的 Mock 数据生成器
-      const { deleteCategory: deleteCategoryData, getCategoryById, getCategoryChildren } = await import('@/mocks/data/categoryMockData')
-      
-      const category = getCategoryById(id)
+      const {
+        deleteCategory: deleteCategoryData,
+        getCategoryById,
+        getCategoryChildren,
+      } = await import('@/mocks/data/categoryMockData');
+
+      const category = getCategoryById(id);
       if (!category) {
         return {
           success: false,
@@ -451,7 +458,7 @@ class CategoryService {
           message: '类目不存在',
           code: 404,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 检查是否被SPU使用
@@ -462,11 +469,11 @@ class CategoryService {
           message: '该类目已有 SPU 使用，不可删除',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 检查是否有子类目
-      const children = getCategoryChildren(id)
+      const children = getCategoryChildren(id);
       if (children.length > 0) {
         return {
           success: false,
@@ -474,11 +481,11 @@ class CategoryService {
           message: '无法删除包含子类目的类目',
           code: 400,
           timestamp: Date.now(),
-        }
+        };
       }
 
       // 执行删除
-      const success = deleteCategoryData(id)
+      const success = deleteCategoryData(id);
       if (!success) {
         return {
           success: false,
@@ -486,7 +493,7 @@ class CategoryService {
           message: '删除失败',
           code: 500,
           timestamp: Date.now(),
-        }
+        };
       }
 
       return {
@@ -495,7 +502,7 @@ class CategoryService {
         message: '类目删除成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -503,7 +510,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '删除失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -512,10 +519,12 @@ class CategoryService {
    * @param ids 分类ID列表
    * @returns 删除结果
    */
-  async batchDeleteCategories(ids: string[]): Promise<ApiResponse<{ success: number; failed: number }>> {
+  async batchDeleteCategories(
+    ids: string[]
+  ): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock批量删除结果
       return {
@@ -524,7 +533,7 @@ class CategoryService {
         message: `成功删除${ids.length}个分类`,
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -532,7 +541,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '批量删除失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -544,29 +553,29 @@ class CategoryService {
   async getCategoryTree(lazy: boolean = true): Promise<ApiResponse<CategoryTree[]>> {
     try {
       // 使用 fetch 发送请求，让 MSW 拦截
-      const url = `${this.baseUrl}/tree?lazy=${lazy}`
+      const url = `${this.baseUrl}/tree?lazy=${lazy}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json()
-      return result
+      const result = await response.json();
+      return result;
     } catch (error) {
-      console.error('getCategoryTree error:', error)
+      console.error('getCategoryTree error:', error);
       return {
         success: false,
         data: [],
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -576,15 +585,19 @@ class CategoryService {
    * @param status 新状态
    * @returns 更新结果
    */
-  async updateCategoryStatus(id: string, status: 'active' | 'inactive'): Promise<ApiResponse<Category>> {
+  async updateCategoryStatus(
+    id: string,
+    status: 'active' | 'inactive'
+  ): Promise<ApiResponse<Category>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       // 使用新的 Mock 数据生成器
-      const { updateCategoryStatus: updateStatusData, getCategoryById } = await import('@/mocks/data/categoryMockData')
-      
-      const category = getCategoryById(id)
+      const { updateCategoryStatus: updateStatusData, getCategoryById } =
+        await import('@/mocks/data/categoryMockData');
+
+      const category = getCategoryById(id);
       if (!category) {
         return {
           success: false,
@@ -592,10 +605,10 @@ class CategoryService {
           message: '类目不存在',
           code: 404,
           timestamp: Date.now(),
-        }
+        };
       }
 
-      const updatedCategory = updateStatusData(id, status)
+      const updatedCategory = updateStatusData(id, status);
 
       return {
         success: true,
@@ -603,7 +616,7 @@ class CategoryService {
         message: '状态更新成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -611,7 +624,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '状态更新失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -627,12 +640,12 @@ class CategoryService {
   ): Promise<ApiResponse<{ isUnique: boolean }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const allCategories = this.generateMockCategories()
-      const existingCategory = allCategories.find(cat =>
-        cat.code === code && cat.id !== excludeId
-      )
+      const allCategories = this.generateMockCategories();
+      const existingCategory = allCategories.find(
+        (cat) => cat.code === code && cat.id !== excludeId
+      );
 
       return {
         success: true,
@@ -640,7 +653,7 @@ class CategoryService {
         message: '验证成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -648,7 +661,7 @@ class CategoryService {
         message: error instanceof Error ? error.message : '验证失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -679,9 +692,9 @@ class CategoryService {
             description: '各类饮料商品',
             sortOrder: 1,
             createdAt: '2024-01-01T00:00:00Z',
-            updatedAt: '2024-01-01T00:00:00Z'
-          }
-        ]
+            updatedAt: '2024-01-01T00:00:00Z',
+          },
+        ],
       },
       {
         id: 'cat_002',
@@ -692,14 +705,14 @@ class CategoryService {
         description: '日常生活用品',
         sortOrder: 2,
         createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      }
-    ]
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ];
   }
 }
 
 // 创建服务实例
-export const categoryService = new CategoryService()
+export const categoryService = new CategoryService();
 
 // 导出默认服务
-export default categoryService
+export default categoryService;

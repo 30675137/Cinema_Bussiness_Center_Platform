@@ -52,4 +52,3 @@ const HallCard: React.FC<HallCardProps> = ({ hall }) => {
 };
 
 export default HallCard;
-

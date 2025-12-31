@@ -18,10 +18,7 @@ interface StatusFilterProps {
  * Status Filter Component
  * Provides dropdown for filtering stores by status
  */
-const StatusFilter: React.FC<StatusFilterProps> = ({
-  value,
-  onChange,
-}) => {
+const StatusFilter: React.FC<StatusFilterProps> = ({ value, onChange }) => {
   const handleChange = (selectedValue: string) => {
     // If "all" is selected, pass undefined to clear the filter
     onChange(selectedValue === 'all' ? undefined : selectedValue);

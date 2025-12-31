@@ -99,10 +99,7 @@ const InventoryManagePage: React.FC = () => {
       <div style={{ marginBottom: 24 }}>
         <Space align="center" style={{ marginBottom: 8 }}>
           {viewMode !== 'list' && (
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBackToList}
-            >
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBackToList}>
               返回列表
             </Button>
           )}
@@ -123,30 +120,16 @@ const InventoryManagePage: React.FC = () => {
 
     return (
       <Space style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleCreate}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
           新建库存项
         </Button>
-        <Button
-          icon={<SyncOutlined />}
-          onClick={handleSyncData}
-          loading={loading}
-        >
+        <Button icon={<SyncOutlined />} onClick={handleSyncData} loading={loading}>
           同步数据
         </Button>
-        <Button
-          icon={<BarChartOutlined />}
-          onClick={() => navigate('/inventory/analytics')}
-        >
+        <Button icon={<BarChartOutlined />} onClick={() => navigate('/inventory/analytics')}>
           数据分析
         </Button>
-        <Button
-          icon={<SettingOutlined />}
-          onClick={() => navigate('/inventory/settings')}
-        >
+        <Button icon={<SettingOutlined />} onClick={() => navigate('/inventory/settings')}>
           库存设置
         </Button>
       </Space>
@@ -157,12 +140,7 @@ const InventoryManagePage: React.FC = () => {
   const renderContent = () => {
     switch (viewMode) {
       case 'list':
-        return (
-          <InventoryList
-            onEdit={handleEdit}
-            onView={handleViewDetail}
-          />
-        );
+        return <InventoryList onEdit={handleEdit} onView={handleViewDetail} />;
 
       case 'create':
       case 'edit':
@@ -176,12 +154,7 @@ const InventoryManagePage: React.FC = () => {
         );
 
       case 'detail':
-        return (
-          <InventoryDetail
-            inventoryId={id!}
-            onEdit={handleEdit}
-          />
-        );
+        return <InventoryDetail inventoryId={id!} onEdit={handleEdit} />;
 
       default:
         return null;
@@ -198,7 +171,8 @@ const InventoryManagePage: React.FC = () => {
           bordered={false}
           style={{
             borderRadius: '8px',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+            boxShadow:
+              '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
           }}
           bodyStyle={{ padding: viewMode === 'detail' ? 0 : '24px' }}
         >

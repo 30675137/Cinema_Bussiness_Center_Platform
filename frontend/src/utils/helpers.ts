@@ -24,10 +24,10 @@ export const generateOrderNumber = (prefix: string = 'ORD'): string => {
 export const deepClone = <T>(obj: T): T => {
   if (obj === null || typeof obj !== 'object') return obj;
   if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-  if (obj instanceof Array) return obj.map(item => deepClone(item)) as unknown as T;
+  if (obj instanceof Array) return obj.map((item) => deepClone(item)) as unknown as T;
   if (typeof obj === 'object') {
     const cloned = {} as { [key: string]: any };
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       cloned[key] = deepClone((obj as any)[key]);
     });
     return cloned as T;
@@ -61,7 +61,7 @@ export const throttle = <T extends (...args: any[]) => any>(
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 };
@@ -90,8 +90,16 @@ export const randomString = (length: number = 8): string => {
  */
 export const randomColor = (): string => {
   const colors = [
-    '#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1',
-    '#13c2c2', '#eb2f96', '#fa541c', '#a0d911', '#2f54eb'
+    '#1890ff',
+    '#52c41a',
+    '#faad14',
+    '#f5222d',
+    '#722ed1',
+    '#13c2c2',
+    '#eb2f96',
+    '#fa541c',
+    '#a0d911',
+    '#2f54eb',
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
@@ -140,7 +148,10 @@ export const getFileExtension = (filename: string): string => {
  * 获取文件名（不含扩展名）
  */
 export const getFileName = (filepath: string): string => {
-  return filepath.slice(((filepath.lastIndexOf('/') - 1) >>> 0) + 1, filepath.lastIndexOf('.')) || filepath;
+  return (
+    filepath.slice(((filepath.lastIndexOf('/') - 1) >>> 0) + 1, filepath.lastIndexOf('.')) ||
+    filepath
+  );
 };
 
 /**
@@ -180,14 +191,17 @@ export const arrayUnique = <T>(arr: T[]): T[] => {
  * 数组分组
  */
 export const arrayGroupBy = <T>(arr: T[], key: keyof T): Record<string, T[]> => {
-  return arr.reduce((groups, item) => {
-    const groupKey = String(item[key]);
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(item);
-    return groups;
-  }, {} as Record<string, T[]>);
+  return arr.reduce(
+    (groups, item) => {
+      const groupKey = String(item[key]);
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(item);
+      return groups;
+    },
+    {} as Record<string, T[]>
+  );
 };
 
 /**
@@ -209,7 +223,7 @@ export const arraySort = <T>(arr: T[], key: keyof T, order: 'asc' | 'desc' = 'as
 export const generateUUID = (): string => {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
@@ -218,7 +232,7 @@ export const generateUUID = (): string => {
  * 延迟执行
  */
 export const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
@@ -325,11 +339,7 @@ export const isObjectEmpty = (obj: Record<string, any>): boolean => {
 /**
  * 安全访问对象属性
  */
-export const safeGet = <T>(
-  obj: any,
-  path: string,
-  defaultValue: T
-): T => {
+export const safeGet = <T>(obj: any, path: string, defaultValue: T): T => {
   const keys = path.split('.');
   let result = obj;
 
@@ -394,5 +404,5 @@ export default {
   isDate,
   isObjectEmpty,
   safeGet,
-  safeSet
+  safeSet,
 };

@@ -7,7 +7,9 @@ import type { ThemeConfig, ColorPalette, CSSVariableMap } from './types';
 /**
  * 生成主题颜色变体
  */
-export const generateColorVariants = (color: string): {
+export const generateColorVariants = (
+  color: string
+): {
   lighter: string;
   light: string;
   base: string;
@@ -17,15 +19,17 @@ export const generateColorVariants = (color: string): {
   // 简化的颜色变体生成逻辑
   const hex2rgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
   };
 
   const rgb2hex = (r: number, g: number, b: number) => {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   };
 
   const { r, g, b } = hex2rgb(color);
@@ -35,7 +39,7 @@ export const generateColorVariants = (color: string): {
     light: rgb2hex(Math.min(255, r + 20), Math.min(255, g + 20), Math.min(255, b + 20)),
     base: color,
     dark: rgb2hex(Math.max(0, r - 20), Math.max(0, g - 20), Math.max(0, b - 20)),
-    darker: rgb2hex(Math.max(0, r - 40), Math.max(0, g - 40), Math.max(0, b - 40))
+    darker: rgb2hex(Math.max(0, r - 40), Math.max(0, g - 40), Math.max(0, b - 40)),
   };
 };
 
@@ -45,11 +49,13 @@ export const generateColorVariants = (color: string): {
 export const blendColors = (color1: string, color2: string, ratio: number = 0.5): string => {
   const hex2rgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
   };
 
   const rgb1 = hex2rgb(color1);
@@ -59,7 +65,7 @@ export const blendColors = (color1: string, color2: string, ratio: number = 0.5)
   const g = Math.round(rgb1.g * (1 - ratio) + rgb2.g * ratio);
   const b = Math.round(rgb1.b * (1 - ratio) + rgb2.b * ratio);
 
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
 
 /**
@@ -68,11 +74,13 @@ export const blendColors = (color1: string, color2: string, ratio: number = 0.5)
 export const getContrastColor = (backgroundColor: string): string => {
   const hex2rgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
   };
 
   const { r, g, b } = hex2rgb(backgroundColor);
@@ -216,7 +224,7 @@ export const createBreakpointHelper = (breakpoints: ThemeConfig['breakpoints']) 
       }
 
       return between(breakpoint, nextBreakpoint);
-    }
+    },
   };
 };
 
@@ -254,7 +262,7 @@ export const createColorHelper = (colors: ColorPalette) => {
     background: colors.background,
     surface: colors.surface,
     border: colors.border,
-    text: colors.text
+    text: colors.text,
   };
 };
 
@@ -287,6 +295,6 @@ export const createSpacingHelper = (spacing: ThemeConfig['spacing']) => {
     '2xl': spacing['2xl'],
     '3xl': spacing['3xl'],
     '4xl': spacing['4xl'],
-    '5xl': spacing['5xl']
+    '5xl': spacing['5xl'],
   };
 };

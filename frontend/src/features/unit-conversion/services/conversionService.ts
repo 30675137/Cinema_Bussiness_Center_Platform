@@ -77,7 +77,10 @@ export async function createConversion(data: CreateConversionRequest): Promise<U
 /**
  * 更新换算规则
  */
-export async function updateConversion(id: string, data: CreateConversionRequest): Promise<UnitConversion> {
+export async function updateConversion(
+  id: string,
+  data: CreateConversionRequest
+): Promise<UnitConversion> {
   const response = await fetch(`${API_BASE}/${id}`, {
     method: 'PUT',
     headers: {

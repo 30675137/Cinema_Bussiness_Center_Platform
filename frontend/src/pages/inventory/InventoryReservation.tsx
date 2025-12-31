@@ -129,11 +129,7 @@ const InventoryReservation: React.FC = () => {
           <Card title="快捷操作" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -157,11 +153,7 @@ const InventoryReservation: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -185,11 +177,7 @@ const InventoryReservation: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -213,11 +201,7 @@ const InventoryReservation: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -259,7 +243,9 @@ const InventoryReservation: React.FC = () => {
               <div>
                 <Title level={5}>
                   <Badge status="error" />
-                  <CloseCircleOutlined style={{ color: '#ff4d4f', marginLeft: 8, marginRight: 8 }} />
+                  <CloseCircleOutlined
+                    style={{ color: '#ff4d4f', marginLeft: 8, marginRight: 8 }}
+                  />
                   2. 取消释放
                 </Title>
                 <Text type="secondary">
@@ -279,7 +265,9 @@ const InventoryReservation: React.FC = () => {
               <div>
                 <Title level={5}>
                   <Badge status="success" />
-                  <CheckCircleOutlined style={{ color: '#52c41a', marginLeft: 8, marginRight: 8 }} />
+                  <CheckCircleOutlined
+                    style={{ color: '#52c41a', marginLeft: 8, marginRight: 8 }}
+                  />
                   4. 预占查询
                 </Title>
                 <Text type="secondary">

@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 流水数量标签组件
- * 
+ *
  * 用于显示库存流水的数量变化，入库绿色+/出库红色-
  * 实现 T030 任务。
- * 
+ *
  * @since US2 - 查看库存流水记录
  */
 
@@ -24,7 +24,7 @@ export interface TransactionQuantityTagProps {
 
 /**
  * 流水数量标签组件
- * 
+ *
  * 功能：
  * - 入库类（正数）：绿色 + 号显示
  * - 出库类（负数）：红色 - 号显示
@@ -38,15 +38,13 @@ export const TransactionQuantityTag: React.FC<TransactionQuantityTagProps> = ({
 }) => {
   const isInbound = quantity > 0;
   const isZero = quantity === 0;
-  
+
   const color = isZero ? 'default' : isInbound ? 'green' : 'red';
   const displayQuantity = Math.abs(quantity);
   const prefix = isZero ? '' : isInbound ? '+' : '-';
-  
-  const icon = showIcon && !isZero ? (
-    isInbound ? <PlusOutlined /> : <MinusOutlined />
-  ) : null;
-  
+
+  const icon = showIcon && !isZero ? isInbound ? <PlusOutlined /> : <MinusOutlined /> : null;
+
   const fontSize = size === 'small' ? 12 : size === 'large' ? 16 : 14;
   const padding = size === 'small' ? '0 4px' : size === 'large' ? '4px 12px' : '2px 8px';
 
@@ -58,7 +56,10 @@ export const TransactionQuantityTag: React.FC<TransactionQuantityTagProps> = ({
       data-testid="transaction-quantity-tag"
     >
       <Space size={4}>
-        <span>{prefix}{displayQuantity}</span>
+        <span>
+          {prefix}
+          {displayQuantity}
+        </span>
         {unit && <span style={{ fontSize: fontSize - 2 }}>{unit}</span>}
       </Space>
     </Tag>

@@ -18,15 +18,27 @@ export interface ProductService {
 
   // 批量操作
   batchDeleteProducts: (ids: string[]) => Promise<ApiResponse<void>>;
-  batchUpdateProducts: (ids: string[], data: Partial<ProductFormData>) => Promise<ApiResponse<Product[]>>;
+  batchUpdateProducts: (
+    ids: string[],
+    data: Partial<ProductFormData>
+  ) => Promise<ApiResponse<Product[]>>;
 
   // 搜索和筛选
-  searchProducts: (keyword: string, params?: ProductQueryParams) => Promise<PaginatedResponse<Product>>;
-  filterProducts: (filters: ProductFilters, params?: ProductQueryParams) => Promise<PaginatedResponse<Product>>;
+  searchProducts: (
+    keyword: string,
+    params?: ProductQueryParams
+  ) => Promise<PaginatedResponse<Product>>;
+  filterProducts: (
+    filters: ProductFilters,
+    params?: ProductQueryParams
+  ) => Promise<PaginatedResponse<Product>>;
 
   // 导入导出
   exportProducts: (params?: ProductQueryParams) => Promise<ApiResponse<{ url: string }>>;
-  importProducts: (file: File, onProgress?: (progress: number) => void) => Promise<ApiResponse<any>>;
+  importProducts: (
+    file: File,
+    onProgress?: (progress: number) => void
+  ) => Promise<ApiResponse<any>>;
 
   // 其他业务操作
   duplicateProduct: (id: string) => Promise<ApiResponse<Product>>;
@@ -50,7 +62,7 @@ class ProductServiceImpl implements ProductService {
     if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
     if (params?.materialType) queryParams.append('materialType', params.materialType);
     if (params?.status?.length) {
-      params.status.forEach(status => queryParams.append('status', status));
+      params.status.forEach((status) => queryParams.append('status', status));
     }
     if (params?.priceRange) {
       queryParams.append('minPrice', params.priceRange[0].toString());
@@ -73,8 +85,8 @@ class ProductServiceImpl implements ProductService {
         total: response.data?.length || 0,
         totalPages: 1,
         hasNext: false,
-        hasPrev: false
-      }
+        hasPrev: false,
+      },
     };
     return paginatedResponse;
   }
@@ -100,16 +112,25 @@ class ProductServiceImpl implements ProductService {
     return apiService.post<void>(`${this.baseUrl}/batch/delete`, { ids });
   }
 
-  async batchUpdateProducts(ids: string[], data: Partial<ProductFormData>): Promise<ApiResponse<Product[]>> {
+  async batchUpdateProducts(
+    ids: string[],
+    data: Partial<ProductFormData>
+  ): Promise<ApiResponse<Product[]>> {
     return apiService.post<Product[]>(`${this.baseUrl}/batch/update`, { ids, data });
   }
 
   // 搜索和筛选
-  async searchProducts(keyword: string, params?: ProductQueryParams): Promise<PaginatedResponse<Product>> {
+  async searchProducts(
+    keyword: string,
+    params?: ProductQueryParams
+  ): Promise<PaginatedResponse<Product>> {
     return this.getProducts({ ...params, keyword });
   }
 
-  async filterProducts(filters: ProductFilters, params?: ProductQueryParams): Promise<PaginatedResponse<Product>> {
+  async filterProducts(
+    filters: ProductFilters,
+    params?: ProductQueryParams
+  ): Promise<PaginatedResponse<Product>> {
     const queryParams: ProductQueryParams = { ...params };
 
     if (filters.categoryId) queryParams.categoryId = filters.categoryId;
@@ -128,7 +149,7 @@ class ProductServiceImpl implements ProductService {
     if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
     if (params?.materialType) queryParams.append('materialType', params.materialType);
     if (params?.status?.length) {
-      params.status.forEach(status => queryParams.append('status', status));
+      params.status.forEach((status) => queryParams.append('status', status));
     }
 
     const url = `${this.baseUrl}/export?${queryParams.toString()}`;
@@ -166,4 +187,3 @@ class ProductServiceImpl implements ProductService {
 
 // 创建服务实例
 export const productService = new ProductServiceImpl();
-

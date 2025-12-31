@@ -19,11 +19,7 @@ interface StoreSearchProps {
  * Store Search Component
  * Provides search input for filtering stores by name
  */
-const StoreSearch: React.FC<StoreSearchProps> = ({
-  onSearch,
-  onReset,
-  loading = false,
-}) => {
+const StoreSearch: React.FC<StoreSearchProps> = ({ onSearch, onReset, loading = false }) => {
   const [form] = Form.useForm();
 
   // Handle search
@@ -45,15 +41,8 @@ const StoreSearch: React.FC<StoreSearchProps> = ({
 
   return (
     <div className="store-search-wrapper">
-      <Form
-        form={form}
-        layout="inline"
-        onFinish={handleSearch}
-      >
-        <Form.Item
-          name="name"
-          label="门店名称"
-        >
+      <Form form={form} layout="inline" onFinish={handleSearch}>
+        <Form.Item name="name" label="门店名称">
           <Input
             placeholder="请输入门店名称"
             onPressEnter={handlePressEnter}
@@ -72,10 +61,7 @@ const StoreSearch: React.FC<StoreSearchProps> = ({
             >
               搜索
             </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleReset}
-            >
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
               重置
             </Button>
           </Space>

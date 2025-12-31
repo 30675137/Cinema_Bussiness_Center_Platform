@@ -18,47 +18,41 @@ const CategoryBreadcrumb: React.FC<CategoryBreadcrumbProps> = ({
   categoryId,
   categoryName,
   className,
-  style
+  style,
 }) => {
   // 构建面包屑路径
   const breadcrumbItems = [
     {
       title: '首页',
       path: '/',
-      icon: <HomeOutlined />
+      icon: <HomeOutlined />,
     },
     {
       title: '基础设置与主数据',
-      path: '/mdm-pim'
+      path: '/mdm-pim',
     },
     {
       title: '商品管理 (MDM/PIM)',
-      path: '/mdm-pim/category'
-    }
+      path: '/mdm-pim/category',
+    },
   ];
 
   // 如果有选中的类目，添加类目详情
   if (categoryId && categoryName) {
     breadcrumbItems.push({
-      title: `类目详情 - ${categoryName}`
+      title: `类目详情 - ${categoryName}`,
     });
   } else if (categoryId) {
     breadcrumbItems.push({
-      title: '类目详情'
+      title: '类目详情',
     });
   } else {
     breadcrumbItems.push({
-      title: '类目管理'
+      title: '类目管理',
     });
   }
 
-  return (
-    <Breadcrumb
-      items={breadcrumbItems}
-      className={className}
-      style={style}
-    />
-  );
+  return <Breadcrumb items={breadcrumbItems} className={className} style={style} />;
 };
 
 export default CategoryBreadcrumb;

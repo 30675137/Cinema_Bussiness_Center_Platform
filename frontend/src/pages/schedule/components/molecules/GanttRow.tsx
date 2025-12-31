@@ -12,7 +12,14 @@ interface GanttRowProps {
   onEmptySlotClick?: (payload: { hallId: string; startHour: number }) => void;
 }
 
-const GanttRow: React.FC<GanttRowProps> = ({ hall, events, startHour, endHour, onEventClick, onEmptySlotClick }) => {
+const GanttRow: React.FC<GanttRowProps> = ({
+  hall,
+  events,
+  startHour,
+  endHour,
+  onEventClick,
+  onEmptySlotClick,
+}) => {
   const totalHours = endHour - startHour;
   const [isHovered, setIsHovered] = useState(false);
 
@@ -21,18 +28,21 @@ const GanttRow: React.FC<GanttRowProps> = ({ hall, events, startHour, endHour, o
     [events, hall.id]
   );
 
-  const handleBackgroundClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!onEmptySlotClick) return;
-    const container = e.currentTarget;
-    const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const ratio = rect.width > 0 ? x / rect.width : 0;
-    const rawStart = startHour + ratio * totalHours;
-    // 四舍五入到最近的30分钟
-    const rounded = Math.round(rawStart * 2) / 2;
-    const clamped = Math.max(startHour, Math.min(endHour - 0.5, rounded));
-    onEmptySlotClick({ hallId: hall.id, startHour: clamped });
-  }, [onEmptySlotClick, startHour, endHour, totalHours, hall.id]);
+  const handleBackgroundClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!onEmptySlotClick) return;
+      const container = e.currentTarget;
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const ratio = rect.width > 0 ? x / rect.width : 0;
+      const rawStart = startHour + ratio * totalHours;
+      // 四舍五入到最近的30分钟
+      const rounded = Math.round(rawStart * 2) / 2;
+      const clamped = Math.max(startHour, Math.min(endHour - 0.5, rounded));
+      onEmptySlotClick({ hallId: hall.id, startHour: clamped });
+    },
+    [onEmptySlotClick, startHour, endHour, totalHours, hall.id]
+  );
 
   return (
     <div
@@ -89,4 +99,3 @@ const GanttRow: React.FC<GanttRowProps> = ({ hall, events, startHour, endHour, o
 };
 
 export default GanttRow;
-

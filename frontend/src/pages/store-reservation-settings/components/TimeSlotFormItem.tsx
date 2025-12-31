@@ -1,16 +1,27 @@
 /**
  * TimeSlotFormItem Component
- * 
+ *
  * Simplified time slot configuration with default time and special rules.
  * Default: 8:00 - 22:00 for all days
  * Special rules can override specific days.
- * 
+ *
  * @feature 016-store-reservation-settings
  * @updated 简化为默认时段+特殊规则模式
  */
 
 import React, { useState, useEffect } from 'react';
-import { Form, TimePicker, Button, Space, Typography, Card, Select, Empty, Popconfirm, Tag } from 'antd';
+import {
+  Form,
+  TimePicker,
+  Button,
+  Space,
+  Typography,
+  Card,
+  Select,
+  Empty,
+  Popconfirm,
+  Tag,
+} from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { Control, FieldErrors } from 'react-hook-form';
 import dayjs from 'dayjs';
@@ -44,9 +55,9 @@ interface SpecialRule {
  * TimeSlotFormGroup Component
  * 简化版时间段配置：默认时段 + 特殊规则
  */
-export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({ 
-  control, 
-  errors, 
+export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
+  control,
+  errors,
   disabled,
   setValue,
 }) => {
@@ -78,18 +89,18 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
   // 添加特殊规则
   const handleAddRule = () => {
     if (availableDays.length === 0) return;
-    
+
     const newRule: SpecialRule = {
       dayOfWeek: newRuleDay,
       startTime: newRuleStartTime,
       endTime: newRuleEndTime,
     };
-    
+
     setSpecialRules([...specialRules, newRule]);
     setAddingRule(false);
-    
+
     // 重置新规则表单
-    const nextAvailableDay = availableDays.find(d => d !== newRuleDay);
+    const nextAvailableDay = availableDays.find((d) => d !== newRuleDay);
     if (nextAvailableDay) {
       setNewRuleDay(nextAvailableDay);
     }
@@ -123,7 +134,9 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
         <Space direction="vertical" style={{ width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text strong>默认可预约时段</Text>
-            <Tag color="blue">{DEFAULT_START_TIME} - {DEFAULT_END_TIME}</Tag>
+            <Tag color="blue">
+              {DEFAULT_START_TIME} - {DEFAULT_END_TIME}
+            </Tag>
           </div>
           <Text type="secondary" style={{ fontSize: 12 }}>
             所有星期默认使用此时段，如需设置特殊时段请添加规则
@@ -133,11 +146,13 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
 
       {/* 时段预览 */}
       <div style={{ marginBottom: 16 }}>
-        <Text type="secondary" style={{ marginBottom: 8, display: 'block' }}>时段预览：</Text>
+        <Text type="secondary" style={{ marginBottom: 8, display: 'block' }}>
+          时段预览：
+        </Text>
         <Space wrap>
           {([1, 2, 3, 4, 5, 6, 7] as DayOfWeek[]).map((day) => (
-            <Tag 
-              key={day} 
+            <Tag
+              key={day}
               color={hasSpecialRule(day) ? 'orange' : 'default'}
               style={{ margin: '2px' }}
             >
@@ -149,12 +164,19 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
 
       {/* 特殊规则列表 */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+          }}
+        >
           <Text strong>特殊时段规则</Text>
           {!addingRule && availableDays.length > 0 && (
-            <Button 
-              type="dashed" 
-              size="small" 
+            <Button
+              type="dashed"
+              size="small"
               icon={<PlusOutlined />}
               onClick={() => {
                 setNewRuleDay(availableDays[0] || 6);
@@ -168,24 +190,22 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
         </div>
 
         {specialRules.length === 0 && !addingRule && (
-          <Empty 
-            image={Empty.PRESENTED_IMAGE_SIMPLE} 
-            description="暂无特殊规则，所有日期使用默认时段" 
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="暂无特殊规则，所有日期使用默认时段"
             style={{ padding: '16px 0' }}
           />
         )}
 
         {/* 已添加的规则 */}
         {specialRules.map((rule) => (
-          <Card 
-            key={rule.dayOfWeek} 
-            size="small" 
-            style={{ marginBottom: 8 }}
-          >
+          <Card key={rule.dayOfWeek} size="small" style={{ marginBottom: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Space>
                 <Tag color="orange">{getDayOfWeekName(rule.dayOfWeek)}</Tag>
-                <Text>{rule.startTime} - {rule.endTime}</Text>
+                <Text>
+                  {rule.startTime} - {rule.endTime}
+                </Text>
               </Space>
               <Popconfirm
                 title="确定删除这条规则吗？"
@@ -193,10 +213,10 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
                 okText="删除"
                 cancelText="取消"
               >
-                <Button 
-                  type="text" 
-                  danger 
-                  size="small" 
+                <Button
+                  type="text"
+                  danger
+                  size="small"
                   icon={<DeleteOutlined />}
                   disabled={disabled}
                 />
@@ -223,7 +243,9 @@ export const TimeSlotFormGroup: React.FC<TimeSlotFormGroupProps> = ({
               </Select>
               <TimePicker
                 value={dayjs(newRuleStartTime, 'HH:mm')}
-                onChange={(time) => setNewRuleStartTime(time?.format('HH:mm') || DEFAULT_START_TIME)}
+                onChange={(time) =>
+                  setNewRuleStartTime(time?.format('HH:mm') || DEFAULT_START_TIME)
+                }
                 format="HH:mm"
                 minuteStep={30}
                 disabled={disabled}

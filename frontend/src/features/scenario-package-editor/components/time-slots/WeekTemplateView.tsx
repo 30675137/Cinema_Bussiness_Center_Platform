@@ -34,22 +34,28 @@ interface WeekTemplateViewProps {
  */
 const groupByDayOfWeek = (templates: TimeSlotTemplate[]): Record<DayOfWeek, TimeSlotTemplate[]> => {
   const groups: Record<DayOfWeek, TimeSlotTemplate[]> = {
-    0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [],
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
   };
-  
+
   templates.forEach((template) => {
     const day = template.dayOfWeek as DayOfWeek;
     if (groups[day]) {
       groups[day].push(template);
     }
   });
-  
+
   // 按开始时间排序
   Object.keys(groups).forEach((key) => {
     const dayKey = Number(key) as DayOfWeek;
     groups[dayKey].sort((a, b) => a.startTime.localeCompare(b.startTime));
   });
-  
+
   return groups;
 };
 
@@ -66,10 +72,10 @@ export const WeekTemplateView: React.FC<WeekTemplateViewProps> = ({
   onCopyToOtherDays,
 }) => {
   const groupedTemplates = groupByDayOfWeek(templates);
-  
+
   // 星期顺序：周一到周日
   const dayOrder: DayOfWeek[] = [1, 2, 3, 4, 5, 6, 0];
-  
+
   return (
     <div className="week-template-view">
       <Row gutter={[8, 8]}>
@@ -77,13 +83,19 @@ export const WeekTemplateView: React.FC<WeekTemplateViewProps> = ({
           const dayTemplates = groupedTemplates[dayOfWeek] || [];
           const dayLabel = DAY_OF_WEEK_LABELS[dayOfWeek];
           const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-          
+
           return (
             <Col key={dayOfWeek} xs={24} sm={12} md={8} lg={6} xl={24 / 7}>
               <Card
                 size="small"
                 title={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Text strong style={{ color: isWeekend ? '#ff4d4f' : undefined }}>
                       {dayLabel}
                     </Text>
@@ -142,7 +154,7 @@ export const WeekTemplateView: React.FC<WeekTemplateViewProps> = ({
           );
         })}
       </Row>
-      
+
       <style>{`
         .week-template-view .ant-card {
           border-radius: 8px;

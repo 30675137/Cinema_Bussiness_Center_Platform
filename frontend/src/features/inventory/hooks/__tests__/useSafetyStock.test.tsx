@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: useSafetyStock Hook 单元测试
- * 
+ *
  * 测试乐观锁冲突处理逻辑。
  * 实现 T056 任务。
- * 
+ *
  * @since US5 - 设置安全库存阈值
  */
 
@@ -32,7 +32,7 @@ describe('useSafetyStock', () => {
   describe('ConflictError', () => {
     it('应该正确创建 ConflictError', () => {
       const error = new ConflictError('数据已被修改');
-      
+
       expect(error).toBeInstanceOf(Error);
       expect(error).toBeInstanceOf(ConflictError);
       expect(error.name).toBe('ConflictError');
@@ -61,14 +61,14 @@ describe('useSafetyStock', () => {
   describe('Hook 初始化', () => {
     it('应该返回 mutate 函数', () => {
       const { result } = renderHook(() => useSafetyStock(), { wrapper: createWrapper() });
-      
+
       expect(result.current.mutate).toBeDefined();
       expect(typeof result.current.mutate).toBe('function');
     });
 
     it('初始状态 isPending 为 false', () => {
       const { result } = renderHook(() => useSafetyStock(), { wrapper: createWrapper() });
-      
+
       expect(result.current.isPending).toBe(false);
     });
   });
@@ -76,31 +76,28 @@ describe('useSafetyStock', () => {
   describe('回调函数', () => {
     it('应该接受 onSuccess 回调', () => {
       const onSuccess = vi.fn();
-      const { result } = renderHook(
-        () => useSafetyStock({ onSuccess }),
-        { wrapper: createWrapper() }
-      );
-      
+      const { result } = renderHook(() => useSafetyStock({ onSuccess }), {
+        wrapper: createWrapper(),
+      });
+
       expect(result.current).toBeDefined();
     });
 
     it('应该接受 onError 回调', () => {
       const onError = vi.fn();
-      const { result } = renderHook(
-        () => useSafetyStock({ onError }),
-        { wrapper: createWrapper() }
-      );
-      
+      const { result } = renderHook(() => useSafetyStock({ onError }), {
+        wrapper: createWrapper(),
+      });
+
       expect(result.current).toBeDefined();
     });
 
     it('应该接受 onConflict 回调', () => {
       const onConflict = vi.fn();
-      const { result } = renderHook(
-        () => useSafetyStock({ onConflict }),
-        { wrapper: createWrapper() }
-      );
-      
+      const { result } = renderHook(() => useSafetyStock({ onConflict }), {
+        wrapper: createWrapper(),
+      });
+
       expect(result.current).toBeDefined();
     });
   });
@@ -113,7 +110,7 @@ describe('UpdateSafetyStockRequest 类型', () => {
       safetyStock: 10,
       version: 1,
     };
-    
+
     expect(request.inventoryId).toBeDefined();
     expect(request.safetyStock).toBeDefined();
     expect(request.version).toBeDefined();

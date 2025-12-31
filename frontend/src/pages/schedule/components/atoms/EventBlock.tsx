@@ -1,7 +1,11 @@
 import React, { useMemo, memo, useCallback } from 'react';
 import { Typography, Tag, Tooltip, Badge } from 'antd';
 import type { ScheduleEvent } from '@/pages/schedule/types/schedule.types';
-import { getLeftStyle, getWidthStyle, formatTimeRange } from '@/features/schedule-management/utils/timeCalculations';
+import {
+  getLeftStyle,
+  getWidthStyle,
+  formatTimeRange,
+} from '@/features/schedule-management/utils/timeCalculations';
 import { useScheduleStore } from '@/features/schedule-management/stores/scheduleStore';
 import EventTypeTag from './EventTypeTag';
 
@@ -27,7 +31,12 @@ const typeStyleMap: Record<string, React.CSSProperties> = {
   },
 };
 
-const EventBlock: React.FC<EventBlockProps> = ({ event, timelineStartHour, totalHours, onClick }) => {
+const EventBlock: React.FC<EventBlockProps> = ({
+  event,
+  timelineStartHour,
+  totalHours,
+  onClick,
+}) => {
   const { setSelectedEvent } = useScheduleStore();
 
   const style = useMemo(() => {
@@ -44,19 +53,25 @@ const EventBlock: React.FC<EventBlockProps> = ({ event, timelineStartHour, total
   const typeStyle = useMemo(() => typeStyleMap[event.type] || typeStyleMap.public, [event.type]);
   const isPending = event.status === 'pending';
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    setSelectedEvent(event);
-    onClick?.(event);
-  }, [event, setSelectedEvent, onClick]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.stopPropagation();
       setSelectedEvent(event);
       onClick?.(event);
-    }
-  }, [event, setSelectedEvent, onClick]);
+    },
+    [event, setSelectedEvent, onClick]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setSelectedEvent(event);
+        onClick?.(event);
+      }
+    },
+    [event, setSelectedEvent, onClick]
+  );
 
   return (
     <div
@@ -83,7 +98,9 @@ const EventBlock: React.FC<EventBlockProps> = ({ event, timelineStartHour, total
         gap: 4,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}>
+      <div
+        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 4 }}
+      >
         <Typography.Text strong ellipsis style={{ maxWidth: '70%' }}>
           {event.title}
         </Typography.Text>
@@ -132,4 +149,3 @@ const EventBlock: React.FC<EventBlockProps> = ({ event, timelineStartHour, total
 };
 
 export default memo(EventBlock);
-

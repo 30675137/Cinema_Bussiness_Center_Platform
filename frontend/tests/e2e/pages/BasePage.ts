@@ -33,7 +33,7 @@ export class BasePage {
 
   async getText(selector: string): Promise<string> {
     await this.waitForElement(selector);
-    return await this.page.textContent(selector) || '';
+    return (await this.page.textContent(selector)) || '';
   }
 
   async isVisible(selector: string): Promise<boolean> {

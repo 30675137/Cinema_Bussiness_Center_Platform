@@ -14,7 +14,7 @@ import {
   Typography,
   Divider,
   Badge,
-  Empty
+  Empty,
 } from 'antd';
 import {
   PlusOutlined,
@@ -23,7 +23,7 @@ import {
   FolderOutlined,
   FolderOpenOutlined,
   ExclamationCircleOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from '@ant-design/icons';
 import type { DataNode } from 'antd/es/tree';
 import { CategoryItem } from '@/types/category';
@@ -50,7 +50,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
   loading = false,
   mode = 'manage',
   onSelect,
-  selectedKeys = []
+  selectedKeys = [],
 }) => {
   const [form] = Form.useForm();
   const [modalVisible, setModalVisible] = useState(false);
@@ -62,14 +62,15 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
   // 构建树形数据结构
   const buildTreeData = (categories: CategoryItem[], keyword?: string): DataNode[] => {
     const filteredCategories = keyword
-      ? categories.filter(cat =>
-          cat.name.toLowerCase().includes(keyword.toLowerCase()) ||
-          cat.code.toLowerCase().includes(keyword.toLowerCase())
+      ? categories.filter(
+          (cat) =>
+            cat.name.toLowerCase().includes(keyword.toLowerCase()) ||
+            cat.code.toLowerCase().includes(keyword.toLowerCase())
         )
       : categories;
 
     const buildNode = (category: CategoryItem): DataNode => {
-      const children = filteredCategories.filter(cat => cat.parentId === category.id);
+      const children = filteredCategories.filter((cat) => cat.parentId === category.id);
 
       return {
         title: (
@@ -122,12 +123,12 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
         key: category.id,
         icon: children.length > 0 ? <FolderOpenOutlined /> : <FolderOutlined />,
         children: children.length > 0 ? children.map(buildNode) : undefined,
-        categoryData: category
+        categoryData: category,
       };
     };
 
     // 找到根分类（parentId为null或undefined的分类）
-    const rootCategories = filteredCategories.filter(cat => !cat.parentId);
+    const rootCategories = filteredCategories.filter((cat) => !cat.parentId);
     return rootCategories.map(buildNode);
   };
 
@@ -144,7 +145,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
       form.setFieldsValue({
         parentId: parentCategory.id,
         parentName: parentCategory.name,
-        level: parentCategory.level + 1
+        level: parentCategory.level + 1,
       });
     }
     setModalVisible(true);
@@ -156,8 +157,8 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
     form.setFieldsValue({
       ...category,
       parentName: category.parentId
-        ? categories.find(c => c.id === category.parentId)?.name
-        : '根分类'
+        ? categories.find((c) => c.id === category.parentId)?.name
+        : '根分类',
     });
     setModalVisible(true);
   };
@@ -218,7 +219,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
     setSearchKeyword(value);
     // 如果有搜索关键词，展开所有节点
     if (value) {
-      const allKeys = categories.map(cat => cat.id);
+      const allKeys = categories.map((cat) => cat.id);
       setExpandedKeys(allKeys);
     }
   };
@@ -274,10 +275,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
             <div className="flex items-center">
               <FolderOutlined className="mr-2" />
               <span>分类管理</span>
-              <Badge
-                count={categories.length}
-                style={{ marginLeft: '8px' }}
-              />
+              <Badge count={categories.length} style={{ marginLeft: '8px' }} />
             </div>
             <Button
               type="primary"
@@ -304,10 +302,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
 
           {/* 分类树 */}
           {treeData.length === 0 ? (
-            <Empty
-              description="暂无分类数据"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            >
+            <Empty description="暂无分类数据" image={Empty.PRESENTED_IMAGE_SIMPLE}>
               {renderAddButton()}
             </Empty>
           ) : (
@@ -347,9 +342,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
           )}
 
           {/* 快速添加按钮 */}
-          {categories.length > 0 && (
-            <Divider />
-          )}
+          {categories.length > 0 && <Divider />}
           {renderAddButton()}
         </div>
       </Card>
@@ -369,7 +362,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
           initialValues={{
             status: 'active',
             level: 1,
-            sortOrder: 0
+            sortOrder: 0,
           }}
         >
           <Form.Item
@@ -377,7 +370,7 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
             label="分类名称"
             rules={[
               { required: true, message: '请输入分类名称' },
-              { max: 50, message: '分类名称不能超过50个字符' }
+              { max: 50, message: '分类名称不能超过50个字符' },
             ]}
           >
             <Input placeholder="请输入分类名称" />
@@ -389,16 +382,13 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
             rules={[
               { required: true, message: '请输入分类编码' },
               { pattern: /^[A-Z0-9_-]+$/, message: '编码只能包含大写字母、数字、下划线和连字符' },
-              { max: 20, message: '分类编码不能超过20个字符' }
+              { max: 20, message: '分类编码不能超过20个字符' },
             ]}
           >
             <Input placeholder="请输入分类编码" disabled={!!editingCategory} />
           </Form.Item>
 
-          <Form.Item
-            name="parentId"
-            label="上级分类"
-          >
+          <Form.Item name="parentId" label="上级分类">
             <Select
               placeholder="请选择上级分类（不选择则为根分类）"
               allowClear
@@ -408,27 +398,21 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
               }
             >
               {categories
-                .filter(cat => !editingCategory || cat.id !== editingCategory.id)
-                .map(category => (
+                .filter((cat) => !editingCategory || cat.id !== editingCategory.id)
+                .map((category) => (
                   <Option key={category.id} value={category.id}>
-                    {Array(category.level).fill('　').join('')}{category.name}
+                    {Array(category.level).fill('　').join('')}
+                    {category.name}
                   </Option>
                 ))}
             </Select>
           </Form.Item>
 
-          <Form.Item
-            name="level"
-            label="分类层级"
-          >
+          <Form.Item name="level" label="分类层级">
             <Input disabled placeholder="根据上级分类自动设置" />
           </Form.Item>
 
-          <Form.Item
-            name="status"
-            label="状态"
-            rules={[{ required: true, message: '请选择状态' }]}
-          >
+          <Form.Item name="status" label="状态" rules={[{ required: true, message: '请选择状态' }]}>
             <Select>
               <Option value="active">启用</Option>
               <Option value="inactive">停用</Option>
@@ -440,23 +424,11 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
             label="排序"
             rules={[{ type: 'number', message: '请输入有效的数字' }]}
           >
-            <Input
-              type="number"
-              placeholder="数字越小排序越靠前"
-              min={0}
-            />
+            <Input type="number" placeholder="数字越小排序越靠前" min={0} />
           </Form.Item>
 
-          <Form.Item
-            name="description"
-            label="分类描述"
-          >
-            <Input.TextArea
-              rows={3}
-              placeholder="请输入分类描述"
-              maxLength={200}
-              showCount
-            />
+          <Form.Item name="description" label="分类描述">
+            <Input.TextArea rows={3} placeholder="请输入分类描述" maxLength={200} showCount />
           </Form.Item>
         </Form>
       </Modal>

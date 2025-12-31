@@ -20,7 +20,7 @@ frontend/src/testdata/
 ### 1. 在测试脚本中导入
 
 ```typescript
-import { inventoryTestData } from '@/testdata/inventory'
+import { inventoryTestData } from '@/testdata/inventory';
 
 test.describe('库存预警通知', () => {
   let testData: any;
@@ -49,7 +49,7 @@ test.describe('库存预警通知', () => {
 每个模块提供了预定义的场景数据集,方便直接使用:
 
 ```typescript
-import { inventoryTestData } from '@/testdata/inventory'
+import { inventoryTestData } from '@/testdata/inventory';
 
 test.beforeEach(async ({ page }) => {
   // 直接使用场景数据集
@@ -62,7 +62,7 @@ test.beforeEach(async ({ page }) => {
 您可以基于现有数据创建自定义数据:
 
 ```typescript
-import { inventoryTestData } from '@/testdata/inventory'
+import { inventoryTestData } from '@/testdata/inventory';
 
 const customData = {
   ...inventoryTestData.scenario_004,
@@ -134,11 +134,11 @@ export default inventoryTestData;
 
 测试数据中的 URL 和环境配置:
 
-| 环境 | URL | 说明 |
-|------|-----|------|
-| B端 (Admin) | http://localhost:3000 | React 管理后台 |
-| C端 (H5) | http://localhost:10086 | Taro H5 应用 |
-| 后端 API | http://localhost:8080 | Spring Boot 后端 |
+| 环境        | URL                    | 说明             |
+| ----------- | ---------------------- | ---------------- |
+| B端 (Admin) | http://localhost:3000  | React 管理后台   |
+| C端 (H5)    | http://localhost:10086 | Taro H5 应用     |
+| 后端 API    | http://localhost:8080  | Spring Boot 后端 |
 
 ## 跨系统测试数据
 

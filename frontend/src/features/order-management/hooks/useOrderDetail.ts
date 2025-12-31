@@ -3,9 +3,9 @@
  * 订单详情查询 Hook - 使用 TanStack Query
  */
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { fetchOrderDetail } from '../services/orderService'
-import type { OrderDetailResponse } from '../types/order'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { fetchOrderDetail } from '../services/orderService';
+import type { OrderDetailResponse } from '../types/order';
 
 /**
  * 订单详情查询 Hook
@@ -29,14 +29,14 @@ export const useOrderDetail = (
     staleTime: 60 * 1000, // 1 minute
     gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    retry: 1
-  })
-}
+    retry: 1,
+  });
+};
 
 /**
  * 订单详情查询的 Query Key 工厂函数
  * 用于手动失效缓存或预取数据
  */
-export const orderDetailQueryKey = (orderId: string) => ['order', orderId]
+export const orderDetailQueryKey = (orderId: string) => ['order', orderId];
 
-export default useOrderDetail
+export default useOrderDetail;

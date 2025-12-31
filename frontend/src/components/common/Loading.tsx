@@ -1,14 +1,14 @@
-import React from 'react'
-import { Spin } from 'antd'
+import React from 'react';
+import { Spin } from 'antd';
 
 interface LoadingProps {
-  size?: 'small' | 'default' | 'large'
-  tip?: string
-  spinning?: boolean
-  children?: React.ReactNode
-  delay?: number
-  className?: string
-  style?: React.CSSProperties
+  size?: 'small' | 'default' | 'large';
+  tip?: string;
+  spinning?: boolean;
+  children?: React.ReactNode;
+  delay?: number;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const Loading: React.FC<LoadingProps> = ({
@@ -18,7 +18,7 @@ const Loading: React.FC<LoadingProps> = ({
   children,
   delay,
   className,
-  style
+  style,
 }) => {
   return (
     <Spin
@@ -31,7 +31,7 @@ const Loading: React.FC<LoadingProps> = ({
     >
       {children}
     </Spin>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

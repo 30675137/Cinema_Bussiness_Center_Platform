@@ -27,9 +27,9 @@ interface UseAutoSaveOptions<TFieldValues extends FieldValues> {
 
 /**
  * 自动保存 Hook
- * 
+ *
  * 当表单数据变化时，延迟一段时间后自动保存
- * 
+ *
  * @example
  * const form = useForm<BasicInfoFormData>();
  * useAutoSave({
@@ -52,7 +52,10 @@ export function useAutoSave<TFieldValues extends FieldValues>({
   const savingRef = useRef(false);
   const lastSavedDataRef = useRef<string>('');
 
-  const { watch, formState: { isDirty, isValid } } = form;
+  const {
+    watch,
+    formState: { isDirty, isValid },
+  } = form;
 
   // 清除定时器
   const clearTimer = useCallback(() => {
@@ -63,32 +66,35 @@ export function useAutoSave<TFieldValues extends FieldValues>({
   }, []);
 
   // 执行保存
-  const doSave = useCallback(async (data: TFieldValues) => {
-    if (savingRef.current) return;
+  const doSave = useCallback(
+    async (data: TFieldValues) => {
+      if (savingRef.current) return;
 
-    const dataString = JSON.stringify(data);
-    if (dataString === lastSavedDataRef.current) {
-      return; // 数据没有变化，不需要保存
-    }
+      const dataString = JSON.stringify(data);
+      if (dataString === lastSavedDataRef.current) {
+        return; // 数据没有变化，不需要保存
+      }
 
-    try {
-      savingRef.current = true;
-      await onSave(data);
-      lastSavedDataRef.current = dataString;
-      
-      if (showMessage) {
-        message.success('自动保存成功');
+      try {
+        savingRef.current = true;
+        await onSave(data);
+        lastSavedDataRef.current = dataString;
+
+        if (showMessage) {
+          message.success('自动保存成功');
+        }
+        onSuccess?.();
+      } catch (error) {
+        if (showMessage) {
+          message.error('自动保存失败');
+        }
+        onError?.(error as Error);
+      } finally {
+        savingRef.current = false;
       }
-      onSuccess?.();
-    } catch (error) {
-      if (showMessage) {
-        message.error('自动保存失败');
-      }
-      onError?.(error as Error);
-    } finally {
-      savingRef.current = false;
-    }
-  }, [onSave, onSuccess, onError, showMessage]);
+    },
+    [onSave, onSuccess, onError, showMessage]
+  );
 
   // 监听表单变化
   useEffect(() => {

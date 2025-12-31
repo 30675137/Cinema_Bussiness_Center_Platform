@@ -65,14 +65,14 @@ export class CategoryTreeUtils {
    */
   static buildTree(categories: Category[], parentId?: string): CategoryTreeNode[] {
     const children = categories
-      .filter(category => category.parentId === parentId)
+      .filter((category) => category.parentId === parentId)
       .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-    return children.map(category => ({
+    return children.map((category) => ({
       ...category,
       path: this.buildPath(category, categories),
-      isLeaf: !categories.some(cat => cat.parentId === category.id),
-      children: this.buildTree(categories, category.id)
+      isLeaf: !categories.some((cat) => cat.parentId === category.id),
+      children: this.buildTree(categories, category.id),
     }));
   }
 
@@ -85,7 +85,7 @@ export class CategoryTreeUtils {
   static buildPath(category: Category, allCategories: Category[]): string {
     if (!category.parentId) return category.name;
 
-    const parent = allCategories.find(cat => cat.id === category.parentId);
+    const parent = allCategories.find((cat) => cat.id === category.parentId);
     if (!parent) return category.name;
 
     const parentPath = this.buildPath(parent, allCategories);
@@ -121,7 +121,11 @@ export class CategoryTreeUtils {
     if (!node) return [];
 
     const path: string[] = [];
-    const findParent = (nodes: CategoryTreeNode[], targetId: string, currentPath: string[] = []): string[] | null => {
+    const findParent = (
+      nodes: CategoryTreeNode[],
+      targetId: string,
+      currentPath: string[] = []
+    ): string[] | null => {
       for (const n of nodes) {
         if (n.id === targetId) return currentPath;
 
@@ -151,13 +155,13 @@ export class CategoryTreeUtils {
     const filterNode = (node: CategoryTreeNode): CategoryTreeNode | null => {
       const nameMatches = node.name.toLowerCase().includes(lowerKeyword);
       const filteredChildren = node.children
-        ? node.children.map(filterNode).filter(Boolean) as CategoryTreeNode[]
+        ? (node.children.map(filterNode).filter(Boolean) as CategoryTreeNode[])
         : [];
 
       if (nameMatches || filteredChildren.length > 0) {
         return {
           ...node,
-          children: filteredChildren
+          children: filteredChildren,
         };
       }
 
@@ -176,9 +180,10 @@ export class CategoryTreeUtils {
     const keys: string[] = [];
 
     const collectKeys = (nodes: CategoryTreeNode[], hasSearchMatch = false) => {
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         const isSearchMatch = keyword && node.name.toLowerCase().includes(keyword.toLowerCase());
-        const shouldExpand = hasSearchMatch || isSearchMatch || (node.children && node.children.length > 0);
+        const shouldExpand =
+          hasSearchMatch || isSearchMatch || (node.children && node.children.length > 0);
 
         if (shouldExpand) {
           keys.push(node.id);
@@ -275,11 +280,9 @@ export class CategoryValidationUtils {
     categories: Category[],
     excludeId?: string
   ): boolean {
-    const siblings = categories.filter(cat =>
-      cat.parentId === parentId && cat.id !== excludeId
-    );
+    const siblings = categories.filter((cat) => cat.parentId === parentId && cat.id !== excludeId);
 
-    return siblings.some(cat => cat.name.trim() === name.trim());
+    return siblings.some((cat) => cat.name.trim() === name.trim());
   }
 
   /**
@@ -307,14 +310,17 @@ export class CategoryValidationUtils {
     }
 
     if (parentId && level > 1) {
-      const parent = categories.find(cat => cat.id === parentId);
+      const parent = categories.find((cat) => cat.id === parentId);
       if (!parent) {
         return { isValid: false, message: '父类目不存在' };
       }
 
       const expectedLevel = (parent.level + 1) as CategoryLevel;
       if (level !== expectedLevel) {
-        return { isValid: false, message: `父类目为${parent.level}级，子类目必须为${expectedLevel}级` };
+        return {
+          isValid: false,
+          message: `父类目为${parent.level}级，子类目必须为${expectedLevel}级`,
+        };
       }
     }
 
@@ -387,7 +393,7 @@ export class AttributeUtils {
       }
 
       // 检查重复值
-      const uniqueValues = [...new Set(optionalValues.map(v => v.trim()))];
+      const uniqueValues = [...new Set(optionalValues.map((v) => v.trim()))];
       if (uniqueValues.length !== optionalValues.length) {
         return { isValid: false, message: '可选值不能重复' };
       }
@@ -403,10 +409,10 @@ export class AttributeUtils {
    */
   static getAttributeTypeLabel(type: AttributeType): string {
     const typeLabels: Record<AttributeType, string> = {
-      'text': '文本',
-      'number': '数字',
+      text: '文本',
+      number: '数字',
       'single-select': '单选',
-      'multi-select': '多选'
+      'multi-select': '多选',
     };
 
     return typeLabels[type] || type;
@@ -424,8 +430,8 @@ export class AttributeUtils {
     attributes: CategoryAttribute[],
     excludeIndex?: number
   ): boolean {
-    return attributes.some((attr, index) =>
-      attr.name.trim() === name.trim() && index !== excludeIndex
+    return attributes.some(
+      (attr, index) => attr.name.trim() === name.trim() && index !== excludeIndex
     );
   }
 
@@ -452,7 +458,7 @@ export class CategoryFormatUtils {
     const levelLabels: Record<CategoryLevel, string> = {
       1: '一级类目',
       2: '二级类目',
-      3: '三级类目'
+      3: '三级类目',
     };
 
     return levelLabels[level] || `第${level}级类目`;
@@ -465,8 +471,8 @@ export class CategoryFormatUtils {
    */
   static formatStatus(status: CategoryStatus): string {
     const statusLabels: Record<CategoryStatus, string> = {
-      'enabled': '启用',
-      'disabled': '停用'
+      enabled: '启用',
+      disabled: '停用',
     };
 
     return statusLabels[status] || status;
@@ -486,7 +492,7 @@ export class CategoryFormatUtils {
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit'
+        second: '2-digit',
       });
     } catch {
       return dateString;
@@ -504,7 +510,7 @@ export class CategoryFormatUtils {
       return date.toLocaleDateString('zh-CN', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
       });
     } catch {
       return dateString;
@@ -574,7 +580,7 @@ export class CategoryDeletionUtils {
     return {
       canDelete: reasons.length === 0,
       reasons,
-      warnings
+      warnings,
     };
   }
 
@@ -588,13 +594,13 @@ export class CategoryDeletionUtils {
     count: number;
   }> {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // 这里应该调用实际的API来检查SPU使用情况
     // 暂时返回未使用的状态
     return {
       isUsed: false,
-      count: 0
+      count: 0,
     };
   }
 
@@ -616,7 +622,7 @@ export class CategoryDeletionUtils {
       title: `删除${levelText}`,
       description: `确定要删除"${category.name}"吗？`,
       warningText: '⚠️ 删除后将无法恢复，请谨慎操作！',
-      impactText: '删除后，该类目及其所有关联数据将被永久删除。'
+      impactText: '删除后，该类目及其所有关联数据将被永久删除。',
     };
   }
 
@@ -626,18 +632,21 @@ export class CategoryDeletionUtils {
    * @param allCategories 所有类目列表
    * @returns 影响统计
    */
-  static getDeletionImpact(category: Category, allCategories: Category[]): {
+  static getDeletionImpact(
+    category: Category,
+    allCategories: Category[]
+  ): {
     childCount: number;
     descendantCount: number;
     levelText: string;
   } {
-    const directChildren = allCategories.filter(cat => cat.parentId === category.id);
+    const directChildren = allCategories.filter((cat) => cat.parentId === category.id);
     const allDescendants = CategoryTransformUtils.getAllChildIds(category.id, allCategories);
 
     return {
       childCount: directChildren.length,
       descendantCount: allDescendants.length,
-      levelText: CategoryFormatUtils.formatLevel(category.level)
+      levelText: CategoryFormatUtils.formatLevel(category.level),
     };
   }
 }
@@ -656,7 +665,7 @@ export class CategoryTransformUtils {
     const result: Category[] = [];
 
     const flatten = (nodes: CategoryTreeNode[], currentLevel: number) => {
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         result.push({
           id: node.id,
           name: node.name,
@@ -668,7 +677,7 @@ export class CategoryTransformUtils {
           createdAt: node.createdAt,
           updatedAt: node.updatedAt,
           createdBy: node.createdBy,
-          updatedBy: node.updatedBy
+          updatedBy: node.updatedBy,
         });
 
         if (node.children && node.children.length > 0) {
@@ -691,8 +700,8 @@ export class CategoryTransformUtils {
     const childIds: string[] = [];
 
     const findChildren = (parentId: string) => {
-      const directChildren = categories.filter(cat => cat.parentId === parentId);
-      directChildren.forEach(child => {
+      const directChildren = categories.filter((cat) => cat.parentId === parentId);
+      directChildren.forEach((child) => {
         childIds.push(child.id);
         findChildren(child.id); // 递归查找子类目的子类目
       });
@@ -714,7 +723,7 @@ export class CategoryTransformUtils {
 
     while (currentId) {
       path.unshift(currentId);
-      const current = categories.find(cat => cat.id === currentId);
+      const current = categories.find((cat) => cat.id === currentId);
       currentId = current?.parentId;
     }
 
@@ -746,5 +755,5 @@ export default {
   AttributeUtils,
   CategoryFormatUtils,
   CategoryDeletionUtils,
-  CategoryTransformUtils
+  CategoryTransformUtils,
 };

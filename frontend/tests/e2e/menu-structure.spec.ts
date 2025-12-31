@@ -23,7 +23,7 @@ test.describe('完整菜单结构显示', () => {
       '档期/排期/资源预约管理',
       '订单与履约管理 (OMS-like)',
       '运营 & 报表/指标看板',
-      '系统管理/设置/权限'
+      '系统管理/设置/权限',
     ];
 
     // 检查每个一级菜单是否可见
@@ -69,7 +69,7 @@ test.describe('完整菜单结构显示', () => {
       '单位 & 换算规则管理',
       '字典与规则配置（损耗原因、报损原因、服务项类型等）',
       '角色与权限管理',
-      '审批流配置（商品/价格/场景包/排期/报损等）'
+      '审批流配置（商品/价格/场景包/排期/报损等）',
     ];
 
     for (const subMenuText of expectedSubMenus) {
@@ -95,7 +95,7 @@ test.describe('完整菜单结构显示', () => {
       '内容编辑 (标题、卖点、图文/素材)',
       '素材库管理（图片/视频）',
       '渠道映射字段管理',
-      '内容发布/审核/历史版本管理'
+      '内容发布/审核/历史版本管理',
     ];
 
     for (const subMenuText of expectedSubMenus) {
@@ -144,8 +144,8 @@ test.describe('完整菜单结构显示', () => {
     // 验证hover效果
     await firstMenuItem.hover();
     // 检查是否有hover样式类或属性
-    const hasHoverClass = await firstMenuItem.evaluate(el =>
-      window.getComputedStyle(el).backgroundColor !== ''
+    const hasHoverClass = await firstMenuItem.evaluate(
+      (el) => window.getComputedStyle(el).backgroundColor !== ''
     );
     expect(hasHoverClass).toBe(true);
   });

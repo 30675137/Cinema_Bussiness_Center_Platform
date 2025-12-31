@@ -1,16 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import {
-  Form,
-  Input,
-  Select,
-  Button,
-  Space,
-  Row,
-  Col,
-  Typography,
-  Divider,
-  message,
-} from 'antd';
+import { Form, Input, Select, Button, Space, Row, Col, Typography, Divider, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { BrandFormProps, Brand } from '../../types/brand.types';
 import { BrandType, BrandStatus, BRAND_CONSTANTS } from '../../types/brand.types';
@@ -55,24 +44,27 @@ const BrandForm: React.FC<BrandFormProps> = ({
   }, [brand, mode, form]);
 
   // 处理表单提交
-  const handleSubmit = useCallback(async (values: any) => {
-    try {
-      const formData = {
-        ...values,
-        // 清理空值
-        englishName: values.englishName?.trim() || undefined,
-        company: values.company?.trim() || undefined,
-        brandLevel: values.brandLevel?.trim() || undefined,
-        tags: values.tags?.filter((tag: string) => tag.trim()) || [],
-        description: values.description?.trim() || undefined,
-        primaryCategories: values.primaryCategories || [],
-      };
+  const handleSubmit = useCallback(
+    async (values: any) => {
+      try {
+        const formData = {
+          ...values,
+          // 清理空值
+          englishName: values.englishName?.trim() || undefined,
+          company: values.company?.trim() || undefined,
+          brandLevel: values.brandLevel?.trim() || undefined,
+          tags: values.tags?.filter((tag: string) => tag.trim()) || [],
+          description: values.description?.trim() || undefined,
+          primaryCategories: values.primaryCategories || [],
+        };
 
-      await onSubmit(formData);
-    } catch (error) {
-      message.error('提交失败，请稍后重试');
-    }
-  }, [onSubmit]);
+        await onSubmit(formData);
+      } catch (error) {
+        message.error('提交失败，请稍后重试');
+      }
+    },
+    [onSubmit]
+  );
 
   // 处理取消
   const handleCancel = useCallback(() => {
@@ -80,13 +72,16 @@ const BrandForm: React.FC<BrandFormProps> = ({
   }, [onCancel]);
 
   // 处理键盘快捷键
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 'Enter') {
-      form.submit();
-    } else if (e.key === 'Escape') {
-      handleCancel();
-    }
-  }, [form, handleCancel]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        form.submit();
+      } else if (e.key === 'Escape') {
+        handleCancel();
+      }
+    },
+    [form, handleCancel]
+  );
 
   // 表单标题
   const getFormTitle = () => {
@@ -103,11 +98,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
   };
 
   return (
-    <div
-      className="brand-form"
-      data-testid="brand-form"
-      onKeyDown={handleKeyDown}
-    >
+    <div className="brand-form" data-testid="brand-form" onKeyDown={handleKeyDown}>
       <div className="brand-form-header" data-testid="brand-form-header">
         <Title level={4} data-testid="brand-form-title">
           {getFormTitle()}
@@ -136,7 +127,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
                   { max: 100, message: '品牌名称不能超过100字符' },
                   {
                     pattern: /^[\u4e00-\u9fa5a-zA-Z0-9\s\-_&]+$/,
-                    message: '品牌名称只能包含中文、英文、数字、空格、连字符、下划线和&符号'
+                    message: '品牌名称只能包含中文、英文、数字、空格、连字符、下划线和&符号',
                   },
                 ]}
                 data-testid="brand-name-form-item"
@@ -157,7 +148,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
                   { max: 200, message: '英文名不能超过200字符' },
                   {
                     pattern: /^[a-zA-Z0-9\s\-_&]+$/,
-                    message: '英文名只能包含英文字母、数字、空格、连字符、下划线和&符号'
+                    message: '英文名只能包含英文字母、数字、空格、连字符、下划线和&符号',
                   },
                 ]}
                 data-testid="english-name-form-item"
@@ -174,9 +165,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
               <Form.Item
                 name="brandType"
                 label="品牌类型"
-                rules={[
-                  { required: true, message: '请选择品牌类型' },
-                ]}
+                rules={[{ required: true, message: '请选择品牌类型' }]}
                 data-testid="brand-type-form-item"
               >
                 <Select
@@ -211,7 +200,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
                         return Promise.reject(new Error('请选择至少一个主营类目'));
                       }
                       return Promise.resolve();
-                    }
+                    },
                   },
                 ]}
                 data-testid="primary-categories-form-item"
@@ -240,9 +229,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
               <Form.Item
                 name="company"
                 label="所属公司"
-                rules={[
-                  { max: 200, message: '公司名称不能超过200字符' },
-                ]}
+                rules={[{ max: 200, message: '公司名称不能超过200字符' }]}
                 data-testid="company-form-item"
               >
                 <Input
@@ -257,16 +244,10 @@ const BrandForm: React.FC<BrandFormProps> = ({
               <Form.Item
                 name="brandLevel"
                 label="品牌等级"
-                rules={[
-                  { max: 50, message: '品牌等级不能超过50字符' },
-                ]}
+                rules={[{ max: 50, message: '品牌等级不能超过50字符' }]}
                 data-testid="brand-level-form-item"
               >
-                <Select
-                  placeholder="请选择品牌等级"
-                  data-testid="brand-level-select"
-                  allowClear
-                >
+                <Select placeholder="请选择品牌等级" data-testid="brand-level-select" allowClear>
                   <Option value="A">A级</Option>
                   <Option value="B">B级</Option>
                   <Option value="C">C级</Option>
@@ -287,7 +268,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
                         return Promise.reject(new Error('标签不能超过10个'));
                       }
                       return Promise.resolve();
-                    }
+                    },
                   },
                 ]}
                 data-testid="brand-tags-form-item"
@@ -303,11 +284,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
             </Col>
 
             <Col xs={24} md={12}>
-              <Form.Item
-                name="status"
-                label="品牌状态"
-                data-testid="brand-status-form-item"
-              >
+              <Form.Item name="status" label="品牌状态" data-testid="brand-status-form-item">
                 <Select
                   placeholder="请选择品牌状态"
                   data-testid="brand-status-select"
@@ -330,9 +307,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
 
           <Form.Item
             name="description"
-            rules={[
-              { max: 1000, message: '品牌介绍不能超过1000字符' },
-            ]}
+            rules={[{ max: 1000, message: '品牌介绍不能超过1000字符' }]}
             data-testid="brand-description-form-item"
           >
             <TextArea
@@ -350,11 +325,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
           <Space>
             {mode !== 'view' && (
               <>
-                <Button
-                  onClick={handleCancel}
-                  disabled={loading}
-                  data-testid="cancel-brand-button"
-                >
+                <Button onClick={handleCancel} disabled={loading} data-testid="cancel-brand-button">
                   取消
                 </Button>
                 <Button

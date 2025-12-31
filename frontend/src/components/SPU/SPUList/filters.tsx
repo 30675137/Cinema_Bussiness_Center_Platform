@@ -22,7 +22,7 @@ interface SPUFiltersProps {
 const statusOptions = [
   { label: '启用', value: 'active' },
   { label: '停用', value: 'inactive' },
-  { label: '草稿', value: 'draft' }
+  { label: '草稿', value: 'draft' },
 ];
 
 // 标签选项（可以从数据中动态获取）
@@ -42,7 +42,7 @@ const tagOptions = [
   { label: '促销', value: '促销' },
   { label: '推荐', value: '推荐' },
   { label: '进口', value: '进口' },
-  { label: '有机', value: '有机' }
+  { label: '有机', value: '有机' },
 ];
 
 const SPUFilters: React.FC<SPUFiltersProps> = ({
@@ -51,7 +51,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
   filters,
   onSearch,
   onFilter,
-  onReset
+  onReset,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState(filters.keyword || '');
@@ -70,8 +70,11 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
     }
   };
 
-  const hasAdvancedFilters = filters.brandId || filters.categoryId ||
-    filters.status || (filters.tags && filters.tags.length > 0) ||
+  const hasAdvancedFilters =
+    filters.brandId ||
+    filters.categoryId ||
+    filters.status ||
+    (filters.tags && filters.tags.length > 0) ||
     filters.dateRange;
 
   return (
@@ -80,9 +83,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
         {/* 基础搜索 */}
         <div className="flex gap-4 items-end">
           <div className="flex-1 max-w-md">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              搜索关键词
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">搜索关键词</label>
             <Input
               placeholder="支持SPU名称、编码搜索"
               value={searchKeyword}
@@ -102,14 +103,8 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={() => onSearch(searchKeyword.trim())}>
-              搜索
-            </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={onReset}
-              type="default"
-            >
+            <Button onClick={() => onSearch(searchKeyword.trim())}>搜索</Button>
+            <Button icon={<ReloadOutlined />} onClick={onReset} type="default">
               重置
             </Button>
 
@@ -130,9 +125,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
             {/* 品牌筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                品牌
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">品牌</label>
               <Select
                 placeholder="全部品牌"
                 value={filters.brandId}
@@ -144,7 +137,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
                   option?.children?.toString().toLowerCase().includes(input.toLowerCase())
                 }
               >
-                {brands.map(brand => (
+                {brands.map((brand) => (
                   <Option key={brand.id} value={brand.id}>
                     {brand.name}
                   </Option>
@@ -154,9 +147,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 分类筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                分类
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">分类</label>
               <Select
                 placeholder="全部分类"
                 value={filters.categoryId}
@@ -168,7 +159,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
                   option?.children?.toString().toLowerCase().includes(input.toLowerCase())
                 }
               >
-                {categories.map(category => (
+                {categories.map((category) => (
                   <Option key={category.id} value={category.id}>
                     {category.name}
                   </Option>
@@ -178,9 +169,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 状态筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                状态
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">状态</label>
               <Select
                 placeholder="全部状态"
                 value={filters.status}
@@ -188,7 +177,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
                 allowClear
                 style={{ width: '100%' }}
               >
-                {statusOptions.map(status => (
+                {statusOptions.map((status) => (
                   <Option key={status.value} value={status.value}>
                     {status.label}
                   </Option>
@@ -198,9 +187,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 标签筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                标签
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">标签</label>
               <Select
                 mode="multiple"
                 placeholder="选择标签"
@@ -209,11 +196,9 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
                 allowClear
                 style={{ width: '100%' }}
                 maxTagCount={2}
-                maxTagPlaceholder={(omittedValues) => (
-                  <span>+{omittedValues.length}...</span>
-                )}
+                maxTagPlaceholder={(omittedValues) => <span>+{omittedValues.length}...</span>}
               >
-                {tagOptions.map(tag => (
+                {tagOptions.map((tag) => (
                   <Option key={tag.value} value={tag.value}>
                     {tag.label}
                   </Option>
@@ -223,19 +208,18 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 日期范围筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                创建时间
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">创建时间</label>
               <RangePicker
-                value={filters.dateRange ? [
-                  dayjs(filters.dateRange[0]),
-                  dayjs(filters.dateRange[1])
-                ] : null}
+                value={
+                  filters.dateRange
+                    ? [dayjs(filters.dateRange[0]), dayjs(filters.dateRange[1])]
+                    : null
+                }
                 onChange={(dates) => {
                   if (dates && dates[0] && dates[1]) {
                     onFilter('dateRange', [
                       dates[0].startOf('day').toISOString(),
-                      dates[1].endOf('day').toISOString()
+                      dates[1].endOf('day').toISOString(),
                     ]);
                   } else {
                     onFilter('dateRange', undefined);
@@ -249,15 +233,15 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 价格范围筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                价格范围
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">价格范围</label>
               <div className="flex gap-2 items-center">
                 <Input
                   type="number"
                   placeholder="最低价"
                   value={filters.minPrice}
-                  onChange={(e) => onFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) =>
+                    onFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)
+                  }
                   style={{ width: '45%' }}
                 />
                 <span>-</span>
@@ -265,7 +249,9 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
                   type="number"
                   placeholder="最高价"
                   value={filters.maxPrice}
-                  onChange={(e) => onFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
+                  onChange={(e) =>
+                    onFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)
+                  }
                   style={{ width: '45%' }}
                 />
               </div>
@@ -273,9 +259,7 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
 
             {/* 库存筛选 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                库存状态
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">库存状态</label>
               <Select
                 placeholder="全部库存"
                 value={filters.lowStock}
@@ -296,34 +280,22 @@ const SPUFilters: React.FC<SPUFiltersProps> = ({
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <span>当前筛选:</span>
               {filters.brandId && (
-                <Tag
-                  closable
-                  onClose={() => onFilter('brandId', undefined)}
-                >
-                  品牌: {brands.find(b => b.id === filters.brandId)?.name}
+                <Tag closable onClose={() => onFilter('brandId', undefined)}>
+                  品牌: {brands.find((b) => b.id === filters.brandId)?.name}
                 </Tag>
               )}
               {filters.categoryId && (
-                <Tag
-                  closable
-                  onClose={() => onFilter('categoryId', undefined)}
-                >
-                  分类: {categories.find(c => c.id === filters.categoryId)?.name}
+                <Tag closable onClose={() => onFilter('categoryId', undefined)}>
+                  分类: {categories.find((c) => c.id === filters.categoryId)?.name}
                 </Tag>
               )}
               {filters.status && (
-                <Tag
-                  closable
-                  onClose={() => onFilter('status', undefined)}
-                >
-                  状态: {statusOptions.find(s => s.value === filters.status)?.label}
+                <Tag closable onClose={() => onFilter('status', undefined)}>
+                  状态: {statusOptions.find((s) => s.value === filters.status)?.label}
                 </Tag>
               )}
               {filters.tags && filters.tags.length > 0 && (
-                <Tag
-                  closable
-                  onClose={() => onFilter('tags', undefined)}
-                >
+                <Tag closable onClose={() => onFilter('tags', undefined)}>
                   标签: {filters.tags.join(', ')}
                 </Tag>
               )}

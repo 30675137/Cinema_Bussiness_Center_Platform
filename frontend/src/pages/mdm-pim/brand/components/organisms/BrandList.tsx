@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, Spin, Alert, Empty, Pagination, Space, Typography } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import type { Brand, BrandFilters as BrandFiltersType, BrandPaginationResponse } from '../../types/brand.types';
+import type {
+  Brand,
+  BrandFilters as BrandFiltersType,
+  BrandPaginationResponse,
+} from '../../types/brand.types';
 import { BrandStatus } from '../../types/brand.types';
 import { brandService } from '../../services/brandService';
 import BrandSearchForm from '../molecules/BrandSearchForm';
@@ -27,7 +31,7 @@ const BrandList: React.FC<BrandListProps> = ({
   onBrandView,
   onBrandEdit,
   onBrandCreate,
-  onBrandStatusChange
+  onBrandStatusChange,
 }) => {
   // 状态管理
   const [filters, setFilters] = useState<BrandFiltersType>({});
@@ -46,32 +50,33 @@ const BrandList: React.FC<BrandListProps> = ({
     data: brandListData,
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ['brands', filters, pagination],
-    queryFn: () => brandService.getBrands({
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-      ...filters,
-    }),
+    queryFn: () =>
+      brandService.getBrands({
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        ...filters,
+      }),
     staleTime: 5 * 60 * 1000, // 5分钟缓存
   });
 
   // 处理搜索
   const handleSearch = (newFilters: BrandFiltersType) => {
     setFilters(newFilters);
-    setPagination(prev => ({ ...prev, current: 1 })); // 搜索时重置到第一页
+    setPagination((prev) => ({ ...prev, current: 1 })); // 搜索时重置到第一页
   };
 
   // 处理重置
   const handleReset = () => {
     setFilters({});
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   // 处理分页变化
   const handlePaginationChange = (page: number, pageSize?: number) => {
-    setPagination(prev => ({
+    setPagination((prev) => ({
       current: page,
       pageSize: pageSize || prev.pageSize,
     }));
@@ -137,14 +142,16 @@ const BrandList: React.FC<BrandListProps> = ({
 
   // 获取品牌列表数据 - API直接返回 {success, data: [...], pagination: {...}}
   const brands = brandListData?.data || [];
-  const paginationData = brandListData?.pagination || {
-    current: 1,
-    pageSize: 20,
-    total: 0,
-    totalPages: 0,
-    hasNext: false,
-    hasPrev: false,
-  } as BrandPaginationResponse;
+  const paginationData =
+    brandListData?.pagination ||
+    ({
+      current: 1,
+      pageSize: 20,
+      total: 0,
+      totalPages: 0,
+      hasNext: false,
+      hasPrev: false,
+    } as BrandPaginationResponse);
 
   // 渲染加载状态
   if (isLoading) {
@@ -185,11 +192,7 @@ const BrandList: React.FC<BrandListProps> = ({
         </div>
         <div className="header-right">
           <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={handleRefresh}
-              loading={isLoading}
-            >
+            <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={isLoading}>
               刷新
             </Button>
             <Button
@@ -206,11 +209,7 @@ const BrandList: React.FC<BrandListProps> = ({
 
       {/* 搜索表单 */}
       <Card className="brand-search-card" bordered={false}>
-        <BrandSearchForm
-          onSearch={handleSearch}
-          onReset={handleReset}
-          loading={isLoading}
-        />
+        <BrandSearchForm onSearch={handleSearch} onReset={handleReset} loading={isLoading} />
       </Card>
 
       {/* 激活的筛选条件 */}
@@ -235,7 +234,8 @@ const BrandList: React.FC<BrandListProps> = ({
         {brands.length > 0 && (
           <div className="brand-pagination-wrapper">
             <div className="pagination-info" data-testid="result-count">
-              共 {paginationData.total} 条记录，第 {paginationData.current} / {paginationData.totalPages} 页
+              共 {paginationData.total} 条记录，第 {paginationData.current} /{' '}
+              {paginationData.totalPages} 页
             </div>
             <Pagination
               current={paginationData.current}
@@ -243,9 +243,7 @@ const BrandList: React.FC<BrandListProps> = ({
               total={paginationData.total}
               showSizeChanger
               showQuickJumper
-              showTotal={(total, range) =>
-                `第 ${range[0]}-${range[1]} 条/共 ${total} 条`
-              }
+              showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
               onChange={handlePaginationChange}
               onShowSizeChange={handlePaginationChange}
               className="brand-pagination"
@@ -261,11 +259,7 @@ const BrandList: React.FC<BrandListProps> = ({
       {brands.length === 0 && !isLoading && (
         <div className="brand-empty-state" data-testid="brand-empty-state">
           <Empty
-            description={
-              Object.keys(filters).length > 0
-                ? '没有找到匹配的品牌'
-                : '暂无品牌数据'
-            }
+            description={Object.keys(filters).length > 0 ? '没有找到匹配的品牌' : '暂无品牌数据'}
           >
             <Button type="primary" onClick={handleBrandCreate}>
               创建品牌

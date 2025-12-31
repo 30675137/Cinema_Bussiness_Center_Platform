@@ -27,7 +27,7 @@ interface EditStoreModalProps {
 
 /**
  * Modal for editing an existing store
- * 
+ *
  * Features:
  * - Pre-fills form with existing store data
  * - Supports optimistic locking via version field
@@ -81,7 +81,7 @@ const EditStoreModal: React.FC<EditStoreModalProps> = ({ open, store, onClose })
         storeId: store.id,
         data: {
           ...data,
-          version: store.version,  // Include version for optimistic locking
+          version: store.version, // Include version for optimistic locking
         },
       });
       message.success('门店信息更新成功');

@@ -65,26 +65,32 @@ const InventoryAdjustmentsPage: React.FC = () => {
   }, []);
 
   // 处理审批
-  const handleApprove = useCallback(async (adjustment: InventoryAdjustment, approved: boolean, remark?: string) => {
-    try {
-      await approveAdjustment(adjustment.id, approved, remark);
-      // 刷新数据
-      refreshData();
-    } catch (error) {
-      console.error('审批失败:', error);
-    }
-  }, [approveAdjustment, refreshData]);
+  const handleApprove = useCallback(
+    async (adjustment: InventoryAdjustment, approved: boolean, remark?: string) => {
+      try {
+        await approveAdjustment(adjustment.id, approved, remark);
+        // 刷新数据
+        refreshData();
+      } catch (error) {
+        console.error('审批失败:', error);
+      }
+    },
+    [approveAdjustment, refreshData]
+  );
 
   // 处理执行
-  const handleExecute = useCallback(async (adjustment: InventoryAdjustment) => {
-    try {
-      await executeAdjustment(adjustment.id, '当前操作员');
-      // 刷新数据
-      refreshData();
-    } catch (error) {
-      console.error('执行失败:', error);
-    }
-  }, [executeAdjustment, refreshData]);
+  const handleExecute = useCallback(
+    async (adjustment: InventoryAdjustment) => {
+      try {
+        await executeAdjustment(adjustment.id, '当前操作员');
+        // 刷新数据
+        refreshData();
+      } catch (error) {
+        console.error('执行失败:', error);
+      }
+    },
+    [executeAdjustment, refreshData]
+  );
 
   // 处理导出
   const handleExport = useCallback(async () => {
@@ -168,9 +174,7 @@ const InventoryAdjustmentsPage: React.FC = () => {
   const renderPageHeader = () => (
     <Space direction="vertical" size="small" style={{ width: '100%' }}>
       <Title level={3}>库存调整历史</Title>
-      <Text type="secondary">
-        查看和管理所有库存调整申请记录，支持审批和执行操作
-      </Text>
+      <Text type="secondary">查看和管理所有库存调整申请记录，支持审批和执行操作</Text>
     </Space>
   );
 
@@ -190,10 +194,7 @@ const InventoryAdjustmentsPage: React.FC = () => {
     if (!canRead) {
       return (
         <Card>
-          <Empty
-            description="没有权限访问调整数据"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
+          <Empty description="没有权限访问调整数据" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Card>
       );
     }
@@ -201,10 +202,7 @@ const InventoryAdjustmentsPage: React.FC = () => {
     if (error) {
       return (
         <Card>
-          <Empty
-            description="加载失败，请重试"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
+          <Empty description="加载失败，请重试" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Card>
       );
     }
@@ -212,10 +210,7 @@ const InventoryAdjustmentsPage: React.FC = () => {
     if (isEmpty && !isLoading) {
       return (
         <Card>
-          <Empty
-            description="暂无调整记录"
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-          />
+          <Empty description="暂无调整记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />
         </Card>
       );
     }
@@ -250,20 +245,36 @@ const InventoryAdjustmentsPage: React.FC = () => {
         <Card title="快速统计" size="small">
           <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <Row justify="space-between">
-              <Col><Text type="secondary">总申请数:</Text></Col>
-              <Col><Text strong>{statistics.totalApplications}</Text></Col>
+              <Col>
+                <Text type="secondary">总申请数:</Text>
+              </Col>
+              <Col>
+                <Text strong>{statistics.totalApplications}</Text>
+              </Col>
             </Row>
             <Row justify="space-between">
-              <Col><Text type="secondary">待审批:</Text></Col>
-              <Col><Text type="warning">{statistics.pendingApplications}</Text></Col>
+              <Col>
+                <Text type="secondary">待审批:</Text>
+              </Col>
+              <Col>
+                <Text type="warning">{statistics.pendingApplications}</Text>
+              </Col>
             </Row>
             <Row justify="space-between">
-              <Col><Text type="secondary">已批准:</Text></Col>
-              <Col><Text type="success">{statistics.approvedApplications}</Text></Col>
+              <Col>
+                <Text type="secondary">已批准:</Text>
+              </Col>
+              <Col>
+                <Text type="success">{statistics.approvedApplications}</Text>
+              </Col>
             </Row>
             <Row justify="space-between">
-              <Col><Text type="secondary">总调整量:</Text></Col>
-              <Col><Text strong>{formatNumber(statistics.totalAdjustmentQuantity)} 件</Text></Col>
+              <Col>
+                <Text type="secondary">总调整量:</Text>
+              </Col>
+              <Col>
+                <Text strong>{formatNumber(statistics.totalAdjustmentQuantity)} 件</Text>
+              </Col>
             </Row>
           </Space>
         </Card>
@@ -272,28 +283,15 @@ const InventoryAdjustmentsPage: React.FC = () => {
       {/* 快捷操作 */}
       <Card title="快捷操作" size="small">
         <Space direction="vertical" size="small" style={{ width: '100%' }}>
-          <Button
-            block
-            icon={<ReloadOutlined />}
-            onClick={refreshData}
-            loading={isLoading}
-          >
+          <Button block icon={<ReloadOutlined />} onClick={refreshData} loading={isLoading}>
             刷新数据
           </Button>
           {canExport && (
-            <Button
-              block
-              icon={<ExportOutlined />}
-              onClick={handleExport}
-              disabled={isEmpty}
-            >
+            <Button block icon={<ExportOutlined />} onClick={handleExport} disabled={isEmpty}>
               导出数据
             </Button>
           )}
-          <Button
-            block
-            onClick={handleBackToLedger}
-          >
+          <Button block onClick={handleBackToLedger}>
             返回库存台账
           </Button>
         </Space>

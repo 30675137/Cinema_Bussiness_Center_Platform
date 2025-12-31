@@ -40,7 +40,9 @@ export const ActivityTypePage: React.FC = () => {
   // 处理错误
   React.useEffect(() => {
     if (error) {
-      message.error('加载活动类型列表失败: ' + (error instanceof Error ? error.message : '未知错误'));
+      message.error(
+        '加载活动类型列表失败: ' + (error instanceof Error ? error.message : '未知错误')
+      );
     }
   }, [error]);
 
@@ -115,9 +117,7 @@ export const ActivityTypePage: React.FC = () => {
   const handleToggleStatus = async (id: string, status: ActivityTypeStatus) => {
     try {
       await toggleStatusMutation.mutateAsync({ id, status });
-      message.success(
-        status === ActivityTypeStatus.ENABLED ? '活动类型已启用' : '活动类型已停用'
-      );
+      message.success(status === ActivityTypeStatus.ENABLED ? '活动类型已启用' : '活动类型已停用');
       await refetch(); // 刷新列表
     } catch (error) {
       message.error(error instanceof Error ? error.message : '操作失败，请重试');
@@ -187,4 +187,3 @@ export const ActivityTypePage: React.FC = () => {
 };
 
 export default ActivityTypePage;
-

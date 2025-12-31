@@ -29,14 +29,8 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<() => void>(() => {});
 
-  const {
-    createBrand,
-    updateBrand,
-    uploadLogo,
-    isCreating,
-    isUpdating,
-    isUploadingLogo,
-  } = useBrandActions();
+  const { createBrand, updateBrand, uploadLogo, isCreating, isUpdating, isUploadingLogo } =
+    useBrandActions();
 
   // 重置表单变更状态
   const resetFormChanges = () => {
@@ -154,11 +148,7 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   // 获取操作按钮
   const getActionButtons = () => {
     if (mode === 'view') {
-      return (
-        <Button onClick={handleClose}>
-          关闭
-        </Button>
-      );
+      return <Button onClick={handleClose}>关闭</Button>;
     }
 
     return (
@@ -177,7 +167,9 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
           icon={mode === 'create' ? <SaveOutlined /> : undefined}
           onClick={() => {
             // 触发表单提交
-            const form = document.querySelector('[data-testid="brand-form"] form') as HTMLFormElement;
+            const form = document.querySelector(
+              '[data-testid="brand-form"] form'
+            ) as HTMLFormElement;
             if (form) {
               form.requestSubmit();
             }

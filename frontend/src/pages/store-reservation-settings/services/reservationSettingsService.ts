@@ -25,15 +25,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 export async function getStoreReservationSettings(
   storeId: string
 ): Promise<StoreReservationSettings> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/stores/${storeId}/reservation-settings`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/api/stores/${storeId}/reservation-settings`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -70,9 +67,7 @@ export async function getAllStoresReservationSettings(
   const results = await Promise.all(promises);
 
   // Filter out null results (stores without settings)
-  return results.filter(
-    (settings): settings is StoreReservationSettings => settings !== null
-  );
+  return results.filter((settings): settings is StoreReservationSettings => settings !== null);
 }
 
 /**
@@ -86,16 +81,13 @@ export async function updateStoreReservationSettings(
   storeId: string,
   request: UpdateStoreReservationSettingsRequest
 ): Promise<StoreReservationSettings> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/stores/${storeId}/reservation-settings`,
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/api/stores/${storeId}/reservation-settings`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
 
   if (!response.ok) {
     if (response.status === 400) {
@@ -122,16 +114,13 @@ export async function updateStoreReservationSettings(
 export async function batchUpdateStoreReservationSettings(
   request: BatchUpdateStoreReservationSettingsRequest
 ): Promise<BatchUpdateResult> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/stores/reservation-settings/batch`,
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    }
-  );
+  const response = await fetch(`${API_BASE_URL}/api/stores/reservation-settings/batch`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
 
   if (!response.ok) {
     if (response.status === 400) {

@@ -16,7 +16,10 @@ import { useDebounce } from '@/hooks/useDebounce';
 import AttributeStatusTag from '../atoms/AttributeStatusTag';
 import type { DictionaryItem } from '@/features/attribute-dictionary/types';
 import { useDictionaryItemsQuery } from '../../hooks/useDictionaryQueries';
-import { useToggleDictionaryItemStatusMutation, useDeleteDictionaryItemMutation } from '../../hooks/useDictionaryMutations';
+import {
+  useToggleDictionaryItemStatusMutation,
+  useDeleteDictionaryItemMutation,
+} from '../../hooks/useDictionaryMutations';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -30,14 +33,10 @@ interface DictionaryItemTableProps {
 /**
  * Table component for dictionary items
  */
-const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({
-  typeId,
-  onEdit,
-  onDelete,
-}) => {
+const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({ typeId, onEdit, onDelete }) => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  
+
   // Debounce search keyword (300ms per FR-006)
   const debouncedSearchKeyword = useDebounce(searchKeyword, 300);
 
@@ -54,13 +53,13 @@ const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({
   }, [statusFilter, debouncedSearchKeyword]);
 
   // Fetch items
-  const { data: items = [], isLoading, refetch } = useDictionaryItemsQuery(
-    typeId,
-    queryParams,
-    {
-      enabled: !!typeId,
-    }
-  );
+  const {
+    data: items = [],
+    isLoading,
+    refetch,
+  } = useDictionaryItemsQuery(typeId, queryParams, {
+    enabled: !!typeId,
+  });
 
   // Mutations
   const toggleStatusMutation = useToggleDictionaryItemStatusMutation();
@@ -169,12 +168,7 @@ const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({
           >
             {record.status === 'active' ? '停用' : '启用'}
           </Button>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onEdit?.(record)}
-          >
+          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => onEdit?.(record)}>
             编辑
           </Button>
           <Popconfirm
@@ -244,5 +238,3 @@ const DictionaryItemTable: React.FC<DictionaryItemTableProps> = ({
 };
 
 export default DictionaryItemTable;
-
-

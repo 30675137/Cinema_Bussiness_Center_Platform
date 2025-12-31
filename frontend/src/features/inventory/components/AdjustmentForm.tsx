@@ -1,22 +1,12 @@
 /**
  * P004-inventory-adjustment: 库存调整表单组件
- * 
+ *
  * 用于录入库存调整信息，包括调整类型、数量和原因选择。
  * 实现 T018 任务。
  */
 
 import React, { useEffect, useMemo } from 'react';
-import {
-  Form,
-  Select,
-  InputNumber,
-  Input,
-  Alert,
-  Spin,
-  Typography,
-  Space,
-  Tag,
-} from 'antd';
+import { Form, Select, InputNumber, Input, Alert, Spin, Typography, Space, Tag } from 'antd';
 import type { FormInstance } from 'antd';
 import { useAdjustmentReasonsByType } from '../hooks/useAdjustmentReasons';
 import {
@@ -59,7 +49,7 @@ export interface AdjustmentFormProps {
 
 /**
  * 库存调整表单组件
- * 
+ *
  * 功能：
  * - 选择调整类型（盘盈/盘亏/报损）
  * - 输入调整数量
@@ -67,7 +57,7 @@ export interface AdjustmentFormProps {
  * - 填写原因说明（可选）
  * - 填写备注（可选）
  * - 实时显示调整金额和审批提示
- * 
+ *
  * @example
  * ```tsx
  * <AdjustmentForm
@@ -145,25 +135,24 @@ export const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
   }, [adjustmentAmount, needsApproval, onAmountChange]);
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      disabled={disabled}
-      requiredMark="optional"
-    >
+    <Form form={form} layout="vertical" disabled={disabled} requiredMark="optional">
       {/* SKU 信息显示 */}
-      <div style={{ 
-        background: '#f5f5f5', 
-        padding: 12, 
-        borderRadius: 6, 
-        marginBottom: 16 
-      }}>
+      <div
+        style={{
+          background: '#f5f5f5',
+          padding: 12,
+          borderRadius: 6,
+          marginBottom: 16,
+        }}
+      >
         <Space direction="vertical" size={4}>
           <Text type="secondary">调整商品</Text>
           <Text strong>{inventory.skuName}</Text>
           <Space>
             <Text type="secondary">SKU编码: {inventory.skuCode}</Text>
-            <Text type="secondary">当前库存: {inventory.onHandQty} {inventory.mainUnit}</Text>
+            <Text type="secondary">
+              当前库存: {inventory.onHandQty} {inventory.mainUnit}
+            </Text>
           </Space>
         </Space>
       </div>
@@ -204,9 +193,10 @@ export const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
             <Space style={{ marginTop: 4 }}>
               <Text type="secondary">调整后:</Text>
               <Text>
-                {stockPreview.before} 
+                {stockPreview.before}
                 <Text type={stockPreview.change > 0 ? 'success' : 'danger'}>
-                  {' '}→ {stockPreview.after}
+                  {' '}
+                  → {stockPreview.after}
                 </Text>
               </Text>
               <Text type="secondary">{inventory.mainUnit}</Text>
@@ -264,11 +254,7 @@ export const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
       </Form.Item>
 
       {/* 备注 */}
-      <Form.Item
-        name="remarks"
-        label="备注"
-        rules={[{ max: 500, message: '备注不能超过500字符' }]}
-      >
+      <Form.Item name="remarks" label="备注" rules={[{ max: 500, message: '备注不能超过500字符' }]}>
         <TextArea
           rows={2}
           placeholder="可选：其他备注信息"
@@ -292,15 +278,17 @@ export const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
 
       {/* 调整金额显示 */}
       {adjustmentAmount > 0 && (
-        <div style={{ 
-          background: '#fafafa', 
-          padding: 12, 
-          borderRadius: 6, 
-          marginTop: 16,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
+        <div
+          style={{
+            background: '#fafafa',
+            padding: 12,
+            borderRadius: 6,
+            marginTop: 16,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <Text type="secondary">预估调整金额:</Text>
           <Text strong style={{ fontSize: 16 }}>
             ¥ {adjustmentAmount.toFixed(2)}

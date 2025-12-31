@@ -18,7 +18,7 @@ import {
   QualityCheckParams,
   ReceiptLog,
   ReturnRecord,
-  } from '@/types/receipt';
+} from '@/types/receipt';
 import { generateOrderNumber, generateId } from '@/utils/helpers';
 import { formatDate } from '@/utils/formatters';
 
@@ -133,8 +133,12 @@ const generateMockReceipts = (count: number = 50): Receipt[] => {
   return Array.from({ length: count }, (_, index) => {
     const id = `receipt-${index + 1}`;
     const receiptNumber = `REC${String(index + 1).padStart(6, '0')}`;
-    const status = Object.values(ReceiptStatus)[Math.floor(Math.random() * Object.values(ReceiptStatus).length)];
-    const priority = Object.values(ReceiptPriority)[Math.floor(Math.random() * Object.values(ReceiptPriority).length)];
+    const status =
+      Object.values(ReceiptStatus)[Math.floor(Math.random() * Object.values(ReceiptStatus).length)];
+    const priority =
+      Object.values(ReceiptPriority)[
+        Math.floor(Math.random() * Object.values(ReceiptPriority).length)
+      ];
 
     const itemQuantity = Math.floor(Math.random() * 5) + 1;
     const items = Array.from({ length: itemQuantity }, (_, itemIndex) => ({
@@ -154,7 +158,10 @@ const generateMockReceipts = (count: number = 50): Receipt[] => {
       productionDate: '2024-01-01',
       expiryDate: '2025-12-31',
       warehouseLocation: `A区${itemIndex + 1}排`,
-      qualityStatus: Object.values(QualityStatus)[Math.floor(Math.random() * Object.values(QualityStatus).length)],
+      qualityStatus:
+        Object.values(QualityStatus)[
+          Math.floor(Math.random() * Object.values(QualityStatus).length)
+        ],
       qualityResult: '质检结果',
       images: [],
       operator: `操作员${itemIndex + 1}`,
@@ -162,7 +169,7 @@ const generateMockReceipts = (count: number = 50): Receipt[] => {
       remarks: `备注信息${itemIndex + 1}`,
     }));
 
-    items.forEach(item => {
+    items.forEach((item) => {
       item.totalPrice = item.unitPrice * item.receivedQuantity;
     });
 
@@ -188,8 +195,12 @@ const generateMockReceipts = (count: number = 50): Receipt[] => {
         location: `位置 ${(index % 3) + 1}`,
         manager: `管理员${(index % 3) + 1}`,
       },
-      receiptDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      expectedDate: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      receiptDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
+      expectedDate: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
       operator: `收货员${(index % 5) + 1}`,
       reviewer: `复核员${(index % 3) + 1}`,
       approvalUser: `审批员${(index % 2) + 1}`,
@@ -259,7 +270,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
         set({ loading: true, error: null });
         try {
           // 模拟API调用
-          await new Promise(resolve => setTimeout(resolve, 800));
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
           const mockReceipts = generateMockReceipts();
 
@@ -268,33 +279,42 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
 
           if (params.search) {
             const searchLower = params.search.toLowerCase();
-            filteredReceipts = filteredReceipts.filter(receipt =>
-              receipt.receiptNumber.toLowerCase().includes(searchLower) ||
-              receipt.supplier.name.toLowerCase().includes(searchLower) ||
-              receipt.operator.toLowerCase().includes(searchLower)
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) =>
+                receipt.receiptNumber.toLowerCase().includes(searchLower) ||
+                receipt.supplier.name.toLowerCase().includes(searchLower) ||
+                receipt.operator.toLowerCase().includes(searchLower)
             );
           }
 
           if (params.status) {
-            filteredReceipts = filteredReceipts.filter(receipt => receipt.status === params.status);
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) => receipt.status === params.status
+            );
           }
 
           if (params.priority) {
-            filteredReceipts = filteredReceipts.filter(receipt => receipt.priority === params.priority);
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) => receipt.priority === params.priority
+            );
           }
 
           if (params.supplierId) {
-            filteredReceipts = filteredReceipts.filter(receipt => receipt.supplier.id === params.supplierId);
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) => receipt.supplier.id === params.supplierId
+            );
           }
 
           if (params.warehouseId) {
-            filteredReceipts = filteredReceipts.filter(receipt => receipt.warehouse.id === params.warehouseId);
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) => receipt.warehouse.id === params.warehouseId
+            );
           }
 
           if (params.dateRange) {
             const [startDate, endDate] = params.dateRange;
-            filteredReceipts = filteredReceipts.filter(receipt =>
-              receipt.receiptDate >= startDate && receipt.receiptDate <= endDate
+            filteredReceipts = filteredReceipts.filter(
+              (receipt) => receipt.receiptDate >= startDate && receipt.receiptDate <= endDate
             );
           }
 
@@ -328,10 +348,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       fetchReceiptById: async (id: string) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const mockReceipts = generateMockReceipts();
-          const receipt = mockReceipts.find(r => r.id === id);
+          const receipt = mockReceipts.find((r) => r.id === id);
 
           set({
             currentReceipt: receipt || null,
@@ -349,7 +369,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       createReceipt: async (data: CreateReceiptParams) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const newReceipt: Receipt = {
             id: generateId(),
@@ -378,7 +398,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
             totalAmount: data.items.reduce((sum, item) => sum + item.totalPrice, 0),
             taxAmount: 0,
             totalAmountWithTax: 0,
-            items: data.items.map(item => ({
+            items: data.items.map((item) => ({
               ...item,
               id: generateId(),
               receivedQuantity: 0,
@@ -411,10 +431,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       updateReceipt: async (id: string, data: UpdateReceiptParams) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 800));
+          await new Promise((resolve) => setTimeout(resolve, 800));
 
           const { receipts } = get();
-          const receiptIndex = receipts.findIndex(r => r.id === id);
+          const receiptIndex = receipts.findIndex((r) => r.id === id);
 
           if (receiptIndex === -1) {
             set({ error: '收货单不存在', loading: false });
@@ -444,11 +464,11 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       deleteReceipt: async (id: string) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const { receipts } = get();
           set({
-            receipts: receipts.filter(r => r.id !== id),
+            receipts: receipts.filter((r) => r.id !== id),
             loading: false,
           });
 
@@ -463,10 +483,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       confirmReceipt: async (data: ReceiptConfirmationParams) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
 
           const { receipts } = get();
-          const receiptIndex = receipts.findIndex(r => r.id === data.receiptId);
+          const receiptIndex = receipts.findIndex((r) => r.id === data.receiptId);
 
           if (receiptIndex === -1) {
             set({ error: '收货单不存在', loading: false });
@@ -477,8 +497,8 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
           const receipt = { ...updatedReceipts[receiptIndex] };
 
           // 更新明细
-          receipt.items = receipt.items.map(item => {
-            const confirmItem = data.items.find(d => d.id === item.id);
+          receipt.items = receipt.items.map((item) => {
+            const confirmItem = data.items.find((d) => d.id === item.id);
             if (confirmItem) {
               return {
                 ...item,
@@ -489,13 +509,26 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
           });
 
           // 重新计算统计数据
-          receipt.totalReceivedQuantity = receipt.items.reduce((sum, item) => sum + item.receivedQuantity, 0);
-          receipt.totalQualifiedQuantity = receipt.items.reduce((sum, item) => sum + item.qualifiedQuantity, 0);
-          receipt.totalDefectiveQuantity = receipt.items.reduce((sum, item) => sum + item.defectiveQuantity, 0);
+          receipt.totalReceivedQuantity = receipt.items.reduce(
+            (sum, item) => sum + item.receivedQuantity,
+            0
+          );
+          receipt.totalQualifiedQuantity = receipt.items.reduce(
+            (sum, item) => sum + item.qualifiedQuantity,
+            0
+          );
+          receipt.totalDefectiveQuantity = receipt.items.reduce(
+            (sum, item) => sum + item.defectiveQuantity,
+            0
+          );
 
           // 判断收货状态
-          const allItemsReceived = receipt.items.every(item => item.receivedQuantity >= item.orderedQuantity);
-          receipt.status = allItemsReceived ? ReceiptStatus.COMPLETED : ReceiptStatus.PARTIAL_RECEIVED;
+          const allItemsReceived = receipt.items.every(
+            (item) => item.receivedQuantity >= item.orderedQuantity
+          );
+          receipt.status = allItemsReceived
+            ? ReceiptStatus.COMPLETED
+            : ReceiptStatus.PARTIAL_RECEIVED;
 
           receipt.updatedAt = new Date().toISOString();
           updatedReceipts[receiptIndex] = receipt;
@@ -516,10 +549,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       cancelReceipt: async (id: string, reason: string) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const { receipts } = get();
-          const receiptIndex = receipts.findIndex(r => r.id === id);
+          const receiptIndex = receipts.findIndex((r) => r.id === id);
 
           if (receiptIndex === -1) {
             set({ error: '收货单不存在', loading: false });
@@ -558,10 +591,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       completeQualityCheck: async (data: QualityCheckParams) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const { receipts } = get();
-          const receiptIndex = receipts.findIndex(r => r.id === data.receiptId);
+          const receiptIndex = receipts.findIndex((r) => r.id === data.receiptId);
 
           if (receiptIndex === -1) {
             set({ error: '收货单不存在', loading: false });
@@ -571,7 +604,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
           const updatedReceipts = [...receipts];
           const receipt = { ...updatedReceipts[receiptIndex] };
 
-          receipt.items = receipt.items.map(item => {
+          receipt.items = receipt.items.map((item) => {
             if (item.id === data.itemId) {
               return {
                 ...item,
@@ -606,10 +639,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       approveQualityCheck: async (receiptId: string, itemId: string) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           const { receipts } = get();
-          const receiptIndex = receipts.findIndex(r => r.id === receiptId);
+          const receiptIndex = receipts.findIndex((r) => r.id === receiptId);
 
           if (receiptIndex === -1) {
             set({ error: '收货单不存在', loading: false });
@@ -619,7 +652,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
           const updatedReceipts = [...receipts];
           const receipt = { ...updatedReceipts[receiptIndex] };
 
-          receipt.items = receipt.items.map(item => {
+          receipt.items = receipt.items.map((item) => {
             if (item.id === itemId) {
               return {
                 ...item,
@@ -648,7 +681,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       // 统计操作
       fetchStatistics: async (params = {}) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
           set({ statistics: generateMockStatistics() });
         } catch (error) {
           console.error('Fetch statistics error:', error);
@@ -657,7 +690,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
 
       fetchLogs: async (receiptId: string) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 300));
           const mockLogs: ReceiptLog[] = Array.from({ length: 5 }, (_, index) => ({
             id: `log-${receiptId}-${index + 1}`,
             receiptId,
@@ -676,14 +709,16 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
 
       fetchReturnRecords: async (receiptId: string) => {
         try {
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise((resolve) => setTimeout(resolve, 300));
           const mockReturnRecords: ReturnRecord[] = Array.from({ length: 2 }, (_, index) => ({
             id: `return-${receiptId}-${index + 1}`,
             receiptId,
             receiptItemId: `${receiptId}-item-${index + 1}`,
             returnQuantity: Math.floor(Math.random() * 10) + 1,
             returnReason: `退货原因 ${index + 1}`,
-            returnDate: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            returnDate: new Date(Date.now() - index * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split('T')[0],
             processor: `处理员 ${index + 1}`,
             status: 'completed',
             remarks: `退货备注 ${index + 1}`,
@@ -723,14 +758,14 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
         const { selectedReceiptIds } = get();
         const newSelectedIds = selected
           ? [...selectedReceiptIds, id]
-          : selectedReceiptIds.filter(selectedId => selectedId !== id);
+          : selectedReceiptIds.filter((selectedId) => selectedId !== id);
         set({ selectedReceiptIds: newSelectedIds });
       },
 
       selectAllReceipts: (selected: boolean) => {
         const { receipts } = get();
         set({
-          selectedReceiptIds: selected ? receipts.map(r => r.id) : [],
+          selectedReceiptIds: selected ? receipts.map((r) => r.id) : [],
         });
       },
 
@@ -787,11 +822,11 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       batchDelete: async (ids: string[]) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const { receipts } = get();
           set({
-            receipts: receipts.filter(r => !ids.includes(r.id)),
+            receipts: receipts.filter((r) => !ids.includes(r.id)),
             selectedReceiptIds: [],
             loading: false,
           });
@@ -807,10 +842,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       batchCancel: async (ids: string[], reason: string) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const { receipts } = get();
-          const updatedReceipts = receipts.map(receipt => {
+          const updatedReceipts = receipts.map((receipt) => {
             if (ids.includes(receipt.id)) {
               return {
                 ...receipt,
@@ -839,10 +874,10 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       batchApprove: async (ids: string[]) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           const { receipts } = get();
-          const updatedReceipts = receipts.map(receipt => {
+          const updatedReceipts = receipts.map((receipt) => {
             if (ids.includes(receipt.id)) {
               return {
                 ...receipt,
@@ -871,7 +906,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       exportReceipts: async (ids?: string[], format = 'excel') => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 1500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
           console.log(`导出收货单 ${format} 格式`, ids);
           set({ loading: false });
         } catch (error) {
@@ -883,7 +918,7 @@ export const useReceiptStore = create<ReceiptState & ReceiptActions>()(
       importReceipts: async (file: File) => {
         set({ loading: true, error: null });
         try {
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           console.log('导入收货单', file.name);
           set({ loading: false });
         } catch (error) {

@@ -357,10 +357,7 @@ class CategoryService {
    * @param data 创建属性请求数据
    * @returns Promise<AttributeResponse>
    */
-  async addAttribute(
-    categoryId: string,
-    data: CreateAttributeRequest
-  ): Promise<AttributeResponse> {
+  async addAttribute(categoryId: string, data: CreateAttributeRequest): Promise<AttributeResponse> {
     const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/attributes`, {
       method: 'POST',
       headers: {
@@ -389,13 +386,16 @@ class CategoryService {
     attributeId: string,
     data: UpdateAttributeRequest
   ): Promise<AttributeResponse> {
-    const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/attributes/${attributeId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/categories/${categoryId}/attributes/${attributeId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -412,9 +412,12 @@ class CategoryService {
    * @returns Promise<SuccessResponse>
    */
   async deleteAttribute(categoryId: string, attributeId: string): Promise<SuccessResponse> {
-    const response = await fetch(`${API_BASE_URL}/categories/${categoryId}/attributes/${attributeId}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/categories/${categoryId}/attributes/${attributeId}`,
+      {
+        method: 'DELETE',
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -430,7 +433,9 @@ class CategoryService {
    * @returns Promise<ApiResponse<Category[]>>
    */
   async searchCategories(keyword: string): Promise<ApiResponse<Category[]>> {
-    const response = await fetch(`${API_BASE_URL}/categories/search?keyword=${encodeURIComponent(keyword)}`);
+    const response = await fetch(
+      `${API_BASE_URL}/categories/search?keyword=${encodeURIComponent(keyword)}`
+    );
 
     if (!response.ok) {
       throw new Error(`搜索类目失败: ${response.status}`);

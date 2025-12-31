@@ -3,13 +3,26 @@
  *
  * Modal component for batch updating reservation settings for multiple stores.
  * Uses React Hook Form with Zod validation.
- * 
+ *
  * @feature 016-store-reservation-settings
  * @updated 添加时长单位、押金配置支持
  */
 
 import React, { useEffect } from 'react';
-import { Modal, Form, Switch, InputNumber, Button, Space, message, Alert, List, Typography, Divider, Radio } from 'antd';
+import {
+  Modal,
+  Form,
+  Switch,
+  InputNumber,
+  Button,
+  Space,
+  message,
+  Alert,
+  List,
+  Typography,
+  Divider,
+  Radio,
+} from 'antd';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { reservationSettingsSchema } from '../types/reservation-settings.schema';
@@ -161,7 +174,9 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
     >
       {/* Selected Stores List */}
       {selectedStoreNames.length > 0 && (
-        <div style={{ marginBottom: 16, padding: '8px 12px', background: '#f5f5f5', borderRadius: 4 }}>
+        <div
+          style={{ marginBottom: 16, padding: '8px 12px', background: '#f5f5f5', borderRadius: 4 }}
+        >
           <Text type="secondary">已选择门店：</Text>
           <Text>{selectedStoreNames.join('、')}</Text>
         </div>
@@ -198,7 +213,10 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
         <Form.Item
           label="可预约天数"
           required={isReservationEnabled}
-          help={errors.maxReservationDays?.message || (isReservationEnabled ? '设置允许预约未来多少天（1-365天）' : '未开放预约时无需设置')}
+          help={
+            errors.maxReservationDays?.message ||
+            (isReservationEnabled ? '设置允许预约未来多少天（1-365天）' : '未开放预约时无需设置')
+          }
           validateStatus={errors.maxReservationDays ? 'error' : ''}
         >
           <Controller
@@ -250,7 +268,9 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
         {/* 押金设置 - US4 */}
         {isReservationEnabled && (
           <>
-            <Divider orientation="left" style={{ margin: '16px 0 8px' }}>押金设置</Divider>
+            <Divider orientation="left" style={{ margin: '16px 0 8px' }}>
+              押金设置
+            </Divider>
             <Form.Item
               label="是否需要押金"
               help={errors.depositRequired?.message}
@@ -328,11 +348,7 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
             <Button onClick={onCancel} disabled={isSubmitting || loading}>
               取消
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isSubmitting || loading}
-            >
+            <Button type="primary" htmlType="submit" loading={isSubmitting || loading}>
               批量保存
             </Button>
           </Space>
@@ -343,4 +359,3 @@ const BatchReservationSettingsModal: React.FC<BatchReservationSettingsModalProps
 };
 
 export default BatchReservationSettingsModal;
-

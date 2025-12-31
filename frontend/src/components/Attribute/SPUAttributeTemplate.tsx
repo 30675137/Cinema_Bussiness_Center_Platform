@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Select,
@@ -19,31 +19,31 @@ import {
   Empty,
   Tooltip,
   Modal,
-  message
-} from 'antd'
+  message,
+} from 'antd';
 import {
   AppstoreOutlined,
   SettingOutlined,
   PlusOutlined,
   EyeOutlined,
   ReloadOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons'
-import type { AttributeTemplate, AttributeTemplateItem, SPUAttribute } from '@/types/spu'
-import { AttributeValidator } from '@/utils/attributeValidation'
-import { attributeService } from '@/services/attributeService'
+  InfoCircleOutlined,
+} from '@ant-design/icons';
+import type { AttributeTemplate, AttributeTemplateItem, SPUAttribute } from '@/types/spu';
+import { AttributeValidator } from '@/utils/attributeValidation';
+import { attributeService } from '@/services/attributeService';
 
-const { Option } = Select
-const { TextArea } = Input
-const { Text, Title } = Typography
+const { Option } = Select;
+const { TextArea } = Input;
+const { Text, Title } = Typography;
 
 interface SPUAttributeTemplateProps {
-  categoryId?: string
-  brandId?: string
-  initialValues?: Record<string, any>
-  onChange?: (attributes: SPUAttribute[]) => void
-  onValidationChange?: (isValid: boolean, errors: string[]) => void
-  readonly?: boolean
+  categoryId?: string;
+  brandId?: string;
+  initialValues?: Record<string, any>;
+  onChange?: (attributes: SPUAttribute[]) => void;
+  onValidationChange?: (isValid: boolean, errors: string[]) => void;
+  readonly?: boolean;
 }
 
 const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
@@ -52,87 +52,87 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
   initialValues = {},
   onChange,
   onValidationChange,
-  readonly = false
+  readonly = false,
 }) => {
-  const [form] = Form.useForm()
-  const [loading, setLoading] = useState(false)
-  const [templates, setTemplates] = useState<AttributeTemplate[]>([])
-  const [selectedTemplate, setSelectedTemplate] = useState<AttributeTemplate | null>(null)
-  const [templateVisible, setTemplateVisible] = useState(false)
-  const [attributeValues, setAttributeValues] = useState<Record<string, any>>(initialValues)
-  const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [templates, setTemplates] = useState<AttributeTemplate[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<AttributeTemplate | null>(null);
+  const [templateVisible, setTemplateVisible] = useState(false);
+  const [attributeValues, setAttributeValues] = useState<Record<string, any>>(initialValues);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // 加载可用的属性模板
   const loadTemplates = async () => {
-    if (!categoryId) return
+    if (!categoryId) return;
 
     try {
-      setLoading(true)
-      const activeTemplates = await attributeService.getActiveTemplates()
+      setLoading(true);
+      const activeTemplates = await attributeService.getActiveTemplates();
 
       // 根据分类筛选模板
-      const filteredTemplates = activeTemplates.filter(template =>
-        !template.categoryId || template.categoryId === categoryId
-      )
+      const filteredTemplates = activeTemplates.filter(
+        (template) => !template.categoryId || template.categoryId === categoryId
+      );
 
-      setTemplates(filteredTemplates)
+      setTemplates(filteredTemplates);
     } catch (error) {
-      console.error('Load templates error:', error)
-      message.error('加载属性模板失败')
+      console.error('Load templates error:', error);
+      message.error('加载属性模板失败');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadTemplates()
-  }, [categoryId])
+    loadTemplates();
+  }, [categoryId]);
 
   // 处理模板选择
   const handleTemplateChange = async (templateId: string) => {
     try {
       if (!templateId) {
-        setSelectedTemplate(null)
-        setAttributeValues({})
-        setValidationErrors([])
-        onChange?.([])
-        onValidationChange?.(true, [])
-        return
+        setSelectedTemplate(null);
+        setAttributeValues({});
+        setValidationErrors([]);
+        onChange?.([]);
+        onValidationChange?.(true, []);
+        return;
       }
 
-      const template = await attributeService.getTemplateById(templateId)
-      setSelectedTemplate(template)
+      const template = await attributeService.getTemplateById(templateId);
+      setSelectedTemplate(template);
 
       // 初始化属性值
-      const initialValues: Record<string, any> = {}
-      template.attributes.forEach(attr => {
+      const initialValues: Record<string, any> = {};
+      template.attributes.forEach((attr) => {
         if (attr.defaultValue !== undefined) {
-          initialValues[attr.code] = attr.defaultValue
+          initialValues[attr.code] = attr.defaultValue;
         }
-      })
+      });
 
-      setAttributeValues(initialValues)
-      validateAndNotify(template.attributes, initialValues)
+      setAttributeValues(initialValues);
+      validateAndNotify(template.attributes, initialValues);
     } catch (error) {
-      console.error('Load template error:', error)
-      message.error('加载模板详情失败')
+      console.error('Load template error:', error);
+      message.error('加载模板详情失败');
     }
-  }
+  };
 
   // 验证属性值并通知
   const validateAndNotify = (attributes: AttributeTemplateItem[], values: Record<string, any>) => {
-    const validationResults = AttributeValidator.validateAttributes(attributes, values)
+    const validationResults = AttributeValidator.validateAttributes(attributes, values);
     const errors = validationResults
-      .filter(result => !result.isValid)
-      .map(result => result.error!)
+      .filter((result) => !result.isValid)
+      .map((result) => result.error!);
 
-    setValidationErrors(errors)
-    onValidationChange?.(errors.length === 0, errors)
+    setValidationErrors(errors);
+    onValidationChange?.(errors.length === 0, errors);
 
     // 转换为SPUAttribute格式
     const spuAttributes: SPUAttribute[] = attributes
-      .filter(attr => attr.status === 'active')
-      .map(attr => ({
+      .filter((attr) => attr.status === 'active')
+      .map((attr) => ({
         id: attr.id,
         name: attr.name,
         value: values[attr.code] || null,
@@ -142,30 +142,30 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
         group: attr.group,
         category: attr.category,
         description: attr.description,
-        validation: attr.validation
-      }))
+        validation: attr.validation,
+      }));
 
-    onChange?.(spuAttributes)
-  }
+    onChange?.(spuAttributes);
+  };
 
   // 处理属性值变更
   const handleAttributeValueChange = (attributeCode: string, value: any) => {
-    const newValues = { ...attributeValues, [attributeCode]: value }
-    setAttributeValues(newValues)
+    const newValues = { ...attributeValues, [attributeCode]: value };
+    setAttributeValues(newValues);
 
     if (selectedTemplate) {
-      validateAndNotify(selectedTemplate.attributes, newValues)
+      validateAndNotify(selectedTemplate.attributes, newValues);
     }
-  }
+  };
 
   // 渲染属性编辑器
   const renderAttributeEditor = (attribute: AttributeTemplateItem) => {
-    const value = attributeValues[attribute.code]
+    const value = attributeValues[attribute.code];
     const commonProps = {
       disabled: readonly,
       placeholder: `请输入${attribute.name}`,
-      onChange: (val: any) => handleAttributeValueChange(attribute.code, val)
-    }
+      onChange: (val: any) => handleAttributeValueChange(attribute.code, val),
+    };
 
     switch (attribute.type) {
       case 'text':
@@ -175,7 +175,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             value={value || ''}
             onChange={(e) => handleAttributeValueChange(attribute.code, e.target.value)}
           />
-        )
+        );
 
       case 'number':
         return (
@@ -186,7 +186,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             min={attribute.validation?.min}
             max={attribute.validation?.max}
           />
-        )
+        );
 
       case 'boolean':
         return (
@@ -194,7 +194,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             checked={value || false}
             onChange={(checked) => handleAttributeValueChange(attribute.code, checked)}
           />
-        )
+        );
 
       case 'select':
         return (
@@ -204,13 +204,13 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             style={{ width: '100%' }}
             allowClear={!attribute.required}
           >
-            {attribute.options?.map(option => (
+            {attribute.options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
             ))}
           </Select>
-        )
+        );
 
       case 'multiselect':
         return (
@@ -221,13 +221,13 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             style={{ width: '100%' }}
             allowClear={!attribute.required}
           >
-            {attribute.options?.map(option => (
+            {attribute.options?.map((option) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
             ))}
           </Select>
-        )
+        );
 
       case 'date':
         return (
@@ -236,9 +236,11 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             value={value ? new Date(value) : null}
             style={{ width: '100%' }}
             format="YYYY-MM-DD"
-            onChange={(date) => handleAttributeValueChange(attribute.code, date?.format('YYYY-MM-DD'))}
+            onChange={(date) =>
+              handleAttributeValueChange(attribute.code, date?.format('YYYY-MM-DD'))
+            }
           />
-        )
+        );
 
       case 'url':
         return (
@@ -248,7 +250,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             onChange={(e) => handleAttributeValueChange(attribute.code, e.target.value)}
             addonBefore="http://"
           />
-        )
+        );
 
       case 'image':
         return (
@@ -260,7 +262,11 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             showUploadList={false}
           >
             {value ? (
-              <img src={value} alt={attribute.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img
+                src={value}
+                alt={attribute.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
             ) : (
               <div>
                 <PlusOutlined />
@@ -268,20 +274,14 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
               </div>
             )}
           </Upload>
-        )
+        );
 
       case 'file':
         return (
-          <Upload
-            {...commonProps}
-            beforeUpload={() => false}
-            showUploadList={false}
-          >
-            <Button icon={<PlusOutlined />}>
-              {value ? '重新选择' : '选择文件'}
-            </Button>
+          <Upload {...commonProps} beforeUpload={() => false} showUploadList={false}>
+            <Button icon={<PlusOutlined />}>{value ? '重新选择' : '选择文件'}</Button>
           </Upload>
-        )
+        );
 
       default:
         return (
@@ -291,32 +291,30 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
             onChange={(e) => handleAttributeValueChange(attribute.code, e.target.value)}
             rows={2}
           />
-        )
+        );
     }
-  }
+  };
 
   // 按分组渲染属性
   const renderAttributesByGroup = () => {
     if (!selectedTemplate || selectedTemplate.attributes.length === 0) {
-      return (
-        <Empty
-          description="暂无属性配置"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      )
+      return <Empty description="暂无属性配置" image={Empty.PRESENTED_IMAGE_SIMPLE} />;
     }
 
     // 按分组组织属性
     const groupedAttributes = selectedTemplate.attributes
-      .filter(attr => attr.status === 'active')
-      .reduce((groups, attr) => {
-        const group = attr.group || '默认属性'
-        if (!groups[group]) {
-          groups[group] = []
-        }
-        groups[group].push(attr)
-        return groups
-      }, {} as Record<string, AttributeTemplateItem[]>)
+      .filter((attr) => attr.status === 'active')
+      .reduce(
+        (groups, attr) => {
+          const group = attr.group || '默认属性';
+          if (!groups[group]) {
+            groups[group] = [];
+          }
+          groups[group].push(attr);
+          return groups;
+        },
+        {} as Record<string, AttributeTemplateItem[]>
+      );
 
     return Object.entries(groupedAttributes).map(([groupName, attributes]) => (
       <Card
@@ -333,7 +331,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
         style={{ marginBottom: 16 }}
       >
         <Row gutter={[16, 16]}>
-          {attributes.map(attribute => (
+          {attributes.map((attribute) => (
             <Col key={attribute.id} xs={24} sm={12} md={8} lg={6}>
               <Form.Item
                 label={
@@ -347,8 +345,10 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
                     )}
                   </span>
                 }
-                validateStatus={validationErrors.some(err => err.includes(attribute.name)) ? 'error' : ''}
-                help={validationErrors.find(err => err.includes(attribute.name))}
+                validateStatus={
+                  validationErrors.some((err) => err.includes(attribute.name)) ? 'error' : ''
+                }
+                help={validationErrors.find((err) => err.includes(attribute.name))}
               >
                 {renderAttributeEditor(attribute)}
               </Form.Item>
@@ -356,8 +356,8 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
           ))}
         </Row>
       </Card>
-    ))
-  }
+    ));
+  };
 
   return (
     <div>
@@ -374,7 +374,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
                 value={selectedTemplate?.id}
                 onChange={handleTemplateChange}
               >
-                {templates.map(template => (
+                {templates.map((template) => (
                   <Option key={template.id} value={template.id}>
                     <div>
                       <div>{template.name}</div>
@@ -403,12 +403,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
           </Col>
 
           <Col>
-            <Button
-              type="link"
-              href="/attribute-templates"
-              target="_blank"
-              icon={<PlusOutlined />}
-            >
+            <Button type="link" href="/attribute-templates" target="_blank" icon={<PlusOutlined />}>
               管理模板
             </Button>
           </Col>
@@ -417,7 +412,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
         {selectedTemplate && (
           <Alert
             message={`已选择模板：${selectedTemplate.name}`}
-            description={`包含 ${selectedTemplate.attributes.filter(attr => attr.status === 'active').length} 个有效属性`}
+            description={`包含 ${selectedTemplate.attributes.filter((attr) => attr.status === 'active').length} 个有效属性`}
             type="info"
             showIcon
             style={{ marginTop: 12 }}
@@ -460,7 +455,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
         footer={[
           <Button key="close" onClick={() => setTemplateVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -489,9 +484,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
               {selectedTemplate.description && (
                 <div style={{ marginTop: 12 }}>
                   <Text strong>描述：</Text>
-                  <div style={{ marginTop: 4, color: '#666' }}>
-                    {selectedTemplate.description}
-                  </div>
+                  <div style={{ marginTop: 4, color: '#666' }}>{selectedTemplate.description}</div>
                 </div>
               )}
             </Card>
@@ -503,9 +496,15 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
                   <Row gutter={16}>
                     <Col span={6}>
                       <Text strong>{attr.name}</Text>
-                      {attr.required && <Tag color="red" size="small" style={{ marginLeft: 4 }}>必填</Tag>}
+                      {attr.required && (
+                        <Tag color="red" size="small" style={{ marginLeft: 4 }}>
+                          必填
+                        </Tag>
+                      )}
                       <br />
-                      <Text type="secondary" style={{ fontSize: '12px' }}>{attr.code}</Text>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {attr.code}
+                      </Text>
                     </Col>
                     <Col span={4}>
                       <Text type="secondary">类型：</Text>
@@ -530,7 +529,7 @@ const SPUAttributeTemplate: React.FC<SPUAttributeTemplateProps> = ({
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default SPUAttributeTemplate
+export default SPUAttributeTemplate;

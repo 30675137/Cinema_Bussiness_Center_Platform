@@ -3,16 +3,7 @@
  * 可复用的SKU选择器，支持单选和多选模式，供其他模块使用
  */
 import React, { useState, useMemo } from 'react';
-import {
-  Modal,
-  Button,
-  Space,
-  message,
-  Table,
-  Tag,
-  Checkbox,
-  Typography,
-} from 'antd';
+import { Modal, Button, Space, message, Table, Tag, Checkbox, Typography } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SKU, SkuQueryParams } from '@/types/sku';
@@ -20,11 +11,7 @@ import { SkuStatus } from '@/types/sku';
 import { useSkuStore } from '@/stores/skuStore';
 import { useSkuListQuery } from '@/hooks/useSku';
 import { SkuFilters } from './SkuFilters';
-import {
-  getSkuStatusText,
-  getSkuStatusColor,
-  formatSkuCode,
-} from '@/utils/skuHelpers';
+import { getSkuStatusText, getSkuStatusColor, formatSkuCode } from '@/utils/skuHelpers';
 
 const { Text } = Typography;
 
@@ -63,27 +50,18 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
   customFilters = {},
   excludeIds = [],
 }) => {
-  const {
-    filters,
-    pagination,
-    sorting,
-    setPagination,
-    setSorting,
-    updateFilter,
-    clearFilters,
-  } = useSkuStore();
+  const { filters, pagination, sorting, setPagination, setSorting, updateFilter, clearFilters } =
+    useSkuStore();
 
   // 内部选中的SKU ID列表
-  const [internalSelectedIds, setInternalSelectedIds] = useState<string[]>(
-    selectedIds
-  );
+  const [internalSelectedIds, setInternalSelectedIds] = useState<string[]>(selectedIds);
 
   // 构建查询参数
   const queryParams: SkuQueryParams = useMemo(
     () => ({
       ...(filters || {}),
       ...(customFilters || {}),
-      status: onlyEnabled ? SkuStatus.ENABLED : (filters?.status || 'all'),
+      status: onlyEnabled ? SkuStatus.ENABLED : filters?.status || 'all',
       page: pagination?.page || 1,
       pageSize: pagination?.pageSize || 20,
       sortField: sorting?.field,
@@ -93,11 +71,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
   );
 
   // 获取SKU列表
-  const {
-    data: skuListResponse,
-    isLoading,
-    refetch,
-  } = useSkuListQuery(queryParams);
+  const { data: skuListResponse, isLoading, refetch } = useSkuListQuery(queryParams);
 
   // 过滤掉排除的SKU
   const filteredItems = useMemo(() => {
@@ -154,9 +128,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       setInternalSelectedIds([...new Set([...internalSelectedIds, ...allIds])]);
     } else {
       const currentPageIds = filteredItems.map((sku) => sku.id);
-      setInternalSelectedIds(
-        internalSelectedIds.filter((id) => !currentPageIds.includes(id))
-      );
+      setInternalSelectedIds(internalSelectedIds.filter((id) => !currentPageIds.includes(id)));
     }
   };
 
@@ -167,10 +139,8 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       return;
     }
 
-    const selectedSkus = filteredItems.filter((sku) =>
-      internalSelectedIds.includes(sku.id)
-    );
-    
+    const selectedSkus = filteredItems.filter((sku) => internalSelectedIds.includes(sku.id));
+
     // 需要获取所有选中的SKU（包括不在当前页的）
     // 这里简化处理，只返回当前页选中的
     onSelect(selectedSkus);
@@ -192,17 +162,11 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
               <Checkbox
                 checked={
                   filteredItems.length > 0 &&
-                  filteredItems.every((sku) =>
-                    internalSelectedIds.includes(sku.id)
-                  )
+                  filteredItems.every((sku) => internalSelectedIds.includes(sku.id))
                 }
                 indeterminate={
-                  filteredItems.some((sku) =>
-                    internalSelectedIds.includes(sku.id)
-                  ) &&
-                  !filteredItems.every((sku) =>
-                    internalSelectedIds.includes(sku.id)
-                  )
+                  filteredItems.some((sku) => internalSelectedIds.includes(sku.id)) &&
+                  !filteredItems.every((sku) => internalSelectedIds.includes(sku.id))
                 }
                 onChange={(e) => handleSelectAll(e.target.checked)}
               />
@@ -213,9 +177,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
             render: (_, record) => (
               <Checkbox
                 checked={internalSelectedIds.includes(record.id)}
-                onChange={(e) =>
-                  handleMultipleSelectToggle(record, e.target.checked)
-                }
+                onChange={(e) => handleMultipleSelectToggle(record, e.target.checked)}
               />
             ),
           },
@@ -236,9 +198,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       ellipsis: {
         showTitle: false,
       },
-      render: (name: string) => (
-        <Text ellipsis={{ tooltip: name }}>{name}</Text>
-      ),
+      render: (name: string) => <Text ellipsis={{ tooltip: name }}>{name}</Text>,
     },
     {
       title: '所属SPU',
@@ -248,9 +208,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       ellipsis: {
         showTitle: false,
       },
-      render: (name: string) => (
-        <Text ellipsis={{ tooltip: name }}>{name}</Text>
-      ),
+      render: (name: string) => <Text ellipsis={{ tooltip: name }}>{name}</Text>,
     },
     {
       title: '品牌',
@@ -266,9 +224,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       ellipsis: {
         showTitle: false,
       },
-      render: (category: string) => (
-        <Text ellipsis={{ tooltip: category }}>{category}</Text>
-      ),
+      render: (category: string) => <Text ellipsis={{ tooltip: category }}>{category}</Text>,
     },
     {
       title: '主条码',
@@ -282,9 +238,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       key: 'status',
       width: 100,
       render: (status: SkuStatus) => (
-        <Tag color={getSkuStatusColor(status)}>
-          {getSkuStatusText(status)}
-        </Tag>
+        <Tag color={getSkuStatusColor(status)}>{getSkuStatusText(status)}</Tag>
       ),
     },
     ...(mode === 'single'
@@ -324,10 +278,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
               已选择 {internalSelectedIds.length} 个SKU
             </Text>
           )}
-          <Button 
-            onClick={handleClose}
-            data-testid="sku-selector-cancel-button"
-          >
+          <Button onClick={handleClose} data-testid="sku-selector-cancel-button">
             取消
           </Button>
           {mode === 'multiple' && (
@@ -345,11 +296,7 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
       destroyOnClose
     >
       <div style={{ marginBottom: 16 }}>
-        <SkuFilters
-          onFilter={handleFilter}
-          onReset={handleReset}
-          loading={isLoading}
-        />
+        <SkuFilters onFilter={handleFilter} onReset={handleReset} loading={isLoading} />
       </div>
 
       <Table<SKU>
@@ -380,4 +327,3 @@ export const SkuSelector: React.FC<SkuSelectorProps> = ({
 };
 
 export default SkuSelector;
-

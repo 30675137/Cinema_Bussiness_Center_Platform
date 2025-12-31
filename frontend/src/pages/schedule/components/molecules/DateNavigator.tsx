@@ -33,4 +33,3 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ date, onPrev, onNext, onT
 };
 
 export default DateNavigator;
-

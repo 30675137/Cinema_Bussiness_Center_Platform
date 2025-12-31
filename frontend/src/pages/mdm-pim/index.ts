@@ -12,7 +12,7 @@ export type {
   AttributeTemplate,
   CategoryLevel,
   CategoryStatus,
-  AttributeType
+  AttributeType,
 } from './category/types/category.types';
 
 // 属性字典管理

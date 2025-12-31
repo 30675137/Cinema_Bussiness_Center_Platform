@@ -18,7 +18,7 @@ import {
   TEST_STORE_ID,
   generateTestOrderId,
   SKU_NAMES,
-  SINGLE_COCKTAIL_ORDER
+  SINGLE_COCKTAIL_ORDER,
 } from './fixtures/test-data';
 import { resetTestData } from './helpers/database-helper';
 
@@ -45,26 +45,24 @@ test.describe('P005 并发操作测试 - UI测试', () => {
 
     // Step 1: 记录初始库存
     await inventoryPage.goto();
-    const initialInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const initialInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('初始库存:', initialInventory);
 
     // Step 2: 并发创建订单
     console.log(`Step 2: 并发创建${concurrentCount}个订单`);
 
-    const requests = orderIds.map(orderId =>
-      orderPage.createOrderViaAPI(
-        orderId,
-        TEST_STORE_ID,
-        SINGLE_COCKTAIL_ORDER(orderId).items
-      )
+    const requests = orderIds.map((orderId) =>
+      orderPage.createOrderViaAPI(orderId, TEST_STORE_ID, SINGLE_COCKTAIL_ORDER(orderId).items)
     );
 
     const responses = await Promise.all(requests);
 
     // Step 3: 统计成功和失败的订单
-    const successCount = responses.filter(r => r.success).length;
-    const failureCount = responses.filter(r => !r.success).length;
+    const successCount = responses.filter((r) => r.success).length;
+    const failureCount = responses.filter((r) => !r.success).length;
 
     console.log(`成功订单: ${successCount}, 失败订单: ${failureCount}`);
 
@@ -89,19 +87,19 @@ test.describe('P005 并发操作测试 - UI测试', () => {
 
     // Step 1: 先消耗大部分库存
     const setupOrderId = generateTestOrderId('19setup');
-    await orderPage.createOrderViaAPI(
-      setupOrderId,
-      TEST_STORE_ID,
-      [{
+    await orderPage.createOrderViaAPI(setupOrderId, TEST_STORE_ID, [
+      {
         skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
         quantity: 50, // 先预占50杯
-        unit: '杯'
-      }]
-    );
+        unit: '杯',
+      },
+    ]);
 
     // Step 2: 查询剩余库存
     await inventoryPage.goto();
-    const remainingInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const remainingInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('剩余可用库存:', remainingInventory.availableQty);
 
@@ -111,19 +109,15 @@ test.describe('P005 并发操作测试 - UI测试', () => {
       orderIds.push(generateTestOrderId(`19${String.fromCharCode(97 + i)}`));
     }
 
-    const requests = orderIds.map(orderId =>
-      orderPage.createOrderViaAPI(
-        orderId,
-        TEST_STORE_ID,
-        SINGLE_COCKTAIL_ORDER(orderId).items
-      )
+    const requests = orderIds.map((orderId) =>
+      orderPage.createOrderViaAPI(orderId, TEST_STORE_ID, SINGLE_COCKTAIL_ORDER(orderId).items)
     );
 
     const responses = await Promise.all(requests);
 
     // Step 4: 验证部分订单失败
-    const successCount = responses.filter(r => r.success).length;
-    const failureCount = responses.filter(r => !r.success).length;
+    const successCount = responses.filter((r) => r.success).length;
+    const failureCount = responses.filter((r) => !r.success).length;
 
     console.log(`成功: ${successCount}, 失败: ${failureCount}`);
 
@@ -158,24 +152,28 @@ test.describe('P005 并发操作测试 - UI测试', () => {
 
     // Step 2: 记录预占后库存
     await inventoryPage.goto();
-    const beforeFulfillment = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const beforeFulfillment = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // Step 3: 并发履约
     console.log('Step 3: 并发履约订单');
 
-    const fulfillRequests = orderIds.map(orderId =>
+    const fulfillRequests = orderIds.map((orderId) =>
       orderPage.fulfillOrderViaAPI(orderId, TEST_STORE_ID)
     );
 
     const fulfillResponses = await Promise.all(fulfillRequests);
 
     // Step 4: 验证所有履约成功
-    const fulfillSuccess = fulfillResponses.filter(r => r.success).length;
+    const fulfillSuccess = fulfillResponses.filter((r) => r.success).length;
     expect(fulfillSuccess).toBe(concurrentCount);
 
     // Step 5: 验证库存扣减正确
     await inventoryPage.refresh();
-    const afterFulfillment = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterFulfillment = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // 现存库存减少 = 订单数 × 每杯需求量
     const expectedDeduction = concurrentCount * 45;
@@ -205,24 +203,26 @@ test.describe('P005 并发操作测试 - UI测试', () => {
 
     // Step 2: 记录预占后库存
     await inventoryPage.goto();
-    const beforeCancellation = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const beforeCancellation = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // Step 3: 并发取消
     console.log('Step 3: 并发取消订单');
 
-    const cancelRequests = orderIds.map(orderId =>
-      orderPage.cancelOrderViaAPI(orderId)
-    );
+    const cancelRequests = orderIds.map((orderId) => orderPage.cancelOrderViaAPI(orderId));
 
     const cancelResponses = await Promise.all(cancelRequests);
 
     // Step 4: 验证所有取消成功
-    const cancelSuccess = cancelResponses.filter(r => r.success).length;
+    const cancelSuccess = cancelResponses.filter((r) => r.success).length;
     expect(cancelSuccess).toBe(concurrentCount);
 
     // Step 5: 验证库存预占释放正确
     await inventoryPage.refresh();
-    const afterCancellation = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterCancellation = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // 预占库存全部释放
     const expectedRelease = concurrentCount * 45;
@@ -255,15 +255,21 @@ test.describe('P005 并发操作测试 - UI测试', () => {
 
     // Step 2: 记录初始库存
     await inventoryPage.goto();
-    const initialInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const initialInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // Step 3: 并发执行3种操作
     console.log('Step 3: 并发执行混合操作');
 
     const [reserveResp, fulfillResp, cancelResp] = await Promise.all([
-      orderPage.createOrderViaAPI(orderIdReserve, TEST_STORE_ID, SINGLE_COCKTAIL_ORDER(orderIdReserve).items),
+      orderPage.createOrderViaAPI(
+        orderIdReserve,
+        TEST_STORE_ID,
+        SINGLE_COCKTAIL_ORDER(orderIdReserve).items
+      ),
       orderPage.fulfillOrderViaAPI(orderIdFulfill, TEST_STORE_ID),
-      orderPage.cancelOrderViaAPI(orderIdCancel)
+      orderPage.cancelOrderViaAPI(orderIdCancel),
     ]);
 
     // Step 4: 验证所有操作成功

@@ -233,10 +233,13 @@ const ReceivingDetail: React.FC = () => {
     );
   }
 
-  const statusInfo = statusMap[receivingData.status] || { label: receivingData.status, color: 'default' };
-  const qualityInfo = qualityStatusMap[receivingData.qualityStatus] || { 
-    label: receivingData.qualityStatus, 
-    color: 'default' 
+  const statusInfo = statusMap[receivingData.status] || {
+    label: receivingData.status,
+    color: 'default',
+  };
+  const qualityInfo = qualityStatusMap[receivingData.qualityStatus] || {
+    label: receivingData.qualityStatus,
+    color: 'default',
   };
 
   // 计算汇总
@@ -319,13 +322,17 @@ const ReceivingDetail: React.FC = () => {
                     <strong>{totalOrdered}</strong>
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={2}>
-                    <strong style={{ color: totalReceived === totalOrdered ? '#52c41a' : '#faad14' }}>
+                    <strong
+                      style={{ color: totalReceived === totalOrdered ? '#52c41a' : '#faad14' }}
+                    >
                       {totalReceived}
                     </strong>
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={3} colSpan={2}>
                     {totalReceived === totalOrdered ? (
-                      <Tag color="success" icon={<CheckOutlined />}>全部收货</Tag>
+                      <Tag color="success" icon={<CheckOutlined />}>
+                        全部收货
+                      </Tag>
                     ) : (
                       <Tag color="warning">部分收货（缺 {totalOrdered - totalReceived}）</Tag>
                     )}
@@ -339,7 +346,7 @@ const ReceivingDetail: React.FC = () => {
         {/* 操作历史 */}
         <Card type="inner" title="操作历史">
           <Timeline
-            items={timeline.map(item => ({
+            items={timeline.map((item) => ({
               children: (
                 <div>
                   <div style={{ marginBottom: 4 }}>

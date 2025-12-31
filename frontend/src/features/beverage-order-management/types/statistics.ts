@@ -7,9 +7,9 @@
  * 时间范围
  */
 export interface DateRangeDTO {
-  startDate: string
-  endDate: string
-  rangeType: 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'
+  startDate: string;
+  endDate: string;
+  rangeType: 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM';
 }
 
 /**
@@ -17,19 +17,19 @@ export interface DateRangeDTO {
  */
 export interface OrderMetrics {
   /** 订单总数 */
-  totalOrders: number
+  totalOrders: number;
 
   /** 已完成订单数 */
-  completedOrders: number
+  completedOrders: number;
 
   /** 已取消订单数 */
-  cancelledOrders: number
+  cancelledOrders: number;
 
   /** 完成率（百分比） */
-  completionRate: number
+  completionRate: number;
 
   /** 平均制作时长（分钟） */
-  averagePreparationTime: number
+  averagePreparationTime: number;
 }
 
 /**
@@ -37,19 +37,19 @@ export interface OrderMetrics {
  */
 export interface SalesMetrics {
   /** 销售总额（元） */
-  totalRevenue: number
+  totalRevenue: number;
 
   /** 平均客单价（元） */
-  averageOrderValue: number
+  averageOrderValue: number;
 
   /** 总销量（杯数） */
-  totalQuantity: number
+  totalQuantity: number;
 
   /** 最畅销饮品名称 */
-  topSellingBeverage: string | null
+  topSellingBeverage: string | null;
 
   /** 最畅销饮品销量 */
-  topSellingQuantity: number | null
+  topSellingQuantity: number | null;
 }
 
 /**
@@ -57,22 +57,22 @@ export interface SalesMetrics {
  */
 export interface BestSellingItem {
   /** 排名 */
-  rank: number
+  rank: number;
 
   /** 饮品ID */
-  beverageId: string
+  beverageId: string;
 
   /** 饮品名称 */
-  beverageName: string
+  beverageName: string;
 
   /** 销售数量 */
-  quantity: number
+  quantity: number;
 
   /** 销售额（元） */
-  revenue: number
+  revenue: number;
 
   /** 占比（百分比） */
-  percentage: number
+  percentage: number;
 }
 
 /**
@@ -80,17 +80,17 @@ export interface BestSellingItem {
  */
 export interface OrderStatisticsDTO {
   /** 时间范围 */
-  dateRange: DateRangeDTO
+  dateRange: DateRangeDTO;
 
   /** 订单指标 */
-  orderMetrics: OrderMetrics
+  orderMetrics: OrderMetrics;
 
   /** 销售指标 */
-  salesMetrics: SalesMetrics
+  salesMetrics: SalesMetrics;
 
   /** 热销饮品排行 */
-  bestSellingBeverages: BestSellingItem[]
+  bestSellingBeverages: BestSellingItem[];
 
   /** 门店ID（如果按门店筛选） */
-  storeId?: string
+  storeId?: string;
 }

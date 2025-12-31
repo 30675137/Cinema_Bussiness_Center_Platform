@@ -1,9 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import inventoryService from '@/services/inventoryService';
-import type {
-  CurrentInventory,
-  InventoryQueryParams,
-} from '@/types/inventory';
+import type { CurrentInventory, InventoryQueryParams } from '@/types/inventory';
 import { message } from 'antd';
 
 /**
@@ -33,10 +30,7 @@ export const useInventoryBySKU = (skuId?: string, storeId?: string) => {
 /**
  * 按门店获取库存数据钩子
  */
-export const useInventoryByStore = (
-  storeId: string,
-  params?: Partial<InventoryQueryParams>
-) => {
+export const useInventoryByStore = (storeId: string, params?: Partial<InventoryQueryParams>) => {
   return useQuery({
     queryKey: ['inventory-by-store', storeId, params],
     queryFn: () => inventoryService.getInventoryByStore(storeId, params),
@@ -114,7 +108,7 @@ export const useExportInventory = () => {
     },
     onSuccess: (blob, variables) => {
       message.success({ content: '导出成功', key: 'export' });
-      
+
       // 处理文件下载
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

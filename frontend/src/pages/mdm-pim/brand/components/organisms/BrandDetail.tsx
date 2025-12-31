@@ -51,7 +51,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
   onStatusChange,
   onRefresh,
   editable = true,
-  mode = 'view'
+  mode = 'view',
 }) => {
   const [showStatusConfirm, setShowStatusConfirm] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<BrandStatus | null>(null);
@@ -97,7 +97,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
 
     const config = typeConfig[brandType as keyof typeof typeConfig] || {
       color: 'default',
-      text: brandType
+      text: brandType,
     };
 
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -113,7 +113,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
 
     const config = levelConfig[level as keyof typeof levelConfig] || {
       color: 'default',
-      text: level
+      text: level,
     };
 
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -122,10 +122,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
   // 加载状态
   if (loading) {
     return (
-      <Card
-        data-testid="brand-detail-loading"
-        style={{ textAlign: 'center', padding: '40px 0' }}
-      >
+      <Card data-testid="brand-detail-loading" style={{ textAlign: 'center', padding: '40px 0' }}>
         <Spin size="large" />
         <div style={{ marginTop: 16 }}>
           <Text type="secondary">加载品牌信息中...</Text>
@@ -157,10 +154,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
   if (!brand) {
     return (
       <Card data-testid="brand-detail-empty">
-        <Empty
-          description="暂无品牌信息"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
+        <Empty description="暂无品牌信息" image={Empty.PRESENTED_IMAGE_SIMPLE} />
       </Card>
     );
   }
@@ -242,13 +236,11 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
 
           {/* 基本信息 */}
           <Col span={20}>
-            <Descriptions
-              column={2}
-              size="small"
-              data-testid="brand-basic-info"
-            >
+            <Descriptions column={2} size="small" data-testid="brand-basic-info">
               <Descriptions.Item label="品牌编码">
-                <Text code data-testid="brand-code">{brand.brandCode}</Text>
+                <Text code data-testid="brand-code">
+                  {brand.brandCode}
+                </Text>
               </Descriptions.Item>
 
               <Descriptions.Item label="英文名称">
@@ -284,10 +276,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
             <Divider />
             <div>
               <Title level={5}>品牌描述</Title>
-              <Paragraph
-                style={{ marginBottom: 0 }}
-                data-testid="brand-description"
-              >
+              <Paragraph style={{ marginBottom: 0 }} data-testid="brand-description">
                 {brand.description}
               </Paragraph>
             </div>
@@ -331,11 +320,7 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
 
       {/* 使用统计信息 */}
       {(brand as any).usageStats && (
-        <Card
-          title="使用统计"
-          style={{ marginBottom: 16 }}
-          data-testid="brand-usage-stats"
-        >
+        <Card title="使用统计" style={{ marginBottom: 16 }} data-testid="brand-usage-stats">
           <Row gutter={16}>
             <Col span={8}>
               <div style={{ textAlign: 'center' }}>
@@ -356,10 +341,10 @@ const BrandDetail: React.FC<BrandDetailProps> = ({
             <Col span={8}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 14, color: '#8c8c8c' }}>
-                  最后使用: {(brand as any).usageStats.lastUsedAt
+                  最后使用:{' '}
+                  {(brand as any).usageStats.lastUsedAt
                     ? new Date((brand as any).usageStats.lastUsedAt).toLocaleDateString()
-                    : '-'
-                  }
+                    : '-'}
                 </div>
               </div>
             </Col>

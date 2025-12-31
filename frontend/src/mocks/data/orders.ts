@@ -3,7 +3,7 @@
  * Mock 订单测试数据
  */
 
-import type { ProductOrder } from '../../features/order-management/types/order'
+import type { ProductOrder } from '../../features/order-management/types/order';
 
 // Use string literals for enum values in mock data
 const OrderStatusValues = {
@@ -11,8 +11,8 @@ const OrderStatusValues = {
   PAID: 'PAID',
   SHIPPED: 'SHIPPED',
   COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
-} as const
+  CANCELLED: 'CANCELLED',
+} as const;
 
 const LogActionValues = {
   CREATE_ORDER: 'CREATE_ORDER',
@@ -20,8 +20,8 @@ const LogActionValues = {
   SHIP: 'SHIP',
   COMPLETE: 'COMPLETE',
   CANCEL: 'CANCEL',
-  SYSTEM_AUTO: 'SYSTEM_AUTO'
-} as const
+  SYSTEM_AUTO: 'SYSTEM_AUTO',
+} as const;
 
 export const mockOrders = [
   {
@@ -29,15 +29,15 @@ export const mockOrders = [
     orderNumber: 'ORD20251227AB12CD',
     userId: 'user-001',
     status: OrderStatusValues.PAID,
-    productTotal: 150.00,
-    shippingFee: 10.00,
-    discountAmount: 5.00,
-    totalAmount: 155.00,
+    productTotal: 150.0,
+    shippingFee: 10.0,
+    discountAmount: 5.0,
+    totalAmount: 155.0,
     shippingAddress: {
       province: '广东省',
       city: '深圳市',
       district: '南山区',
-      detail: '科技园南区18号楼'
+      detail: '科技园南区18号楼',
     },
     paymentMethod: 'WECHAT_PAY',
     paymentTime: '2025-12-27T10:30:00Z',
@@ -55,7 +55,7 @@ export const mockOrders = [
       province: '广东省',
       city: '深圳市',
       district: '南山区',
-      address: '科技园南区18号楼'
+      address: '科技园南区18号楼',
     },
     productSummary: '可口可乐 等2件商品',
     items: [
@@ -67,9 +67,9 @@ export const mockOrders = [
         productSpec: '500ml',
         productImage: null,
         quantity: 2,
-        unitPrice: 5.00,
-        subtotal: 10.00,
-        createdAt: '2025-12-27T10:00:00Z'
+        unitPrice: 5.0,
+        subtotal: 10.0,
+        createdAt: '2025-12-27T10:00:00Z',
       },
       {
         id: 'item-002',
@@ -79,10 +79,10 @@ export const mockOrders = [
         productSpec: '大包装',
         productImage: null,
         quantity: 3,
-        unitPrice: 12.00,
-        subtotal: 36.00,
-        createdAt: '2025-12-27T10:00:00Z'
-      }
+        unitPrice: 12.0,
+        subtotal: 36.0,
+        createdAt: '2025-12-27T10:00:00Z',
+      },
     ],
     logs: [
       {
@@ -94,7 +94,7 @@ export const mockOrders = [
         operatorId: 'user-001',
         operatorName: '张三',
         comments: '创建订单',
-        createdAt: '2025-12-27T10:00:00Z'
+        createdAt: '2025-12-27T10:00:00Z',
       },
       {
         id: 'log-002',
@@ -105,24 +105,24 @@ export const mockOrders = [
         operatorId: 'user-001',
         operatorName: '张三',
         comments: '微信支付成功',
-        createdAt: '2025-12-27T10:30:00Z'
-      }
-    ]
+        createdAt: '2025-12-27T10:30:00Z',
+      },
+    ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440002',
     orderNumber: 'ORD20251227EF34GH',
     userId: 'user-002',
     status: OrderStatusValues.SHIPPED,
-    productTotal: 200.00,
-    shippingFee: 0.00,
-    discountAmount: 20.00,
-    totalAmount: 180.00,
+    productTotal: 200.0,
+    shippingFee: 0.0,
+    discountAmount: 20.0,
+    totalAmount: 180.0,
     shippingAddress: {
       province: '北京市',
       city: '北京市',
       district: '朝阳区',
-      detail: '三里屯SOHO 5号楼'
+      detail: '三里屯SOHO 5号楼',
     },
     paymentMethod: 'ALIPAY',
     paymentTime: '2025-12-26T14:20:00Z',
@@ -140,7 +140,7 @@ export const mockOrders = [
       province: '北京市',
       city: '北京市',
       district: '朝阳区',
-      address: '三里屯SOHO 5号楼'
+      address: '三里屯SOHO 5号楼',
     },
     productSummary: '矿泉水 等3件商品',
     items: [
@@ -152,10 +152,10 @@ export const mockOrders = [
         productSpec: '550ml',
         productImage: null,
         quantity: 6,
-        unitPrice: 3.00,
-        subtotal: 18.00,
-        createdAt: '2025-12-26T14:00:00Z'
-      }
+        unitPrice: 3.0,
+        subtotal: 18.0,
+        createdAt: '2025-12-26T14:00:00Z',
+      },
     ],
     logs: [
       {
@@ -167,7 +167,7 @@ export const mockOrders = [
         operatorId: 'user-002',
         operatorName: '李四',
         comments: '创建订单',
-        createdAt: '2025-12-26T14:00:00Z'
+        createdAt: '2025-12-26T14:00:00Z',
       },
       {
         id: 'log-004',
@@ -178,7 +178,7 @@ export const mockOrders = [
         operatorId: 'user-002',
         operatorName: '李四',
         comments: '支付宝支付成功',
-        createdAt: '2025-12-26T14:20:00Z'
+        createdAt: '2025-12-26T14:20:00Z',
       },
       {
         id: 'log-005',
@@ -189,24 +189,24 @@ export const mockOrders = [
         operatorId: 'admin-001',
         operatorName: '运营管理员',
         comments: '订单已发货，快递单号: SF1234567890',
-        createdAt: '2025-12-27T09:00:00Z'
-      }
-    ]
+        createdAt: '2025-12-27T09:00:00Z',
+      },
+    ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440003',
     orderNumber: 'ORD20251226IJ56KL',
     userId: 'user-003',
     status: OrderStatusValues.COMPLETED,
-    productTotal: 80.00,
-    shippingFee: 10.00,
-    discountAmount: 0.00,
-    totalAmount: 90.00,
+    productTotal: 80.0,
+    shippingFee: 10.0,
+    discountAmount: 0.0,
+    totalAmount: 90.0,
     shippingAddress: {
       province: '上海市',
       city: '上海市',
       district: '浦东新区',
-      detail: '陆家嘴环路1000号'
+      detail: '陆家嘴环路1000号',
     },
     paymentMethod: 'WECHAT_PAY',
     paymentTime: '2025-12-25T11:00:00Z',
@@ -224,7 +224,7 @@ export const mockOrders = [
       province: '上海市',
       city: '上海市',
       district: '浦东新区',
-      address: '陆家嘴环路1000号'
+      address: '陆家嘴环路1000号',
     },
     productSummary: '爆米花',
     items: [
@@ -236,10 +236,10 @@ export const mockOrders = [
         productSpec: '大桶',
         productImage: null,
         quantity: 1,
-        unitPrice: 80.00,
-        subtotal: 80.00,
-        createdAt: '2025-12-25T10:45:00Z'
-      }
+        unitPrice: 80.0,
+        subtotal: 80.0,
+        createdAt: '2025-12-25T10:45:00Z',
+      },
     ],
     logs: [
       {
@@ -251,7 +251,7 @@ export const mockOrders = [
         operatorId: 'user-003',
         operatorName: '王五',
         comments: '创建订单',
-        createdAt: '2025-12-25T10:45:00Z'
+        createdAt: '2025-12-25T10:45:00Z',
       },
       {
         id: 'log-007',
@@ -262,7 +262,7 @@ export const mockOrders = [
         operatorId: 'user-003',
         operatorName: '王五',
         comments: '微信支付成功',
-        createdAt: '2025-12-25T11:00:00Z'
+        createdAt: '2025-12-25T11:00:00Z',
       },
       {
         id: 'log-008',
@@ -273,7 +273,7 @@ export const mockOrders = [
         operatorId: 'admin-001',
         operatorName: '运营管理员',
         comments: '订单已发货',
-        createdAt: '2025-12-26T08:30:00Z'
+        createdAt: '2025-12-26T08:30:00Z',
       },
       {
         id: 'log-009',
@@ -284,24 +284,24 @@ export const mockOrders = [
         operatorId: 'user-003',
         operatorName: '王五',
         comments: '用户确认收货',
-        createdAt: '2025-12-27T15:00:00Z'
-      }
-    ]
+        createdAt: '2025-12-27T15:00:00Z',
+      },
+    ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440004',
     orderNumber: 'ORD20251227MN78OP',
     userId: 'user-004',
     status: OrderStatusValues.PENDING_PAYMENT,
-    productTotal: 120.00,
-    shippingFee: 10.00,
-    discountAmount: 10.00,
-    totalAmount: 120.00,
+    productTotal: 120.0,
+    shippingFee: 10.0,
+    discountAmount: 10.0,
+    totalAmount: 120.0,
     shippingAddress: {
       province: '浙江省',
       city: '杭州市',
       district: '西湖区',
-      detail: '文三路588号'
+      detail: '文三路588号',
     },
     paymentMethod: null,
     paymentTime: null,
@@ -319,7 +319,7 @@ export const mockOrders = [
       province: '浙江省',
       city: '杭州市',
       district: '西湖区',
-      address: '文三路588号'
+      address: '文三路588号',
     },
     productSummary: '可乐 等2件商品',
     items: [
@@ -331,9 +331,9 @@ export const mockOrders = [
         productSpec: '500ml',
         productImage: null,
         quantity: 3,
-        unitPrice: 5.00,
-        subtotal: 15.00,
-        createdAt: '2025-12-27T16:00:00Z'
+        unitPrice: 5.0,
+        subtotal: 15.0,
+        createdAt: '2025-12-27T16:00:00Z',
       },
       {
         id: 'item-006',
@@ -343,10 +343,10 @@ export const mockOrders = [
         productSpec: '经典款',
         productImage: null,
         quantity: 2,
-        unitPrice: 15.00,
-        subtotal: 30.00,
-        createdAt: '2025-12-27T16:00:00Z'
-      }
+        unitPrice: 15.0,
+        subtotal: 30.0,
+        createdAt: '2025-12-27T16:00:00Z',
+      },
     ],
     logs: [
       {
@@ -358,24 +358,24 @@ export const mockOrders = [
         operatorId: 'user-004',
         operatorName: '赵六',
         comments: '创建订单',
-        createdAt: '2025-12-27T16:00:00Z'
-      }
-    ]
+        createdAt: '2025-12-27T16:00:00Z',
+      },
+    ],
   },
   {
     id: '550e8400-e29b-41d4-a716-446655440005',
     orderNumber: 'ORD20251226QR90ST',
     userId: 'user-005',
     status: OrderStatusValues.CANCELLED,
-    productTotal: 50.00,
-    shippingFee: 10.00,
-    discountAmount: 0.00,
-    totalAmount: 60.00,
+    productTotal: 50.0,
+    shippingFee: 10.0,
+    discountAmount: 0.0,
+    totalAmount: 60.0,
     shippingAddress: {
       province: '江苏省',
       city: '南京市',
       district: '鼓楼区',
-      detail: '中山路200号'
+      detail: '中山路200号',
     },
     paymentMethod: null,
     paymentTime: null,
@@ -393,7 +393,7 @@ export const mockOrders = [
       province: '江苏省',
       city: '南京市',
       district: '鼓楼区',
-      address: '中山路200号'
+      address: '中山路200号',
     },
     productSummary: '矿泉水',
     items: [
@@ -405,10 +405,10 @@ export const mockOrders = [
         productSpec: '550ml',
         productImage: null,
         quantity: 10,
-        unitPrice: 3.00,
-        subtotal: 30.00,
-        createdAt: '2025-12-26T12:00:00Z'
-      }
+        unitPrice: 3.0,
+        subtotal: 30.0,
+        createdAt: '2025-12-26T12:00:00Z',
+      },
     ],
     logs: [
       {
@@ -420,7 +420,7 @@ export const mockOrders = [
         operatorId: 'user-005',
         operatorName: '孙七',
         comments: '创建订单',
-        createdAt: '2025-12-26T12:00:00Z'
+        createdAt: '2025-12-26T12:00:00Z',
       },
       {
         id: 'log-012',
@@ -431,8 +431,8 @@ export const mockOrders = [
         operatorId: 'user-005',
         operatorName: '孙七',
         comments: '用户主动取消 - 不需要了',
-        createdAt: '2025-12-26T12:30:00Z'
-      }
-    ]
-  }
-]
+        createdAt: '2025-12-26T12:30:00Z',
+      },
+    ],
+  },
+];

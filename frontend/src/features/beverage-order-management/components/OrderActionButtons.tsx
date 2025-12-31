@@ -2,30 +2,30 @@
  * @spec O003-beverage-order
  * 订单快捷操作按钮组件
  */
-import React from 'react'
-import { Button, Space, Popconfirm } from 'antd'
+import React from 'react';
+import { Button, Space, Popconfirm } from 'antd';
 import {
   PlayCircleOutlined,
   CheckCircleOutlined,
   DeliveredProcedureOutlined,
   CloseCircleOutlined,
-} from '@ant-design/icons'
+} from '@ant-design/icons';
 import {
   useStartProduction,
   useCompleteOrder,
   useDeliverOrder,
   useCancelOrder,
-} from '../../../hooks/useUpdateOrderStatus'
-import { BeverageOrderStatus } from '../../../types/beverageOrder'
+} from '../../../hooks/useUpdateOrderStatus';
+import { BeverageOrderStatus } from '../../../types/beverageOrder';
 
 /**
  * 订单快捷操作按钮组件属性
  */
 export interface OrderActionButtonsProps {
-  orderId: string
-  orderNumber: string
-  status: BeverageOrderStatus
-  compact?: boolean
+  orderId: string;
+  orderNumber: string;
+  status: BeverageOrderStatus;
+  compact?: boolean;
 }
 
 /**
@@ -43,12 +43,12 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
   status,
   compact = false,
 }) => {
-  const { mutate: startProduction, isPending: isStarting } = useStartProduction()
-  const { mutate: completeOrder, isPending: isCompleting } = useCompleteOrder()
-  const { mutate: deliverOrder, isPending: isDelivering } = useDeliverOrder()
-  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder()
+  const { mutate: startProduction, isPending: isStarting } = useStartProduction();
+  const { mutate: completeOrder, isPending: isCompleting } = useCompleteOrder();
+  const { mutate: deliverOrder, isPending: isDelivering } = useDeliverOrder();
+  const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrder();
 
-  const buttonSize = compact ? 'small' : 'middle'
+  const buttonSize = compact ? 'small' : 'middle';
 
   return (
     <Space size="small">
@@ -101,16 +101,11 @@ export const OrderActionButtons: React.FC<OrderActionButtonsProps> = ({
           okText="确认"
           cancelText="取消"
         >
-          <Button
-            danger
-            size={buttonSize}
-            icon={<CloseCircleOutlined />}
-            loading={isCancelling}
-          >
+          <Button danger size={buttonSize} icon={<CloseCircleOutlined />} loading={isCancelling}>
             取消订单
           </Button>
         </Popconfirm>
       )}
     </Space>
-  )
-}
+  );
+};

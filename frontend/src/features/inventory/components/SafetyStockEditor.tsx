@@ -1,21 +1,14 @@
 /**
  * P004-inventory-adjustment: 安全库存编辑器组件
- * 
+ *
  * 提供安全库存的查看和编辑功能，支持乐观锁冲突处理。
  * 实现 T057 和 T062 任务。
- * 
+ *
  * @since US5 - 设置安全库存阈值
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  InputNumber,
-  Button,
-  Space,
-  Typography,
-  Tooltip,
-  Alert,
-} from 'antd';
+import { InputNumber, Button, Space, Typography, Tooltip, Alert } from 'antd';
 import { EditOutlined, CheckOutlined, CloseOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useSafetyStock, isConflictError } from '../hooks/useSafetyStock';
 
@@ -40,13 +33,13 @@ export interface SafetyStockEditorProps {
 
 /**
  * 安全库存编辑器组件
- * 
+ *
  * 功能：
  * - 点击编辑按钮进入编辑模式
  * - 输入新的安全库存值
  * - 保存时自动处理乐观锁冲突
  * - 冲突时显示刷新按钮
- * 
+ *
  * @example
  * ```tsx
  * <SafetyStockEditor
@@ -138,11 +131,7 @@ export const SafetyStockEditor: React.FC<SafetyStockEditorProps> = ({
           description="该记录已被他人修改，请刷新后重试"
           showIcon
           action={
-            <Button 
-              size="small" 
-              icon={<ReloadOutlined />}
-              onClick={handleRefresh}
-            >
+            <Button size="small" icon={<ReloadOutlined />} onClick={handleRefresh}>
               刷新
             </Button>
           }

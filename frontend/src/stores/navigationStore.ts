@@ -13,7 +13,7 @@ import {
   NavigationAction,
   MenuLevel,
   FunctionalArea,
-  User
+  User,
 } from '@/types/navigation';
 import { filterMenusByPermissions } from '@/utils/navigation';
 import { useUserStore } from './userStore';
@@ -141,70 +141,93 @@ export const useNavigationStore = create<NavigationStore>()(
         },
 
         // Actions
-        setMenus: (menus) =>
-          set({ menus, loading: false, error: null }, false, 'setMenus'),
+        setMenus: (menus) => set({ menus, loading: false, error: null }, false, 'setMenus'),
 
-        setActiveMenu: (menuId) =>
-          set({ activeMenuId: menuId }, false, 'setActiveMenu'),
+        setActiveMenu: (menuId) => set({ activeMenuId: menuId }, false, 'setActiveMenu'),
 
         toggleMenuExpansion: (menuId) =>
-          set((state) => ({
-            expandedMenuIds: state.expandedMenuIds.includes(menuId)
-              ? state.expandedMenuIds.filter(id => id !== menuId)
-              : [...state.expandedMenuIds, menuId]
-          }), false, 'toggleMenuExpansion'),
+          set(
+            (state) => ({
+              expandedMenuIds: state.expandedMenuIds.includes(menuId)
+                ? state.expandedMenuIds.filter((id) => id !== menuId)
+                : [...state.expandedMenuIds, menuId],
+            }),
+            false,
+            'toggleMenuExpansion'
+          ),
 
         expandMenu: (menuId) =>
-          set((state) => ({
-            expandedMenuIds: state.expandedMenuIds.includes(menuId)
-              ? state.expandedMenuIds
-              : [...state.expandedMenuIds, menuId]
-          }), false, 'expandMenu'),
+          set(
+            (state) => ({
+              expandedMenuIds: state.expandedMenuIds.includes(menuId)
+                ? state.expandedMenuIds
+                : [...state.expandedMenuIds, menuId],
+            }),
+            false,
+            'expandMenu'
+          ),
 
         collapseMenu: (menuId) =>
-          set((state) => ({
-            expandedMenuIds: state.expandedMenuIds.filter(id => id !== menuId)
-          }), false, 'collapseMenu'),
+          set(
+            (state) => ({
+              expandedMenuIds: state.expandedMenuIds.filter((id) => id !== menuId),
+            }),
+            false,
+            'collapseMenu'
+          ),
 
         setSidebarCollapsed: (collapsed) =>
-          set({
-            sidebarCollapsed: collapsed,
-            sidebarState: collapsed ? SidebarState.COLLAPSED : SidebarState.EXPANDED
-          }, false, 'setSidebarCollapsed'),
+          set(
+            {
+              sidebarCollapsed: collapsed,
+              sidebarState: collapsed ? SidebarState.COLLAPSED : SidebarState.EXPANDED,
+            },
+            false,
+            'setSidebarCollapsed'
+          ),
 
-        setLoading: (loading) =>
-          set({ loading }, false, 'setLoading'),
+        setLoading: (loading) => set({ loading }, false, 'setLoading'),
 
-        setError: (error) =>
-          set({ error, loading: false }, false, 'setError'),
+        setError: (error) => set({ error, loading: false }, false, 'setError'),
 
-        clearError: () =>
-          set({ error: null }, false, 'clearError'),
+        clearError: () => set({ error: null }, false, 'clearError'),
 
         // Breadcrumb actions
-        setBreadcrumb: (breadcrumb) =>
-          set({ breadcrumb: undefined }, false, 'setBreadcrumb'),
+        setBreadcrumb: (breadcrumb) => set({ breadcrumb: undefined }, false, 'setBreadcrumb'),
 
         addBreadcrumbItem: (item) =>
-          set((state) => ({
-            breadcrumb: state.breadcrumb
-              ? [...state.breadcrumb, item]
-              : [item]
-          }), false, 'addBreadcrumbItem'),
+          set(
+            (state) => ({
+              breadcrumb: state.breadcrumb ? [...state.breadcrumb, item] : [item],
+            }),
+            false,
+            'addBreadcrumbItem'
+          ),
 
         removeBreadcrumbItem: (itemId) =>
-          set((state) => ({
-            breadcrumb: state.breadcrumb?.filter(item => item.id !== itemId) || []
-          }), false, 'removeBreadcrumbItem'),
+          set(
+            (state) => ({
+              breadcrumb: state.breadcrumb?.filter((item) => item.id !== itemId) || [],
+            }),
+            false,
+            'removeBreadcrumbItem'
+          ),
 
         // Navigation actions
         navigateToMenu: (menu) => {
           const state = get();
-          set({
-            activeMenuId: menu.id,
-            // Add to recent menus (keep only last 10)
-            recentMenus: [menu.id, ...state.recentMenus.filter(id => id !== menu.id)].slice(0, 10)
-          }, false, 'navigateToMenu');
+          set(
+            {
+              activeMenuId: menu.id,
+              // Add to recent menus (keep only last 10)
+              recentMenus: [menu.id, ...state.recentMenus.filter((id) => id !== menu.id)].slice(
+                0,
+                10
+              ),
+            },
+            false,
+            'navigateToMenu'
+          );
         },
 
         goBack: () => {
@@ -218,37 +241,54 @@ export const useNavigationStore = create<NavigationStore>()(
         },
 
         // Search and favorites
-        setSearchQuery: (query) =>
-          set({ searchQuery: query }, false, 'setSearchQuery'),
+        setSearchQuery: (query) => set({ searchQuery: query }, false, 'setSearchQuery'),
 
         toggleFavorite: (menuId) =>
-          set((state) => ({
-            favoriteMenus: state.favoriteMenus.includes(menuId)
-              ? state.favoriteMenus.filter(id => id !== menuId)
-              : [...state.favoriteMenus, menuId]
-          }), false, 'toggleFavorite'),
+          set(
+            (state) => ({
+              favoriteMenus: state.favoriteMenus.includes(menuId)
+                ? state.favoriteMenus.filter((id) => id !== menuId)
+                : [...state.favoriteMenus, menuId],
+            }),
+            false,
+            'toggleFavorite'
+          ),
 
         addRecentMenu: (menuId) =>
-          set((state) => ({
-            recentMenus: [menuId, ...state.recentMenus.filter(id => id !== menuId)].slice(0, 10)
-          }), false, 'addRecentMenu'),
+          set(
+            (state) => ({
+              recentMenus: [menuId, ...state.recentMenus.filter((id) => id !== menuId)].slice(
+                0,
+                10
+              ),
+            }),
+            false,
+            'addRecentMenu'
+          ),
 
         // Mobile support
         setSidebarState: (sidebarState) =>
-          set({
-            sidebarState,
-            sidebarCollapsed: sidebarState === SidebarState.COLLAPSED
-          }, false, 'setSidebarState'),
+          set(
+            {
+              sidebarState,
+              sidebarCollapsed: sidebarState === SidebarState.COLLAPSED,
+            },
+            false,
+            'setSidebarState'
+          ),
 
         setScreenSize: (screenSize) =>
-          set({
-            screenSize,
-            // Auto-collapse sidebar on mobile
-            sidebarCollapsed: screenSize === LayoutSize.SMALL,
-            sidebarState: screenSize === LayoutSize.SMALL
-              ? SidebarState.HIDDEN
-              : SidebarState.EXPANDED
-          }, false, 'setScreenSize'),
+          set(
+            {
+              screenSize,
+              // Auto-collapse sidebar on mobile
+              sidebarCollapsed: screenSize === LayoutSize.SMALL,
+              sidebarState:
+                screenSize === LayoutSize.SMALL ? SidebarState.HIDDEN : SidebarState.EXPANDED,
+            },
+            false,
+            'setScreenSize'
+          ),
 
         // Permission-aware actions
         getFilteredMenus: () => {
@@ -259,21 +299,26 @@ export const useNavigationStore = create<NavigationStore>()(
 
         canAccessMenu: (menu) => {
           const userPermissions = useUserStore.getState().permissions;
-          return menu.requiredPermissions.length === 0 ||
-            menu.requiredPermissions.some(permission => userPermissions.includes(permission));
+          return (
+            menu.requiredPermissions.length === 0 ||
+            menu.requiredPermissions.some((permission) => userPermissions.includes(permission))
+          );
         },
 
         // Reset
         reset: () =>
-          set({
-            ...initialState,
-            searchQuery: '',
-            favoriteMenus: [],
-            recentMenus: [],
-            sidebarState: SidebarState.EXPANDED,
-            screenSize: LayoutSize.LARGE
-          }, false, 'reset'),
-
+          set(
+            {
+              ...initialState,
+              searchQuery: '',
+              favoriteMenus: [],
+              recentMenus: [],
+              sidebarState: SidebarState.EXPANDED,
+              screenSize: LayoutSize.LARGE,
+            },
+            false,
+            'reset'
+          ),
       }),
       {
         name: 'navigation-storage',
@@ -310,23 +355,24 @@ export const useScreenSize = () => useNavigationStore((state) => state.screenSiz
 /**
  * Actions选择器 - 只获取action函数
  */
-export const useNavigationActions = () => useNavigationStore((state) => ({
-  setMenus: state.setMenus,
-  setActiveMenu: state.setActiveMenu,
-  toggleMenuExpansion: state.toggleMenuExpansion,
-  expandMenu: state.expandMenu,
-  collapseMenu: state.collapseMenu,
-  setSidebarCollapsed: state.setSidebarCollapsed,
-  setLoading: state.setLoading,
-  setError: state.setError,
-  clearError: state.clearError,
-  navigateToMenu: state.navigateToMenu,
-  goBack: state.goBack,
-  goForward: state.goForward,
-  setSearchQuery: state.setSearchQuery,
-  toggleFavorite: state.toggleFavorite,
-  addRecentMenu: state.addRecentMenu,
-  setSidebarState: state.setSidebarState,
-  setScreenSize: state.setScreenSize,
-  reset: state.reset,
-}));
+export const useNavigationActions = () =>
+  useNavigationStore((state) => ({
+    setMenus: state.setMenus,
+    setActiveMenu: state.setActiveMenu,
+    toggleMenuExpansion: state.toggleMenuExpansion,
+    expandMenu: state.expandMenu,
+    collapseMenu: state.collapseMenu,
+    setSidebarCollapsed: state.setSidebarCollapsed,
+    setLoading: state.setLoading,
+    setError: state.setError,
+    clearError: state.clearError,
+    navigateToMenu: state.navigateToMenu,
+    goBack: state.goBack,
+    goForward: state.goForward,
+    setSearchQuery: state.setSearchQuery,
+    toggleFavorite: state.toggleFavorite,
+    addRecentMenu: state.addRecentMenu,
+    setSidebarState: state.setSidebarState,
+    setScreenSize: state.setScreenSize,
+    reset: state.reset,
+  }));

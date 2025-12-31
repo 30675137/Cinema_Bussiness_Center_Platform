@@ -1,16 +1,28 @@
 /**
  * MSW Handlers for Schedule Management API
- * 
+ *
  * Mock API handlers for schedule and hall endpoints
  */
 
 import { http, HttpResponse } from 'msw';
-import type { ScheduleEvent, Hall, CreateScheduleEventRequest, UpdateScheduleEventRequest, ConflictCheckRequest } from '@/pages/schedule/types/schedule.types';
-import { mockHalls, generateMockEvents, getScheduleEventsStore, setScheduleEventsStore, initializeMockData } from '../data/scheduleMockData';
+import type {
+  ScheduleEvent,
+  Hall,
+  CreateScheduleEventRequest,
+  UpdateScheduleEventRequest,
+  ConflictCheckRequest,
+} from '@/pages/schedule/types/schedule.types';
+import {
+  mockHalls,
+  generateMockEvents,
+  getScheduleEventsStore,
+  setScheduleEventsStore,
+  initializeMockData,
+} from '../data/scheduleMockData';
 import { checkTimeConflict } from '@/features/schedule-management/utils/conflictDetection';
 
 // API延迟模拟
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 初始化默认日期的数据
 const today = new Date().toISOString().split('T')[0];
@@ -25,28 +37,28 @@ initializeMockData(today);
  */
 export const getSchedulesHandler = http.get('/api/schedules', async ({ request }) => {
   await delay(300);
-  
+
   const url = new URL(request.url);
   const date = url.searchParams.get('date') || today;
   const hallId = url.searchParams.get('hallId');
   const type = url.searchParams.get('type');
   const status = url.searchParams.get('status');
-  
+
   // 如果日期改变，重新初始化数据
   let events = getScheduleEventsStore();
   if (events.length === 0 || events[0]?.date !== date) {
     initializeMockData(date);
     events = getScheduleEventsStore();
   }
-  
+
   // 应用筛选
-  let filteredEvents = events.filter(event => {
+  let filteredEvents = events.filter((event) => {
     if (hallId && event.hallId !== hallId) return false;
     if (type && event.type !== type) return false;
     if (status && event.status !== status) return false;
     return true;
   });
-  
+
   return HttpResponse.json({
     success: true,
     data: filteredEvents,
@@ -61,11 +73,11 @@ export const getSchedulesHandler = http.get('/api/schedules', async ({ request }
  */
 export const getScheduleDetailHandler = http.get('/api/schedules/:id', async ({ params }) => {
   await delay(200);
-  
+
   const { id } = params;
   const events = getScheduleEventsStore();
-  const event = events.find(e => e.id === id);
-  
+  const event = events.find((e) => e.id === id);
+
   if (!event) {
     return HttpResponse.json(
       {
@@ -77,7 +89,7 @@ export const getScheduleDetailHandler = http.get('/api/schedules/:id', async ({ 
       { status: 404 }
     );
   }
-  
+
   return HttpResponse.json({
     success: true,
     data: event,
@@ -91,10 +103,10 @@ export const getScheduleDetailHandler = http.get('/api/schedules/:id', async ({ 
  */
 export const createScheduleHandler = http.post('/api/schedules', async ({ request }) => {
   await delay(500);
-  
+
   try {
-    const requestData = await request.json() as CreateScheduleEventRequest;
-    
+    const requestData = (await request.json()) as CreateScheduleEventRequest;
+
     // 验证必填字段
     if (!requestData.hallId || !requestData.date || !requestData.title || !requestData.type) {
       return HttpResponse.json(
@@ -107,7 +119,7 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
         { status: 400 }
       );
     }
-    
+
     // 包场必须有客户信息
     if (requestData.type === 'private' && !requestData.customer) {
       return HttpResponse.json(
@@ -120,7 +132,7 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
         { status: 400 }
       );
     }
-    
+
     // 检查冲突
     const events = getScheduleEventsStore();
     const conflicts = checkTimeConflict(
@@ -133,7 +145,7 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
       },
       events
     );
-    
+
     if (conflicts.length > 0) {
       return HttpResponse.json(
         {
@@ -145,7 +157,7 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
         { status: 409 }
       );
     }
-    
+
     // 创建新事件
     const newEvent: ScheduleEvent = {
       id: `e_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -153,18 +165,21 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     // 更新存储
     const updatedEvents = [...events, newEvent];
     setScheduleEventsStore(updatedEvents);
-    
-    return HttpResponse.json({
-      success: true,
-      data: newEvent,
-      message: '创建成功',
-      code: 201,
-      timestamp: Date.now(),
-    }, { status: 201 });
+
+    return HttpResponse.json(
+      {
+        success: true,
+        data: newEvent,
+        message: '创建成功',
+        code: 201,
+        timestamp: Date.now(),
+      },
+      { status: 201 }
+    );
   } catch (error) {
     return HttpResponse.json(
       {
@@ -183,14 +198,14 @@ export const createScheduleHandler = http.post('/api/schedules', async ({ reques
  */
 export const updateScheduleHandler = http.put('/api/schedules/:id', async ({ params, request }) => {
   await delay(500);
-  
+
   try {
     const { id } = params;
-    const updateData = await request.json() as Partial<UpdateScheduleEventRequest>;
-    
+    const updateData = (await request.json()) as Partial<UpdateScheduleEventRequest>;
+
     const events = getScheduleEventsStore();
-    const eventIndex = events.findIndex(e => e.id === id);
-    
+    const eventIndex = events.findIndex((e) => e.id === id);
+
     if (eventIndex === -1) {
       return HttpResponse.json(
         {
@@ -202,12 +217,16 @@ export const updateScheduleHandler = http.put('/api/schedules/:id', async ({ par
         { status: 404 }
       );
     }
-    
+
     const existingEvent = events[eventIndex];
     const updatedEvent = { ...existingEvent, ...updateData };
-    
+
     // 如果时间改变，检查冲突
-    if (updateData.startHour !== undefined || updateData.duration !== undefined || updateData.hallId !== undefined) {
+    if (
+      updateData.startHour !== undefined ||
+      updateData.duration !== undefined ||
+      updateData.hallId !== undefined
+    ) {
       const conflicts = checkTimeConflict(
         {
           hallId: updatedEvent.hallId,
@@ -219,7 +238,7 @@ export const updateScheduleHandler = http.put('/api/schedules/:id', async ({ par
         events,
         id as string
       );
-      
+
       if (conflicts.length > 0) {
         return HttpResponse.json(
           {
@@ -232,13 +251,13 @@ export const updateScheduleHandler = http.put('/api/schedules/:id', async ({ par
         );
       }
     }
-    
+
     // 更新事件
     updatedEvent.updatedAt = new Date().toISOString();
     const updatedEvents = [...events];
     updatedEvents[eventIndex] = updatedEvent;
     setScheduleEventsStore(updatedEvents);
-    
+
     return HttpResponse.json({
       success: true,
       data: updatedEvent,
@@ -264,11 +283,11 @@ export const updateScheduleHandler = http.put('/api/schedules/:id', async ({ par
  */
 export const deleteScheduleHandler = http.delete('/api/schedules/:id', async ({ params }) => {
   await delay(300);
-  
+
   const { id } = params;
   const events = getScheduleEventsStore();
-  const filteredEvents = events.filter(e => e.id !== id);
-  
+  const filteredEvents = events.filter((e) => e.id !== id);
+
   if (filteredEvents.length === events.length) {
     return HttpResponse.json(
       {
@@ -280,9 +299,9 @@ export const deleteScheduleHandler = http.delete('/api/schedules/:id', async ({ 
       { status: 404 }
     );
   }
-  
+
   setScheduleEventsStore(filteredEvents);
-  
+
   return HttpResponse.json({
     success: true,
     message: '删除成功',
@@ -294,40 +313,39 @@ export const deleteScheduleHandler = http.delete('/api/schedules/:id', async ({ 
 /**
  * POST /api/schedules/conflict-check - 检查时间冲突
  */
-export const checkConflictHandler = http.post('/api/schedules/conflict-check', async ({ request }) => {
-  await delay(200);
-  
-  try {
-    const requestData = await request.json() as ConflictCheckRequest;
-    const events = getScheduleEventsStore();
-    
-    const conflicts = checkTimeConflict(
-      requestData,
-      events,
-      requestData.excludeEventId
-    );
-    
-    return HttpResponse.json({
-      success: true,
-      data: {
-        hasConflict: conflicts.length > 0,
-        conflictingEvents: conflicts,
-      },
-      code: 200,
-      timestamp: Date.now(),
-    });
-  } catch (error) {
-    return HttpResponse.json(
-      {
-        success: false,
-        message: '冲突检查失败',
-        code: 400,
+export const checkConflictHandler = http.post(
+  '/api/schedules/conflict-check',
+  async ({ request }) => {
+    await delay(200);
+
+    try {
+      const requestData = (await request.json()) as ConflictCheckRequest;
+      const events = getScheduleEventsStore();
+
+      const conflicts = checkTimeConflict(requestData, events, requestData.excludeEventId);
+
+      return HttpResponse.json({
+        success: true,
+        data: {
+          hasConflict: conflicts.length > 0,
+          conflictingEvents: conflicts,
+        },
+        code: 200,
         timestamp: Date.now(),
-      },
-      { status: 400 }
-    );
+      });
+    } catch (error) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '冲突检查失败',
+          code: 400,
+          timestamp: Date.now(),
+        },
+        { status: 400 }
+      );
+    }
   }
-});
+);
 
 // ============================================================================
 // Hall Handlers
@@ -338,20 +356,20 @@ export const checkConflictHandler = http.post('/api/schedules/conflict-check', a
  */
 export const getHallsHandler = http.get('/api/halls', async ({ request }) => {
   await delay(200);
-  
+
   const url = new URL(request.url);
   const status = url.searchParams.get('status');
   const type = url.searchParams.get('type');
-  
+
   let filteredHalls = [...mockHalls];
-  
+
   if (status) {
-    filteredHalls = filteredHalls.filter(h => h.status === status);
+    filteredHalls = filteredHalls.filter((h) => h.status === status);
   }
   if (type) {
-    filteredHalls = filteredHalls.filter(h => h.type === type);
+    filteredHalls = filteredHalls.filter((h) => h.type === type);
   }
-  
+
   return HttpResponse.json({
     success: true,
     data: filteredHalls,
@@ -366,10 +384,10 @@ export const getHallsHandler = http.get('/api/halls', async ({ request }) => {
  */
 export const getHallDetailHandler = http.get('/api/halls/:id', async ({ params }) => {
   await delay(200);
-  
+
   const { id } = params;
-  const hall = mockHalls.find(h => h.id === id);
-  
+  const hall = mockHalls.find((h) => h.id === id);
+
   if (!hall) {
     return HttpResponse.json(
       {
@@ -381,7 +399,7 @@ export const getHallDetailHandler = http.get('/api/halls/:id', async ({ params }
       { status: 404 }
     );
   }
-  
+
   return HttpResponse.json({
     success: true,
     data: hall,
@@ -404,4 +422,3 @@ export const scheduleHandlers = [
   getHallsHandler,
   getHallDetailHandler,
 ];
-

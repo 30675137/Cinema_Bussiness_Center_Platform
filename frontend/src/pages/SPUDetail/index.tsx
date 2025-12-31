@@ -1,165 +1,168 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { Card, Button, Space, message, Breadcrumb, Typography, Row, Col, Spin } from 'antd'
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Card, Button, Space, message, Breadcrumb, Typography, Row, Col, Spin } from 'antd';
 import {
   ArrowLeftOutlined,
   EditOutlined,
   ShareAltOutlined,
   PrinterOutlined,
   DownloadOutlined,
-  SettingOutlined
-} from '@ant-design/icons'
-import SPUDetail from '@/components/SPU/SPUDetail'
-import SPUEditForm from '@/components/forms/SPUEditForm'
-import StatusManager from '@/components/SPU/StatusManager'
-import type { SPUItem, SPUStatus } from '@/types/spu'
-import { spuService } from '@/services/spuService'
-import { Breadcrumb as CustomBreadcrumb } from '@/components/common'
+  SettingOutlined,
+} from '@ant-design/icons';
+import SPUDetail from '@/components/SPU/SPUDetail';
+import SPUEditForm from '@/components/forms/SPUEditForm';
+import StatusManager from '@/components/SPU/StatusManager';
+import type { SPUItem, SPUStatus } from '@/types/spu';
+import { spuService } from '@/services/spuService';
+import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
 
-const { Title } = Typography
+const { Title } = Typography;
 
 interface SPUDetailPageProps {}
 
 const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = useParams<{ id: string }>();
   // 根据 URL 路径自动设置模式
-  const isEditPath = location.pathname.endsWith('/edit')
-  const [mode, setMode] = useState<'view' | 'edit'>(isEditPath ? 'edit' : 'view')
-  const [currentSPU, setCurrentSPU] = useState<SPUItem | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [dataLoading, setDataLoading] = useState(true)
+  const isEditPath = location.pathname.endsWith('/edit');
+  const [mode, setMode] = useState<'view' | 'edit'>(isEditPath ? 'edit' : 'view');
+  const [currentSPU, setCurrentSPU] = useState<SPUItem | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   // 加载 SPU 数据
   useEffect(() => {
     const loadSPUData = async () => {
-      if (!id) return
+      if (!id) return;
 
       try {
-        setDataLoading(true)
-        const response = await spuService.getSPUDetail(id)
+        setDataLoading(true);
+        const response = await spuService.getSPUDetail(id);
         if (response.success && response.data) {
-          setCurrentSPU(response.data)
+          setCurrentSPU(response.data);
         } else {
-          message.error(response.message || '获取SPU详情失败')
-          navigate('/products/spu')
+          message.error(response.message || '获取SPU详情失败');
+          navigate('/products/spu');
         }
       } catch (error) {
-        console.error('Load SPU error:', error)
-        message.error('获取SPU详情失败，请重试')
-        navigate('/products/spu')
+        console.error('Load SPU error:', error);
+        message.error('获取SPU详情失败，请重试');
+        navigate('/products/spu');
       } finally {
-        setDataLoading(false)
+        setDataLoading(false);
       }
-    }
+    };
 
-    loadSPUData()
-  }, [id, navigate])
+    loadSPUData();
+  }, [id, navigate]);
 
   // 当 URL 路径变化时，同步更新模式
   useEffect(() => {
     if (isEditPath && mode !== 'edit') {
-      setMode('edit')
+      setMode('edit');
     } else if (!isEditPath && mode !== 'view') {
-      setMode('view')
+      setMode('view');
     }
-  }, [isEditPath, mode])
+  }, [isEditPath, mode]);
 
   // 面包屑导航
   const breadcrumbItems = [
     { title: '首页', path: '/dashboard' },
     { title: 'SPU管理', path: '/products/spu' },
     { title: mode === 'edit' ? '编辑SPU' : 'SPU详情' },
-  ]
+  ];
 
   // 处理编辑
   const handleEdit = () => {
-    navigate(`/spu/${id}/edit`)
-  }
+    navigate(`/spu/${id}/edit`);
+  };
 
   // 处理保存
   const handleSave = async (updatedData: SPUItem) => {
-    if (!id) return
+    if (!id) return;
 
     try {
-      setLoading(true)
-      const response = await spuService.updateSPU(id, updatedData)
+      setLoading(true);
+      const response = await spuService.updateSPU(id, updatedData);
       if (response.success) {
-        setCurrentSPU(response.data || updatedData)
-        message.success('SPU更新成功')
-        navigate(`/spu/${id}`) // 保存后跳转到详情页
+        setCurrentSPU(response.data || updatedData);
+        message.success('SPU更新成功');
+        navigate(`/spu/${id}`); // 保存后跳转到详情页
       } else {
-        message.error(response.message || '更新失败')
+        message.error(response.message || '更新失败');
       }
     } catch (error) {
-      console.error('Update SPU error:', error)
-      message.error('更新失败，请重试')
+      console.error('Update SPU error:', error);
+      message.error('更新失败，请重试');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // 处理取消
   const handleCancel = () => {
-    navigate(`/spu/${id}`)
-  }
+    navigate(`/spu/${id}`);
+  };
 
   // 处理状态变更
   const handleStatusChange = (newStatus: SPUStatus, reason?: string) => {
     if (currentSPU) {
       setCurrentSPU({
         ...currentSPU,
-        status: newStatus
-      })
+        status: newStatus,
+      });
     }
-  }
+  };
 
   // 处理返回
   const handleBack = () => {
-    navigate('/products/spu')
-  }
+    navigate('/products/spu');
+  };
 
   // 处理分享
   const handleShare = () => {
     if (id) {
-      const shareUrl = `${window.location.origin}/spu/${id}`
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        message.success('分享链接已复制到剪贴板')
-      }).catch(() => {
-        message.error('复制链接失败')
-      })
+      const shareUrl = `${window.location.origin}/spu/${id}`;
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          message.success('分享链接已复制到剪贴板');
+        })
+        .catch(() => {
+          message.error('复制链接失败');
+        });
     }
-  }
+  };
 
   // 处理打印
   const handlePrint = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   // 处理导出
   const handleExport = async () => {
     if (id) {
       try {
-        setLoading(true)
-        const response = await spuService.exportSPU({ spuId: id })
+        setLoading(true);
+        const response = await spuService.exportSPU({ spuId: id });
         if (response.success) {
           // 模拟下载
-          const link = document.createElement('a')
-          link.href = response.data.downloadUrl
-          link.download = `${currentSPU?.name || 'SPU'}_详情.pdf`
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          message.success('导出成功')
+          const link = document.createElement('a');
+          link.href = response.data.downloadUrl;
+          link.download = `${currentSPU?.name || 'SPU'}_详情.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          message.success('导出成功');
         }
       } catch (error) {
-        message.error('导出失败，请重试')
+        message.error('导出失败，请重试');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-  }
+  };
 
   return (
     <div style={{ padding: 24, backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
@@ -169,20 +172,19 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
       </div>
 
       {/* 页面标题和操作按钮 */}
-      <div style={{
-        marginBottom: 24,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: 16
-      }}>
+      <div
+        style={{
+          marginBottom: 24,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 16,
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {mode === 'edit' && (
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={handleCancel}
-            >
+            <Button icon={<ArrowLeftOutlined />} onClick={handleCancel}>
               取消编辑
             </Button>
           )}
@@ -200,35 +202,19 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
 
         {mode === 'view' && (
           <Space wrap>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={handleEdit}
-            >
+            <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
               编辑
             </Button>
-            <Button
-              icon={<ShareAltOutlined />}
-              onClick={handleShare}
-            >
+            <Button icon={<ShareAltOutlined />} onClick={handleShare}>
               分享
             </Button>
-            <Button
-              icon={<PrinterOutlined />}
-              onClick={handlePrint}
-            >
+            <Button icon={<PrinterOutlined />} onClick={handlePrint}>
               打印
             </Button>
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={handleExport}
-              loading={loading}
-            >
+            <Button icon={<DownloadOutlined />} onClick={handleExport} loading={loading}>
               导出
             </Button>
-            <Button onClick={handleBack}>
-              返回列表
-            </Button>
+            <Button onClick={handleBack}>返回列表</Button>
           </Space>
         )}
       </div>
@@ -246,12 +232,7 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
           {/* SPU详情组件 */}
           {currentSPU && (
             <>
-              <SPUDetail
-                spuId={id}
-                mode="page"
-                onEdit={handleEdit}
-                onClose={handleBack}
-              />
+              <SPUDetail spuId={id} mode="page" onEdit={handleEdit} onClose={handleBack} />
 
               {/* 状态管理组件 */}
               <StatusManager
@@ -275,7 +256,7 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default SPUDetailPage
+export default SPUDetailPage;

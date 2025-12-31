@@ -48,9 +48,7 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
 
   // Merge stores with their reservation settings
   const storesWithSettings: StoreWithSettings[] = stores.map((store) => {
-    const settings = reservationSettings.find(
-      (s) => s.storeId === store.id
-    );
+    const settings = reservationSettings.find((s) => s.storeId === store.id);
     return {
       ...store,
       reservationSettings: settings,
@@ -92,11 +90,7 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
             <span className="store-name-text" title={text}>
               {text}
             </span>
-            {record.code && (
-              <div style={{ fontSize: '12px', color: '#999' }}>
-                {record.code}
-              </div>
-            )}
+            {record.code && <div style={{ fontSize: '12px', color: '#999' }}>{record.code}</div>}
           </div>
         </div>
       ),
@@ -107,11 +101,7 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
       dataIndex: 'region',
       key: 'region',
       width: 150,
-      render: (text: string | null) => (
-        <span className="region-text">
-          {text || '-'}
-        </span>
-      ),
+      render: (text: string | null) => <span className="region-text">{text || '-'}</span>,
       sorter: (a, b) => (a.region || '').localeCompare(b.region || ''),
     },
     {
@@ -121,9 +111,7 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
       render: (_, record: StoreWithSettings) => {
         const enabled = record.reservationSettings?.isReservationEnabled ?? false;
         return (
-          <Tag color={getReservationStatusColor(enabled)}>
-            {getReservationStatusText(enabled)}
-          </Tag>
+          <Tag color={getReservationStatusColor(enabled)}>{getReservationStatusText(enabled)}</Tag>
         );
       },
       filters: [
@@ -142,17 +130,13 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
       render: (_, record: StoreWithSettings) => {
         const days = record.reservationSettings?.maxReservationDays ?? 0;
         const enabled = record.reservationSettings?.isReservationEnabled ?? false;
-        
+
         if (!enabled) {
           return <span style={{ color: '#999' }}>-</span>;
         }
-        
+
         return (
-          <Badge
-            count={days}
-            showZero
-            style={{ backgroundColor: days > 0 ? '#52c41a' : '#999' }}
-          />
+          <Badge count={days} showZero style={{ backgroundColor: days > 0 ? '#52c41a' : '#999' }} />
         );
       },
       sorter: (a, b) => {
@@ -201,10 +185,7 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
   if (!loading && storesWithSettings.length === 0) {
     return (
       <div className="reservation-settings-table-empty">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="暂无门店数据"
-        />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="暂无门店数据" />
       </div>
     );
   }
@@ -250,18 +231,21 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
         rowKey="id"
         rowSelection={rowSelection}
         loading={loading}
-        pagination={pagination ? {
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: (total, range) =>
-            `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
-          onChange: pagination.onChange,
-          onShowSizeChange: pagination.onChange,
-          pageSizeOptions: ['10', '20', '50', '100'],
-        } : false}
+        pagination={
+          pagination
+            ? {
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: pagination.total,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+                onChange: pagination.onChange,
+                onShowSizeChange: pagination.onChange,
+                pageSizeOptions: ['10', '20', '50', '100'],
+              }
+            : false
+        }
         scroll={{ x: 1000 }}
         className="reservation-settings-table"
         size="middle"
@@ -271,4 +255,3 @@ const ReservationSettingsTable: React.FC<ReservationSettingsTableProps> = ({
 };
 
 export default ReservationSettingsTable;
-

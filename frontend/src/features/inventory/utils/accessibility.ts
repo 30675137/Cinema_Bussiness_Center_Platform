@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 可访问性工具
- * 
+ *
  * 提供 ARIA 标签、键盘导航和屏幕阅读器支持。
  * 实现 T067 任务。
- * 
+ *
  * @since Phase 8 - Polish
  */
 
@@ -232,7 +232,10 @@ export const focusUtils = {
 /**
  * 屏幕阅读器公告工具
  */
-export const announceToScreenReader = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+export const announceToScreenReader = (
+  message: string,
+  priority: 'polite' | 'assertive' = 'polite'
+) => {
   const announcement = document.createElement('div');
   announcement.setAttribute('role', 'status');
   announcement.setAttribute('aria-live', priority);

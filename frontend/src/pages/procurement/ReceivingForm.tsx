@@ -1,6 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Select, DatePicker, Button, Row, Col, Table, InputNumber, Space, message, Divider } from 'antd';
-import { SaveOutlined, CheckOutlined, ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  Row,
+  Col,
+  Table,
+  InputNumber,
+  Space,
+  message,
+  Divider,
+} from 'antd';
+import {
+  SaveOutlined,
+  CheckOutlined,
+  ArrowLeftOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -83,31 +103,25 @@ const ReceivingForm: React.FC = () => {
   };
 
   const handleQuantityChange = (key: string, value: number | null) => {
-    setReceivingItems(items =>
-      items.map(item =>
-        item.key === key ? { ...item, receivingQuantity: value || 0 } : item
-      )
+    setReceivingItems((items) =>
+      items.map((item) => (item.key === key ? { ...item, receivingQuantity: value || 0 } : item))
     );
   };
 
   const handleQualityStatusChange = (key: string, value: string) => {
-    setReceivingItems(items =>
-      items.map(item =>
-        item.key === key ? { ...item, qualityStatus: value } : item
-      )
+    setReceivingItems((items) =>
+      items.map((item) => (item.key === key ? { ...item, qualityStatus: value } : item))
     );
   };
 
   const handleRemarkChange = (key: string, value: string) => {
-    setReceivingItems(items =>
-      items.map(item =>
-        item.key === key ? { ...item, remark: value } : item
-      )
+    setReceivingItems((items) =>
+      items.map((item) => (item.key === key ? { ...item, remark: value } : item))
     );
   };
 
   const handleDeleteItem = (key: string) => {
-    setReceivingItems(items => items.filter(item => item.key !== key));
+    setReceivingItems((items) => items.filter((item) => item.key !== key));
   };
 
   const columns: ColumnsType<ReceivingItem> = [
@@ -208,7 +222,7 @@ const ReceivingForm: React.FC = () => {
     }
 
     const hasInvalidQuantity = receivingItems.some(
-      item => item.receivingQuantity <= 0 || item.receivingQuantity > item.orderedQuantity
+      (item) => item.receivingQuantity <= 0 || item.receivingQuantity > item.orderedQuantity
     );
 
     if (hasInvalidQuantity) {
@@ -249,9 +263,16 @@ const ReceivingForm: React.FC = () => {
 
   // 计算汇总信息
   const totalOrderedQuantity = receivingItems.reduce((sum, item) => sum + item.orderedQuantity, 0);
-  const totalReceivedQuantity = receivingItems.reduce((sum, item) => sum + item.receivingQuantity, 0);
-  const qualityPassedCount = receivingItems.filter(item => item.qualityStatus === 'passed').length;
-  const qualityFailedCount = receivingItems.filter(item => item.qualityStatus === 'failed').length;
+  const totalReceivedQuantity = receivingItems.reduce(
+    (sum, item) => sum + item.receivingQuantity,
+    0
+  );
+  const qualityPassedCount = receivingItems.filter(
+    (item) => item.qualityStatus === 'passed'
+  ).length;
+  const qualityFailedCount = receivingItems.filter(
+    (item) => item.qualityStatus === 'failed'
+  ).length;
 
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
@@ -267,7 +288,12 @@ const ReceivingForm: React.FC = () => {
             <Button icon={<SaveOutlined />} onClick={handleSaveDraft} loading={loading}>
               保存草稿
             </Button>
-            <Button type="primary" icon={<CheckOutlined />} onClick={() => form.submit()} loading={loading}>
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => form.submit()}
+              loading={loading}
+            >
               确认收货
             </Button>
           </Space>

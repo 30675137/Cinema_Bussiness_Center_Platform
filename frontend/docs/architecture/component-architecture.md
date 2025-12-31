@@ -607,18 +607,21 @@ export const useProductList = (options: UseProductListOptions = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  const fetchProducts = useCallback(async (fetchParams?: ProductQueryParams) => {
-    try {
-      setLoading(true);
-      setError(undefined);
-      const response = await productService.getProducts(fetchParams || params);
-      setData(response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '获取商品列表失败');
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
+  const fetchProducts = useCallback(
+    async (fetchParams?: ProductQueryParams) => {
+      try {
+        setLoading(true);
+        setError(undefined);
+        const response = await productService.getProducts(fetchParams || params);
+        setData(response);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '获取商品列表失败');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [params]
+  );
 
   useEffect(() => {
     if (immediate) {
@@ -657,27 +660,30 @@ export const useFormValidation = <T extends Record<string, any>>({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const setValue = useCallback((name: keyof T, value: any) => {
-    setValues(prev => ({ ...prev, [name]: value }));
-    setTouched(prev => ({ ...prev, [name as string]: true }));
+    setValues((prev) => ({ ...prev, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name as string]: true }));
   }, []);
 
   const setError = useCallback((name: keyof T, error: string) => {
-    setErrors(prev => ({ ...prev, [name as string]: error }));
+    setErrors((prev) => ({ ...prev, [name as string]: error }));
   }, []);
 
-  const validateField = useCallback((name: keyof T, value: any) => {
-    try {
-      validationSchema.pick({ [name]: true } as any).parse({ [name]: value });
-      setError(name, '');
-      return true;
-    } catch (err) {
-      if (err instanceof ZodError) {
-        setError(name, err.errors[0]?.message || '验证失败');
+  const validateField = useCallback(
+    (name: keyof T, value: any) => {
+      try {
+        validationSchema.pick({ [name]: true } as any).parse({ [name]: value });
+        setError(name, '');
+        return true;
+      } catch (err) {
+        if (err instanceof ZodError) {
+          setError(name, err.errors[0]?.message || '验证失败');
+          return false;
+        }
         return false;
       }
-      return false;
-    }
-  }, [validationSchema, setError]);
+    },
+    [validationSchema, setError]
+  );
 
   const validateForm = useCallback(() => {
     try {
@@ -687,7 +693,7 @@ export const useFormValidation = <T extends Record<string, any>>({
     } catch (err) {
       if (err instanceof ZodError) {
         const formErrors: Record<string, string> = {};
-        err.errors.forEach(error => {
+        err.errors.forEach((error) => {
           if (error.path.length > 0) {
             formErrors[error.path[0] as string] = error.message;
           }
@@ -751,10 +757,7 @@ export const useDebounce = <T>(value: T, delay: number): T => {
 };
 
 // useLocalStorage Hook
-export const useLocalStorage = <T>(
-  key: string,
-  initialValue: T
-): [T, (value: T) => void] => {
+export const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T) => void] => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -765,14 +768,17 @@ export const useLocalStorage = <T>(
     }
   });
 
-  const setValue = useCallback((value: T) => {
-    try {
-      setStoredValue(value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
-    }
-  }, [key]);
+  const setValue = useCallback(
+    (value: T) => {
+      try {
+        setStoredValue(value);
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.error(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key]
+  );
 
   return [storedValue, setValue];
 };

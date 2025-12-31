@@ -22,7 +22,7 @@ export interface InventoryDetailDrawerProps {
 /**
  * 库存详情抽屉组件
  * 显示单个SKU的完整库存信息，包含低库存警告。
- * 
+ *
  * @example
  * ```tsx
  * <InventoryDetailDrawer
@@ -31,7 +31,7 @@ export interface InventoryDetailDrawerProps {
  *   onClose={() => setDrawerOpen(false)}
  * />
  * ```
- * 
+ *
  * @since P003-inventory-query US4
  */
 export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
@@ -40,10 +40,16 @@ export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<string>('info');
-  
+
   // 获取库存详情
-  const { data: detailData, isLoading, isError, error, refetch } = useInventoryDetail(inventoryId, open && !!inventoryId);
-  
+  const {
+    data: detailData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useInventoryDetail(inventoryId, open && !!inventoryId);
+
   const detail = detailData?.data as StoreInventoryDetail | undefined;
 
   // 判断是否低库存
@@ -71,7 +77,8 @@ export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
         <Descriptions.Item label="SKU编码">{detail?.skuCode}</Descriptions.Item>
         <Descriptions.Item label="SKU名称">{detail?.skuName}</Descriptions.Item>
         <Descriptions.Item label="门店">
-          {detail?.storeCode && `[${detail.storeCode}] `}{detail?.storeName}
+          {detail?.storeCode && `[${detail.storeCode}] `}
+          {detail?.storeName}
         </Descriptions.Item>
         <Descriptions.Item label="分类">{detail?.categoryName || '-'}</Descriptions.Item>
         <Descriptions.Item label="单位">{detail?.mainUnit}</Descriptions.Item>
@@ -92,11 +99,13 @@ export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
         </Descriptions.Item>
         <Descriptions.Item label="可用数量">
           <Space>
-            <span style={{ 
-              fontWeight: 'bold', 
-              fontSize: 16,
-              color: isLowStock ? '#ff4d4f' : undefined 
-            }}>
+            <span
+              style={{
+                fontWeight: 'bold',
+                fontSize: 16,
+                color: isLowStock ? '#ff4d4f' : undefined,
+              }}
+            >
               {detail?.availableQty}
             </span>
             <span style={{ color: '#8c8c8c' }}>{detail?.mainUnit}</span>
@@ -156,12 +165,7 @@ export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
           流水记录
         </span>
       ),
-      children: detail ? (
-        <TransactionList 
-          skuId={detail.skuId} 
-          storeId={detail.storeId}
-        />
-      ) : null,
+      children: detail ? <TransactionList skuId={detail.skuId} storeId={detail.storeId} /> : null,
     },
   ];
 
@@ -183,21 +187,11 @@ export const InventoryDetailDrawer: React.FC<InventoryDetailDrawerProps> = ({
 
       {/* 错误状态 */}
       {isError && (
-        <Alert
-          type="error"
-          message="加载失败"
-          description={error?.message || '无法加载库存详情'}
-        />
+        <Alert type="error" message="加载失败" description={error?.message || '无法加载库存详情'} />
       )}
 
       {/* 标签页内容 */}
-      {detail && (
-        <Tabs 
-          activeKey={activeTab} 
-          onChange={setActiveTab}
-          items={tabItems}
-        />
-      )}
+      {detail && <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />}
     </Drawer>
   );
 };

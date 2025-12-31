@@ -1,6 +1,6 @@
 /**
  * AddressForm Component Unit Tests
- * 
+ *
  * @since 020-store-address
  */
 
@@ -16,14 +16,8 @@ const TestWrapper: React.FC<{
   onValuesChange?: (values: AddressFormData) => void;
 }> = ({ initialValues, onValuesChange }) => {
   const [form] = Form.useForm<AddressFormData>();
-  
-  return (
-    <AddressForm
-      form={form}
-      initialValues={initialValues}
-      showLabels={true}
-    />
-  );
+
+  return <AddressForm form={form} initialValues={initialValues} showLabels={true} />;
 };
 
 describe('AddressForm', () => {
@@ -131,11 +125,14 @@ describe('AddressForm', () => {
       const [form] = Form.useForm<AddressFormData>();
       render(
         <Form form={form}>
-          <AddressForm form={form} initialValues={{
-            province: '北京市',
-            city: '北京市',
-            district: '朝阳区',
-          }} />
+          <AddressForm
+            form={form}
+            initialValues={{
+              province: '北京市',
+              city: '北京市',
+              district: '朝阳区',
+            }}
+          />
         </Form>
       );
 
@@ -151,11 +148,14 @@ describe('AddressForm', () => {
       const [form] = Form.useForm<AddressFormData>();
       render(
         <Form form={form}>
-          <AddressForm form={form} initialValues={{
-            province: '北京市',
-            city: '北京市',
-            district: '朝阳区',
-          }} />
+          <AddressForm
+            form={form}
+            initialValues={{
+              province: '北京市',
+              city: '北京市',
+              district: '朝阳区',
+            }}
+          />
         </Form>
       );
 
@@ -170,11 +170,14 @@ describe('AddressForm', () => {
       const [form] = Form.useForm<AddressFormData>();
       render(
         <Form form={form}>
-          <AddressForm form={form} initialValues={{
-            province: '北京市',
-            city: '北京市',
-            district: '朝阳区',
-          }} />
+          <AddressForm
+            form={form}
+            initialValues={{
+              province: '北京市',
+              city: '北京市',
+              district: '朝阳区',
+            }}
+          />
         </Form>
       );
 
@@ -189,11 +192,14 @@ describe('AddressForm', () => {
       const [form] = Form.useForm<AddressFormData>();
       render(
         <Form form={form}>
-          <AddressForm form={form} initialValues={{
-            province: '北京市',
-            city: '北京市',
-            district: '朝阳区',
-          }} />
+          <AddressForm
+            form={form}
+            initialValues={{
+              province: '北京市',
+              city: '北京市',
+              district: '朝阳区',
+            }}
+          />
         </Form>
       );
 
@@ -215,11 +221,14 @@ describe('AddressForm', () => {
       const [form] = Form.useForm<AddressFormData>();
       render(
         <Form form={form}>
-          <AddressForm form={form} initialValues={{
-            province: '北京市',
-            city: '北京市',
-            district: '朝阳区',
-          }} />
+          <AddressForm
+            form={form}
+            initialValues={{
+              province: '北京市',
+              city: '北京市',
+              district: '朝阳区',
+            }}
+          />
         </Form>
       );
 

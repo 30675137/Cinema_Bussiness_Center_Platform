@@ -17,19 +17,19 @@ import type {
   BeverageQueryParams,
   PageResponse,
   BeverageStatus,
-} from '../types/beverage'
+} from '../types/beverage';
 
-const API_BASE_URL = '/api/admin/beverages'
+const API_BASE_URL = '/api/admin/beverages';
 
 /**
  * API响应包装类型
  */
 interface ApiResponse<T> {
-  success: boolean
-  data: T
-  timestamp: string
-  error?: string
-  message?: string
+  success: boolean;
+  data: T;
+  timestamp: string;
+  error?: string;
+  message?: string;
 }
 
 /**
@@ -39,60 +39,58 @@ interface ApiResponse<T> {
 export async function getBeverageList(
   params: BeverageQueryParams = {}
 ): Promise<PageResponse<BeverageDTO>> {
-  const queryParams = new URLSearchParams()
+  const queryParams = new URLSearchParams();
 
-  if (params.page !== undefined) queryParams.append('page', params.page.toString())
-  if (params.size !== undefined) queryParams.append('size', params.size.toString())
-  if (params.name) queryParams.append('name', params.name)
-  if (params.category) queryParams.append('category', params.category)
-  if (params.status) queryParams.append('status', params.status)
+  if (params.page !== undefined) queryParams.append('page', params.page.toString());
+  if (params.size !== undefined) queryParams.append('size', params.size.toString());
+  if (params.name) queryParams.append('name', params.name);
+  if (params.category) queryParams.append('category', params.category);
+  if (params.status) queryParams.append('status', params.status);
 
-  const response = await fetch(`${API_BASE_URL}?${queryParams.toString()}`)
-  const json: ApiResponse<PageResponse<BeverageDTO>> = await response.json()
+  const response = await fetch(`${API_BASE_URL}?${queryParams.toString()}`);
+  const json: ApiResponse<PageResponse<BeverageDTO>> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '获取饮品列表失败')
+    throw new Error(json.message || '获取饮品列表失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
  * 获取饮品详情
  */
 export async function getBeverageDetail(id: string): Promise<BeverageDetailDTO> {
-  const response = await fetch(`${API_BASE_URL}/${id}`)
-  const json: ApiResponse<BeverageDetailDTO> = await response.json()
+  const response = await fetch(`${API_BASE_URL}/${id}`);
+  const json: ApiResponse<BeverageDetailDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '获取饮品详情失败')
+    throw new Error(json.message || '获取饮品详情失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
  * 创建饮品
  * FR-029
  */
-export async function createBeverage(
-  request: CreateBeverageRequest
-): Promise<BeverageDTO> {
+export async function createBeverage(request: CreateBeverageRequest): Promise<BeverageDTO> {
   const response = await fetch(API_BASE_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageDTO> = await response.json()
+  const json: ApiResponse<BeverageDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '创建饮品失败')
+    throw new Error(json.message || '创建饮品失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -109,15 +107,15 @@ export async function updateBeverage(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageDTO> = await response.json()
+  const json: ApiResponse<BeverageDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '更新饮品失败')
+    throw new Error(json.message || '更新饮品失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -127,12 +125,12 @@ export async function updateBeverage(
 export async function deleteBeverage(id: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/${id}`, {
     method: 'DELETE',
-  })
+  });
 
-  const json: ApiResponse<void> = await response.json()
+  const json: ApiResponse<void> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '删除饮品失败')
+    throw new Error(json.message || '删除饮品失败');
   }
 }
 
@@ -146,15 +144,15 @@ export async function updateBeverageStatus(
 ): Promise<BeverageDTO> {
   const response = await fetch(`${API_BASE_URL}/${id}/status?status=${status}`, {
     method: 'PATCH',
-  })
+  });
 
-  const json: ApiResponse<BeverageDTO> = await response.json()
+  const json: ApiResponse<BeverageDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '切换状态失败')
+    throw new Error(json.message || '切换状态失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -162,21 +160,21 @@ export async function updateBeverageStatus(
  * FR-029
  */
 export async function uploadBeverageImage(file: File): Promise<string> {
-  const formData = new FormData()
-  formData.append('file', file)
+  const formData = new FormData();
+  formData.append('file', file);
 
   const response = await fetch(`${API_BASE_URL}/upload-image`, {
     method: 'POST',
     body: formData,
-  })
+  });
 
-  const json: ApiResponse<string> = await response.json()
+  const json: ApiResponse<string> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '上传图片失败')
+    throw new Error(json.message || '上传图片失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 // ==================== 规格管理 API ====================
@@ -186,14 +184,14 @@ export async function uploadBeverageImage(file: File): Promise<string> {
  * FR-032
  */
 export async function getBeverageSpecs(beverageId: string): Promise<BeverageSpecDTO[]> {
-  const response = await fetch(`${API_BASE_URL}/${beverageId}/specs`)
-  const json: ApiResponse<BeverageSpecDTO[]> = await response.json()
+  const response = await fetch(`${API_BASE_URL}/${beverageId}/specs`);
+  const json: ApiResponse<BeverageSpecDTO[]> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '获取规格列表失败')
+    throw new Error(json.message || '获取规格列表失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -210,15 +208,15 @@ export async function addBeverageSpec(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageSpecDTO> = await response.json()
+  const json: ApiResponse<BeverageSpecDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '添加规格失败')
+    throw new Error(json.message || '添加规格失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -236,33 +234,30 @@ export async function updateBeverageSpec(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageSpecDTO> = await response.json()
+  const json: ApiResponse<BeverageSpecDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '更新规格失败')
+    throw new Error(json.message || '更新规格失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
  * 删除饮品规格
  * FR-033
  */
-export async function deleteBeverageSpec(
-  beverageId: string,
-  specId: string
-): Promise<void> {
+export async function deleteBeverageSpec(beverageId: string, specId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/${beverageId}/specs/${specId}`, {
     method: 'DELETE',
-  })
+  });
 
-  const json: ApiResponse<void> = await response.json()
+  const json: ApiResponse<void> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '删除规格失败')
+    throw new Error(json.message || '删除规格失败');
   }
 }
 
@@ -273,14 +268,14 @@ export async function deleteBeverageSpec(
  * FR-035
  */
 export async function getBeverageRecipes(beverageId: string): Promise<BeverageRecipeDTO[]> {
-  const response = await fetch(`${API_BASE_URL}/${beverageId}/recipes`)
-  const json: ApiResponse<BeverageRecipeDTO[]> = await response.json()
+  const response = await fetch(`${API_BASE_URL}/${beverageId}/recipes`);
+  const json: ApiResponse<BeverageRecipeDTO[]> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '获取配方列表失败')
+    throw new Error(json.message || '获取配方列表失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -297,15 +292,15 @@ export async function addBeverageRecipe(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageRecipeDTO> = await response.json()
+  const json: ApiResponse<BeverageRecipeDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '添加配方失败')
+    throw new Error(json.message || '添加配方失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
@@ -323,32 +318,29 @@ export async function updateBeverageRecipe(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
-  })
+  });
 
-  const json: ApiResponse<BeverageRecipeDTO> = await response.json()
+  const json: ApiResponse<BeverageRecipeDTO> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '更新配方失败')
+    throw new Error(json.message || '更新配方失败');
   }
 
-  return json.data
+  return json.data;
 }
 
 /**
  * 删除饮品配方
  * FR-036
  */
-export async function deleteBeverageRecipe(
-  beverageId: string,
-  recipeId: string
-): Promise<void> {
+export async function deleteBeverageRecipe(beverageId: string, recipeId: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/${beverageId}/recipes/${recipeId}`, {
     method: 'DELETE',
-  })
+  });
 
-  const json: ApiResponse<void> = await response.json()
+  const json: ApiResponse<void> = await response.json();
 
   if (!json.success) {
-    throw new Error(json.message || '删除配方失败')
+    throw new Error(json.message || '删除配方失败');
   }
 }

@@ -23,14 +23,14 @@ test.describe('响应式布局', () => {
 
     // 验证侧边栏是展开状态
     const sidebar = page.locator('.sidebar');
-    const sidebarWidth = await sidebar.evaluate(el => {
+    const sidebarWidth = await sidebar.evaluate((el) => {
       return window.getComputedStyle(el).width;
     });
     expect(parseInt(sidebarWidth)).toBeGreaterThan(200);
 
     // 验证主内容区域的位置
     const mainContent = page.locator('.main-content, .ant-layout-content');
-    const mainContentLeft = await mainContent.evaluate(el => {
+    const mainContentLeft = await mainContent.evaluate((el) => {
       return window.getComputedStyle(el).marginLeft;
     });
     expect(parseInt(mainContentLeft)).toBeGreaterThan(200);
@@ -47,7 +47,7 @@ test.describe('响应式布局', () => {
 
     // 验证侧边栏可能是紧凑模式
     const sidebar = page.locator('.sidebar');
-    const sidebarWidth = await sidebar.evaluate(el => {
+    const sidebarWidth = await sidebar.evaluate((el) => {
       return window.getComputedStyle(el).width;
     });
 
@@ -67,7 +67,7 @@ test.describe('响应式布局', () => {
 
     // 侧边栏应该隐藏或转换为抽屉
     const sidebar = page.locator('.sidebar');
-    const isSidebarHidden = await sidebar.evaluate(el => {
+    const isSidebarHidden = await sidebar.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return style.display === 'none' || style.transform === 'translateX(-100%)';
     });
@@ -93,7 +93,7 @@ test.describe('响应式布局', () => {
       { width: 992, name: 'Desktop Medium' },
       { width: 768, name: 'Tablet' },
       { width: 576, name: 'Mobile Large' },
-      { width: 375, name: 'Mobile Small' }
+      { width: 375, name: 'Mobile Small' },
     ];
 
     for (const breakpoint of breakpoints) {
@@ -124,7 +124,7 @@ test.describe('响应式布局', () => {
     if (await collapseButton.isVisible()) {
       // 检查展开状态
       const sidebar = page.locator('.sidebar');
-      const initialWidth = await sidebar.evaluate(el => {
+      const initialWidth = await sidebar.evaluate((el) => {
         return window.getComputedStyle(el).width;
       });
 
@@ -133,7 +133,7 @@ test.describe('响应式布局', () => {
       await page.waitForTimeout(300);
 
       // 验证折叠状态
-      const collapsedWidth = await sidebar.evaluate(el => {
+      const collapsedWidth = await sidebar.evaluate((el) => {
         return window.getComputedStyle(el).width;
       });
       expect(parseInt(collapsedWidth)).toBeLessThan(parseInt(initialWidth));
@@ -143,7 +143,7 @@ test.describe('响应式布局', () => {
       await page.waitForTimeout(300);
 
       // 验证展开状态
-      const expandedWidth = await sidebar.evaluate(el => {
+      const expandedWidth = await sidebar.evaluate((el) => {
         return window.getComputedStyle(el).width;
       });
       expect(parseInt(expandedWidth)).toBe(parseInt(initialWidth));
@@ -154,7 +154,7 @@ test.describe('响应式布局', () => {
     const breakpoints = [
       { width: 1920, expected: 'full' },
       { width: 768, expected: 'compact' },
-      { width: 375, expected: 'minimal' }
+      { width: 375, expected: 'minimal' },
     ];
 
     for (const breakpoint of breakpoints) {
@@ -179,11 +179,7 @@ test.describe('响应式布局', () => {
   });
 
   test('T061-7: 内容区域的响应式适应', async ({ page }) => {
-    const breakpoints = [
-      { width: 1920 },
-      { width: 768 },
-      { width: 375 }
-    ];
+    const breakpoints = [{ width: 1920 }, { width: 768 }, { width: 375 }];
 
     for (const breakpoint of breakpoints) {
       await page.setViewportSize({ width: breakpoint.width, height: 800 });
@@ -194,17 +190,17 @@ test.describe('响应式布局', () => {
       await expect(mainContent).toBeVisible();
 
       // 检查内容区域的宽度
-      const contentWidth = await mainContent.evaluate(el => {
+      const contentWidth = await mainContent.evaluate((el) => {
         return window.getComputedStyle(el).width;
       });
       expect(parseInt(contentWidth)).toBeGreaterThan(0);
 
       // 检查内容区域的内边距
-      const contentPadding = await mainContent.evaluate(el => {
+      const contentPadding = await mainContent.evaluate((el) => {
         const style = window.getComputedStyle(el);
         return {
           left: parseInt(style.paddingLeft),
-          right: parseInt(style.paddingRight)
+          right: parseInt(style.paddingRight),
         };
       });
 
@@ -220,7 +216,10 @@ test.describe('响应式布局', () => {
     await page.waitForLoadState('networkidle');
 
     // 导航到包含表格的页面
-    const productMenuItem = page.locator('.sidebar-menu .ant-menu-item').filter({ hasText: '商品' }).first();
+    const productMenuItem = page
+      .locator('.sidebar-menu .ant-menu-item')
+      .filter({ hasText: '商品' })
+      .first();
     if (await productMenuItem.isVisible()) {
       await productMenuItem.click();
       await page.waitForLoadState('networkidle');
@@ -240,7 +239,7 @@ test.describe('响应式布局', () => {
         // 检查表格是否有横向滚动
         const tableWrapper = table.locator('.ant-table-container, .table-container');
         if (await tableWrapper.isVisible()) {
-          const hasHorizontalScroll = await tableWrapper.evaluate(el => {
+          const hasHorizontalScroll = await tableWrapper.evaluate((el) => {
             return el.scrollWidth > el.clientWidth;
           });
 
@@ -259,7 +258,10 @@ test.describe('响应式布局', () => {
     await page.waitForLoadState('networkidle');
 
     // 尝试找到表单相关的菜单项
-    const formMenuItem = page.locator('.sidebar-menu .ant-menu-item').filter({ hasText: /添加|新增|创建|编辑/ }).first();
+    const formMenuItem = page
+      .locator('.sidebar-menu .ant-menu-item')
+      .filter({ hasText: /添加|新增|创建|编辑/ })
+      .first();
     if (await formMenuItem.isVisible()) {
       await formMenuItem.click();
       await page.waitForLoadState('networkidle');
@@ -282,18 +284,20 @@ test.describe('响应式布局', () => {
 
         if (itemCount > 0) {
           const firstFormItem = formItems.first();
-          const formItemLayout = await firstFormItem.evaluate(el => {
+          const formItemLayout = await firstFormItem.evaluate((el) => {
             const style = window.getComputedStyle(el);
             return {
               display: style.display,
               flexDirection: style.flexDirection,
-              flexWrap: style.flexWrap
+              flexWrap: style.flexWrap,
             };
           });
 
           // 移动端表单项通常是垂直布局
           if (width < 768) {
-            expect(formItemLayout.flexDirection === 'column' || formItemLayout.display.includes('block')).toBeTruthy();
+            expect(
+              formItemLayout.flexDirection === 'column' || formItemLayout.display.includes('block')
+            ).toBeTruthy();
           }
         }
       }
@@ -304,7 +308,7 @@ test.describe('响应式布局', () => {
     const breakpoints = [
       { width: 1920, maxWidth: 1200 },
       { width: 768, maxWidth: 728 },
-      { width: 375, maxWidth: 345 }
+      { width: 375, maxWidth: 345 },
     ];
 
     for (const breakpoint of breakpoints) {
@@ -321,21 +325,21 @@ test.describe('响应式布局', () => {
           const image = images.nth(i);
           if (await image.isVisible()) {
             // 检查图片的响应式属性
-            const imageStyles = await image.evaluate(el => {
+            const imageStyles = await image.evaluate((el) => {
               const style = window.getComputedStyle(el);
               return {
                 maxWidth: style.maxWidth,
                 height: style.height,
-                width: style.width
+                width: style.width,
               };
             });
 
             // 图片应该有maxWidth: 100%或其他响应式样式
             expect(
               imageStyles.maxWidth === '100%' ||
-              imageStyles.maxWidth === breakpoint.maxWidth + 'px' ||
-              imageStyles.width === '100%' ||
-              parseInt(imageStyles.width) <= breakpoint.maxWidth
+                imageStyles.maxWidth === breakpoint.maxWidth + 'px' ||
+                imageStyles.width === '100%' ||
+                parseInt(imageStyles.width) <= breakpoint.maxWidth
             ).toBeTruthy();
           }
         }
@@ -347,7 +351,7 @@ test.describe('响应式布局', () => {
     const breakpoints = [
       { width: 1920, minFontSize: 14 },
       { width: 768, minFontSize: 14 },
-      { width: 375, minFontSize: 12 }
+      { width: 375, minFontSize: 12 },
     ];
 
     for (const breakpoint of breakpoints) {
@@ -362,7 +366,7 @@ test.describe('响应式布局', () => {
       if (textCount > 0) {
         const sampleText = textElements.first();
         if (await sampleText.isVisible()) {
-          const fontSize = await sampleText.evaluate(el => {
+          const fontSize = await sampleText.evaluate((el) => {
             return parseInt(window.getComputedStyle(el).fontSize);
           });
 
@@ -380,7 +384,7 @@ test.describe('响应式布局', () => {
     await page.waitForTimeout(300);
 
     const portraitSidebar = page.locator('.sidebar');
-    const portraitIsHidden = await portraitSidebar.evaluate(el => {
+    const portraitIsHidden = await portraitSidebar.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return style.display === 'none' || style.transform.includes('translateX');
     });
@@ -391,7 +395,7 @@ test.describe('响应式布局', () => {
     await page.waitForTimeout(300);
 
     const landscapeSidebar = page.locator('.sidebar');
-    const landscapeIsHidden = await landscapeSidebar.evaluate(el => {
+    const landscapeIsHidden = await landscapeSidebar.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return style.display === 'none' || style.transform.includes('translateX');
     });

@@ -117,11 +117,7 @@ const DictionaryTypeForm: React.FC<DictionaryTypeFormProps> = ({
           name="name"
           control={control}
           render={({ field }) => (
-            <Input
-              {...field}
-              placeholder="请输入字典名称（如：容量单位）"
-              maxLength={50}
-            />
+            <Input {...field} placeholder="请输入字典名称（如：容量单位）" maxLength={50} />
           )}
         />
       </Form.Item>
@@ -135,11 +131,7 @@ const DictionaryTypeForm: React.FC<DictionaryTypeFormProps> = ({
           name="category"
           control={control}
           render={({ field }) => (
-            <Select
-              {...field}
-              placeholder="请选择字典分类"
-              options={CATEGORY_OPTIONS}
-            />
+            <Select {...field} placeholder="请选择字典分类" options={CATEGORY_OPTIONS} />
           )}
         />
       </Form.Item>

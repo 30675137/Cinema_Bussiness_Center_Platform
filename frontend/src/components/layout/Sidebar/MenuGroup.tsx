@@ -50,13 +50,14 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
   isFavorite,
   defaultExpanded = true,
   showIcon = true,
-  className
+  className,
 }) => {
   // 检查分组是否展开
-  const isGroupExpanded = defaultExpanded || menus.some(menu => expandedMenuIds.includes(menu.id));
+  const isGroupExpanded =
+    defaultExpanded || menus.some((menu) => expandedMenuIds.includes(menu.id));
 
   // 过滤可见的菜单
-  const visibleMenus = menus.filter(menu => menu.isVisible && menu.isActive);
+  const visibleMenus = menus.filter((menu) => menu.isVisible && menu.isActive);
 
   // 如果没有可见菜单，不渲染分组
   if (visibleMenus.length === 0) {
@@ -66,7 +67,7 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
   // 处理分组标题点击（展开/折叠所有子菜单）
   const handleGroupTitleClick = () => {
     // 展开或折叠所有主菜单
-    visibleMenus.forEach(menu => {
+    visibleMenus.forEach((menu) => {
       if (menu.children && menu.children.length > 0) {
         if (isGroupExpanded) {
           // 如果分组当前是展开的，则收起所有主菜单
@@ -86,11 +87,12 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
   // 渲染菜单项（包括子菜单）
   const renderMenuItems = (menuList: MenuItemType[], level: number = 0) => {
     return menuList
-      .filter(menu => menu.isVisible && menu.isActive)
-      .map(menu => {
+      .filter((menu) => menu.isVisible && menu.isActive)
+      .map((menu) => {
         const isExpanded = expandedMenuIds.includes(menu.id);
         const isActive = activeMenuId === menu.id;
-        const childCount = menu.children?.filter(child => child.isVisible && child.isActive).length || 0;
+        const childCount =
+          menu.children?.filter((child) => child.isVisible && child.isActive).length || 0;
 
         return (
           <div key={menu.id} className="menu-item-wrapper">
@@ -108,9 +110,7 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
 
             {/* 渲染子菜单 */}
             {menu.children && isExpanded && (
-              <div className="menu-children">
-                {renderMenuItems(menu.children, level + 1)}
-              </div>
+              <div className="menu-children">{renderMenuItems(menu.children, level + 1)}</div>
             )}
           </div>
         );
@@ -118,19 +118,14 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
   };
 
   // 构建分组样式类名
-  const groupClasses = [
-    'menu-group',
-    isGroupExpanded && 'menu-group-expanded',
-    className
-  ].filter(Boolean).join(' ');
+  const groupClasses = ['menu-group', isGroupExpanded && 'menu-group-expanded', className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={groupClasses}>
       {/* 分组标题 */}
-      <div
-        className="menu-group-header"
-        onClick={handleGroupTitleClick}
-      >
+      <div className="menu-group-header" onClick={handleGroupTitleClick}>
         <div className="menu-group-title-content">
           {showIcon && (
             <span className="menu-group-icon">
@@ -143,11 +138,7 @@ const MenuGroup: React.FC<MenuGroupProps> = ({
       </div>
 
       {/* 菜单项列表 */}
-      {isGroupExpanded && (
-        <div className="menu-group-content">
-          {renderMenuItems(visibleMenus)}
-        </div>
-      )}
+      {isGroupExpanded && <div className="menu-group-content">{renderMenuItems(visibleMenus)}</div>}
     </div>
   );
 };

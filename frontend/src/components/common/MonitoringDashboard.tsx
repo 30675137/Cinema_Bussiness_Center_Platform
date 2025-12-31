@@ -21,7 +21,7 @@ import {
   Switch,
   Select,
   DatePicker,
-  Modal
+  Modal,
 } from 'antd';
 import {
   LineChart,
@@ -38,7 +38,7 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import {
   BugOutlined,
@@ -51,7 +51,7 @@ import {
   SettingOutlined,
   DownloadOutlined,
   DeleteOutlined,
-  ReloadOutlined
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { monitoring, getMetrics } from '@/utils/monitoring';
 import { logger, LogCategories } from '@/utils/logger';
@@ -71,13 +71,10 @@ const COLORS = {
   warning: '#faad14',
   error: '#ff4d4f',
   purple: '#722ed1',
-  cyan: '#13c2c2'
+  cyan: '#13c2c2',
 };
 
-export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
-  visible,
-  onClose
-}) => {
+export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({ visible, onClose }) => {
   const [metrics, setMetrics] = useState<{
     performance: PerformanceMetrics;
     errors: ErrorMetrics;
@@ -122,23 +119,23 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
       {
         name: 'DOM加载',
         value: Math.round(metrics.performance.pageLoad.domContentLoaded),
-        unit: 'ms'
+        unit: 'ms',
       },
       {
         name: '页面完全加载',
         value: Math.round(metrics.performance.pageLoad.loadComplete),
-        unit: 'ms'
+        unit: 'ms',
       },
       {
         name: '首次内容绘制',
         value: Math.round(metrics.performance.pageLoad.firstContentfulPaint),
-        unit: 'ms'
+        unit: 'ms',
       },
       {
         name: '首次输入延迟',
         value: Math.round(metrics.performance.pageLoad.firstInputDelay),
-        unit: 'ms'
-      }
+        unit: 'ms',
+      },
     ];
   };
 
@@ -148,7 +145,7 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
 
     return Object.entries(metrics.errors.errorsByType).map(([type, count]) => ({
       name: type,
-      value: count
+      value: count,
     }));
   };
 
@@ -161,13 +158,13 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
       {
         name: '已使用',
         value: Math.round(memory.usedJSHeapSize / 1024 / 1024), // MB
-        color: COLORS.error
+        color: COLORS.error,
       },
       {
         name: '未使用',
         value: Math.round((memory.totalJSHeapSize - memory.usedJSHeapSize) / 1024 / 1024), // MB
-        color: COLORS.success
-      }
+        color: COLORS.success,
+      },
     ];
   };
 
@@ -186,7 +183,9 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
     const { network } = metrics.performance;
     if (network.totalRequests === 0) return 100;
 
-    return Math.round(((network.totalRequests - network.failedRequests) / network.totalRequests) * 100);
+    return Math.round(
+      ((network.totalRequests - network.failedRequests) / network.totalRequests) * 100
+    );
   };
 
   // 导出日志
@@ -214,7 +213,7 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
       content: '确定要清空所有日志吗？此操作不可恢复。',
       onOk: () => {
         logger.clear();
-      }
+      },
     });
   };
 
@@ -251,7 +250,7 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
         </Button>,
         <Button key="close" onClick={onClose}>
           关闭
-        </Button>
+        </Button>,
       ]}
     >
       <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -267,7 +266,12 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                     value={metrics.performance.pageLoad.loadComplete}
                     suffix="ms"
                     prefix={<ThunderboltOutlined />}
-                    valueStyle={{ color: metrics.performance.pageLoad.loadComplete > 3000 ? COLORS.error : COLORS.success }}
+                    valueStyle={{
+                      color:
+                        metrics.performance.pageLoad.loadComplete > 3000
+                          ? COLORS.error
+                          : COLORS.success,
+                    }}
                   />
                 </Card>
               </Col>
@@ -278,7 +282,9 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                     title="错误数量"
                     value={metrics.errors.totalErrors}
                     prefix={<BugOutlined />}
-                    valueStyle={{ color: metrics.errors.totalErrors > 0 ? COLORS.error : COLORS.success }}
+                    valueStyle={{
+                      color: metrics.errors.totalErrors > 0 ? COLORS.error : COLORS.success,
+                    }}
                   />
                 </Card>
               </Col>
@@ -317,10 +323,12 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <RechartsTooltip formatter={(value: number, name: string, props: any) => [
-                        `${value} ${props.payload.unit}`,
-                        name
-                      ]} />
+                      <RechartsTooltip
+                        formatter={(value: number, name: string, props: any) => [
+                          `${value} ${props.payload.unit}`,
+                          name,
+                        ]}
+                      />
                       <Bar dataKey="value" fill={COLORS.primary} />
                     </BarChart>
                   </ResponsiveContainer>
@@ -360,12 +368,30 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                   <List
                     size="small"
                     dataSource={[
-                      { label: 'DOM 内容加载', value: `${Math.round(metrics.performance.pageLoad.domContentLoaded)}ms` },
-                      { label: '页面完全加载', value: `${Math.round(metrics.performance.pageLoad.loadComplete)}ms` },
-                      { label: '首次内容绘制', value: `${Math.round(metrics.performance.pageLoad.firstContentfulPaint)}ms` },
-                      { label: '最大内容绘制', value: `${Math.round(metrics.performance.pageLoad.largestContentfulPaint)}ms` },
-                      { label: '首次输入延迟', value: `${Math.round(metrics.performance.pageLoad.firstInputDelay)}ms` },
-                      { label: '累积布局偏移', value: metrics.performance.pageLoad.cumulativeLayoutShift.toFixed(3) }
+                      {
+                        label: 'DOM 内容加载',
+                        value: `${Math.round(metrics.performance.pageLoad.domContentLoaded)}ms`,
+                      },
+                      {
+                        label: '页面完全加载',
+                        value: `${Math.round(metrics.performance.pageLoad.loadComplete)}ms`,
+                      },
+                      {
+                        label: '首次内容绘制',
+                        value: `${Math.round(metrics.performance.pageLoad.firstContentfulPaint)}ms`,
+                      },
+                      {
+                        label: '最大内容绘制',
+                        value: `${Math.round(metrics.performance.pageLoad.largestContentfulPaint)}ms`,
+                      },
+                      {
+                        label: '首次输入延迟',
+                        value: `${Math.round(metrics.performance.pageLoad.firstInputDelay)}ms`,
+                      },
+                      {
+                        label: '累积布局偏移',
+                        value: metrics.performance.pageLoad.cumulativeLayoutShift.toFixed(3),
+                      },
                     ]}
                     renderItem={(item) => (
                       <List.Item>
@@ -391,7 +417,9 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                         title="成功率"
                         value={getNetworkSuccessRate()}
                         suffix="%"
-                        valueStyle={{ color: getNetworkSuccessRate() > 95 ? COLORS.success : COLORS.error }}
+                        valueStyle={{
+                          color: getNetworkSuccessRate() > 95 ? COLORS.success : COLORS.error,
+                        }}
                       />
                     </Col>
                   </Row>
@@ -439,7 +467,10 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                         dataKey="value"
                       >
                         {getErrorDistributionData().map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % Object.values(COLORS).length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={Object.values(COLORS)[index % Object.values(COLORS).length]}
+                          />
                         ))}
                       </Pie>
                       <RechartsTooltip />
@@ -455,16 +486,19 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                     mode="left"
                     items={metrics.errors.recentErrors.slice(0, 10).map((error, index) => ({
                       key: index,
-                      color: error.type === 'fatal' ? 'red' : error.type === 'error' ? 'orange' : 'blue',
+                      color:
+                        error.type === 'fatal' ? 'red' : error.type === 'error' ? 'orange' : 'blue',
                       children: (
                         <div>
-                          <div><strong>{error.type}</strong></div>
+                          <div>
+                            <strong>{error.type}</strong>
+                          </div>
                           <div>{error.message}</div>
                           <div style={{ fontSize: 12, color: '#666' }}>
                             {new Date(error.timestamp).toLocaleString()} - {error.url}
                           </div>
                         </div>
-                      )
+                      ),
                     }))}
                   />
                 </Card>
@@ -509,20 +543,20 @@ export const MonitoringDashboard: React.FC<MonitoringDashboardProps> = ({
                           <Tooltip title={url}>
                             <span>{url.split('/').pop() || '/'}</span>
                           </Tooltip>
-                        )
+                        ),
                       },
                       {
                         title: '访问次数',
                         dataIndex: 'views',
                         key: 'views',
-                        render: (views: number) => <Tag color="blue">{views}</Tag>
+                        render: (views: number) => <Tag color="blue">{views}</Tag>,
                       },
                       {
                         title: '平均停留时间',
                         dataIndex: 'avgDuration',
                         key: 'avgDuration',
-                        render: (duration: number) => `${Math.round(duration / 1000)}s`
-                      }
+                        render: (duration: number) => `${Math.round(duration / 1000)}s`,
+                      },
                     ]}
                   />
                 </Card>

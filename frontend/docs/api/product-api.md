@@ -78,19 +78,19 @@ X-Timestamp: <timestamp>
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 示例 |
-|--------|------|------|------|------|
-| page | number | 否 | 页码，默认1 | 1 |
-| pageSize | number | 否 | 每页数量，默认20 | 20 |
-| keyword | string | 否 | 搜索关键词 | "手机" |
-| skuId | string | 否 | 商品SKU ID | "SKU001" |
-| categoryId | string | 否 | 商品分类ID | "cat_001" |
-| materialType | string | 否 | 物料类型 | "finished_goods" |
-| status | string[] | 否 | 商品状态列表 | ["active", "draft"] |
-| minPrice | number | 否 | 最低价格 | 100 |
-| maxPrice | number | 否 | 最高价格 | 1000 |
-| sortBy | string | 否 | 排序字段 | "createdAt" |
-| sortOrder | string | 否 | 排序方向 | "desc" |
+| 参数名       | 类型     | 必填 | 说明             | 示例                |
+| ------------ | -------- | ---- | ---------------- | ------------------- |
+| page         | number   | 否   | 页码，默认1      | 1                   |
+| pageSize     | number   | 否   | 每页数量，默认20 | 20                  |
+| keyword      | string   | 否   | 搜索关键词       | "手机"              |
+| skuId        | string   | 否   | 商品SKU ID       | "SKU001"            |
+| categoryId   | string   | 否   | 商品分类ID       | "cat_001"           |
+| materialType | string   | 否   | 物料类型         | "finished_goods"    |
+| status       | string[] | 否   | 商品状态列表     | ["active", "draft"] |
+| minPrice     | number   | 否   | 最低价格         | 100                 |
+| maxPrice     | number   | 否   | 最高价格         | 1000                |
+| sortBy       | string   | 否   | 排序字段         | "createdAt"         |
+| sortOrder    | string   | 否   | 排序方向         | "desc"              |
 
 **响应示例**:
 
@@ -140,9 +140,9 @@ X-Timestamp: <timestamp>
 
 **路径参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 示例 |
-|--------|------|------|------|------|
-| id | string | 是 | 商品ID | "prod_001" |
+| 参数名 | 类型   | 必填 | 说明   | 示例       |
+| ------ | ------ | ---- | ------ | ---------- |
+| id     | string | 是   | 商品ID | "prod_001" |
 
 **响应示例**:
 
@@ -274,9 +274,9 @@ X-Timestamp: <timestamp>
 
 **路径参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| id | string | 是 | 商品ID |
+| 参数名 | 类型   | 必填 | 说明   |
+| ------ | ------ | ---- | ------ |
+| id     | string | 是   | 商品ID |
 
 **请求体**: 与创建商品相同，支持部分字段更新
 
@@ -288,9 +288,9 @@ X-Timestamp: <timestamp>
 
 **路径参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| id | string | 是 | 商品ID |
+| 参数名 | 类型   | 必填 | 说明   |
+| ------ | ------ | ---- | ------ |
+| id     | string | 是   | 商品ID |
 
 **响应示例**:
 
@@ -345,11 +345,11 @@ X-Timestamp: <timestamp>
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| keyword | string | 是 | 搜索关键词 |
-| page | number | 否 | 页码 |
-| pageSize | number | 否 | 每页数量 |
+| 参数名   | 类型   | 必填 | 说明       |
+| -------- | ------ | ---- | ---------- |
+| keyword  | string | 是   | 搜索关键词 |
+| page     | number | 否   | 页码       |
+| pageSize | number | 否   | 每页数量   |
 
 ### 3.2 筛选商品
 
@@ -359,12 +359,12 @@ X-Timestamp: <timestamp>
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| categoryId | string | 否 | 分类ID |
-| materialType | string | 否 | 物料类型 |
-| status | string[] | 否 | 状态列表 |
-| priceRange | number[] | 否 | 价格区间 [min, max] |
+| 参数名       | 类型     | 必填 | 说明                |
+| ------------ | -------- | ---- | ------------------- |
+| categoryId   | string   | 否   | 分类ID              |
+| materialType | string   | 否   | 物料类型            |
+| status       | string[] | 否   | 状态列表            |
+| priceRange   | number[] | 否   | 价格区间 [min, max] |
 
 ## 4. 导入导出
 
@@ -397,9 +397,9 @@ X-Timestamp: <timestamp>
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| file | File | 是 | Excel文件 |
+| 参数名 | 类型 | 必填 | 说明      |
+| ------ | ---- | ---- | --------- |
+| file   | File | 是   | Excel文件 |
 
 **响应示例**:
 
@@ -455,15 +455,15 @@ X-Timestamp: <timestamp>
 
 ## 6. 错误码说明
 
-| 错误码 | HTTP状态码 | 说明 | 解决方案 |
-|--------|------------|------|----------|
-| PRODUCT_NOT_FOUND | 404 | 商品不存在 | 检查商品ID是否正确 |
-| PRODUCT_ALREADY_EXISTS | 409 | 商品已存在 | 使用不同的SKU或名称 |
-| INVALID_PRICE | 400 | 价格格式错误 | 检查价格数值和格式 |
-| CATEGORY_NOT_FOUND | 400 | 分类不存在 | 选择有效的商品分类 |
-| INSUFFICIENT_PERMISSION | 403 | 权限不足 | 联系管理员分配权限 |
-| VALIDATION_ERROR | 422 | 数据验证失败 | 检查必填字段和数据格式 |
-| INTERNAL_ERROR | 500 | 服务器内部错误 | 联系技术支持 |
+| 错误码                  | HTTP状态码 | 说明           | 解决方案               |
+| ----------------------- | ---------- | -------------- | ---------------------- |
+| PRODUCT_NOT_FOUND       | 404        | 商品不存在     | 检查商品ID是否正确     |
+| PRODUCT_ALREADY_EXISTS  | 409        | 商品已存在     | 使用不同的SKU或名称    |
+| INVALID_PRICE           | 400        | 价格格式错误   | 检查价格数值和格式     |
+| CATEGORY_NOT_FOUND      | 400        | 分类不存在     | 选择有效的商品分类     |
+| INSUFFICIENT_PERMISSION | 403        | 权限不足       | 联系管理员分配权限     |
+| VALIDATION_ERROR        | 422        | 数据验证失败   | 检查必填字段和数据格式 |
+| INTERNAL_ERROR          | 500        | 服务器内部错误 | 联系技术支持           |
 
 ## 7. 使用示例
 
@@ -479,7 +479,7 @@ const fetchProducts = async () => {
       page: 1,
       pageSize: 20,
       keyword: 'iPhone',
-      status: ['active']
+      status: ['active'],
     });
 
     console.log('商品列表:', response.data);
@@ -495,7 +495,7 @@ const createProduct = async () => {
     categoryId: 'cat_001',
     basePrice: 100,
     materialType: 'finished_goods',
-    status: 'draft'
+    status: 'draft',
   };
 
   try {
@@ -544,6 +544,6 @@ export const useCreateProduct = () => {
 
 ## 9. 版本更新记录
 
-| 版本 | 更新日期 | 更新内容 |
-|------|----------|----------|
+| 版本   | 更新日期   | 更新内容                   |
+| ------ | ---------- | -------------------------- |
 | v1.0.0 | 2025-12-10 | 初始版本，包含基础CRUD操作 |

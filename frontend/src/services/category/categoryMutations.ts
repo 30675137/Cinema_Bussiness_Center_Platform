@@ -17,7 +17,7 @@ import type {
   CreateAttributeRequest,
   UpdateAttributeRequest,
   SaveAttributeTemplateRequest,
-  SuccessResponse
+  SuccessResponse,
 } from '../../../pages/mdm-pim/category/types/category.types';
 
 // 默认变更配置
@@ -72,7 +72,10 @@ export const useCreateCategoryMutation = (
  * @param options 额外的变更选项
  */
 export const useUpdateCategoryMutation = (
-  options: Omit<UseMutationOptions<Category, Error, { id: string; data: UpdateCategoryRequest }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<Category, Error, { id: string; data: UpdateCategoryRequest }>,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
@@ -119,9 +122,13 @@ export const useUpdateCategoryMutation = (
       queryClient.invalidateQueries({ queryKey: categoryKeys.list() });
 
       // 如果有父类目，使父类目的子类目数据失效
-      const currentCategory = queryClient.getQueryData(categoryKeys.detail(variables.id)) as Category;
+      const currentCategory = queryClient.getQueryData(
+        categoryKeys.detail(variables.id)
+      ) as Category;
       if (currentCategory?.parentId) {
-        queryClient.invalidateQueries({ queryKey: categoryKeys.children(currentCategory.parentId) });
+        queryClient.invalidateQueries({
+          queryKey: categoryKeys.children(currentCategory.parentId),
+        });
       }
 
       // 调用用户提供的成功回调
@@ -192,12 +199,25 @@ export const useDeleteCategoryMutation = (
  * @param options 额外的变更选项
  */
 export const useSaveAttributeTemplateMutation = (
-  options: Omit<UseMutationOptions<AttributeTemplate, Error, { categoryId: string; data: SaveAttributeTemplateRequest }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<
+      AttributeTemplate,
+      Error,
+      { categoryId: string; data: SaveAttributeTemplateRequest }
+    >,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ categoryId, data }: { categoryId: string; data: SaveAttributeTemplateRequest }) => {
+    mutationFn: async ({
+      categoryId,
+      data,
+    }: {
+      categoryId: string;
+      data: SaveAttributeTemplateRequest;
+    }) => {
       const response = await categoryService.saveAttributeTemplate(categoryId, data);
       if (!response.success || !response.data) {
         throw new Error(response.message || '保存属性模板失败');
@@ -212,20 +232,23 @@ export const useSaveAttributeTemplateMutation = (
       const previousTemplate = queryClient.getQueryData(categoryKeys.detail(categoryId));
 
       // 乐观更新属性模板数据
-      queryClient.setQueryData(categoryKeys.detail(categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          attributes: data.attributes.map((attr, index) => ({
-            ...attr,
-            id: `temp-${Date.now()}-${index}`, // 临时ID
-            createdAt: new Date().toISOString(),
+          return {
+            ...old,
+            attributes: data.attributes.map((attr, index) => ({
+              ...attr,
+              id: `temp-${Date.now()}-${index}`, // 临时ID
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            })),
             updatedAt: new Date().toISOString(),
-          })),
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          };
+        }
+      );
 
       // 返回包含快照的上下文
       return { previousTemplate };
@@ -233,7 +256,10 @@ export const useSaveAttributeTemplateMutation = (
     onError: (error, variables, context) => {
       // 如果有先前数据，恢复到之前的状态
       if (context?.previousTemplate) {
-        queryClient.setQueryData(categoryKeys.detail(variables.categoryId), context.previousTemplate);
+        queryClient.setQueryData(
+          categoryKeys.detail(variables.categoryId),
+          context.previousTemplate
+        );
       }
 
       console.error('保存属性模板失败:', error);
@@ -257,12 +283,25 @@ export const useSaveAttributeTemplateMutation = (
  * @param options 额外的变更选项
  */
 export const useAddAttributeMutation = (
-  options: Omit<UseMutationOptions<CategoryAttribute, Error, { categoryId: string; data: CreateAttributeRequest }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<
+      CategoryAttribute,
+      Error,
+      { categoryId: string; data: CreateAttributeRequest }
+    >,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ categoryId, data }: { categoryId: string; data: CreateAttributeRequest }) => {
+    mutationFn: async ({
+      categoryId,
+      data,
+    }: {
+      categoryId: string;
+      data: CreateAttributeRequest;
+    }) => {
       const response = await categoryService.addAttribute(categoryId, data);
       if (!response.success || !response.data) {
         throw new Error(response.message || '新增属性失败');
@@ -277,22 +316,25 @@ export const useAddAttributeMutation = (
       const previousTemplate = queryClient.getQueryData(categoryKeys.detail(categoryId));
 
       // 乐观更新：添加新属性到模板
-      queryClient.setQueryData(categoryKeys.detail(categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        const newAttribute: CategoryAttribute = {
-          id: `temp-${Date.now()}`, // 临时ID
-          ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+          const newAttribute: CategoryAttribute = {
+            id: `temp-${Date.now()}`, // 临时ID
+            ...data,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
 
-        return {
-          ...old,
-          attributes: [...old.attributes, newAttribute],
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          return {
+            ...old,
+            attributes: [...old.attributes, newAttribute],
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
 
       // 返回包含快照的上下文
       return { previousTemplate };
@@ -300,7 +342,10 @@ export const useAddAttributeMutation = (
     onError: (error, variables, context) => {
       // 如果有先前数据，恢复到之前的状态
       if (context?.previousTemplate) {
-        queryClient.setQueryData(categoryKeys.detail(variables.categoryId), context.previousTemplate);
+        queryClient.setQueryData(
+          categoryKeys.detail(variables.categoryId),
+          context.previousTemplate
+        );
       }
 
       console.error('新增属性失败:', error);
@@ -308,17 +353,18 @@ export const useAddAttributeMutation = (
     },
     onSuccess: (data, variables, context) => {
       // 更新属性模板缓存
-      queryClient.setQueryData(categoryKeys.detail(variables.categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(variables.categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          attributes: old.attributes.map(attr =>
-            attr.id.startsWith('temp-') ? data : attr
-          ),
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          return {
+            ...old,
+            attributes: old.attributes.map((attr) => (attr.id.startsWith('temp-') ? data : attr)),
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
 
       // 调用用户提供的成功回调
       options.onSuccess?.(data, variables, context);
@@ -334,12 +380,27 @@ export const useAddAttributeMutation = (
  * @param options 额外的变更选项
  */
 export const useUpdateAttributeMutation = (
-  options: Omit<UseMutationOptions<CategoryAttribute, Error, { categoryId: string; attributeId: string; data: UpdateAttributeRequest }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<
+      CategoryAttribute,
+      Error,
+      { categoryId: string; attributeId: string; data: UpdateAttributeRequest }
+    >,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ categoryId, attributeId, data }: { categoryId: string; attributeId: string; data: UpdateAttributeRequest }) => {
+    mutationFn: async ({
+      categoryId,
+      attributeId,
+      data,
+    }: {
+      categoryId: string;
+      attributeId: string;
+      data: UpdateAttributeRequest;
+    }) => {
       const response = await categoryService.updateAttribute(categoryId, attributeId, data);
       if (!response.success || !response.data) {
         throw new Error(response.message || '更新属性失败');
@@ -354,17 +415,22 @@ export const useUpdateAttributeMutation = (
       const previousTemplate = queryClient.getQueryData(categoryKeys.detail(categoryId));
 
       // 乐观更新：更新模板中的属性
-      queryClient.setQueryData(categoryKeys.detail(categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          attributes: old.attributes.map(attr =>
-            attr.id === attributeId ? { ...attr, ...data, updatedAt: new Date().toISOString() } : attr
-          ),
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          return {
+            ...old,
+            attributes: old.attributes.map((attr) =>
+              attr.id === attributeId
+                ? { ...attr, ...data, updatedAt: new Date().toISOString() }
+                : attr
+            ),
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
 
       // 返回包含快照的上下文
       return { previousTemplate };
@@ -372,7 +438,10 @@ export const useUpdateAttributeMutation = (
     onError: (error, variables, context) => {
       // 如果有先前数据，恢复到之前的状态
       if (context?.previousTemplate) {
-        queryClient.setQueryData(categoryKeys.detail(variables.categoryId), context.previousTemplate);
+        queryClient.setQueryData(
+          categoryKeys.detail(variables.categoryId),
+          context.previousTemplate
+        );
       }
 
       console.error('更新属性失败:', error);
@@ -380,17 +449,20 @@ export const useUpdateAttributeMutation = (
     },
     onSuccess: (data, variables, context) => {
       // 更新属性模板缓存
-      queryClient.setQueryData(categoryKeys.detail(variables.categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(variables.categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          attributes: old.attributes.map(attr =>
-            attr.id === variables.attributeId ? data : attr
-          ),
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          return {
+            ...old,
+            attributes: old.attributes.map((attr) =>
+              attr.id === variables.attributeId ? data : attr
+            ),
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
 
       // 调用用户提供的成功回调
       options.onSuccess?.(data, variables, context);
@@ -406,12 +478,21 @@ export const useUpdateAttributeMutation = (
  * @param options 额外的变更选项
  */
 export const useDeleteAttributeMutation = (
-  options: Omit<UseMutationOptions<SuccessResponse, Error, { categoryId: string; attributeId: string }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<SuccessResponse, Error, { categoryId: string; attributeId: string }>,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ categoryId, attributeId }: { categoryId: string; attributeId: string }) => {
+    mutationFn: async ({
+      categoryId,
+      attributeId,
+    }: {
+      categoryId: string;
+      attributeId: string;
+    }) => {
       const response = await categoryService.deleteAttribute(categoryId, attributeId);
       if (!response.success) {
         throw new Error(response.message || '删除属性失败');
@@ -426,15 +507,18 @@ export const useDeleteAttributeMutation = (
       const previousTemplate = queryClient.getQueryData(categoryKeys.detail(categoryId));
 
       // 乐观更新：从模板中移除属性
-      queryClient.setQueryData(categoryKeys.detail(categoryId), (old: AttributeTemplate | undefined) => {
-        if (!old) return old;
+      queryClient.setQueryData(
+        categoryKeys.detail(categoryId),
+        (old: AttributeTemplate | undefined) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          attributes: old.attributes.filter(attr => attr.id !== attributeId),
-          updatedAt: new Date().toISOString(),
-        };
-      });
+          return {
+            ...old,
+            attributes: old.attributes.filter((attr) => attr.id !== attributeId),
+            updatedAt: new Date().toISOString(),
+          };
+        }
+      );
 
       // 返回包含快照的上下文
       return { previousTemplate };
@@ -442,7 +526,10 @@ export const useDeleteAttributeMutation = (
     onError: (error, variables, context) => {
       // 如果有先前数据，恢复到之前的状态
       if (context?.previousTemplate) {
-        queryClient.setQueryData(categoryKeys.detail(variables.categoryId), context.previousTemplate);
+        queryClient.setQueryData(
+          categoryKeys.detail(variables.categoryId),
+          context.previousTemplate
+        );
       }
 
       console.error('删除属性失败:', error);
@@ -463,7 +550,10 @@ export const useDeleteAttributeMutation = (
  * @param options 额外的变更选项
  */
 export const useBatchUpdateCategoryStatusMutation = (
-  options: Omit<UseMutationOptions<Category[], Error, { ids: string[]; status: 'enabled' | 'disabled' }>, 'mutationFn'> = {}
+  options: Omit<
+    UseMutationOptions<Category[], Error, { ids: string[]; status: 'enabled' | 'disabled' }>,
+    'mutationFn'
+  > = {}
 ) => {
   const queryClient = useQueryClient();
 
@@ -483,7 +573,7 @@ export const useBatchUpdateCategoryStatusMutation = (
       queryClient.invalidateQueries({ queryKey: categoryKeys.list() });
 
       // 使涉及的类目详情数据失效
-      variables.ids.forEach(id => {
+      variables.ids.forEach((id) => {
         queryClient.invalidateQueries({ queryKey: categoryKeys.detail(id) });
       });
 

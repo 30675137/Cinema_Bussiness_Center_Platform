@@ -9,12 +9,14 @@ interface LazyLoadWrapperProps {
 }
 
 const DefaultFallback = () => (
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '50px'
-  }}>
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '50px',
+    }}
+  >
     <Spin size="large" />
   </div>
 );
@@ -28,7 +30,7 @@ const DefaultSkeleton = () => (
 export const LazyLoadWrapper: React.FC<LazyLoadWrapperProps> = ({
   loader,
   fallback = <DefaultFallback />,
-  delay = 200
+  delay = 200,
 }) => {
   const LazyComponent = lazy(loader);
 
@@ -43,7 +45,10 @@ export const LazyLoadWrapper: React.FC<LazyLoadWrapperProps> = ({
 export class Preloader {
   private static preloadedComponents = new Set<string>();
 
-  public static preloadComponent(key: string, loader: () => Promise<{ default: React.ComponentType<any> }>): void {
+  public static preloadComponent(
+    key: string,
+    loader: () => Promise<{ default: React.ComponentType<any> }>
+  ): void {
     if (this.preloadedComponents.has(key)) {
       return;
     }
@@ -80,7 +85,7 @@ export class Preloader {
 // 路由级别的懒加载包装器
 export const LazyRoute: React.FC<LazyLoadWrapperProps> = ({
   loader,
-  fallback = <DefaultSkeleton />
+  fallback = <DefaultSkeleton />,
 }) => {
   return <LazyLoadWrapper loader={loader} fallback={fallback} />;
 };
@@ -91,13 +96,7 @@ export function withLazyLoad<P extends object>(
   loader: () => Promise<{ default: React.ComponentType<P> }>,
   fallback?: React.ReactNode
 ) {
-  return (props: P) => (
-    <LazyLoadWrapper
-      loader={loader}
-      fallback={fallback}
-      key={componentPath}
-    />
-  );
+  return (props: P) => <LazyLoadWrapper loader={loader} fallback={fallback} key={componentPath} />;
 }
 
 // 延迟加载组件

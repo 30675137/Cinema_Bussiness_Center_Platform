@@ -9,11 +9,11 @@ import enUS from './en-US.json';
 // 资源配置
 const resources = {
   'zh-CN': {
-    translation: zhCN
+    translation: zhCN,
   },
   'en-US': {
-    translation: enUS
-  }
+    translation: enUS,
+  },
 };
 
 // 初始化i18n

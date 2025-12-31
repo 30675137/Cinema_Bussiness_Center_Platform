@@ -9,7 +9,7 @@ import {
   Col,
   Typography,
   Divider,
-  Alert
+  Alert,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { RuleType, PriceRuleType } from '@/types/price';
@@ -23,18 +23,14 @@ interface PriceRuleConfigProps {
   onChange: (config: any) => void;
 }
 
-const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
-  ruleType,
-  value,
-  onChange
-}) => {
+const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({ ruleType, value, onChange }) => {
   const [config, setConfig] = useState({
     discountType: 'percentage' as 'fixed' | 'percentage' | 'fixed_amount',
     discountValue: 0,
     minOrderValue: undefined,
     maxDiscountAmount: undefined,
     applyConditions: {},
-    excludeConditions: {}
+    excludeConditions: {},
   });
 
   useEffect(() => {
@@ -48,9 +44,9 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
   }, [config, onChange]);
 
   const updateConfig = (field: string, value: any) => {
-    setConfig(prev => ({
+    setConfig((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -181,10 +177,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                 <Form.Item label="最小购买量">
                   <InputNumber
                     value={config.applyConditions?.minQuantity || 1}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      minQuantity: value || 1
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        minQuantity: value || 1,
+                      })
+                    }
                     style={{ width: '100%' }}
                     placeholder="1"
                     min={1}
@@ -235,10 +233,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                   <Input
                     placeholder="例如: 09:00-18:00"
                     value={config.applyConditions?.timeRange}
-                    onChange={(e) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      timeRange: e.target.value
-                    })}
+                    onChange={(e) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        timeRange: e.target.value,
+                      })
+                    }
                   />
                 </Form.Item>
               </Col>
@@ -248,10 +248,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                     mode="multiple"
                     placeholder="请选择适用星期"
                     value={config.applyConditions?.weekdays || []}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      weekdays: value
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        weekdays: value,
+                      })
+                    }
                     style={{ width: '100%' }}
                   >
                     <Option value="1">周一</Option>
@@ -312,10 +314,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                     mode="multiple"
                     placeholder="请选择会员等级"
                     value={config.applyConditions?.memberLevels || []}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      memberLevels: value
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        memberLevels: value,
+                      })
+                    }
                     style={{ width: '100%' }}
                   >
                     <Option value="bronze">青铜会员</Option>
@@ -387,10 +391,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                     mode="multiple"
                     placeholder="请选择适用渠道"
                     value={config.applyConditions?.channels || []}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      channels: value
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        channels: value,
+                      })
+                    }
                     style={{ width: '100%' }}
                   >
                     <Option value="online">线上渠道</Option>
@@ -406,10 +412,12 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                 <Form.Item label="加价类型">
                   <Select
                     value={config.applyConditions?.priceAdjustmentType || 'percentage'}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      priceAdjustmentType: value
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        priceAdjustmentType: value,
+                      })
+                    }
                     style={{ width: '100%' }}
                   >
                     <Option value="percentage">百分比加价</Option>
@@ -424,16 +432,23 @@ const PriceRuleConfig: React.FC<PriceRuleConfigProps> = ({
                 <Form.Item label="加价值">
                   <InputNumber
                     value={config.applyConditions?.priceAdjustmentValue || 0}
-                    onChange={(value) => updateConfig('applyConditions', {
-                      ...config.applyConditions,
-                      priceAdjustmentValue: value || 0
-                    })}
+                    onChange={(value) =>
+                      updateConfig('applyConditions', {
+                        ...config.applyConditions,
+                        priceAdjustmentValue: value || 0,
+                      })
+                    }
                     style={{ width: '100%' }}
                     placeholder="0"
-                    min={config.applyConditions?.priceAdjustmentType === 'fixed_price' ? 0 : undefined}
+                    min={
+                      config.applyConditions?.priceAdjustmentType === 'fixed_price' ? 0 : undefined
+                    }
                     addonAfter={
-                      config.applyConditions?.priceAdjustmentType === 'percentage' ? '%' :
-                      config.applyConditions?.priceAdjustmentType === 'fixed_price' ? '元' : '元'
+                      config.applyConditions?.priceAdjustmentType === 'percentage'
+                        ? '%'
+                        : config.applyConditions?.priceAdjustmentType === 'fixed_price'
+                          ? '元'
+                          : '元'
                     }
                   />
                 </Form.Item>

@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 审批管理页面
- * 
+ *
  * 运营总监审批页面，显示待审批的库存调整记录。
  * 实现 T049 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
@@ -55,9 +55,7 @@ const ApprovalPage: React.FC = () => {
       {/* 页面标题 */}
       <div style={{ marginBottom: 24 }}>
         <Title level={4}>库存调整审批</Title>
-        <Text type="secondary">
-          审批金额达到1000元及以上的库存调整申请
-        </Text>
+        <Text type="secondary">审批金额达到1000元及以上的库存调整申请</Text>
       </div>
 
       {/* 状态筛选器 */}
@@ -129,12 +127,20 @@ const ApprovalPage: React.FC = () => {
             {/* 调整信息 */}
             <Descriptions title="调整信息" column={1} bordered size="small">
               <Descriptions.Item label="调整类型">
-                <Tag color={
-                  selectedAdjustment.adjustmentType === 'surplus' ? 'green' :
-                  selectedAdjustment.adjustmentType === 'shortage' ? 'orange' : 'red'
-                }>
-                  {selectedAdjustment.adjustmentType === 'surplus' ? '盘盈' :
-                   selectedAdjustment.adjustmentType === 'shortage' ? '盘亏' : '报损'}
+                <Tag
+                  color={
+                    selectedAdjustment.adjustmentType === 'surplus'
+                      ? 'green'
+                      : selectedAdjustment.adjustmentType === 'shortage'
+                        ? 'orange'
+                        : 'red'
+                  }
+                >
+                  {selectedAdjustment.adjustmentType === 'surplus'
+                    ? '盘盈'
+                    : selectedAdjustment.adjustmentType === 'shortage'
+                      ? '盘亏'
+                      : '报损'}
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="调整数量">
@@ -173,42 +179,51 @@ const ApprovalPage: React.FC = () => {
                 </Descriptions.Item>
               )}
               {selectedAdjustment.remarks && (
-                <Descriptions.Item label="备注">
-                  {selectedAdjustment.remarks}
-                </Descriptions.Item>
+                <Descriptions.Item label="备注">{selectedAdjustment.remarks}</Descriptions.Item>
               )}
             </Descriptions>
 
             {/* 审批历史 */}
-            {selectedAdjustment.approvalHistory && selectedAdjustment.approvalHistory.length > 0 && (
-              <>
-                <Divider />
-                <Title level={5}>审批历史</Title>
-                <Timeline
-                  items={selectedAdjustment.approvalHistory.map((record) => ({
-                    color: record.action === 'approve' ? 'green' : 
-                           record.action === 'reject' ? 'red' : 'gray',
-                    children: (
-                      <div>
-                        <Text strong>{record.approverName}</Text>
-                        <Text type="secondary"> {record.action === 'approve' ? '通过' : 
-                               record.action === 'reject' ? '拒绝' : '撤回'}</Text>
+            {selectedAdjustment.approvalHistory &&
+              selectedAdjustment.approvalHistory.length > 0 && (
+                <>
+                  <Divider />
+                  <Title level={5}>审批历史</Title>
+                  <Timeline
+                    items={selectedAdjustment.approvalHistory.map((record) => ({
+                      color:
+                        record.action === 'approve'
+                          ? 'green'
+                          : record.action === 'reject'
+                            ? 'red'
+                            : 'gray',
+                      children: (
                         <div>
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            {dayjs(record.actionTime).format('YYYY-MM-DD HH:mm')}
+                          <Text strong>{record.approverName}</Text>
+                          <Text type="secondary">
+                            {' '}
+                            {record.action === 'approve'
+                              ? '通过'
+                              : record.action === 'reject'
+                                ? '拒绝'
+                                : '撤回'}
                           </Text>
-                        </div>
-                        {record.comments && (
-                          <div style={{ marginTop: 4 }}>
-                            <Text type="secondary">意见：{record.comments}</Text>
+                          <div>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {dayjs(record.actionTime).format('YYYY-MM-DD HH:mm')}
+                            </Text>
                           </div>
-                        )}
-                      </div>
-                    ),
-                  }))}
-                />
-              </>
-            )}
+                          {record.comments && (
+                            <div style={{ marginTop: 4 }}>
+                              <Text type="secondary">意见：{record.comments}</Text>
+                            </div>
+                          )}
+                        </div>
+                      ),
+                    }))}
+                  />
+                </>
+              )}
           </>
         )}
       </Drawer>

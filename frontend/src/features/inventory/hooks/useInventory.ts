@@ -1,6 +1,6 @@
 /**
  * P003-inventory-query: 库存查询 React Hooks
- * 
+ *
  * 使用 TanStack Query 封装库存相关的数据获取逻辑。
  */
 
@@ -21,14 +21,11 @@ export const inventoryKeys = {
 
 /**
  * 获取库存列表
- * 
+ *
  * @param params 查询参数
  * @param enabled 是否启用查询
  */
-export function useInventoryList(
-  params: InventoryQueryParams,
-  enabled = true
-) {
+export function useInventoryList(params: InventoryQueryParams, enabled = true) {
   return useQuery({
     queryKey: inventoryKeys.list(params),
     queryFn: () => inventoryService.listInventory(params),
@@ -40,7 +37,7 @@ export function useInventoryList(
 
 /**
  * 获取库存详情
- * 
+ *
  * @param id 库存记录ID
  * @param enabled 是否启用查询
  */

@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import { Table, Tag, Button, Space, Tooltip, Avatar, Image, Popconfirm, message } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
+import React, { useState, useCallback, useEffect } from 'react';
+import { Table, Tag, Button, Space, Tooltip, Avatar, Image, Popconfirm, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -8,40 +8,40 @@ import {
   CopyOutlined,
   MoreOutlined,
   SettingOutlined,
-} from '@ant-design/icons'
-import type { SPUItem, SPUStatus, ProductType } from '@/types/spu'
-import { PRODUCT_TYPE_OPTIONS } from '@/types/spu'
-import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers'
-import { statusColors } from '@/theme'
+} from '@ant-design/icons';
+import type { SPUItem, SPUStatus, ProductType } from '@/types/spu';
+import { PRODUCT_TYPE_OPTIONS } from '@/types/spu';
+import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers';
+import { statusColors } from '@/theme';
 
 interface SPUListProps {
-  data: SPUItem[]
-  loading?: boolean
-  selectedRowKeys?: React.Key[]
-  onSelectChange?: (selectedRowKeys: React.Key[]) => void
-  onEdit?: (record: SPUItem) => void
-  onDelete?: (record: SPUItem) => void
-  onView?: (record: SPUItem) => void
-  onCopy?: (record: SPUItem) => void
-  onBatchDelete?: (ids: string[]) => void
-  onStatusChange?: (id: string, status: SPUStatus) => void
+  data: SPUItem[];
+  loading?: boolean;
+  selectedRowKeys?: React.Key[];
+  onSelectChange?: (selectedRowKeys: React.Key[]) => void;
+  onEdit?: (record: SPUItem) => void;
+  onDelete?: (record: SPUItem) => void;
+  onView?: (record: SPUItem) => void;
+  onCopy?: (record: SPUItem) => void;
+  onBatchDelete?: (ids: string[]) => void;
+  onStatusChange?: (id: string, status: SPUStatus) => void;
   rowSelection?: {
-    type?: 'checkbox' | 'radio'
-    getCheckboxProps?: (record: SPUItem) => { disabled?: boolean }
-  }
+    type?: 'checkbox' | 'radio';
+    getCheckboxProps?: (record: SPUItem) => { disabled?: boolean };
+  };
   pagination?: {
-    current: number
-    pageSize: number
-    total: number
-    showSizeChanger?: boolean
-    showQuickJumper?: boolean
-    showTotal?: (total: number, range: [number, number]) => string
-    onChange?: (page: number, pageSize: number) => void
-  }
+    current: number;
+    pageSize: number;
+    total: number;
+    showSizeChanger?: boolean;
+    showQuickJumper?: boolean;
+    showTotal?: (total: number, range: [number, number]) => string;
+    onChange?: (page: number, pageSize: number) => void;
+  };
   scroll?: {
-    x?: number
-    y?: number
-  }
+    x?: number;
+    y?: number;
+  };
 }
 
 const SPUList: React.FC<SPUListProps> = ({
@@ -59,68 +59,71 @@ const SPUList: React.FC<SPUListProps> = ({
   pagination,
   scroll,
 }) => {
-  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
+  const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
   // 处理行展开
-  const handleExpand = useCallback((expanded: boolean, record: SPUItem) => {
-    const newExpanded = expanded
-      ? [...expandedRowKeys, record.id]
-      : expandedRowKeys.filter(key => key !== record.id)
-    setExpandedRowKeys(newExpanded)
-  }, [expandedRowKeys])
+  const handleExpand = useCallback(
+    (expanded: boolean, record: SPUItem) => {
+      const newExpanded = expanded
+        ? [...expandedRowKeys, record.id]
+        : expandedRowKeys.filter((key) => key !== record.id);
+      setExpandedRowKeys(newExpanded);
+    },
+    [expandedRowKeys]
+  );
 
   // 获取状态标签
   const getStatusTag = (status: SPUStatus) => {
-    const statusInfo = statusColors[status as keyof typeof statusColors]
+    const statusInfo = statusColors[status as keyof typeof statusColors];
     return (
       <Tag color={statusInfo.color} style={{ fontSize: '12px' }}>
         {statusInfo.text}
       </Tag>
-    )
-  }
+    );
+  };
 
   // 获取产品类型标签
-    const getProductTypeTag = (productType?: ProductType) => {
-      if (!productType) return '-'
-      const typeOption = PRODUCT_TYPE_OPTIONS.find(opt => opt.value === productType)
-      if (!typeOption) return '-'
-      return (
-        <Tag color={typeOption.color} style={{ fontSize: '12px' }}>
-          {typeOption.label}
-        </Tag>
-      )
-    }
-  
-    // 获取品牌标签
+  const getProductTypeTag = (productType?: ProductType) => {
+    if (!productType) return '-';
+    const typeOption = PRODUCT_TYPE_OPTIONS.find((opt) => opt.value === productType);
+    if (!typeOption) return '-';
+    return (
+      <Tag color={typeOption.color} style={{ fontSize: '12px' }}>
+        {typeOption.label}
+      </Tag>
+    );
+  };
+
+  // 获取品牌标签
   const getBrandTag = (brand?: { name: string; code?: string }) => {
-    if (!brand) return '-'
+    if (!brand) return '-';
     return (
       <Tag color="blue" style={{ fontSize: '12px' }}>
         {brand.code ? `${brand.name}(${brand.code})` : brand.name}
       </Tag>
-    )
-  }
+    );
+  };
 
   // 获取分类标签
   const getCategoryTag = (category?: { name: string; path?: string[] }) => {
-    if (!category) return '-'
+    if (!category) return '-';
     return (
       <Tooltip title={category.path?.join(' / ') || category.name}>
         <Tag color="green" style={{ fontSize: '12px', maxWidth: '150px' }}>
           {category.name}
         </Tag>
       </Tooltip>
-    )
-  }
+    );
+  };
 
   // 渲染规格参数
   const renderSpecifications = (specifications: Array<{ name: string; value: string }>) => {
     if (!specifications || specifications.length === 0) {
-      return '-'
+      return '-';
     }
 
-    const displaySpecs = specifications.slice(0, 2)
-    const hasMore = specifications.length > 2
+    const displaySpecs = specifications.slice(0, 2);
+    const hasMore = specifications.length > 2;
 
     return (
       <div>
@@ -135,17 +138,17 @@ const SPUList: React.FC<SPUListProps> = ({
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   // 渲染图片预览
   const renderImages = (images: Array<{ url: string; alt: string }>) => {
     if (!images || images.length === 0) {
-      return <Avatar size="small" icon={<EyeOutlined />} />
+      return <Avatar size="small" icon={<EyeOutlined />} />;
     }
 
-    const firstImage = images[0]
-    const hasMore = images.length > 1
+    const firstImage = images[0];
+    const hasMore = images.length > 1;
 
     return (
       <Space>
@@ -160,14 +163,10 @@ const SPUList: React.FC<SPUListProps> = ({
           }}
           fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMCThS6VzhQM+oi6lP4UrWixxg1Gko1+B8OJh0l7IJgJZYC7tdy4wJKjEzzHJcNglMcAA=="
         />
-        {hasMore && (
-          <span style={{ fontSize: '12px', color: '#999' }}>
-            +{images.length - 1}
-          </span>
-        )}
+        {hasMore && <span style={{ fontSize: '12px', color: '#999' }}>+{images.length - 1}</span>}
       </Space>
-    )
-  }
+    );
+  };
 
   // 渲染操作按钮
   const renderActions = (record: SPUItem) => {
@@ -203,10 +202,10 @@ const SPUList: React.FC<SPUListProps> = ({
             title: '确认删除',
             content: `确定要删除SPU"${record.name}"吗？此操作不可恢复。`,
             onConfirm: () => onDelete?.(record),
-          })
+          });
         },
       },
-    ]
+    ];
 
     return (
       <Space size="small">
@@ -232,14 +231,14 @@ const SPUList: React.FC<SPUListProps> = ({
             size="small"
             icon={<MoreOutlined />}
             onClick={(e) => {
-              e.stopPropagation()
+              e.stopPropagation();
               // 这里可以添加下拉菜单逻辑
             }}
           />
         </Tooltip>
       </Space>
-    )
-  }
+    );
+  };
 
   // 表格列配置
   const columns: ColumnsType<SPUItem> = [
@@ -252,9 +251,7 @@ const SPUList: React.FC<SPUListProps> = ({
       sorter: true,
       render: (text: string) => (
         <Tooltip title={text}>
-          <span style={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 500 }}>
-            {text}
-          </span>
+          <span style={{ fontFamily: 'monospace', fontSize: '12px', fontWeight: 500 }}>{text}</span>
         </Tooltip>
       ),
     },
@@ -326,10 +323,12 @@ const SPUList: React.FC<SPUListProps> = ({
       width: 80,
       align: 'center',
       render: (status: SPUStatus, record: SPUItem) => (
-        <div onClick={(e) => {
-          e.stopPropagation()
-          // 这里可以添加状态切换逻辑
-        }}>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            // 这里可以添加状态切换逻辑
+          }}
+        >
           {getStatusTag(status)}
         </div>
       ),
@@ -355,10 +354,10 @@ const SPUList: React.FC<SPUListProps> = ({
       key: 'tags',
       width: 120,
       render: (tags: string[]) => {
-        if (!tags || tags.length === 0) return '-'
+        if (!tags || tags.length === 0) return '-';
 
-        const displayTags = tags.slice(0, 2)
-        const hasMore = tags.length > 2
+        const displayTags = tags.slice(0, 2);
+        const hasMore = tags.length > 2;
 
         return (
           <div>
@@ -368,14 +367,10 @@ const SPUList: React.FC<SPUListProps> = ({
                   {tag}
                 </Tag>
               ))}
-              {hasMore && (
-                <Tag style={{ fontSize: '11px', color: '#999' }}>
-                  +{tags.length - 2}
-                </Tag>
-              )}
+              {hasMore && <Tag style={{ fontSize: '11px', color: '#999' }}>+{tags.length - 2}</Tag>}
             </Space>
           </div>
-        )
+        );
       },
     },
     {
@@ -392,7 +387,7 @@ const SPUList: React.FC<SPUListProps> = ({
       fixed: 'right',
       render: (_: any, record: SPUItem) => renderActions(record),
     },
-  ]
+  ];
 
   // 展开行内容
   const expandedRowRender = (record: SPUItem) => {
@@ -402,11 +397,21 @@ const SPUList: React.FC<SPUListProps> = ({
           <div>
             <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: 600 }}>基础信息</h4>
             <div style={{ fontSize: '13px', lineHeight: '1.8' }}>
-              <div><strong>SPU编码:</strong> {record.code}</div>
-              <div><strong>标准简称:</strong> {record.shortName || '-'}</div>
-              <div><strong>标准单位:</strong> {record.unit || '-'}</div>
-              <div><strong>创建者:</strong> {record.createdBy || '-'}</div>
-              <div><strong>更新者:</strong> {record.updatedBy || '-'}</div>
+              <div>
+                <strong>SPU编码:</strong> {record.code}
+              </div>
+              <div>
+                <strong>标准简称:</strong> {record.shortName || '-'}
+              </div>
+              <div>
+                <strong>标准单位:</strong> {record.unit || '-'}
+              </div>
+              <div>
+                <strong>创建者:</strong> {record.createdBy || '-'}
+              </div>
+              <div>
+                <strong>更新者:</strong> {record.updatedBy || '-'}
+              </div>
             </div>
           </div>
           <div>
@@ -429,21 +434,23 @@ const SPUList: React.FC<SPUListProps> = ({
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   // 处理表格行选择
-  const rowSelectionConfig = rowSelection ? {
-    selectedRowKeys,
-    onChange: (keys: React.Key[]) => {
-      onSelectChange?.(keys)
-    },
-    getCheckboxProps: (record: SPUItem) => ({
-      disabled: record.status === 'archived', // 归档状态的SPU不可选
-      ...rowSelection.getCheckboxProps?.(record),
-    }),
-    ...rowSelection,
-  } : undefined
+  const rowSelectionConfig = rowSelection
+    ? {
+        selectedRowKeys,
+        onChange: (keys: React.Key[]) => {
+          onSelectChange?.(keys);
+        },
+        getCheckboxProps: (record: SPUItem) => ({
+          disabled: record.status === 'archived', // 归档状态的SPU不可选
+          ...rowSelection.getCheckboxProps?.(record),
+        }),
+        ...rowSelection,
+      }
+    : undefined;
 
   return (
     <Table
@@ -469,7 +476,7 @@ const SPUList: React.FC<SPUListProps> = ({
         style: { cursor: 'pointer' },
       })}
     />
-  )
-}
+  );
+};
 
-export default SPUList
+export default SPUList;

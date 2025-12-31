@@ -70,59 +70,28 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
 
   return (
     <Card size="small" style={{ marginBottom: 16 }}>
-      <Form
-        form={form}
-        onFinish={handleFinish}
-        {...formLayout}
-        style={{ marginBottom: 0 }}
-      >
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-          gap: 16,
-          marginBottom: 16 
-        }}>
-          <Form.Item
-            label="关键词"
-            name="keyword"
-            style={{ marginBottom: 0 }}
-          >
-            <Input
-              placeholder="SKU编码/名称"
-              prefix={<SearchOutlined />}
-              allowClear
-            />
+      <Form form={form} onFinish={handleFinish} {...formLayout} style={{ marginBottom: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+            gap: 16,
+            marginBottom: 16,
+          }}
+        >
+          <Form.Item label="关键词" name="keyword" style={{ marginBottom: 0 }}>
+            <Input placeholder="SKU编码/名称" prefix={<SearchOutlined />} allowClear />
           </Form.Item>
 
-          <Form.Item
-            label="门店/仓库"
-            name="storeId"
-            style={{ marginBottom: 0 }}
-          >
-            <Select
-              placeholder="选择门店"
-              options={storeOptions}
-              allowClear
-            />
+          <Form.Item label="门店/仓库" name="storeId" style={{ marginBottom: 0 }}>
+            <Select placeholder="选择门店" options={storeOptions} allowClear />
           </Form.Item>
 
-          <Form.Item
-            label="库存状态"
-            name="status"
-            style={{ marginBottom: 0 }}
-          >
-            <Select
-              placeholder="选择状态"
-              options={statusOptions}
-              allowClear
-            />
+          <Form.Item label="库存状态" name="status" style={{ marginBottom: 0 }}>
+            <Select placeholder="选择状态" options={statusOptions} allowClear />
           </Form.Item>
 
-          <Form.Item
-            label="更新时间"
-            name="dateRange"
-            style={{ marginBottom: 0 }}
-          >
+          <Form.Item label="更新时间" name="dateRange" style={{ marginBottom: 0 }}>
             <RangePicker style={{ width: '100%' }} />
           </Form.Item>
         </div>
@@ -132,12 +101,7 @@ export const InventoryFilters: React.FC<InventoryFiltersProps> = ({
             <Button onClick={handleReset} icon={<ReloadOutlined />}>
               重置
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              icon={<SearchOutlined />}
-            >
+            <Button type="primary" htmlType="submit" loading={loading} icon={<SearchOutlined />}>
               查询
             </Button>
           </Space>

@@ -30,20 +30,20 @@ const defaultPreferences: UserPreference = {
   favoriteMenuIds: [],
   theme: {
     mode: 'light',
-    primaryColor: '#1890ff'
+    primaryColor: '#1890ff',
   },
   navigation: {
     showBreadcrumb: true,
     enableSearch: true,
     recentItemsLimit: 10,
-    searchHistoryLimit: 20
+    searchHistoryLimit: 20,
   },
   ui: {
     compactMode: false,
     fixedSidebar: true,
-    enableAnimation: true
+    enableAnimation: true,
   },
-  lastUpdated: new Date().toISOString()
+  lastUpdated: new Date().toISOString(),
 };
 
 /**
@@ -64,7 +64,9 @@ export class UserPreferenceService {
 
       // 检查版本
       if (data.version !== STORAGE_VERSION) {
-        console.warn(`Preferences version mismatch: expected ${STORAGE_VERSION}, got ${data.version}`);
+        console.warn(
+          `Preferences version mismatch: expected ${STORAGE_VERSION}, got ${data.version}`
+        );
         return null;
       }
 
@@ -89,7 +91,7 @@ export class UserPreferenceService {
       const data: StorageData = {
         version: STORAGE_VERSION,
         preferences,
-        exportDate: new Date().toISOString()
+        exportDate: new Date().toISOString(),
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -109,13 +111,7 @@ export class UserPreferenceService {
     }
 
     // 检查必需字段
-    const requiredFields = [
-      'userId',
-      'theme',
-      'navigation',
-      'ui',
-      'lastUpdated'
-    ];
+    const requiredFields = ['userId', 'theme', 'navigation', 'ui', 'lastUpdated'];
 
     for (const field of requiredFields) {
       if (!(field in preferences)) {
@@ -133,19 +129,23 @@ export class UserPreferenceService {
 
     // 检查导航偏好结构
     const navigation = preferences.navigation;
-    if (typeof navigation.showBreadcrumb !== 'boolean' ||
-        typeof navigation.enableSearch !== 'boolean' ||
-        typeof navigation.recentItemsLimit !== 'number' ||
-        typeof navigation.searchHistoryLimit !== 'number') {
+    if (
+      typeof navigation.showBreadcrumb !== 'boolean' ||
+      typeof navigation.enableSearch !== 'boolean' ||
+      typeof navigation.recentItemsLimit !== 'number' ||
+      typeof navigation.searchHistoryLimit !== 'number'
+    ) {
       console.warn('Invalid navigation preferences structure');
       return false;
     }
 
     // 检查UI偏好结构
     const ui = preferences.ui;
-    if (typeof ui.compactMode !== 'boolean' ||
-        typeof ui.fixedSidebar !== 'boolean' ||
-        typeof ui.enableAnimation !== 'boolean') {
+    if (
+      typeof ui.compactMode !== 'boolean' ||
+      typeof ui.fixedSidebar !== 'boolean' ||
+      typeof ui.enableAnimation !== 'boolean'
+    ) {
       console.warn('Invalid UI preferences structure');
       return false;
     }
@@ -169,7 +169,7 @@ export class UserPreferenceService {
     return {
       ...defaultPreferences,
       userId: userId || defaultPreferences.userId,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -183,11 +183,14 @@ export class UserPreferenceService {
   /**
    * 合并偏好设置
    */
-  static mergePreferences(current: UserPreference, updates: Partial<UserPreference>): UserPreference {
+  static mergePreferences(
+    current: UserPreference,
+    updates: Partial<UserPreference>
+  ): UserPreference {
     return {
       ...current,
       ...updates,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     };
   }
 
@@ -263,7 +266,7 @@ export class UserPreferenceService {
       return {
         ...imported,
         userId: userId || imported.userId,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
     } catch (error) {
       console.error('Failed to import preferences:', error);
@@ -294,20 +297,20 @@ export class UserPreferenceService {
         favoriteMenuIds: oldPreferences.favoriteMenuIds || [],
         theme: oldPreferences.theme || {
           mode: 'light',
-          primaryColor: '#1890ff'
+          primaryColor: '#1890ff',
         },
         navigation: oldPreferences.navigation || {
           showBreadcrumb: true,
           enableSearch: true,
           recentItemsLimit: 10,
-          searchHistoryLimit: 20
+          searchHistoryLimit: 20,
         },
         ui: oldPreferences.ui || {
           compactMode: false,
           fixedSidebar: true,
-          enableAnimation: true
+          enableAnimation: true,
         },
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
 
       // 保存新格式
@@ -337,7 +340,7 @@ export class UserPreferenceService {
 
       const backup = {
         timestamp: new Date().toISOString(),
-        preferences: preferences
+        preferences: preferences,
       };
 
       const backupKey = `${STORAGE_KEY}-backup-${Date.now()}`;
@@ -381,12 +384,12 @@ export class UserPreferenceService {
       let cleaned = 0;
       const keys = Object.keys(localStorage);
 
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (key.startsWith(`${STORAGE_KEY}-backup-`)) {
           // 保留最近的5个备份
           const timestamp = key.split('-').pop();
           const backupTime = parseInt(timestamp);
-          const cutoffTime = Date.now() - (7 * 24 * 60 * 60 * 1000); // 7天前
+          const cutoffTime = Date.now() - 7 * 24 * 60 * 60 * 1000; // 7天前
 
           if (backupTime < cutoffTime) {
             localStorage.removeItem(key);

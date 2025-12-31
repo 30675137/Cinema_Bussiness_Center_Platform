@@ -78,201 +78,227 @@ export const useErrorHandling = (initialRetryConfig?: Partial<RetryConfig>) => {
   }, []);
 
   // 设置错误
-  const setErrorWithInfo = useCallback((
-    message: string,
-    type: ErrorType = ErrorType.SYSTEM,
-    severity: ErrorSeverity = ErrorSeverity.MEDIUM,
-    code?: string,
-    context?: Record<string, any>,
-    retryable: boolean = true
-  ) => {
-    const errorInfo: ErrorInfo = {
-      hasError: true,
-      message,
-      code: code || type,
-      type,
-      severity,
-      timestamp: new Date().toISOString(),
-      context,
-      retryable,
-      retryCount: 0,
-      maxRetries: retryConfig.maxRetries,
-    };
-    setError(errorInfo);
-  }, [retryConfig.maxRetries]);
+  const setErrorWithInfo = useCallback(
+    (
+      message: string,
+      type: ErrorType = ErrorType.SYSTEM,
+      severity: ErrorSeverity = ErrorSeverity.MEDIUM,
+      code?: string,
+      context?: Record<string, any>,
+      retryable: boolean = true
+    ) => {
+      const errorInfo: ErrorInfo = {
+        hasError: true,
+        message,
+        code: code || type,
+        type,
+        severity,
+        timestamp: new Date().toISOString(),
+        context,
+        retryable,
+        retryCount: 0,
+        maxRetries: retryConfig.maxRetries,
+      };
+      setError(errorInfo);
+    },
+    [retryConfig.maxRetries]
+  );
 
   // 异步操作包装器
-  const withErrorHandling = useCallback(async <T,>(
-    operation: () => Promise<T>,
-    operationType: keyof LoadingStateWithProgress = 'data',
-    options?: {
-      errorType?: ErrorType;
-      errorSeverity?: ErrorSeverity;
-      retryable?: boolean;
-      context?: Record<string, any>;
-      progressCallback?: (progress: number) => void;
-      loadingMessage?: string;
-    }
-  ): Promise<T | null> => {
-    const {
-      errorType = ErrorType.SYSTEM,
-      errorSeverity = ErrorSeverity.MEDIUM,
-      retryable = true,
-      context,
-      progressCallback,
-      loadingMessage,
-    } = options || {};
+  const withErrorHandling = useCallback(
+    async <T>(
+      operation: () => Promise<T>,
+      operationType: keyof LoadingStateWithProgress = 'data',
+      options?: {
+        errorType?: ErrorType;
+        errorSeverity?: ErrorSeverity;
+        retryable?: boolean;
+        context?: Record<string, any>;
+        progressCallback?: (progress: number) => void;
+        loadingMessage?: string;
+      }
+    ): Promise<T | null> => {
+      const {
+        errorType = ErrorType.SYSTEM,
+        errorSeverity = ErrorSeverity.MEDIUM,
+        retryable = true,
+        context,
+        progressCallback,
+        loadingMessage,
+      } = options || {};
 
-    // 设置加载状态
-    setIsLoading(true);
-    setLoadingState(prev => ({
-      ...prev,
-      [operationType]: true,
-      message: loadingMessage,
-      startTime: Date.now(),
-    }));
-
-    // 清除之前的错误
-    clearError();
-
-    try {
-      const result = await operation();
-
-      // 清除加载状态
-      setIsLoading(false);
-      setLoadingState(prev => ({
+      // 设置加载状态
+      setIsLoading(true);
+      setLoadingState((prev) => ({
         ...prev,
-        [operationType]: false,
-        progress: undefined,
-        message: undefined,
+        [operationType]: true,
+        message: loadingMessage,
+        startTime: Date.now(),
       }));
 
-      return result;
-    } catch (err) {
-      // 清除加载状态
-      setIsLoading(false);
-      setLoadingState(prev => ({
-        ...prev,
-        [operationType]: false,
-        progress: undefined,
-        message: undefined,
-      }));
+      // 清除之前的错误
+      clearError();
 
-      // 处理错误
-      const errorMessage = err instanceof Error ? err.message : '未知错误';
-      const errorCode = (err as any)?.code;
+      try {
+        const result = await operation();
 
-      setErrorWithInfo(
-        errorMessage,
-        errorType,
-        errorSeverity,
-        errorCode,
-        { ...context, originalError: err },
-        retryable
-      );
+        // 清除加载状态
+        setIsLoading(false);
+        setLoadingState((prev) => ({
+          ...prev,
+          [operationType]: false,
+          progress: undefined,
+          message: undefined,
+        }));
 
-      return null;
-    }
-  }, [clearError, setErrorWithInfo]);
+        return result;
+      } catch (err) {
+        // 清除加载状态
+        setIsLoading(false);
+        setLoadingState((prev) => ({
+          ...prev,
+          [operationType]: false,
+          progress: undefined,
+          message: undefined,
+        }));
+
+        // 处理错误
+        const errorMessage = err instanceof Error ? err.message : '未知错误';
+        const errorCode = (err as any)?.code;
+
+        setErrorWithInfo(
+          errorMessage,
+          errorType,
+          errorSeverity,
+          errorCode,
+          { ...context, originalError: err },
+          retryable
+        );
+
+        return null;
+      }
+    },
+    [clearError, setErrorWithInfo]
+  );
 
   // 重试机制
-  const retry = useCallback(async (operation?: () => Promise<any>): Promise<boolean> => {
-    if (!error || !error.retryable || error.retryCount! >= error.maxRetries!) {
-      return false;
-    }
+  const retry = useCallback(
+    async (operation?: () => Promise<any>): Promise<boolean> => {
+      if (!error || !error.retryable || error.retryCount! >= error.maxRetries!) {
+        return false;
+      }
 
-    // 清除重试超时
-    if (retryTimeoutRef.current) {
-      clearTimeout(retryTimeoutRef.current);
-    }
+      // 清除重试超时
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
 
-    // 计算重试延迟
-    const delay = Math.min(
-      retryConfig.retryDelay * Math.pow(retryConfig.backoffMultiplier, error.retryCount!),
-      retryConfig.maxDelay
-    );
+      // 计算重试延迟
+      const delay = Math.min(
+        retryConfig.retryDelay * Math.pow(retryConfig.backoffMultiplier, error.retryCount!),
+        retryConfig.maxDelay
+      );
 
-    // 更新错误状态
-    setError(prev => prev ? {
-      ...prev,
-      retryCount: (prev.retryCount || 0) + 1,
-    } : null);
+      // 更新错误状态
+      setError((prev) =>
+        prev
+          ? {
+              ...prev,
+              retryCount: (prev.retryCount || 0) + 1,
+            }
+          : null
+      );
 
-    // 延迟后重试
-    return new Promise((resolve) => {
-      retryTimeoutRef.current = setTimeout(async () => {
-        if (operation) {
-          const result = await withErrorHandling(operation);
-          resolve(result !== null);
-        } else {
-          resolve(true);
-        }
-      }, delay);
-    });
-  }, [error, retryConfig, withErrorHandling]);
+      // 延迟后重试
+      return new Promise((resolve) => {
+        retryTimeoutRef.current = setTimeout(async () => {
+          if (operation) {
+            const result = await withErrorHandling(operation);
+            resolve(result !== null);
+          } else {
+            resolve(true);
+          }
+        }, delay);
+      });
+    },
+    [error, retryConfig, withErrorHandling]
+  );
 
   // 网络错误处理
-  const handleNetworkError = useCallback((err: any, context?: Record<string, any>) => {
-    const isNetworkError = !navigator.onLine || err?.message?.includes('network') || err?.code === 'NETWORK_ERROR';
-    const isTimeoutError = err?.message?.includes('timeout') || err?.code === 'TIMEOUT';
+  const handleNetworkError = useCallback(
+    (err: any, context?: Record<string, any>) => {
+      const isNetworkError =
+        !navigator.onLine || err?.message?.includes('network') || err?.code === 'NETWORK_ERROR';
+      const isTimeoutError = err?.message?.includes('timeout') || err?.code === 'TIMEOUT';
 
-    let errorType = ErrorType.SYSTEM;
-    if (isNetworkError) {
-      errorType = ErrorType.NETWORK;
-    } else if (isTimeoutError) {
-      errorType = ErrorType.TIMEOUT;
-    }
+      let errorType = ErrorType.SYSTEM;
+      if (isNetworkError) {
+        errorType = ErrorType.NETWORK;
+      } else if (isTimeoutError) {
+        errorType = ErrorType.TIMEOUT;
+      }
 
-    setErrorWithInfo(
-      err?.message || '网络连接失败',
-      errorType,
-      isTimeoutError ? ErrorSeverity.MEDIUM : ErrorSeverity.HIGH,
-      err?.code,
-      context,
-      true
-    );
-  }, [setErrorWithInfo]);
+      setErrorWithInfo(
+        err?.message || '网络连接失败',
+        errorType,
+        isTimeoutError ? ErrorSeverity.MEDIUM : ErrorSeverity.HIGH,
+        err?.code,
+        context,
+        true
+      );
+    },
+    [setErrorWithInfo]
+  );
 
   // 验证错误处理
-  const handleValidationError = useCallback((errors: string[], context?: Record<string, any>) => {
-    const message = errors.join('; ');
-    setErrorWithInfo(
-      message,
-      ErrorType.VALIDATION,
-      ErrorSeverity.MEDIUM,
-      'VALIDATION_ERROR',
-      context,
-      false
-    );
-  }, [setErrorWithInfo]);
+  const handleValidationError = useCallback(
+    (errors: string[], context?: Record<string, any>) => {
+      const message = errors.join('; ');
+      setErrorWithInfo(
+        message,
+        ErrorType.VALIDATION,
+        ErrorSeverity.MEDIUM,
+        'VALIDATION_ERROR',
+        context,
+        false
+      );
+    },
+    [setErrorWithInfo]
+  );
 
   // 权限错误处理
-  const handlePermissionError = useCallback((action: string, context?: Record<string, any>) => {
-    setErrorWithInfo(
-      `没有权限执行操作: ${action}`,
-      ErrorType.PERMISSION,
-      ErrorSeverity.HIGH,
-      'PERMISSION_DENIED',
-      context,
-      false
-    );
-  }, [setErrorWithInfo]);
+  const handlePermissionError = useCallback(
+    (action: string, context?: Record<string, any>) => {
+      setErrorWithInfo(
+        `没有权限执行操作: ${action}`,
+        ErrorType.PERMISSION,
+        ErrorSeverity.HIGH,
+        'PERMISSION_DENIED',
+        context,
+        false
+      );
+    },
+    [setErrorWithInfo]
+  );
 
   // 业务逻辑错误处理
-  const handleBusinessError = useCallback((message: string, context?: Record<string, any>) => {
-    setErrorWithInfo(
-      message,
-      ErrorType.BUSINESS,
-      ErrorSeverity.MEDIUM,
-      'BUSINESS_ERROR',
-      context,
-      true
-    );
-  }, [setErrorWithInfo]);
+  const handleBusinessError = useCallback(
+    (message: string, context?: Record<string, any>) => {
+      setErrorWithInfo(
+        message,
+        ErrorType.BUSINESS,
+        ErrorSeverity.MEDIUM,
+        'BUSINESS_ERROR',
+        context,
+        true
+      );
+    },
+    [setErrorWithInfo]
+  );
 
   // 更新加载进度
   const updateProgress = useCallback((progress: number, message?: string) => {
-    setLoadingState(prev => ({
+    setLoadingState((prev) => ({
       ...prev,
       progress: Math.max(0, Math.min(100, progress)),
       ...(message && { message }),
@@ -281,7 +307,7 @@ export const useErrorHandling = (initialRetryConfig?: Partial<RetryConfig>) => {
 
   // 设置加载状态
   const setLoading = useCallback((state: Partial<LoadingStateWithProgress>) => {
-    setLoadingState(prev => ({ ...prev, ...state }));
+    setLoadingState((prev) => ({ ...prev, ...state }));
     setIsLoading(Object.values(state).some(Boolean));
   }, []);
 
@@ -341,13 +367,11 @@ export const useGlobalErrorHandler = () => {
     };
 
     const handleError = (event: ErrorEvent) => {
-      setError(
-        event.message || '脚本错误',
-        ErrorType.SYSTEM,
-        ErrorSeverity.HIGH,
-        'SCRIPT_ERROR',
-        { filename: event.filename, lineno: event.lineno, colno: event.colno }
-      );
+      setError(event.message || '脚本错误', ErrorType.SYSTEM, ErrorSeverity.HIGH, 'SCRIPT_ERROR', {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+      });
     };
 
     window.addEventListener('unhandledrejection', handleUnhandledRejection);

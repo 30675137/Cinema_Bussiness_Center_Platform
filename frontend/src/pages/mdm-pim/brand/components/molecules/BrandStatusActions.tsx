@@ -25,7 +25,7 @@ const BrandStatusActions: React.FC<BrandStatusActionsProps> = ({
   loading = false,
   disabled = false,
   size = 'small',
-  type = 'default'
+  type = 'default',
 }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<BrandStatus | null>(null);
@@ -107,7 +107,7 @@ const BrandStatusActions: React.FC<BrandStatusActionsProps> = ({
       icon: <CheckOutlined />,
       disabled: brand.status === BrandStatus.ENABLED || loading,
       onClick: () => handleStatusChange(BrandStatus.ENABLED),
-      'data-testid': 'brand-enable-menu-item'
+      'data-testid': 'brand-enable-menu-item',
     },
     {
       key: 'disable',
@@ -115,12 +115,12 @@ const BrandStatusActions: React.FC<BrandStatusActionsProps> = ({
       icon: <CloseOutlined />,
       disabled: brand.status === BrandStatus.DISABLED || loading,
       onClick: () => handleStatusChange(BrandStatus.DISABLED),
-      'data-testid': 'brand-disable-menu-item'
-    }
+      'data-testid': 'brand-disable-menu-item',
+    },
   ];
 
   // 过滤掉当前状态对应的禁用项
-  const filteredMenuItems = menuItems.filter(item => {
+  const filteredMenuItems = menuItems.filter((item) => {
     if (brand.status === BrandStatus.ENABLED) {
       return item.key === 'disable';
     } else if (brand.status === BrandStatus.DISABLED || brand.status === BrandStatus.DRAFT) {
@@ -165,7 +165,7 @@ const BrandStatusActions: React.FC<BrandStatusActionsProps> = ({
           onClick: ({ key }) => {
             const status = key === 'enable' ? BrandStatus.ENABLED : BrandStatus.DISABLED;
             handleStatusChange(status);
-          }
+          },
         }}
         trigger={['click']}
         disabled={disabled || loading}

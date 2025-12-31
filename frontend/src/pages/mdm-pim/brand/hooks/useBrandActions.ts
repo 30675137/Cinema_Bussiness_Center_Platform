@@ -25,7 +25,7 @@ interface ApiResponse<T = any> {
 const brandApi = {
   createBrand: async (data: CreateBrandRequest): Promise<ApiResponse<Brand>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 模拟创建品牌响应
     const newBrand: Brand = {
@@ -57,7 +57,7 @@ const brandApi = {
 
   updateBrand: async (id: string, data: UpdateBrandRequest): Promise<ApiResponse<Brand>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 模拟更新品牌响应
     const updatedBrand: Brand = {
@@ -89,7 +89,7 @@ const brandApi = {
 
   deleteBrand: async (id: string): Promise<ApiResponse<void>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 模拟删除品牌响应
     return {
@@ -99,9 +99,12 @@ const brandApi = {
     };
   },
 
-  updateBrandStatus: async (id: string, data: UpdateBrandStatusRequest): Promise<ApiResponse<Brand>> => {
+  updateBrandStatus: async (
+    id: string,
+    data: UpdateBrandStatusRequest
+  ): Promise<ApiResponse<Brand>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 模拟状态更新响应
     const updatedBrand: Brand = {
@@ -131,9 +134,12 @@ const brandApi = {
     };
   },
 
-  uploadLogo: async (id: string, file: File): Promise<ApiResponse<{ logoUrl: string; updatedAt: string }>> => {
+  uploadLogo: async (
+    id: string,
+    file: File
+  ): Promise<ApiResponse<{ logoUrl: string; updatedAt: string }>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // 模拟Logo上传响应
     return {
@@ -147,11 +153,13 @@ const brandApi = {
     };
   },
 
-  checkNameDuplication: async (
-    params: { name: string; brandType: string; excludeId?: string }
-  ): Promise<ApiResponse<{ isDuplicate: boolean }>> => {
+  checkNameDuplication: async (params: {
+    name: string;
+    brandType: string;
+    excludeId?: string;
+  }): Promise<ApiResponse<{ isDuplicate: boolean }>> => {
     // Mock API 延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // 模拟重复检查逻辑
     const existingBrands = ['可口可乐', '百事可乐', '农夫山泉'];
@@ -200,31 +208,26 @@ export const useBrandActions = () => {
       message.success('品牌更新成功');
 
       // 更新列表缓存中的特定品牌
-      queryClient.setQueriesData(
-        { queryKey: brandQueryKeys.all },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: brandQueryKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          // 处理列表数据
-          if (Array.isArray(oldData)) {
-            return oldData.map((brand: Brand) =>
-              brand.id === variables.id ? response.data : brand
-            );
-          }
-
-          // 处理分页数据
-          if (oldData.data && Array.isArray(oldData.data)) {
-            return {
-              ...oldData,
-              data: oldData.data.map((brand: Brand) =>
-                brand.id === variables.id ? response.data : brand
-              ),
-            };
-          }
-
-          return oldData;
+        // 处理列表数据
+        if (Array.isArray(oldData)) {
+          return oldData.map((brand: Brand) => (brand.id === variables.id ? response.data : brand));
         }
-      );
+
+        // 处理分页数据
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map((brand: Brand) =>
+              brand.id === variables.id ? response.data : brand
+            ),
+          };
+        }
+
+        return oldData;
+      });
 
       // 刷新详情缓存
       queryClient.invalidateQueries({ queryKey: brandQueryKeys.detail(variables.id) });
@@ -261,35 +264,37 @@ export const useBrandActions = () => {
     mutationFn: ({ id, status, reason }: { id: string; status: string; reason?: string }) =>
       brandService.updateBrandStatus(id, status, reason),
     onSuccess: (response, variables) => {
-      const statusText = variables.status === 'enabled' ? '启用' : variables.status === 'disabled' ? '停用' : '设置状态';
+      const statusText =
+        variables.status === 'enabled'
+          ? '启用'
+          : variables.status === 'disabled'
+            ? '停用'
+            : '设置状态';
       message.success(`品牌${statusText}成功`);
 
       // 更新列表缓存中的品牌状态
-      queryClient.setQueriesData(
-        { queryKey: brandQueryKeys.all },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: brandQueryKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          // 处理列表数据
-          if (Array.isArray(oldData)) {
-            return oldData.map((brand: Brand) =>
-              brand.id === variables.id ? { ...brand, ...response.data.data } : brand
-            );
-          }
-
-          // 处理分页数据
-          if (oldData.data && Array.isArray(oldData.data)) {
-            return {
-              ...oldData,
-              data: oldData.data.map((brand: Brand) =>
-                brand.id === variables.id ? { ...brand, ...response.data.data } : brand
-              ),
-            };
-          }
-
-          return oldData;
+        // 处理列表数据
+        if (Array.isArray(oldData)) {
+          return oldData.map((brand: Brand) =>
+            brand.id === variables.id ? { ...brand, ...response.data.data } : brand
+          );
         }
-      );
+
+        // 处理分页数据
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map((brand: Brand) =>
+              brand.id === variables.id ? { ...brand, ...response.data.data } : brand
+            ),
+          };
+        }
+
+        return oldData;
+      });
 
       // 刷新详情缓存
       queryClient.invalidateQueries({ queryKey: brandQueryKeys.detail(variables.id) });
@@ -311,35 +316,32 @@ export const useBrandActions = () => {
       message.success('Logo上传成功');
 
       // 更新列表和详情缓存中的Logo URL
-      queryClient.setQueriesData(
-        { queryKey: brandQueryKeys.all },
-        (oldData: any) => {
-          if (!oldData) return oldData;
+      queryClient.setQueriesData({ queryKey: brandQueryKeys.all }, (oldData: any) => {
+        if (!oldData) return oldData;
 
-          // 处理列表数据
-          if (Array.isArray(oldData)) {
-            return oldData.map((brand: Brand) =>
+        // 处理列表数据
+        if (Array.isArray(oldData)) {
+          return oldData.map((brand: Brand) =>
+            brand.id === variables.id
+              ? { ...brand, logoUrl: response.data.logoUrl, updatedAt: response.data.updatedAt }
+              : brand
+          );
+        }
+
+        // 处理分页数据
+        if (oldData.data && Array.isArray(oldData.data)) {
+          return {
+            ...oldData,
+            data: oldData.data.map((brand: Brand) =>
               brand.id === variables.id
                 ? { ...brand, logoUrl: response.data.logoUrl, updatedAt: response.data.updatedAt }
                 : brand
-            );
-          }
-
-          // 处理分页数据
-          if (oldData.data && Array.isArray(oldData.data)) {
-            return {
-              ...oldData,
-              data: oldData.data.map((brand: Brand) =>
-                brand.id === variables.id
-                  ? { ...brand, logoUrl: response.data.logoUrl, updatedAt: response.data.updatedAt }
-                  : brand
-              ),
-            };
-          }
-
-          return oldData;
+            ),
+          };
         }
-      );
+
+        return oldData;
+      });
 
       // 刷新详情缓存
       queryClient.invalidateQueries({ queryKey: brandQueryKeys.detail(variables.id) });
@@ -391,19 +393,21 @@ export const useBrandActions = () => {
     isCheckingName: checkNameDuplicationMutation.isPending,
 
     // 批量操作状态
-    isLoading: createBrandMutation.isPending ||
-               updateBrandMutation.isPending ||
-               deleteBrandMutation.isPending ||
-               updateStatusMutation.isPending ||
-               uploadLogoMutation.isPending,
+    isLoading:
+      createBrandMutation.isPending ||
+      updateBrandMutation.isPending ||
+      deleteBrandMutation.isPending ||
+      updateStatusMutation.isPending ||
+      uploadLogoMutation.isPending,
 
     // 错误状态
-    error: createBrandMutation.error ||
-            updateBrandMutation.error ||
-            deleteBrandMutation.error ||
-            updateStatusMutation.error ||
-            uploadLogoMutation.error ||
-            checkNameDuplicationMutation.error,
+    error:
+      createBrandMutation.error ||
+      updateBrandMutation.error ||
+      deleteBrandMutation.error ||
+      updateStatusMutation.error ||
+      uploadLogoMutation.error ||
+      checkNameDuplicationMutation.error,
   };
 };
 

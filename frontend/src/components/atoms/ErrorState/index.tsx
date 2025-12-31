@@ -2,39 +2,39 @@
  * @spec O003-beverage-order
  * ErrorState - 通用错误状态组件
  */
-import React from 'react'
-import { Button, Result } from 'antd'
-import type { ResultStatusType } from 'antd/es/result'
+import React from 'react';
+import { Button, Result } from 'antd';
+import type { ResultStatusType } from 'antd/es/result';
 
 export interface ErrorStateProps {
   /**
    * 错误标题
    */
-  title?: string
+  title?: string;
   /**
    * 错误描述
    */
-  description?: string
+  description?: string;
   /**
    * 错误状态类型
    */
-  status?: ResultStatusType
+  status?: ResultStatusType;
   /**
    * 重试按钮文字
    */
-  retryText?: string
+  retryText?: string;
   /**
    * 重试回调
    */
-  onRetry?: () => void
+  onRetry?: () => void;
   /**
    * 额外操作按钮
    */
-  extra?: React.ReactNode
+  extra?: React.ReactNode;
   /**
    * 自定义类名
    */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -82,17 +82,16 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         title={title}
         subTitle={description}
         extra={
-          extra || (
-            onRetry && (
-              <Button type="primary" onClick={onRetry}>
-                {retryText}
-              </Button>
-            )
-          )
+          extra ||
+          (onRetry && (
+            <Button type="primary" onClick={onRetry}>
+              {retryText}
+            </Button>
+          ))
         }
       />
     </div>
-  )
-}
+  );
+};
 
-export default ErrorState
+export default ErrorState;

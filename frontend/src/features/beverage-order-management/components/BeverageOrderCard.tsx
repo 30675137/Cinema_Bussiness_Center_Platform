@@ -2,20 +2,20 @@
  * @spec O003-beverage-order
  * B端饮品订单卡片组件
  */
-import React from 'react'
-import { Card, Descriptions, Typography, Space, Divider } from 'antd'
-import { BeverageOrderStatusBadge } from './BeverageOrderStatusBadge'
-import { OrderActionButtons } from './OrderActionButtons'
-import type { BeverageOrderDTO } from '../../../types/beverageOrder'
+import React from 'react';
+import { Card, Descriptions, Typography, Space, Divider } from 'antd';
+import { BeverageOrderStatusBadge } from './BeverageOrderStatusBadge';
+import { OrderActionButtons } from './OrderActionButtons';
+import type { BeverageOrderDTO } from '../../../types/beverageOrder';
 
-const { Text, Title } = Typography
+const { Text, Title } = Typography;
 
 /**
  * 订单卡片组件属性
  */
 export interface BeverageOrderCardProps {
-  order: BeverageOrderDTO
-  onClick?: (order: BeverageOrderDTO) => void
+  order: BeverageOrderDTO;
+  onClick?: (order: BeverageOrderDTO) => void;
 }
 
 /**
@@ -30,17 +30,17 @@ export const BeverageOrderCard: React.FC<BeverageOrderCardProps> = ({ order, onC
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-    })
-  }
+    });
+  };
 
   const formatSpecs = (specsJson: string) => {
     try {
-      const specs = JSON.parse(specsJson)
-      return Object.values(specs).filter(Boolean).join(' · ')
+      const specs = JSON.parse(specsJson);
+      return Object.values(specs).filter(Boolean).join(' · ');
     } catch {
-      return specsJson
+      return specsJson;
     }
-  }
+  };
 
   return (
     <Card
@@ -53,7 +53,10 @@ export const BeverageOrderCard: React.FC<BeverageOrderCardProps> = ({ order, onC
       <Space direction="vertical" size="small" style={{ width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Title level={4} style={{ margin: 0 }}>
-            取餐号: <Text type="danger" style={{ fontSize: 32 }}>D{order.queueNumber || '---'}</Text>
+            取餐号:{' '}
+            <Text type="danger" style={{ fontSize: 32 }}>
+              D{order.queueNumber || '---'}
+            </Text>
           </Title>
           <Text type="secondary">{formatTime(order.createdAt)}</Text>
         </div>
@@ -110,5 +113,5 @@ export const BeverageOrderCard: React.FC<BeverageOrderCardProps> = ({ order, onC
         </div>
       </Space>
     </Card>
-  )
-}
+  );
+};

@@ -35,12 +35,12 @@ interface FormTabsProps {
 
 /**
  * 场景包编辑器多标签页布局容器
- * 
+ *
  * 功能：
  * 1. 5个标签页导航（基础信息、套餐配置、加购项、时段模板、发布设置）
  * 2. 未保存修改提示（标签页红点）
  * 3. 切换标签页时的未保存确认弹窗
- * 
+ *
  * @example
  * <FormTabs
  *   tabs={[
@@ -77,12 +77,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
           {tab.icon}
           {tab.label}
           {dirtyTabs[tab.key] && (
-            <Badge
-              dot
-              offset={[4, -2]}
-              status="warning"
-              style={{ marginLeft: 4 }}
-            />
+            <Badge dot offset={[4, -2]} status="warning" style={{ marginLeft: 4 }} />
           )}
         </span>
       ),
@@ -107,15 +102,7 @@ const FormTabs: React.FC<FormTabsProps> = ({
 
   // 错误状态
   if (error) {
-    return (
-      <Alert
-        type="error"
-        title="加载失败"
-        message={error}
-        showIcon
-        style={{ margin: 24 }}
-      />
-    );
+    return <Alert type="error" title="加载失败" message={error} showIcon style={{ margin: 24 }} />;
   }
 
   return (

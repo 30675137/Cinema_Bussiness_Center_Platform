@@ -11,7 +11,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   DragOutlined,
-  EllipsisOutlined
+  EllipsisOutlined,
 } from '@ant-design/icons';
 import { MenuItem } from '@/types/navigation';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
@@ -187,25 +187,15 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
         actions={isEditing ? [getActionButtons()] : undefined}
       >
         <List.Item.Meta
-          avatar={
-            <div className="favorite-item-icon">
-              {getMenuIcon(item.icon)}
-            </div>
-          }
+          avatar={<div className="favorite-item-icon">{getMenuIcon(item.icon)}</div>}
           title={
             <div className="favorite-item-title">
               <span className="title-text">{item.title}</span>
-              {isFavorite(item.id) && (
-                <StarFilled className="favorite-indicator" />
-              )}
+              {isFavorite(item.id) && <StarFilled className="favorite-indicator" />}
             </div>
           }
           description={
-            item.description && (
-              <div className="favorite-item-description">
-                {item.description}
-              </div>
-            )
+            item.description && <div className="favorite-item-description">{item.description}</div>
           }
         />
       </List.Item>
@@ -229,26 +219,18 @@ const FavoriteItem: React.FC<FavoriteItemProps> = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        cover={
-          <div className="favorite-item-cover">
-            {getMenuIcon(item.icon)}
-          </div>
-        }
+        cover={<div className="favorite-item-cover">{getMenuIcon(item.icon)}</div>}
         extra={isEditing ? getActionButtons() : undefined}
       >
         <Card.Meta
           title={
             <div className="favorite-item-title">
               <span className="title-text">{item.title}</span>
-              {isFavorite(item.id) && (
-                <StarFilled className="favorite-indicator" />
-              )}
+              {isFavorite(item.id) && <StarFilled className="favorite-indicator" />}
             </div>
           }
           description={
-            <div className="favorite-item-description">
-              {item.description || '暂无描述'}
-            </div>
+            <div className="favorite-item-description">{item.description || '暂无描述'}</div>
           }
         />
       </Card>

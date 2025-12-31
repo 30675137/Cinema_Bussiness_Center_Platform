@@ -124,8 +124,8 @@ class MockDataGenerator {
   // 生成商品SKU数据
   private generateProducts(count: number): ProductSKU[] {
     const products: ProductSKU[] = [];
-    const categoryNames = this.categories.map(c => c.name);
-    const brandNames = this.brands.map(b => b.name);
+    const categoryNames = this.categories.map((c) => c.name);
+    const brandNames = this.brands.map((b) => b.name);
     const specifications = ['小包装', '中包装', '大包装', '标准装', '礼盒装'];
     const units = ['个', '瓶', '罐', '袋', '盒', '箱', '套', '双'];
 
@@ -143,7 +143,9 @@ class MockDataGenerator {
         categoryId: category.id,
         categoryName: category.name,
         subcategoryId: category.parentId,
-        subcategoryName: category.parentId ? this.categories.find(c => c.id === category.parentId)?.name : undefined,
+        subcategoryName: category.parentId
+          ? this.categories.find((c) => c.id === category.parentId)?.name
+          : undefined,
         brandId: brand.id,
         brandName: brand.name,
         specification,
@@ -225,7 +227,14 @@ class MockDataGenerator {
   // 生成库存流水数据
   generateInventoryMovements(count: number = 500): InventoryMovement[] {
     const movements: InventoryMovement[] = [];
-    const movementTypes = ['in', 'out', 'transfer_in', 'transfer_out', 'adjust_positive', 'adjust_negative'] as const;
+    const movementTypes = [
+      'in',
+      'out',
+      'transfer_in',
+      'transfer_out',
+      'adjust_positive',
+      'adjust_negative',
+    ] as const;
     const movementSubtypes = {
       in: ['采购入库', '退货入库', '调拨入库', '盘盈'],
       out: ['销售出库', '报损出库', '调拨出库', '盘亏'],
@@ -252,9 +261,10 @@ class MockDataGenerator {
       const location = this.locations[Math.floor(Math.random() * this.locations.length)];
       const product = this.products[Math.floor(Math.random() * this.products.length)];
 
-      const quantity = movementType.includes('in') || movementType.includes('positive')
-        ? Math.floor(Math.random() * 100) + 1
-        : -(Math.floor(Math.random() * 100) + 1);
+      const quantity =
+        movementType.includes('in') || movementType.includes('positive')
+          ? Math.floor(Math.random() * 100) + 1
+          : -(Math.floor(Math.random() * 100) + 1);
 
       movements.push({
         id: `movement_${Date.now()}_${String(i).padStart(6, '0')}`,
@@ -282,13 +292,21 @@ class MockDataGenerator {
       });
     }
 
-    return movements.sort((a, b) => new Date(b.operationTime).getTime() - new Date(a.operationTime).getTime());
+    return movements.sort(
+      (a, b) => new Date(b.operationTime).getTime() - new Date(a.operationTime).getTime()
+    );
   }
 
   // 生成库存调整记录
   generateInventoryAdjustments(count: number = 100): InventoryAdjustment[] {
     const adjustments: InventoryAdjustment[] = [];
-    const adjustmentTypes = ['stocktaking_profit', 'stocktaking_loss', 'damage', 'expired', 'other'] as const;
+    const adjustmentTypes = [
+      'stocktaking_profit',
+      'stocktaking_loss',
+      'damage',
+      'expired',
+      'other',
+    ] as const;
     const reasons = {
       stocktaking_profit: '盘盈发现',
       stocktaking_loss: '盘亏损失',
@@ -322,11 +340,17 @@ class MockDataGenerator {
         adjustedQuantity: adjustmentType.includes('profit')
           ? originalQuantity + adjustmentQuantity
           : originalQuantity - adjustmentQuantity,
-        adjustmentQuantity: adjustmentType.includes('profit') ? adjustmentQuantity : -adjustmentQuantity,
+        adjustmentQuantity: adjustmentType.includes('profit')
+          ? adjustmentQuantity
+          : -adjustmentQuantity,
         requestUserId: `user_${Math.floor(Math.random() * 4) + 1}`,
         requestUserName: operator,
-        approveUserId: status !== 'pending' ? `user_${Math.floor(Math.random() * 4) + 5}` : undefined,
-        approveUserName: status !== 'pending' ? operators[Math.floor(Math.random() * operators.length)] : undefined,
+        approveUserId:
+          status !== 'pending' ? `user_${Math.floor(Math.random() * 4) + 5}` : undefined,
+        approveUserName:
+          status !== 'pending'
+            ? operators[Math.floor(Math.random() * operators.length)]
+            : undefined,
         approveTime: status !== 'pending' ? this.getRandomDate(-7, -1) : undefined,
         status,
         reason: reasons[adjustmentType],
@@ -337,7 +361,9 @@ class MockDataGenerator {
       });
     }
 
-    return adjustments.sort((a, b) => new Date(b.requestTime).getTime() - new Date(a.requestTime).getTime());
+    return adjustments.sort(
+      (a, b) => new Date(b.requestTime).getTime() - new Date(a.requestTime).getTime()
+    );
   }
 
   // 生成统计数据
@@ -345,13 +371,16 @@ class MockDataGenerator {
     const ledger = this.generateInventoryLedger(200);
 
     const totalItems = ledger.length;
-    const lowStockItems = ledger.filter(item => item.stockStatus === 'low').length;
-    const outOfStockItems = ledger.filter(item => item.stockStatus === 'out_of_stock').length;
+    const lowStockItems = ledger.filter((item) => item.stockStatus === 'low').length;
+    const outOfStockItems = ledger.filter((item) => item.stockStatus === 'out_of_stock').length;
     const totalQuantity = ledger.reduce((sum, item) => sum + item.physicalQuantity, 0);
     const reservedQuantity = ledger.reduce((sum, item) => sum + item.reservedQuantity, 0);
     const availableQuantity = ledger.reduce((sum, item) => sum + item.availableQuantity, 0);
     const inTransitQuantity = ledger.reduce((sum, item) => sum + item.inTransitQuantity, 0);
-    const totalValue = ledger.reduce((sum, item) => sum + (item.physicalQuantity * (item.sellingPrice || 10)), 0);
+    const totalValue = ledger.reduce(
+      (sum, item) => sum + item.physicalQuantity * (item.sellingPrice || 10),
+      0
+    );
 
     return {
       totalItems,
@@ -369,35 +398,35 @@ class MockDataGenerator {
   // 生成库存调整数据
   generateInventoryAdjustments(count: number = 50): InventoryAdjustment[] {
     const adjustments: InventoryAdjustment[] = [];
-    const statuses: InventoryAdjustment['status'][] = ['pending', 'approved', 'rejected', 'completed'];
+    const statuses: InventoryAdjustment['status'][] = [
+      'pending',
+      'approved',
+      'rejected',
+      'completed',
+    ];
     const adjustmentTypes = [
-      'stocktaking_profit', 'stocktaking_loss', 'damage', 'expired', 'other'
+      'stocktaking_profit',
+      'stocktaking_loss',
+      'damage',
+      'expired',
+      'other',
     ];
 
-    const requesters = [
-      '张三', '李四', '王五', '赵六', '陈七', '刘八', '周九', '吴十'
-    ];
+    const requesters = ['张三', '李四', '王五', '赵六', '陈七', '刘八', '周九', '吴十'];
 
-    const approvers = [
-      '管理员A', '管理员B', '主管C', '经理D'
-    ];
+    const approvers = ['管理员A', '管理员B', '主管C', '经理D'];
 
     const reasons = {
       stocktaking_profit: [
-        '盘点错误导致数量不符', '收货时漏记入库', '系统数据异常', '其他盘盈原因'
+        '盘点错误导致数量不符',
+        '收货时漏记入库',
+        '系统数据异常',
+        '其他盘盈原因',
       ],
-      stocktaking_loss: [
-        '盘点错误导致数量不符', '发货时多发货物', '货物被盗', '其他盘亏原因'
-      ],
-      damage: [
-        '运输过程中损坏', '存储环境不当', '包装破损导致', '商品质量问题'
-      ],
-      expired: [
-        '食品超过保质期', '药品超过有效期', '化妆品超过保质期', '其他类型商品过期'
-      ],
-      other: [
-        '系统数据调账', '基础数据修正', '业务需求调整', '其他库存调整'
-      ]
+      stocktaking_loss: ['盘点错误导致数量不符', '发货时多发货物', '货物被盗', '其他盘亏原因'],
+      damage: ['运输过程中损坏', '存储环境不当', '包装破损导致', '商品质量问题'],
+      expired: ['食品超过保质期', '药品超过有效期', '化妆品超过保质期', '其他类型商品过期'],
+      other: ['系统数据调账', '基础数据修正', '业务需求调整', '其他库存调整'],
     };
 
     for (let i = 1; i <= count; i++) {
@@ -459,14 +488,16 @@ class MockDataGenerator {
     }
 
     // 按申请时间倒序排列
-    return adjustments.sort((a, b) =>
-      new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
+    return adjustments.sort(
+      (a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime()
     );
   }
 
   private getRandomDate(daysAgo: number, daysMax: number = 0): string {
     const date = new Date();
-    const pastDate = new Date(date.getTime() - (Math.random() * (Math.abs(daysAgo) - daysMax) * 24 * 60 * 60 * 1000));
+    const pastDate = new Date(
+      date.getTime() - Math.random() * (Math.abs(daysAgo) - daysMax) * 24 * 60 * 60 * 1000
+    );
     return pastDate.toISOString();
   }
 
@@ -523,7 +554,7 @@ export class InventoryMockService {
 
   // 模拟延迟
   private async delay(ms: number = 300): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // 库存台账相关API
@@ -539,7 +570,7 @@ export class InventoryMockService {
     const allData = this.mockInventory;
 
     // 应用筛选
-    let filteredData = allData.filter(item => {
+    let filteredData = allData.filter((item) => {
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
         return (
@@ -626,7 +657,7 @@ export class InventoryMockService {
     await this.delay();
 
     const allData = this.mockInventory;
-    const item = allData.find(item => item.id === id);
+    const item = allData.find((item) => item.id === id);
 
     if (!item) {
       throw new Error(`库存台账记录不存在: ${id}`);
@@ -652,14 +683,16 @@ export class InventoryMockService {
     const allData = this.mockMovements();
 
     // 应用筛选
-    let filteredData = allData.filter(item => {
+    let filteredData = allData.filter((item) => {
       // 关键字搜索
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
-        if (!item.sku.toLowerCase().includes(keyword) &&
-            !item.productName.toLowerCase().includes(keyword) &&
-            !item.locationName.toLowerCase().includes(keyword) &&
-            !item.operatorName.toLowerCase().includes(keyword)) {
+        if (
+          !item.sku.toLowerCase().includes(keyword) &&
+          !item.productName.toLowerCase().includes(keyword) &&
+          !item.locationName.toLowerCase().includes(keyword) &&
+          !item.operatorName.toLowerCase().includes(keyword)
+        ) {
           return false;
         }
       }
@@ -802,7 +835,7 @@ export class InventoryMockService {
     const allData = this.generator.generateInventoryAdjustments();
 
     // 应用筛选
-    let filteredData = allData.filter(item => {
+    let filteredData = allData.filter((item) => {
       if (filters.status && item.status !== filters.status) {
         return false;
       }
@@ -898,11 +931,7 @@ export class InventoryMockService {
     };
   }
 
-  async adjustStock(
-    itemId: string,
-    quantity: number,
-    reason: string
-  ): Promise<ApiResponse<void>> {
+  async adjustStock(itemId: string, quantity: number, reason: string): Promise<ApiResponse<void>> {
     await this.delay(500); // 模拟API调用延迟
 
     // 模拟库存调整逻辑
@@ -935,7 +964,7 @@ export class InventoryMockService {
 
     const allLocations = this.generator.getLocations();
     const filteredLocations = type
-      ? allLocations.filter(location => location.type === type)
+      ? allLocations.filter((location) => location.type === type)
       : allLocations;
 
     return {
@@ -966,24 +995,23 @@ export class InventoryMockService {
   }
 
   // 导出功能
-  async exportInventoryLedger(
-    filters?: InventoryLedgerFilters,
-    columns?: string[]
-  ): Promise<Blob> {
+  async exportInventoryLedger(filters?: InventoryLedgerFilters, columns?: string[]): Promise<Blob> {
     await this.delay(1000);
 
     // 模拟生成Excel文件
     const csvContent = this.generateCSV(
       ['ID', 'SKU', '商品名称', '仓库', '现存库存', '可用库存', '库存状态'],
-      this.mockInventory.slice(0, 50).map(item => [
-        item.id,
-        item.sku,
-        item.productName,
-        item.locationName,
-        item.physicalQuantity.toString(),
-        item.availableQuantity.toString(),
-        item.stockStatus,
-      ])
+      this.mockInventory
+        .slice(0, 50)
+        .map((item) => [
+          item.id,
+          item.sku,
+          item.productName,
+          item.locationName,
+          item.physicalQuantity.toString(),
+          item.availableQuantity.toString(),
+          item.stockStatus,
+        ])
     );
 
     return new Blob([csvContent], { type: 'text/csv' });
@@ -1001,7 +1029,7 @@ export class InventoryMockService {
       current: 1,
       pageSize: 10000, // 导出大量数据
       filters,
-      sort: { sortBy: 'operationTime', sortOrder: 'desc' } as SortParams
+      sort: { sortBy: 'operationTime', sortOrder: 'desc' } as SortParams,
     };
 
     const response = await this.getInventoryMovements(params);
@@ -1009,12 +1037,27 @@ export class InventoryMockService {
 
     // 生成CSV内容
     const headers = [
-      'ID', 'SKU', '商品名称', '商品类别', '仓库', '变动类型', '变动子类型',
-      '变动数量', '变动前余额', '变动后余额', '成本价', '总价值',
-      '单据类型', '单据号', '操作员', '操作时间', '状态', '备注'
+      'ID',
+      'SKU',
+      '商品名称',
+      '商品类别',
+      '仓库',
+      '变动类型',
+      '变动子类型',
+      '变动数量',
+      '变动前余额',
+      '变动后余额',
+      '成本价',
+      '总价值',
+      '单据类型',
+      '单据号',
+      '操作员',
+      '操作时间',
+      '状态',
+      '备注',
     ];
 
-    const rows = movements.map(item => [
+    const rows = movements.map((item) => [
       item.id,
       item.sku,
       item.productName,
@@ -1032,18 +1075,16 @@ export class InventoryMockService {
       item.operatorName,
       item.operationTime,
       item.status,
-      item.remark || ''
+      item.remark || '',
     ]);
 
     return new Blob(['\ufeff' + this.generateCSV(headers, rows)], {
-      type: 'text/csv;charset=utf-8'
+      type: 'text/csv;charset=utf-8',
     });
   }
 
   // 生成流水数据统计
-  async getMovementsStatistics(
-    filters?: InventoryMovementFilters
-  ): Promise<{
+  async getMovementsStatistics(filters?: InventoryMovementFilters): Promise<{
     totalMovements: number;
     inboundMovements: number;
     outboundMovements: number;
@@ -1059,35 +1100,35 @@ export class InventoryMockService {
     const params = {
       current: 1,
       pageSize: 10000,
-      filters
+      filters,
     };
 
     const response = await this.getInventoryMovements(params);
     const movements = response.data;
 
-    const inboundMovements = movements.filter(m =>
+    const inboundMovements = movements.filter((m) =>
       ['in', 'transfer_in', 'adjust_positive'].includes(m.movementType)
     ).length;
 
-    const outboundMovements = movements.filter(m =>
+    const outboundMovements = movements.filter((m) =>
       ['out', 'transfer_out', 'adjust_negative'].includes(m.movementType)
     ).length;
 
-    const transferMovements = movements.filter(m =>
+    const transferMovements = movements.filter((m) =>
       ['transfer_in', 'transfer_out'].includes(m.movementType)
     ).length;
 
-    const adjustmentMovements = movements.filter(m =>
+    const adjustmentMovements = movements.filter((m) =>
       ['adjust_positive', 'adjust_negative'].includes(m.movementType)
     ).length;
 
     const totalQuantity = movements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
     const inboundQuantity = movements
-      .filter(m => m.quantity > 0)
+      .filter((m) => m.quantity > 0)
       .reduce((sum, m) => sum + m.quantity, 0);
-    const outboundQuantity = Math.abs(movements
-      .filter(m => m.quantity < 0)
-      .reduce((sum, m) => sum + m.quantity, 0));
+    const outboundQuantity = Math.abs(
+      movements.filter((m) => m.quantity < 0).reduce((sum, m) => sum + m.quantity, 0)
+    );
 
     const recentMovements = movements
       .sort((a, b) => new Date(b.operationTime).getTime() - new Date(a.operationTime).getTime())
@@ -1102,16 +1143,14 @@ export class InventoryMockService {
       totalQuantity,
       inboundQuantity,
       outboundQuantity,
-      recentMovements
+      recentMovements,
     };
   }
 
   // ==================== 库存调整相关API ====================
 
   // 获取库存调整记录
-  async getInventoryAdjustments(
-    queryParams: QueryParams
-  ): Promise<{
+  async getInventoryAdjustments(queryParams: QueryParams): Promise<{
     data: InventoryAdjustment[];
     total: number;
     current: number;
@@ -1150,7 +1189,10 @@ export class InventoryMockService {
 
   // 创建库存调整申请
   async createAdjustment(
-    adjustmentData: Omit<InventoryAdjustment, 'id' | 'adjustmentNo' | 'approvedAt' | 'completedAt' | 'approvedBy'>
+    adjustmentData: Omit<
+      InventoryAdjustment,
+      'id' | 'adjustmentNo' | 'approvedAt' | 'completedAt' | 'approvedBy'
+    >
   ): Promise<InventoryAdjustment> {
     await this.delay(800);
 
@@ -1180,7 +1222,7 @@ export class InventoryMockService {
   ): Promise<InventoryAdjustment> {
     await this.delay(600);
 
-    const adjustment = this.mockAdjustments.find(adj => adj.id === id);
+    const adjustment = this.mockAdjustments.find((adj) => adj.id === id);
     if (!adjustment) {
       throw new Error('调整记录不存在');
     }
@@ -1207,7 +1249,7 @@ export class InventoryMockService {
   async executeAdjustment(id: string): Promise<InventoryAdjustment> {
     await this.delay(1000);
 
-    const adjustment = this.mockAdjustments.find(adj => adj.id === id);
+    const adjustment = this.mockAdjustments.find((adj) => adj.id === id);
     if (!adjustment) {
       throw new Error('调整记录不存在');
     }
@@ -1217,8 +1259,8 @@ export class InventoryMockService {
     }
 
     // 更新库存台账
-    const ledgerItem = this.mockInventory.find(item =>
-      item.sku === adjustment.sku && item.locationId === adjustment.locationId
+    const ledgerItem = this.mockInventory.find(
+      (item) => item.sku === adjustment.sku && item.locationId === adjustment.locationId
     );
 
     if (!ledgerItem) {
@@ -1257,9 +1299,7 @@ export class InventoryMockService {
   }
 
   // 获取调整统计信息
-  async getAdjustmentStatistics(
-    filters?: InventoryAdjustmentFilters
-  ): Promise<{
+  async getAdjustmentStatistics(filters?: InventoryAdjustmentFilters): Promise<{
     totalApplications: number;
     pendingApplications: number;
     approvedApplications: number;
@@ -1276,19 +1316,22 @@ export class InventoryMockService {
     const response = await this.getInventoryAdjustments({
       filters,
       sort: { sortBy: 'requestedAt', sortOrder: 'desc' },
-      pagination: { current: 1, pageSize: 10000 }
+      pagination: { current: 1, pageSize: 10000 },
     });
 
     const applications = response.data;
     const totalApplications = applications.length;
-    const pendingApplications = applications.filter(item => item.status === 'pending').length;
-    const approvedApplications = applications.filter(item => item.status === 'approved').length;
-    const rejectedApplications = applications.filter(item => item.status === 'rejected').length;
-    const completedApplications = applications.filter(item => item.status === 'completed').length;
+    const pendingApplications = applications.filter((item) => item.status === 'pending').length;
+    const approvedApplications = applications.filter((item) => item.status === 'approved').length;
+    const rejectedApplications = applications.filter((item) => item.status === 'rejected').length;
+    const completedApplications = applications.filter((item) => item.status === 'completed').length;
 
-    const totalAdjustmentQuantity = applications.reduce((sum, item) => sum + Math.abs(item.adjustmentQuantity), 0);
-    const positiveAdjustments = applications.filter(item => item.adjustmentQuantity > 0).length;
-    const negativeAdjustments = applications.filter(item => item.adjustmentQuantity < 0).length;
+    const totalAdjustmentQuantity = applications.reduce(
+      (sum, item) => sum + Math.abs(item.adjustmentQuantity),
+      0
+    );
+    const positiveAdjustments = applications.filter((item) => item.adjustmentQuantity > 0).length;
+    const negativeAdjustments = applications.filter((item) => item.adjustmentQuantity < 0).length;
 
     return {
       totalApplications,
@@ -1299,8 +1342,10 @@ export class InventoryMockService {
       totalAdjustmentQuantity,
       positiveAdjustments,
       negativeAdjustments,
-      pendingRate: totalApplications > 0 ? (pendingApplications / totalApplications * 100).toFixed(1) : '0',
-      approvedRate: totalApplications > 0 ? (approvedApplications / totalApplications * 100).toFixed(1) : '0',
+      pendingRate:
+        totalApplications > 0 ? ((pendingApplications / totalApplications) * 100).toFixed(1) : '0',
+      approvedRate:
+        totalApplications > 0 ? ((approvedApplications / totalApplications) * 100).toFixed(1) : '0',
     };
   }
 
@@ -1311,14 +1356,17 @@ export class InventoryMockService {
     adjustments: InventoryAdjustment[],
     filters: InventoryAdjustmentFilters
   ): InventoryAdjustment[] {
-    return adjustments.filter(adjustment => {
+    return adjustments.filter((adjustment) => {
       // SKU筛选
       if (filters.sku && !adjustment.sku.toLowerCase().includes(filters.sku.toLowerCase())) {
         return false;
       }
 
       // 商品名称筛选
-      if (filters.productName && !adjustment.productName.toLowerCase().includes(filters.productName.toLowerCase())) {
+      if (
+        filters.productName &&
+        !adjustment.productName.toLowerCase().includes(filters.productName.toLowerCase())
+      ) {
         return false;
       }
 
@@ -1338,7 +1386,10 @@ export class InventoryMockService {
       }
 
       // 申请人筛选
-      if (filters.requestedBy && !adjustment.requestedBy.toLowerCase().includes(filters.requestedBy.toLowerCase())) {
+      if (
+        filters.requestedBy &&
+        !adjustment.requestedBy.toLowerCase().includes(filters.requestedBy.toLowerCase())
+      ) {
         return false;
       }
 
@@ -1428,7 +1479,10 @@ export class InventoryMockService {
   }
 
   // 创建拒绝流水
-  private async createRejectionMovement(adjustment: InventoryAdjustment, remark?: string): Promise<void> {
+  private async createRejectionMovement(
+    adjustment: InventoryAdjustment,
+    remark?: string
+  ): Promise<void> {
     const now = new Date().toISOString();
     const movement: InventoryMovement = {
       id: `MOV${Date.now()}`,
@@ -1463,7 +1517,10 @@ export class InventoryMockService {
   }
 
   // 创建执行流水
-  private async createExecutionMovement(adjustment: InventoryAdjustment, oldQuantity: number): Promise<void> {
+  private async createExecutionMovement(
+    adjustment: InventoryAdjustment,
+    oldQuantity: number
+  ): Promise<void> {
     const now = new Date().toISOString();
     const movement: InventoryMovement = {
       id: `MOV${Date.now()}`,
@@ -1505,7 +1562,7 @@ export class InventoryMockService {
   private generateCSV(headers: string[], rows: string[][]): string {
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
     ].join('\n');
 
     return '\ufeff' + csvContent; // 添加BOM以支持中文

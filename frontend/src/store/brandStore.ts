@@ -1,39 +1,39 @@
-import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
-import { BrandItem, BrandStatus, LoadingState } from '@/types/brand'
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { BrandItem, BrandStatus, LoadingState } from '@/types/brand';
 
 interface BrandSlice {
   // 数据状态
-  brands: BrandItem[]
-  currentBrand: BrandItem | null
+  brands: BrandItem[];
+  currentBrand: BrandItem | null;
 
   // 查询状态
-  selectedStatus?: BrandStatus
-  keyword?: string
+  selectedStatus?: BrandStatus;
+  keyword?: string;
 
   // UI 状态
-  loadingState: LoadingState
-  createModalVisible: boolean
-  editModalVisible: boolean
+  loadingState: LoadingState;
+  createModalVisible: boolean;
+  editModalVisible: boolean;
 
   // 错误状态
-  error: string | null
+  error: string | null;
 
   // Actions
-  setBrands: (brands: BrandItem[]) => void
-  setCurrentBrand: (brand: BrandItem | null) => void
-  setSelectedStatus: (status?: BrandStatus) => void
-  setKeyword: (keyword?: string) => void
-  setLoadingState: (state: LoadingState) => void
-  setCreateModalVisible: (visible: boolean) => void
-  setEditModalVisible: (visible: boolean) => void
-  setError: (error: string | null) => void
+  setBrands: (brands: BrandItem[]) => void;
+  setCurrentBrand: (brand: BrandItem | null) => void;
+  setSelectedStatus: (status?: BrandStatus) => void;
+  setKeyword: (keyword?: string) => void;
+  setLoadingState: (state: LoadingState) => void;
+  setCreateModalVisible: (visible: boolean) => void;
+  setEditModalVisible: (visible: boolean) => void;
+  setError: (error: string | null) => void;
 
   // 复合操作
-  addBrand: (brand: BrandItem) => void
-  updateBrand: (id: string, updates: Partial<BrandItem>) => void
-  removeBrand: (id: string) => void
-  reset: () => void
+  addBrand: (brand: BrandItem) => void;
+  updateBrand: (id: string, updates: Partial<BrandItem>) => void;
+  removeBrand: (id: string) => void;
+  reset: () => void;
 }
 
 export const useBrandStore = create<BrandSlice>()(
@@ -60,39 +60,42 @@ export const useBrandStore = create<BrandSlice>()(
       setError: (error) => set({ error }),
 
       // 复合操作
-      addBrand: (brand) => set((state) => ({
-        brands: [brand, ...state.brands],
-      })),
+      addBrand: (brand) =>
+        set((state) => ({
+          brands: [brand, ...state.brands],
+        })),
 
-      updateBrand: (id, updates) => set((state) => ({
-        brands: state.brands.map(brand =>
-          brand.id === id
-            ? { ...brand, ...updates, updatedAt: new Date().toISOString() }
-            : brand
-        ),
-        currentBrand: state.currentBrand?.id === id
-          ? { ...state.currentBrand, ...updates, updatedAt: new Date().toISOString() }
-          : state.currentBrand,
-      })),
+      updateBrand: (id, updates) =>
+        set((state) => ({
+          brands: state.brands.map((brand) =>
+            brand.id === id ? { ...brand, ...updates, updatedAt: new Date().toISOString() } : brand
+          ),
+          currentBrand:
+            state.currentBrand?.id === id
+              ? { ...state.currentBrand, ...updates, updatedAt: new Date().toISOString() }
+              : state.currentBrand,
+        })),
 
-      removeBrand: (id) => set((state) => ({
-        brands: state.brands.filter(brand => brand.id !== id),
-        currentBrand: state.currentBrand?.id === id ? null : state.currentBrand,
-      })),
+      removeBrand: (id) =>
+        set((state) => ({
+          brands: state.brands.filter((brand) => brand.id !== id),
+          currentBrand: state.currentBrand?.id === id ? null : state.currentBrand,
+        })),
 
-      reset: () => set({
-        brands: [],
-        currentBrand: null,
-        selectedStatus: undefined,
-        keyword: undefined,
-        loadingState: 'idle',
-        createModalVisible: false,
-        editModalVisible: false,
-        error: null,
-      }),
+      reset: () =>
+        set({
+          brands: [],
+          currentBrand: null,
+          selectedStatus: undefined,
+          keyword: undefined,
+          loadingState: 'idle',
+          createModalVisible: false,
+          editModalVisible: false,
+          error: null,
+        }),
     }),
     {
       name: 'brand-store',
     }
   )
-)
+);

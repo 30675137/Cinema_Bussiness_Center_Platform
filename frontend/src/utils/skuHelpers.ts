@@ -85,15 +85,15 @@ export const validateBarcodeFormat = (barcode: string): { valid: boolean; messag
   if (!barcode) {
     return { valid: false, message: '条码不能为空' };
   }
-  
+
   if (barcode.length < 8 || barcode.length > 20) {
     return { valid: false, message: '条码长度必须在8-20位之间' };
   }
-  
+
   if (!/^[0-9A-Za-z]+$/.test(barcode)) {
     return { valid: false, message: '条码只能包含数字和字母' };
   }
-  
+
   return { valid: true };
 };
 
@@ -104,11 +104,11 @@ export const validateConversionRate = (rate: number): { valid: boolean; message?
   if (!rate || rate <= 0) {
     return { valid: false, message: '换算关系必须大于0' };
   }
-  
+
   if (!Number.isInteger(rate)) {
     return { valid: false, message: '换算关系必须是整数' };
   }
-  
+
   return { valid: true };
 };
 
@@ -127,4 +127,3 @@ export const formatSkuUpdatedTime = (sku: SKU): string => {
   if (!sku.updatedAt) return '-';
   return new Date(sku.updatedAt).toLocaleString('zh-CN');
 };
-

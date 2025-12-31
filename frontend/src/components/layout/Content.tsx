@@ -1,22 +1,17 @@
-import React from 'react'
-import { Layout } from 'antd'
-import { Breadcrumb } from '@/components/common/Breadcrumb'
+import React from 'react';
+import { Layout } from 'antd';
+import { Breadcrumb } from '@/components/common/Breadcrumb';
 
-const { Content } = Layout
+const { Content } = Layout;
 
 interface ContentProps {
-  children: React.ReactNode
-  title?: string
-  breadcrumb?: Array<{ title: string; path?: string }>
-  extra?: React.ReactNode
+  children: React.ReactNode;
+  title?: string;
+  breadcrumb?: Array<{ title: string; path?: string }>;
+  extra?: React.ReactNode;
 }
 
-const ContentLayout: React.FC<ContentProps> = ({
-  children,
-  title,
-  breadcrumb,
-  extra
-}) => {
+const ContentLayout: React.FC<ContentProps> = ({ children, title, breadcrumb, extra }) => {
   return (
     <Layout style={{ marginLeft: 256, minHeight: '100vh' }}>
       <Content
@@ -40,21 +35,10 @@ const ContentLayout: React.FC<ContentProps> = ({
             }}
           >
             <div>
-              {breadcrumb && (
-                <Breadcrumb
-                  items={breadcrumb}
-                  style={{ marginBottom: '8px' }}
-                />
-              )}
-              <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
-                {title}
-              </h1>
+              {breadcrumb && <Breadcrumb items={breadcrumb} style={{ marginBottom: '8px' }} />}
+              <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>{title}</h1>
             </div>
-            {extra && (
-              <div>
-                {extra}
-              </div>
-            )}
+            {extra && <div>{extra}</div>}
           </div>
         )}
 
@@ -70,7 +54,7 @@ const ContentLayout: React.FC<ContentProps> = ({
         </div>
       </Content>
     </Layout>
-  )
-}
+  );
+};
 
-export default ContentLayout
+export default ContentLayout;

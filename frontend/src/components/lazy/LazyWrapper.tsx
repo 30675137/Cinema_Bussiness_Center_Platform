@@ -49,9 +49,9 @@ class LazyErrorBoundary extends React.Component<
 
   handleRetry = () => {
     if (this.state.retryAttempts < this.props.retryCount) {
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         hasError: false,
-        retryAttempts: prevState.retryAttempts + 1
+        retryAttempts: prevState.retryAttempts + 1,
       }));
 
       setTimeout(() => {
@@ -64,24 +64,26 @@ class LazyErrorBoundary extends React.Component<
     if (this.state.hasError) {
       const canRetry = this.state.retryAttempts < this.props.retryCount;
 
-      return this.props.fallback || (
-        <Result
-          status="error"
-          title="组件加载失败"
-          subTitle={`重试次数: ${this.state.retryAttempts}/${this.props.retryCount}`}
-          extra={
-            canRetry && (
-              <button
-                onClick={this.handleRetry}
-                className={cn(
-                  'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200'
-                )}
-              >
-                重试加载
-              </button>
-            )
-          }
-        />
+      return (
+        this.props.fallback || (
+          <Result
+            status="error"
+            title="组件加载失败"
+            subTitle={`重试次数: ${this.state.retryAttempts}/${this.props.retryCount}`}
+            extra={
+              canRetry && (
+                <button
+                  onClick={this.handleRetry}
+                  className={cn(
+                    'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200'
+                  )}
+                >
+                  重试加载
+                </button>
+              )
+            }
+          />
+        )
       );
     }
 
@@ -93,10 +95,7 @@ class LazyErrorBoundary extends React.Component<
  * 默认加载组件
  */
 const DefaultFallback = () => (
-  <div className={cn(
-    'flex items-center justify-center p-8',
-    tailwindPreset('min-h-screen')
-  )}>
+  <div className={cn('flex items-center justify-center p-8', tailwindPreset('min-h-screen'))}>
     <Spin
       size="large"
       indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
@@ -110,7 +109,7 @@ const DefaultFallback = () => (
  */
 const SkeletonLoader = ({
   type = 'text',
-  rows = 3
+  rows = 3,
 }: {
   type?: 'text' | 'input' | 'button' | 'avatar' | 'image' | 'list';
   rows?: number;
@@ -151,11 +150,7 @@ const SkeletonLoader = ({
     }
   };
 
-  return (
-    <div className={cn('p-4', tailwindPreset('loading'))}>
-      {renderSkeleton()}
-    </div>
-  );
+  return <div className={cn('p-4', tailwindPreset('loading'))}>{renderSkeleton()}</div>;
 };
 
 /**
@@ -207,9 +202,7 @@ export const LazyWrapper: React.FC<{
         console.log('Retrying to load lazy component...');
       }}
     >
-      <Suspense fallback={loadingFallback}>
-        {children}
-      </Suspense>
+      <Suspense fallback={loadingFallback}>{children}</Suspense>
     </LazyErrorBoundary>
   );
 };

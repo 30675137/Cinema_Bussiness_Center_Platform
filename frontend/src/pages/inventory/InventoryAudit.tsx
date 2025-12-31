@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Row, Col, Statistic, Empty, Typography, Space, Badge, Alert, Table, Tag } from 'antd';
+import {
+  Card,
+  Tabs,
+  Row,
+  Col,
+  Statistic,
+  Empty,
+  Typography,
+  Space,
+  Badge,
+  Alert,
+  Table,
+  Tag,
+} from 'antd';
 import {
   AuditOutlined,
   FileSearchOutlined,
@@ -32,12 +45,12 @@ const InventoryAudit: React.FC = () => {
       width: 120,
       render: (type: string) => {
         const colorMap: Record<string, string> = {
-          '入库': 'green',
-          '出库': 'blue',
-          '调拨': 'purple',
-          '盘点': 'orange',
-          '报损': 'red',
-          '退库': 'gold',
+          入库: 'green',
+          出库: 'blue',
+          调拨: 'purple',
+          盘点: 'orange',
+          报损: 'red',
+          退库: 'gold',
         };
         return <Tag color={colorMap[type] || 'default'}>{type}</Tag>;
       },
@@ -54,10 +67,12 @@ const InventoryAudit: React.FC = () => {
       key: 'quantity',
       width: 120,
       render: (quantity: number) => (
-        <span style={{ 
-          color: quantity > 0 ? '#52c41a' : '#ff4d4f',
-          fontWeight: 'bold'
-        }}>
+        <span
+          style={{
+            color: quantity > 0 ? '#52c41a' : '#ff4d4f',
+            fontWeight: 'bold',
+          }}
+        >
           {quantity > 0 ? `+${quantity}` : quantity}
         </span>
       ),
@@ -81,9 +96,9 @@ const InventoryAudit: React.FC = () => {
       width: 100,
       render: (status: string) => {
         const config: Record<string, { color: string; icon: React.ReactNode }> = {
-          '正常': { color: 'success', icon: <CheckCircleOutlined /> },
-          '异常': { color: 'error', icon: <WarningOutlined /> },
-          '待审核': { color: 'warning', icon: <ClockCircleOutlined /> },
+          正常: { color: 'success', icon: <CheckCircleOutlined /> },
+          异常: { color: 'error', icon: <WarningOutlined /> },
+          待审核: { color: 'warning', icon: <ClockCircleOutlined /> },
         };
         return (
           <Tag color={config[status]?.color || 'default'} icon={config[status]?.icon}>
@@ -226,11 +241,7 @@ const InventoryAudit: React.FC = () => {
           <Card title="审计功能" style={{ marginBottom: 16 }}>
             <Row gutter={[16, 16]}>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -254,11 +265,7 @@ const InventoryAudit: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -282,11 +289,7 @@ const InventoryAudit: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,
@@ -310,11 +313,7 @@ const InventoryAudit: React.FC = () => {
                 </Card>
               </Col>
               <Col span={6}>
-                <Card
-                  hoverable
-                  style={{ textAlign: 'center' }}
-                  bodyStyle={{ padding: '24px' }}
-                >
+                <Card hoverable style={{ textAlign: 'center' }} bodyStyle={{ padding: '24px' }}>
                   <div
                     style={{
                       width: 64,

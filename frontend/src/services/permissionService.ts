@@ -78,7 +78,7 @@ export class PermissionService {
       return true; // 空权限列表默认允许访问
     }
 
-    return permissions.every(permission => this.hasPermission(user, permission));
+    return permissions.every((permission) => this.hasPermission(user, permission));
   }
 
   /**
@@ -93,7 +93,7 @@ export class PermissionService {
       return false;
     }
 
-    return permissions.some(permission => this.hasPermission(user, permission));
+    return permissions.some((permission) => this.hasPermission(user, permission));
   }
 
   /**
@@ -108,9 +108,7 @@ export class PermissionService {
       return false;
     }
 
-    return user.roles.some(role =>
-      role.code === roleCode && role.isActive
-    );
+    return user.roles.some((role) => role.code === roleCode && role.isActive);
   }
 
   /**
@@ -125,7 +123,7 @@ export class PermissionService {
       return false;
     }
 
-    return roleCodes.some(code => this.hasRole(user, code));
+    return roleCodes.some((code) => this.hasRole(user, code));
   }
 
   /**
@@ -137,7 +135,7 @@ export class PermissionService {
         hasAccess: false,
         requiredPermissions,
         userPermissions: [],
-        missingPermissions: requiredPermissions
+        missingPermissions: requiredPermissions,
       };
     }
 
@@ -146,20 +144,20 @@ export class PermissionService {
         hasAccess: false,
         requiredPermissions: [],
         userPermissions: user.permissions,
-        missingPermissions: []
+        missingPermissions: [],
       };
     }
 
     const userPermissions = this.getAllUserPermissions(user);
     const missingPermissions = requiredPermissions.filter(
-      permission => !userPermissions.includes(permission)
+      (permission) => !userPermissions.includes(permission)
     );
 
     return {
       hasAccess: missingPermissions.length === 0,
       requiredPermissions,
       userPermissions,
-      missingPermissions
+      missingPermissions,
     };
   }
 
@@ -213,12 +211,12 @@ export class PermissionService {
     const permissions = new Set<string>();
 
     // 添加直接权限
-    user.permissions.forEach(permission => permissions.add(permission));
+    user.permissions.forEach((permission) => permissions.add(permission));
 
     // 添加角色权限
-    user.roles.forEach(role => {
+    user.roles.forEach((role) => {
       if (role.isActive) {
-        role.permissions.forEach(permission => {
+        role.permissions.forEach((permission) => {
           permissions.add(permission.code);
         });
       }
@@ -238,7 +236,7 @@ export class PermissionService {
       return cachedPermissions.includes(permission);
     }
 
-    const rolePermissions = role.permissions.map(p => p.code);
+    const rolePermissions = role.permissions.map((p) => p.code);
     this.rolePermissionCache.set(cacheKey, rolePermissions);
 
     return rolePermissions.includes(permission);
@@ -247,7 +245,10 @@ export class PermissionService {
   /**
    * 检查权限冲突
    */
-  checkPermissionConflicts(user: User | null, permissions: string[]): {
+  checkPermissionConflicts(
+    user: User | null,
+    permissions: string[]
+  ): {
     hasConflicts: boolean;
     conflicts: string[];
     resolution: 'allow' | 'deny' | 'review';
@@ -256,7 +257,7 @@ export class PermissionService {
       return {
         hasConflicts: false,
         conflicts: [],
-        resolution: 'deny'
+        resolution: 'deny',
       };
     }
 
@@ -264,7 +265,7 @@ export class PermissionService {
     // 例如：某些权限组合不应该同时存在
     const conflictingPairs = [
       ['product.delete', 'product.readonly'],
-      ['user.delete', 'audit.readonly']
+      ['user.delete', 'audit.readonly'],
     ];
 
     const conflicts: string[] = [];
@@ -282,7 +283,7 @@ export class PermissionService {
     return {
       hasConflicts: conflicts.length > 0,
       conflicts,
-      resolution: conflicts.length > 0 ? 'review' : 'allow'
+      resolution: conflicts.length > 0 ? 'review' : 'allow',
     };
   }
 
@@ -292,11 +293,11 @@ export class PermissionService {
   comparePermissionPriority(perm1: string, perm2: string): number {
     // 权限优先级规则
     const priorityMap: Record<string, number> = {
-      'admin': 100,
-      'delete': 90,
-      'write': 80,
-      'approve': 70,
-      'read': 60
+      admin: 100,
+      delete: 90,
+      write: 80,
+      approve: 70,
+      read: 60,
     };
 
     const getPriority = (permission: string): number => {
@@ -331,7 +332,7 @@ export class PermissionService {
       }
     }
 
-    keysToDelete.forEach(key => this.permissionCache.delete(key));
+    keysToDelete.forEach((key) => this.permissionCache.delete(key));
   }
 
   /**
@@ -350,17 +351,17 @@ export class PermissionService {
         directPermissions: 0,
         rolePermissions: 0,
         activeRoles: 0,
-        permissionBreakdown: {}
+        permissionBreakdown: {},
       };
     }
 
     const directPermissions = user.permissions.length;
-    const activeRoles = user.roles.filter(role => role.isActive).length;
+    const activeRoles = user.roles.filter((role) => role.isActive).length;
 
     const rolePermissionSet = new Set<string>();
-    user.roles.forEach(role => {
+    user.roles.forEach((role) => {
       if (role.isActive) {
-        role.permissions.forEach(permission => {
+        role.permissions.forEach((permission) => {
           rolePermissionSet.add(permission.code);
         });
       }
@@ -371,7 +372,7 @@ export class PermissionService {
 
     // 权限分类统计
     const permissionBreakdown: Record<string, number> = {};
-    allPermissions.forEach(permission => {
+    allPermissions.forEach((permission) => {
       const category = permission.split('.')[0] || 'other';
       permissionBreakdown[category] = (permissionBreakdown[category] || 0) + 1;
     });
@@ -381,7 +382,7 @@ export class PermissionService {
       directPermissions,
       rolePermissions,
       activeRoles,
-      permissionBreakdown
+      permissionBreakdown,
     };
   }
 }
@@ -405,7 +406,9 @@ export const hasRole = (user: User | null, roleCode: string): boolean =>
 export const canAccessMenu = (user: User | null, menu: MenuItem): boolean =>
   permissionService.canAccessMenu(user, menu);
 
-export const checkPermissions = (user: User | null, requiredPermissions: string[]): PermissionCheckResult =>
-  permissionService.checkPermissions(user, requiredPermissions);
+export const checkPermissions = (
+  user: User | null,
+  requiredPermissions: string[]
+): PermissionCheckResult => permissionService.checkPermissions(user, requiredPermissions);
 
 export default permissionService;

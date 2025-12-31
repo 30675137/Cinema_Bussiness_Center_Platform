@@ -1,6 +1,6 @@
 /**
  * Unit tests for code generator utility
- * 
+ *
  * Tests pinyin conversion and conflict resolution
  */
 
@@ -58,5 +58,3 @@ describe('codeGenerator', () => {
     });
   });
 });
-
-

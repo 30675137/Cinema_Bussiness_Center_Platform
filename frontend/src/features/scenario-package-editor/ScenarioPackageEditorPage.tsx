@@ -22,7 +22,7 @@ import { useScenarioPackageStore, type TabKey } from './stores/useScenarioPackag
 
 /**
  * 场景包编辑器主页面
- * 
+ *
  * 功能：
  * 1. 5个标签页：基础信息、套餐配置、加购项、时段模板、发布设置
  * 2. 未保存修改提示
@@ -57,62 +57,43 @@ const ScenarioPackageEditorPage: React.FC = () => {
 
   // 标签页配置
   const tabs = useMemo(() => {
-    const tabConfigs: Array<{ key: TabKey; label: string; icon: React.ReactNode; children: React.ReactNode }> = [
+    const tabConfigs: Array<{
+      key: TabKey;
+      label: string;
+      icon: React.ReactNode;
+      children: React.ReactNode;
+    }> = [
       {
         key: 'basic',
         label: '基础信息',
         icon: <InfoCircleOutlined />,
         children: (
-          <BasicInfoTab
-            packageId={packageId!}
-            packageData={packageData}
-            loading={isLoading}
-          />
+          <BasicInfoTab packageId={packageId!} packageData={packageData} loading={isLoading} />
         ),
       },
       {
         key: 'packages',
         label: '套餐配置',
         icon: <ShoppingOutlined />,
-        children: (
-          <PackagesTab
-            packageId={packageId!}
-            loading={isLoading}
-          />
-        ),
+        children: <PackagesTab packageId={packageId!} loading={isLoading} />,
       },
       {
         key: 'addons',
         label: '加购项',
         icon: <GiftOutlined />,
-        children: (
-          <AddonsTab
-            packageId={packageId!}
-            loading={isLoading}
-          />
-        ),
+        children: <AddonsTab packageId={packageId!} loading={isLoading} />,
       },
       {
         key: 'timeslots',
         label: '时段模板',
         icon: <ClockCircleOutlined />,
-        children: (
-          <TimeSlotsTab
-            packageId={packageId!}
-            loading={isLoading}
-          />
-        ),
+        children: <TimeSlotsTab packageId={packageId!} loading={isLoading} />,
       },
       {
         key: 'publish',
         label: '发布设置',
         icon: <SendOutlined />,
-        children: (
-          <PublishTab
-            packageId={packageId!}
-            loading={isLoading}
-          />
-        ),
+        children: <PublishTab packageId={packageId!} loading={isLoading} />,
       },
     ];
 
@@ -139,9 +120,7 @@ const ScenarioPackageEditorPage: React.FC = () => {
         description={error.message || '获取场景包详情失败'}
         showIcon
         style={{ margin: 24 }}
-        action={
-          <Button onClick={() => refetch()}>重试</Button>
-        }
+        action={<Button onClick={() => refetch()}>重试</Button>}
       />
     );
   }
@@ -151,38 +130,25 @@ const ScenarioPackageEditorPage: React.FC = () => {
       {/* 页头 */}
       <div style={{ padding: '16px 24px', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
         <Breadcrumb
-          items={[
-            { title: '场景包管理' },
-            { title: packageData?.name || '编辑场景包' },
-          ]}
+          items={[{ title: '场景包管理' }, { title: packageData?.name || '编辑场景包' }]}
           style={{ marginBottom: 12 }}
         />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Space>
-            <Button
-              type="text"
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
-            >
+            <Button type="text" icon={<ArrowLeftOutlined />} onClick={handleBack}>
               返回
             </Button>
             <span style={{ fontSize: 18, fontWeight: 500 }}>
               {packageData?.name || '编辑场景包'}
             </span>
-            {packageData && (
-              <UnpublishedBadge status={packageData.status} />
-            )}
+            {packageData && <UnpublishedBadge status={packageData.status} />}
           </Space>
         </div>
       </div>
 
       {/* 标签页内容 */}
       <div style={{ flex: 1, padding: 24, overflow: 'auto', background: '#f5f5f5' }}>
-        <FormTabs
-          tabs={tabs}
-          loading={isLoading}
-          error={error?.message || null}
-        />
+        <FormTabs tabs={tabs} loading={isLoading} error={error?.message || null} />
       </div>
     </div>
   );

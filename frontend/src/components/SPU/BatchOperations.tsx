@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react'
-import { Button, Dropdown, Space, message, Popconfirm, Modal, Form, Select } from 'antd'
+import React, { useState, useCallback } from 'react';
+import { Button, Dropdown, Space, message, Popconfirm, Modal, Form, Select } from 'antd';
 import {
   DeleteOutlined,
   ExportOutlined,
@@ -9,25 +9,25 @@ import {
   CheckOutlined,
   CloseOutlined,
   SettingOutlined,
-} from '@ant-design/icons'
-import type { MenuProps } from 'antd'
-import type { SPUStatus, SPUItem } from '@/types/spu'
-import { SPUNotificationService } from '@/components/common/Notification'
-import { statusColors } from '@/theme'
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import type { SPUStatus, SPUItem } from '@/types/spu';
+import { SPUNotificationService } from '@/components/common/Notification';
+import { statusColors } from '@/theme';
 
-const { Option } = Select
+const { Option } = Select;
 
 interface BatchOperationsProps {
-  selectedRowKeys: React.Key[]
-  selectedRows: SPUItem[]
-  dataSource: SPUItem[]
-  onBatchDelete?: (ids: string[]) => void
-  onBatchExport?: (ids: string[]) => void
-  onBatchStatusChange?: (ids: string[], status: SPUStatus) => void
-  onBatchCopy?: (ids: string[]) => void
-  onClearSelection?: () => void
-  onSelectAll?: () => void
-  loading?: boolean
+  selectedRowKeys: React.Key[];
+  selectedRows: SPUItem[];
+  dataSource: SPUItem[];
+  onBatchDelete?: (ids: string[]) => void;
+  onBatchExport?: (ids: string[]) => void;
+  onBatchStatusChange?: (ids: string[], status: SPUStatus) => void;
+  onBatchCopy?: (ids: string[]) => void;
+  onClearSelection?: () => void;
+  onSelectAll?: () => void;
+  loading?: boolean;
 }
 
 const BatchOperations: React.FC<BatchOperationsProps> = ({
@@ -42,24 +42,26 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
   onSelectAll,
   loading = false,
 }) => {
-  const [statusModalVisible, setStatusModalVisible] = useState(false)
-  const [statusForm] = Form.useForm()
-  const [currentAction, setCurrentAction] = useState<string | null>(null)
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [statusForm] = Form.useForm();
+  const [currentAction, setCurrentAction] = useState<string | null>(null);
 
   // 检查是否有选中的项目
-  const hasSelection = selectedRowKeys.length > 0
-  const isAllSelected = selectedRowKeys.length === dataSource.length
+  const hasSelection = selectedRowKeys.length > 0;
+  const isAllSelected = selectedRowKeys.length === dataSource.length;
 
   // 处理批量删除
   const handleBatchDelete = useCallback(() => {
-    if (!hasSelection || !onBatchDelete) return
+    if (!hasSelection || !onBatchDelete) return;
 
-    const ids = selectedRowKeys as string[]
+    const ids = selectedRowKeys as string[];
     Modal.confirm({
       title: '批量删除确认',
       content: (
         <div>
-          <p>确定要删除选中的 <strong>{selectedRowKeys.length}</strong> 个SPU吗？</p>
+          <p>
+            确定要删除选中的 <strong>{selectedRowKeys.length}</strong> 个SPU吗？
+          </p>
           <p style={{ color: '#ff4d4f', fontSize: '12px', marginTop: 8 }}>
             此操作不可恢复，请谨慎操作！
           </p>
@@ -75,62 +77,64 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
       okType: 'danger',
       okButtonProps: { loading },
       onOk: () => {
-        onBatchDelete(ids)
-        SPUNotificationService.batchSuccess('删除', ids.length)
+        onBatchDelete(ids);
+        SPUNotificationService.batchSuccess('删除', ids.length);
       },
-    })
-  }, [hasSelection, selectedRowKeys.length, onBatchDelete, loading])
+    });
+  }, [hasSelection, selectedRowKeys.length, onBatchDelete, loading]);
 
   // 处理批量导出
   const handleBatchExport = useCallback(() => {
-    if (!hasSelection || !onBatchExport) return
+    if (!hasSelection || !onBatchExport) return;
 
-    const ids = selectedRowKeys as string[]
-    onBatchExport(ids)
-    message.success(`正在导出 ${ids.length} 个SPU数据...`)
-  }, [hasSelection, selectedRowKeys.length, onBatchExport])
+    const ids = selectedRowKeys as string[];
+    onBatchExport(ids);
+    message.success(`正在导出 ${ids.length} 个SPU数据...`);
+  }, [hasSelection, selectedRowKeys.length, onBatchExport]);
 
   // 处理状态变更
-  const handleStatusChange = useCallback((status: SPUStatus) => {
-    setCurrentAction('statusChange')
-    setStatusModalVisible(true)
-    statusForm.setFieldsValue({ status })
-  }, [statusForm])
+  const handleStatusChange = useCallback(
+    (status: SPUStatus) => {
+      setCurrentAction('statusChange');
+      setStatusModalVisible(true);
+      statusForm.setFieldsValue({ status });
+    },
+    [statusForm]
+  );
 
   // 确认状态变更
   const handleStatusChangeConfirm = useCallback(async () => {
-    if (!hasSelection || !onBatchStatusChange) return
+    if (!hasSelection || !onBatchStatusChange) return;
 
     try {
-      const values = await statusForm.validateFields()
-      const ids = selectedRowKeys as string[]
-      const newStatus = values.status as SPUStatus
+      const values = await statusForm.validateFields();
+      const ids = selectedRowKeys as string[];
+      const newStatus = values.status as SPUStatus;
 
-      onBatchStatusChange(ids, newStatus)
+      onBatchStatusChange(ids, newStatus);
 
-      const statusText = statusColors[newStatus as keyof typeof statusColors]?.text
-      SPUNotificationService.batchSuccess(
-        `将状态更改为"${statusText}"`,
-        ids.length
-      )
+      const statusText = statusColors[newStatus as keyof typeof statusColors]?.text;
+      SPUNotificationService.batchSuccess(`将状态更改为"${statusText}"`, ids.length);
 
-      setStatusModalVisible(false)
-      statusForm.resetFields()
+      setStatusModalVisible(false);
+      statusForm.resetFields();
     } catch (error) {
-      console.error('Status change validation failed:', error)
+      console.error('Status change validation failed:', error);
     }
-  }, [hasSelection, selectedRowKeys, onBatchStatusChange, statusForm])
+  }, [hasSelection, selectedRowKeys, onBatchStatusChange, statusForm]);
 
   // 处理批量复制
   const handleBatchCopy = useCallback(() => {
-    if (!hasSelection || !onBatchCopy) return
+    if (!hasSelection || !onBatchCopy) return;
 
-    const ids = selectedRowKeys as string[]
+    const ids = selectedRowKeys as string[];
     Modal.confirm({
       title: '批量复制确认',
       content: (
         <div>
-          <p>确定要复制选中的 <strong>{selectedRowKeys.length}</strong> 个SPU吗？</p>
+          <p>
+            确定要复制选中的 <strong>{selectedRowKeys.length}</strong> 个SPU吗？
+          </p>
           <p style={{ fontSize: '12px', color: '#666' }}>
             复制的SPU将创建为草稿状态，您可以稍后修改。
           </p>
@@ -139,18 +143,18 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
       okText: '确认复制',
       cancelText: '取消',
       onOk: () => {
-        onBatchCopy(ids)
-        SPUNotificationService.batchSuccess('复制', ids.length)
+        onBatchCopy(ids);
+        SPUNotificationService.batchSuccess('复制', ids.length);
       },
-    })
-  }, [hasSelection, selectedRowKeys.length, onBatchCopy])
+    });
+  }, [hasSelection, selectedRowKeys.length, onBatchCopy]);
 
   // 处理批量编辑
   const handleBatchEdit = useCallback(() => {
-    if (!hasSelection) return
+    if (!hasSelection) return;
 
-    message.info('批量编辑功能开发中...')
-  }, [hasSelection])
+    message.info('批量编辑功能开发中...');
+  }, [hasSelection]);
 
   // 批量操作菜单
   const batchMenuItems: MenuProps['items'] = [
@@ -160,11 +164,7 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
       icon: <SettingOutlined />,
       children: Object.entries(statusColors).map(([key, config]) => ({
         key,
-        label: (
-          <span style={{ color: config.color }}>
-            {config.text}
-          </span>
-        ),
+        label: <span style={{ color: config.color }}>{config.text}</span>,
         onClick: () => handleStatusChange(key as SPUStatus),
       })),
     },
@@ -203,27 +203,29 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
       danger: true,
       onClick: handleBatchDelete,
     },
-  ]
+  ];
 
   // 全选/取消全选
   const handleSelectToggle = useCallback(() => {
     if (isAllSelected) {
-      onClearSelection?.()
+      onClearSelection?.();
     } else {
-      onSelectAll?.()
+      onSelectAll?.();
     }
-  }, [isAllSelected, onClearSelection, onSelectAll])
+  }, [isAllSelected, onClearSelection, onSelectAll]);
 
   return (
     <>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '16px 0',
-        borderBottom: hasSelection ? '1px solid #f0f0f0' : 'none',
-        backgroundColor: hasSelection ? '#f6ffed' : 'transparent',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '16px 0',
+          borderBottom: hasSelection ? '1px solid #f0f0f0' : 'none',
+          backgroundColor: hasSelection ? '#f6ffed' : 'transparent',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {hasSelection && (
             <>
@@ -260,11 +262,7 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
                 <CloseOutlined /> 清除选择
               </Button>
 
-              <Dropdown
-                menu={{ items: batchMenuItems }}
-                trigger={['click']}
-                placement="bottomLeft"
-              >
+              <Dropdown menu={{ items: batchMenuItems }} trigger={['click']} placement="bottomLeft">
                 <Button loading={loading}>
                   <MoreOutlined /> 批量操作
                 </Button>
@@ -279,9 +277,9 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
         title="批量更改状态"
         open={statusModalVisible}
         onCancel={() => {
-          setStatusModalVisible(false)
-          statusForm.resetFields()
-          setCurrentAction(null)
+          setStatusModalVisible(false);
+          statusForm.resetFields();
+          setCurrentAction(null);
         }}
         onOk={handleStatusChangeConfirm}
         okText="确认更改"
@@ -297,9 +295,7 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
             <Select placeholder="请选择状态" style={{ width: '100%' }}>
               {Object.entries(statusColors).map(([key, config]) => (
                 <Option key={key} value={key}>
-                  <span style={{ color: config.color }}>
-                    {config.text}
-                  </span>
+                  <span style={{ color: config.color }}>{config.text}</span>
                 </Option>
               ))}
             </Select>
@@ -318,34 +314,30 @@ const BatchOperations: React.FC<BatchOperationsProps> = ({
         </Form>
       </Modal>
     </>
-  )
-}
+  );
+};
 
 // 选择统计组件
 export const SelectionInfo: React.FC<{
-  selectedCount: number
-  totalCount: number
-  onClearSelection?: () => void
+  selectedCount: number;
+  totalCount: number;
+  onClearSelection?: () => void;
 }> = ({ selectedCount, totalCount, onClearSelection }) => {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      padding: '8px 12px',
-      backgroundColor: '#f6ffed',
-      border: '1px solid #b7eb8f',
-      borderRadius: 4,
-      fontSize: '13px',
-    }}>
-      <span style={{ color: '#52c41a', fontWeight: 500 }}>
-        已选择 {selectedCount} 项
-      </span>
-      <span style={{ color: '#999', margin: '0 8px' }}>
-        /
-      </span>
-      <span style={{ color: '#666' }}>
-        共 {totalCount} 项
-      </span>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '8px 12px',
+        backgroundColor: '#f6ffed',
+        border: '1px solid #b7eb8f',
+        borderRadius: 4,
+        fontSize: '13px',
+      }}
+    >
+      <span style={{ color: '#52c41a', fontWeight: 500 }}>已选择 {selectedCount} 项</span>
+      <span style={{ color: '#999', margin: '0 8px' }}>/</span>
+      <span style={{ color: '#666' }}>共 {totalCount} 项</span>
       {onClearSelection && (
         <Button
           type="link"
@@ -357,7 +349,7 @@ export const SelectionInfo: React.FC<{
         </Button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BatchOperations
+export default BatchOperations;

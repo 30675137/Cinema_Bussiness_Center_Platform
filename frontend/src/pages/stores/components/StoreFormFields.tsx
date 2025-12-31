@@ -22,11 +22,7 @@ interface StoreFormFieldsProps {
 /**
  * Shared form fields component for store create/edit
  */
-const StoreFormFields: React.FC<StoreFormFieldsProps> = ({
-  control,
-  errors,
-  disabled = false,
-}) => {
+const StoreFormFields: React.FC<StoreFormFieldsProps> = ({ control, errors, disabled = false }) => {
   // Watch region to update city options
   const selectedRegion = useWatch({ control, name: 'region' });
   const cityOptions = selectedRegion ? getCitiesByRegion(selectedRegion) : [];

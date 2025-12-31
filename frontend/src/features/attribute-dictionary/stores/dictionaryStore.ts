@@ -1,6 +1,6 @@
 /**
  * Zustand Store for Dictionary Management
- * 
+ *
  * Manages dictionary types and items with localStorage persistence
  */
 
@@ -146,9 +146,7 @@ export const useDictionaryStore = create<DictionaryStore>()(
       getActiveDictionaryItems: (typeId) => {
         const state = get();
         const items = state.dictionaryItems.get(typeId) || [];
-        return items
-          .filter((item) => item.status === 'active')
-          .sort((a, b) => a.sort - b.sort);
+        return items.filter((item) => item.status === 'active').sort((a, b) => a.sort - b.sort);
       },
 
       getDictionaryItem: (id) => {
@@ -202,4 +200,3 @@ export const useDictionaryStore = create<DictionaryStore>()(
     }
   )
 );
-

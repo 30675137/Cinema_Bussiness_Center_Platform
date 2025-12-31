@@ -15,10 +15,7 @@ interface AttributeStatusTagProps {
   size?: 'small' | 'default';
 }
 
-const STATUS_CONFIG: Record<
-  AttributeStatus,
-  { color: string; text: string }
-> = {
+const STATUS_CONFIG: Record<AttributeStatus, { color: string; text: string }> = {
   active: {
     color: 'success',
     text: '启用',
@@ -32,17 +29,11 @@ const STATUS_CONFIG: Record<
 /**
  * Status tag component for displaying active/inactive state
  */
-const AttributeStatusTag: React.FC<AttributeStatusTagProps> = ({
-  status,
-  size = 'default',
-}) => {
+const AttributeStatusTag: React.FC<AttributeStatusTagProps> = ({ status, size = 'default' }) => {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.inactive;
 
   return (
-    <Tag
-      color={config.color}
-      style={size === 'small' ? { fontSize: 12 } : undefined}
-    >
+    <Tag color={config.color} style={size === 'small' ? { fontSize: 12 } : undefined}>
       {config.text}
     </Tag>
   );

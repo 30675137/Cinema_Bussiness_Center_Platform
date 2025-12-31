@@ -49,7 +49,7 @@ export default {
     login: '登录',
     register: '注册',
     profile: '个人资料',
-    dashboard: '仪表板'
+    dashboard: '仪表板',
   },
 
   // 错误信息
@@ -69,7 +69,7 @@ export default {
     invalidEmail: '邮箱格式不正确',
     invalidPhone: '手机号码格式不正确',
     passwordTooWeak: '密码强度太弱',
-    passwordsNotMatch: '两次输入的密码不一致'
+    passwordsNotMatch: '两次输入的密码不一致',
   },
 
   // 成功信息
@@ -83,7 +83,7 @@ export default {
     exportSuccess: '导出成功',
     loginSuccess: '登录成功',
     logoutSuccess: '退出成功',
-    operationSuccess: '操作成功'
+    operationSuccess: '操作成功',
   },
 
   // 导航菜单
@@ -110,7 +110,7 @@ export default {
     systemConfig: '系统配置',
     logs: '系统日志',
     reports: '报表统计',
-    dataAnalysis: '数据分析'
+    dataAnalysis: '数据分析',
   },
 
   // 库存管理
@@ -143,7 +143,7 @@ export default {
     overStock: '库存积压',
     stockAdjustment: '库存调整',
     stockMovement: '库存变动',
-    stockWarning: '库存预警'
+    stockWarning: '库存预警',
   },
 
   // 价格管理
@@ -174,7 +174,7 @@ export default {
     rejected: '已拒绝',
     priceHistory: '价格历史',
     priceChange: '价格变更',
-    priceChangeReason: '变更原因'
+    priceChangeReason: '变更原因',
   },
 
   // 审核管理
@@ -200,7 +200,7 @@ export default {
     urgent: '紧急',
     normal: '普通',
     lowPriority: '低优先级',
-    highPriority: '高优先级'
+    highPriority: '高优先级',
   },
 
   // 表单字段
@@ -238,7 +238,7 @@ export default {
     city: '城市',
     district: '区域',
     street: '街道',
-    postalCode: '邮政编码'
+    postalCode: '邮政编码',
   },
 
   // 操作确认
@@ -249,7 +249,7 @@ export default {
     submitConfirm: '确定要提交当前的操作吗？',
     resetConfirm: '确定要重置所有的数据吗？',
     logoutConfirm: '确定要退出系统吗？',
-    clearDataConfirm: '确定要清空所有数据吗？此操作不可撤销。'
+    clearDataConfirm: '确定要清空所有数据吗？此操作不可撤销。',
   },
 
   // 分页
@@ -262,7 +262,7 @@ export default {
     prev: '上一页',
     next: '下一页',
     first: '首页',
-    last: '尾页'
+    last: '尾页',
   },
 
   // 搜索和筛选
@@ -286,7 +286,7 @@ export default {
     thisYear: '今年',
     lastWeek: '上周',
     lastMonth: '上月',
-    lastYear: '去年'
+    lastYear: '去年',
   },
 
   // 时间
@@ -310,7 +310,7 @@ export default {
     thisMorning: '今天上午',
     thisAfternoon: '今天下午',
     thisEvening: '今天晚上',
-    tonight: '今晚'
+    tonight: '今晚',
   },
 
   // 单位
@@ -334,7 +334,7 @@ export default {
     meter: '米',
     centimeter: '厘米',
     squareMeter: '平方米',
-    cubicMeter: '立方米'
+    cubicMeter: '立方米',
   },
 
   // 系统消息
@@ -349,6 +349,6 @@ export default {
     pageNotFound: '页面不存在',
     serverError: '服务器错误，请联系管理员',
     operationInProgress: '操作正在进行中，请稍候...',
-    operationCompleted: '操作已完成'
-  }
+    operationCompleted: '操作已完成',
+  },
 } as const;

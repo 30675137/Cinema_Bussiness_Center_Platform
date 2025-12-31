@@ -5,7 +5,13 @@
  */
 import React, { useMemo } from 'react';
 import { Alert, Divider, Typography } from 'antd';
-import type { Control, FieldErrors, UseFormSetValue, UseFormGetValues, UseFormWatch } from 'react-hook-form';
+import type {
+  Control,
+  FieldErrors,
+  UseFormSetValue,
+  UseFormGetValues,
+  UseFormWatch,
+} from 'react-hook-form';
 import { ComboConfiguration, type AvailableSubItem } from '@/components/shared/ComboConfiguration';
 import { SkuType, SKU_TYPE_CONFIG, SkuStatus } from '@/types/sku';
 import type { SkuFormValues } from './schema';
@@ -118,11 +124,7 @@ export const ComboConfigTab: React.FC<ComboConfigTabProps> = ({
         <>
           <Divider />
           <Title level={5}>成本计算明细</Title>
-          <CostBreakdownTable
-            items={comboItems}
-            type="combo"
-            compact={false}
-          />
+          <CostBreakdownTable items={comboItems} type="combo" compact={false} />
         </>
       )}
     </div>

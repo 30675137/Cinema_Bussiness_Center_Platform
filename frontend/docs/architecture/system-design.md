@@ -8,28 +8,28 @@
 
 ### 核心技术栈
 
-| 技术类别 | 技术选型 | 版本 | 用途说明 |
-|----------|----------|------|----------|
-| 前端框架 | React | 18.2.0 | 核心UI框架，组件化开发 |
-| 编程语言 | TypeScript | 5.0.0 | 类型安全，提高代码质量 |
-| UI组件库 | Ant Design | 5.12.0 | 企业级UI组件库 |
-| 路由管理 | React Router | 6.8.0 | 单页应用路由管理 |
-| 状态管理 | Zustand | 5.0.9 | 轻量级状态管理 |
-| 数据获取 | React Query | 5.90.12 | 服务器状态管理 |
-| HTTP客户端 | Axios | 1.13.2 | API请求处理 |
-| 表单处理 | React Hook Form | 7.68.0 | 高性能表单管理 |
-| 构建工具 | Vite | 7.2.4 | 现代化构建工具 |
-| 包管理器 | npm | 9.6.7 | 依赖管理和脚本执行 |
+| 技术类别   | 技术选型        | 版本    | 用途说明               |
+| ---------- | --------------- | ------- | ---------------------- |
+| 前端框架   | React           | 18.2.0  | 核心UI框架，组件化开发 |
+| 编程语言   | TypeScript      | 5.0.0   | 类型安全，提高代码质量 |
+| UI组件库   | Ant Design      | 5.12.0  | 企业级UI组件库         |
+| 路由管理   | React Router    | 6.8.0   | 单页应用路由管理       |
+| 状态管理   | Zustand         | 5.0.9   | 轻量级状态管理         |
+| 数据获取   | React Query     | 5.90.12 | 服务器状态管理         |
+| HTTP客户端 | Axios           | 1.13.2  | API请求处理            |
+| 表单处理   | React Hook Form | 7.68.0  | 高性能表单管理         |
+| 构建工具   | Vite            | 7.2.4   | 现代化构建工具         |
+| 包管理器   | npm             | 9.6.7   | 依赖管理和脚本执行     |
 
 ### 开发工具链
 
-| 工具类型 | 工具名称 | 版本 | 用途说明 |
-|----------|----------|------|----------|
-| 代码规范 | ESLint | 9.39.1 | 代码质量检查 |
-| 代码格式化 | Prettier | 3.7.4 | 代码格式化 |
-| 类型检查 | TypeScript | 5.9.3 | 静态类型检查 |
-| Git钩子 | Husky | 9.1.7 | Git提交钩子管理 |
-| 提交规范 | Commitlint | 20.2.0 | 提交信息规范检查 |
+| 工具类型   | 工具名称   | 版本   | 用途说明         |
+| ---------- | ---------- | ------ | ---------------- |
+| 代码规范   | ESLint     | 9.39.1 | 代码质量检查     |
+| 代码格式化 | Prettier   | 3.7.4  | 代码格式化       |
+| 类型检查   | TypeScript | 5.9.3  | 静态类型检查     |
+| Git钩子    | Husky      | 9.1.7  | Git提交钩子管理  |
+| 提交规范   | Commitlint | 20.2.0 | 提交信息规范检查 |
 
 ## 系统架构图
 
@@ -86,16 +86,19 @@ graph TB
 系统采用经典的分层架构设计，从上到下分为：
 
 #### 表现层（Presentation Layer）
+
 - **职责**: 用户界面展示和用户交互处理
 - **技术**: React组件、Ant Design、CSS/Styled Components
 - **特点**: 组件化、可复用、响应式设计
 
 #### 业务逻辑层（Business Logic Layer）
+
 - **职责**: 业务逻辑处理、数据转换、状态管理
 - **技术**: React Hooks、Custom Hooks、Zustand Store
 - **特点**: 业务逻辑封装、数据流管理、副作用处理
 
 #### 数据访问层（Data Access Layer）
+
 - **职责**: API调用、数据缓存、错误处理
 - **技术**: Axios、React Query、LocalStorage
 - **特点**: 统一数据接口、缓存策略、请求重试
@@ -133,33 +136,43 @@ graph LR
 采用原子设计理念，组件分为以下层级：
 
 #### 原子组件（Atoms）
+
 最基础的UI组件，无法再拆分：
+
 - Button、Input、Select、Modal等基础组件
 - Typography、Icon、Divider等展示组件
 - Form.Item、Table.Column等业务基础组件
 
 #### 分子组件（Molecules）
+
 由原子组件组合而成，具有特定功能：
+
 - SearchForm（搜索表单）
 - DataTable（数据表格）
 - FileUploader（文件上传）
 - ImagePreview（图片预览）
 
 #### 有机体（Organisms）
+
 复杂的业务组件，由分子组件组成：
+
 - ProductList（商品列表）
 - ProductForm（商品表单）
 - CategoryTree（分类树）
 - UserMenu（用户菜单）
 
 #### 模板（Templates）
+
 页面布局模板：
+
 - MainLayout（主布局）
 - AuthLayout（认证布局）
 - BlankLayout（空白布局）
 
 #### 页面（Pages）
+
 完整的页面组件：
+
 - ProductListPage（商品列表页）
 - ProductDetailPage（商品详情页）
 - UserLoginPage（用户登录页）
@@ -221,12 +234,14 @@ graph TB
 ### 3. 数据缓存策略
 
 #### React Query缓存策略
+
 - **查询缓存**: 自动缓存API响应数据
 - **后台刷新**: 定期在后台刷新数据
 - **失效策略**: 基于时间的手动/自动失效
 - **乐观更新**: 提升用户体验的即时UI更新
 
 #### 本地存储策略
+
 - **用户偏好**: LocalStorage持久化
 - **临时数据**: SessionStorage会话存储
 - **大数据量**: IndexedDB存储
@@ -247,6 +262,7 @@ const HeavyComponent = lazy(() => import('@/components/HeavyComponent'));
 ### 2. 组件优化策略
 
 #### React.memo优化
+
 ```typescript
 const ProductItem = React.memo(({ product }: ProductItemProps) => {
   return <div>{product.name}</div>;
@@ -256,15 +272,19 @@ const ProductItem = React.memo(({ product }: ProductItemProps) => {
 ```
 
 #### useMemo和useCallback优化
+
 ```typescript
 const ProductList = ({ products }: ProductListProps) => {
   const expensiveValue = useMemo(() => {
-    return products.filter(p => p.status === 'active');
+    return products.filter((p) => p.status === 'active');
   }, [products]);
 
-  const handleClick = useCallback((productId: string) => {
-    onProductSelect(productId);
-  }, [onProductSelect]);
+  const handleClick = useCallback(
+    (productId: string) => {
+      onProductSelect(productId);
+    },
+    [onProductSelect]
+  );
 };
 ```
 

@@ -3,7 +3,14 @@
  * 记录用户的导航行为和访问统计
  */
 
-import { NavigationLog, NavigationAction, MenuItem, User, MenuLevel, FunctionalArea } from '@/types/navigation';
+import {
+  NavigationLog,
+  NavigationAction,
+  MenuItem,
+  User,
+  MenuLevel,
+  FunctionalArea,
+} from '@/types/navigation';
 
 /**
  * 导航日志服务类
@@ -45,7 +52,7 @@ export class NavigationLogService {
       action: NavigationAction.MENU_CLICK,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -65,7 +72,7 @@ export class NavigationLogService {
       action: NavigationAction.BREADCRUMB_CLICK,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -85,7 +92,7 @@ export class NavigationLogService {
       action: NavigationAction.SEARCH_SELECT,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -105,7 +112,7 @@ export class NavigationLogService {
       action: NavigationAction.FAVORITE_CLICK,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -131,7 +138,7 @@ export class NavigationLogService {
       action: NavigationAction.PAGE_VIEW,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -160,7 +167,7 @@ export class NavigationLogService {
       duration,
       userAgent: navigator.userAgent,
       ipAddress: this.getClientIP(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     this.addLog(log);
@@ -173,7 +180,7 @@ export class NavigationLogService {
    */
   getUserNavigationHistory(userId: string, limit: number = 50): NavigationLog[] {
     return this.logs
-      .filter(log => log.userId === userId)
+      .filter((log) => log.userId === userId)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
   }
@@ -181,8 +188,14 @@ export class NavigationLogService {
   /**
    * 获取页面访问统计
    */
-  getPageAccessStats(userId: string, days: number = 30): {
-    pageStats: Record<string, { visits: number; totalTime: number; averageTime: number; lastVisit: Date }>;
+  getPageAccessStats(
+    userId: string,
+    days: number = 30
+  ): {
+    pageStats: Record<
+      string,
+      { visits: number; totalTime: number; averageTime: number; lastVisit: Date }
+    >;
     totalVisits: number;
     totalSessions: number;
     averageSessionTime: number;
@@ -190,22 +203,24 @@ export class NavigationLogService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
-    const userLogs = this.logs.filter(log =>
-      log.userId === userId &&
-      log.timestamp >= cutoffDate
+    const userLogs = this.logs.filter(
+      (log) => log.userId === userId && log.timestamp >= cutoffDate
     );
 
-    const pageStats: Record<string, {
-      visits: number;
-      totalTime: number;
-      averageTime: number;
-      lastVisit: Date;
-    }> = {};
+    const pageStats: Record<
+      string,
+      {
+        visits: number;
+        totalTime: number;
+        averageTime: number;
+        lastVisit: Date;
+      }
+    > = {};
 
     let totalVisits = 0;
     let totalTime = 0;
 
-    userLogs.forEach(log => {
+    userLogs.forEach((log) => {
       if (log.action === NavigationAction.PAGE_VIEW) {
         const key = log.menuPath || log.menuId;
 
@@ -214,7 +229,7 @@ export class NavigationLogService {
             visits: 0,
             totalTime: 0,
             averageTime: 0,
-            lastVisit: log.timestamp
+            lastVisit: log.timestamp,
           };
         }
 
@@ -231,7 +246,7 @@ export class NavigationLogService {
     });
 
     // 计算平均时间
-    Object.values(pageStats).forEach(stat => {
+    Object.values(pageStats).forEach((stat) => {
       stat.averageTime = stat.visits > 0 ? stat.totalTime / stat.visits : 0;
     });
 
@@ -242,7 +257,7 @@ export class NavigationLogService {
       pageStats,
       totalVisits,
       totalSessions: sessions,
-      averageSessionTime
+      averageSessionTime,
     };
   }
 
@@ -253,7 +268,7 @@ export class NavigationLogService {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    this.logs = this.logs.filter(log => log.timestamp >= cutoffDate);
+    this.logs = this.logs.filter((log) => log.timestamp >= cutoffDate);
     this.saveLogsToStorage();
   }
 
@@ -333,7 +348,7 @@ export class NavigationLogService {
         const parsedLogs = JSON.parse(stored);
         this.logs = parsedLogs.map((log: any) => ({
           ...log,
-          timestamp: new Date(log.timestamp)
+          timestamp: new Date(log.timestamp),
         }));
       }
     } catch (error) {
@@ -372,7 +387,7 @@ export class NavigationLogService {
       action,
       timestamp: new Date(),
       duration: 0,
-      metadata: additionalData
+      metadata: additionalData,
     };
 
     this.logs.push(log);
@@ -419,7 +434,7 @@ export const logNavigationAction = async (params: {
       displayName: '系统用户',
       isActive: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // 创建模拟菜单对象（如果有menuId）
@@ -433,7 +448,7 @@ export const logNavigationAction = async (params: {
         sortOrder: 0,
         isActive: true,
         isVisible: true,
-        functionalArea: FunctionalArea.BASIC_SETTINGS
+        functionalArea: FunctionalArea.BASIC_SETTINGS,
       };
     }
 
@@ -456,7 +471,12 @@ export const logNavigationAction = async (params: {
       case NavigationAction.SEARCH_SELECT:
       case NavigationAction.FAVORITE_CLICK:
         // 对于其他操作，记录为通用日志
-        await navigationLogService.logGenericNavigationAction(user, params.action, menu, params.metadata);
+        await navigationLogService.logGenericNavigationAction(
+          user,
+          params.action,
+          menu,
+          params.metadata
+        );
         break;
       default:
         console.warn('未知的导航动作类型:', params.action);

@@ -163,11 +163,6 @@ export class ApiError extends Error {
    * Create ApiError from error response
    */
   static fromResponse(response: ErrorResponse, httpStatus?: number): ApiError {
-    return new ApiError(
-      response.error,
-      response.message,
-      response.details,
-      httpStatus
-    );
+    return new ApiError(response.error, response.message, response.details, httpStatus);
   }
 }

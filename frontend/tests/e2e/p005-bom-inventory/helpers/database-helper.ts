@@ -15,7 +15,7 @@ const DB_CONFIG = {
   port: 6543,
   database: 'postgres',
   user: 'postgres.fxhgyxceqrmnpezluaht',
-  password: process.env.SUPABASE_DB_PASSWORD || 'Pgsql.2024'
+  password: process.env.SUPABASE_DB_PASSWORD || 'Pgsql.2024',
 };
 
 /**
@@ -30,7 +30,10 @@ export async function execSQL(sql: string): Promise<string> {
 /**
  * 查询库存数量
  */
-export async function getInventoryQuantities(storeId: string, skuId: string): Promise<{
+export async function getInventoryQuantities(
+  storeId: string,
+  skuId: string
+): Promise<{
   onHandQty: number;
   reservedQty: number;
   availableQty: number;
@@ -94,7 +97,10 @@ export async function verifyBomSnapshot(orderId: string): Promise<{
 /**
  * 验证事务日志
  */
-export async function verifyTransactionLog(orderId: string, transactionType?: string): Promise<{
+export async function verifyTransactionLog(
+  orderId: string,
+  transactionType?: string
+): Promise<{
   exists: boolean;
   count: number;
 }> {

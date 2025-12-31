@@ -25,4 +25,3 @@ const EventTypeTag: React.FC<EventTypeTagProps> = ({ type, size = 'default' }) =
 };
 
 export default EventTypeTag;
-

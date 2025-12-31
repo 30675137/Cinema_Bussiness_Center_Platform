@@ -118,7 +118,9 @@ test.describe('品牌创建功能', () => {
     await page.fill('[data-testid="brand-description-textarea"]', description);
 
     // 验证描述内容
-    await expect(page.locator('[data-testid="brand-description-textarea"]')).toHaveValue(description);
+    await expect(page.locator('[data-testid="brand-description-textarea"]')).toHaveValue(
+      description
+    );
   });
 
   test('应该验证必填字段', async ({ page }) => {
@@ -133,7 +135,9 @@ test.describe('品牌创建功能', () => {
     await expect(page.locator('[data-testid="brand-type-error"]')).toBeVisible();
 
     // 验证错误消息
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称不能为空');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称不能为空'
+    );
     await expect(page.locator('[data-testid="brand-type-error"]')).toContainText('请选择品牌类型');
   });
 
@@ -150,13 +154,20 @@ test.describe('品牌创建功能', () => {
               id: 'existing-brand',
               name: '已有品牌',
               brandType: 'own',
-              status: 'enabled'
-            }
+              status: 'enabled',
+            },
           ],
-          pagination: { current: 1, pageSize: 20, total: 1, totalPages: 1, hasNext: false, hasPrev: false },
+          pagination: {
+            current: 1,
+            pageSize: 20,
+            total: 1,
+            totalPages: 1,
+            hasNext: false,
+            hasPrev: false,
+          },
           message: 'Success',
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
     });
 
@@ -171,12 +182,10 @@ test.describe('品牌创建功能', () => {
             error: {
               code: 'DUPLICATE_BRAND',
               message: '系统中已存在同名品牌',
-              details: [
-                { field: 'name', message: '品牌名称在同类型中已存在' }
-              ]
+              details: [{ field: 'name', message: '品牌名称在同类型中已存在' }],
             },
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -194,7 +203,9 @@ test.describe('品牌创建功能', () => {
 
     // 验证重复错误提示
     await expect(page.locator('[data-testid="duplicate-brand-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="duplicate-brand-error"]')).toContainText('系统中已存在同名品牌');
+    await expect(page.locator('[data-testid="duplicate-brand-error"]')).toContainText(
+      '系统中已存在同名品牌'
+    );
   });
 
   test('应该能够成功创建品牌', async ({ page }) => {
@@ -224,11 +235,11 @@ test.describe('品牌创建功能', () => {
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               createdBy: 'admin',
-              updatedBy: 'admin'
+              updatedBy: 'admin',
             },
             message: 'Brand created successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -258,13 +269,20 @@ test.describe('品牌创建功能', () => {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 createdBy: 'admin',
-                updatedBy: 'admin'
-              }
+                updatedBy: 'admin',
+              },
             ],
-            pagination: { current: 1, pageSize: 20, total: 1, totalPages: 1, hasNext: false, hasPrev: false },
+            pagination: {
+              current: 1,
+              pageSize: 20,
+              total: 1,
+              totalPages: 1,
+              hasNext: false,
+              hasPrev: false,
+            },
             message: 'Success',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -327,7 +345,9 @@ test.describe('品牌创建功能', () => {
 
     // 验证确认对话框出现
     await expect(page.locator('[data-testid="unsaved-changes-dialog"]')).toBeVisible();
-    await expect(page.locator('[data-testid="unsaved-changes-dialog"]')).toContainText('当前有未保存的修改，确定要关闭吗？');
+    await expect(page.locator('[data-testid="unsaved-changes-dialog"]')).toContainText(
+      '当前有未保存的修改，确定要关闭吗？'
+    );
 
     // 点击确认关闭
     await page.click('[data-testid="confirm-close-button"]');
@@ -347,10 +367,10 @@ test.describe('品牌创建功能', () => {
             success: false,
             error: {
               code: 'INTERNAL_SERVER_ERROR',
-              message: '服务器内部错误'
+              message: '服务器内部错误',
             },
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });

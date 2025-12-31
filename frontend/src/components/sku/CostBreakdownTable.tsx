@@ -155,7 +155,10 @@ export const CostBreakdownTable: React.FC<CostBreakdownTableProps> = ({
         summary={() => (
           <Table.Summary fixed>
             {summaryRows.map((row) => (
-              <Table.Summary.Row key={row.key} style={{ backgroundColor: row.highlight ? '#fafafa' : undefined }}>
+              <Table.Summary.Row
+                key={row.key}
+                style={{ backgroundColor: row.highlight ? '#fafafa' : undefined }}
+              >
                 <Table.Summary.Cell index={0} colSpan={3} align="right">
                   <Text strong={row.highlight} style={{ fontSize: row.highlight ? 16 : 14 }}>
                     {row.label}

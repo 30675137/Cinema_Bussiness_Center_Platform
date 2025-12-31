@@ -15,7 +15,7 @@ export const scenario_001 = {
   userCredentials: {
     phone: '13800138000',
     verifyCode: '123456',
-    role: 'customer'
+    role: 'customer',
   },
 
   // 商品页面路径
@@ -25,7 +25,7 @@ export const scenario_001 = {
   product_whiskey_cola: {
     id: '550e8400-e29b-41d4-a716-446655440021',
     name: '威士忌可乐鸡尾酒',
-    price: 35.00,
+    price: 35.0,
     category: 'cocktail',
     // BOM 配方
     bomItems: [
@@ -33,15 +33,15 @@ export const scenario_001 = {
         skuId: '550e8400-e29b-41d4-a716-446655440001',
         skuName: '威士忌',
         quantity: 45,
-        unit: 'ml'
+        unit: 'ml',
       },
       {
         skuId: '550e8400-e29b-41d4-a716-446655440002',
         skuName: '可乐糖浆',
         quantity: 150,
-        unit: 'ml'
-      }
-    ]
+        unit: 'ml',
+      },
+    ],
   },
 
   // 订单创建参数
@@ -52,7 +52,7 @@ export const scenario_001 = {
     hallName: 'VIP影厅1号',
     deliveryTime: '2025-12-30T15:00:00Z',
     paymentMethod: 'wechat',
-    remark: 'E2E测试订单 - BOM库存扣减验证'
+    remark: 'E2E测试订单 - BOM库存扣减验证',
   },
 
   // ====== B端配置 (React Admin 运营中台) ======
@@ -63,7 +63,7 @@ export const scenario_001 = {
     username: 'bartender',
     password: 'test123',
     email: 'bartender@cinema.com',
-    role: 'bartender'
+    role: 'bartender',
   },
 
   // B端操作元素选择器
@@ -75,20 +75,20 @@ export const scenario_001 = {
   whiskey_after_reserve: {
     skuId: '550e8400-e29b-41d4-a716-446655440001',
     skuName: '威士忌',
-    on_hand: 100,      // 现存库存不变
-    reserved: 45,      // 预占 45ml
-    available: 55,     // 可用库存 = on_hand - reserved
-    unit: 'ml'
+    on_hand: 100, // 现存库存不变
+    reserved: 45, // 预占 45ml
+    available: 55, // 可用库存 = on_hand - reserved
+    unit: 'ml',
   },
 
   // 预占后: 可乐糖浆库存状态
   cola_after_reserve: {
     skuId: '550e8400-e29b-41d4-a716-446655440002',
     skuName: '可乐糖浆',
-    on_hand: 500,      // 现存库存不变
-    reserved: 150,     // 预占 150ml
-    available: 350,    // 可用库存 = on_hand - reserved
-    unit: 'ml'
+    on_hand: 500, // 现存库存不变
+    reserved: 150, // 预占 150ml
+    available: 350, // 可用库存 = on_hand - reserved
+    unit: 'ml',
   },
 
   // ====== 数据库验证数据 - 实扣阶段 ======
@@ -96,20 +96,20 @@ export const scenario_001 = {
   whiskey_after_deduct: {
     skuId: '550e8400-e29b-41d4-a716-446655440001',
     skuName: '威士忌',
-    on_hand: 55,       // 扣减 45ml (100 - 45)
-    reserved: 0,       // 释放预占
-    available: 55,     // 可用库存 = on_hand - reserved
-    unit: 'ml'
+    on_hand: 55, // 扣减 45ml (100 - 45)
+    reserved: 0, // 释放预占
+    available: 55, // 可用库存 = on_hand - reserved
+    unit: 'ml',
   },
 
   // 实扣后: 可乐糖浆库存状态
   cola_after_deduct: {
     skuId: '550e8400-e29b-41d4-a716-446655440002',
     skuName: '可乐糖浆',
-    on_hand: 350,      // 扣减 150ml (500 - 150)
-    reserved: 0,       // 释放预占
-    available: 350,    // 可用库存 = on_hand - reserved
-    unit: 'ml'
+    on_hand: 350, // 扣减 150ml (500 - 150)
+    reserved: 0, // 释放预占
+    available: 350, // 可用库存 = on_hand - reserved
+    unit: 'ml',
   },
 
   // ====== 事务记录验证数据 ======
@@ -117,22 +117,22 @@ export const scenario_001 = {
   whiskey_transaction: {
     skuId: '550e8400-e29b-41d4-a716-446655440001',
     skuName: '威士忌',
-    type: 'DEDUCT',    // 扣减类型
-    quantity: 45,      // 扣减数量
+    type: 'DEDUCT', // 扣减类型
+    quantity: 45, // 扣减数量
     unit: 'ml',
     reason: 'BOM出品扣减',
-    operator: 'bartender'
+    operator: 'bartender',
   },
 
   // 可乐糖浆扣减事务记录
   cola_transaction: {
     skuId: '550e8400-e29b-41d4-a716-446655440002',
     skuName: '可乐糖浆',
-    type: 'DEDUCT',    // 扣减类型
-    quantity: 150,     // 扣减数量
+    type: 'DEDUCT', // 扣减类型
+    quantity: 150, // 扣减数量
     unit: 'ml',
     reason: 'BOM出品扣减',
-    operator: 'bartender'
+    operator: 'bartender',
   },
 
   // ====== 库存初始状态 (测试前准备) ======
@@ -141,15 +141,15 @@ export const scenario_001 = {
       skuId: '550e8400-e29b-41d4-a716-446655440001',
       on_hand: 100,
       reserved: 0,
-      unit: 'ml'
+      unit: 'ml',
     },
     cola: {
       skuId: '550e8400-e29b-41d4-a716-446655440002',
       on_hand: 500,
       reserved: 0,
-      unit: 'ml'
-    }
-  }
+      unit: 'ml',
+    },
+  },
 };
 
 /**

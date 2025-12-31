@@ -25,7 +25,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   throw new Error(
     'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in .env file. ' +
-    'See docs/SUPABASE_E2E_CONFIG_GUIDE.md for configuration instructions.'
+      'See docs/SUPABASE_E2E_CONFIG_GUIDE.md for configuration instructions.'
   );
 }
 
@@ -70,8 +70,8 @@ async function executeSQLScript(scriptPath: string): Promise<void> {
   // We need to split by semicolons and execute separately
   const statements = sql
     .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'));
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0 && !s.startsWith('--'));
 
   for (const statement of statements) {
     if (statement.toUpperCase().startsWith('SELECT')) {
@@ -100,25 +100,21 @@ async function cleanupTestData(): Promise<void> {
   await supabase
     .from('inventory_transactions')
     .delete()
-    .in('sku_id', [
-      '550e8400-e29b-41d4-a716-446655440001',
-      '550e8400-e29b-41d4-a716-446655440002',
-    ]);
+    .in('sku_id', ['550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440002']);
 
   // Delete inventory records
   await supabase
     .from('inventory')
     .delete()
-    .in('sku_id', [
-      '550e8400-e29b-41d4-a716-446655440001',
-      '550e8400-e29b-41d4-a716-446655440002',
-    ]);
+    .in('sku_id', ['550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440002']);
 }
 
 /**
  * Playwright fixture extending base test
  */
-export const test = base.extend<{ TD_INVENTORY_BOM_WHISKEY_COLA: TD_INVENTORY_BOM_WHISKEY_COLA_Data }>({
+export const test = base.extend<{
+  TD_INVENTORY_BOM_WHISKEY_COLA: TD_INVENTORY_BOM_WHISKEY_COLA_Data;
+}>({
   TD_INVENTORY_BOM_WHISKEY_COLA: async ({}, use) => {
     console.log('[Fixture Setup] Initializing inventory test data...');
 

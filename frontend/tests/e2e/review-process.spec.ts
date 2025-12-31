@@ -17,7 +17,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       // 点击第一个待审核商品
       await reviewItems.first().click();
 
@@ -45,12 +45,12 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       await reviewItems.first().click();
 
       // 查找修改字段
       const modifiedFields = page.locator('[data-testid="modified-field"]');
-      if (await modifiedFields.count() > 0) {
+      if ((await modifiedFields.count()) > 0) {
         // 点击第一个修改字段
         await modifiedFields.first().click();
 
@@ -75,7 +75,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       await reviewItems.first().click();
 
       // 检查初始状态 - 审核通过按钮应该是禁用的
@@ -106,7 +106,9 @@ test.describe('用户故事4: 商品审核流程', () => {
         }
 
         // 验证所有字段都已确认
-        await expect(page.locator('[data-testid="modified-field"].confirmed')).toHaveCount(unconfirmedCount);
+        await expect(page.locator('[data-testid="modified-field"].confirmed')).toHaveCount(
+          unconfirmedCount
+        );
 
         // 验证审核通过按钮现在被激活
         await expect(approveButton).toBeEnabled();
@@ -121,7 +123,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       await reviewItems.first().click();
 
       // 测试驳回按钮（应该总是可用的）
@@ -151,7 +153,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       await reviewItems.first().click();
 
       // 点击驳回按钮
@@ -229,7 +231,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
       // 查找历史记录
       const historyItems = page.locator('[data-testid="history-item"]');
-      if (await historyItems.count() > 0) {
+      if ((await historyItems.count()) > 0) {
         const firstHistory = historyItems.first();
 
         // 验证历史记录信息
@@ -267,8 +269,10 @@ test.describe('用户故事4: 商品审核流程', () => {
 
       // 验证筛选结果
       const reviewItems = page.locator('[data-testid="review-item"]');
-      if (await reviewItems.count() > 0) {
-        await expect(reviewItems.first().locator('[data-testid="item-status"]')).toContainText('待审核');
+      if ((await reviewItems.count()) > 0) {
+        await expect(reviewItems.first().locator('[data-testid="item-status"]')).toContainText(
+          '待审核'
+        );
       }
     }
 
@@ -294,7 +298,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找待审核商品
     const reviewItems = page.locator('[data-testid="review-item"]');
-    if (await reviewItems.count() > 0) {
+    if ((await reviewItems.count()) > 0) {
       await reviewItems.first().click();
 
       // 查找详情查看按钮
@@ -324,7 +328,7 @@ test.describe('用户故事4: 商品审核流程', () => {
 
     // 查找不同状态的商品
     const allReviewItems = page.locator('[data-testid="review-item"]');
-    if (await allReviewItems.count() > 0) {
+    if ((await allReviewItems.count()) > 0) {
       // 遍历所有商品，验证状态显示
       const itemCount = await allReviewItems.count();
 

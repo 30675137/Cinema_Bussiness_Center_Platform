@@ -75,7 +75,9 @@ describe('SupplierStore', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
-        expect(result.current.suppliers.every(supplier => supplier.status === 'active')).toBe(true);
+        expect(result.current.suppliers.every((supplier) => supplier.status === 'active')).toBe(
+          true
+        );
       });
     });
 
@@ -122,14 +124,16 @@ describe('SupplierStore', () => {
         name: '新供应商',
         type: 'manufacturer' as const,
         level: 'standard' as const,
-        contacts: [{
-          id: 'contact-1',
-          name: '张三',
-          phone: '13800138000',
-          position: '经理',
-          email: 'zhangsan@example.com',
-          isPrimary: true,
-        }],
+        contacts: [
+          {
+            id: 'contact-1',
+            name: '张三',
+            phone: '13800138000',
+            position: '经理',
+            email: 'zhangsan@example.com',
+            isPrimary: true,
+          },
+        ],
       };
 
       await act(async () => {
@@ -141,7 +145,7 @@ describe('SupplierStore', () => {
         expect(result.current.loading).toBe(false);
         expect(result.current.suppliers.length).toBeGreaterThan(0);
 
-        const newSupplier = result.current.suppliers.find(s => s.name === '新供应商');
+        const newSupplier = result.current.suppliers.find((s) => s.name === '新供应商');
         expect(newSupplier).toBeTruthy();
         expect(newSupplier?.name).toBe('新供应商');
         expect(newSupplier?.type).toBe('manufacturer');
@@ -197,7 +201,7 @@ describe('SupplierStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedSupplier = result.current.suppliers.find(s => s.id === firstSupplier.id);
+        const updatedSupplier = result.current.suppliers.find((s) => s.id === firstSupplier.id);
         expect(updatedSupplier?.name).toBe('更新后的供应商名称');
         expect(updatedSupplier?.phone).toBe('010-88888888');
       });
@@ -244,7 +248,7 @@ describe('SupplierStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
         expect(result.current.suppliers.length).toBe(initialCount - 1);
-        expect(result.current.suppliers.find(s => s.id === firstSupplier.id)).toBeFalsy();
+        expect(result.current.suppliers.find((s) => s.id === firstSupplier.id)).toBeFalsy();
       });
     });
   });
@@ -278,7 +282,7 @@ describe('SupplierStore', () => {
         expect(result.current.suppliers.length).toBeGreaterThan(0);
       });
 
-      const supplierIds = result.current.suppliers.map(s => s.id);
+      const supplierIds = result.current.suppliers.map((s) => s.id);
 
       act(() => {
         result.current.selectAllSuppliers(true);
@@ -324,7 +328,7 @@ describe('SupplierStore', () => {
         expect(result.current.suppliers.length).toBeGreaterThan(0);
       });
 
-      const supplierIds = result.current.suppliers.slice(0, 2).map(s => s.id);
+      const supplierIds = result.current.suppliers.slice(0, 2).map((s) => s.id);
       const initialCount = result.current.suppliers.length;
 
       await act(async () => {
@@ -350,7 +354,7 @@ describe('SupplierStore', () => {
         expect(result.current.suppliers.length).toBeGreaterThan(0);
       });
 
-      const supplierIds = result.current.suppliers.slice(0, 2).map(s => s.id);
+      const supplierIds = result.current.suppliers.slice(0, 2).map((s) => s.id);
 
       await act(async () => {
         const success = await result.current.batchUpdateStatus(supplierIds, 'suspended');
@@ -360,10 +364,8 @@ describe('SupplierStore', () => {
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
 
-        const updatedSuppliers = result.current.suppliers.filter(s =>
-          supplierIds.includes(s.id)
-        );
-        expect(updatedSuppliers.every(s => s.status === 'suspended')).toBe(true);
+        const updatedSuppliers = result.current.suppliers.filter((s) => supplierIds.includes(s.id));
+        expect(updatedSuppliers.every((s) => s.status === 'suspended')).toBe(true);
       });
     });
   });

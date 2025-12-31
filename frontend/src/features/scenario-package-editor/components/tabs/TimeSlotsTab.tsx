@@ -5,14 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
-  Tabs,
-  message,
-  Modal,
-  Checkbox,
-  Space,
-  Typography,
-} from 'antd';
+import { Tabs, message, Modal, Checkbox, Space, Typography } from 'antd';
 import { CalendarOutlined, ScheduleOutlined } from '@ant-design/icons';
 import { EditableCard } from '../';
 import { useScenarioPackageStore } from '../../stores/useScenarioPackageStore';
@@ -22,10 +15,18 @@ import {
   useUpdateTimeSlotTemplate,
   useDeleteTimeSlotTemplate,
 } from '../../hooks/useScenarioPackageQueries';
-import { DAY_OF_WEEK_LABELS, type TimeSlotTemplate, type TimeSlotOverride, type DayOfWeek } from '../../types';
+import {
+  DAY_OF_WEEK_LABELS,
+  type TimeSlotTemplate,
+  type TimeSlotOverride,
+  type DayOfWeek,
+} from '../../types';
 import { WeekTemplateView } from '../time-slots/WeekTemplateView';
 import { CalendarOverrideView } from '../time-slots/CalendarOverrideView';
-import { TimeSlotTemplateForm, type TimeSlotTemplateFormValues } from '../forms/TimeSlotTemplateForm';
+import {
+  TimeSlotTemplateForm,
+  type TimeSlotTemplateFormValues,
+} from '../forms/TimeSlotTemplateForm';
 import { DateOverrideForm, type DateOverrideFormValues } from '../forms/DateOverrideForm';
 
 const { Text } = Typography;
@@ -49,17 +50,17 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
 
   // 子标签页状态
   const [activeTab, setActiveTab] = useState('week');
-  
+
   // 时段模板表单状态
   const [templateFormVisible, setTemplateFormVisible] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<TimeSlotTemplate | undefined>();
   const [defaultDayOfWeek, setDefaultDayOfWeek] = useState<DayOfWeek>(1);
-  
+
   // 日期覆盖表单状态
   const [overrideFormVisible, setOverrideFormVisible] = useState(false);
   const [editingOverride, setEditingOverride] = useState<TimeSlotOverride | undefined>();
   const [defaultOverrideDate, setDefaultOverrideDate] = useState<string | undefined>();
-  
+
   // 复制到其他天 Modal 状态
   const [copyModalVisible, setCopyModalVisible] = useState(false);
   const [templateToCopy, setTemplateToCopy] = useState<TimeSlotTemplate | undefined>();
@@ -77,7 +78,7 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
   const loading = parentLoading || templatesLoading;
 
   // === 时段模板操作 ===
-  
+
   // 添加时段
   const handleAddTemplate = useCallback((dayOfWeek: DayOfWeek) => {
     setDefaultDayOfWeek(dayOfWeek);
@@ -92,69 +93,79 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
   }, []);
 
   // 删除时段
-  const handleDeleteTemplate = useCallback(async (id: string) => {
-    try {
-      await deleteMutation.mutateAsync(id);
-      message.success('已删除');
-      setTabDirty('timeslots', true);
-    } catch (error) {
-      message.error('删除失败');
-    }
-  }, [deleteMutation, setTabDirty]);
+  const handleDeleteTemplate = useCallback(
+    async (id: string) => {
+      try {
+        await deleteMutation.mutateAsync(id);
+        message.success('已删除');
+        setTabDirty('timeslots', true);
+      } catch (error) {
+        message.error('删除失败');
+      }
+    },
+    [deleteMutation, setTabDirty]
+  );
 
   // 切换启用状态
-  const handleToggleEnabled = useCallback(async (id: string, enabled: boolean) => {
-    try {
-      await updateMutation.mutateAsync({
-        templateId: id,
-        data: { isEnabled: enabled },
-      });
-      message.success(enabled ? '已启用' : '已禁用');
-      setTabDirty('timeslots', true);
-    } catch (error) {
-      message.error('操作失败');
-    }
-  }, [updateMutation, setTabDirty]);
+  const handleToggleEnabled = useCallback(
+    async (id: string, enabled: boolean) => {
+      try {
+        await updateMutation.mutateAsync({
+          templateId: id,
+          data: { isEnabled: enabled },
+        });
+        message.success(enabled ? '已启用' : '已禁用');
+        setTabDirty('timeslots', true);
+      } catch (error) {
+        message.error('操作失败');
+      }
+    },
+    [updateMutation, setTabDirty]
+  );
 
   // 提交时段模板表单
-  const handleSubmitTemplate = useCallback(async (values: TimeSlotTemplateFormValues) => {
-    try {
-      const priceAdjustment = values.priceAdjustmentType !== 'none' && values.priceAdjustmentValue !== undefined
-        ? { type: values.priceAdjustmentType, value: values.priceAdjustmentValue }
-        : undefined;
+  const handleSubmitTemplate = useCallback(
+    async (values: TimeSlotTemplateFormValues) => {
+      try {
+        const priceAdjustment =
+          values.priceAdjustmentType !== 'none' && values.priceAdjustmentValue !== undefined
+            ? { type: values.priceAdjustmentType, value: values.priceAdjustmentValue }
+            : undefined;
 
-      if (editingTemplate) {
-        // 更新
-        await updateMutation.mutateAsync({
-          templateId: editingTemplate.id,
-          data: {
+        if (editingTemplate) {
+          // 更新
+          await updateMutation.mutateAsync({
+            templateId: editingTemplate.id,
+            data: {
+              startTime: values.startTime,
+              endTime: values.endTime,
+              capacity: values.capacity,
+              priceAdjustment,
+              isEnabled: values.isEnabled,
+            },
+          });
+          message.success('已更新');
+        } else {
+          // 创建
+          await createMutation.mutateAsync({
+            dayOfWeek: values.dayOfWeek,
             startTime: values.startTime,
             endTime: values.endTime,
             capacity: values.capacity,
             priceAdjustment,
             isEnabled: values.isEnabled,
-          },
-        });
-        message.success('已更新');
-      } else {
-        // 创建
-        await createMutation.mutateAsync({
-          dayOfWeek: values.dayOfWeek,
-          startTime: values.startTime,
-          endTime: values.endTime,
-          capacity: values.capacity,
-          priceAdjustment,
-          isEnabled: values.isEnabled,
-        });
-        message.success('已添加');
+          });
+          message.success('已添加');
+        }
+        setTabDirty('timeslots', true);
+        setTemplateFormVisible(false);
+      } catch (error) {
+        message.error(editingTemplate ? '更新失败' : '添加失败');
+        throw error;
       }
-      setTabDirty('timeslots', true);
-      setTemplateFormVisible(false);
-    } catch (error) {
-      message.error(editingTemplate ? '更新失败' : '添加失败');
-      throw error;
-    }
-  }, [editingTemplate, createMutation, updateMutation, setTabDirty]);
+    },
+    [editingTemplate, createMutation, updateMutation, setTabDirty]
+  );
 
   // 复制到其他天
   const handleCopyToOtherDays = useCallback((template: TimeSlotTemplate) => {
@@ -187,7 +198,7 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
   }, [templateToCopy, selectedDays, createMutation, setTabDirty]);
 
   // === 日期覆盖操作 ===
-  
+
   const handleAddOverride = useCallback((date: string) => {
     setDefaultOverrideDate(date);
     setEditingOverride(undefined);
@@ -212,16 +223,12 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
 
   // 可选天列表（排除当前模板所在天）
   const availableDays = templateToCopy
-    ? ([0, 1, 2, 3, 4, 5, 6] as DayOfWeek[]).filter(d => d !== templateToCopy.dayOfWeek)
+    ? ([0, 1, 2, 3, 4, 5, 6] as DayOfWeek[]).filter((d) => d !== templateToCopy.dayOfWeek)
     : [];
 
   return (
     <>
-      <EditableCard
-        title="时段配置"
-        description="配置场景包的可预订时段规则"
-        isDirty={isDirty}
-      >
+      <EditableCard title="时段配置" description="配置场景包的可预订时段规则" isDirty={isDirty}>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -299,7 +306,12 @@ const TimeSlotsTab: React.FC<TimeSlotsTabProps> = ({
       >
         <div style={{ marginBottom: 16 }}>
           <Text>
-            将时段 <Text strong>{templateToCopy?.startTime?.substring(0, 5)} - {templateToCopy?.endTime?.substring(0, 5)}</Text> 复制到：
+            将时段{' '}
+            <Text strong>
+              {templateToCopy?.startTime?.substring(0, 5)} -{' '}
+              {templateToCopy?.endTime?.substring(0, 5)}
+            </Text>{' '}
+            复制到：
           </Text>
         </div>
         <Checkbox.Group

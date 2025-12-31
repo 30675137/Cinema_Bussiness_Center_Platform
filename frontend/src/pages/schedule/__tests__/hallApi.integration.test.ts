@@ -96,9 +96,7 @@ describe('Hall API Integration Tests', () => {
       expect(response.data[0].status).toBe('ACTIVE');
 
       // 验证 API 调用包含状态参数
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('status=ACTIVE')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('status=ACTIVE'));
     });
   });
 
@@ -173,9 +171,7 @@ describe('Hall API Integration Tests', () => {
       await scheduleService.getHallsByStore(storeId);
 
       // Then
-      expect(mockFetch).toHaveBeenCalledWith(
-        `/api/stores/${storeId}/halls`
-      );
+      expect(mockFetch).toHaveBeenCalledWith(`/api/stores/${storeId}/halls`);
     });
 
     it('should filter halls by status', async () => {
@@ -189,9 +185,7 @@ describe('Hall API Integration Tests', () => {
       await scheduleService.getHallsByStore(storeId, { status: 'active' });
 
       // Then
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('status=ACTIVE')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('status=ACTIVE'));
     });
 
     it('should filter halls by type', async () => {
@@ -205,9 +199,7 @@ describe('Hall API Integration Tests', () => {
       await scheduleService.getHallsByStore(storeId, { type: 'VIP' });
 
       // Then
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('type=VIP')
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('type=VIP'));
     });
 
     it('should return empty array when store has no halls', async () => {
@@ -283,10 +275,46 @@ describe('Hall API Integration Tests', () => {
     it('should support all HallType values from frontend type definition', async () => {
       // Given
       const mockHalls: Hall[] = [
-        { id: '1', name: 'VIP厅', capacity: 50, type: 'VIP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-        { id: '2', name: '公众厅', capacity: 100, type: 'Public', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-        { id: '3', name: 'CP厅', capacity: 80, type: 'CP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-        { id: '4', name: '派对厅', capacity: 60, type: 'Party', tags: [], status: 'active', createdAt: '', updatedAt: '' },
+        {
+          id: '1',
+          name: 'VIP厅',
+          capacity: 50,
+          type: 'VIP',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: '2',
+          name: '公众厅',
+          capacity: 100,
+          type: 'Public',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: '3',
+          name: 'CP厅',
+          capacity: 80,
+          type: 'CP',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: '4',
+          name: '派对厅',
+          capacity: 60,
+          type: 'Party',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
       ];
 
       mockFetch.mockResolvedValueOnce({
@@ -298,7 +326,7 @@ describe('Hall API Integration Tests', () => {
       const response = await scheduleService.getHallsByStore('store-1');
 
       // Then
-      const types = response.data.map(h => h.type);
+      const types = response.data.map((h) => h.type);
       expect(types).toContain('VIP');
       expect(types).toContain('Public');
       expect(types).toContain('CP');
@@ -308,9 +336,36 @@ describe('Hall API Integration Tests', () => {
     it('should support all HallStatus values from frontend type definition', async () => {
       // Given
       const mockHalls: Hall[] = [
-        { id: '1', name: '活动厅', capacity: 50, type: 'VIP', tags: [], status: 'active', createdAt: '', updatedAt: '' },
-        { id: '2', name: '停用厅', capacity: 100, type: 'Public', tags: [], status: 'inactive', createdAt: '', updatedAt: '' },
-        { id: '3', name: '维护厅', capacity: 80, type: 'CP', tags: [], status: 'maintenance', createdAt: '', updatedAt: '' },
+        {
+          id: '1',
+          name: '活动厅',
+          capacity: 50,
+          type: 'VIP',
+          tags: [],
+          status: 'active',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: '2',
+          name: '停用厅',
+          capacity: 100,
+          type: 'Public',
+          tags: [],
+          status: 'inactive',
+          createdAt: '',
+          updatedAt: '',
+        },
+        {
+          id: '3',
+          name: '维护厅',
+          capacity: 80,
+          type: 'CP',
+          tags: [],
+          status: 'maintenance',
+          createdAt: '',
+          updatedAt: '',
+        },
       ];
 
       mockFetch.mockResolvedValueOnce({
@@ -322,7 +377,7 @@ describe('Hall API Integration Tests', () => {
       const response = await scheduleService.getHallsByStore('store-1');
 
       // Then
-      const statuses = response.data.map(h => h.status);
+      const statuses = response.data.map((h) => h.status);
       expect(statuses).toContain('active');
       expect(statuses).toContain('inactive');
       expect(statuses).toContain('maintenance');

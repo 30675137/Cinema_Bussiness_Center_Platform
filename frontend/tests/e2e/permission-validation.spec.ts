@@ -13,20 +13,20 @@ const PERMISSION_TESTS = {
       user: { username: 'viewer', password: 'viewer' },
       path: '/basic-settings/permission',
       expectedStatus: 403,
-      expectedMessage: '权限不足'
+      expectedMessage: '权限不足',
     },
     {
       user: { username: 'operator', password: 'operator' },
       path: '/basic-settings/permission',
       expectedStatus: 403,
-      expectedMessage: '权限不足'
+      expectedMessage: '权限不足',
     },
     {
       user: { username: 'viewer', password: 'viewer' },
       path: '/pricing/rules',
       expectedStatus: 403,
-      expectedMessage: '权限不足'
-    }
+      expectedMessage: '权限不足',
+    },
   ],
   // 有权限访问测试
   authorizedAccess: [
@@ -34,27 +34,27 @@ const PERMISSION_TESTS = {
       user: { username: 'admin', password: 'admin' },
       path: '/basic-settings/permission',
       expectedStatus: 200,
-      expectedContent: '角色与权限管理'
+      expectedContent: '角色与权限管理',
     },
     {
       user: { username: 'admin', password: 'admin' },
       path: '/pricing/rules',
       expectedStatus: 200,
-      expectedContent: '价格规则配置'
+      expectedContent: '价格规则配置',
     },
     {
       user: { username: 'operator', password: 'operator' },
       path: '/product/spu',
       expectedStatus: 200,
-      expectedContent: 'SPU 管理'
+      expectedContent: 'SPU 管理',
     },
     {
       user: { username: 'operator', password: 'operator' },
       path: '/inventory/overview',
       expectedStatus: 200,
-      expectedContent: '库存台账查看'
-    }
-  ]
+      expectedContent: '库存台账查看',
+    },
+  ],
 };
 
 test.describe('权限验证测试', () => {
@@ -145,12 +145,14 @@ test.describe('权限验证测试', () => {
     // 这里我们模拟一个权限更新后的状态
     await page.evaluate(() => {
       // 模拟更新用户权限
-      window.dispatchEvent(new CustomEvent('permissions-updated', {
-        detail: {
-          addedPermissions: ['pricing.read', 'pricing.write'],
-          removedPermissions: []
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('permissions-updated', {
+          detail: {
+            addedPermissions: ['pricing.read', 'pricing.write'],
+            removedPermissions: [],
+          },
+        })
+      );
     });
 
     // 验证价格管理菜单现在可见
@@ -188,12 +190,12 @@ test.describe('权限验证测试', () => {
   test('权限检查API调用验证', async ({ page }) => {
     // 启用请求拦截来监控API调用
     const apiCalls: any[] = [];
-    page.on('request', request => {
+    page.on('request', (request) => {
       if (request.url().includes('/api/permissions/check')) {
         apiCalls.push({
           url: request.url(),
           method: request.method(),
-          postData: request.postData()
+          postData: request.postData(),
         });
       }
     });
@@ -212,9 +214,8 @@ test.describe('权限验证测试', () => {
     expect(apiCalls.length).toBeGreaterThan(0);
 
     // 验证API调用格式正确
-    const permissionCheck = apiCalls.find(call =>
-      call.url.includes('/permissions/check') &&
-      call.method === 'POST'
+    const permissionCheck = apiCalls.find(
+      (call) => call.url.includes('/permissions/check') && call.method === 'POST'
     );
     expect(permissionCheck).toBeDefined();
 
@@ -258,7 +259,7 @@ test.describe('权限验证测试', () => {
 
     // 监控网络请求
     const requests: any[] = [];
-    page.on('request', request => {
+    page.on('request', (request) => {
       if (request.url().includes('/api/')) {
         requests.push(request.url());
       }
@@ -271,7 +272,7 @@ test.describe('权限验证测试', () => {
     }
 
     // 验证权限检查API调用被缓存
-    const permissionRequests = requests.filter(url => url.includes('/permissions/check'));
+    const permissionRequests = requests.filter((url) => url.includes('/permissions/check'));
 
     // 权限检查应该被缓存，避免重复调用
     expect(permissionRequests.length).toBeLessThan(3);
@@ -285,7 +286,7 @@ function getMenuNameFromPath(path: string): string | null {
     '/product': '商品管理',
     '/inventory': '库存 & 仓店库存管理',
     '/pricing': '价格体系管理',
-    '/operations': '运营 & 报表 / 指标看板'
+    '/operations': '运营 & 报表 / 指标看板',
   };
 
   const pathSegments = path.split('/').filter(Boolean);
@@ -305,7 +306,7 @@ function getSubMenuNameFromPath(path: string): string | null {
     '/pricing/rules': '价格规则配置',
     '/operations/data-quality': '商品数据质量报表',
     '/operations/inventory-accuracy': '库存准确性报表',
-    '/operations/resource-utilization': '资源利用率报表'
+    '/operations/resource-utilization': '资源利用率报表',
   };
 
   return pathToSubMenu[path] || null;

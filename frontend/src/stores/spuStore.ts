@@ -59,16 +59,16 @@ const initialState = {
     detail: false,
     create: false,
     update: false,
-    delete: false
+    delete: false,
   },
   errors: {},
   filters: {},
   pagination: {
     current: 1,
     pageSize: 20,
-    total: 0
+    total: 0,
   },
-  selectedRowKeys: []
+  selectedRowKeys: [],
 };
 
 export const useSPUStore = create<SPUState>()(
@@ -82,24 +82,24 @@ export const useSPUStore = create<SPUState>()(
 
       setLoading: (key, value) =>
         set((state) => ({
-          loading: { ...state.loading, [key]: value }
+          loading: { ...state.loading, [key]: value },
         })),
 
       setError: (key, error) =>
         set((state) => ({
-          errors: { ...state.errors, [key]: error }
+          errors: { ...state.errors, [key]: error },
         })),
 
       setFilters: (newFilters) =>
         set((state) => ({
-          filters: { ...state.filters, ...newFilters }
+          filters: { ...state.filters, ...newFilters },
         })),
 
       clearFilters: () => set({ filters: {} }),
 
       setPagination: (newPagination) =>
         set((state) => ({
-          pagination: { ...state.pagination, ...newPagination }
+          pagination: { ...state.pagination, ...newPagination },
         })),
 
       setSelectedRowKeys: (selectedRowKeys) => set({ selectedRowKeys }),
@@ -111,54 +111,49 @@ export const useSPUStore = create<SPUState>()(
           items: [item, ...state.items],
           pagination: {
             ...state.pagination,
-            total: state.pagination.total + 1
-          }
+            total: state.pagination.total + 1,
+          },
         })),
 
       updateItem: (id, updates) =>
         set((state) => ({
-          items: state.items.map(item =>
-            item.id === id ? { ...item, ...updates } : item
-          ),
+          items: state.items.map((item) => (item.id === id ? { ...item, ...updates } : item)),
           selectedItem:
             state.selectedItem?.id === id
               ? { ...state.selectedItem, ...updates }
-              : state.selectedItem
+              : state.selectedItem,
         })),
 
       removeItem: (id) =>
         set((state) => ({
-          items: state.items.filter(item => item.id !== id),
-          selectedItem:
-            state.selectedItem?.id === id ? null : state.selectedItem,
-          selectedRowKeys: state.selectedRowKeys.filter(key => key !== id),
+          items: state.items.filter((item) => item.id !== id),
+          selectedItem: state.selectedItem?.id === id ? null : state.selectedItem,
+          selectedRowKeys: state.selectedRowKeys.filter((key) => key !== id),
           pagination: {
             ...state.pagination,
-            total: Math.max(0, state.pagination.total - 1)
-          }
+            total: Math.max(0, state.pagination.total - 1),
+          },
         })),
 
       removeItems: (ids) =>
         set((state) => {
-          const filteredItems = state.items.filter(item => !ids.includes(item.id));
+          const filteredItems = state.items.filter((item) => !ids.includes(item.id));
           return {
             items: filteredItems,
             selectedItem:
-              state.selectedItem && ids.includes(state.selectedItem.id)
-                ? null
-                : state.selectedItem,
-            selectedRowKeys: state.selectedRowKeys.filter(key => !ids.includes(key)),
+              state.selectedItem && ids.includes(state.selectedItem.id) ? null : state.selectedItem,
+            selectedRowKeys: state.selectedRowKeys.filter((key) => !ids.includes(key)),
             pagination: {
               ...state.pagination,
-              total: Math.max(0, state.pagination.total - ids.length)
-            }
+              total: Math.max(0, state.pagination.total - ids.length),
+            },
           };
         }),
 
-      reset: () => set(initialState)
+      reset: () => set(initialState),
     }),
     {
-      name: 'spu-store'
+      name: 'spu-store',
     }
   )
 );

@@ -89,9 +89,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
       dataIndex: 'servicePriceSnapshot',
       key: 'servicePriceSnapshot',
       width: 120,
-      render: (price: number) => (
-        <Text strong>¥{price.toFixed(2)}</Text>
-      ),
+      render: (price: number) => <Text strong>¥{price.toFixed(2)}</Text>,
     },
     {
       title: '操作',
@@ -103,13 +101,7 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
           onConfirm={() => handleRemove(record.id)}
           disabled={disabled}
         >
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            disabled={disabled}
-          />
+          <Button type="text" danger size="small" icon={<DeleteOutlined />} disabled={disabled} />
         </Popconfirm>
       ),
     },
@@ -128,7 +120,10 @@ export const ServiceSelector: React.FC<ServiceSelectorProps> = ({
         <Space>
           {value.length > 0 && (
             <Text type="secondary">
-              合计：<Text strong style={{ color: '#1890ff' }}>¥{totalPrice.toFixed(2)}</Text>
+              合计：
+              <Text strong style={{ color: '#1890ff' }}>
+                ¥{totalPrice.toFixed(2)}
+              </Text>
             </Text>
           )}
           <Button

@@ -178,10 +178,7 @@ export function formatPath(path: string[]): string {
  * @param fromUnit 起始单位
  * @returns 所有可达的单位集合
  */
-export function getReachableUnits(
-  conversions: UnitConversion[],
-  fromUnit: string
-): Set<string> {
+export function getReachableUnits(conversions: UnitConversion[], fromUnit: string): Set<string> {
   const graph = buildBidirectionalGraph(conversions);
   const reachable = new Set<string>();
   const queue = [fromUnit];

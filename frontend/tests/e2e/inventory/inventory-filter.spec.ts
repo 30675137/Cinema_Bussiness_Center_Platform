@@ -174,7 +174,11 @@ test.describe('门店SKU库存查询 - 用户故事3: 多维度筛选库存', ()
     // Then 同时应用筛选和搜索条件
 
     // 先输入搜索
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]').first();
+    const searchInput = page
+      .locator(
+        'input[placeholder*="搜索"], input[placeholder*="SKU"], [data-testid="search-input"]'
+      )
+      .first();
     if (await searchInput.isVisible()) {
       await searchInput.fill('SKU');
       await page.waitForTimeout(400);

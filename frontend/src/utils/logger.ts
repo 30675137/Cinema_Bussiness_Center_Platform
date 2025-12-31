@@ -8,7 +8,7 @@ export enum LogLevel {
   INFO = 1,
   WARN = 2,
   ERROR = 3,
-  FATAL = 4
+  FATAL = 4,
 }
 
 // 日志条目接口
@@ -60,7 +60,7 @@ export class Logger {
       batchSize: 50,
       flushInterval: 5000, // 5秒
       maxLogEntries: 1000,
-      includeStackTrace: true
+      includeStackTrace: true,
     };
 
     this.setupFlushTimer();
@@ -150,7 +150,7 @@ export class Logger {
       context,
       url: window.location.href,
       userAgent: navigator.userAgent,
-      sessionId: this.sessionId
+      sessionId: this.sessionId,
     };
 
     // 添加错误信息
@@ -242,7 +242,7 @@ export class Logger {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': this.config.apiKey || ''
+          'X-API-Key': this.config.apiKey || '',
         },
         body: JSON.stringify({
           logs: logsToSend,
@@ -250,9 +250,9 @@ export class Logger {
             timestamp: new Date().toISOString(),
             url: window.location.href,
             userAgent: navigator.userAgent,
-            sessionId: this.sessionId
-          }
-        })
+            sessionId: this.sessionId,
+          },
+        }),
       });
     } catch (error) {
       // 如果发送失败，将日志重新加入队列
@@ -279,7 +279,7 @@ export class Logger {
     const stats = {
       totalLogs: this.logQueue.length,
       logsByLevel: {} as Record<LogLevel, number>,
-      logsByCategory: {} as Record<string, number>
+      logsByCategory: {} as Record<string, number>,
     };
 
     for (const entry of this.logQueue) {
@@ -313,9 +313,9 @@ export class Logger {
       metadata: {
         exportTime: new Date().toISOString(),
         sessionId: this.sessionId,
-        totalLogs: this.logQueue.length
+        totalLogs: this.logQueue.length,
       },
-      logs: this.logQueue
+      logs: this.logQueue,
     };
 
     return JSON.stringify(exportData, null, 2);
@@ -348,7 +348,7 @@ export const log = {
   error: (message: string, error?: Error, context?: Record<string, any>, category?: string) =>
     logger.error(message, error, context, category),
   fatal: (message: string, error?: Error, context?: Record<string, any>, category?: string) =>
-    logger.fatal(message, error, context, category)
+    logger.fatal(message, error, context, category),
 };
 
 // 业务日志类别
@@ -365,7 +365,7 @@ export const LogCategories = {
   SECURITY: 'security',
   NETWORK: 'network',
   CACHE: 'cache',
-  DATABASE: 'database'
+  DATABASE: 'database',
 } as const;
 
 export default logger;

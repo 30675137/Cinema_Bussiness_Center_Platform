@@ -15,7 +15,7 @@ import {
   Divider,
   Alert,
   Tag,
-  message
+  message,
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
@@ -29,7 +29,7 @@ import {
   PriceType,
   PriceStatus,
   PriceRuleType,
-  PriceTypeConfig
+  PriceTypeConfig,
 } from '@/types/price';
 import { useCreatePriceMutation, useUpdatePriceMutation } from '@/stores/priceStore';
 import PriceRuleConfig from './PriceRuleConfig';
@@ -45,12 +45,7 @@ interface PriceFormProps {
   productId?: string;
 }
 
-const PriceForm: React.FC<PriceFormProps> = ({
-  mode,
-  price,
-  onSuccess,
-  productId
-}) => {
+const PriceForm: React.FC<PriceFormProps> = ({ mode, price, onSuccess, productId }) => {
   const createMutation = useCreatePriceMutation();
   const updateMutation = useUpdatePriceMutation();
   const [showRuleConfig, setShowRuleConfig] = useState(false);
@@ -72,8 +67,8 @@ const PriceForm: React.FC<PriceFormProps> = ({
       minQuantity: undefined,
       maxQuantity: undefined,
       ruleType: undefined,
-      ruleConfig: undefined
-    }
+      ruleConfig: undefined,
+    },
   });
 
   const {
@@ -83,7 +78,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
     getValues,
     watch,
     formState: { errors, touched, isValid },
-    trigger
+    trigger,
   } = form;
 
   // 监听价格类型变化
@@ -93,7 +88,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
   // 编辑模式加载数据
   useEffect(() => {
     if (mode === 'edit' && price) {
-      Object.keys(price).forEach(key => {
+      Object.keys(price).forEach((key) => {
         if (key in getValues()) {
           setValue(key as keyof PriceFormData, price[key as any]);
         }
@@ -118,14 +113,14 @@ const PriceForm: React.FC<PriceFormProps> = ({
         const priceData = {
           ...data,
           productId: productId || '',
-          status: PriceStatus.ACTIVE
+          status: PriceStatus.ACTIVE,
         };
         await createMutation.mutateAsync(priceData);
         message.success('价格创建成功');
       } else {
         await updateMutation.mutateAsync({
           id: price!.id,
-          data
+          data,
         });
         message.success('价格更新成功');
       }
@@ -147,7 +142,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
     { value: 'EUR', label: '欧元 (EUR)' },
     { value: 'GBP', label: '英镑 (GBP)' },
     { value: 'JPY', label: '日元 (JPY)' },
-    { value: 'HKD', label: '港币 (HKD)' }
+    { value: 'HKD', label: '港币 (HKD)' },
   ];
 
   // 渠道选项
@@ -157,7 +152,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
     { value: 'wechat', label: '微信小程序' },
     { value: 'app', label: 'APP应用' },
     { value: 'website', label: '官方网站' },
-    { value: 'partner', label: '合作伙伴' }
+    { value: 'partner', label: '合作伙伴' },
   ];
 
   // 会员等级选项
@@ -167,7 +162,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
     { value: 'gold', label: '黄金会员' },
     { value: 'platinum', label: '铂金会员' },
     { value: 'diamond', label: '钻石会员' },
-    { value: 'vip', label: 'VIP会员' }
+    { value: 'vip', label: 'VIP会员' },
   ];
 
   // 价格规则类型选项
@@ -178,7 +173,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
     { value: PriceRuleType.BULK_PURCHASE, label: '批量采购' },
     { value: PriceRuleType.TIME_BASED, label: '时效价格' },
     { value: PriceRuleType.MEMBER_LEVEL, label: '会员等级' },
-    { value: PriceRuleType.CHANNEL_BASED, label: '渠道定价' }
+    { value: PriceRuleType.CHANNEL_BASED, label: '渠道定价' },
   ];
 
   // 计算折扣金额
@@ -191,7 +186,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
       const discountPercentage = ((discountAmount / basePrice) * 100).toFixed(2);
       return {
         amount: discountAmount,
-        percentage: parseFloat(discountPercentage)
+        percentage: parseFloat(discountPercentage),
       };
     }
     return null;
@@ -216,10 +211,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
                   name="priceType"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择价格类型"
-                    >
+                    <Select {...field} placeholder="请选择价格类型">
                       {Object.entries(PriceTypeConfig).map(([value, config]) => (
                         <Option key={value} value={value}>
                           <Tag color={config.color} style={{ marginRight: 8 }}>
@@ -243,11 +235,8 @@ const PriceForm: React.FC<PriceFormProps> = ({
                   name="currency"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      {...field}
-                      placeholder="请选择货币类型"
-                    >
-                      {currencyOptions.map(option => (
+                    <Select {...field} placeholder="请选择货币类型">
+                      {currencyOptions.map((option) => (
                         <Option key={option.value} value={option.value}>
                           {option.label}
                         </Option>
@@ -465,7 +454,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
                       placeholder="请选择适用渠道（可选）"
                       style={{ width: '100%' }}
                     >
-                      {channelOptions.map(option => (
+                      {channelOptions.map((option) => (
                         <Option key={option.value} value={option.value}>
                           {option.label}
                         </Option>
@@ -487,7 +476,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
                       placeholder="请选择会员等级（可选）"
                       style={{ width: '100%' }}
                     >
-                      {memberLevelOptions.map(option => (
+                      {memberLevelOptions.map((option) => (
                         <Option key={option.value} value={option.value}>
                           {option.label}
                         </Option>
@@ -555,7 +544,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
                           setValue('ruleConfig', undefined);
                         }}
                       >
-                        {ruleTypeOptions.map(option => (
+                        {ruleTypeOptions.map((option) => (
                           <Option key={option.value} value={option.value}>
                             {option.label}
                           </Option>
@@ -581,9 +570,7 @@ const PriceForm: React.FC<PriceFormProps> = ({
         <Row justify="end">
           <Col>
             <Space>
-              <Button onClick={handleReset}>
-                重置
-              </Button>
+              <Button onClick={handleReset}>重置</Button>
               <Button
                 type="primary"
                 htmlType="submit"

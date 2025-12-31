@@ -162,7 +162,7 @@ export const useProductListStore = create<ProductListStore>()(
           }),
         selectAllProducts: () =>
           set((state) => {
-            state.selectedProductIds = state.products.map(p => p.id);
+            state.selectedProductIds = state.products.map((p) => p.id);
           }),
         clearSelection: () =>
           set((state) => {
@@ -379,19 +379,22 @@ export const useBatchDeleteProductsMutation = () => {
 
 // 选择器函数
 export const useSelectedProducts = () => {
-  const selectedIds = useProductListStore(state => state.selectedProductIds);
-  const products = useProductListStore(state => state.products);
+  const selectedIds = useProductListStore((state) => state.selectedProductIds);
+  const products = useProductListStore((state) => state.products);
 
-  return products.filter(product => selectedIds.includes(product.id));
+  return products.filter((product) => selectedIds.includes(product.id));
 };
 
 export const useProductCountByStatus = () => {
-  const products = useProductListStore(state => state.products);
+  const products = useProductListStore((state) => state.products);
 
-  return products.reduce((acc, product) => {
-    acc[product.status] = (acc[product.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  return products.reduce(
+    (acc, product) => {
+      acc[product.status] = (acc[product.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 };
 
 // 导出别名，方便旧代码兼容

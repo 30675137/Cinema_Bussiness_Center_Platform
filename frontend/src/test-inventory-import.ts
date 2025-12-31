@@ -16,7 +16,7 @@ const test: CurrentInventory = {
   safetyStock: 0,
   lastUpdated: '',
   sku: { id: '', name: '', skuCode: '', isActive: true },
-  store: { id: '', name: '', code: '', isActive: true }
+  store: { id: '', name: '', code: '', isActive: true },
 };
 
 console.log('Test import successful:', test);

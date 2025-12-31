@@ -46,40 +46,32 @@ const CategoryManagement: React.FC = () => {
   const navigate = useNavigate();
 
   // 状态管理hooks
-  const selectedCategoryId = useCategoryStore(state => state.selectedCategoryId);
-  const expandedKeys = useCategoryStore(state => state.expandedKeys);
-  const searchKeyword = useCategoryStore(state => state.searchKeyword);
+  const selectedCategoryId = useCategoryStore((state) => state.selectedCategoryId);
+  const expandedKeys = useCategoryStore((state) => state.expandedKeys);
+  const searchKeyword = useCategoryStore((state) => state.searchKeyword);
 
   // 创建顶级类目弹窗状态
   const [createTopLevelFormVisible, setCreateTopLevelFormVisible] = React.useState(false);
 
   // 状态管理actions
-  const {
-    setSelectedCategoryId,
-    setExpandedKeys,
-    selectCategory,
-    performSearch,
-    clearSearch
-  } = useCategoryActions();
+  const { setSelectedCategoryId, setExpandedKeys, selectCategory, performSearch, clearSearch } =
+    useCategoryActions();
 
   // 数据查询hooks
   const {
     data: treeData,
     isLoading: isTreeLoading,
     error: treeError,
-    refetch: refetchTree
+    refetch: refetchTree,
   } = useCategoryTreeQuery(searchKeyword);
 
   const {
     data: selectedCategory,
     isLoading: isDetailLoading,
-    error: detailError
-  } = useCategoryQuery(
-    selectedCategoryId || id || '',
-    {
-      enabled: !!(selectedCategoryId || id)
-    }
-  );
+    error: detailError,
+  } = useCategoryQuery(selectedCategoryId || id || '', {
+    enabled: !!(selectedCategoryId || id),
+  });
 
   // 处理URL参数变化
   useEffect(() => {
@@ -103,30 +95,39 @@ const CategoryManagement: React.FC = () => {
   /**
    * 处理类目节点选择
    */
-  const handleSelect = useCallback((categoryId: string) => {
-    selectCategory(categoryId);
-    navigate(`/mdm-pim/category/${categoryId}`);
-  }, [selectCategory, navigate]);
+  const handleSelect = useCallback(
+    (categoryId: string) => {
+      selectCategory(categoryId);
+      navigate(`/mdm-pim/category/${categoryId}`);
+    },
+    [selectCategory, navigate]
+  );
 
   /**
    * 处理类目节点展开/收起
    */
-  const handleExpand = useCallback((keys: string[]) => {
-    setExpandedKeys(keys);
-  }, [setExpandedKeys]);
+  const handleExpand = useCallback(
+    (keys: string[]) => {
+      setExpandedKeys(keys);
+    },
+    [setExpandedKeys]
+  );
 
   /**
    * 处理搜索
    */
-  const handleSearch = useCallback((keyword: string) => {
-    performSearch(keyword);
+  const handleSearch = useCallback(
+    (keyword: string) => {
+      performSearch(keyword);
 
-    // 搜索后自动展开匹配的路径
-    if (keyword.trim() && treeData?.data) {
-      const expandedKeys = CategoryTreeUtils.getExpandedKeys(treeData.data, keyword);
-      setExpandedKeys(expandedKeys);
-    }
-  }, [performSearch, treeData?.data, setExpandedKeys]);
+      // 搜索后自动展开匹配的路径
+      if (keyword.trim() && treeData?.data) {
+        const expandedKeys = CategoryTreeUtils.getExpandedKeys(treeData.data, keyword);
+        setExpandedKeys(expandedKeys);
+      }
+    },
+    [performSearch, treeData?.data, setExpandedKeys]
+  );
 
   /**
    * 处理搜索清除
@@ -138,19 +139,25 @@ const CategoryManagement: React.FC = () => {
   /**
    * 处理类目更新成功
    */
-  const handleCategoryUpdate = useCallback((category: Category) => {
-    refetchTree(); // 刷新树结构数据
-    message.success('类目更新成功');
-  }, [refetchTree]);
+  const handleCategoryUpdate = useCallback(
+    (category: Category) => {
+      refetchTree(); // 刷新树结构数据
+      message.success('类目更新成功');
+    },
+    [refetchTree]
+  );
 
   /**
    * 处理类目创建成功
    */
-  const handleCategoryCreate = useCallback((category: Category) => {
-    refetchTree(); // 刷新树结构数据
-    handleSelect(category.id); // 选中新创建的类目
-    message.success('类目创建成功');
-  }, [refetchTree, handleSelect]);
+  const handleCategoryCreate = useCallback(
+    (category: Category) => {
+      refetchTree(); // 刷新树结构数据
+      handleSelect(category.id); // 选中新创建的类目
+      message.success('类目创建成功');
+    },
+    [refetchTree, handleSelect]
+  );
 
   /**
    * 处理类目删除成功
@@ -172,12 +179,15 @@ const CategoryManagement: React.FC = () => {
   /**
    * 处理顶级类目创建成功
    */
-  const handleTopLevelCreateSuccess = useCallback((category: Category) => {
-    setCreateTopLevelFormVisible(false);
-    refetchTree(); // 刷新树结构数据
-    handleSelect(category.id); // 选中新创建的类目
-    message.success('顶级类目创建成功');
-  }, [refetchTree, handleSelect]);
+  const handleTopLevelCreateSuccess = useCallback(
+    (category: Category) => {
+      setCreateTopLevelFormVisible(false);
+      refetchTree(); // 刷新树结构数据
+      handleSelect(category.id); // 选中新创建的类目
+      message.success('顶级类目创建成功');
+    },
+    [refetchTree, handleSelect]
+  );
 
   /**
    * 处理刷新
@@ -202,12 +212,14 @@ const CategoryManagement: React.FC = () => {
           style={{
             background: '#fff',
             borderRight: '1px solid #f0f0f0',
-            overflow: 'hidden'
+            overflow: 'hidden',
           }}
         >
           <Card
             title={
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              >
                 <span>类目管理</span>
                 <Button
                   type="primary"
@@ -224,14 +236,14 @@ const CategoryManagement: React.FC = () => {
             style={{
               height: '100%',
               border: 'none',
-              boxShadow: 'none'
+              boxShadow: 'none',
             }}
             styles={{
               body: {
                 padding: '8px',
                 height: 'calc(100% - 57px)',
-                overflow: 'hidden'
-              }
+                overflow: 'hidden',
+              },
             }}
           >
             <CategoryTree
@@ -254,7 +266,8 @@ const CategoryManagement: React.FC = () => {
             title={currentCategory ? `类目详情 - ${currentCategory.name}` : '类目详情'}
             style={{
               minHeight: 400,
-              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)'
+              boxShadow:
+                '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
             }}
           >
             <CategoryDetail

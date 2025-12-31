@@ -105,10 +105,10 @@ describe('StoreTable - addressSummary 显示', () => {
     it('点击地址按钮应该触发 onEdit 回调', () => {
       const onEdit = vi.fn();
       render(<StoreTable stores={[mockStores[0]]} onEdit={onEdit} />);
-      
+
       const editButton = screen.getByRole('button', { name: /编辑.*地址/i });
       editButton.click();
-      
+
       expect(onEdit).toHaveBeenCalledWith(mockStores[0]);
     });
   });
@@ -116,7 +116,7 @@ describe('StoreTable - addressSummary 显示', () => {
   describe('表格渲染', () => {
     it('应该正确渲染门店列表', () => {
       render(<StoreTable stores={mockStores} />);
-      
+
       expect(screen.getByText('北京朝阳店')).toBeInTheDocument();
       expect(screen.getByText('上海浦东店')).toBeInTheDocument();
       expect(screen.getByText('深圳南山店')).toBeInTheDocument();

@@ -17,7 +17,7 @@ window.addEventListener('error', (event) => {
 // 忽略未处理的 Promise 拒绝（来自扩展）
 window.addEventListener('unhandledrejection', (event) => {
   const error = event.reason;
-  
+
   // 检查是否是 Axios 网络错误且来自扩展
   if (error && error.name === 'AxiosError' && error.code === 'ERR_NETWORK') {
     console.warn('忽略网络错误（可能来自浏览器扩展）');

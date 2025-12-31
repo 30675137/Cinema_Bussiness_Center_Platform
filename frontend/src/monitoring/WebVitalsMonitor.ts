@@ -5,11 +5,11 @@ export interface WebVitalsConfig {
   onReport?: (metric: any) => void;
   onThresholdExceeded?: (metric: any, threshold: number) => void;
   thresholds?: {
-    fcp?: number;    // First Contentful Paint (Good: < 1.8s)
-    lcp?: number;    // Largest Contentful Paint (Good: < 2.5s)
-    fid?: number;    // First Input Delay (Good: < 100ms)
-    ttfb?: number;   // Time to First Byte (Good: < 800ms)
-    cls?: number;    // Cumulative Layout Shift (Good: < 0.1)
+    fcp?: number; // First Contentful Paint (Good: < 1.8s)
+    lcp?: number; // Largest Contentful Paint (Good: < 2.5s)
+    fid?: number; // First Input Delay (Good: < 100ms)
+    ttfb?: number; // Time to First Byte (Good: < 800ms)
+    cls?: number; // Cumulative Layout Shift (Good: < 0.1)
   };
 }
 
@@ -78,7 +78,6 @@ export class WebVitalsMonitor {
         this.metrics.cls = metric.value;
         this.handleMetric('cls', metric);
       });
-
     } catch (error) {
       console.warn('Failed to initialize Web Vitals monitoring:', error);
     }
@@ -150,19 +149,27 @@ export class WebVitalsMonitor {
 
   private getRatingEmoji(rating: string): string {
     switch (rating) {
-      case 'good': return '✅';
-      case 'needs-improvement': return '⚠️';
-      case 'poor': return '❌';
-      default: return '❓';
+      case 'good':
+        return '✅';
+      case 'needs-improvement':
+        return '⚠️';
+      case 'poor':
+        return '❌';
+      default:
+        return '❓';
     }
   }
 
   private getRatingColor(rating: string): string {
     switch (rating) {
-      case 'good': return '#52c41a';
-      case 'needs-improvement': return '#faad14';
-      case 'poor': return '#ff4d4f';
-      default: return '#d9d9d9';
+      case 'good':
+        return '#52c41a';
+      case 'needs-improvement':
+        return '#faad14';
+      case 'poor':
+        return '#ff4d4f';
+      default:
+        return '#d9d9d9';
     }
   }
 
@@ -176,36 +183,16 @@ export class WebVitalsMonitor {
   private getOptimizationTips(name: string): string[] {
     switch (name) {
       case 'fcp':
-        return [
-          '减少服务器响应时间',
-          '优化资源加载顺序',
-          '启用资源压缩',
-          '使用CDN加速',
-        ];
+        return ['减少服务器响应时间', '优化资源加载顺序', '启用资源压缩', '使用CDN加速'];
 
       case 'lcp':
-        return [
-          '优化关键资源加载',
-          '压缩图片',
-          '使用现代图片格式',
-          '预加载重要资源',
-        ];
+        return ['优化关键资源加载', '压缩图片', '使用现代图片格式', '预加载重要资源'];
 
       case 'fid':
-        return [
-          '减少JavaScript执行时间',
-          '分割代码块',
-          '使用Web Workers',
-          '减少第三方脚本影响',
-        ];
+        return ['减少JavaScript执行时间', '分割代码块', '使用Web Workers', '减少第三方脚本影响'];
 
       case 'ttfb':
-        return [
-          '优化服务器性能',
-          '使用HTTP/2',
-          '启用缓存',
-          '优化数据库查询',
-        ];
+        return ['优化服务器性能', '使用HTTP/2', '启用缓存', '优化数据库查询'];
 
       case 'cls':
         return [
@@ -276,9 +263,10 @@ export class WebVitalsMonitor {
       poor: 0,
     };
 
-    const weightedSum = (summary.good * weights.good +
-                        summary.needsImprovement * weights.needsImprovement +
-                        summary.poor * weights.poor);
+    const weightedSum =
+      summary.good * weights.good +
+      summary.needsImprovement * weights.needsImprovement +
+      summary.poor * weights.poor;
 
     return Math.round(weightedSum / totalMetrics);
   }

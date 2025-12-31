@@ -1,1 +1,1 @@
-specs/P006-fix-sku-edit-data/spec.md
+specs/O004-beverage-sku-reuse/spec.md

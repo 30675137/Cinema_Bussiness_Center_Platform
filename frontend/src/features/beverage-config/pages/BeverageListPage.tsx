@@ -1,25 +1,29 @@
 /**
- * @spec O003-beverage-order
+ * @spec O003-beverage-order, O004-beverage-sku-reuse
  * B端饮品列表页面 (User Story 3 - FR-028)
+ *
+ * T044 + T045: 显示迁移通知，禁用创建/编辑按钮，重定向到SKU管理
  */
 
-import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button, Input, Select, Space, Table, Tag, message, Popconfirm } from 'antd'
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
-import { getBeverageList, deleteBeverage } from '../services/beverageAdminApi'
-import { BeverageFormModal } from '../components/BeverageFormModal'
-import { SpecConfigModal } from '../components/SpecConfigModal'
-import { RecipeConfigModal } from '../components/RecipeConfigModal'
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Button, Input, Select, Space, Table, Tag, message, Popconfirm } from 'antd';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import { getBeverageList, deleteBeverage } from '../services/beverageAdminApi';
+import { BeverageFormModal } from '../components/BeverageFormModal';
+import { SpecConfigModal } from '../components/SpecConfigModal';
+import { RecipeConfigModal } from '../components/RecipeConfigModal';
+import { MigrationNotice } from '../components/MigrationNotice';
 import type {
   BeverageDTO,
   BeverageCategory,
   BeverageStatus,
   BeverageQueryParams,
-} from '../types/beverage'
+} from '../types/beverage';
 
-const { Search } = Input
+const { Search } = Input;
 
 /**
  * 分类显示名称映射
@@ -31,52 +35,50 @@ const CATEGORY_LABELS: Record<BeverageCategory, string> = {
   SMOOTHIE: '奶昔',
   MILK_TEA: '奶茶',
   OTHER: '其他',
-}
+};
 
 /**
  * 状态显示名称和颜色映射
  */
-const STATUS_CONFIG: Record<
-  BeverageStatus,
-  { label: string; color: string }
-> = {
+const STATUS_CONFIG: Record<BeverageStatus, { label: string; color: string }> = {
   ACTIVE: { label: '已上架', color: 'green' },
   INACTIVE: { label: '已下架', color: 'default' },
   OUT_OF_STOCK: { label: '已售罄', color: 'red' },
-}
+};
 
 export const BeverageListPage: React.FC = () => {
-  const queryClient = useQueryClient()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [queryParams, setQueryParams] = useState<BeverageQueryParams>({
     page: 0,
     size: 20,
-  })
-  const [formModalOpen, setFormModalOpen] = useState(false)
-  const [editingBeverage, setEditingBeverage] = useState<BeverageDTO | null>(null)
-  const [specModalOpen, setSpecModalOpen] = useState(false)
-  const [recipeModalOpen, setRecipeModalOpen] = useState(false)
+  });
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [editingBeverage, setEditingBeverage] = useState<BeverageDTO | null>(null);
+  const [specModalOpen, setSpecModalOpen] = useState(false);
+  const [recipeModalOpen, setRecipeModalOpen] = useState(false);
   const [selectedBeverage, setSelectedBeverage] = useState<{
-    id: string
-    name: string
-  } | null>(null)
+    id: string;
+    name: string;
+  } | null>(null);
 
   // 获取饮品列表数据
   const { data, isLoading } = useQuery({
     queryKey: ['beverages', queryParams],
     queryFn: () => getBeverageList(queryParams),
-  })
+  });
 
   // 删除饮品
   const deleteMutation = useMutation({
     mutationFn: deleteBeverage,
     onSuccess: () => {
-      message.success('删除饮品成功')
-      queryClient.invalidateQueries({ queryKey: ['beverages'] })
+      message.success('删除饮品成功');
+      queryClient.invalidateQueries({ queryKey: ['beverages'] });
     },
     onError: (error: Error) => {
-      message.error(`删除失败: ${error.message}`)
+      message.error(`删除失败: ${error.message}`);
     },
-  })
+  });
 
   // 搜索处理
   const handleSearch = (value: string) => {
@@ -84,8 +86,8 @@ export const BeverageListPage: React.FC = () => {
       ...prev,
       name: value || undefined,
       page: 0,
-    }))
-  }
+    }));
+  };
 
   // 分类筛选
   const handleCategoryFilter = (category: string | undefined) => {
@@ -93,8 +95,8 @@ export const BeverageListPage: React.FC = () => {
       ...prev,
       category,
       page: 0,
-    }))
-  }
+    }));
+  };
 
   // 状态筛选
   const handleStatusFilter = (status: BeverageStatus | undefined) => {
@@ -102,8 +104,8 @@ export const BeverageListPage: React.FC = () => {
       ...prev,
       status,
       page: 0,
-    }))
-  }
+    }));
+  };
 
   // 分页变化
   const handleTableChange = (page: number, pageSize: number) => {
@@ -111,37 +113,37 @@ export const BeverageListPage: React.FC = () => {
       ...prev,
       page: page - 1, // Table组件从1开始，后端从0开始
       size: pageSize,
-    }))
-  }
+    }));
+  };
 
-  // 新增饮品
+  // 新增饮品 (T045: 重定向到SKU管理)
   const handleAddBeverage = () => {
-    setEditingBeverage(null)
-    setFormModalOpen(true)
-  }
+    // 重定向到SKU管理页面，自动选择finished_product类型和饮品分类
+    navigate('/products/sku?type=finished_product&category=beverage');
+  };
 
   // 编辑饮品
   const handleEditBeverage = (beverage: BeverageDTO) => {
-    setEditingBeverage(beverage)
-    setFormModalOpen(true)
-  }
+    setEditingBeverage(beverage);
+    setFormModalOpen(true);
+  };
 
   // 删除饮品
   const handleDeleteBeverage = (id: string) => {
-    deleteMutation.mutate(id)
-  }
+    deleteMutation.mutate(id);
+  };
 
   // 配置规格
   const handleConfigSpecs = (beverage: BeverageDTO) => {
-    setSelectedBeverage({ id: beverage.id, name: beverage.name })
-    setSpecModalOpen(true)
-  }
+    setSelectedBeverage({ id: beverage.id, name: beverage.name });
+    setSpecModalOpen(true);
+  };
 
   // 配置配方
   const handleConfigRecipe = (beverage: BeverageDTO) => {
-    setSelectedBeverage({ id: beverage.id, name: beverage.name })
-    setRecipeModalOpen(true)
-  }
+    setSelectedBeverage({ id: beverage.id, name: beverage.name });
+    setRecipeModalOpen(true);
+  };
 
   // 表格列定义
   const columns: ColumnsType<BeverageDTO> = [
@@ -183,8 +185,8 @@ export const BeverageListPage: React.FC = () => {
       key: 'status',
       width: 100,
       render: (status: BeverageStatus) => {
-        const config = STATUS_CONFIG[status]
-        return <Tag color={config.color}>{config.label}</Tag>
+        const config = STATUS_CONFIG[status];
+        return <Tag color={config.color}>{config.label}</Tag>;
       },
     },
     {
@@ -192,8 +194,7 @@ export const BeverageListPage: React.FC = () => {
       dataIndex: 'isRecommended',
       key: 'isRecommended',
       width: 80,
-      render: (isRecommended: boolean) =>
-        isRecommended ? <Tag color="gold">推荐</Tag> : '-',
+      render: (isRecommended: boolean) => (isRecommended ? <Tag color="gold">推荐</Tag> : '-'),
     },
     {
       title: '规格数量',
@@ -225,13 +226,17 @@ export const BeverageListPage: React.FC = () => {
             type="link"
             size="small"
             onClick={() => handleEditBeverage(record)}
+            disabled
+            title="请前往SKU管理页面编辑"
           >
-            编辑
+            编辑 (已禁用)
           </Button>
           <Button
             type="link"
             size="small"
             onClick={() => handleConfigSpecs(record)}
+            disabled
+            title="请前往SKU管理页面配置"
           >
             规格
           </Button>
@@ -239,11 +244,13 @@ export const BeverageListPage: React.FC = () => {
             type="link"
             size="small"
             onClick={() => handleConfigRecipe(record)}
+            disabled
+            title="请前往BOM管理页面配置"
           >
             配方
           </Button>
           <Popconfirm
-            title="确定删除此饮品吗？"
+            title="确定删除此饮品吗？删除后需在SKU管理中查看。"
             onConfirm={() => handleDeleteBeverage(record.id)}
             okText="确定"
             cancelText="取消"
@@ -255,10 +262,13 @@ export const BeverageListPage: React.FC = () => {
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <div style={{ padding: 24 }}>
+      {/* T044: Migration Notice */}
+      <MigrationNotice />
+
       <div style={{ marginBottom: 16 }}>
         <Space style={{ marginBottom: 16 }}>
           <Search
@@ -299,7 +309,7 @@ export const BeverageListPage: React.FC = () => {
           style={{ float: 'right' }}
           onClick={handleAddBeverage}
         >
-          新增饮品
+          新增饮品 (跳转至SKU管理)
         </Button>
       </div>
 
@@ -324,8 +334,8 @@ export const BeverageListPage: React.FC = () => {
         open={formModalOpen}
         beverage={editingBeverage}
         onClose={() => {
-          setFormModalOpen(false)
-          setEditingBeverage(null)
+          setFormModalOpen(false);
+          setEditingBeverage(null);
         }}
       />
 
@@ -334,8 +344,8 @@ export const BeverageListPage: React.FC = () => {
         beverageId={selectedBeverage?.id || null}
         beverageName={selectedBeverage?.name}
         onClose={() => {
-          setSpecModalOpen(false)
-          setSelectedBeverage(null)
+          setSpecModalOpen(false);
+          setSelectedBeverage(null);
         }}
       />
 
@@ -344,12 +354,12 @@ export const BeverageListPage: React.FC = () => {
         beverageId={selectedBeverage?.id || null}
         beverageName={selectedBeverage?.name}
         onClose={() => {
-          setRecipeModalOpen(false)
-          setSelectedBeverage(null)
+          setRecipeModalOpen(false);
+          setSelectedBeverage(null);
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default BeverageListPage
+export default BeverageListPage;

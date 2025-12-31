@@ -60,15 +60,11 @@ export const validateField = (
     // 字符串长度验证
     if (typeof value === 'string') {
       if (rule.minLength !== undefined && value.length < rule.minLength) {
-        errors.push(
-          rule.message || `${fieldName}长度不能少于${rule.minLength}个字符`
-        );
+        errors.push(rule.message || `${fieldName}长度不能少于${rule.minLength}个字符`);
       }
 
       if (rule.maxLength !== undefined && value.length > rule.maxLength) {
-        errors.push(
-          rule.message || `${fieldName}长度不能超过${rule.maxLength}个字符`
-        );
+        errors.push(rule.message || `${fieldName}长度不能超过${rule.maxLength}个字符`);
       }
     }
 
@@ -95,9 +91,7 @@ export const validateField = (
       const customResult = rule.custom(value);
       if (customResult !== true) {
         errors.push(
-          typeof customResult === 'string'
-            ? customResult
-            : rule.message || `${fieldName}验证失败`
+          typeof customResult === 'string' ? customResult : rule.message || `${fieldName}验证失败`
         );
       }
     }
@@ -249,7 +243,8 @@ export const commonRules = {
 
   // IP地址
   ip: (message?: string): ValidationRule => ({
-    pattern: /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+    pattern:
+      /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
     message: message || '请输入有效的IP地址',
   }),
 
@@ -267,7 +262,7 @@ export const asyncValidators = {
   // 检查用户名是否存在
   checkUsernameExists: async (username: string): Promise<boolean> => {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const existingUsernames = ['admin', 'user', 'test'];
     return !existingUsernames.includes(username.toLowerCase());
   },
@@ -275,7 +270,7 @@ export const asyncValidators = {
   // 检查邮箱是否已注册
   checkEmailExists: async (email: string): Promise<boolean> => {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const existingEmails = ['admin@example.com', 'user@example.com'];
     return !existingEmails.includes(email.toLowerCase());
   },
@@ -283,7 +278,7 @@ export const asyncValidators = {
   // 检查SPU编码是否重复
   checkSPUCodeExists: async (code: string, excludeId?: string): Promise<boolean> => {
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     // 这里应该调用真实的API
     return true;
   },
@@ -462,9 +457,7 @@ export class FormValidator {
  * @param rules - 验证规则
  * @returns FormValidator实例
  */
-export const createFormValidator = (
-  rules: Record<string, ValidationRule[]>
-): FormValidator => {
+export const createFormValidator = (rules: Record<string, ValidationRule[]>): FormValidator => {
   const validator = new FormValidator();
   for (const [fieldName, fieldRules] of Object.entries(rules)) {
     validator.addRule(fieldName, fieldRules);
@@ -508,13 +501,9 @@ export const spuFormRules = {
     },
   ],
 
-  brandId: [
-    commonRules.required('请选择品牌'),
-  ],
+  brandId: [commonRules.required('请选择品牌')],
 
-  categoryId: [
-    commonRules.required('请选择分类'),
-  ],
+  categoryId: [commonRules.required('请选择分类')],
 
   status: [
     commonRules.required('请选择状态'),
@@ -596,31 +585,31 @@ export const spuFormRules = {
       const errors: string[] = [];
 
       // 检查必填项
-      const hasEmptyName = specifications.some(spec => !spec.name || spec.name.trim() === '');
+      const hasEmptyName = specifications.some((spec) => !spec.name || spec.name.trim() === '');
       if (hasEmptyName) {
         errors.push('规格参数名称不能为空');
       }
 
-      const hasEmptyValue = specifications.some(spec => !spec.value || spec.value.trim() === '');
+      const hasEmptyValue = specifications.some((spec) => !spec.value || spec.value.trim() === '');
       if (hasEmptyValue) {
         errors.push('规格参数值不能为空');
       }
 
       // 检查名称重复
-      const names = specifications.map(spec => spec.name.trim()).filter(name => name);
+      const names = specifications.map((spec) => spec.name.trim()).filter((name) => name);
       const duplicateNames = names.filter((name, index) => names.indexOf(name) !== index);
       if (duplicateNames.length > 0) {
         errors.push(`规格参数名称重复: ${duplicateNames.join(', ')}`);
       }
 
       // 检查名称长度
-      const longNames = specifications.filter(spec => spec.name && spec.name.length > 50);
+      const longNames = specifications.filter((spec) => spec.name && spec.name.length > 50);
       if (longNames.length > 0) {
         errors.push('规格参数名称不能超过50个字符');
       }
 
       // 检查值长度
-      const longValues = specifications.filter(spec => spec.value && spec.value.length > 100);
+      const longValues = specifications.filter((spec) => spec.value && spec.value.length > 100);
       if (longValues.length > 0) {
         errors.push('规格参数值不能超过100个字符');
       }
@@ -642,30 +631,30 @@ export const spuFormRules = {
       const errors: string[] = [];
 
       // 检查必填项
-      const hasEmptyName = attributes.some(attr => !attr.name || attr.name.trim() === '');
+      const hasEmptyName = attributes.some((attr) => !attr.name || attr.name.trim() === '');
       if (hasEmptyName) {
         errors.push('动态属性名称不能为空');
       }
 
-      const hasEmptyValue = attributes.some(attr => !attr.value || attr.value.trim() === '');
+      const hasEmptyValue = attributes.some((attr) => !attr.value || attr.value.trim() === '');
       if (hasEmptyValue) {
         errors.push('动态属性值不能为空');
       }
 
       // 检查名称重复
-      const names = attributes.map(attr => attr.name.trim()).filter(name => name);
+      const names = attributes.map((attr) => attr.name.trim()).filter((name) => name);
       const duplicateNames = names.filter((name, index) => names.indexOf(name) !== index);
       if (duplicateNames.length > 0) {
         errors.push(`动态属性名称重复: ${duplicateNames.join(', ')}`);
       }
 
       // 检查长度限制
-      const longNames = attributes.filter(attr => attr.name && attr.name.length > 50);
+      const longNames = attributes.filter((attr) => attr.name && attr.name.length > 50);
       if (longNames.length > 0) {
         errors.push('动态属性名称不能超过50个字符');
       }
 
-      const longValues = attributes.filter(attr => attr.value && attr.value.length > 200);
+      const longValues = attributes.filter((attr) => attr.value && attr.value.length > 200);
       if (longValues.length > 0) {
         errors.push('动态属性值不能超过200个字符');
       }
@@ -694,7 +683,15 @@ export const validateSPUForm = (
   const fieldErrors: string[] = [];
 
   // 验证基础字段
-  const basicFields = ['name', 'shortName', 'description', 'unit', 'brandId', 'categoryId', 'status'];
+  const basicFields = [
+    'name',
+    'shortName',
+    'description',
+    'unit',
+    'brandId',
+    'categoryId',
+    'status',
+  ];
   for (const field of basicFields) {
     const rules = spuFormRules[field as keyof typeof spuFormRules] as ValidationRule[];
     if (rules) {

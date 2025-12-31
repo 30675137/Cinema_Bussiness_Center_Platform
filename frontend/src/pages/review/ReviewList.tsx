@@ -5,7 +5,7 @@ import {
   CloseOutlined,
   ClockCircleOutlined,
   EyeOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from '@ant-design/icons';
 
 const { Search } = Input;
@@ -54,7 +54,7 @@ const ReviewList: React.FC = () => {
       priority: '低',
       status: 'pending',
       content: '周末套餐组合促销活动申请',
-    }
+    },
   ];
 
   const completedData = [
@@ -85,23 +85,23 @@ const ReviewList: React.FC = () => {
       priority: '高',
       status: 'rejected',
       content: '库存盘点报告数据不完整，已驳回',
-    }
+    },
   ];
 
   const getPriorityColor = (priority: string) => {
     const colorMap: Record<string, string> = {
-      '高': 'red',
-      '中': 'orange',
-      '低': 'green',
+      高: 'red',
+      中: 'orange',
+      低: 'green',
     };
     return colorMap[priority] || 'default';
   };
 
   const getStatusIcon = (status: string) => {
     const iconMap: Record<string, React.ReactNode> = {
-      'approved': <CheckOutlined style={{ color: '#52c41a' }} />,
-      'rejected': <CloseOutlined style={{ color: '#f5222d' }} />,
-      'pending': <ClockCircleOutlined style={{ color: '#faad14' }} />,
+      approved: <CheckOutlined style={{ color: '#52c41a' }} />,
+      rejected: <CloseOutlined style={{ color: '#f5222d' }} />,
+      pending: <ClockCircleOutlined style={{ color: '#faad14' }} />,
     };
     return iconMap[status] || <ClockCircleOutlined />;
   };
@@ -137,9 +137,7 @@ const ReviewList: React.FC = () => {
       title: '优先级',
       dataIndex: 'priority',
       key: 'priority',
-      render: (priority: string) => (
-        <Tag color={getPriorityColor(priority)}>{priority}</Tag>
-      ),
+      render: (priority: string) => <Tag color={getPriorityColor(priority)}>{priority}</Tag>,
     },
     {
       title: '提交时间',
@@ -200,10 +198,10 @@ const ReviewList: React.FC = () => {
   // 审核统计
   const reviewStats = {
     pending: pendingData.length,
-    approved: completedData.filter(item => item.status === 'approved').length,
-    rejected: completedData.filter(item => item.status === 'rejected').length,
-    today: completedData.filter(item =>
-      item.reviewTime && item.reviewTime.startsWith('2025-12-10')
+    approved: completedData.filter((item) => item.status === 'approved').length,
+    rejected: completedData.filter((item) => item.status === 'rejected').length,
+    today: completedData.filter(
+      (item) => item.reviewTime && item.reviewTime.startsWith('2025-12-10')
     ).length,
   };
 
@@ -224,12 +222,17 @@ const ReviewList: React.FC = () => {
     if (record.reviewTime) {
       items.push({
         key: 'review',
-        dot: record.status === 'approved'
-          ? <CheckOutlined style={{ color: '#52c41a' }} />
-          : <CloseOutlined style={{ color: '#f5222d' }} />,
+        dot:
+          record.status === 'approved' ? (
+            <CheckOutlined style={{ color: '#52c41a' }} />
+          ) : (
+            <CloseOutlined style={{ color: '#f5222d' }} />
+          ),
         children: (
           <div>
-            <div>{record.reviewer} {record.status === 'approved' ? '通过' : '驳回'}审核</div>
+            <div>
+              {record.reviewer} {record.status === 'approved' ? '通过' : '驳回'}审核
+            </div>
             <div style={{ color: '#666', fontSize: '12px' }}>{record.reviewTime}</div>
           </div>
         ),
@@ -314,8 +317,7 @@ const ReviewList: React.FC = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+                showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
               }}
               expandedRowRender={renderTimeline}
             />
@@ -352,8 +354,7 @@ const ReviewList: React.FC = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+                showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
               }}
               expandedRowRender={renderTimeline}
             />

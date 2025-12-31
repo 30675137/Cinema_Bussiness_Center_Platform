@@ -12,7 +12,7 @@ import {
   Permission,
   UserPermissionState,
   UserPreference,
-  PermissionCheckResult
+  PermissionCheckResult,
 } from '@/types/navigation';
 
 /**
@@ -42,7 +42,7 @@ const mockUser: User = {
   isActive: true,
   lastLoginAt: new Date(),
   createdAt: new Date('2025-01-01'),
-  updatedAt: new Date('2025-12-11')
+  updatedAt: new Date('2025-12-11'),
 };
 
 const mockUserRoles: UserRole[] = [
@@ -54,8 +54,8 @@ const mockUserRoles: UserRole[] = [
     permissions: [],
     isActive: true,
     createdAt: new Date('2025-01-01'),
-    updatedAt: new Date('2025-01-01')
-  }
+    updatedAt: new Date('2025-01-01'),
+  },
 ];
 
 const mockUserPermissions: string[] = [
@@ -70,7 +70,7 @@ const mockUserPermissions: string[] = [
   'pricing.read',
   'pricing.write',
   'dashboard.view',
-  'navigation.access'
+  'navigation.access',
 ];
 
 /**
@@ -103,7 +103,7 @@ export const useUserStore = create<UserStore>()(
           theme: 'light',
           language: 'zh-CN',
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         isAuthenticated: true,
         loginLoading: false,
@@ -111,48 +111,54 @@ export const useUserStore = create<UserStore>()(
 
         // Mock user actions (取消真实登录)
         initializeMockUser: () => {
-          set({
-            user: mockUser,
-            permissions: mockUserPermissions,
-            roles: mockUserRoles,
-            userPreferences: {
-              id: `pref_${mockUser.id}`,
-              userId: mockUser.id,
-              sidebarCollapsed: false,
-              favoriteMenus: [],
-              recentMenus: [],
-              searchHistory: [],
-              theme: 'light',
-              language: 'zh-CN',
-              createdAt: new Date(),
-              updatedAt: new Date()
+          set(
+            {
+              user: mockUser,
+              permissions: mockUserPermissions,
+              roles: mockUserRoles,
+              userPreferences: {
+                id: `pref_${mockUser.id}`,
+                userId: mockUser.id,
+                sidebarCollapsed: false,
+                favoriteMenus: [],
+                recentMenus: [],
+                searchHistory: [],
+                theme: 'light',
+                language: 'zh-CN',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+              isAuthenticated: true,
+              loginLoading: false,
+              loginError: null,
+              loading: false,
+              error: null,
             },
-            isAuthenticated: true,
-            loginLoading: false,
-            loginError: null,
-            loading: false,
-            error: null
-          }, false, 'initializeMockUser');
+            false,
+            'initializeMockUser'
+          );
         },
 
         logout: async () => {
           // Clear auth token
           localStorage.removeItem('auth_token');
 
-          set({
-            user: null,
-            permissions: [],
-            roles: [],
-            userPreferences: null,
-            isAuthenticated: false,
-            loginLoading: false,
-            loginError: null,
-            loading: false,
-            error: null
-          }, false, 'logout');
+          set(
+            {
+              user: null,
+              permissions: [],
+              roles: [],
+              userPreferences: null,
+              isAuthenticated: false,
+              loginLoading: false,
+              loginError: null,
+              loading: false,
+              error: null,
+            },
+            false,
+            'logout'
+          );
         },
-
-  
       }),
       {
         name: 'user-storage',
@@ -183,19 +189,21 @@ export const useUserPreferences = () => useUserStore((state) => state.userPrefer
 /**
  * 用户操作选择器
  */
-export const useUserActions = () => useUserStore((state) => ({
-  initializeMockUser: state.initializeMockUser,
-  logout: state.logout,
-}));
+export const useUserActions = () =>
+  useUserStore((state) => ({
+    initializeMockUser: state.initializeMockUser,
+    logout: state.logout,
+  }));
 
 /**
  * 用户偏好操作选择器（临时保留，向后兼容）
  */
-export const useUserPreferenceActions = () => useUserStore((state) => ({
-  updatePreferences: () => {}, // 空实现，因为已经简化
-  toggleSidebarCollapsed: () => {}, // 空实现，因为已经简化
-  addFavoriteMenu: () => {}, // 空实现，因为已经简化
-  removeFavoriteMenu: () => {}, // 空实现，因为已经简化
-  addRecentMenu: () => {}, // 空实现，因为已经简化
-  clearRecentMenus: () => {}, // 空实现，因为已经简化
-}));
+export const useUserPreferenceActions = () =>
+  useUserStore((state) => ({
+    updatePreferences: () => {}, // 空实现，因为已经简化
+    toggleSidebarCollapsed: () => {}, // 空实现，因为已经简化
+    addFavoriteMenu: () => {}, // 空实现，因为已经简化
+    removeFavoriteMenu: () => {}, // 空实现，因为已经简化
+    addRecentMenu: () => {}, // 空实现，因为已经简化
+    clearRecentMenus: () => {}, // 空实现，因为已经简化
+  }));

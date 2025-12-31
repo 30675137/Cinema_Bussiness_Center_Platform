@@ -103,13 +103,7 @@ describe('PackageList Component', () => {
     });
 
     it('should render empty state when no data', () => {
-      render(
-        <PackageList
-          {...defaultProps}
-          data={[]}
-          total={0}
-        />
-      );
+      render(<PackageList {...defaultProps} data={[]} total={0} />);
 
       // Ant Design Table shows "暂无数据" for empty state
       const table = screen.getByRole('table');
@@ -185,9 +179,7 @@ describe('PackageList Component', () => {
 
   describe('Loading State', () => {
     it('should show loading state when loading prop is true', () => {
-      const { container } = render(
-        <PackageList {...defaultProps} loading={true} />
-      );
+      const { container } = render(<PackageList {...defaultProps} loading={true} />);
 
       // Ant Design Table adds spin class when loading
       const table = container.querySelector('.ant-spin-spinning');
@@ -195,9 +187,7 @@ describe('PackageList Component', () => {
     });
 
     it('should not show loading state when loading is false', () => {
-      const { container } = render(
-        <PackageList {...defaultProps} loading={false} />
-      );
+      const { container } = render(<PackageList {...defaultProps} loading={false} />);
 
       const table = container.querySelector('.ant-spin-spinning');
       expect(table).not.toBeInTheDocument();
@@ -214,12 +204,7 @@ describe('PackageList Component', () => {
 
     it('should call onPageChange when page is changed', async () => {
       const onPageChange = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onPageChange={onPageChange}
-        />
-      );
+      render(<PackageList {...defaultProps} onPageChange={onPageChange} />);
 
       // Find pagination next button and click
       const nextButton = screen.getByLabelText('Next Page');
@@ -230,13 +215,7 @@ describe('PackageList Component', () => {
     });
 
     it('should display current page and pageSize', () => {
-      render(
-        <PackageList
-          {...defaultProps}
-          page={2}
-          pageSize={20}
-        />
-      );
+      render(<PackageList {...defaultProps} page={2} pageSize={20} />);
 
       // Verify pagination is rendered with correct config
       const pagination = screen.getByRole('list', { name: /pagination/ });
@@ -267,12 +246,7 @@ describe('PackageList Component', () => {
 
     it('should call onPreview when preview button is clicked', async () => {
       const onPreview = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onPreview={onPreview}
-        />
-      );
+      render(<PackageList {...defaultProps} onPreview={onPreview} />);
 
       const previewButtons = screen.getAllByText('预览');
       await userEvent.click(previewButtons[0]);
@@ -282,12 +256,7 @@ describe('PackageList Component', () => {
 
     it('should call onEdit when edit button is clicked', async () => {
       const onEdit = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onEdit={onEdit}
-        />
-      );
+      render(<PackageList {...defaultProps} onEdit={onEdit} />);
 
       const editButtons = screen.getAllByText('编辑');
       await userEvent.click(editButtons[0]);
@@ -297,12 +266,7 @@ describe('PackageList Component', () => {
 
     it('should show delete confirmation popconfirm when delete button is clicked', async () => {
       const onDelete = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onDelete={onDelete}
-        />
-      );
+      render(<PackageList {...defaultProps} onDelete={onDelete} />);
 
       const deleteButtons = screen.getAllByText('删除');
       await userEvent.click(deleteButtons[0]);
@@ -315,12 +279,7 @@ describe('PackageList Component', () => {
 
     it('should call onDelete after confirming delete', async () => {
       const onDelete = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onDelete={onDelete}
-        />
-      );
+      render(<PackageList {...defaultProps} onDelete={onDelete} />);
 
       const deleteButtons = screen.getAllByText('删除');
       await userEvent.click(deleteButtons[0]);
@@ -339,12 +298,7 @@ describe('PackageList Component', () => {
 
     it('should not call onDelete when cancel is clicked', async () => {
       const onDelete = vi.fn();
-      render(
-        <PackageList
-          {...defaultProps}
-          onDelete={onDelete}
-        />
-      );
+      render(<PackageList {...defaultProps} onDelete={onDelete} />);
 
       const deleteButtons = screen.getAllByText('删除');
       await userEvent.click(deleteButtons[0]);
@@ -362,12 +316,7 @@ describe('PackageList Component', () => {
     });
 
     it('should show loading state on delete button when deleteLoading is true', () => {
-      render(
-        <PackageList
-          {...defaultProps}
-          deleteLoading={true}
-        />
-      );
+      render(<PackageList {...defaultProps} deleteLoading={true} />);
 
       const deleteButtons = screen.getAllByText('删除');
       const firstDeleteButton = deleteButtons[0].closest('button');
@@ -387,18 +336,14 @@ describe('PackageList Component', () => {
     });
 
     it('should show "-" when date is missing', () => {
-      const packagesWithoutDates = [{
-        ...mockPackages[0],
-        createdAt: '',
-      }];
+      const packagesWithoutDates = [
+        {
+          ...mockPackages[0],
+          createdAt: '',
+        },
+      ];
 
-      render(
-        <PackageList
-          {...defaultProps}
-          data={packagesWithoutDates}
-          total={1}
-        />
-      );
+      render(<PackageList {...defaultProps} data={packagesWithoutDates} total={1} />);
 
       const dashElements = screen.getAllByText('-');
       expect(dashElements.length).toBeGreaterThan(0);
@@ -455,13 +400,7 @@ describe('PackageList Component', () => {
         name: '这是一个非常非常非常长的场景包名称用来测试文本截断功能是否正常工作',
       };
 
-      render(
-        <PackageList
-          {...defaultProps}
-          data={[longNamePackage]}
-          total={1}
-        />
-      );
+      render(<PackageList {...defaultProps} data={[longNamePackage]} total={1} />);
 
       // Ant Design Table with ellipsis should render the text
       expect(screen.getByText(/这是一个非常非常/)).toBeInTheDocument();
@@ -476,13 +415,7 @@ describe('PackageList Component', () => {
         serviceCount: 0,
       };
 
-      render(
-        <PackageList
-          {...defaultProps}
-          data={[zeroValuePackage]}
-          total={1}
-        />
-      );
+      render(<PackageList {...defaultProps} data={[zeroValuePackage]} total={1} />);
 
       // Should render "0个" for zero counts
       expect(screen.getByText('0个')).toBeInTheDocument();

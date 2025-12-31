@@ -40,6 +40,7 @@ frontend/src/
 ### 1. 性能监控系统
 
 #### 1.1 PerformanceMonitor（核心监控器）
+
 - **功能**: 统一的性能数据收集和管理
 - **监控指标**:
   - 页面加载时间（DOM加载、完整加载）
@@ -49,6 +50,7 @@ frontend/src/
 - **告警机制**: 基于阈值的智能告警系统
 
 #### 1.2 PerformanceProvider（React上下文）
+
 - **功能**: 为React应用提供性能监控上下文
 - **特性**:
   - 自动初始化性能监控
@@ -56,6 +58,7 @@ frontend/src/
   - 支持组件级别性能跟踪
 
 #### 1.3 PerformanceDashboard（监控面板）
+
 - **功能**: 可视化性能数据和告警信息
 - **展示内容**:
   - 关键性能指标概览
@@ -68,6 +71,7 @@ frontend/src/
 ### 2. API性能监控
 
 #### 2.1 PerformanceInterceptor（请求拦截器）
+
 - **功能**: 自动拦截和监控所有API请求
 - **监控指标**:
   - 请求响应时间
@@ -82,6 +86,7 @@ frontend/src/
 ### 3. Web Vitals集成
 
 #### 3.1 WebVitalsMonitor（Web Vitals监控器）
+
 - **监控指标**:
   - **FCP** (First Contentful Paint): 首次内容绘制 < 1.8秒
   - **LCP** (Largest Contentful Paint): 最大内容绘制 < 2.5秒
@@ -96,6 +101,7 @@ frontend/src/
 ### 4. Bundle分析
 
 #### 4.1 BundleAnalyzer（打包分析工具）
+
 - **功能**: 分析前端打包结果
 - **分析内容**:
   - Bundle大小统计
@@ -112,6 +118,7 @@ frontend/src/
 ### 1. 代码分割优化
 
 #### 1.1 LazyLoadWrapper（懒加载包装器）
+
 - **功能**: 智能组件懒加载
 - **特性**:
   - 自动代码分割
@@ -130,6 +137,7 @@ const LazyComponent = () => (
 ```
 
 #### 1.2 预加载策略
+
 - **空闲时预加载**: 使用`requestIdleCallback`
 - **用户交互预加载**: 鼠标悬停时预加载
 - **关键资源预加载**: 页面加载时预加载
@@ -137,6 +145,7 @@ const LazyComponent = () => (
 ### 2. 图片懒加载
 
 #### 2.1 LazyImage（图片懒加载组件）
+
 - **功能**: 优化图片加载性能
 - **特性**:
   - 原生`loading="lazy"`支持
@@ -158,6 +167,7 @@ const LazyComponent = () => (
 ### 3. 虚拟滚动
 
 #### 3.1 VirtualScroll（虚拟滚动组件）
+
 - **功能**: 高性能长列表渲染
 - **特性**:
   - 动态高度支持
@@ -178,6 +188,7 @@ const LazyComponent = () => (
 ### 4. 缓存策略
 
 #### 4.1 CacheManager（缓存管理器）
+
 - **功能**: 多级缓存系统
 - **特性**:
   - LRU/LFU/FIFO淘汰策略
@@ -186,6 +197,7 @@ const LazyComponent = () => (
   - 压缩支持
 
 #### 4.2 APICacheManager（API缓存）
+
 - **功能**: API请求缓存管理
 - **特性**:
   - 自动请求去重
@@ -196,7 +208,7 @@ const LazyComponent = () => (
 // 使用示例
 const data = await apiCache.request(
   'users',
-  () => fetch('/api/users').then(r => r.json()),
+  () => fetch('/api/users').then((r) => r.json()),
   5 * 60 * 1000 // 5分钟TTL
 );
 ```
@@ -204,6 +216,7 @@ const data = await apiCache.request(
 ## 性能目标达成
 
 ### 1. 页面加载时间 < 3秒
+
 - **实现措施**:
   - 代码分割减少初始包大小
   - 关键资源预加载
@@ -212,6 +225,7 @@ const data = await apiCache.request(
   - 优化关键渲染路径
 
 ### 2. API响应时间 < 500ms
+
 - **实现措施**:
   - 智能缓存策略
   - 请求合并和批处理
@@ -220,6 +234,7 @@ const data = await apiCache.request(
   - 错误处理
 
 ### 3. 支持1000+并发用户
+
 - **实现措施**:
   - 虚拟滚动优化长列表
   - 内存使用监控和清理
@@ -232,12 +247,14 @@ const data = await apiCache.request(
 ### 1. 快速开始
 
 1. **安装依赖**:
+
 ```bash
 npm install web-vitals
 ```
 
 2. **配置监控**:
-在`monitoring/config.ts`中启用性能监控：
+   在`monitoring/config.ts`中启用性能监控：
+
 ```typescript
 export const PERFORMANCE_CONFIG = {
   monitoring: {
@@ -249,7 +266,8 @@ export const PERFORMANCE_CONFIG = {
 ```
 
 3. **包装应用**:
-在应用根组件中使用`PerformanceProvider`：
+   在应用根组件中使用`PerformanceProvider`：
+
 ```tsx
 <PerformanceProvider>
   <App />
@@ -263,6 +281,7 @@ export const PERFORMANCE_CONFIG = {
 ### 3. 性能优化建议
 
 系统会根据监控数据自动生成优化建议，包括：
+
 - 页面加载优化建议
 - API性能优化建议
 - 组件渲染优化建议
@@ -271,24 +290,28 @@ export const PERFORMANCE_CONFIG = {
 ## 技术特点
 
 ### 1. 基于现代Web标准
+
 - 使用Web Vitals API
 - Intersection Observer API
 - Performance Observer API
 - 原生懒加载支持
 
 ### 2. React 18特性
+
 - Concurrent Mode支持
 - Suspense边界
 - Profiler集成
 - 自动批处理
 
 ### 3. TypeScript支持
+
 - 完整的类型定义
 - 类型安全的API
 - 智能代码提示
 - 编译时错误检查
 
 ### 4. 生产就绪
+
 - 错误边界处理
 - 性能降级策略
 - 采样率控制
@@ -297,16 +320,17 @@ export const PERFORMANCE_CONFIG = {
 ## 配置选项
 
 ### 监控配置
+
 ```typescript
 export const PERFORMANCE_CONFIG = {
   monitoring: {
-    enabled: boolean,        // 是否启用监控
-    samplingRate: number,    // 采样率 (0-1)
+    enabled: boolean, // 是否启用监控
+    samplingRate: number, // 采样率 (0-1)
     reportToConsole: boolean, // 是否输出到控制台
   },
   thresholds: {
-    pageLoadTime: 3000,      // 页面加载时间阈值
-    apiResponseTime: 500,    // API响应时间阈值
+    pageLoadTime: 3000, // 页面加载时间阈值
+    apiResponseTime: 500, // API响应时间阈值
     componentRenderTime: 100, // 组件渲染时间阈值
   },
   // ... 更多配置
@@ -314,25 +338,26 @@ export const PERFORMANCE_CONFIG = {
 ```
 
 ### 缓存配置
+
 ```typescript
 const cacheOptions = {
-  maxSize: 200,              // 最大缓存条目数
-  ttl: 5 * 60 * 1000,        // 默认TTL (5分钟)
-  strategy: 'lru',          // 淘汰策略
-  compressionEnabled: true,  // 是否启用压缩
+  maxSize: 200, // 最大缓存条目数
+  ttl: 5 * 60 * 1000, // 默认TTL (5分钟)
+  strategy: 'lru', // 淘汰策略
+  compressionEnabled: true, // 是否启用压缩
 };
 ```
 
 ## 性能指标说明
 
-| 指标 | 目标值 | 说明 |
-|------|--------|------|
-| 页面加载时间 | < 3秒 | 从开始到页面完全加载 |
-| 首次内容绘制 | < 1.8秒 | 首次有内容绘制 |
-| API响应时间 | < 500ms | API请求总耗时 |
-| 组件渲染时间 | < 100ms | 单次组件渲染 |
-| 内存使用率 | < 80% | JavaScript堆内存使用 |
-| 重渲染次数 | < 10次 | 组件重渲染次数限制 |
+| 指标         | 目标值  | 说明                 |
+| ------------ | ------- | -------------------- |
+| 页面加载时间 | < 3秒   | 从开始到页面完全加载 |
+| 首次内容绘制 | < 1.8秒 | 首次有内容绘制       |
+| API响应时间  | < 500ms | API请求总耗时        |
+| 组件渲染时间 | < 100ms | 单次组件渲染         |
+| 内存使用率   | < 80%   | JavaScript堆内存使用 |
+| 重渲染次数   | < 10次  | 组件重渲染次数限制   |
 
 ## 总结
 

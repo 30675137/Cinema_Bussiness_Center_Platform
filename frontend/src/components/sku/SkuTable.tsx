@@ -4,12 +4,7 @@
  */
 import React from 'react';
 import { Table, Tag, Space, Button, Tooltip, Typography } from 'antd';
-import {
-  EyeOutlined,
-  EditOutlined,
-  CheckCircleOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, CheckCircleOutlined, StopOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SKU } from '@/types/sku';
 import { SkuStatus, SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
@@ -178,8 +173,7 @@ export const SkuTable: React.FC<SkuTableProps> = ({
       onHeaderCell: () => ({
         onClick: () => handleSort('createdAt', 'ascend'),
       }),
-      render: (date: string) =>
-        date ? new Date(date).toLocaleString('zh-CN') : '-',
+      render: (date: string) => (date ? new Date(date).toLocaleString('zh-CN') : '-'),
     },
     {
       title: '操作',
@@ -258,4 +252,3 @@ export const SkuTable: React.FC<SkuTableProps> = ({
 };
 
 export default SkuTable;
-

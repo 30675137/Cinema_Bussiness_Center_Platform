@@ -21,10 +21,7 @@ import {
   Tag,
   Statistic,
 } from 'antd';
-import {
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
+import { ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import type { InventoryAdjustment, InventoryLedger } from '@/types/inventory';
 import { getAdjustmentTypeConfig } from '@/utils/inventoryHelpers';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -134,48 +131,47 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
   const [useCustomReason, setUseCustomReason] = useState(false);
 
   // 表单值变化处理
-  const handleValuesChange = useCallback((changedValues: any, allValues: any) => {
-    if (changedValues.adjustmentType !== undefined) {
-      setAdjustmentType(changedValues.adjustmentType);
-      setQuantity(undefined);
-      setReason(undefined);
-      setCustomReason('');
-      setUseCustomReason(false);
-    }
-
-    if (changedValues.quantity !== undefined) {
-      setQuantity(changedValues.quantity);
-    }
-
-    if (changedValues.reason !== undefined) {
-      if (changedValues.reason === '__custom__') {
-        setUseCustomReason(true);
-        setReason('');
-      } else {
+  const handleValuesChange = useCallback(
+    (changedValues: any, allValues: any) => {
+      if (changedValues.adjustmentType !== undefined) {
+        setAdjustmentType(changedValues.adjustmentType);
+        setQuantity(undefined);
+        setReason(undefined);
+        setCustomReason('');
         setUseCustomReason(false);
-        setReason(changedValues.reason);
       }
-    }
 
-    if (changedValues.remark !== undefined) {
-      setRemark(changedValues.remark);
-    }
+      if (changedValues.quantity !== undefined) {
+        setQuantity(changedValues.quantity);
+      }
 
-    onValuesChange?.(allValues);
-  }, [onValuesChange]);
+      if (changedValues.reason !== undefined) {
+        if (changedValues.reason === '__custom__') {
+          setUseCustomReason(true);
+          setReason('');
+        } else {
+          setUseCustomReason(false);
+          setReason(changedValues.reason);
+        }
+      }
+
+      if (changedValues.remark !== undefined) {
+        setRemark(changedValues.remark);
+      }
+
+      onValuesChange?.(allValues);
+    },
+    [onValuesChange]
+  );
 
   // 监听表单字段变化
   useEffect(() => {
-    const unsubscribe = form.onFieldsChange(
-      (changedFields, allFields) => {
-        handleValuesChange(
-          Object.fromEntries(
-            changedFields.map(field => [field.name[0], allFields[field.name[0]]])
-          ),
-          allFields
-        );
-      }
-    );
+    const unsubscribe = form.onFieldsChange((changedFields, allFields) => {
+      handleValuesChange(
+        Object.fromEntries(changedFields.map((field) => [field.name[0], allFields[field.name[0]]])),
+        allFields
+      );
+    });
 
     return unsubscribe;
   }, [form, handleValuesChange]);
@@ -197,16 +193,22 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
   }, [adjustment, form, mode]);
 
   // 计算调整后的数量
-  const adjustedQuantity = inventoryItem && quantity !== undefined
-    ? (adjustmentType?.includes('profit') ? inventoryItem.physicalQuantity + quantity : inventoryItem.physicalQuantity - quantity)
-    : 0;
+  const adjustedQuantity =
+    inventoryItem && quantity !== undefined
+      ? adjustmentType?.includes('profit')
+        ? inventoryItem.physicalQuantity + quantity
+        : inventoryItem.physicalQuantity - quantity
+      : 0;
 
   // 计算库存状态影响
   const getStockImpact = () => {
     if (!inventoryItem || adjustedQuantity === 0) return null;
 
     const impact = adjustedQuantity - inventoryItem.physicalQuantity;
-    const percentage = inventoryItem.physicalQuantity > 0 ? (Math.abs(impact) / inventoryItem.physicalQuantity * 100) : 0;
+    const percentage =
+      inventoryItem.physicalQuantity > 0
+        ? (Math.abs(impact) / inventoryItem.physicalQuantity) * 100
+        : 0;
 
     if (impact > 0) {
       return {
@@ -232,25 +234,31 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
   const stockImpact = getStockImpact();
 
   // 处理自定义原因输入
-  const handleCustomReasonChange = useCallback((value: string) => {
-    setCustomReason(value);
-    if (value.trim()) {
-      form.setFieldValue('reason', value);
-    }
-  }, [form]);
+  const handleCustomReasonChange = useCallback(
+    (value: string) => {
+      setCustomReason(value);
+      if (value.trim()) {
+        form.setFieldValue('reason', value);
+      }
+    },
+    [form]
+  );
 
   // 处理使用自定义原因
-  const handleUseCustomReasonChange = useCallback((checked: boolean) => {
-    setUseCustomReason(checked);
-    if (checked) {
-      setReason('');
-      form.setFieldValue('reason', '__custom__');
-    } else {
-      setReason('');
-      form.setFieldValue('reason', undefined);
-      setCustomReason('');
-    }
-  }, [form]);
+  const handleUseCustomReasonChange = useCallback(
+    (checked: boolean) => {
+      setUseCustomReason(checked);
+      if (checked) {
+        setReason('');
+        form.setFieldValue('reason', '__custom__');
+      } else {
+        setReason('');
+        form.setFieldValue('reason', undefined);
+        setCustomReason('');
+      }
+    },
+    [form]
+  );
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -267,27 +275,32 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
               />
             </Col>
             <Col span={6}>
-              <Statistic
-                title="可用库存"
-                value={inventoryItem.availableQuantity}
-                suffix="件"
-              />
+              <Statistic title="可用库存" value={inventoryItem.availableQuantity} suffix="件" />
             </Col>
             <Col span={6}>
               <Statistic
                 title="安全库存"
                 value={inventoryItem.safetyStock}
                 suffix="件"
-                valueStyle={{ color: inventoryItem.physicalQuantity <= inventoryItem.safetyStock ? '#f5222d' : undefined }}
+                valueStyle={{
+                  color:
+                    inventoryItem.physicalQuantity <= inventoryItem.safetyStock
+                      ? '#f5222d'
+                      : undefined,
+                }}
               />
             </Col>
             <Col span={6}>
               <Statistic
                 title="库存状态"
                 value={
-                  inventoryItem.stockStatus === 'low' ? '库存不足' :
-                  inventoryItem.stockStatus === 'out_of_stock' ? '缺货' :
-                  inventoryItem.stockStatus === 'high' ? '库存积压' : '正常'
+                  inventoryItem.stockStatus === 'low'
+                    ? '库存不足'
+                    : inventoryItem.stockStatus === 'out_of_stock'
+                      ? '缺货'
+                      : inventoryItem.stockStatus === 'high'
+                        ? '库存积压'
+                        : '正常'
                 }
               />
             </Col>
@@ -297,19 +310,14 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
 
       {/* 调整类型选择 */}
       <Card size="small" title="调整类型">
-        <Form.Item
-          name="adjustmentType"
-          rules={[
-            { required: true, message: '请选择调整类型' }
-          ]}
-        >
+        <Form.Item name="adjustmentType" rules={[{ required: true, message: '请选择调整类型' }]}>
           <Radio.Group
             value={adjustmentType}
             onChange={(e) => form.setFieldValue('adjustmentType', e.target.value)}
             disabled={mode === 'view'}
           >
             <Row gutter={[16, 16]}>
-              {ADJUSTMENT_TYPE_OPTIONS.map(option => (
+              {ADJUSTMENT_TYPE_OPTIONS.map((option) => (
                 <Col span={12} key={option.value}>
                   <Radio
                     value={option.value}
@@ -361,7 +369,9 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
           >
             <InputNumber
               min={1}
-              max={adjustmentType === 'stocktaking_loss' ? inventoryItem?.physicalQuantity : undefined}
+              max={
+                adjustmentType === 'stocktaking_loss' ? inventoryItem?.physicalQuantity : undefined
+              }
               placeholder="请输入调整数量"
               onChange={(value) => {
                 if (value) {
@@ -374,10 +384,7 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
                 <Space>
                   <Text>件</Text>
                   {adjustedQuantity !== 0 && (
-                    <Tag
-                      color={stockImpact?.color}
-                      style={{ marginLeft: 8 }}
-                    >
+                    <Tag color={stockImpact?.color} style={{ marginLeft: 8 }}>
                       {adjustedQuantity}件
                     </Tag>
                   )}
@@ -390,7 +397,13 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
           {stockImpact && (
             <Alert
               message={stockImpact.message}
-              type={stockImpact.color === 'success' ? 'success' : stockImpact.color === 'error' ? 'error' : 'default'}
+              type={
+                stockImpact.color === 'success'
+                  ? 'success'
+                  : stockImpact.color === 'error'
+                    ? 'error'
+                    : 'default'
+              }
               showIcon
               style={{ marginTop: 8 }}
             />
@@ -400,12 +413,7 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
 
       {/* 调整原因 */}
       <Card size="small" title="调整原因">
-        <Form.Item
-          name="reason"
-          rules={[
-            { required: true, message: '请选择或输入调整原因' }
-          ]}
-        >
+        <Form.Item name="reason" rules={[{ required: true, message: '请选择或输入调整原因' }]}>
           {!useCustomReason && (
             <Select
               placeholder="请选择调整原因"
@@ -421,7 +429,7 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
               options={[
                 {
                   label: '选择常用原因',
-                  options: getReasonOptions(adjustmentType!).map(option => ({
+                  options: getReasonOptions(adjustmentType!).map((option) => ({
                     label: option.label,
                     value: option.value,
                   })),
@@ -474,9 +482,7 @@ const AdjustmentForm: React.FC<AdjustmentFormProps> = ({
                   <li>审批通过后系统自动执行调整</li>
                   <li>调整完成后可在库存台账中查看最新库存</li>
                 </ol>
-                <Text type="warning">
-                  注意：调整操作需要有相应权限，并经过审批流程才能生效。
-                </Text>
+                <Text type="warning">注意：调整操作需要有相应权限，并经过审批流程才能生效。</Text>
               </Space>
             }
             type="info"

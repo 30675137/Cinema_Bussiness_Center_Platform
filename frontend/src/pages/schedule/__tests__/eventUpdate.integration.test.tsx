@@ -1,6 +1,6 @@
 /**
  * Integration tests for event update
- * 
+ *
  * Tests updating event fields, conflict validation on update
  */
 
@@ -31,9 +31,7 @@ const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
     <ConfigProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </QueryClientProvider>
     </ConfigProvider>
   );
@@ -92,7 +90,10 @@ describe('Event Update Integration Tests', () => {
     });
 
     it('should update event customer information', async () => {
-      const listResponse = await scheduleService.getScheduleList({ date: '2025-01-27', type: 'private' });
+      const listResponse = await scheduleService.getScheduleList({
+        date: '2025-01-27',
+        type: 'private',
+      });
       if (listResponse.success && listResponse.data.length > 0) {
         const event = listResponse.data[0];
         const updateResponse = await scheduleService.updateSchedule({
@@ -164,4 +165,3 @@ describe('Event Update Integration Tests', () => {
     });
   });
 });
-

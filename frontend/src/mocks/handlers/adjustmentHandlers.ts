@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整 MSW 处理器
- * 
+ *
  * 提供库存调整、审批、流水、原因字典的 Mock 数据。
  */
 
@@ -26,14 +26,70 @@ const APPROVAL_THRESHOLD = 1000; // 审批阈值（元）
  * 调整原因字典
  */
 const mockReasons: AdjustmentReason[] = [
-  { id: 'r-001', code: 'STOCK_DIFF', name: '盘点差异', category: 'surplus', isActive: true, sortOrder: 1 },
-  { id: 'r-002', code: 'STOCK_DIFF_SHORTAGE', name: '盘点差异', category: 'shortage', isActive: true, sortOrder: 2 },
-  { id: 'r-003', code: 'GOODS_DAMAGE', name: '货物损坏', category: 'damage', isActive: true, sortOrder: 3 },
-  { id: 'r-004', code: 'EXPIRED_WRITE_OFF', name: '过期报废', category: 'damage', isActive: true, sortOrder: 4 },
-  { id: 'r-005', code: 'INBOUND_ERROR', name: '入库错误', category: 'shortage', isActive: true, sortOrder: 5 },
-  { id: 'r-006', code: 'OTHER_SURPLUS', name: '其他(盘盈)', category: 'surplus', isActive: true, sortOrder: 6 },
-  { id: 'r-007', code: 'OTHER_SHORTAGE', name: '其他(盘亏)', category: 'shortage', isActive: true, sortOrder: 7 },
-  { id: 'r-008', code: 'OTHER_DAMAGE', name: '其他(报损)', category: 'damage', isActive: true, sortOrder: 8 },
+  {
+    id: 'r-001',
+    code: 'STOCK_DIFF',
+    name: '盘点差异',
+    category: 'surplus',
+    isActive: true,
+    sortOrder: 1,
+  },
+  {
+    id: 'r-002',
+    code: 'STOCK_DIFF_SHORTAGE',
+    name: '盘点差异',
+    category: 'shortage',
+    isActive: true,
+    sortOrder: 2,
+  },
+  {
+    id: 'r-003',
+    code: 'GOODS_DAMAGE',
+    name: '货物损坏',
+    category: 'damage',
+    isActive: true,
+    sortOrder: 3,
+  },
+  {
+    id: 'r-004',
+    code: 'EXPIRED_WRITE_OFF',
+    name: '过期报废',
+    category: 'damage',
+    isActive: true,
+    sortOrder: 4,
+  },
+  {
+    id: 'r-005',
+    code: 'INBOUND_ERROR',
+    name: '入库错误',
+    category: 'shortage',
+    isActive: true,
+    sortOrder: 5,
+  },
+  {
+    id: 'r-006',
+    code: 'OTHER_SURPLUS',
+    name: '其他(盘盈)',
+    category: 'surplus',
+    isActive: true,
+    sortOrder: 6,
+  },
+  {
+    id: 'r-007',
+    code: 'OTHER_SHORTAGE',
+    name: '其他(盘亏)',
+    category: 'shortage',
+    isActive: true,
+    sortOrder: 7,
+  },
+  {
+    id: 'r-008',
+    code: 'OTHER_DAMAGE',
+    name: '其他(报损)',
+    category: 'damage',
+    isActive: true,
+    sortOrder: 8,
+  },
 ];
 
 /**
@@ -73,7 +129,7 @@ export const adjustmentHandlers = [
 
     const response: ReasonListResponse = {
       success: true,
-      data: mockReasons.filter(r => r.isActive),
+      data: mockReasons.filter((r) => r.isActive),
     };
 
     return HttpResponse.json(response);
@@ -87,7 +143,7 @@ export const adjustmentHandlers = [
   http.post('/api/adjustments', async ({ request }) => {
     await delay(300);
 
-    const body = await request.json() as {
+    const body = (await request.json()) as {
       skuId: string;
       storeId: string;
       adjustmentType: AdjustmentType;
@@ -98,7 +154,13 @@ export const adjustmentHandlers = [
     };
 
     // 验证必填字段
-    if (!body.skuId || !body.storeId || !body.adjustmentType || !body.quantity || !body.reasonCode) {
+    if (
+      !body.skuId ||
+      !body.storeId ||
+      !body.adjustmentType ||
+      !body.quantity ||
+      !body.reasonCode
+    ) {
       return HttpResponse.json(
         { success: false, error: 'VALIDATION_ERROR', message: '请填写必填字段' },
         { status: 400 }
@@ -113,7 +175,9 @@ export const adjustmentHandlers = [
     // 计算调整后库存
     const isIncrease = body.adjustmentType === 'surplus';
     const stockAfter = isIncrease ? stockBefore + body.quantity : stockBefore - body.quantity;
-    const availableAfter = isIncrease ? availableBefore + body.quantity : availableBefore - body.quantity;
+    const availableAfter = isIncrease
+      ? availableBefore + body.quantity
+      : availableBefore - body.quantity;
 
     // 计算调整金额并判断是否需要审批
     const adjustmentAmount = body.quantity * mockUnitPrice;
@@ -158,10 +222,7 @@ export const adjustmentHandlers = [
 
     mockAdjustments.unshift(newAdjustment);
 
-    return HttpResponse.json(
-      { success: true, data: newAdjustment },
-      { status: 201 }
-    );
+    return HttpResponse.json({ success: true, data: newAdjustment }, { status: 201 });
   }),
 
   /**
@@ -182,13 +243,13 @@ export const adjustmentHandlers = [
     // 筛选
     if (status) {
       const statuses = status.split(',') as AdjustmentStatus[];
-      filtered = filtered.filter(item => statuses.includes(item.status));
+      filtered = filtered.filter((item) => statuses.includes(item.status));
     }
     if (storeId) {
-      filtered = filtered.filter(item => item.storeId === storeId);
+      filtered = filtered.filter((item) => item.storeId === storeId);
     }
     if (skuId) {
-      filtered = filtered.filter(item => item.skuId === skuId);
+      filtered = filtered.filter((item) => item.skuId === skuId);
     }
 
     // 分页
@@ -214,7 +275,7 @@ export const adjustmentHandlers = [
     await delay(200);
 
     const { id } = params;
-    const adjustment = mockAdjustments.find(a => a.id === id);
+    const adjustment = mockAdjustments.find((a) => a.id === id);
 
     if (!adjustment) {
       return HttpResponse.json(
@@ -224,7 +285,7 @@ export const adjustmentHandlers = [
     }
 
     // 查找关联的审批记录
-    const approvalHistory = mockApprovalRecords.filter(r => r.adjustmentId === id);
+    const approvalHistory = mockApprovalRecords.filter((r) => r.adjustmentId === id);
 
     const response: AdjustmentDetailResponse = {
       success: true,
@@ -241,7 +302,7 @@ export const adjustmentHandlers = [
     await delay(300);
 
     const { id } = params;
-    const adjustmentIndex = mockAdjustments.findIndex(a => a.id === id);
+    const adjustmentIndex = mockAdjustments.findIndex((a) => a.id === id);
 
     if (adjustmentIndex === -1) {
       return HttpResponse.json(
@@ -288,9 +349,9 @@ export const adjustmentHandlers = [
     await delay(300);
 
     const { id } = params;
-    const body = await request.json() as { comments?: string };
+    const body = (await request.json()) as { comments?: string };
 
-    const adjustmentIndex = mockAdjustments.findIndex(a => a.id === id);
+    const adjustmentIndex = mockAdjustments.findIndex((a) => a.id === id);
 
     if (adjustmentIndex === -1) {
       return HttpResponse.json(
@@ -340,9 +401,9 @@ export const adjustmentHandlers = [
     await delay(300);
 
     const { id } = params;
-    const body = await request.json() as { comments?: string };
+    const body = (await request.json()) as { comments?: string };
 
-    const adjustmentIndex = mockAdjustments.findIndex(a => a.id === id);
+    const adjustmentIndex = mockAdjustments.findIndex((a) => a.id === id);
 
     if (adjustmentIndex === -1) {
       return HttpResponse.json(
@@ -394,7 +455,7 @@ export const adjustmentHandlers = [
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
 
-    const pending = mockAdjustments.filter(a => a.status === 'pending_approval');
+    const pending = mockAdjustments.filter((a) => a.status === 'pending_approval');
     const total = pending.length;
     const startIndex = (page - 1) * pageSize;
     const data = pending.slice(startIndex, startIndex + pageSize);
@@ -417,9 +478,9 @@ export const adjustmentHandlers = [
     await delay(300);
 
     const { adjustmentId } = params;
-    const body = await request.json() as { action: 'approve' | 'reject'; comments?: string };
+    const body = (await request.json()) as { action: 'approve' | 'reject'; comments?: string };
 
-    const adjustmentIndex = mockAdjustments.findIndex(a => a.id === adjustmentId);
+    const adjustmentIndex = mockAdjustments.findIndex((a) => a.id === adjustmentId);
 
     if (adjustmentIndex === -1) {
       return HttpResponse.json(
@@ -476,7 +537,7 @@ export const adjustmentHandlers = [
     await delay(300);
 
     const { id } = params;
-    const body = await request.json() as { safetyStock: number; version: number };
+    const body = (await request.json()) as { safetyStock: number; version: number };
 
     // Mock 乐观锁检查 - 假设 50% 概率会有冲突
     const hasConflict = Math.random() < 0.1;
@@ -520,7 +581,11 @@ export const adjustmentHandlers = [
 
     // Mock 流水数据
     const transactionTypes = [
-      'purchase_in', 'sale_out', 'adjustment_in', 'adjustment_out', 'damage_out',
+      'purchase_in',
+      'sale_out',
+      'adjustment_in',
+      'adjustment_out',
+      'damage_out',
     ];
 
     const mockTransactions = Array.from({ length: 50 }, (_, i) => {
@@ -545,10 +610,10 @@ export const adjustmentHandlers = [
 
     let filtered = mockTransactions;
     if (skuId) {
-      filtered = filtered.filter(t => t.skuId === skuId);
+      filtered = filtered.filter((t) => t.skuId === skuId);
     }
     if (storeId) {
-      filtered = filtered.filter(t => t.storeId === storeId);
+      filtered = filtered.filter((t) => t.storeId === storeId);
     }
 
     const total = filtered.length;

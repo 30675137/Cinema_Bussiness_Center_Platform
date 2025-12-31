@@ -1,6 +1,6 @@
 /**
  * P003-inventory-query: 库存 API 服务
- * 
+ *
  * 提供库存列表查询、详情获取、分类列表、门店列表等接口。
  */
 
@@ -51,15 +51,13 @@ const API_BASE = '';
 
 /**
  * 查询库存列表
- * 
+ *
  * @param params 查询参数
  * @returns 库存列表响应
  */
-export async function listInventory(
-  params: InventoryQueryParams
-): Promise<InventoryListResponse> {
+export async function listInventory(params: InventoryQueryParams): Promise<InventoryListResponse> {
   const searchParams = new URLSearchParams();
-  
+
   if (params.storeId) {
     searchParams.set('storeId', params.storeId);
   }
@@ -81,40 +79,40 @@ export async function listInventory(
 
   const queryString = searchParams.toString();
   const url = `${API_BASE}/inventory${queryString ? `?${queryString}` : ''}`;
-  
+
   const response = await apiClient.get<InventoryListResponse>(url);
   return response.data;
 }
 
 /**
  * 获取库存详情
- * 
+ *
  * @param id 库存记录ID
  * @returns 库存详情响应
  */
-export async function getInventoryDetail(
-  id: string
-): Promise<InventoryDetailResponse> {
+export async function getInventoryDetail(id: string): Promise<InventoryDetailResponse> {
   const response = await apiClient.get<InventoryDetailResponse>(`${API_BASE}/inventory/${id}`);
   return response.data;
 }
 
 /**
  * 获取商品分类列表
- * 
+ *
  * @param status 分类状态（默认 ACTIVE）
  * @returns 分类列表响应
  */
 export async function listCategories(
   status: 'ACTIVE' | 'INACTIVE' = 'ACTIVE'
 ): Promise<CategoryListResponse> {
-  const response = await apiClient.get<CategoryListResponse>(`${API_BASE}/categories?status=${status}`);
+  const response = await apiClient.get<CategoryListResponse>(
+    `${API_BASE}/categories?status=${status}`
+  );
   return response.data;
 }
 
 /**
  * 获取当前用户可访问的门店列表
- * 
+ *
  * @returns 门店列表响应
  */
 export async function listAccessibleStores(): Promise<StoreListResponse> {

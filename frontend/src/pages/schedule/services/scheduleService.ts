@@ -345,7 +345,10 @@ class ScheduleService {
    * @param params 查询参数（可选状态、类型过滤）
    * @returns 该门店下的影厅列表
    */
-  async getHallsByStore(storeId: string, params: HallQueryParams = {}): Promise<ApiResponse<Hall[]>> {
+  async getHallsByStore(
+    storeId: string,
+    params: HallQueryParams = {}
+  ): Promise<ApiResponse<Hall[]>> {
     try {
       const queryParams = new URLSearchParams();
 
@@ -425,4 +428,3 @@ class ScheduleService {
 
 // Export service instance
 export const scheduleService = new ScheduleService();
-

@@ -145,9 +145,7 @@ const ScenarioPackageEditPage: React.FC = () => {
    */
   const handleHallTypeToggle = (hallId: string) => {
     setSelectedHallTypes((prev) =>
-      prev.includes(hallId)
-        ? prev.filter((id) => id !== hallId)
-        : [...prev, hallId]
+      prev.includes(hallId) ? prev.filter((id) => id !== hallId) : [...prev, hallId]
     );
   };
 
@@ -263,9 +261,7 @@ const ScenarioPackageEditPage: React.FC = () => {
             description="未找到指定的场景包"
             type="warning"
             showIcon
-            action={
-              <Button onClick={() => navigate('/scenario-packages')}>返回列表</Button>
-            }
+            action={<Button onClick={() => navigate('/scenario-packages')}>返回列表</Button>}
           />
         </Card>
       </div>
@@ -404,9 +400,7 @@ const ScenarioPackageEditPage: React.FC = () => {
                         backgroundColor: selectedHallTypes.includes(hall.id)
                           ? '#1890ff'
                           : 'transparent',
-                        color: selectedHallTypes.includes(hall.id)
-                          ? '#fff'
-                          : 'inherit',
+                        color: selectedHallTypes.includes(hall.id) ? '#fff' : 'inherit',
                       }}
                     >
                       {hall.name}
@@ -425,17 +419,9 @@ const ScenarioPackageEditPage: React.FC = () => {
                 </Space>
               }
               style={{ marginBottom: 24 }}
-              extra={
-                <span style={{ color: '#8c8c8c', fontSize: 12 }}>
-                  必填，至少选择一个门店
-                </span>
-              }
+              extra={<span style={{ color: '#8c8c8c', fontSize: 12 }}>必填，至少选择一个门店</span>}
             >
-              <StoreSelector
-                value={selectedStoreIds}
-                onChange={setSelectedStoreIds}
-                required
-              />
+              <StoreSelector value={selectedStoreIds} onChange={setSelectedStoreIds} required />
             </Card>
 
             {/* 使用规则 Card - 三列横向排列 */}

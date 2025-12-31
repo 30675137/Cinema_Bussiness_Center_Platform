@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: ApprovalList 组件单元测试
- * 
+ *
  * 测试审批列表显示和操作。
  * 实现 T042 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
@@ -45,19 +45,19 @@ describe('ApprovalList', () => {
   describe('组件渲染', () => {
     it('应该渲染审批列表容器', () => {
       render(<ApprovalList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByTestId('approval-list')).toBeInTheDocument();
     });
 
     it('应该显示通过按钮', () => {
       render(<ApprovalList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText('通过')).toBeInTheDocument();
     });
 
     it('应该显示拒绝按钮', () => {
       render(<ApprovalList {...defaultProps} />, { wrapper: createWrapper() });
-      
+
       expect(screen.getByText('拒绝')).toBeInTheDocument();
     });
   });

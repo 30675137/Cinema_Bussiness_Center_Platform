@@ -26,12 +26,17 @@ test.describe('P005 BOM库存扣减 UI测试', () => {
     console.log(`✓ 库存表格加载成功,共 ${rowCount} 条记录`);
 
     // Step 3: 搜索威士忌
-    const searchInput = page.locator('input[placeholder*="搜索"], input[placeholder*="SKU"]').first();
+    const searchInput = page
+      .locator('input[placeholder*="搜索"], input[placeholder*="SKU"]')
+      .first();
     if (await searchInput.isVisible()) {
       await searchInput.fill('威士忌');
 
       // 查找搜索按钮并点击
-      const searchButton = page.locator('button').filter({ hasText: /搜索|Search/ }).first();
+      const searchButton = page
+        .locator('button')
+        .filter({ hasText: /搜索|Search/ })
+        .first();
       if (await searchButton.isVisible()) {
         await searchButton.click();
         await page.waitForTimeout(1000);
@@ -85,7 +90,10 @@ test.describe('P005 BOM库存扣减 UI测试', () => {
     await checkStatistic('释放');
 
     // 截图
-    await page.screenshot({ path: 'test-results/tc-ui-002-reservation-overview.png', fullPage: true });
+    await page.screenshot({
+      path: 'test-results/tc-ui-002-reservation-overview.png',
+      fullPage: true,
+    });
   });
 
   test('TC-UI-003: 订单出品确认（模拟）', async ({ page }) => {
@@ -159,7 +167,9 @@ test.describe('P005 BOM库存扣减 UI测试', () => {
       expect(firstItem).toHaveProperty('availableQty');
       expect(firstItem).toHaveProperty('reservedQty');
 
-      console.log(`第一条记录: ${firstItem.skuName} - 现存:${firstItem.onHandQty}, 可用:${firstItem.availableQty}, 预占:${firstItem.reservedQty}`);
+      console.log(
+        `第一条记录: ${firstItem.skuName} - 现存:${firstItem.onHandQty}, 可用:${firstItem.availableQty}, 预占:${firstItem.reservedQty}`
+      );
     }
   });
 
@@ -171,17 +181,17 @@ test.describe('P005 BOM库存扣减 UI测试', () => {
       items: [
         {
           skuId: '22222222-0000-0000-0000-000000000001', // 威士忌可乐鸡尾酒
-          quantity: 1
-        }
-      ]
+          quantity: 1,
+        },
+      ],
     };
 
     try {
       const response = await request.post('http://localhost:8080/api/inventory/deductions', {
         data: deductionPayload,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       console.log(`BOM扣减API状态码: ${response.status()}`);
@@ -217,7 +227,7 @@ test.describe('P005 BOM库存扣减 UI测试', () => {
 
       // 检查页面无JavaScript错误
       const errors: string[] = [];
-      page.on('pageerror', error => errors.push(error.message));
+      page.on('pageerror', (error) => errors.push(error.message));
 
       await page.waitForTimeout(1000);
 
@@ -237,14 +247,14 @@ test.describe('P005 异常处理测试', () => {
       items: [
         {
           skuId: '11111111-0000-0000-0000-000000000001', // 威士忌
-          quantity: 999999 // 远超库存
-        }
-      ]
+          quantity: 999999, // 远超库存
+        },
+      ],
     };
 
     try {
       const response = await request.post('http://localhost:8080/api/inventory/deductions', {
-        data: insufficientPayload
+        data: insufficientPayload,
       });
 
       console.log(`库存不足测试状态码: ${response.status()}`);

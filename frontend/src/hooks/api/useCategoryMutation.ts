@@ -15,11 +15,11 @@ export function useCreateCategoryMutation() {
     onSuccess: (response) => {
       if (response.success) {
         message.success('类目创建成功');
-        
+
         // 使树查询失效，触发重新获取
         queryClient.invalidateQueries({ queryKey: categoryKeys.tree() });
         queryClient.invalidateQueries({ queryKey: categoryKeys.all() });
-        
+
         // 预取新创建的类目详情
         if (response.data) {
           queryClient.prefetchQuery({
@@ -46,17 +46,17 @@ export function useUpdateCategoryMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryRequest }) => 
+    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryRequest }) =>
       categoryService.updateCategory({ ...data, id }),
     onSuccess: (response) => {
       if (response.success) {
         message.success('类目更新成功');
-        
+
         // 更新类目详情缓存
         if (response.data) {
           queryClient.setQueryData(categoryKeys.detail(response.data.id), response.data);
         }
-        
+
         // 使树查询失效，触发重新获取
         queryClient.invalidateQueries({ queryKey: categoryKeys.tree() });
         queryClient.invalidateQueries({ queryKey: categoryKeys.all() });
@@ -83,10 +83,10 @@ export function useDeleteCategoryMutation() {
     onSuccess: (response) => {
       if (response.success) {
         message.success('类目删除成功');
-        
+
         // 移除类目详情缓存
         queryClient.removeQueries({ queryKey: categoryKeys.detail(id) });
-        
+
         // 使树查询失效，触发重新获取
         queryClient.invalidateQueries({ queryKey: categoryKeys.tree() });
         queryClient.invalidateQueries({ queryKey: categoryKeys.all() });
@@ -109,18 +109,18 @@ export function useUpdateCategoryStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: 'active' | 'inactive' }) => 
+    mutationFn: ({ id, status }: { id: string; status: 'active' | 'inactive' }) =>
       categoryService.updateCategoryStatus(id, status),
     onSuccess: (response) => {
       if (response.success) {
         const statusText = response.data.status === 'active' ? '启用' : '停用';
         message.success(`类目已${statusText}`);
-        
+
         // 更新类目详情缓存
         if (response.data) {
           queryClient.setQueryData(categoryKeys.detail(response.data.id), response.data);
         }
-        
+
         // 使树查询失效，触发重新获取
         queryClient.invalidateQueries({ queryKey: categoryKeys.tree() });
       } else {
@@ -134,6 +134,3 @@ export function useUpdateCategoryStatusMutation() {
     },
   });
 }
-
-
-

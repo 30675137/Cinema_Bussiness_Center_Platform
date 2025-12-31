@@ -1,4 +1,9 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type AxiosError,
+} from 'axios';
 import type { ApiResponse, ErrorResponse } from '@/types';
 
 // API基础配置
@@ -47,10 +52,13 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // 开发环境下打印响应信息
     if (import.meta.env.DEV) {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        status: response.status,
-        data: response.data,
-      });
+      console.log(
+        `[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`,
+        {
+          status: response.status,
+          data: response.data,
+        }
+      );
     }
 
     return response;
@@ -126,10 +134,7 @@ const generateRequestId = (): string => {
 // API方法封装
 class ApiService {
   // GET请求
-  async get<T = any>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await apiClient.get<ApiResponse<T>>(url, config);
     return response.data;
   }
@@ -165,10 +170,7 @@ class ApiService {
   }
 
   // DELETE请求
-  async delete<T = any>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await apiClient.delete<ApiResponse<T>>(url, config);
     return response.data;
   }

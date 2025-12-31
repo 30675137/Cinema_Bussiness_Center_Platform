@@ -1,0 +1,120 @@
+-- @spec O004-beverage-sku-reuse
+-- Rollback Script: Undo beverages → skus migration
+-- Purpose: Clean up migrated data if migration needs to be rolled back
+-- Task: T042
+-- Date: 2025-12-31
+--
+-- 注意: 此功能不包含权限与认证逻辑(详见宪法"认证与权限要求分层"原则)
+
+-- ============================================================
+-- ⚠️  WARNING: DESTRUCTIVE OPERATION
+-- ============================================================
+--
+-- This script DELETES migrated SKU data and mapping records.
+-- Use this script ONLY if:
+-- 1. Migration failed or produced incorrect data
+-- 2. You need to re-run migration with corrected logic
+-- 3. You are rolling back to the old beverages table
+--
+-- IMPORTANT:
+-- - Original beverages table is preserved (not deleted by migration)
+-- - This script only removes SKUs created by migration
+-- - Application code must be rolled back to use beverages table
+--
+-- To rollback:
+-- 1. Stop application services
+-- 2. Run this script: `./mvnw flyway:migrate` (Flyway will skip if not needed)
+-- 3. Verify data with verification queries below
+-- 4. Re-run migration V064 if needed
+
+-- ============================================================
+-- Step 1: Delete migrated SKUs
+-- ============================================================
+--
+-- Delete SKUs that were created by migration V064
+-- Identified by: SKUs referenced in beverage_sku_mapping table
+
+DELETE FROM skus
+WHERE id IN (
+    SELECT new_sku_id FROM beverage_sku_mapping
+    WHERE migration_script_version = 'V064'
+);
+
+-- ============================================================
+-- Step 2: Clear beverage_sku_mapping table
+-- ============================================================
+--
+-- Remove all migration mapping records created by V064
+
+DELETE FROM beverage_sku_mapping
+WHERE migration_script_version = 'V064';
+
+-- ============================================================
+-- Step 3: Restore beverages table comment
+-- ============================================================
+
+COMMENT ON TABLE beverages IS
+    '饮品商品表 - 菜单中的饮品商品信息 (ACTIVE - migration rolled back)';
+
+-- ============================================================
+-- Verification Queries (run after rollback)
+-- ============================================================
+--
+-- 1. Verify all migrated SKUs are deleted:
+-- SELECT COUNT(*) AS remaining_migrated_skus
+-- FROM skus s
+-- WHERE EXISTS (SELECT 1 FROM beverage_sku_mapping bsm WHERE bsm.new_sku_id = s.id);
+--
+-- Expected: 0
+--
+-- 2. Verify mapping table is empty (for V064 migration):
+-- SELECT COUNT(*) AS remaining_mappings
+-- FROM beverage_sku_mapping
+-- WHERE migration_script_version = 'V064';
+--
+-- Expected: 0
+--
+-- 3. Verify original beverages table is intact:
+-- SELECT COUNT(*) AS total_beverages
+-- FROM beverages;
+--
+-- Expected: Original count (e.g., 50-100 beverages)
+--
+-- 4. Verify application can read beverages table:
+-- SELECT id, name, category, status, base_price
+-- FROM beverages
+-- WHERE status = 'ACTIVE'
+-- ORDER BY sort_order DESC
+-- LIMIT 10;
+--
+-- Expected: Active beverages displayed correctly
+
+-- ============================================================
+-- Post-Rollback Actions
+-- ============================================================
+--
+-- After running this rollback script:
+--
+-- 1. **Update Application Code**:
+--    - Revert to using beverages table instead of skus table
+--    - Disable SKU management UI for beverages
+--    - Re-enable old beverage management UI
+--
+-- 2. **Verify Data Integrity**:
+--    - Run all verification queries above
+--    - Test beverage list/create/update operations in UI
+--    - Check beverage order placement flow
+--
+-- 3. **Re-run Migration (if needed)**:
+--    - Fix migration logic issues (V064 script)
+--    - Re-run migration: `./mvnw flyway:migrate`
+--    - Verify with V064 verification queries
+--
+-- 4. **Communication**:
+--    - Notify team that migration was rolled back
+--    - Document reason for rollback
+--    - Plan for re-migration if needed
+
+-- ============================================================
+-- Rollback Complete
+-- ============================================================

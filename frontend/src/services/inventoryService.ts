@@ -5,7 +5,7 @@ import type {
   InventoryQueryParams,
   InventoryStatistics,
   TransactionDetail,
-  InventoryAlert
+  InventoryAlert,
 } from '@/types/inventory';
 import {
   TransactionType,
@@ -13,7 +13,7 @@ import {
   InventoryStatus,
   InventoryQueryParamsSchema,
   CurrentInventorySchema,
-  InventoryTransactionSchema
+  InventoryTransactionSchema,
 } from '@/types/inventory';
 import { z } from 'zod';
 
@@ -58,20 +58,22 @@ class InventoryService {
         // 添加性能优化配置
         timeout: 5000, // 5秒超时
         paramsSerializer: {
-          indexes: null // 避免数组索引参数
-        }
+          indexes: null, // 避免数组索引参数
+        },
       });
 
       const data = response.data.data || [];
-      const validatedData = Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : [];
+      const validatedData = Array.isArray(data)
+        ? data.map((item) => CurrentInventorySchema.parse(item))
+        : [];
 
       return {
         data: validatedData as CurrentInventory[],
         pagination: response.data.pagination || {
           current: 1,
           pageSize: 20,
-          total: validatedData.length
-        }
+          total: validatedData.length,
+        },
       };
     } catch (error) {
       console.error('获取当前库存失败:', error);
@@ -88,7 +90,9 @@ class InventoryService {
       const response = await apiClient.get(`${this.basePath}/current/by-sku`, { params });
       const data = response.data.data || [];
 
-      return (Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : []) as CurrentInventory[];
+      return (
+        Array.isArray(data) ? data.map((item) => CurrentInventorySchema.parse(item)) : []
+      ) as CurrentInventory[];
     } catch (error) {
       console.error('根据SKU获取库存失败:', error);
       throw error;
@@ -96,7 +100,10 @@ class InventoryService {
   }
 
   // 根据门店获取库存列表（支持批量查询）
-  async getInventoryByStore(storeId: string, params?: Partial<InventoryQueryParams>): Promise<{
+  async getInventoryByStore(
+    storeId: string,
+    params?: Partial<InventoryQueryParams>
+  ): Promise<{
     data: CurrentInventory[];
     pagination: {
       current: number;
@@ -108,19 +115,21 @@ class InventoryService {
       const validatedParams = InventoryQueryParamsSchema.partial().parse({ ...params, storeId });
       const response = await apiClient.get(`${this.basePath}/current/by-store`, {
         params: validatedParams,
-        timeout: 5000
+        timeout: 5000,
       });
 
       const data = response.data.data || [];
-      const validatedData = Array.isArray(data) ? data.map(item => CurrentInventorySchema.parse(item)) : [];
+      const validatedData = Array.isArray(data)
+        ? data.map((item) => CurrentInventorySchema.parse(item))
+        : [];
 
       return {
         data: validatedData as CurrentInventory[],
         pagination: response.data.pagination || {
           current: 1,
           pageSize: 20,
-          total: validatedData.length
-        }
+          total: validatedData.length,
+        },
       };
     } catch (error) {
       console.error('根据门店获取库存失败:', error);
@@ -143,12 +152,12 @@ class InventoryService {
         pageSize: 20,
         sortBy: 'transactionTime',
         sortOrder: 'desc',
-        ...params
+        ...params,
       });
 
       const response = await apiClient.get(`${this.basePath}/transactions`, {
         params: validatedParams,
-        timeout: 8000 // 交易查询允许更长超时
+        timeout: 8000, // 交易查询允许更长超时
       });
 
       const data = response.data.data || [];
@@ -157,8 +166,8 @@ class InventoryService {
         pagination: response.data.pagination || {
           current: validatedParams.page || 1,
           pageSize: validatedParams.pageSize || 20,
-          total: Array.isArray(data) ? data.length : 0
-        }
+          total: Array.isArray(data) ? data.length : 0,
+        },
       };
     } catch (error) {
       console.error('获取库存交易历史失败:', error);
@@ -190,7 +199,7 @@ class InventoryService {
     try {
       const response = await apiClient.get(`${this.basePath}/statistics`, {
         params,
-        timeout: 6000
+        timeout: 6000,
       });
       return response.data as InventoryStatistics;
     } catch (error) {
@@ -200,17 +209,20 @@ class InventoryService {
   }
 
   // 获取库存分析报告
-  async getInventoryAnalysis(analysisType: AnalysisType, params: {
-    storeIds?: string[];
-    categoryIds?: string[];
-    dateRange: [string, string];
-    timeUnit?: TimeUnit;
-    groupBy?: string[];
-  }): Promise<InventoryAnalysis> {
+  async getInventoryAnalysis(
+    analysisType: AnalysisType,
+    params: {
+      storeIds?: string[];
+      categoryIds?: string[];
+      dateRange: [string, string];
+      timeUnit?: TimeUnit;
+      groupBy?: string[];
+    }
+  ): Promise<InventoryAnalysis> {
     try {
       const response = await apiClient.get(`${this.basePath}/analysis/${analysisType}`, {
         params,
-        timeout: 10000 // 分析查询可能需要更长时间
+        timeout: 10000, // 分析查询可能需要更长时间
       });
       return response.data;
     } catch (error) {
@@ -254,7 +266,7 @@ class InventoryService {
   validateInventoryData(data: any): boolean {
     try {
       if (Array.isArray(data)) {
-        data.forEach(item => CurrentInventorySchema.parse(item));
+        data.forEach((item) => CurrentInventorySchema.parse(item));
       } else {
         CurrentInventorySchema.parse(data);
       }
@@ -269,7 +281,7 @@ class InventoryService {
   validateTransactionData(data: any): boolean {
     try {
       if (Array.isArray(data)) {
-        data.forEach(item => InventoryTransactionSchema.parse(item));
+        data.forEach((item) => InventoryTransactionSchema.parse(item));
       } else {
         InventoryTransactionSchema.parse(data);
       }
@@ -303,21 +315,30 @@ class InventoryService {
   }
 
   // 批量获取库存信息（支持1000+SKU同时查询）
-  async batchGetInventory(skuIds: string[], storeIds?: string[]): Promise<{
+  async batchGetInventory(
+    skuIds: string[],
+    storeIds?: string[]
+  ): Promise<{
     successful: CurrentInventory[];
     failed: Array<{ skuId: string; error: string }>;
   }> {
     try {
-      const response = await apiClient.post(`${this.basePath}/current/batch`, {
-        skuIds,
-        storeIds
-      }, {
-        timeout: 15000 // 批量查询需要更长超时
-      });
+      const response = await apiClient.post(
+        `${this.basePath}/current/batch`,
+        {
+          skuIds,
+          storeIds,
+        },
+        {
+          timeout: 15000, // 批量查询需要更长超时
+        }
+      );
 
       return {
-        successful: (response.data.successful || []).map((item: any) => CurrentInventorySchema.parse(item)),
-        failed: response.data.failed || []
+        successful: (response.data.successful || []).map((item: any) =>
+          CurrentInventorySchema.parse(item)
+        ),
+        failed: response.data.failed || [],
       };
     } catch (error) {
       console.error('批量获取库存失败:', error);
@@ -342,12 +363,16 @@ class InventoryService {
     return CurrentInventorySchema.parse(response.data);
   }
 
-  async createInventoryTransaction(data: Omit<InventoryTransaction, 'id' | 'createdAt' | 'updatedAt'>): Promise<InventoryTransaction> {
+  async createInventoryTransaction(
+    data: Omit<InventoryTransaction, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<InventoryTransaction> {
     const response = await apiClient.post(`${this.basePath}/transactions`, data);
     return InventoryTransactionSchema.parse(response.data);
   }
 
-  async batchCreateInventoryTransactions(data: Omit<InventoryTransaction, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<{
+  async batchCreateInventoryTransactions(
+    data: Omit<InventoryTransaction, 'id' | 'createdAt' | 'updatedAt'>[]
+  ): Promise<{
     success: number;
     failed: number;
     errors: Array<{
@@ -356,7 +381,7 @@ class InventoryService {
     }>;
   }> {
     const response = await apiClient.post(`${this.basePath}/transactions/batch`, data, {
-      timeout: 20000 // 批量操作需要更长超时
+      timeout: 20000, // 批量操作需要更长超时
     });
     return response.data;
   }
@@ -380,7 +405,9 @@ class InventoryService {
     return response.data;
   }
 
-  async createInventoryAlert(data: Omit<InventoryAlert, 'id' | 'createdAt' | 'lastTriggered' | 'triggerCount'>): Promise<InventoryAlert> {
+  async createInventoryAlert(
+    data: Omit<InventoryAlert, 'id' | 'createdAt' | 'lastTriggered' | 'triggerCount'>
+  ): Promise<InventoryAlert> {
     const response = await apiClient.post('/inventory/alerts', data);
     return response.data;
   }
@@ -414,7 +441,9 @@ class InventoryService {
     return response.data;
   }
 
-  async createInventoryBatch(data: Omit<BatchInfo, 'id' | 'createdAt' | 'updatedAt'>): Promise<BatchInfo> {
+  async createInventoryBatch(
+    data: Omit<BatchInfo, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<BatchInfo> {
     const response = await apiClient.post('/inventory/batches', data);
     return response.data;
   }
@@ -443,12 +472,21 @@ class InventoryService {
     return response.data;
   }
 
-  async createInventoryTransfer(data: Omit<TransferOrder, 'id' | 'transferNumber' | 'createdAt' | 'updatedAt' | 'requestedAt' | 'status'>): Promise<TransferOrder> {
+  async createInventoryTransfer(
+    data: Omit<
+      TransferOrder,
+      'id' | 'transferNumber' | 'createdAt' | 'updatedAt' | 'requestedAt' | 'status'
+    >
+  ): Promise<TransferOrder> {
     const response = await apiClient.post('/inventory/transfers', data);
     return response.data;
   }
 
-  async updateInventoryTransferStatus(id: string, status: TransferStatus, remarks?: string): Promise<TransferOrder> {
+  async updateInventoryTransferStatus(
+    id: string,
+    status: TransferStatus,
+    remarks?: string
+  ): Promise<TransferOrder> {
     const response = await apiClient.put(`/inventory/transfers/${id}/status`, { status, remarks });
     return response.data;
   }
@@ -466,13 +504,15 @@ class InventoryService {
   }): Promise<Blob> {
     const response = await apiClient.post('/inventory/export', params, {
       responseType: 'blob',
-      timeout: 30000 // 导出操作需要更长超时
+      timeout: 30000, // 导出操作需要更长超时
     });
     return response.data;
   }
 
   // 实时库存查询（WebSocket支持）
-  subscribeToInventoryUpdates(callback: (data: { skuId: string; storeId: string; quantity: number; }) => void): () => void {
+  subscribeToInventoryUpdates(
+    callback: (data: { skuId: string; storeId: string; quantity: number }) => void
+  ): () => void {
     // 这里可以集成WebSocket连接来实现实时更新
     console.log('库存实时更新订阅已启动');
 
@@ -496,7 +536,7 @@ class InventoryService {
       return {
         queryOptimizations: [],
         cacheSuggestions: [],
-        indexingRecommendations: []
+        indexingRecommendations: [],
       };
     }
   }
@@ -512,30 +552,47 @@ export const inventoryService = {
   getInventoryBySKU: inventoryServiceInstance.getInventoryBySKU.bind(inventoryServiceInstance),
   getInventoryByStore: inventoryServiceInstance.getInventoryByStore.bind(inventoryServiceInstance),
   batchGetInventory: inventoryServiceInstance.batchGetInventory.bind(inventoryServiceInstance),
-  validateInventoryData: inventoryServiceInstance.validateInventoryData.bind(inventoryServiceInstance),
-  validateTransactionData: inventoryServiceInstance.validateTransactionData.bind(inventoryServiceInstance),
+  validateInventoryData:
+    inventoryServiceInstance.validateInventoryData.bind(inventoryServiceInstance),
+  validateTransactionData:
+    inventoryServiceInstance.validateTransactionData.bind(inventoryServiceInstance),
   formatQueryParams: inventoryServiceInstance.formatQueryParams.bind(inventoryServiceInstance),
-  subscribeToInventoryUpdates: inventoryServiceInstance.subscribeToInventoryUpdates.bind(inventoryServiceInstance),
-  getPerformanceRecommendations: inventoryServiceInstance.getPerformanceRecommendations.bind(inventoryServiceInstance),
+  subscribeToInventoryUpdates:
+    inventoryServiceInstance.subscribeToInventoryUpdates.bind(inventoryServiceInstance),
+  getPerformanceRecommendations:
+    inventoryServiceInstance.getPerformanceRecommendations.bind(inventoryServiceInstance),
 
   // 原有兼容方法
-  getInventoryTransactions: inventoryServiceInstance.getInventoryTransactions.bind(inventoryServiceInstance),
-  getInventoryTransaction: inventoryServiceInstance.getTransactionDetail.bind(inventoryServiceInstance),
-  createInventoryTransaction: inventoryServiceInstance.createInventoryTransaction.bind(inventoryServiceInstance),
-  batchCreateInventoryTransactions: inventoryServiceInstance.batchCreateInventoryTransactions.bind(inventoryServiceInstance),
+  getInventoryTransactions:
+    inventoryServiceInstance.getInventoryTransactions.bind(inventoryServiceInstance),
+  getInventoryTransaction:
+    inventoryServiceInstance.getTransactionDetail.bind(inventoryServiceInstance),
+  createInventoryTransaction:
+    inventoryServiceInstance.createInventoryTransaction.bind(inventoryServiceInstance),
+  batchCreateInventoryTransactions:
+    inventoryServiceInstance.batchCreateInventoryTransactions.bind(inventoryServiceInstance),
   getSingleInventory: inventoryServiceInstance.getSingleInventory.bind(inventoryServiceInstance),
   updateInventory: inventoryServiceInstance.updateInventory.bind(inventoryServiceInstance),
-  getInventoryStatistics: inventoryServiceInstance.getInventoryStatistics.bind(inventoryServiceInstance),
+  getInventoryStatistics:
+    inventoryServiceInstance.getInventoryStatistics.bind(inventoryServiceInstance),
   getInventoryAlerts: inventoryServiceInstance.getInventoryAlerts.bind(inventoryServiceInstance),
-  createInventoryAlert: inventoryServiceInstance.createInventoryAlert.bind(inventoryServiceInstance),
-  updateInventoryAlert: inventoryServiceInstance.updateInventoryAlert.bind(inventoryServiceInstance),
-  deleteInventoryAlert: inventoryServiceInstance.deleteInventoryAlert.bind(inventoryServiceInstance),
+  createInventoryAlert:
+    inventoryServiceInstance.createInventoryAlert.bind(inventoryServiceInstance),
+  updateInventoryAlert:
+    inventoryServiceInstance.updateInventoryAlert.bind(inventoryServiceInstance),
+  deleteInventoryAlert:
+    inventoryServiceInstance.deleteInventoryAlert.bind(inventoryServiceInstance),
   getInventoryBatches: inventoryServiceInstance.getInventoryBatches.bind(inventoryServiceInstance),
-  createInventoryBatch: inventoryServiceInstance.createInventoryBatch.bind(inventoryServiceInstance),
-  updateInventoryBatch: inventoryServiceInstance.updateInventoryBatch.bind(inventoryServiceInstance),
-  getInventoryTransfers: inventoryServiceInstance.getInventoryTransfers.bind(inventoryServiceInstance),
-  createInventoryTransfer: inventoryServiceInstance.createInventoryTransfer.bind(inventoryServiceInstance),
-  updateInventoryTransferStatus: inventoryServiceInstance.updateInventoryTransferStatus.bind(inventoryServiceInstance),
+  createInventoryBatch:
+    inventoryServiceInstance.createInventoryBatch.bind(inventoryServiceInstance),
+  updateInventoryBatch:
+    inventoryServiceInstance.updateInventoryBatch.bind(inventoryServiceInstance),
+  getInventoryTransfers:
+    inventoryServiceInstance.getInventoryTransfers.bind(inventoryServiceInstance),
+  createInventoryTransfer:
+    inventoryServiceInstance.createInventoryTransfer.bind(inventoryServiceInstance),
+  updateInventoryTransferStatus:
+    inventoryServiceInstance.updateInventoryTransferStatus.bind(inventoryServiceInstance),
   exportInventoryData: inventoryServiceInstance.exportInventoryData.bind(inventoryServiceInstance),
 
   // 原有方法保持不变（继续支持）
@@ -566,8 +623,8 @@ export const inventoryService = {
 
     const response = await apiClient.post('/inventory/import/transactions', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -585,8 +642,8 @@ export const inventoryService = {
 
     const response = await apiClient.post('/inventory/import/preview', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
     return response.data;
@@ -639,19 +696,25 @@ export const inventoryService = {
 
   // 原有调拨相关方法
   async approveInventoryTransfer(id: string, approvedBy: string, remarks?: string) {
-    const response = await apiClient.post(`/inventory/transfers/${id}/approve`, { approvedBy, remarks });
+    const response = await apiClient.post(`/inventory/transfers/${id}/approve`, {
+      approvedBy,
+      remarks,
+    });
     return response.data;
   },
 
   async confirmInventoryTransfer(id: string, receivedBy: string, remarks?: string) {
-    const response = await apiClient.post(`/inventory/transfers/${id}/confirm`, { receivedBy, remarks });
+    const response = await apiClient.post(`/inventory/transfers/${id}/confirm`, {
+      receivedBy,
+      remarks,
+    });
     return response.data;
   },
 
   async cancelInventoryTransfer(id: string, cancelReason: string) {
     const response = await apiClient.post(`/inventory/transfers/${id}/cancel`, { cancelReason });
     return response.data;
-  }
+  },
 };
 
 // 默认导出服务实例
@@ -670,19 +733,9 @@ export type {
   ReplenishmentSuggestion,
   TransferOrder,
   InventoryAnalysis,
-  InventoryConfig
+  InventoryConfig,
 };
 
-export {
-  TransactionType,
-  SourceType,
-  InventoryStatus
-};
+export { TransactionType, SourceType, InventoryStatus };
 
-export type {
-  AlertType,
-  AlertSeverity,
-  TransferStatus,
-  AnalysisType,
-  TimeUnit
-};
+export type { AlertType, AlertSeverity, TransferStatus, AnalysisType, TimeUnit };

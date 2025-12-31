@@ -44,9 +44,7 @@ let mockDictionaryItems: Record<string, DictionaryItem[]> = JSON.parse(
   JSON.stringify(initialDictionaryItems)
 );
 let mockAttributeTemplates: AttributeTemplate[] = [...initialAttributeTemplates];
-let mockAttributes: Record<string, Attribute[]> = JSON.parse(
-  JSON.stringify(initialAttributes)
-);
+let mockAttributes: Record<string, Attribute[]> = JSON.parse(JSON.stringify(initialAttributes));
 
 // ============================================================================
 // Helper functions
@@ -91,8 +89,7 @@ const dictionaryTypeHandlers = [
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
         (t) =>
-          t.name.toLowerCase().includes(searchLower) ||
-          t.code.toLowerCase().includes(searchLower)
+          t.name.toLowerCase().includes(searchLower) || t.code.toLowerCase().includes(searchLower)
       );
     }
 
@@ -127,10 +124,7 @@ const dictionaryTypeHandlers = [
     const type = mockDictionaryTypes.find((t) => t.id === id);
 
     if (!type) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型不存在' }, { status: 404 });
     }
 
     return HttpResponse.json({
@@ -147,18 +141,12 @@ const dictionaryTypeHandlers = [
 
     // Check for duplicate code
     if (mockDictionaryTypes.some((t) => t.code === body.code)) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型编码已存在' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型编码已存在' }, { status: 400 });
     }
 
     // Check for duplicate name
     if (mockDictionaryTypes.some((t) => t.name === body.name)) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型名称已存在' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型名称已存在' }, { status: 400 });
     }
 
     const newType = generateDictionaryType({
@@ -186,18 +174,12 @@ const dictionaryTypeHandlers = [
 
     const index = mockDictionaryTypes.findIndex((t) => t.id === id);
     if (index === -1) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型不存在' }, { status: 404 });
     }
 
     // Check for duplicate name (excluding self)
     if (body.name && mockDictionaryTypes.some((t) => t.name === body.name && t.id !== id)) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型名称已存在' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型名称已存在' }, { status: 400 });
     }
 
     mockDictionaryTypes[index] = {
@@ -221,10 +203,7 @@ const dictionaryTypeHandlers = [
     const type = mockDictionaryTypes.find((t) => t.id === id);
 
     if (!type) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型不存在' }, { status: 404 });
     }
 
     // Check if type is system type
@@ -292,8 +271,7 @@ const dictionaryItemHandlers = [
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
         (i) =>
-          i.name.toLowerCase().includes(searchLower) ||
-          i.code.toLowerCase().includes(searchLower)
+          i.name.toLowerCase().includes(searchLower) || i.code.toLowerCase().includes(searchLower)
       );
     }
 
@@ -316,10 +294,7 @@ const dictionaryItemHandlers = [
     // Check type exists
     const type = mockDictionaryTypes.find((t) => t.id === typeId);
     if (!type) {
-      return HttpResponse.json(
-        { success: false, message: '字典类型不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典类型不存在' }, { status: 404 });
     }
 
     const items = mockDictionaryItems[typeId as string] || [];
@@ -354,8 +329,7 @@ const dictionaryItemHandlers = [
     // Update type itemCount
     const typeIndex = mockDictionaryTypes.findIndex((t) => t.id === typeId);
     if (typeIndex !== -1) {
-      mockDictionaryTypes[typeIndex].itemCount =
-        mockDictionaryItems[typeId as string].length;
+      mockDictionaryTypes[typeIndex].itemCount = mockDictionaryItems[typeId as string].length;
     }
 
     return HttpResponse.json({
@@ -386,10 +360,7 @@ const dictionaryItemHandlers = [
     }
 
     if (!foundTypeId || foundIndex === -1) {
-      return HttpResponse.json(
-        { success: false, message: '字典项不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典项不存在' }, { status: 404 });
     }
 
     const items = mockDictionaryItems[foundTypeId];
@@ -434,10 +405,7 @@ const dictionaryItemHandlers = [
     }
 
     if (!foundTypeId) {
-      return HttpResponse.json(
-        { success: false, message: '字典项不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '字典项不存在' }, { status: 404 });
     }
 
     // Update type itemCount
@@ -529,10 +497,7 @@ const attributeTemplateHandlers = [
     const template = mockAttributeTemplates.find((t) => t.id === id);
 
     if (!template) {
-      return HttpResponse.json(
-        { success: false, message: '属性模板不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性模板不存在' }, { status: 404 });
     }
 
     // Include attributes
@@ -552,9 +517,7 @@ const attributeTemplateHandlers = [
     await delay(200);
 
     const { categoryId } = params;
-    const template = mockAttributeTemplates.find(
-      (t) => t.categoryId === categoryId && t.isActive
-    );
+    const template = mockAttributeTemplates.find((t) => t.categoryId === categoryId && t.isActive);
 
     if (!template) {
       return HttpResponse.json({
@@ -612,10 +575,7 @@ const attributeTemplateHandlers = [
 
     const index = mockAttributeTemplates.findIndex((t) => t.id === id);
     if (index === -1) {
-      return HttpResponse.json(
-        { success: false, message: '属性模板不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性模板不存在' }, { status: 404 });
     }
 
     mockAttributeTemplates[index] = {
@@ -640,10 +600,7 @@ const attributeTemplateHandlers = [
     const template = mockAttributeTemplates.find((t) => t.id === id);
 
     if (!template) {
-      return HttpResponse.json(
-        { success: false, message: '属性模板不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性模板不存在' }, { status: 404 });
     }
 
     mockAttributeTemplates = mockAttributeTemplates.filter((t) => t.id !== id);
@@ -664,10 +621,7 @@ const attributeTemplateHandlers = [
 
     const sourceTemplate = mockAttributeTemplates.find((t) => t.id === id);
     if (!sourceTemplate) {
-      return HttpResponse.json(
-        { success: false, message: '源属性模板不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '源属性模板不存在' }, { status: 404 });
     }
 
     // Check if target category already has a template
@@ -740,10 +694,7 @@ const attributeHandlers = [
     // Check template exists
     const template = mockAttributeTemplates.find((t) => t.id === body.templateId);
     if (!template) {
-      return HttpResponse.json(
-        { success: false, message: '属性模板不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性模板不存在' }, { status: 404 });
     }
 
     const attributes = mockAttributes[body.templateId] || [];
@@ -817,10 +768,7 @@ const attributeHandlers = [
     }
 
     if (!foundTemplateId || foundIndex === -1 || !existingAttribute) {
-      return HttpResponse.json(
-        { success: false, message: '属性不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性不存在' }, { status: 404 });
     }
 
     // Note: Type change prevention would be checked here in real implementation
@@ -858,10 +806,7 @@ const attributeHandlers = [
     }
 
     if (!foundTemplateId) {
-      return HttpResponse.json(
-        { success: false, message: '属性不存在' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ success: false, message: '属性不存在' }, { status: 404 });
     }
 
     return HttpResponse.json({

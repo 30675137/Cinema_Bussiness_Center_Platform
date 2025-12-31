@@ -8,17 +8,8 @@
  */
 import React, { useMemo } from 'react';
 import { Card, Typography, Divider, Space, Statistic, Row, Col, Alert } from 'antd';
-import {
-  DollarOutlined,
-  PercentageOutlined,
-  ProfileOutlined,
-} from '@ant-design/icons';
-import {
-  RuleConfigurator,
-  BenefitSelector,
-  ItemSelector,
-  ServiceSelector,
-} from '../molecules';
+import { DollarOutlined, PercentageOutlined, ProfileOutlined } from '@ant-design/icons';
+import { RuleConfigurator, BenefitSelector, ItemSelector, ServiceSelector } from '../molecules';
 import type {
   PackageRule,
   PackageBenefit,
@@ -75,16 +66,10 @@ export const ContentConfigurator: React.FC<ContentConfiguratorProps> = ({
     const services = content.services || [];
 
     // 单品总价
-    const itemsTotal = items.reduce(
-      (sum, item) => sum + item.itemPriceSnapshot * item.quantity,
-      0
-    );
+    const itemsTotal = items.reduce((sum, item) => sum + item.itemPriceSnapshot * item.quantity, 0);
 
     // 服务总价
-    const servicesTotal = services.reduce(
-      (sum, service) => sum + service.servicePriceSnapshot,
-      0
-    );
+    const servicesTotal = services.reduce((sum, service) => sum + service.servicePriceSnapshot, 0);
 
     // 参考总价（不含硬权益，因为硬权益是优惠）
     const referencePrice = itemsTotal + servicesTotal;
@@ -92,9 +77,7 @@ export const ContentConfigurator: React.FC<ContentConfiguratorProps> = ({
     // 优惠金额和比例
     const discountAmount = packagePrice ? referencePrice - packagePrice : 0;
     const discountPercentage =
-      referencePrice > 0 && packagePrice
-        ? ((discountAmount / referencePrice) * 100).toFixed(1)
-        : 0;
+      referencePrice > 0 && packagePrice ? ((discountAmount / referencePrice) * 100).toFixed(1) : 0;
 
     return {
       itemsTotal,
@@ -111,11 +94,7 @@ export const ContentConfigurator: React.FC<ContentConfiguratorProps> = ({
   return (
     <div className="content-configurator">
       {/* 规则配置 */}
-      <RuleConfigurator
-        value={rule}
-        onChange={onRuleChange}
-        disabled={disabled}
-      />
+      <RuleConfigurator value={rule} onChange={onRuleChange} disabled={disabled} />
 
       <Divider />
 
@@ -129,11 +108,7 @@ export const ContentConfigurator: React.FC<ContentConfiguratorProps> = ({
       <Divider />
 
       {/* 单品配置 */}
-      <ItemSelector
-        value={content.items || []}
-        onChange={onItemsChange}
-        disabled={disabled}
-      />
+      <ItemSelector value={content.items || []} onChange={onItemsChange} disabled={disabled} />
 
       <Divider />
 

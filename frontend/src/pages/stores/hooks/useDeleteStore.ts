@@ -10,11 +10,11 @@ import { deleteStore } from '../services/storeService';
 
 /**
  * Hook for deleting a store
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useDeleteStore();
- * 
+ *
  * const handleDelete = (storeId: string) => {
  *   Modal.confirm({
  *     title: '确认删除',

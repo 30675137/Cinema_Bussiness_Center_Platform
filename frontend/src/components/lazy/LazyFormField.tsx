@@ -14,14 +14,7 @@ import { createLazyComponent, LazyConfigPresets } from './LazyWrapper';
  * />
  * ```
  */
-export default createLazyComponent(
-  () => import('../ui/FormField'),
-  LazyConfigPresets.form
-);
+export default createLazyComponent(() => import('../ui/FormField'), LazyConfigPresets.form);
 
 // 重导出类型
-export type {
-  FormFieldProps,
-  FormFieldConfig,
-  FormFieldType,
-} from '../ui/FormField/types';
+export type { FormFieldProps, FormFieldConfig, FormFieldType } from '../ui/FormField/types';

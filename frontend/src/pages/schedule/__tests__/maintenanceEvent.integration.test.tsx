@@ -1,6 +1,6 @@
 /**
  * Integration tests for maintenance/cleaning event creation
- * 
+ *
  * Tests creating maintenance events, cleaning events, and verifying special styling
  */
 
@@ -31,9 +31,7 @@ const createWrapper = () => {
   return ({ children }: { children: React.ReactNode }) => (
     <ConfigProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </QueryClientProvider>
     </ConfigProvider>
   );
@@ -171,4 +169,3 @@ describe('Maintenance/Cleaning Event Integration Tests', () => {
     });
   });
 });
-

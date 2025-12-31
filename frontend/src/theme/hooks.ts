@@ -4,12 +4,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { themeManager } from './core';
-import type {
-  ThemeMode,
-  ThemeConfig,
-  ThemeSettings,
-  ThemeCustomization
-} from './types';
+import type { ThemeMode, ThemeConfig, ThemeSettings, ThemeCustomization } from './types';
 
 /**
  * 使用主题的Hook
@@ -84,7 +79,7 @@ export const useTheme = () => {
     boxShadow,
     breakpoints,
     animation,
-    zIndex
+    zIndex,
   };
 };
 
@@ -112,21 +107,21 @@ export const useThemeSettings = () => {
   // 切换动画
   const toggleAnimations = useCallback(() => {
     themeManager.updateSettings({
-      enableAnimations: !settings.enableAnimations
+      enableAnimations: !settings.enableAnimations,
     });
   }, [settings.enableAnimations]);
 
   // 切换高对比度
   const toggleHighContrast = useCallback(() => {
     themeManager.updateSettings({
-      enableHighContrast: !settings.enableHighContrast
+      enableHighContrast: !settings.enableHighContrast,
     });
   }, [settings.enableHighContrast]);
 
   // 切换减少动画
   const toggleReducedMotion = useCallback(() => {
     themeManager.updateSettings({
-      enableReducedMotion: !settings.enableReducedMotion
+      enableReducedMotion: !settings.enableReducedMotion,
     });
   }, [settings.enableReducedMotion]);
 
@@ -147,7 +142,7 @@ export const useThemeSettings = () => {
     toggleHighContrast,
     toggleReducedMotion,
     setFontSize,
-    setFontFamily
+    setFontFamily,
   };
 };
 
@@ -177,12 +172,12 @@ export const useCustomThemes = () => {
   }, []);
 
   // 创建自定义主题
-  const createCustomTheme = useCallback((
-    customization: ThemeCustomization,
-    name: string
-  ): ThemeConfig => {
-    return themeManager.createCustomTheme(customization, name);
-  }, []);
+  const createCustomTheme = useCallback(
+    (customization: ThemeCustomization, name: string): ThemeConfig => {
+      return themeManager.createCustomTheme(customization, name);
+    },
+    []
+  );
 
   // 添加自定义主题
   const addCustomTheme = useCallback((theme: ThemeConfig) => {
@@ -195,23 +190,26 @@ export const useCustomThemes = () => {
   }, []);
 
   // 克隆主题
-  const cloneTheme = useCallback((baseTheme: ThemeConfig, name: string): ThemeConfig => {
-    const cloned: ThemeConfig = {
-      ...baseTheme,
-      id: `custom-${Date.now()}`,
-      name,
-      description: `Cloned from ${baseTheme.name}`
-    };
-    addCustomTheme(cloned);
-    return cloned;
-  }, [addCustomTheme]);
+  const cloneTheme = useCallback(
+    (baseTheme: ThemeConfig, name: string): ThemeConfig => {
+      const cloned: ThemeConfig = {
+        ...baseTheme,
+        id: `custom-${Date.now()}`,
+        name,
+        description: `Cloned from ${baseTheme.name}`,
+      };
+      addCustomTheme(cloned);
+      return cloned;
+    },
+    [addCustomTheme]
+  );
 
   return {
     customThemes,
     createCustomTheme,
     addCustomTheme,
     removeCustomTheme,
-    cloneTheme
+    cloneTheme,
   };
 };
 
@@ -255,7 +253,7 @@ export const useThemeToggle = () => {
     toggleLightDark,
     setLightMode,
     setDarkMode,
-    setAutoMode
+    setAutoMode,
   };
 };
 
@@ -268,9 +266,12 @@ export const useThemeCSSVariables = () => {
   }, []);
 
   // 获取CSS变量值
-  const getVariable = useCallback((key: string): string => {
-    return cssVariables[key] || '';
-  }, [cssVariables]);
+  const getVariable = useCallback(
+    (key: string): string => {
+      return cssVariables[key] || '';
+    },
+    [cssVariables]
+  );
 
   // 生成CSS变量字符串
   const getCSSVariableString = useCallback((): string => {
@@ -280,28 +281,27 @@ export const useThemeCSSVariables = () => {
   }, [cssVariables]);
 
   // 应用CSS变量到元素
-  const applyToElement = useCallback((element: HTMLElement) => {
-    Object.entries(cssVariables).forEach(([key, value]) => {
-      element.style.setProperty(key, value);
-    });
-  }, [cssVariables]);
+  const applyToElement = useCallback(
+    (element: HTMLElement) => {
+      Object.entries(cssVariables).forEach(([key, value]) => {
+        element.style.setProperty(key, value);
+      });
+    },
+    [cssVariables]
+  );
 
   return {
     cssVariables,
     getVariable,
     getCSSVariableString,
-    applyToElement
+    applyToElement,
   };
 };
 
 /**
  * 使用主题适配的Hook（根据主题模式返回不同值）
  */
-export const useThemeAdapt = <T>(options: {
-  light?: T;
-  dark?: T;
-  auto?: T;
-}): T | undefined => {
+export const useThemeAdapt = <T>(options: { light?: T; dark?: T; auto?: T }): T | undefined => {
   const { effectiveMode } = useTheme();
 
   return useMemo(() => {

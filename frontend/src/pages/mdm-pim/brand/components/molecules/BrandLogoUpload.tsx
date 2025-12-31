@@ -1,15 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  Upload,
-  Button,
-  Image,
-  Progress,
-  message,
-  Modal,
-  Space,
-  Typography,
-  Spin,
-} from 'antd';
+import { Upload, Button, Image, Progress, message, Modal, Space, Typography, Spin } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -83,7 +73,7 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
 
     // 文件扩展名检查
     const fileName = file.name.toLowerCase();
-    const hasValidExtension = VALIDATION_RULES.ALLOWED_LOGO_EXTENSIONS.some(ext =>
+    const hasValidExtension = VALIDATION_RULES.ALLOWED_LOGO_EXTENSIONS.some((ext) =>
       fileName.endsWith(ext)
     );
     if (!hasValidExtension) {
@@ -122,7 +112,7 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
       }
 
       // 上传成功
-      setUploadState(prev => ({
+      setUploadState((prev) => ({
         ...prev,
         uploading: false,
         progress: 100,
@@ -135,7 +125,7 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
     } catch (error) {
       console.error('Logo上传失败:', error);
 
-      setUploadState(prev => ({
+      setUploadState((prev) => ({
         ...prev,
         uploading: false,
         error: '上传失败，请重试',
@@ -153,7 +143,7 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
     if (disabled || uploadState.uploading) return;
 
     const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
     if (imageFiles.length > 0) {
       await handleFileSelect(imageFiles[0]);
@@ -266,9 +256,10 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
               </Text>
               <div style={{ marginTop: 8 }}>
                 <Text type="secondary" data-testid="logo-upload-hint">
-                  点击或拖拽文件到此区域上传<br />
-                  支持 {VALIDATION_RULES.ALLOWED_LOGO_EXTENSIONS.join(', ')} 格式，
-                  文件大小不超过 {VALIDATION_RULES.LOGO_MAX_SIZE / 1024 / 1024}MB
+                  点击或拖拽文件到此区域上传
+                  <br />
+                  支持 {VALIDATION_RULES.ALLOWED_LOGO_EXTENSIONS.join(', ')} 格式， 文件大小不超过{' '}
+                  {VALIDATION_RULES.LOGO_MAX_SIZE / 1024 / 1024}MB
                 </Text>
               </div>
             </div>
@@ -338,9 +329,7 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
           </div>
 
           <div>
-            <Text strong>
-              {mode === 'create' ? 'Logo预览' : '当前Logo'}
-            </Text>
+            <Text strong>{mode === 'create' ? 'Logo预览' : '当前Logo'}</Text>
             {uploadState.file && (
               <div style={{ marginTop: 4 }}>
                 <Text type="secondary" style={{ fontSize: 12 }}>
@@ -384,13 +373,11 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
         </Text>
       </Title>
 
-      {uploadState.error ? (
-        renderError()
-      ) : uploadState.previewUrl ? (
-        renderPreview()
-      ) : (
-        renderUploadArea()
-      )}
+      {uploadState.error
+        ? renderError()
+        : uploadState.previewUrl
+          ? renderPreview()
+          : renderUploadArea()}
 
       {/* 删除确认对话框 */}
       <Modal

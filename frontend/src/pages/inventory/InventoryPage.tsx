@@ -1,7 +1,7 @@
 /**
  * P003-inventory-query: 库存查询页面
  * P004-inventory-adjustment: 添加库存调整功能
- * 
+ *
  * 提供门店SKU库存列表展示，支持分页和库存调整。
  */
 
@@ -14,13 +14,17 @@ import { SearchInput } from '@/features/inventory/components/SearchInput';
 import { InventoryFilterBar } from '@/features/inventory/components/InventoryFilterBar';
 import { InventoryDetailDrawer } from '@/features/inventory/components/InventoryDetailDrawer';
 import { AdjustmentModal } from '@/features/inventory/components/AdjustmentModal';
-import type { InventoryQueryParams, StoreInventoryItem, InventoryStatus } from '@/features/inventory/types';
+import type {
+  InventoryQueryParams,
+  StoreInventoryItem,
+  InventoryStatus,
+} from '@/features/inventory/types';
 
 const { Title } = Typography;
 
 /**
  * 库存查询页面
- * 
+ *
  * User Story 1: 店长能够查看门店所有SKU的当前库存数量
  */
 export function InventoryPage() {
@@ -37,7 +41,8 @@ export function InventoryPage() {
 
   // 调整弹窗状态
   const [adjustmentModalOpen, setAdjustmentModalOpen] = useState(false);
-  const [selectedInventoryForAdjust, setSelectedInventoryForAdjust] = useState<StoreInventoryItem | null>(null);
+  const [selectedInventoryForAdjust, setSelectedInventoryForAdjust] =
+    useState<StoreInventoryItem | null>(null);
 
   // 获取库存列表
   const { data, isLoading, isError, error, refetch } = useInventoryList(queryParams);
@@ -61,19 +66,18 @@ export function InventoryPage() {
   }, []);
 
   // 筛选变化处理
-  const handleFilterChange = useCallback((filters: {
-    storeId?: string;
-    statuses?: InventoryStatus[];
-    categoryId?: string;
-  }) => {
-    setQueryParams((prev: InventoryQueryParams) => ({
-      ...prev,
-      storeId: filters.storeId,
-      statuses: filters.statuses,
-      categoryId: filters.categoryId,
-      page: 1, // 筛选时重置到第一页
-    }));
-  }, []);
+  const handleFilterChange = useCallback(
+    (filters: { storeId?: string; statuses?: InventoryStatus[]; categoryId?: string }) => {
+      setQueryParams((prev: InventoryQueryParams) => ({
+        ...prev,
+        storeId: filters.storeId,
+        statuses: filters.statuses,
+        categoryId: filters.categoryId,
+        page: 1, // 筛选时重置到第一页
+      }));
+    },
+    []
+  );
 
   // 行点击处理（打开详情抽屉）
   const handleRowClick = useCallback((record: StoreInventoryItem) => {
@@ -131,8 +135,17 @@ export function InventoryPage() {
   return (
     <div className="inventory-page">
       <Card>
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={4} style={{ margin: 0 }} data-testid="page-title">库存查询</Title>
+        <div
+          style={{
+            marginBottom: 16,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Title level={4} style={{ margin: 0 }} data-testid="page-title">
+            库存查询
+          </Title>
           <Space>
             <SearchInput
               value={queryParams.keyword}
@@ -154,12 +167,7 @@ export function InventoryPage() {
         )}
 
         {/* 空状态 */}
-        {isEmpty && (
-          <Empty
-            description="暂无库存数据"
-            style={{ padding: 48 }}
-          />
-        )}
+        {isEmpty && <Empty description="暂无库存数据" style={{ padding: 48 }} />}
 
         {/* 库存表格 */}
         {!isLoading && !isEmpty && (

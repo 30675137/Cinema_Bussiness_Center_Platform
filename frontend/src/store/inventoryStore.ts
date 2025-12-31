@@ -10,7 +10,7 @@ import type {
   InventoryAlert,
   TransactionType,
   SourceType,
-  InventoryStatus
+  InventoryStatus,
 } from '@/types/inventory';
 import inventoryService from '@/services/inventoryService';
 
@@ -113,7 +113,7 @@ const defaultFilters: Partial<InventoryQueryParams> = {
   page: 1,
   pageSize: 20,
   sortBy: 'transactionTime',
-  sortOrder: 'desc'
+  sortOrder: 'desc',
 };
 
 /**
@@ -138,7 +138,7 @@ const defaultState = {
   replenishmentSuggestions: [],
   sidebarCollapsed: false,
   activeTab: 'overview',
-  searchKeyword: ''
+  searchKeyword: '',
 };
 
 /**
@@ -155,23 +155,25 @@ export const useInventoryStore = create<InventoryState>()(
 
       // 库存相关操作
       setCurrentInventory: (inventory: CurrentInventory[]) => set({ currentInventory: inventory }),
-      setSelectedInventory: (inventory: CurrentInventory | null) => set({ selectedInventory: inventory }),
+      setSelectedInventory: (inventory: CurrentInventory | null) =>
+        set({ selectedInventory: inventory }),
       setInventoryFilters: (filters: Partial<InventoryQueryParams>) =>
         set({ inventoryFilters: { ...defaultFilters, ...filters } }),
       updateInventoryFilter: (key: keyof InventoryQueryParams, value: any) =>
         set((state) => ({
-          inventoryFilters: { ...state.inventoryFilters, [key]: value }
+          inventoryFilters: { ...state.inventoryFilters, [key]: value },
         })),
       clearInventoryFilters: () => set({ inventoryFilters: defaultFilters }),
 
       // 交易相关操作
       setTransactions: (transactions: InventoryTransaction[]) => set({ transactions }),
-      setSelectedTransaction: (transaction: TransactionDetail | null) => set({ selectedTransaction: transaction }),
+      setSelectedTransaction: (transaction: TransactionDetail | null) =>
+        set({ selectedTransaction: transaction }),
       setTransactionFilters: (filters: Partial<InventoryQueryParams>) =>
         set({ transactionFilters: { ...defaultFilters, ...filters } }),
       updateTransactionFilter: (key: keyof InventoryQueryParams, value: any) =>
         set((state) => ({
-          transactionFilters: { ...state.transactionFilters, [key]: value }
+          transactionFilters: { ...state.transactionFilters, [key]: value },
         })),
       clearTransactionFilters: () => set({ transactionFilters: defaultFilters }),
 
@@ -191,7 +193,8 @@ export const useInventoryStore = create<InventoryState>()(
       setSelectedTransfer: (transfer: TransferOrder | null) => set({ selectedTransfer: transfer }),
 
       // 补货建议操作
-      setReplenishmentSuggestions: (suggestions: ReplenishmentSuggestion[]) => set({ replenishmentSuggestions: suggestions }),
+      setReplenishmentSuggestions: (suggestions: ReplenishmentSuggestion[]) =>
+        set({ replenishmentSuggestions: suggestions }),
 
       // UI状态操作
       setSidebarCollapsed: (collapsed: boolean) => set({ sidebarCollapsed: collapsed }),
@@ -200,13 +203,14 @@ export const useInventoryStore = create<InventoryState>()(
 
       // 重置操作
       resetStore: () => set(defaultState),
-      resetFilters: () => set({
-        inventoryFilters: defaultFilters,
-        transactionFilters: defaultFilters
-      })
+      resetFilters: () =>
+        set({
+          inventoryFilters: defaultFilters,
+          transactionFilters: defaultFilters,
+        }),
     }),
     {
-      name: 'inventory-store'
+      name: 'inventory-store',
     }
   )
 );
@@ -237,7 +241,7 @@ export const inventoryQueryKeys = {
   transfers: (params?: any) => [...inventoryQueryKeys.all, 'transfers', params] as const,
   replenishment: (params?: any) => [...inventoryQueryKeys.all, 'replenishment', params] as const,
   trends: (params?: any) => [...inventoryQueryKeys.all, 'trends', params] as const,
-  forecast: (params?: any) => [...inventoryQueryKeys.all, 'forecast', params] as const
+  forecast: (params?: any) => [...inventoryQueryKeys.all, 'forecast', params] as const,
 };
 
 /**
@@ -253,7 +257,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.currentWithFilters(inventoryFilters),
       queryFn: () => inventoryService.getCurrentInventory(inventoryFilters),
       staleTime: 5 * 60 * 1000, // 5分钟缓存
-      ...options
+      ...options,
     }),
 
     // 交易历史查询
@@ -261,7 +265,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.transactionsWithFilters(transactionFilters),
       queryFn: () => inventoryService.getInventoryTransactions(transactionFilters),
       staleTime: 2 * 60 * 1000, // 2分钟缓存
-      ...options
+      ...options,
     }),
 
     // 统计数据查询
@@ -269,7 +273,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.statistics(params),
       queryFn: () => inventoryService.getInventoryStatistics(params),
       staleTime: 10 * 60 * 1000, // 10分钟缓存
-      ...options
+      ...options,
     }),
 
     // 库存详情查询
@@ -277,7 +281,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.inventoryDetail(skuId, storeId),
       queryFn: () => inventoryService.getSingleInventory(skuId, storeId),
       staleTime: 5 * 60 * 1000,
-      ...options
+      ...options,
     }),
 
     // 交易详情查询
@@ -285,7 +289,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.transactionDetail(transactionId),
       queryFn: () => inventoryService.getTransactionDetail(transactionId),
       staleTime: 30 * 60 * 1000, // 30分钟缓存
-      ...options
+      ...options,
     }),
 
     // 警报查询
@@ -293,7 +297,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.alerts(params),
       queryFn: () => inventoryService.getInventoryAlerts(params),
       staleTime: 3 * 60 * 1000, // 3分钟缓存
-      ...options
+      ...options,
     }),
 
     // 批次信息查询
@@ -301,7 +305,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.batches(params),
       queryFn: () => inventoryService.getInventoryBatches(params),
       staleTime: 5 * 60 * 1000,
-      ...options
+      ...options,
     }),
 
     // 调拨订单查询
@@ -309,7 +313,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.transfers(params),
       queryFn: () => inventoryService.getInventoryTransfers(params),
       staleTime: 5 * 60 * 1000,
-      ...options
+      ...options,
     }),
 
     // 补货建议查询
@@ -317,7 +321,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.replenishment(params),
       queryFn: () => inventoryService.getReplenishmentSuggestions(params),
       staleTime: 15 * 60 * 1000, // 15分钟缓存
-      ...options
+      ...options,
     }),
 
     // 趋势数据查询
@@ -325,7 +329,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.trends(params),
       queryFn: () => inventoryService.getInventoryTrends(params),
       staleTime: 30 * 60 * 1000, // 30分钟缓存
-      ...options
+      ...options,
     }),
 
     // 预测数据查询
@@ -333,7 +337,7 @@ export const useInventoryQueries = () => {
       queryKey: inventoryQueryKeys.forecast(params),
       queryFn: () => inventoryService.getInventoryForecast(params),
       staleTime: 60 * 60 * 1000, // 1小时缓存
-      ...options
+      ...options,
     }),
 
     // 批量库存查询（高性能）
@@ -341,7 +345,7 @@ export const useInventoryQueries = () => {
       queryKey: [...inventoryQueryKeys.all, 'batch', skuIds, storeIds],
       queryFn: () => inventoryService.batchGetInventory(skuIds, storeIds),
       staleTime: 2 * 60 * 1000, // 2分钟缓存
-      ...options
+      ...options,
     }),
 
     // 查询客户端方法
@@ -353,22 +357,21 @@ export const useInventoryQueries = () => {
       queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.statistics() }),
     invalidateAlerts: () =>
       queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.alerts() }),
-    invalidateAll: () =>
-      queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.all }),
+    invalidateAll: () => queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.all }),
 
     // 预取数据方法
     prefetchInventoryDetail: (skuId: string, storeId?: string) =>
       queryClient.prefetchQuery({
         queryKey: inventoryQueryKeys.inventoryDetail(skuId, storeId),
         queryFn: () => inventoryService.getSingleInventory(skuId, storeId),
-        staleTime: 5 * 60 * 1000
+        staleTime: 5 * 60 * 1000,
       }),
     prefetchTransactionDetail: (transactionId: string) =>
       queryClient.prefetchQuery({
         queryKey: inventoryQueryKeys.transactionDetail(transactionId),
         queryFn: () => inventoryService.getTransactionDetail(transactionId),
-        staleTime: 30 * 60 * 1000
-      })
+        staleTime: 30 * 60 * 1000,
+      }),
   };
 };
 
@@ -388,7 +391,7 @@ export const useInventoryActions = () => {
     setTransfers,
     setReplenishmentSuggestions,
     setLoading,
-    setError
+    setError,
   } = useInventoryStore();
 
   return {
@@ -601,7 +604,11 @@ export const useInventoryActions = () => {
     updateTransferStatus: async (transferId: string, status: any, remarks?: string) => {
       try {
         setLoading(true);
-        const transfer = await inventoryService.updateInventoryTransferStatus(transferId, status, remarks);
+        const transfer = await inventoryService.updateInventoryTransferStatus(
+          transferId,
+          status,
+          remarks
+        );
         // 刷新调拨列表
         queryClient.invalidateQueries({ queryKey: inventoryQueryKeys.transfers() });
         return transfer;
@@ -630,7 +637,7 @@ export const useInventoryActions = () => {
       } finally {
         setLoading(false);
       }
-    }
+    },
   };
 };
 
@@ -665,7 +672,7 @@ export const useInventoryUtils = () => {
         [TransactionType.RETURN_OUT]: { text: '退货出库', color: '#fa8c16', icon: '↷' },
         [TransactionType.DAMAGE_OUT]: { text: '损耗出库', color: '#ff4d4f', icon: '✗' },
         [TransactionType.PRODUCTION_IN]: { text: '生产入库', color: '#13c2c2', icon: '⚙' },
-        [TransactionType.EXPIRED_OUT]: { text: '过期出库', color: '#a0d911', icon: '⏰' }
+        [TransactionType.EXPIRED_OUT]: { text: '过期出库', color: '#a0d911', icon: '⏰' },
       };
       return typeMap[type] || { text: '未知', color: '#d9d9d9', icon: '?' };
     },
@@ -688,37 +695,41 @@ export const useInventoryUtils = () => {
 
     // 计算库存价值
     calculateInventoryValue: (inventory: CurrentInventory[]) => {
-      return inventory.reduce((total, item) =>
-        total + (item.availableQuantity * item.unitCost || 0), 0
+      return inventory.reduce(
+        (total, item) => total + (item.availableQuantity * item.unitCost || 0),
+        0
       );
     },
 
     // 获取热门商品（按交易次数）
     getTopMovingProducts: (limit = 10) => {
-      const productCounts = transactions.reduce((acc, transaction) => {
-        const key = transaction.skuId;
-        acc[key] = (acc[key] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const productCounts = transactions.reduce(
+        (acc, transaction) => {
+          const key = transaction.skuId;
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       return Object.entries(productCounts)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, limit)
         .map(([skuId, count]) => ({ skuId, transactionCount: count }));
     },
 
     // 获取库存警报统计
     getAlertStatistics: () => {
-      const criticalAlerts = alerts.filter(alert => alert.severity === 'critical').length;
-      const warningAlerts = alerts.filter(alert => alert.severity === 'high').length;
-      const infoAlerts = alerts.filter(alert => alert.severity === 'medium').length;
+      const criticalAlerts = alerts.filter((alert) => alert.severity === 'critical').length;
+      const warningAlerts = alerts.filter((alert) => alert.severity === 'high').length;
+      const infoAlerts = alerts.filter((alert) => alert.severity === 'medium').length;
 
       return {
         total: alerts.length,
         critical: criticalAlerts,
         high: warningAlerts,
         medium: infoAlerts,
-        percentage: alerts.length > 0 ? Math.round((criticalAlerts / alerts.length) * 100) : 0
+        percentage: alerts.length > 0 ? Math.round((criticalAlerts / alerts.length) * 100) : 0,
       };
     },
 
@@ -727,25 +738,26 @@ export const useInventoryUtils = () => {
       if (!keyword.trim()) return currentInventory;
 
       const lowerKeyword = keyword.toLowerCase();
-      return currentInventory.filter(item =>
-        item.skuName?.toLowerCase().includes(lowerKeyword) ||
-        item.skuCode?.toLowerCase().includes(lowerKeyword) ||
-        item.storeName?.toLowerCase().includes(lowerKeyword) ||
-        item.remarks?.toLowerCase().includes(lowerKeyword)
+      return currentInventory.filter(
+        (item) =>
+          item.skuName?.toLowerCase().includes(lowerKeyword) ||
+          item.skuCode?.toLowerCase().includes(lowerKeyword) ||
+          item.storeName?.toLowerCase().includes(lowerKeyword) ||
+          item.remarks?.toLowerCase().includes(lowerKeyword)
       );
     },
 
     // 按状态筛选库存
     filterInventoryByStatus: (status?: InventoryStatus[]) => {
       if (!status || status.length === 0) return currentInventory;
-      return currentInventory.filter(item => status.includes(item.status));
+      return currentInventory.filter((item) => status.includes(item.status));
     },
 
     // 按门店筛选库存
     filterInventoryByStore: (storeIds?: string[]) => {
       if (!storeIds || storeIds.length === 0) return currentInventory;
-      return currentInventory.filter(item => storeIds.includes(item.storeId));
-    }
+      return currentInventory.filter((item) => storeIds.includes(item.storeId));
+    },
   };
 };
 

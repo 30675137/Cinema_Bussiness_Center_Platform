@@ -17,16 +17,16 @@ interface UpdateStoreParams {
 
 /**
  * Hook for updating an existing store
- * 
+ *
  * Features:
  * - Automatically invalidates store list cache on success
  * - Supports optimistic locking via version field
  * - Provides loading and error states
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending } = useUpdateStore();
- * 
+ *
  * const handleSubmit = (storeId: string, data: UpdateStoreDTO) => {
  *   mutate({ storeId, data }, {
  *     onSuccess: (store) => {

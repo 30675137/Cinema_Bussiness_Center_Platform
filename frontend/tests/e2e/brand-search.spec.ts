@@ -50,7 +50,7 @@ test.describe('品牌搜索功能', () => {
     const brandRows = page.locator('[data-testid="brand-table-row"]');
 
     // 如果有结果，验证英文名包含关键词
-    if (await brandRows.count() > 0) {
+    if ((await brandRows.count()) > 0) {
       const firstRow = brandRows.first();
       const englishName = await firstRow.locator('[data-testid="english-name"]').textContent();
       if (englishName) {
@@ -74,7 +74,7 @@ test.describe('品牌搜索功能', () => {
     const brandRows = page.locator('[data-testid="brand-table-row"]');
 
     // 如果有结果，验证品牌编码包含关键词
-    if (await brandRows.count() > 0) {
+    if ((await brandRows.count()) > 0) {
       const firstRow = brandRows.first();
       const brandCode = await firstRow.locator('[data-testid="brand-code"]').textContent();
       if (brandCode) {
@@ -286,7 +286,7 @@ test.describe('品牌搜索功能', () => {
       // 验证搜索结果
       const brandRows = page.locator('[data-testid="brand-table-row"]');
 
-      if (await brandRows.count() > 0) {
+      if ((await brandRows.count()) > 0) {
         const firstRow = brandRows.first();
         const brandName = await firstRow.locator('[data-testid="brand-name"]').textContent();
         expect(brandName.toLowerCase()).toContain('实时搜索测试'.toLowerCase());

@@ -1,6 +1,6 @@
 /**
  * Unit tests for attributeTemplateStore
- * 
+ *
  * Tests attribute template and attribute CRUD operations
  */
 
@@ -197,5 +197,3 @@ describe('attributeTemplateStore', () => {
     });
   });
 });
-
-

@@ -1,6 +1,6 @@
 /**
  * P004-inventory-adjustment: 库存调整 Hooks
- * 
+ *
  * 提供库存调整创建、查询等 React Query hooks。
  * 实现 T021 任务。
  */
@@ -42,16 +42,16 @@ export interface UseCreateAdjustmentOptions {
 
 /**
  * 创建库存调整的 mutation hook
- * 
+ *
  * 功能：
  * - 调用 API 创建调整记录
  * - 自动刷新调整列表缓存
  * - 提供加载状态和错误处理
  * - 显示操作结果消息
- * 
+ *
  * @param options 配置选项
  * @returns mutation 对象
- * 
+ *
  * @example
  * ```tsx
  * const { mutate: createAdjustment, isPending } = useCreateAdjustment({
@@ -60,7 +60,7 @@ export interface UseCreateAdjustmentOptions {
  *     closeModal();
  *   },
  * });
- * 
+ *
  * // 提交调整
  * createAdjustment({
  *   skuId: 'xxx',
@@ -72,12 +72,7 @@ export interface UseCreateAdjustmentOptions {
  * ```
  */
 export function useCreateAdjustment(options: UseCreateAdjustmentOptions = {}) {
-  const {
-    onSuccess,
-    onError,
-    showSuccessMessage = true,
-    showErrorMessage = true,
-  } = options;
+  const { onSuccess, onError, showSuccessMessage = true, showErrorMessage = true } = options;
 
   const queryClient = useQueryClient();
 
@@ -102,9 +97,7 @@ export function useCreateAdjustment(options: UseCreateAdjustmentOptions = {}) {
 
       // 显示成功消息
       if (showSuccessMessage) {
-        const statusMessage = data.requiresApproval
-          ? '调整已提交审批'
-          : '调整成功，库存已更新';
+        const statusMessage = data.requiresApproval ? '调整已提交审批' : '调整成功，库存已更新';
         message.success(statusMessage);
       }
 
@@ -128,11 +121,11 @@ export function useCreateAdjustment(options: UseCreateAdjustmentOptions = {}) {
 
 /**
  * 查询调整列表的 hook
- * 
+ *
  * @param params 查询参数
  * @param enabled 是否启用查询
  * @returns 查询结果
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAdjustments({
@@ -161,11 +154,11 @@ export function useAdjustments(params: AdjustmentQueryParams = {}, enabled = tru
 
 /**
  * 查询调整详情的 hook
- * 
+ *
  * @param id 调整记录 ID
  * @param enabled 是否启用查询
  * @returns 查询结果
- * 
+ *
  * @example
  * ```tsx
  * const { data: adjustment, isLoading } = useAdjustmentDetail(adjustmentId);
@@ -202,10 +195,10 @@ export interface UseWithdrawAdjustmentOptions {
 
 /**
  * 撤回调整申请的 mutation hook
- * 
+ *
  * @param options 配置选项
  * @returns mutation 对象
- * 
+ *
  * @example
  * ```tsx
  * const { mutate: withdrawAdjustment, isPending } = useWithdrawAdjustment({
@@ -213,7 +206,7 @@ export interface UseWithdrawAdjustmentOptions {
  *     message.success('已撤回');
  *   },
  * });
- * 
+ *
  * // 撤回
  * withdrawAdjustment('adjustment-id');
  * ```

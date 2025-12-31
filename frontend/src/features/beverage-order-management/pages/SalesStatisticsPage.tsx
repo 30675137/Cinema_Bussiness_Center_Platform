@@ -5,17 +5,28 @@
  * US3: FR-022 - B端管理员查看营业统计
  * US3: FR-023 - B端管理员导出报表
  */
-import React, { useState } from 'react'
-import { Layout, Card, Typography, Select, DatePicker, Button, Space, message, Row, Col } from 'antd'
-import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons'
-import dayjs, { type Dayjs } from 'dayjs'
-import { useOrderStatistics, useExportReport } from '../hooks'
-import { SalesChart, BestSellingList } from '../components'
+import React, { useState } from 'react';
+import {
+  Layout,
+  Card,
+  Typography,
+  Select,
+  DatePicker,
+  Button,
+  Space,
+  message,
+  Row,
+  Col,
+} from 'antd';
+import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
+import dayjs, { type Dayjs } from 'dayjs';
+import { useOrderStatistics, useExportReport } from '../hooks';
+import { SalesChart, BestSellingList } from '../components';
 
-const { Title } = Typography
-const { RangePicker } = DatePicker
+const { Title } = Typography;
+const { RangePicker } = DatePicker;
 
-type RangeType = 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'
+type RangeType = 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM';
 
 /**
  * 销售统计页面
@@ -29,25 +40,29 @@ type RangeType = 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'
  */
 export const SalesStatisticsPage: React.FC = () => {
   // 状态管理
-  const [rangeType, setRangeType] = useState<RangeType>('TODAY')
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null)
-  const [storeId, setStoreId] = useState<string | undefined>(undefined)
+  const [rangeType, setRangeType] = useState<RangeType>('TODAY');
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  const [storeId, setStoreId] = useState<string | undefined>(undefined);
 
   // 计算自定义时间范围的日期字符串
-  const startDate = dateRange ? dateRange[0].format('YYYY-MM-DD') : undefined
-  const endDate = dateRange ? dateRange[1].format('YYYY-MM-DD') : undefined
+  const startDate = dateRange ? dateRange[0].format('YYYY-MM-DD') : undefined;
+  const endDate = dateRange ? dateRange[1].format('YYYY-MM-DD') : undefined;
 
   // 获取统计数据
-  const { data: statistics, isLoading, refetch } = useOrderStatistics({
+  const {
+    data: statistics,
+    isLoading,
+    refetch,
+  } = useOrderStatistics({
     storeId,
     rangeType,
     startDate,
     endDate,
-  })
+  });
 
   // 导出报表
-  const { exportReport } = useExportReport()
-  const [isExporting, setIsExporting] = useState(false)
+  const { exportReport } = useExportReport();
+  const [isExporting, setIsExporting] = useState(false);
 
   // 时间范围选项
   const rangeOptions = [
@@ -55,61 +70,61 @@ export const SalesStatisticsPage: React.FC = () => {
     { label: '本周', value: 'WEEK' },
     { label: '本月', value: 'MONTH' },
     { label: '自定义', value: 'CUSTOM' },
-  ]
+  ];
 
   // 处理时间范围类型变更
   const handleRangeTypeChange = (value: RangeType) => {
-    setRangeType(value)
+    setRangeType(value);
     if (value !== 'CUSTOM') {
-      setDateRange(null)
+      setDateRange(null);
     }
-  }
+  };
 
   // 处理自定义日期范围变更
   const handleDateRangeChange = (dates: [Dayjs, Dayjs] | null) => {
-    setDateRange(dates)
-  }
+    setDateRange(dates);
+  };
 
   // 处理导出报表
   const handleExport = async () => {
     try {
-      setIsExporting(true)
+      setIsExporting(true);
 
       // 确定导出的日期范围
-      let exportStartDate: string
-      let exportEndDate: string
+      let exportStartDate: string;
+      let exportEndDate: string;
 
       if (rangeType === 'CUSTOM' && dateRange) {
-        exportStartDate = dateRange[0].format('YYYY-MM-DD')
-        exportEndDate = dateRange[1].format('YYYY-MM-DD')
+        exportStartDate = dateRange[0].format('YYYY-MM-DD');
+        exportEndDate = dateRange[1].format('YYYY-MM-DD');
       } else if (statistics?.dateRange) {
-        exportStartDate = statistics.dateRange.startDate
-        exportEndDate = statistics.dateRange.endDate
+        exportStartDate = statistics.dateRange.startDate;
+        exportEndDate = statistics.dateRange.endDate;
       } else {
-        message.error('无法确定导出日期范围')
-        return
+        message.error('无法确定导出日期范围');
+        return;
       }
 
       await exportReport({
         storeId,
         startDate: exportStartDate,
         endDate: exportEndDate,
-      })
+      });
 
-      message.success('报表导出成功')
+      message.success('报表导出成功');
     } catch (error) {
-      console.error('导出失败:', error)
-      message.error('导出失败，请重试')
+      console.error('导出失败:', error);
+      message.error('导出失败，请重试');
     } finally {
-      setIsExporting(false)
+      setIsExporting(false);
     }
-  }
+  };
 
   // 处理刷新
   const handleRefresh = () => {
-    refetch()
-    message.success('数据已刷新')
-  }
+    refetch();
+    message.success('数据已刷新');
+  };
 
   return (
     <Layout style={{ padding: '24px' }}>
@@ -162,11 +177,7 @@ export const SalesStatisticsPage: React.FC = () => {
           <Space direction="vertical" size="small">
             <span style={{ color: '#8c8c8c', fontSize: '14px' }}>&nbsp;</span>
             <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleRefresh}
-                disabled={isLoading}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleRefresh} disabled={isLoading}>
                 刷新
               </Button>
               <Button
@@ -218,7 +229,7 @@ export const SalesStatisticsPage: React.FC = () => {
         </Card>
       )}
     </Layout>
-  )
-}
+  );
+};
 
-export default SalesStatisticsPage
+export default SalesStatisticsPage;

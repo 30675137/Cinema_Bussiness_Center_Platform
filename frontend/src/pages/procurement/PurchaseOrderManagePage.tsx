@@ -112,7 +112,14 @@ const PurchaseOrderManagePage: React.FC = () => {
     }
 
     return (
-      <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
           <Button icon={<ArrowLeftOutlined />} onClick={handleBackToList}>
             返回列表
@@ -125,11 +132,7 @@ const PurchaseOrderManagePage: React.FC = () => {
         </Space>
 
         {viewMode === 'detail' && currentOrder && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreateOrder}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateOrder}>
             新建订单
           </Button>
         )}
@@ -141,9 +144,7 @@ const PurchaseOrderManagePage: React.FC = () => {
   const renderContent = () => {
     switch (viewMode) {
       case 'list':
-        return (
-          <SimplePurchaseOrderPage />
-        );
+        return <SimplePurchaseOrderPage />;
 
       case 'create':
         return (

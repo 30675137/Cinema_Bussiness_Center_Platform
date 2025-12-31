@@ -12,11 +12,7 @@ import {
   Col,
   Empty,
 } from 'antd';
-import {
-  ArrowRightOutlined,
-  HistoryOutlined,
-  WarningOutlined,
-} from '@ant-design/icons';
+import { ArrowRightOutlined, HistoryOutlined, WarningOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { CurrentInventory } from '@/types/inventory';
 import {
@@ -37,11 +33,7 @@ interface InventoryDetailsProps {
  * 库存详情抽屉组件
  * 展示SKU在特定门店的完整库存信息
  */
-export const InventoryDetails: React.FC<InventoryDetailsProps> = ({
-  open,
-  inventory,
-  onClose,
-}) => {
+export const InventoryDetails: React.FC<InventoryDetailsProps> = ({ open, inventory, onClose }) => {
   const { isMobile } = useResponsive();
   const navigate = useNavigate();
 
@@ -65,11 +57,7 @@ export const InventoryDetails: React.FC<InventoryDetailsProps> = ({
       open={open}
       onClose={onClose}
       extra={
-        <Button
-          type="primary"
-          icon={<HistoryOutlined />}
-          onClick={handleViewMovements}
-        >
+        <Button type="primary" icon={<HistoryOutlined />} onClick={handleViewMovements}>
           查看流水
         </Button>
       }
@@ -78,24 +66,14 @@ export const InventoryDetails: React.FC<InventoryDetailsProps> = ({
         {/* 基本信息 */}
         <Card title="基本信息" size="small">
           <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="SKU编码">
-              {inventory.sku?.skuCode}
-            </Descriptions.Item>
-            <Descriptions.Item label="SKU名称">
-              {inventory.sku?.name}
-            </Descriptions.Item>
+            <Descriptions.Item label="SKU编码">{inventory.sku?.skuCode}</Descriptions.Item>
+            <Descriptions.Item label="SKU名称">{inventory.sku?.name}</Descriptions.Item>
             <Descriptions.Item label="门店/仓库">
               {inventory.store?.name} ({inventory.store?.code})
             </Descriptions.Item>
-            <Descriptions.Item label="规格">
-              {inventory.sku?.description || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="单位">
-              {inventory.sku?.unit || '件'}
-            </Descriptions.Item>
-            <Descriptions.Item label="类目">
-              {inventory.sku?.category || '-'}
-            </Descriptions.Item>
+            <Descriptions.Item label="规格">{inventory.sku?.description || '-'}</Descriptions.Item>
+            <Descriptions.Item label="单位">{inventory.sku?.unit || '件'}</Descriptions.Item>
+            <Descriptions.Item label="类目">{inventory.sku?.category || '-'}</Descriptions.Item>
           </Descriptions>
         </Card>
 
@@ -107,11 +85,7 @@ export const InventoryDetails: React.FC<InventoryDetailsProps> = ({
                 title="现存数量"
                 value={inventory.onHandQty}
                 suffix={inventory.sku?.unit || '件'}
-                valueStyle={
-                  inventory.onHandQty <= 0
-                    ? { color: '#ff4d4f' }
-                    : undefined
-                }
+                valueStyle={inventory.onHandQty <= 0 ? { color: '#ff4d4f' } : undefined}
               />
             </Col>
             <Col xs={12} sm={8}>
@@ -227,12 +201,7 @@ export const InventoryDetails: React.FC<InventoryDetailsProps> = ({
         {/* 操作按钮 */}
         <Card size="small">
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Button
-              block
-              type="primary"
-              icon={<HistoryOutlined />}
-              onClick={handleViewMovements}
-            >
+            <Button block type="primary" icon={<HistoryOutlined />} onClick={handleViewMovements}>
               查看全部流水记录
             </Button>
             <Button

@@ -101,14 +101,8 @@ const priorityOptions = [
 const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const {
-    transfers,
-    loading,
-    error,
-    selectedTransferIds,
-    statistics,
-    queryParams,
-  } = useTransferStore();
+  const { transfers, loading, error, selectedTransferIds, statistics, queryParams } =
+    useTransferStore();
 
   const {
     fetchTransfers,
@@ -134,28 +128,20 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
 
   // 获取状态标签
   const getStatusTag = (status: TransferStatus) => {
-    const option = statusOptions.find(opt => opt.value === status);
-    return (
-      <Tag color={option?.color || 'default'}>
-        {option?.label || status}
-      </Tag>
-    );
+    const option = statusOptions.find((opt) => opt.value === status);
+    return <Tag color={option?.color || 'default'}>{option?.label || status}</Tag>;
   };
 
   // 获取类型标签
   const getTypeTag = (type: TransferType) => {
-    const option = typeOptions.find(opt => opt.value === type);
+    const option = typeOptions.find((opt) => opt.value === type);
     return <Tag>{option?.label || type}</Tag>;
   };
 
   // 获取优先级标签
   const getPriorityTag = (priority: TransferPriority) => {
-    const option = priorityOptions.find(opt => opt.value === priority);
-    return (
-      <Tag color={option?.color || 'default'}>
-        {option?.label || priority}
-      </Tag>
-    );
+    const option = priorityOptions.find((opt) => opt.value === priority);
+    return <Tag color={option?.color || 'default'}>{option?.label || priority}</Tag>;
   };
 
   // 删除单个调拨
@@ -358,7 +344,11 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
       });
     }
 
-    if ([TransferStatus.DRAFT, TransferStatus.PENDING_APPROVAL, TransferStatus.REJECTED].includes(transfer.status)) {
+    if (
+      [TransferStatus.DRAFT, TransferStatus.PENDING_APPROVAL, TransferStatus.REJECTED].includes(
+        transfer.status
+      )
+    ) {
       items.push({
         key: 'cancel',
         label: '取消调拨',
@@ -408,10 +398,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
     if (dates && dates.length === 2) {
       const [start, end] = dates;
       setFilters({
-        dateRange: [
-          start.format('YYYY-MM-DD'),
-          end.format('YYYY-MM-DD'),
-        ],
+        dateRange: [start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD')],
       });
     } else {
       setFilters({ dateRange: undefined });
@@ -492,14 +479,14 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
       dataIndex: 'actualShipDate',
       key: 'actualShipDate',
       width: 120,
-      render: (date: string) => date ? formatDate(date) : '-',
+      render: (date: string) => (date ? formatDate(date) : '-'),
     },
     {
       title: '实际收货',
       dataIndex: 'actualReceiveDate',
       key: 'actualReceiveDate',
       width: 120,
-      render: (date: string) => date ? formatDate(date) : '-',
+      render: (date: string) => (date ? formatDate(date) : '-'),
     },
     {
       title: '总金额',
@@ -554,11 +541,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
             trigger={['click']}
             placement="bottomRight"
           >
-            <Button
-              type="text"
-              size="small"
-              icon={<MoreOutlined />}
-            />
+            <Button type="text" size="small" icon={<MoreOutlined />} />
           </Dropdown>
         </Space>
       ),
@@ -570,12 +553,12 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
     selectedRowKeys: selectedTransferIds,
     onChange: (keys: React.Key[]) => {
       setSelectedRowKeys(keys as string[]);
-      keys.forEach(key => {
+      keys.forEach((key) => {
         if (!selectedTransferIds.includes(key as string)) {
           selectTransfer(key as string);
         }
       });
-      selectedTransferIds.forEach(id => {
+      selectedTransferIds.forEach((id) => {
         if (!keys.includes(id)) {
           selectTransfer(id);
         }
@@ -584,7 +567,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
     onSelectAll: (selected: boolean) => {
       if (selected) {
         selectAllTransfers();
-        setSelectedRowKeys(transfers.map(t => t.id));
+        setSelectedRowKeys(transfers.map((t) => t.id));
       } else {
         clearSelection();
         setSelectedRowKeys([]);
@@ -680,7 +663,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
                 onChange={handleStatusFilter}
                 style={{ width: '100%' }}
               >
-                {statusOptions.map(option => (
+                {statusOptions.map((option) => (
                   <Select.Option key={option.value} value={option.value}>
                     {option.label}
                   </Select.Option>
@@ -694,7 +677,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
                 onChange={handleTypeFilter}
                 style={{ width: '100%' }}
               >
-                {typeOptions.map(option => (
+                {typeOptions.map((option) => (
                   <Select.Option key={option.value} value={option.value}>
                     {option.label}
                   </Select.Option>
@@ -708,7 +691,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
                 onChange={handlePriorityFilter}
                 style={{ width: '100%' }}
               >
-                {priorityOptions.map(option => (
+                {priorityOptions.map((option) => (
                   <Select.Option key={option.value} value={option.value}>
                     {option.label}
                   </Select.Option>
@@ -727,11 +710,7 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
           {/* 操作行 */}
           <div className="flex items-center justify-between">
             <Space>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={onCreate}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
                 新建调拨
               </Button>
 
@@ -739,24 +718,16 @@ const TransferList: React.FC<TransferListProps> = ({ onView, onEdit, onCreate })
                 menu={{ items: batchMenuItems }}
                 disabled={selectedTransferIds.length === 0}
               >
-                <Button>
-                  批量操作 ({selectedTransferIds.length})
-                </Button>
+                <Button>批量操作 ({selectedTransferIds.length})</Button>
               </Dropdown>
 
               <Divider type="vertical" />
 
-              <Button
-                icon={<ExportOutlined />}
-                onClick={handleExport}
-              >
+              <Button icon={<ExportOutlined />} onClick={handleExport}>
                 导出
               </Button>
 
-              <Button
-                icon={<PrinterOutlined />}
-                onClick={handlePrint}
-              >
+              <Button icon={<PrinterOutlined />} onClick={handlePrint}>
                 打印
               </Button>
             </Space>

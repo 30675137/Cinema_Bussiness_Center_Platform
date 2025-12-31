@@ -1,5 +1,18 @@
 import React from 'react';
-import { Card, Typography, Empty, Button, Form, Input, InputNumber, Select, DatePicker, Space, Row, Col } from 'antd';
+import {
+  Card,
+  Typography,
+  Empty,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  Space,
+  Row,
+  Col,
+} from 'antd';
 import { PlusOutlined, SaveOutlined, CloseOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -105,47 +118,33 @@ const PurchaseOrders: React.FC = () => {
 
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item
-                label="订单描述"
-                name="description"
-              >
-                <TextArea
-                  rows={4}
-                  placeholder="请输入订单描述或备注信息"
-                />
+              <Form.Item label="订单描述" name="description">
+                <TextArea rows={4} placeholder="请输入订单描述或备注信息" />
               </Form.Item>
             </Col>
           </Row>
 
-          <Title level={4} style={{ marginTop: 24 }}>采购明细</Title>
-          <Empty
-            description="采购明细功能开发中"
-            style={{ margin: '40px 0' }}
-          >
+          <Title level={4} style={{ marginTop: 24 }}>
+            采购明细
+          </Title>
+          <Empty description="采购明细功能开发中" style={{ margin: '40px 0' }}>
             <Button type="primary" icon={<PlusOutlined />}>
               添加采购商品
             </Button>
           </Empty>
 
-          <Title level={4} style={{ marginTop: 24 }}>订单汇总</Title>
+          <Title level={4} style={{ marginTop: 24 }}>
+            订单汇总
+          </Title>
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item label="商品总数" name="totalQuantity">
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0"
-                  disabled
-                />
+                <InputNumber style={{ width: '100%' }} placeholder="0" disabled />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label="订单总额" name="totalAmount">
-                <InputNumber
-                  style={{ width: '100%' }}
-                  placeholder="0.00"
-                  prefix="¥"
-                  disabled
-                />
+                <InputNumber style={{ width: '100%' }} placeholder="0.00" prefix="¥" disabled />
               </Form.Item>
             </Col>
             <Col span={8}>

@@ -25,11 +25,11 @@ test.describe('品牌状态管理功能', () => {
               status,
               oldStatus: status === 'enabled' ? 'disabled' : 'enabled',
               updatedAt: new Date().toISOString(),
-              updatedBy: 'admin'
+              updatedBy: 'admin',
             },
             message: 'Brand status updated successfully',
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -52,7 +52,9 @@ test.describe('品牌状态管理功能', () => {
   test('应该能够点击状态按钮打开操作菜单', async ({ page }) => {
     // 查找第一个品牌的状态操作按钮
     const firstBrandRow = page.locator('[data-testid="brand-table-row"]').first();
-    const statusActionsButton = firstBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = firstBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
 
     await expect(statusActionsButton).toBeVisible();
     await statusActionsButton.click();
@@ -71,11 +73,14 @@ test.describe('品牌状态管理功能', () => {
 
   test('应该能够成功将品牌从启用状态切换到停用状态', async ({ page }) => {
     // 找到启用状态的品牌
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() === 0) {
+    if ((await enabledBrandRow.count()) === 0) {
       // 如果没有启用的品牌，创建一个测试场景
       console.log('没有找到启用状态的品牌，跳过此测试');
       test.skip();
@@ -83,7 +88,9 @@ test.describe('品牌状态管理功能', () => {
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = enabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -125,11 +132,14 @@ test.describe('品牌状态管理功能', () => {
 
   test('应该能够成功将品牌从停用状态切换到启用状态', async ({ page }) => {
     // 找到停用状态的品牌
-    const disabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '停用' })
-    }).first();
+    const disabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '停用' }),
+      })
+      .first();
 
-    if (await disabledBrandRow.count() === 0) {
+    if ((await disabledBrandRow.count()) === 0) {
       // 如果没有停用的品牌，创建一个测试场景
       console.log('没有找到停用状态的品牌，跳过此测试');
       test.skip();
@@ -137,7 +147,9 @@ test.describe('品牌状态管理功能', () => {
     }
 
     // 点击状态操作按钮
-    const statusActionsButton = disabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = disabledBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击启用菜单项
@@ -174,7 +186,9 @@ test.describe('品牌状态管理功能', () => {
     const firstBrandRow = page.locator('[data-testid="brand-table-row"]').first();
 
     // 点击状态操作按钮
-    const statusActionsButton = firstBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = firstBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击停用菜单项
@@ -200,12 +214,17 @@ test.describe('品牌状态管理功能', () => {
 
   test('应该显示正确的操作按钮状态', async ({ page }) => {
     // 检查启用状态品牌的操作按钮
-    const enabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' })
-    }).first();
+    const enabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '启用' }),
+      })
+      .first();
 
-    if (await enabledBrandRow.count() > 0) {
-      const statusActionsButton = enabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    if ((await enabledBrandRow.count()) > 0) {
+      const statusActionsButton = enabledBrandRow.locator(
+        '[data-testid="brand-status-actions-button"]'
+      );
       await statusActionsButton.click();
 
       const disableMenuItem = page.locator('[data-testid="brand-disable-menu-item"]');
@@ -219,12 +238,17 @@ test.describe('品牌状态管理功能', () => {
     }
 
     // 检查停用状态品牌的操作按钮
-    const disabledBrandRow = page.locator('[data-testid="brand-table-row"]').filter({
-      has: page.locator('[data-testid="brand-status-badge"]', { hasText: '停用' })
-    }).first();
+    const disabledBrandRow = page
+      .locator('[data-testid="brand-table-row"]')
+      .filter({
+        has: page.locator('[data-testid="brand-status-badge"]', { hasText: '停用' }),
+      })
+      .first();
 
-    if (await disabledBrandRow.count() > 0) {
-      const statusActionsButton = disabledBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    if ((await disabledBrandRow.count()) > 0) {
+      const statusActionsButton = disabledBrandRow.locator(
+        '[data-testid="brand-status-actions-button"]'
+      );
       await statusActionsButton.click();
 
       const enableMenuItem = page.locator('[data-testid="brand-enable-menu-item"]');
@@ -246,10 +270,10 @@ test.describe('品牌状态管理功能', () => {
             success: false,
             error: {
               code: 'STATUS_CHANGE_FAILED',
-              message: '品牌状态变更失败'
+              message: '品牌状态变更失败',
             },
-            timestamp: new Date().toISOString()
-          })
+            timestamp: new Date().toISOString(),
+          }),
         });
       }
     });
@@ -258,7 +282,9 @@ test.describe('品牌状态管理功能', () => {
     const firstBrandRow = page.locator('[data-testid="brand-table-row"]').first();
 
     // 点击状态操作按钮
-    const statusActionsButton = firstBrandRow.locator('[data-testid="brand-status-actions-button"]');
+    const statusActionsButton = firstBrandRow.locator(
+      '[data-testid="brand-status-actions-button"]'
+    );
     await statusActionsButton.click();
 
     // 点击启用菜单项
@@ -289,7 +315,7 @@ test.describe('品牌状态管理功能', () => {
     const checkboxes = page.locator('[data-testid="brand-checkbox"]');
     const firstThreeCheckboxes = checkboxes.first().nth(0);
 
-    if (await firstThreeCheckboxes.count() >= 2) {
+    if ((await firstThreeCheckboxes.count()) >= 2) {
       // 选择前两个品牌
       await checkboxes.first().check();
       await checkboxes.nth(1).check();

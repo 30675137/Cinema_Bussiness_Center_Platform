@@ -11,7 +11,7 @@ import {
   CreateSupplierParams,
   UpdateSupplierParams,
   SupplierStatistics,
-  SupplierBatchOperationParams
+  SupplierBatchOperationParams,
 } from '../types/supplier';
 
 // 供应商状态类型
@@ -85,7 +85,10 @@ export type SupplierStoreActions = {
   saveEditing: () => Promise<boolean>;
 
   // 导入导出
-  importSuppliers: (params: { fileUrl: string; overwrite?: boolean }) => Promise<{ success: number; failed: number }>;
+  importSuppliers: (params: {
+    fileUrl: string;
+    overwrite?: boolean;
+  }) => Promise<{ success: number; failed: number }>;
   exportSuppliers: (params?: { supplierIds?: string[]; format?: string }) => Promise<string>;
 
   // 分页操作
@@ -96,46 +99,46 @@ export type SupplierStoreActions = {
   duplicateSupplier: (id: string) => Promise<string | null>;
 
   // 供应商评价
-  addEvaluation: (supplierId: string, evaluation: {
-    evaluationType: string;
-    score: number;
-    comments?: string;
-  }) => Promise<boolean>;
+  addEvaluation: (
+    supplierId: string,
+    evaluation: {
+      evaluationType: string;
+      score: number;
+      comments?: string;
+    }
+  ) => Promise<boolean>;
 
   // 更新供应商采购统计
   updatePurchaseStats: (supplierId: string) => Promise<boolean>;
 };
 
 // 创建供应商Store
-export const useSupplierStore = createStore<Supplier>(
-  'supplier',
-  {
-    // 初始数据状态
-    suppliers: [],
-    currentSupplier: null,
-    statistics: null,
+export const useSupplierStore = createStore<Supplier>('supplier', {
+  // 初始数据状态
+  suppliers: [],
+  currentSupplier: null,
+  statistics: null,
 
-    // 过滤器初始状态
-    statusFilter: undefined,
-    levelFilter: undefined,
-    typeFilter: undefined,
-    searchQuery: '',
-    productCategoryFilter: undefined,
+  // 过滤器初始状态
+  statusFilter: undefined,
+  levelFilter: undefined,
+  typeFilter: undefined,
+  searchQuery: '',
+  productCategoryFilter: undefined,
 
-    // 编辑状态
-    editingSupplier: null,
-    isEditing: false,
+  // 编辑状态
+  editingSupplier: null,
+  isEditing: false,
 
-    // 批量操作状态
-    selectedSupplierIds: [],
-    isBatchOperating: false,
+  // 批量操作状态
+  selectedSupplierIds: [],
+  isBatchOperating: false,
 
-    // 分页状态
-    currentPage: 1,
-    pageSize: 10,
-    total: 0
-  }
-);
+  // 分页状态
+  currentPage: 1,
+  pageSize: 10,
+  total: 0,
+});
 
 // 扩展store以添加供应商特定的动作
 export const supplierStore = {
@@ -143,20 +146,14 @@ export const supplierStore = {
 
   // 获取过滤后的供应商
   get filteredSuppliers() {
-    const {
-      suppliers,
-      statusFilter,
-      levelFilter,
-      typeFilter,
-      searchQuery,
-      productCategoryFilter
-    } = useSupplierStore.getState();
+    const { suppliers, statusFilter, levelFilter, typeFilter, searchQuery, productCategoryFilter } =
+      useSupplierStore.getState();
 
     if (!suppliers || !Array.isArray(suppliers)) {
       return [];
     }
 
-    return suppliers.filter(supplier => {
+    return suppliers.filter((supplier) => {
       // 状态过滤
       if (statusFilter && supplier.status !== statusFilter) {
         return false;
@@ -180,8 +177,10 @@ export const supplierStore = {
           supplier.code,
           supplier.shortName || '',
           supplier.phone,
-          supplier.email || ''
-        ].join(' ').toLowerCase();
+          supplier.email || '',
+        ]
+          .join(' ')
+          .toLowerCase();
 
         if (!searchableText.includes(query)) {
           return false;
@@ -189,8 +188,7 @@ export const supplierStore = {
       }
 
       // 供应品类过滤
-      if (productCategoryFilter &&
-          !supplier.productCategories.includes(productCategoryFilter)) {
+      if (productCategoryFilter && !supplier.productCategories.includes(productCategoryFilter)) {
         return false;
       }
 
@@ -204,14 +202,16 @@ export const supplierStore = {
     if (!suppliers || !Array.isArray(suppliers) || !selectedSupplierIds) {
       return [];
     }
-    return suppliers.filter(supplier => selectedSupplierIds.includes(supplier.id));
+    return suppliers.filter((supplier) => selectedSupplierIds.includes(supplier.id));
   },
 
   // 检查是否全选
   get isAllSelected() {
     const { filteredSuppliers, selectedSupplierIds } = this as any;
-    return filteredSuppliers.length > 0 &&
-           filteredSuppliers.every((supplier: Supplier) => selectedSupplierIds.includes(supplier.id));
+    return (
+      filteredSuppliers.length > 0 &&
+      filteredSuppliers.every((supplier: Supplier) => selectedSupplierIds.includes(supplier.id))
+    );
   },
 
   // 获取供应商状态统计
@@ -222,11 +222,14 @@ export const supplierStore = {
       return {};
     }
 
-    return suppliers.reduce((stats, supplier) => {
-      const status = supplier.status;
-      stats[status] = (stats[status] || 0) + 1;
-      return stats;
-    }, {} as Record<SupplierStatus, number>);
+    return suppliers.reduce(
+      (stats, supplier) => {
+        const status = supplier.status;
+        stats[status] = (stats[status] || 0) + 1;
+        return stats;
+      },
+      {} as Record<SupplierStatus, number>
+    );
   },
 
   // 获取供应商等级统计
@@ -237,11 +240,14 @@ export const supplierStore = {
       return {};
     }
 
-    return suppliers.reduce((stats, supplier) => {
-      const level = supplier.level;
-      stats[level] = (stats[level] || 0) + 1;
-      return stats;
-    }, {} as Record<SupplierLevel, number>);
+    return suppliers.reduce(
+      (stats, supplier) => {
+        const level = supplier.level;
+        stats[level] = (stats[level] || 0) + 1;
+        return stats;
+      },
+      {} as Record<SupplierLevel, number>
+    );
   },
 
   // 获取活跃供应商数量
@@ -250,7 +256,7 @@ export const supplierStore = {
     if (!suppliers || !Array.isArray(suppliers)) {
       return 0;
     }
-    return suppliers.filter(supplier => supplier.status === SupplierStatus.ACTIVE).length;
+    return suppliers.filter((supplier) => supplier.status === SupplierStatus.ACTIVE).length;
   },
 
   // 获取即将到期资质的供应商
@@ -263,8 +269,8 @@ export const supplierStore = {
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
-    return suppliers.filter(supplier => {
-      return supplier.qualifications.some(qualification => {
+    return suppliers.filter((supplier) => {
+      return supplier.qualifications.some((qualification) => {
         if (qualification.expireDate) {
           const expireDate = new Date(qualification.expireDate);
           return expireDate <= thirtyDaysFromNow && expireDate > new Date();
@@ -272,7 +278,7 @@ export const supplierStore = {
         return false;
       });
     });
-  }
+  },
 };
 
 // 实现store动作
@@ -380,7 +386,7 @@ const actions: SupplierStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: SupplierStatus.ACTIVE,
-          remarks
+          remarks,
         });
         return true;
       },
@@ -402,7 +408,7 @@ const actions: SupplierStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: SupplierStatus.SUSPENDED,
-          remarks
+          remarks,
         });
         return true;
       },
@@ -424,7 +430,7 @@ const actions: SupplierStoreActions = {
         // 乐观更新
         updateItem(id, {
           status: SupplierStatus.TERMINATED,
-          remarks
+          remarks,
         });
         return true;
       },
@@ -445,10 +451,10 @@ const actions: SupplierStoreActions = {
         // await supplierService.batchActivate(supplierIds, remarks);
 
         // 乐观更新
-        supplierIds.forEach(id => {
+        supplierIds.forEach((id) => {
           updateItem(id, {
             status: SupplierStatus.ACTIVE,
-            remarks
+            remarks,
           });
         });
         return true;
@@ -469,10 +475,10 @@ const actions: SupplierStoreActions = {
         // await supplierService.batchSuspend(supplierIds, remarks);
 
         // 乐观更新
-        supplierIds.forEach(id => {
+        supplierIds.forEach((id) => {
           updateItem(id, {
             status: SupplierStatus.SUSPENDED,
-            remarks
+            remarks,
           });
         });
         return true;
@@ -493,10 +499,10 @@ const actions: SupplierStoreActions = {
         // await supplierService.batchTerminate(supplierIds, remarks);
 
         // 乐观更新
-        supplierIds.forEach(id => {
+        supplierIds.forEach((id) => {
           updateItem(id, {
             status: SupplierStatus.TERMINATED,
-            remarks
+            remarks,
           });
         });
         return true;
@@ -517,7 +523,7 @@ const actions: SupplierStoreActions = {
         // await supplierService.batchUpdateLevel(supplierIds, level);
 
         // 乐观更新
-        supplierIds.forEach(id => {
+        supplierIds.forEach((id) => {
           updateItem(id, { level });
         });
         return true;
@@ -538,7 +544,7 @@ const actions: SupplierStoreActions = {
         // await supplierService.batchDelete(supplierIds);
 
         // 乐观更新
-        supplierIds.forEach(id => removeItem(id));
+        supplierIds.forEach((id) => removeItem(id));
         return true;
       },
       setLoading,
@@ -624,7 +630,7 @@ const actions: SupplierStoreActions = {
     const { selectedSupplierIds } = useSupplierStore.getState();
     const newSelection = selected
       ? [...selectedSupplierIds, supplierId]
-      : selectedSupplierIds.filter(id => id !== supplierId);
+      : selectedSupplierIds.filter((id) => id !== supplierId);
     useSupplierStore.setState({ selectedSupplierIds: newSelection });
   },
 
@@ -642,14 +648,14 @@ const actions: SupplierStoreActions = {
   startEditing(supplier: Supplier) {
     useSupplierStore.setState({
       editingSupplier: { ...supplier },
-      isEditing: true
+      isEditing: true,
     });
   },
 
   cancelEditing() {
     useSupplierStore.setState({
       editingSupplier: null,
-      isEditing: false
+      isEditing: false,
     });
   },
 
@@ -664,7 +670,7 @@ const actions: SupplierStoreActions = {
       level: editingSupplier.level,
       phone: editingSupplier.phone,
       email: editingSupplier.email,
-      address: editingSupplier.address
+      address: editingSupplier.address,
     });
   },
 
@@ -734,11 +740,14 @@ const actions: SupplierStoreActions = {
   },
 
   // 供应商评价
-  async addEvaluation(supplierId: string, evaluation: {
-    evaluationType: string;
-    score: number;
-    comments?: string;
-  }) {
+  async addEvaluation(
+    supplierId: string,
+    evaluation: {
+      evaluationType: string;
+      score: number;
+      comments?: string;
+    }
+  ) {
     const setUpdating = useSupplierStore.getState().setUpdating;
     const setError = useSupplierStore.getState().setError;
 

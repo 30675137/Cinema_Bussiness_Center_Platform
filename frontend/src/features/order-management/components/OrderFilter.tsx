@@ -3,42 +3,42 @@
  * 订单筛选组件 - User Story 2
  */
 
-import React from 'react'
-import { Form, Select, DatePicker, Input, Button, Space, Row, Col } from 'antd'
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
-import { OrderStatus } from '../types/order'
-import { ORDER_STATUS_CONFIG } from '../utils/formatOrderStatus'
-import dayjs, { type Dayjs } from 'dayjs'
+import React from 'react';
+import { Form, Select, DatePicker, Input, Button, Space, Row, Col } from 'antd';
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { OrderStatus } from '../types/order';
+import { ORDER_STATUS_CONFIG } from '../utils/formatOrderStatus';
+import dayjs, { type Dayjs } from 'dayjs';
 
-const { RangePicker } = DatePicker
-const { Option } = Select
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export interface OrderFilterValues {
-  status?: OrderStatus
-  dateRange?: [Dayjs, Dayjs]
-  search?: string
+  status?: OrderStatus;
+  dateRange?: [Dayjs, Dayjs];
+  search?: string;
 }
 
 export interface OrderFilterProps {
   /**
    * 筛选条件变化回调
    */
-  onFilter: (values: OrderFilterValues) => void
+  onFilter: (values: OrderFilterValues) => void;
 
   /**
    * 重置回调
    */
-  onReset: () => void
+  onReset: () => void;
 
   /**
    * 默认值
    */
-  defaultValues?: OrderFilterValues
+  defaultValues?: OrderFilterValues;
 
   /**
    * 加载状态
    */
-  loading?: boolean
+  loading?: boolean;
 }
 
 /**
@@ -64,36 +64,36 @@ export interface OrderFilterProps {
  */
 export const OrderFilter: React.FC<OrderFilterProps> = React.memo(
   ({ onFilter, onReset, defaultValues, loading = false }) => {
-    const [form] = Form.useForm<OrderFilterValues>()
+    const [form] = Form.useForm<OrderFilterValues>();
 
     // 设置默认时间范围为最近30天
     React.useEffect(() => {
       if (defaultValues?.dateRange) {
         form.setFieldsValue({
-          dateRange: defaultValues.dateRange
-        })
+          dateRange: defaultValues.dateRange,
+        });
       } else {
         // 默认最近30天
         form.setFieldsValue({
-          dateRange: [dayjs().subtract(30, 'days'), dayjs()]
-        })
+          dateRange: [dayjs().subtract(30, 'days'), dayjs()],
+        });
       }
-    }, [form, defaultValues])
+    }, [form, defaultValues]);
 
     // 处理表单提交
     const handleFinish = (values: OrderFilterValues) => {
-      onFilter(values)
-    }
+      onFilter(values);
+    };
 
     // 处理重置
     const handleReset = () => {
-      form.resetFields()
+      form.resetFields();
       // 重置后恢复默认时间范围
       form.setFieldsValue({
-        dateRange: [dayjs().subtract(30, 'days'), dayjs()]
-      })
-      onReset()
-    }
+        dateRange: [dayjs().subtract(30, 'days'), dayjs()],
+      });
+      onReset();
+    };
 
     return (
       <Form<OrderFilterValues>
@@ -106,11 +106,7 @@ export const OrderFilter: React.FC<OrderFilterProps> = React.memo(
           {/* 订单状态 */}
           <Col xs={24} sm={12} md={6}>
             <Form.Item label="订单状态" name="status">
-              <Select
-                placeholder="全部状态"
-                allowClear
-                style={{ width: '100%' }}
-              >
+              <Select placeholder="全部状态" allowClear style={{ width: '100%' }}>
                 {Object.entries(ORDER_STATUS_CONFIG).map(([key, config]) => (
                   <Option key={key} value={key}>
                     {config.label}
@@ -134,11 +130,7 @@ export const OrderFilter: React.FC<OrderFilterProps> = React.memo(
           {/* 搜索框 */}
           <Col xs={24} sm={12} md={6}>
             <Form.Item label="搜索" name="search">
-              <Input
-                placeholder="订单号/用户名/手机号"
-                prefix={<SearchOutlined />}
-                allowClear
-              />
+              <Input placeholder="订单号/用户名/手机号" prefix={<SearchOutlined />} allowClear />
             </Form.Item>
           </Col>
 
@@ -162,10 +154,10 @@ export const OrderFilter: React.FC<OrderFilterProps> = React.memo(
           </Col>
         </Row>
       </Form>
-    )
+    );
   }
-)
+);
 
-OrderFilter.displayName = 'OrderFilter'
+OrderFilter.displayName = 'OrderFilter';
 
-export default OrderFilter
+export default OrderFilter;

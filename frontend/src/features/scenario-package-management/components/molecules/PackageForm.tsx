@@ -8,13 +8,7 @@
  */
 
 import React from 'react';
-import {
-  Form,
-  Input,
-  InputNumber,
-  Card,
-  Select,
-} from 'antd';
+import { Form, Input, InputNumber, Card, Select } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import ImageUpload from '../atoms/ImageUpload';
 import type { CreatePackageRequest, HallType } from '../../types';
@@ -76,27 +70,14 @@ export const PackageForm: React.FC<PackageFormProps> = ({
       <Form.Item
         label="描述"
         name="description"
-        rules={[
-          { max: 500, message: '描述长度不能超过500个字符' },
-        ]}
+        rules={[{ max: 500, message: '描述长度不能超过500个字符' }]}
       >
-        <TextArea
-          rows={4}
-          placeholder="描述场景包的特色和适用场景"
-          maxLength={500}
-          showCount
-        />
+        <TextArea rows={4} placeholder="描述场景包的特色和适用场景" maxLength={500} showCount />
       </Form.Item>
 
       {/* 背景图片 */}
-      <Form.Item
-        label="背景图片"
-        name="backgroundImageUrl"
-      >
-        <ImageUpload
-          packageId={packageId}
-          disabled={disabled}
-        />
+      <Form.Item label="背景图片" name="backgroundImageUrl">
+        <ImageUpload packageId={packageId} disabled={disabled} />
       </Form.Item>
 
       {/* 使用规则 */}
@@ -121,32 +102,18 @@ export const PackageForm: React.FC<PackageFormProps> = ({
         <Form.Item
           label="最小人数"
           name={['rule', 'minPeople']}
-          rules={[
-            { type: 'number', min: 0, message: '人数不能为负数' },
-          ]}
+          rules={[{ type: 'number', min: 0, message: '人数不能为负数' }]}
         >
-          <InputNumber
-            min={0}
-            style={{ width: 200 }}
-            addonAfter="人"
-            placeholder="不限制可留空"
-          />
+          <InputNumber min={0} style={{ width: 200 }} addonAfter="人" placeholder="不限制可留空" />
         </Form.Item>
 
         <Form.Item
           label="最大人数"
           name={['rule', 'maxPeople']}
-          rules={[
-            { type: 'number', min: 0, message: '人数不能为负数' },
-          ]}
+          rules={[{ type: 'number', min: 0, message: '人数不能为负数' }]}
           dependencies={[['rule', 'minPeople']]}
         >
-          <InputNumber
-            min={0}
-            style={{ width: 200 }}
-            addonAfter="人"
-            placeholder="不限制可留空"
-          />
+          <InputNumber min={0} style={{ width: 200 }} addonAfter="人" placeholder="不限制可留空" />
         </Form.Item>
       </Card>
 
@@ -167,9 +134,7 @@ export const PackageForm: React.FC<PackageFormProps> = ({
             allowClear
           />
         ) : (
-          <Input
-            placeholder="请手动输入影厅类型 ID（多个用逗号分隔）"
-          />
+          <Input placeholder="请手动输入影厅类型 ID（多个用逗号分隔）" />
         )}
       </Form.Item>
     </Form>

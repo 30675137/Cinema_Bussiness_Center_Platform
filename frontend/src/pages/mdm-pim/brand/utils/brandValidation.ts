@@ -4,17 +4,22 @@ import { BrandType, BrandStatus } from '../types/brand.types';
 /**
  * 品牌名称验证模式
  */
-export const brandNameSchema = z.string({
-  required_error: '品牌名称不能为空',
-})
+export const brandNameSchema = z
+  .string({
+    required_error: '品牌名称不能为空',
+  })
   .min(1, '品牌名称不能为空')
   .max(100, '品牌名称不能超过100字符')
-  .regex(/^[\u4e00-\u9fa5a-zA-Z0-9\s\-_&]+$/, '品牌名称只能包含中文、英文、数字、空格、连字符、下划线和&符号');
+  .regex(
+    /^[\u4e00-\u9fa5a-zA-Z0-9\s\-_&]+$/,
+    '品牌名称只能包含中文、英文、数字、空格、连字符、下划线和&符号'
+  );
 
 /**
  * 英文名称验证模式
  */
-export const englishNameSchema = z.string()
+export const englishNameSchema = z
+  .string()
   .max(200, '英文名不能超过200字符')
   .regex(/^[a-zA-Z0-9\s\-_&]*$/, '英文名只能包含英文字母、数字、空格、连字符、下划线和&符号')
   .optional();
@@ -29,37 +34,30 @@ export const brandTypeSchema = z.nativeEnum(BrandType, {
 /**
  * 公司名称验证模式
  */
-export const companyNameSchema = z.string()
-  .max(200, '公司名称不能超过200字符')
-  .optional();
+export const companyNameSchema = z.string().max(200, '公司名称不能超过200字符').optional();
 
 /**
  * 品牌等级验证模式
  */
-export const brandLevelSchema = z.string()
-  .max(50, '品牌等级不能超过50字符')
-  .optional();
+export const brandLevelSchema = z.string().max(50, '品牌等级不能超过50字符').optional();
 
 /**
  * 主营类目验证模式
  */
-export const primaryCategoriesSchema = z.array(z.string())
+export const primaryCategoriesSchema = z
+  .array(z.string())
   .min(1, '请选择至少一个主营类目')
   .max(10, '主营类目不能超过10个');
 
 /**
  * 品牌标签验证模式
  */
-export const brandTagsSchema = z.array(z.string())
-  .max(10, '标签不能超过10个')
-  .optional();
+export const brandTagsSchema = z.array(z.string()).max(10, '标签不能超过10个').optional();
 
 /**
  * 品牌描述验证模式
  */
-export const brandDescriptionSchema = z.string()
-  .max(1000, '品牌介绍不能超过1000字符')
-  .optional();
+export const brandDescriptionSchema = z.string().max(1000, '品牌介绍不能超过1000字符').optional();
 
 /**
  * 品牌状态验证模式
@@ -69,7 +67,8 @@ export const brandStatusSchema = z.nativeEnum(BrandStatus);
 /**
  * 品牌Logo URL验证模式
  */
-export const brandLogoUrlSchema = z.string()
+export const brandLogoUrlSchema = z
+  .string()
   .url('请提供有效的LOGO URL')
   .optional()
   .or(z.literal(''));
@@ -92,54 +91,50 @@ export const createBrandRequestSchema = z.object({
 /**
  * 更新品牌请求验证模式
  */
-export const updateBrandRequestSchema = z.object({
-  name: brandNameSchema.optional(),
-  englishName: englishNameSchema,
-  brandType: brandTypeSchema.optional(),
-  primaryCategories: primaryCategoriesSchema.optional(),
-  company: companyNameSchema,
-  brandLevel: brandLevelSchema,
-  tags: brandTagsSchema,
-  description: brandDescriptionSchema,
-}).partial();
+export const updateBrandRequestSchema = z
+  .object({
+    name: brandNameSchema.optional(),
+    englishName: englishNameSchema,
+    brandType: brandTypeSchema.optional(),
+    primaryCategories: primaryCategoriesSchema.optional(),
+    company: companyNameSchema,
+    brandLevel: brandLevelSchema,
+    tags: brandTagsSchema,
+    description: brandDescriptionSchema,
+  })
+  .partial();
 
 /**
  * 品牌状态更新请求验证模式
  */
 export const updateBrandStatusRequestSchema = z.object({
   status: brandStatusSchema,
-  reason: z.string()
-    .max(500, '变更原因不能超过500字符')
-    .optional(),
+  reason: z.string().max(500, '变更原因不能超过500字符').optional(),
 });
 
 /**
  * 品牌查询参数验证模式
  */
 export const brandQueryParamsSchema = z.object({
-  keyword: z.string()
-    .max(100, '搜索关键词不能超过100字符')
-    .optional(),
+  keyword: z.string().max(100, '搜索关键词不能超过100字符').optional(),
   brandType: z.nativeEnum(BrandType).optional(),
   status: z.nativeEnum(BrandStatus).optional(),
-  page: z.coerce.number()
+  page: z.coerce
+    .number()
     .int('页码必须是整数')
     .min(1, '页码不能小于1')
     .max(1000, '页码不能大于1000')
     .optional()
     .default(1),
-  pageSize: z.coerce.number()
+  pageSize: z.coerce
+    .number()
     .int('每页大小必须是整数')
     .min(1, '每页大小不能小于1')
     .max(100, '每页大小不能大于100')
     .optional()
     .default(20),
-  sortBy: z.enum(['createdAt', 'name', 'updatedAt'])
-    .optional()
-    .default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc'])
-    .optional()
-    .default('desc'),
+  sortBy: z.enum(['createdAt', 'name', 'updatedAt']).optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
 
 /**
@@ -255,14 +250,13 @@ export const validateBrandBusinessRules = async (
   }
 
   // 规则2: 草稿状态不能直接切换为停用
-  if (brandData.status === BrandStatus.DISABLED &&
-      existingBrand?.status === BrandStatus.DRAFT) {
+  if (brandData.status === BrandStatus.DISABLED && existingBrand?.status === BrandStatus.DRAFT) {
     errors.push('草稿状态的品牌不能直接停用，请先启用或删除');
   }
 
   // 规则3: 检查品牌名称中的敏感词
   const sensitiveWords = ['敏感词', '违禁词', '测试品牌'];
-  const hasSensitiveWord = sensitiveWords.some(word =>
+  const hasSensitiveWord = sensitiveWords.some((word) =>
     brandData.name.toLowerCase().includes(word.toLowerCase())
   );
   if (hasSensitiveWord) {
@@ -294,7 +288,7 @@ export const validateLogoFile = (file: File): { valid: boolean; error?: string }
   // 文件扩展名检查
   const fileName = file.name.toLowerCase();
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-  const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+  const hasValidExtension = allowedExtensions.some((ext) => fileName.endsWith(ext));
   if (!hasValidExtension) {
     return { valid: false, error: '文件扩展名不正确，请选择JPG、PNG或GIF文件' };
   }

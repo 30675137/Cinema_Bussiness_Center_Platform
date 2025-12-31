@@ -12,7 +12,7 @@ describe('MemoryCache', () => {
     cache = new MemoryCache<string>({
       defaultExpireTime: 1000, // 1秒
       maxSize: 5,
-      autoCleanup: false
+      autoCleanup: false,
     });
   });
 
@@ -154,10 +154,10 @@ describe('LocalStorageCache', () => {
       removeItem: vi.fn(),
       clear: vi.fn(),
       key: vi.fn(),
-      length: 0
+      length: 0,
     };
     Object.defineProperty(window, 'localStorage', {
-      value: localStorageMock
+      value: localStorageMock,
     });
 
     cache = new LocalStorageCache<string>('test-cache');
@@ -178,7 +178,7 @@ describe('LocalStorageCache', () => {
     it('should load from localStorage on initialization', () => {
       const mockData = {
         items: [['key1', { value: 'value1', timestamp: Date.now() }]],
-        config: {}
+        config: {},
       };
 
       vi.spyOn(localStorage, 'getItem').mockReturnValue(JSON.stringify(mockData));

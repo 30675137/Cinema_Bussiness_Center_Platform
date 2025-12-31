@@ -10,15 +10,15 @@
  * 5. Adjustment is created and inventory is updated
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { server } from '@/test/setup'
-import { http, HttpResponse } from 'msw'
-import { AdjustmentModal } from '@/features/inventory/components/AdjustmentModal'
-import type { StoreInventoryItem, AdjustmentReason } from '@/features/inventory/types'
+import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { server } from '@/test/setup';
+import { http, HttpResponse } from 'msw';
+import { AdjustmentModal } from '@/features/inventory/components/AdjustmentModal';
+import type { StoreInventoryItem, AdjustmentReason } from '@/features/inventory/types';
 
 // Test data
 const mockInventoryItem: StoreInventoryItem = {
@@ -47,7 +47,7 @@ const mockInventoryItem: StoreInventoryItem = {
   status: 'normal',
   version: 1,
   updatedAt: new Date().toISOString(),
-}
+};
 
 const mockReasons: AdjustmentReason[] = [
   {
@@ -66,7 +66,7 @@ const mockReasons: AdjustmentReason[] = [
     isActive: true,
     sortOrder: 2,
   },
-]
+];
 
 // Test wrapper component
 function TestWrapper({ children }: { children: React.ReactNode }) {
@@ -80,13 +80,13 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
         retry: false,
       },
     },
-  })
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
-  )
+  );
 }
 
 describe('Adjustment Creation Integration Test', () => {
@@ -97,10 +97,10 @@ describe('Adjustment Creation Integration Test', () => {
         return HttpResponse.json({
           success: true,
           data: mockReasons,
-        })
+        });
       }),
       http.post('/api/adjustments', async ({ request }) => {
-        const body = await request.json()
+        const body = await request.json();
         return HttpResponse.json({
           success: true,
           data: {
@@ -109,9 +109,13 @@ describe('Adjustment Creation Integration Test', () => {
             ...body,
             status: 'approved',
             stockBefore: mockInventoryItem.onHandQty,
-            stockAfter: mockInventoryItem.onHandQty + (body.adjustmentType === 'surplus' ? body.quantity : -body.quantity),
+            stockAfter:
+              mockInventoryItem.onHandQty +
+              (body.adjustmentType === 'surplus' ? body.quantity : -body.quantity),
             availableBefore: mockInventoryItem.availableQty,
-            availableAfter: mockInventoryItem.availableQty + (body.adjustmentType === 'surplus' ? body.quantity : -body.quantity),
+            availableAfter:
+              mockInventoryItem.availableQty +
+              (body.adjustmentType === 'surplus' ? body.quantity : -body.quantity),
             requiresApproval: false,
             operatorId: 'user-001',
             operatorName: '测试用户',
@@ -119,15 +123,15 @@ describe('Adjustment Creation Integration Test', () => {
             updatedAt: new Date().toISOString(),
             version: 1,
           },
-        })
+        });
       })
-    )
-  })
+    );
+  });
 
   it('should complete the full adjustment creation workflow', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
-    const onSuccess = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const onSuccess = vi.fn();
 
     render(
       <TestWrapper>
@@ -138,77 +142,77 @@ describe('Adjustment Creation Integration Test', () => {
           onSuccess={onSuccess}
         />
       </TestWrapper>
-    )
+    );
 
     // Step 1: Verify adjustment form is displayed
-    expect(screen.getByText('库存调整')).toBeInTheDocument()
-    expect(screen.getByText('测试商品')).toBeInTheDocument()
+    expect(screen.getByText('库存调整')).toBeInTheDocument();
+    expect(screen.getByText('测试商品')).toBeInTheDocument();
 
     // Step 2: Fill in adjustment form
     // Select adjustment type
-    const typeSelect = screen.getByLabelText('调整类型')
-    await user.click(typeSelect)
+    const typeSelect = screen.getByLabelText('调整类型');
+    await user.click(typeSelect);
     await waitFor(() => {
-      expect(screen.getByText('盘盈')).toBeInTheDocument()
-    })
-    await user.click(screen.getByText('盘盈'))
+      expect(screen.getByText('盘盈')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('盘盈'));
 
     // Enter quantity
-    const quantityInput = screen.getByLabelText('调整数量')
-    await user.clear(quantityInput)
-    await user.type(quantityInput, '10')
+    const quantityInput = screen.getByLabelText('调整数量');
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '10');
 
     // Select reason (wait for reasons to load)
     await waitFor(() => {
-      const reasonSelect = screen.getByLabelText('调整原因')
-      expect(reasonSelect).toBeInTheDocument()
-    })
-    const reasonSelect = screen.getByLabelText('调整原因')
-    await user.click(reasonSelect)
+      const reasonSelect = screen.getByLabelText('调整原因');
+      expect(reasonSelect).toBeInTheDocument();
+    });
+    const reasonSelect = screen.getByLabelText('调整原因');
+    await user.click(reasonSelect);
     await waitFor(() => {
-      expect(screen.getByText('盘点差异')).toBeInTheDocument()
-    })
-    await user.click(screen.getByText('盘点差异'))
+      expect(screen.getByText('盘点差异')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('盘点差异'));
 
     // Enter remarks (optional)
-    const remarksInput = screen.getByLabelText('备注')
-    await user.type(remarksInput, '测试调整')
+    const remarksInput = screen.getByLabelText('备注');
+    await user.type(remarksInput, '测试调整');
 
     // Step 3: Submit form to show confirmation modal
-    const submitButton = screen.getByText('提交')
-    await user.click(submitButton)
+    const submitButton = screen.getByText('提交');
+    await user.click(submitButton);
 
     // Step 4: Verify confirmation modal appears with before/after comparison
     await waitFor(() => {
-      expect(screen.getByText('确认库存调整')).toBeInTheDocument()
-    })
-    expect(screen.getByText('调整前')).toBeInTheDocument()
-    expect(screen.getByText('调整后')).toBeInTheDocument()
-    expect(screen.getByText('100')).toBeInTheDocument() // before quantity
-    expect(screen.getByText('110')).toBeInTheDocument() // after quantity
+      expect(screen.getByText('确认库存调整')).toBeInTheDocument();
+    });
+    expect(screen.getByText('调整前')).toBeInTheDocument();
+    expect(screen.getByText('调整后')).toBeInTheDocument();
+    expect(screen.getByText('100')).toBeInTheDocument(); // before quantity
+    expect(screen.getByText('110')).toBeInTheDocument(); // after quantity
 
     // Step 5: Confirm adjustment
-    const confirmButton = screen.getByText('确认调整')
-    await user.click(confirmButton)
+    const confirmButton = screen.getByText('确认调整');
+    await user.click(confirmButton);
 
     // Step 6: Verify success callback is called
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalled()
-    })
-    expect(onClose).toHaveBeenCalled()
-  })
+      expect(onSuccess).toHaveBeenCalled();
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
 
   it('should handle large adjustment requiring approval', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
-    const onSuccess = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const onSuccess = vi.fn();
 
     // Override handler for large adjustment
     server.use(
       http.post('/api/adjustments', async ({ request }) => {
-        const body = await request.json()
-        const adjustmentAmount = body.quantity * mockInventoryItem.sku.price
-        const requiresApproval = adjustmentAmount >= 1000
+        const body = await request.json();
+        const adjustmentAmount = body.quantity * mockInventoryItem.sku.price;
+        const requiresApproval = adjustmentAmount >= 1000;
 
         return HttpResponse.json({
           success: true,
@@ -228,9 +232,9 @@ describe('Adjustment Creation Integration Test', () => {
             updatedAt: new Date().toISOString(),
             version: 1,
           },
-        })
+        });
       })
-    )
+    );
 
     render(
       <TestWrapper>
@@ -241,44 +245,44 @@ describe('Adjustment Creation Integration Test', () => {
           onSuccess={onSuccess}
         />
       </TestWrapper>
-    )
+    );
 
     // Fill form with large quantity (total >= 1000 yuan)
-    const typeSelect = screen.getByLabelText('调整类型')
-    await user.click(typeSelect)
-    await user.click(screen.getByText('盘盈'))
+    const typeSelect = screen.getByLabelText('调整类型');
+    await user.click(typeSelect);
+    await user.click(screen.getByText('盘盈'));
 
     // 50 yuan * 20 = 1000 yuan (threshold)
-    const quantityInput = screen.getByLabelText('调整数量')
-    await user.clear(quantityInput)
-    await user.type(quantityInput, '20')
+    const quantityInput = screen.getByLabelText('调整数量');
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '20');
 
-    const reasonSelect = screen.getByLabelText('调整原因')
-    await user.click(reasonSelect)
+    const reasonSelect = screen.getByLabelText('调整原因');
+    await user.click(reasonSelect);
     await waitFor(() => {
-      expect(screen.getByText('盘点差异')).toBeInTheDocument()
-    })
-    await user.click(screen.getByText('盘点差异'))
+      expect(screen.getByText('盘点差异')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('盘点差异'));
 
     // Submit
-    await user.click(screen.getByText('提交'))
+    await user.click(screen.getByText('提交'));
 
     // Confirm
     await waitFor(() => {
-      expect(screen.getByText('确认调整')).toBeInTheDocument()
-    })
-    await user.click(screen.getByText('确认调整'))
+      expect(screen.getByText('确认调整')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('确认调整'));
 
     // Should show pending approval message
     await waitFor(() => {
-      expect(screen.getByText(/待审批/)).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText(/待审批/)).toBeInTheDocument();
+    });
+  });
 
   it('should show validation errors for invalid input', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
-    const onSuccess = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const onSuccess = vi.fn();
 
     render(
       <TestWrapper>
@@ -289,27 +293,27 @@ describe('Adjustment Creation Integration Test', () => {
           onSuccess={onSuccess}
         />
       </TestWrapper>
-    )
+    );
 
     // Try to submit without filling required fields
-    const submitButton = screen.getByText('提交')
-    await user.click(submitButton)
+    const submitButton = screen.getByText('提交');
+    await user.click(submitButton);
 
     // Should show validation errors
     await waitFor(() => {
-      expect(screen.getByText(/请选择调整类型/)).toBeInTheDocument()
-      expect(screen.getByText(/请输入调整数量/)).toBeInTheDocument()
-      expect(screen.getByText(/请选择调整原因/)).toBeInTheDocument()
-    })
+      expect(screen.getByText(/请选择调整类型/)).toBeInTheDocument();
+      expect(screen.getByText(/请输入调整数量/)).toBeInTheDocument();
+      expect(screen.getByText(/请选择调整原因/)).toBeInTheDocument();
+    });
 
     // onSuccess should not be called
-    expect(onSuccess).not.toHaveBeenCalled()
-  })
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
 
   it('should handle API errors gracefully', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
-    const onSuccess = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const onSuccess = vi.fn();
 
     // Override handler to return error
     server.use(
@@ -321,9 +325,9 @@ describe('Adjustment Creation Integration Test', () => {
             message: '库存数量不足',
           },
           { status: 400 }
-        )
+        );
       })
-    )
+    );
 
     render(
       <TestWrapper>
@@ -334,39 +338,39 @@ describe('Adjustment Creation Integration Test', () => {
           onSuccess={onSuccess}
         />
       </TestWrapper>
-    )
+    );
 
     // Fill and submit form
-    const typeSelect = screen.getByLabelText('调整类型')
-    await user.click(typeSelect)
-    await user.click(screen.getByText('盘亏'))
+    const typeSelect = screen.getByLabelText('调整类型');
+    await user.click(typeSelect);
+    await user.click(screen.getByText('盘亏'));
 
-    const quantityInput = screen.getByLabelText('调整数量')
-    await user.clear(quantityInput)
-    await user.type(quantityInput, '200')
+    const quantityInput = screen.getByLabelText('调整数量');
+    await user.clear(quantityInput);
+    await user.type(quantityInput, '200');
 
     await waitFor(() => {
-      const reasonSelect = screen.getByLabelText('调整原因')
-      expect(reasonSelect).toBeInTheDocument()
-    })
-    const reasonSelect = screen.getByLabelText('调整原因')
-    await user.click(reasonSelect)
-    await user.click(screen.getByText('盘点差异'))
+      const reasonSelect = screen.getByLabelText('调整原因');
+      expect(reasonSelect).toBeInTheDocument();
+    });
+    const reasonSelect = screen.getByLabelText('调整原因');
+    await user.click(reasonSelect);
+    await user.click(screen.getByText('盘点差异'));
 
-    await user.click(screen.getByText('提交'))
+    await user.click(screen.getByText('提交'));
 
     // Confirm
     await waitFor(() => {
-      expect(screen.getByText('确认调整')).toBeInTheDocument()
-    })
-    await user.click(screen.getByText('确认调整'))
+      expect(screen.getByText('确认调整')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('确认调整'));
 
     // Should show error message
     await waitFor(() => {
-      expect(screen.getByText('库存数量不足')).toBeInTheDocument()
-    })
+      expect(screen.getByText('库存数量不足')).toBeInTheDocument();
+    });
 
     // Should not call onSuccess
-    expect(onSuccess).not.toHaveBeenCalled()
-  })
-})
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+});

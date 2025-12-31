@@ -190,7 +190,11 @@ export interface ThemeSettings {
 }
 
 // 主题事件类型
-export type ThemeEventType = 'themeChanged' | 'modeChanged' | 'customThemeAdded' | 'customThemeRemoved';
+export type ThemeEventType =
+  | 'themeChanged'
+  | 'modeChanged'
+  | 'customThemeAdded'
+  | 'customThemeRemoved';
 
 // 主题事件监听器
 export type ThemeEventListener = (data: any) => void;

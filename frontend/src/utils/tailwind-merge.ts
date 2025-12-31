@@ -87,7 +87,7 @@ export const tailwindPresets = {
   'flex-end': 'flex items-center justify-end',
   'flex-col': 'flex flex-col items-center justify-center',
   'flex-col-between': 'flex flex-col justify-between',
-  'grid': 'grid grid-cols-1 gap-4',
+  grid: 'grid grid-cols-1 gap-4',
   'grid-cols-2': 'grid grid-cols-1 md:grid-cols-2 gap-4',
   'grid-cols-3': 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
   'grid-cols-4': 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4',
@@ -117,49 +117,53 @@ export const tailwindPresets = {
   'size-screen': 'w-screen h-screen',
 
   // 按钮相关
-  'button-base': 'px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2',
+  'button-base':
+    'px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2',
   'button-primary': 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
   'button-secondary': 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
   'button-danger': 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   'button-success': 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
   'button-warning': 'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-500',
-  'button-ghost': 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
+  'button-ghost':
+    'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
   'button-sm': 'px-3 py-1.5 text-sm',
   'button-lg': 'px-6 py-3 text-lg',
 
   // 卡片相关
-  'card': 'bg-white rounded-lg shadow-md border border-gray-200',
+  card: 'bg-white rounded-lg shadow-md border border-gray-200',
   'card-hover': 'hover:shadow-lg transition-shadow duration-200',
   'card-compact': 'p-4',
   'card-comfortable': 'p-6',
   'card-spacious': 'p-8',
 
   // 状态相关
-  'interactive': 'hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200',
-  'disabled': 'opacity-50 cursor-not-allowed pointer-events-none',
-  'loading': 'animate-pulse opacity-75',
-  'active': 'bg-blue-50 border-blue-200 text-blue-700',
-  'success': 'bg-green-50 border-green-200 text-green-700',
-  'warning': 'bg-yellow-50 border-yellow-200 text-yellow-700',
-  'error': 'bg-red-50 border-red-200 text-red-700',
-  'info': 'bg-blue-50 border-blue-200 text-blue-700',
+  interactive:
+    'hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200',
+  disabled: 'opacity-50 cursor-not-allowed pointer-events-none',
+  loading: 'animate-pulse opacity-75',
+  active: 'bg-blue-50 border-blue-200 text-blue-700',
+  success: 'bg-green-50 border-green-200 text-green-700',
+  warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
+  error: 'bg-red-50 border-red-200 text-red-700',
+  info: 'bg-blue-50 border-blue-200 text-blue-700',
 
   // 输入框相关
-  'input-base': 'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200',
+  'input-base':
+    'px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200',
   'input-error': 'border-red-300 focus:ring-red-500',
   'input-success': 'border-green-300 focus:ring-green-500',
   'input-disabled': 'bg-gray-100 cursor-not-allowed',
 
   // 动画相关
-  'transition': 'transition-all duration-200 ease-in-out',
+  transition: 'transition-all duration-200 ease-in-out',
   'transition-fast': 'transition-all duration-150 ease-in-out',
   'transition-slow': 'transition-all duration-300 ease-in-out',
   'scale-hover': 'hover:scale-105 active:scale-95 transition-transform duration-200',
   'fade-in': 'animate-fade-in',
   'slide-up': 'animate-slide-up',
   'slide-down': 'animate-slide-down',
-  'bounce': 'animate-bounce',
-  'spin': 'animate-spin',
+  bounce: 'animate-bounce',
+  spin: 'animate-spin',
 
   // 阴影相关
   'shadow-sm': 'shadow-sm',
@@ -171,10 +175,10 @@ export const tailwindPresets = {
   'shadow-none': 'shadow-none',
 
   // 边框相关
-  'border': 'border border-gray-300',
+  border: 'border border-gray-300',
   'border-sm': 'border border-gray-200',
   'border-lg': 'border-2 border-gray-300',
-  'rounded': 'rounded-md',
+  rounded: 'rounded-md',
   'rounded-sm': 'rounded-sm',
   'rounded-lg': 'rounded-lg',
   'rounded-full': 'rounded-full',
@@ -190,7 +194,7 @@ export const tailwindPresets = {
   'text-right': 'text-right',
 
   // 响应式相关
-  'container': 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
+  container: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8',
   'mobile-hide': 'hidden md:block',
   'desktop-hide': 'block md:hidden',
   'mobile-full': 'w-full md:w-auto',
@@ -202,7 +206,8 @@ export const tailwindPresets = {
 
   // 表格相关
   'table-cell': 'px-4 py-2 border-b border-gray-200 text-sm',
-  'table-header': 'px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+  'table-header':
+    'px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
   'table-row-hover': 'hover:bg-gray-50 transition-colors duration-150',
 
   // 模态框相关
@@ -213,10 +218,10 @@ export const tailwindPresets = {
   'modal-footer': 'px-6 py-4 border-t border-gray-200 bg-gray-50',
 
   // 加载状态相关
-  'skeleton': 'animate-pulse bg-gray-200 rounded',
+  skeleton: 'animate-pulse bg-gray-200 rounded',
   'skeleton-text': 'h-4 bg-gray-200 rounded animate-pulse',
   'skeleton-avatar': 'w-10 h-10 bg-gray-200 rounded-full animate-pulse',
-  'spinner': 'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600',
+  spinner: 'animate-spin rounded-full border-2 border-gray-300 border-t-blue-600',
 };
 
 /**
@@ -233,7 +238,10 @@ export const tailwindPresets = {
  * // 结果: 'flex items-center justify-between p-4'
  * ```
  */
-export const tailwindPreset = (preset: keyof typeof tailwindPresets, ...additionalClasses: ClassValue[]): string => {
+export const tailwindPreset = (
+  preset: keyof typeof tailwindPresets,
+  ...additionalClasses: ClassValue[]
+): string => {
   return tailwindMerge(tailwindPresets[preset], ...additionalClasses);
 };
 
@@ -323,33 +331,45 @@ export const safeTailwindPreset = (preset: string, ...additionalClasses: ClassVa
  */
 export const createThemeClasses = (theme: 'light' | 'dark', baseClasses: string) => {
   const themePrefix = theme === 'dark' ? 'dark:' : '';
-  return tailwindMerge(baseClasses, themePrefix + baseClasses.split(' ').map(cls => {
-    // 为深色主题转换颜色类名
-    if (cls.includes('text-gray-')) return cls.replace('text-gray-', 'text-gray-700');
-    if (cls.includes('bg-gray-')) return cls.replace('bg-gray-', 'bg-gray-800');
-    if (cls.includes('border-gray-')) return cls.replace('border-gray-', 'border-gray-600');
-    return cls;
-  }).join(' '));
+  return tailwindMerge(
+    baseClasses,
+    themePrefix +
+      baseClasses
+        .split(' ')
+        .map((cls) => {
+          // 为深色主题转换颜色类名
+          if (cls.includes('text-gray-')) return cls.replace('text-gray-', 'text-gray-700');
+          if (cls.includes('bg-gray-')) return cls.replace('bg-gray-', 'bg-gray-800');
+          if (cls.includes('border-gray-')) return cls.replace('border-gray-', 'border-gray-600');
+          return cls;
+        })
+        .join(' ')
+  );
 };
 
 /**
  * 条件类名应用器
  */
-export const conditionalClasses = (condition: boolean, trueClasses: ClassValue, falseClasses: ClassValue = ''): string => {
-  return tailwindMerge(
-    condition ? trueClasses : falseClasses
-  );
+export const conditionalClasses = (
+  condition: boolean,
+  trueClasses: ClassValue,
+  falseClasses: ClassValue = ''
+): string => {
+  return tailwindMerge(condition ? trueClasses : falseClasses);
 };
 
 /**
  * 状态变体生成器（hover, focus, active等）
  */
-export const createStateVariants = (baseClass: string, variants: {
-  hover?: ClassValue;
-  focus?: ClassValue;
-  active?: ClassValue;
-  disabled?: ClassValue;
-}): string => {
+export const createStateVariants = (
+  baseClass: string,
+  variants: {
+    hover?: ClassValue;
+    focus?: ClassValue;
+    active?: ClassValue;
+    disabled?: ClassValue;
+  }
+): string => {
   const classes: string[] = [baseClass];
 
   if (variants.hover) {
@@ -422,7 +442,10 @@ export const createGridLayout = (
 /**
  * Ant Design组件专用样式生成器
  */
-export const createAntdStyles = (component: 'button' | 'input' | 'select' | 'modal' | 'table', variant: 'default' | 'primary' | 'danger' | 'success' | 'warning' = 'default'): string => {
+export const createAntdStyles = (
+  component: 'button' | 'input' | 'select' | 'modal' | 'table',
+  variant: 'default' | 'primary' | 'danger' | 'success' | 'warning' = 'default'
+): string => {
   const baseStyles = {
     button: 'ant-btn',
     input: 'ant-input',
@@ -439,11 +462,7 @@ export const createAntdStyles = (component: 'button' | 'input' | 'select' | 'mod
     warning: 'ant-btn-warning',
   };
 
-  return antdMerge(
-    baseStyles[component],
-    variantStyles[variant],
-    'transition-all duration-200'
-  );
+  return antdMerge(baseStyles[component], variantStyles[variant], 'transition-all duration-200');
 };
 
 /**

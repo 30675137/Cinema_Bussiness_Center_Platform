@@ -10,16 +10,16 @@
  * 5. Transaction list updates with filtered results
  */
 
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import { server } from '@/test/setup'
-import { http, HttpResponse } from 'msw'
-import { InventoryDetailDrawer } from '@/features/inventory/components/InventoryDetailDrawer'
-import type { StoreInventoryItem, InventoryTransaction } from '@/features/inventory/types'
-import dayjs from 'dayjs'
+import { describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { server } from '@/test/setup';
+import { http, HttpResponse } from 'msw';
+import { InventoryDetailDrawer } from '@/features/inventory/components/InventoryDetailDrawer';
+import type { StoreInventoryItem, InventoryTransaction } from '@/features/inventory/types';
+import dayjs from 'dayjs';
 
 // Test data
 const mockInventoryItem: StoreInventoryItem = {
@@ -48,7 +48,7 @@ const mockInventoryItem: StoreInventoryItem = {
   status: 'normal',
   version: 1,
   updatedAt: new Date().toISOString(),
-}
+};
 
 const mockTransactions: InventoryTransaction[] = [
   {
@@ -111,7 +111,7 @@ const mockTransactions: InventoryTransaction[] = [
     remarks: '预订出库',
     createdAt: dayjs().subtract(5, 'days').toISOString(),
   },
-]
+];
 
 // Test wrapper component
 function TestWrapper({ children }: { children: React.ReactNode }) {
@@ -125,13 +125,13 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
         retry: false,
       },
     },
-  })
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
-  )
+  );
 }
 
 describe('Transaction Query Integration Test', () => {
@@ -139,18 +139,18 @@ describe('Transaction Query Integration Test', () => {
     // Setup MSW handlers for this test suite
     server.use(
       http.get('/api/transactions', ({ request }) => {
-        const url = new URL(request.url)
-        const startDate = url.searchParams.get('startDate')
-        const endDate = url.searchParams.get('endDate')
+        const url = new URL(request.url);
+        const startDate = url.searchParams.get('startDate');
+        const endDate = url.searchParams.get('endDate');
 
-        let filteredTransactions = [...mockTransactions]
+        let filteredTransactions = [...mockTransactions];
 
         // Apply date filter if provided
         if (startDate && endDate) {
-          filteredTransactions = mockTransactions.filter(tx => {
-            const txDate = dayjs(tx.createdAt)
-            return txDate.isAfter(startDate) && txDate.isBefore(endDate)
-          })
+          filteredTransactions = mockTransactions.filter((tx) => {
+            const txDate = dayjs(tx.createdAt);
+            return txDate.isAfter(startDate) && txDate.isBefore(endDate);
+          });
         }
 
         return HttpResponse.json({
@@ -159,159 +159,147 @@ describe('Transaction Query Integration Test', () => {
           total: filteredTransactions.length,
           page: 1,
           pageSize: 20,
-        })
+        });
       })
-    )
-  })
+    );
+  });
 
   it('should display transaction list with color-coded quantities', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Step 1: Verify detail drawer is displayed
-    expect(screen.getByText('库存详情')).toBeInTheDocument()
-    expect(screen.getByText('威士忌')).toBeInTheDocument()
+    expect(screen.getByText('库存详情')).toBeInTheDocument();
+    expect(screen.getByText('威士忌')).toBeInTheDocument();
 
     // Step 2: Switch to transaction history tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Step 3: Wait for transactions to load and verify display
     await waitFor(() => {
-      expect(screen.getByText('tx-001')).toBeInTheDocument()
-    })
+      expect(screen.getByText('tx-001')).toBeInTheDocument();
+    });
 
     // Verify inbound transaction (green +)
-    const inboundRow = screen.getByText('盘点发现多余').closest('tr')
-    expect(inboundRow).toBeInTheDocument()
-    const inboundQuantity = within(inboundRow!).getByText('+10')
-    expect(inboundQuantity).toHaveStyle('color: #52c41a') // Green for inbound
+    const inboundRow = screen.getByText('盘点发现多余').closest('tr');
+    expect(inboundRow).toBeInTheDocument();
+    const inboundQuantity = within(inboundRow!).getByText('+10');
+    expect(inboundQuantity).toHaveStyle('color: #52c41a'); // Green for inbound
 
     // Verify outbound transaction (red -)
-    const outboundRow = screen.getByText('货物损坏').closest('tr')
-    expect(outboundRow).toBeInTheDocument()
-    const outboundQuantity = within(outboundRow!).getByText('-5')
-    expect(outboundQuantity).toHaveStyle('color: #ff4d4f') // Red for outbound
+    const outboundRow = screen.getByText('货物损坏').closest('tr');
+    expect(outboundRow).toBeInTheDocument();
+    const outboundQuantity = within(outboundRow!).getByText('-5');
+    expect(outboundQuantity).toHaveStyle('color: #ff4d4f'); // Red for outbound
 
     // Verify all 4 transactions are displayed
-    expect(screen.getByText('盘点发现多余')).toBeInTheDocument()
-    expect(screen.getByText('采购入库')).toBeInTheDocument()
-    expect(screen.getByText('货物损坏')).toBeInTheDocument()
-    expect(screen.getByText('预订出库')).toBeInTheDocument()
-  })
+    expect(screen.getByText('盘点发现多余')).toBeInTheDocument();
+    expect(screen.getByText('采购入库')).toBeInTheDocument();
+    expect(screen.getByText('货物损坏')).toBeInTheDocument();
+    expect(screen.getByText('预订出库')).toBeInTheDocument();
+  });
 
   it('should filter transactions by date range', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Switch to transaction tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Wait for initial load
     await waitFor(() => {
-      expect(screen.getAllByRole('row').length).toBeGreaterThan(1)
-    })
+      expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    });
 
     // Step 4: Apply date range filter (last 2 days)
-    const dateRangePicker = screen.getByPlaceholderText('选择日期范围')
-    await user.click(dateRangePicker)
+    const dateRangePicker = screen.getByPlaceholderText('选择日期范围');
+    await user.click(dateRangePicker);
 
     // Select start date (2 days ago)
-    const startDate = dayjs().subtract(2, 'days').format('YYYY-MM-DD')
-    const startDateCell = screen.getByText(dayjs().subtract(2, 'days').date())
-    await user.click(startDateCell)
+    const startDate = dayjs().subtract(2, 'days').format('YYYY-MM-DD');
+    const startDateCell = screen.getByText(dayjs().subtract(2, 'days').date());
+    await user.click(startDateCell);
 
     // Select end date (today)
-    const endDateCell = screen.getByText(dayjs().date())
-    await user.click(endDateCell)
+    const endDateCell = screen.getByText(dayjs().date());
+    await user.click(endDateCell);
 
     // Apply filter
-    const applyButton = screen.getByText('确定')
-    await user.click(applyButton)
+    const applyButton = screen.getByText('确定');
+    await user.click(applyButton);
 
     // Step 5: Verify filtered results
     await waitFor(() => {
       // Should only show transactions from last 2 days
-      expect(screen.getByText('盘点发现多余')).toBeInTheDocument()
-      expect(screen.getByText('采购入库')).toBeInTheDocument()
+      expect(screen.getByText('盘点发现多余')).toBeInTheDocument();
+      expect(screen.getByText('采购入库')).toBeInTheDocument();
       // Should not show older transactions
-      expect(screen.queryByText('预订出库')).not.toBeInTheDocument()
-    })
-  })
+      expect(screen.queryByText('预订出库')).not.toBeInTheDocument();
+    });
+  });
 
   it('should show transaction details when clicking on a row', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     // Add handler for transaction detail
     server.use(
       http.get('/api/transactions/:id', ({ params }) => {
-        const transaction = mockTransactions.find(tx => tx.id === params.id)
+        const transaction = mockTransactions.find((tx) => tx.id === params.id);
         return HttpResponse.json({
           success: true,
           data: transaction,
-        })
+        });
       })
-    )
+    );
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Switch to transaction tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Wait for transactions to load
     await waitFor(() => {
-      expect(screen.getByText('盘点发现多余')).toBeInTheDocument()
-    })
+      expect(screen.getByText('盘点发现多余')).toBeInTheDocument();
+    });
 
     // Click on a transaction row
-    const transactionRow = screen.getByText('盘点发现多余').closest('tr')
-    await user.click(transactionRow!)
+    const transactionRow = screen.getByText('盘点发现多余').closest('tr');
+    await user.click(transactionRow!);
 
     // Verify detail drawer appears
     await waitFor(() => {
-      expect(screen.getByText('流水详情')).toBeInTheDocument()
-    })
+      expect(screen.getByText('流水详情')).toBeInTheDocument();
+    });
 
     // Verify detail information
-    expect(screen.getByText('类型：盘点入库')).toBeInTheDocument()
-    expect(screen.getByText('数量：+10')).toBeInTheDocument()
-    expect(screen.getByText('操作人：张三')).toBeInTheDocument()
-  })
+    expect(screen.getByText('类型：盘点入库')).toBeInTheDocument();
+    expect(screen.getByText('数量：+10')).toBeInTheDocument();
+    expect(screen.getByText('操作人：张三')).toBeInTheDocument();
+  });
 
   it('should handle empty transaction list', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     // Override handler to return empty list
     server.use(
@@ -322,33 +310,29 @@ describe('Transaction Query Integration Test', () => {
           total: 0,
           page: 1,
           pageSize: 20,
-        })
+        });
       })
-    )
+    );
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Switch to transaction tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Should show empty state
     await waitFor(() => {
-      expect(screen.getByText('暂无流水记录')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('暂无流水记录')).toBeInTheDocument();
+    });
+  });
 
   it('should handle API errors when loading transactions', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     // Override handler to return error
     server.use(
@@ -360,33 +344,29 @@ describe('Transaction Query Integration Test', () => {
             message: '系统错误',
           },
           { status: 500 }
-        )
+        );
       })
-    )
+    );
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Switch to transaction tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Should show error message
     await waitFor(() => {
-      expect(screen.getByText(/加载失败/)).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText(/加载失败/)).toBeInTheDocument();
+    });
+  });
 
   it('should support pagination for large transaction lists', async () => {
-    const user = userEvent.setup()
-    const onClose = vi.fn()
+    const user = userEvent.setup();
+    const onClose = vi.fn();
 
     // Generate large transaction list
     const largeTransactionList = Array.from({ length: 50 }, (_, i) => ({
@@ -403,15 +383,15 @@ describe('Transaction Query Integration Test', () => {
       operatorName: '测试用户',
       remarks: `测试流水 ${i + 1}`,
       createdAt: dayjs().subtract(i, 'hours').toISOString(),
-    }))
+    }));
 
     server.use(
       http.get('/api/transactions', ({ request }) => {
-        const url = new URL(request.url)
-        const page = parseInt(url.searchParams.get('page') || '1')
-        const pageSize = parseInt(url.searchParams.get('pageSize') || '20')
-        const start = (page - 1) * pageSize
-        const end = start + pageSize
+        const url = new URL(request.url);
+        const page = parseInt(url.searchParams.get('page') || '1');
+        const pageSize = parseInt(url.searchParams.get('pageSize') || '20');
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
 
         return HttpResponse.json({
           success: true,
@@ -419,39 +399,35 @@ describe('Transaction Query Integration Test', () => {
           total: largeTransactionList.length,
           page,
           pageSize,
-        })
+        });
       })
-    )
+    );
 
     render(
       <TestWrapper>
-        <InventoryDetailDrawer
-          open={true}
-          inventory={mockInventoryItem}
-          onClose={onClose}
-        />
+        <InventoryDetailDrawer open={true} inventory={mockInventoryItem} onClose={onClose} />
       </TestWrapper>
-    )
+    );
 
     // Switch to transaction tab
-    const transactionTab = screen.getByText('流水记录')
-    await user.click(transactionTab)
+    const transactionTab = screen.getByText('流水记录');
+    await user.click(transactionTab);
 
     // Wait for first page to load
     await waitFor(() => {
-      expect(screen.getByText('测试流水 1')).toBeInTheDocument()
-    })
+      expect(screen.getByText('测试流水 1')).toBeInTheDocument();
+    });
 
     // Verify pagination controls are displayed
-    expect(screen.getByText('共 50 条')).toBeInTheDocument()
+    expect(screen.getByText('共 50 条')).toBeInTheDocument();
 
     // Click next page
-    const nextButton = screen.getByLabelText('下一页')
-    await user.click(nextButton)
+    const nextButton = screen.getByLabelText('下一页');
+    await user.click(nextButton);
 
     // Verify page 2 content
     await waitFor(() => {
-      expect(screen.getByText('测试流水 21')).toBeInTheDocument()
-    })
-  })
-})
+      expect(screen.getByText('测试流水 21')).toBeInTheDocument();
+    });
+  });
+});

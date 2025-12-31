@@ -9,7 +9,7 @@ import {
   ExperimentOutlined,
   GoldOutlined,
   NumberOutlined,
-  CalculatorOutlined
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import { useConversionStats } from '../hooks/useConversions';
 
@@ -73,11 +73,7 @@ const ConversionStats: React.FC = () => {
             styles={{ body: { padding: '20px 24px' } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Statistic
-                title={item.title}
-                value={item.value}
-                suffix="条"
-              />
+              <Statistic title={item.title} value={item.value} suffix="条" />
               {item.icon}
             </div>
           </Card>

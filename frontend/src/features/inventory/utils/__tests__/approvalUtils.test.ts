@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: approvalUtils 工具函数单元测试
- * 
+ *
  * 测试审批阈值计算和状态判断逻辑。
  * 实现 T041 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 

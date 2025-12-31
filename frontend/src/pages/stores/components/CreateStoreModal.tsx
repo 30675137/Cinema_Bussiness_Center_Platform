@@ -23,7 +23,7 @@ interface CreateStoreModalProps {
 
 /**
  * Modal for creating a new store
- * 
+ *
  * Features:
  * - Form validation with Zod schema
  * - Auto-invalidates store list cache on success

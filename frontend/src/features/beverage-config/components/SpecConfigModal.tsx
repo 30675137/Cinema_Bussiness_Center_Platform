@@ -3,7 +3,7 @@
  * 饮品规格配置弹窗组件 (User Story 3 - FR-032, FR-033)
  */
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   Modal,
   Table,
@@ -17,28 +17,28 @@ import {
   Popconfirm,
   message,
   Tag,
-} from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { ColumnsType } from 'antd/es/table'
+} from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { ColumnsType } from 'antd/es/table';
 import {
   getBeverageSpecs,
   addBeverageSpec,
   updateBeverageSpec,
   deleteBeverageSpec,
-} from '../services/beverageAdminApi'
+} from '../services/beverageAdminApi';
 import type {
   BeverageSpecDTO,
   CreateSpecRequest,
   UpdateSpecRequest,
   SpecType,
-} from '../types/beverage'
+} from '../types/beverage';
 
 interface SpecConfigModalProps {
-  open: boolean
-  beverageId: string | null
-  beverageName?: string
-  onClose: () => void
+  open: boolean;
+  beverageId: string | null;
+  beverageName?: string;
+  onClose: () => void;
 }
 
 /**
@@ -49,14 +49,14 @@ const SPEC_TYPE_OPTIONS: { label: string; value: SpecType }[] = [
   { label: '温度', value: 'TEMPERATURE' },
   { label: '甜度', value: 'SWEETNESS' },
   { label: '配料', value: 'TOPPING' },
-]
+];
 
 const SPEC_TYPE_LABELS: Record<SpecType, string> = {
   SIZE: '容量大小',
   TEMPERATURE: '温度',
   SWEETNESS: '甜度',
   TOPPING: '配料',
-}
+};
 
 export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
   open,
@@ -64,66 +64,65 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
   beverageName,
   onClose,
 }) => {
-  const [form] = Form.useForm()
-  const queryClient = useQueryClient()
-  const [editingSpec, setEditingSpec] = useState<BeverageSpecDTO | null>(null)
-  const [formVisible, setFormVisible] = useState(false)
+  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
+  const [editingSpec, setEditingSpec] = useState<BeverageSpecDTO | null>(null);
+  const [formVisible, setFormVisible] = useState(false);
 
   // 获取规格列表
   const { data: specs, isLoading } = useQuery({
     queryKey: ['beverage-specs', beverageId],
     queryFn: () => getBeverageSpecs(beverageId!),
     enabled: !!beverageId && open,
-  })
+  });
 
   // 添加规格
   const addMutation = useMutation({
-    mutationFn: (data: CreateSpecRequest) =>
-      addBeverageSpec(beverageId!, data),
+    mutationFn: (data: CreateSpecRequest) => addBeverageSpec(beverageId!, data),
     onSuccess: () => {
-      message.success('添加规格成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] })
-      handleFormCancel()
+      message.success('添加规格成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] });
+      handleFormCancel();
     },
     onError: (error: Error) => {
-      message.error(`添加失败: ${error.message}`)
+      message.error(`添加失败: ${error.message}`);
     },
-  })
+  });
 
   // 更新规格
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateSpecRequest }) =>
       updateBeverageSpec(beverageId!, id, data),
     onSuccess: () => {
-      message.success('更新规格成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] })
-      handleFormCancel()
+      message.success('更新规格成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] });
+      handleFormCancel();
     },
     onError: (error: Error) => {
-      message.error(`更新失败: ${error.message}`)
+      message.error(`更新失败: ${error.message}`);
     },
-  })
+  });
 
   // 删除规格
   const deleteMutation = useMutation({
     mutationFn: (specId: string) => deleteBeverageSpec(beverageId!, specId),
     onSuccess: () => {
-      message.success('删除规格成功')
-      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] })
+      message.success('删除规格成功');
+      queryClient.invalidateQueries({ queryKey: ['beverage-specs', beverageId] });
     },
     onError: (error: Error) => {
-      message.error(`删除失败: ${error.message}`)
+      message.error(`删除失败: ${error.message}`);
     },
-  })
+  });
 
   const handleAddSpec = () => {
-    setEditingSpec(null)
-    form.resetFields()
-    setFormVisible(true)
-  }
+    setEditingSpec(null);
+    form.resetFields();
+    setFormVisible(true);
+  };
 
   const handleEditSpec = (spec: BeverageSpecDTO) => {
-    setEditingSpec(spec)
+    setEditingSpec(spec);
     form.setFieldsValue({
       specType: spec.specType,
       name: spec.name,
@@ -131,20 +130,20 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
       isDefault: spec.isDefault,
       sortOrder: spec.sortOrder,
       description: spec.description,
-    })
-    setFormVisible(true)
-  }
+    });
+    setFormVisible(true);
+  };
 
   const handleDeleteSpec = (specId: string) => {
-    deleteMutation.mutate(specId)
-  }
+    deleteMutation.mutate(specId);
+  };
 
   const handleFormSubmit = async () => {
     try {
-      const values = await form.validateFields()
+      const values = await form.validateFields();
 
       // 转换价格为分
-      const priceAdjustmentInCents = Math.round(values.priceAdjustment * 100)
+      const priceAdjustmentInCents = Math.round(values.priceAdjustment * 100);
 
       if (editingSpec) {
         // 编辑模式
@@ -155,8 +154,8 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
           isDefault: values.isDefault,
           sortOrder: values.sortOrder,
           description: values.description,
-        }
-        updateMutation.mutate({ id: editingSpec.id, data: updateData })
+        };
+        updateMutation.mutate({ id: editingSpec.id, data: updateData });
       } else {
         // 新增模式
         const createData: CreateSpecRequest = {
@@ -166,19 +165,19 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
           isDefault: values.isDefault || false,
           sortOrder: values.sortOrder || 0,
           description: values.description,
-        }
-        addMutation.mutate(createData)
+        };
+        addMutation.mutate(createData);
       }
     } catch (error) {
-      console.error('表单验证失败:', error)
+      console.error('表单验证失败:', error);
     }
-  }
+  };
 
   const handleFormCancel = () => {
-    form.resetFields()
-    setFormVisible(false)
-    setEditingSpec(null)
-  }
+    form.resetFields();
+    setFormVisible(false);
+    setEditingSpec(null);
+  };
 
   const columns: ColumnsType<BeverageSpecDTO> = [
     {
@@ -186,9 +185,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
       dataIndex: 'specType',
       key: 'specType',
       width: 120,
-      render: (type: SpecType) => (
-        <Tag color="blue">{SPEC_TYPE_LABELS[type]}</Tag>
-      ),
+      render: (type: SpecType) => <Tag color="blue">{SPEC_TYPE_LABELS[type]}</Tag>,
     },
     {
       title: '规格名称',
@@ -202,8 +199,8 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
       key: 'priceAdjustment',
       width: 120,
       render: (adjustment: number) => {
-        const yuan = adjustment / 100
-        return yuan >= 0 ? `+¥${yuan.toFixed(2)}` : `-¥${Math.abs(yuan).toFixed(2)}`
+        const yuan = adjustment / 100;
+        return yuan >= 0 ? `+¥${yuan.toFixed(2)}` : `-¥${Math.abs(yuan).toFixed(2)}`;
       },
     },
     {
@@ -211,8 +208,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
       dataIndex: 'isDefault',
       key: 'isDefault',
       width: 100,
-      render: (isDefault: boolean) =>
-        isDefault ? <Tag color="green">默认</Tag> : '-',
+      render: (isDefault: boolean) => (isDefault ? <Tag color="green">默认</Tag> : '-'),
     },
     {
       title: '排序',
@@ -254,7 +250,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
         </Space>
       ),
     },
-  ]
+  ];
 
   return (
     <Modal
@@ -269,11 +265,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
       ]}
     >
       <div style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAddSpec}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddSpec}>
           添加规格
         </Button>
       </div>
@@ -333,11 +325,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
           </Form.Item>
 
           <Space>
-            <Form.Item
-              label="排序序号"
-              name="sortOrder"
-              initialValue={0}
-            >
+            <Form.Item label="排序序号" name="sortOrder" initialValue={0}>
               <InputNumber min={0} placeholder="0" />
             </Form.Item>
 
@@ -361,7 +349,7 @@ export const SpecConfigModal: React.FC<SpecConfigModalProps> = ({
         </Form>
       </Modal>
     </Modal>
-  )
-}
+  );
+};
 
-export default SpecConfigModal
+export default SpecConfigModal;

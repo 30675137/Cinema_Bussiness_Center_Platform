@@ -1,6 +1,6 @@
 /**
  * EventDetailDrawer Component (Organism)
- * 
+ *
  * Displays event details in a drawer with edit and delete actions
  */
 
@@ -75,30 +75,20 @@ const EventDetailDrawer: React.FC<EventDetailDrawerProps> = ({ event, open, onCl
           </Space>
         </Descriptions.Item>
 
-        <Descriptions.Item label="时间">
-          {timeRange}
-        </Descriptions.Item>
+        <Descriptions.Item label="时间">{timeRange}</Descriptions.Item>
 
-        <Descriptions.Item label="影厅ID">
-          {event.hallId}
-        </Descriptions.Item>
+        <Descriptions.Item label="影厅ID">{event.hallId}</Descriptions.Item>
 
-        <Descriptions.Item label="日期">
-          {event.date}
-        </Descriptions.Item>
+        <Descriptions.Item label="日期">{event.date}</Descriptions.Item>
 
         {event.type === 'private' && (
           <>
             {event.customer && (
-              <Descriptions.Item label="客户信息">
-                {event.customer}
-              </Descriptions.Item>
+              <Descriptions.Item label="客户信息">{event.customer}</Descriptions.Item>
             )}
 
             {event.serviceManager && (
-              <Descriptions.Item label="服务经理">
-                {event.serviceManager}
-              </Descriptions.Item>
+              <Descriptions.Item label="服务经理">{event.serviceManager}</Descriptions.Item>
             )}
 
             {event.status && (
@@ -112,16 +102,10 @@ const EventDetailDrawer: React.FC<EventDetailDrawerProps> = ({ event, open, onCl
         )}
 
         {event.type === 'public' && event.occupancy && (
-          <Descriptions.Item label="上座率">
-            {event.occupancy}
-          </Descriptions.Item>
+          <Descriptions.Item label="上座率">{event.occupancy}</Descriptions.Item>
         )}
 
-        {event.details && (
-          <Descriptions.Item label="备注">
-            {event.details}
-          </Descriptions.Item>
-        )}
+        {event.details && <Descriptions.Item label="备注">{event.details}</Descriptions.Item>}
 
         <Descriptions.Item label="创建时间">
           {new Date(event.createdAt).toLocaleString('zh-CN')}
@@ -136,4 +120,3 @@ const EventDetailDrawer: React.FC<EventDetailDrawerProps> = ({ event, open, onCl
 };
 
 export default EventDetailDrawer;
-

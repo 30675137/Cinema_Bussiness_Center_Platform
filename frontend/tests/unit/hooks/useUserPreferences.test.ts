@@ -82,20 +82,20 @@ describe('useUserPreferences', () => {
         searchHistory: ['搜索1', '搜索2'],
         theme: {
           mode: 'dark',
-          primaryColor: '#ff4d4f'
+          primaryColor: '#ff4d4f',
         },
         navigation: {
           showBreadcrumb: false,
           enableSearch: true,
           recentItemsLimit: 5,
-          searchHistoryLimit: 10
+          searchHistoryLimit: 10,
         },
         ui: {
           compactMode: true,
           fixedSidebar: false,
-          enableAnimation: false
+          enableAnimation: false,
         },
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
 
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockPreferences));
@@ -135,8 +135,8 @@ describe('useUserPreferences', () => {
           sidebarExpanded: false,
           theme: {
             mode: 'dark',
-            primaryColor: '#ff4d4f'
-          }
+            primaryColor: '#ff4d4f',
+          },
         });
       });
 
@@ -359,19 +359,19 @@ describe('useUserPreferences', () => {
         sidebarExpanded: false,
         theme: {
           mode: 'dark',
-          primaryColor: '#ff4d4f'
+          primaryColor: '#ff4d4f',
         },
         navigation: {
           showBreadcrumb: false,
           enableSearch: true,
           recentItemsLimit: 5,
-          searchHistoryLimit: 10
+          searchHistoryLimit: 10,
         },
         ui: {
           compactMode: true,
           fixedSidebar: false,
-          enableAnimation: false
-        }
+          enableAnimation: false,
+        },
       };
 
       const success = result.current.importPreferences(JSON.stringify(mockPreferences));
@@ -404,8 +404,8 @@ describe('useUserPreferences', () => {
           sidebarExpanded: false,
           theme: {
             mode: 'dark',
-            primaryColor: '#ff4d4f'
-          }
+            primaryColor: '#ff4d4f',
+          },
         });
       });
 

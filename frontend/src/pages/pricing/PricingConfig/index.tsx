@@ -15,7 +15,7 @@ import {
   Col,
   Statistic,
   Table,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,7 +26,7 @@ import {
   SettingOutlined,
   ShoppingCartOutlined,
   AuditOutlined,
-  DollarOutlined
+  DollarOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -49,7 +49,6 @@ interface PricingStrategy {
   updatedAt: string;
 }
 
-
 const PricingConfig: React.FC = () => {
   const [activeTab, setActiveTab] = useState('strategies');
   const [strategies, setStrategies] = useState<PricingStrategy[]>([
@@ -61,7 +60,7 @@ const PricingConfig: React.FC = () => {
       description: '基础商品的标准定价策略',
       status: 'active',
       createdAt: '2024-01-15',
-      updatedAt: '2024-01-15'
+      updatedAt: '2024-01-15',
     },
     {
       id: '2',
@@ -71,7 +70,7 @@ const PricingConfig: React.FC = () => {
       description: 'VIP会员享受85折优惠',
       status: 'active',
       createdAt: '2024-01-10',
-      updatedAt: '2024-01-10'
+      updatedAt: '2024-01-10',
     },
     {
       id: '3',
@@ -81,8 +80,8 @@ const PricingConfig: React.FC = () => {
       description: '根据购买数量提供不同折扣',
       status: 'draft',
       createdAt: '2024-01-05',
-      updatedAt: '2024-01-05'
-    }
+      updatedAt: '2024-01-05',
+    },
   ]);
 
   const [strategyModalVisible, setStrategyModalVisible] = useState(false);
@@ -92,9 +91,9 @@ const PricingConfig: React.FC = () => {
   // 统计数据
   const stats = {
     totalStrategies: strategies.length,
-    activeStrategies: strategies.filter(s => s.status === 'active').length,
+    activeStrategies: strategies.filter((s) => s.status === 'active').length,
     pendingApprovals: 3, // 模拟待审批数量
-    channelPrices: 6 // 模拟渠道价格数量
+    channelPrices: 6, // 模拟渠道价格数量
   };
 
   // 定价策略表格列
@@ -113,7 +112,7 @@ const PricingConfig: React.FC = () => {
             {record.type === 'dynamic' && '动态定价'}
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '策略值',
@@ -131,13 +130,13 @@ const PricingConfig: React.FC = () => {
             </Tooltip>
           );
         }
-      }
+      },
     },
     {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
-      ellipsis: true
+      ellipsis: true,
     },
     {
       title: '状态',
@@ -147,35 +146,27 @@ const PricingConfig: React.FC = () => {
         const statusMap = {
           active: { color: 'green', text: '已启用' },
           inactive: { color: 'red', text: '已禁用' },
-          draft: { color: 'orange', text: '草稿' }
+          draft: { color: 'orange', text: '草稿' },
         };
         const config = statusMap[status as keyof typeof statusMap];
         return <Tag color={config.color}>{config.text}</Tag>;
-      }
+      },
     },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => dayjs(date).format('YYYY-MM-DD')
+      render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
     },
     {
       title: '操作',
       key: 'action',
       render: (_, record: PricingStrategy) => (
         <Space size="small">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEditStrategy(record)}
-          >
+          <Button type="link" icon={<EditOutlined />} onClick={() => handleEditStrategy(record)}>
             编辑
           </Button>
-          <Button
-            type="link"
-            icon={<CopyOutlined />}
-            onClick={() => handleCopyStrategy(record)}
-          >
+          <Button type="link" icon={<CopyOutlined />} onClick={() => handleCopyStrategy(record)}>
             复制
           </Button>
           <Button
@@ -187,11 +178,10 @@ const PricingConfig: React.FC = () => {
             删除
           </Button>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
-  
   // 处理定价策略操作
   const handleEditStrategy = (strategy: PricingStrategy) => {
     setEditingStrategy(strategy);
@@ -202,7 +192,7 @@ const PricingConfig: React.FC = () => {
       ...strategy,
       id: Date.now().toString(),
       name: `${strategy.name} (副本)`,
-      status: 'draft' as const
+      status: 'draft' as const,
     };
     setStrategies([...strategies, newStrategy]);
     message.success('策略复制成功');
@@ -216,13 +206,12 @@ const PricingConfig: React.FC = () => {
       okText: '确认',
       cancelText: '取消',
       onOk() {
-        setStrategies(strategies.filter(s => s.id !== strategy.id));
+        setStrategies(strategies.filter((s) => s.id !== strategy.id));
         message.success('策略删除成功');
-      }
+      },
     });
   };
 
-  
   return (
     <div>
       <Title level={3}>价格配置单</Title>
@@ -308,10 +297,7 @@ const PricingConfig: React.FC = () => {
                 >
                   新建策略
                 </Button>
-                <Button
-                  icon={<SettingOutlined />}
-                  onClick={() => setStrategyFormVisible(true)}
-                >
+                <Button icon={<SettingOutlined />} onClick={() => setStrategyFormVisible(true)}>
                   高级配置
                 </Button>
               </Space>
@@ -325,7 +311,7 @@ const PricingConfig: React.FC = () => {
                 pageSize: 10,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total) => `共 ${total} 条记录`
+                showTotal: (total) => `共 ${total} 条记录`,
               }}
             />
           </Card>
@@ -371,38 +357,57 @@ const PricingConfig: React.FC = () => {
         destroyOnClose
       >
         <PricingStrategyForm
-          initialValues={editingStrategy ? {
-            type: editingStrategy.type,
-            basePrice: editingStrategy.type === 'fixed' ? (typeof editingStrategy.value === 'number' ? editingStrategy.value : 0) : undefined,
-            discountRate: editingStrategy.type === 'percentage' ? (typeof editingStrategy.value === 'number' ? editingStrategy.value : 0) : undefined
-          } : undefined}
+          initialValues={
+            editingStrategy
+              ? {
+                  type: editingStrategy.type,
+                  basePrice:
+                    editingStrategy.type === 'fixed'
+                      ? typeof editingStrategy.value === 'number'
+                        ? editingStrategy.value
+                        : 0
+                      : undefined,
+                  discountRate:
+                    editingStrategy.type === 'percentage'
+                      ? typeof editingStrategy.value === 'number'
+                        ? editingStrategy.value
+                        : 0
+                      : undefined,
+                }
+              : undefined
+          }
           onSubmit={(config) => {
             const strategyData = {
               name: editingStrategy?.name || `新建策略_${Date.now()}`,
               type: config.type,
-              value: config.type === 'fixed' ? (config.basePrice || 0) :
-                     config.type === 'percentage' ? (config.discountRate || 0) :
-                     JSON.stringify({
-                       tierRules: config.tierRules,
-                       dynamicRules: config.dynamicRules
-                     }),
+              value:
+                config.type === 'fixed'
+                  ? config.basePrice || 0
+                  : config.type === 'percentage'
+                    ? config.discountRate || 0
+                    : JSON.stringify({
+                        tierRules: config.tierRules,
+                        dynamicRules: config.dynamicRules,
+                      }),
               description: `${config.type}类型定价策略`,
-              status: 'draft' as const
+              status: 'draft' as const,
             };
 
             if (editingStrategy) {
-              setStrategies(strategies.map(s =>
-                s.id === editingStrategy.id
-                  ? { ...s, ...strategyData, updatedAt: dayjs().format('YYYY-MM-DD') }
-                  : s
-              ));
+              setStrategies(
+                strategies.map((s) =>
+                  s.id === editingStrategy.id
+                    ? { ...s, ...strategyData, updatedAt: dayjs().format('YYYY-MM-DD') }
+                    : s
+                )
+              );
               message.success('策略更新成功');
             } else {
               const newStrategy = {
                 ...strategyData,
                 id: Date.now().toString(),
                 createdAt: dayjs().format('YYYY-MM-DD'),
-                updatedAt: dayjs().format('YYYY-MM-DD')
+                updatedAt: dayjs().format('YYYY-MM-DD'),
               };
               setStrategies([...strategies, newStrategy]);
               message.success('策略创建成功');

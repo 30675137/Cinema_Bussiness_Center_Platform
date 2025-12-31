@@ -42,7 +42,7 @@ const ScenarioPackageCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const createMutation = useCreatePackage();
-  
+
   // 选中的影厅类型
   const [selectedHallTypes, setSelectedHallTypes] = useState<string[]>([]);
 
@@ -54,9 +54,7 @@ const ScenarioPackageCreatePage: React.FC = () => {
    */
   const handleHallTypeToggle = (hallId: string) => {
     setSelectedHallTypes((prev) =>
-      prev.includes(hallId)
-        ? prev.filter((id) => id !== hallId)
-        : [...prev, hallId]
+      prev.includes(hallId) ? prev.filter((id) => id !== hallId) : [...prev, hallId]
     );
   };
 
@@ -194,9 +192,7 @@ const ScenarioPackageCreatePage: React.FC = () => {
                         backgroundColor: selectedHallTypes.includes(hall.id)
                           ? '#1890ff'
                           : 'transparent',
-                        color: selectedHallTypes.includes(hall.id)
-                          ? '#fff'
-                          : 'inherit',
+                        color: selectedHallTypes.includes(hall.id) ? '#fff' : 'inherit',
                       }}
                     >
                       {hall.name}
@@ -215,17 +211,9 @@ const ScenarioPackageCreatePage: React.FC = () => {
                 </Space>
               }
               style={{ marginBottom: 24 }}
-              extra={
-                <span style={{ color: '#8c8c8c', fontSize: 12 }}>
-                  必填，至少选择一个门店
-                </span>
-              }
+              extra={<span style={{ color: '#8c8c8c', fontSize: 12 }}>必填，至少选择一个门店</span>}
             >
-              <StoreSelector
-                value={selectedStoreIds}
-                onChange={setSelectedStoreIds}
-                required
-              />
+              <StoreSelector value={selectedStoreIds} onChange={setSelectedStoreIds} required />
             </Card>
 
             {/* 使用规则 Card - 三列横向排列 */}
@@ -280,9 +268,7 @@ const ScenarioPackageCreatePage: React.FC = () => {
               style={{ marginBottom: 24 }}
             >
               <Form.Item name="backgroundImageUrl" noStyle>
-                <ImageUpload
-                  onChange={(url) => form.setFieldValue('backgroundImageUrl', url)}
-                />
+                <ImageUpload onChange={(url) => form.setFieldValue('backgroundImageUrl', url)} />
               </Form.Item>
             </Card>
 

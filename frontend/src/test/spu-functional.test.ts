@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { spuService } from '@/services/spuService'
-import { validateSPUForm } from '@/utils/validation'
-import type { CreateSPURequest } from '@/services/spuService'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { spuService } from '@/services/spuService';
+import { validateSPUForm } from '@/utils/validation';
+import type { CreateSPURequest } from '@/services/spuService';
 
 // Mock spuService methods
 vi.mock('@/services/spuService', () => ({
@@ -11,26 +11,26 @@ vi.mock('@/services/spuService', () => ({
     getSPUDetail: vi.fn(),
     getSPUList: vi.fn(),
   },
-}))
+}));
 
-const mockSPUService = spuService as any
+const mockSPUService = spuService as any;
 
 describe('SPU Functionality Tests', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   describe('SPU Creation Validation', () => {
     it('should validate required fields', () => {
-      const emptyData = {}
-      const result = validateSPUForm(emptyData)
+      const emptyData = {};
+      const result = validateSPUForm(emptyData);
 
-      expect(result.isValid).toBe(false)
-      expect(result.fieldErrors).toContain('SPU名称不能为空')
-      expect(result.fieldErrors).toContain('请选择品牌')
-      expect(result.fieldErrors).toContain('请选择分类')
-      expect(result.fieldErrors).toContain('商品描述不能为空')
-    })
+      expect(result.isValid).toBe(false);
+      expect(result.fieldErrors).toContain('SPU名称不能为空');
+      expect(result.fieldErrors).toContain('请选择品牌');
+      expect(result.fieldErrors).toContain('请选择分类');
+      expect(result.fieldErrors).toContain('商品描述不能为空');
+    });
 
     it('should validate name length', () => {
       const data = {
@@ -40,12 +40,12 @@ describe('SPU Functionality Tests', () => {
         categoryId: 'category_001',
         images: [{}],
         specifications: [{ name: 'test', value: 'test' }],
-      }
+      };
 
-      const result = validateSPUForm(data)
-      expect(result.isValid).toBe(false)
-      expect(result.fieldErrors.some(e => e.includes('SPU名称至少需要2个字符'))).toBe(true)
-    })
+      const result = validateSPUForm(data);
+      expect(result.isValid).toBe(false);
+      expect(result.fieldErrors.some((e) => e.includes('SPU名称至少需要2个字符'))).toBe(true);
+    });
 
     it('should validate description length', () => {
       const data = {
@@ -55,12 +55,12 @@ describe('SPU Functionality Tests', () => {
         categoryId: 'category_001',
         images: [{}],
         specifications: [{ name: 'test', value: 'test' }],
-      }
+      };
 
-      const result = validateSPUForm(data)
-      expect(result.isValid).toBe(false)
-      expect(result.fieldErrors.some(e => e.includes('商品描述不能超过2000个字符'))).toBe(true)
-    })
+      const result = validateSPUForm(data);
+      expect(result.isValid).toBe(false);
+      expect(result.fieldErrors.some((e) => e.includes('商品描述不能超过2000个字符'))).toBe(true);
+    });
 
     it('should validate image requirements', () => {
       const data = {
@@ -70,12 +70,12 @@ describe('SPU Functionality Tests', () => {
         categoryId: 'category_001',
         images: [], // empty images
         specifications: [{ name: 'test', value: 'test' }],
-      }
+      };
 
-      const result = validateSPUForm(data)
-      expect(result.isValid).toBe(false)
-      expect(result.fieldErrors).toContain('请至少上传一张商品图片')
-    })
+      const result = validateSPUForm(data);
+      expect(result.isValid).toBe(false);
+      expect(result.fieldErrors).toContain('请至少上传一张商品图片');
+    });
 
     it('should pass validation with valid data', () => {
       const validData = {
@@ -90,13 +90,13 @@ describe('SPU Functionality Tests', () => {
         images: [{ uid: '1', name: 'test.jpg', url: '/test.jpg', status: 'done' as const }],
         specifications: [{ name: '容量', value: '500ml' }],
         attributes: [{ name: '保质期', value: '12个月' }],
-      }
+      };
 
-      const result = validateSPUForm(validData)
-      expect(result.isValid).toBe(true)
-      expect(result.fieldErrors).toHaveLength(0)
-    })
-  })
+      const result = validateSPUForm(validData);
+      expect(result.isValid).toBe(true);
+      expect(result.fieldErrors).toHaveLength(0);
+    });
+  });
 
   describe('SPU Service', () => {
     it('should create SPU successfully', async () => {
@@ -109,7 +109,7 @@ describe('SPU Functionality Tests', () => {
         images: [{ uid: '1', name: 'test.jpg', url: '/test.jpg', status: 'done' }],
         specifications: [{ name: 'test', value: 'test' }],
         attributes: [],
-      }
+      };
 
       const mockResponse = {
         success: true,
@@ -124,17 +124,17 @@ describe('SPU Functionality Tests', () => {
         message: 'SPU创建成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
 
-      mockSPUService.createSPU.mockResolvedValue(mockResponse)
+      mockSPUService.createSPU.mockResolvedValue(mockResponse);
 
-      const result = await spuService.createSPU(requestData)
+      const result = await spuService.createSPU(requestData);
 
-      expect(mockSPUService.createSPU).toHaveBeenCalledWith(requestData)
-      expect(result).toEqual(mockResponse)
-      expect(result.success).toBe(true)
-      expect(result.data.name).toBe('Test SPU')
-    })
+      expect(mockSPUService.createSPU).toHaveBeenCalledWith(requestData);
+      expect(result).toEqual(mockResponse);
+      expect(result.success).toBe(true);
+      expect(result.data.name).toBe('Test SPU');
+    });
 
     it('should handle creation errors', async () => {
       const requestData: CreateSPURequest = {
@@ -146,7 +146,7 @@ describe('SPU Functionality Tests', () => {
         images: [{ uid: '1', name: 'test.jpg', url: '/test.jpg', status: 'done' }],
         specifications: [{ name: 'test', value: 'test' }],
         attributes: [],
-      }
+      };
 
       const mockResponse = {
         success: false,
@@ -154,16 +154,16 @@ describe('SPU Functionality Tests', () => {
         message: 'SPU名称不能为空',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
 
-      mockSPUService.createSPU.mockResolvedValue(mockResponse)
+      mockSPUService.createSPU.mockResolvedValue(mockResponse);
 
-      const result = await spuService.createSPU(requestData)
+      const result = await spuService.createSPU(requestData);
 
-      expect(result.success).toBe(false)
-      expect(result.message).toBe('SPU名称不能为空')
-    })
-  })
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('SPU名称不能为空');
+    });
+  });
 
   describe('SPU Form Integration', () => {
     it('should integrate validation and service', async () => {
@@ -177,11 +177,11 @@ describe('SPU Functionality Tests', () => {
         images: [{ uid: '1', name: 'test.jpg', url: '/test.jpg', status: 'done' as const }],
         specifications: [{ name: '容量', value: '500ml' }],
         attributes: [],
-      }
+      };
 
       // Step 1: Validation
-      const validation = validateSPUForm(formData)
-      expect(validation.isValid).toBe(true)
+      const validation = validateSPUForm(formData);
+      expect(validation.isValid).toBe(true);
 
       // Step 2: Service call
       const mockServiceResponse = {
@@ -197,17 +197,17 @@ describe('SPU Functionality Tests', () => {
         message: 'SPU创建成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
 
-      mockSPUService.createSPU.mockResolvedValue(mockServiceResponse)
+      mockSPUService.createSPU.mockResolvedValue(mockServiceResponse);
 
       // Step 3: Execute creation
-      const result = await spuService.createSPU(formData)
+      const result = await spuService.createSPU(formData);
 
       // Step 4: Verify results
-      expect(result.success).toBe(true)
-      expect(result.data.name).toBe(formData.name)
-      expect(result.data.code).toMatch(/^SPU\d{12}$/) // SPU format validation
-    })
-  })
-})
+      expect(result.success).toBe(true);
+      expect(result.data.name).toBe(formData.name);
+      expect(result.data.code).toMatch(/^SPU\d{12}$/); // SPU format validation
+    });
+  });
+});

@@ -24,7 +24,7 @@ export interface SearchInputProps extends Omit<InputProps, 'onChange'> {
 /**
  * 搜索输入框组件
  * 支持 300ms 防抖，回车立即触发搜索
- * 
+ *
  * @example
  * ```tsx
  * <SearchInput
@@ -33,7 +33,7 @@ export interface SearchInputProps extends Omit<InputProps, 'onChange'> {
  *   placeholder="搜索SKU编码/名称"
  * />
  * ```
- * 
+ *
  * @since P003-inventory-query FR-005
  */
 export const SearchInput: React.FC<SearchInputProps> = ({
@@ -47,7 +47,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 }) => {
   // 内部输入值 (即时响应用户输入)
   const [inputValue, setInputValue] = useState(value);
-  
+
   // 同步外部 value 变化
   useEffect(() => {
     setInputValue(value);

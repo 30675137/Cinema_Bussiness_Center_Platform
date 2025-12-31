@@ -21,12 +21,12 @@ import {
   generateTestOrderId,
   SKU_NAMES,
   SINGLE_COCKTAIL_ORDER,
-  TransactionType
+  TransactionType,
 } from './fixtures/test-data';
 import {
   resetTestData,
   verifyReservationRecord,
-  verifyTransactionLog
+  verifyTransactionLog,
 } from './helpers/database-helper';
 
 test.describe('P005 预占取消 - UI测试', () => {
@@ -58,7 +58,9 @@ test.describe('P005 预占取消 - UI测试', () => {
 
     // Step 2: 查询预占后的库存
     await inventoryPage.goto();
-    const afterReservation = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterReservation = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('预占后库存:', afterReservation);
 
@@ -73,7 +75,9 @@ test.describe('P005 预占取消 - UI测试', () => {
     console.log('Step 4: 验证UI库存变化');
     await inventoryPage.refresh();
 
-    const afterCancellation = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterCancellation = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('取消后库存:', afterCancellation);
 
@@ -102,7 +106,9 @@ test.describe('P005 预占取消 - UI测试', () => {
     const whiskeyBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
     const colaBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.COLA]);
     const iceBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.ICE_CUBE]);
-    const lemonBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.LEMON_SLICE]);
+    const lemonBefore = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.LEMON_SLICE]
+    );
 
     // Step 3: 取消订单
     await orderPage.cancelOrderViaAPI(testOrderId);
@@ -145,10 +151,16 @@ test.describe('P005 预占取消 - UI测试', () => {
     await transactionLogPage.searchByOrderId(testOrderId);
 
     // Step 3: 验证预占释放事务
-    await transactionLogPage.verifyTransactionExists(testOrderId, TransactionType.RESERVATION_RELEASE);
+    await transactionLogPage.verifyTransactionExists(
+      testOrderId,
+      TransactionType.RESERVATION_RELEASE
+    );
 
     // Step 4: 验证事务数量（应该有4条释放记录）
-    const transactions = await verifyTransactionLog(testOrderId, TransactionType.RESERVATION_RELEASE);
+    const transactions = await verifyTransactionLog(
+      testOrderId,
+      TransactionType.RESERVATION_RELEASE
+    );
 
     expect(transactions.exists).toBe(true);
     expect(transactions.count).toBeGreaterThan(0);
@@ -185,15 +197,13 @@ test.describe('P005 预占取消 - UI测试', () => {
     const quantity = 5; // 5杯
 
     // Step 1: 创建多杯订单
-    await orderPage.createOrderViaAPI(
-      testOrderId,
-      TEST_STORE_ID,
-      [{
+    await orderPage.createOrderViaAPI(testOrderId, TEST_STORE_ID, [
+      {
         skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
         quantity,
-        unit: '杯'
-      }]
-    );
+        unit: '杯',
+      },
+    ]);
 
     // Step 2: 记录预占后库存
     await inventoryPage.goto();
@@ -229,7 +239,9 @@ test.describe('P005 预占取消 - UI测试', () => {
 
     // Step 3: 记录取消后库存
     await inventoryPage.goto();
-    const firstCancelInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const firstCancelInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     // Step 4: 第二次取消（重复操作）
     const secondCancelResponse = await orderPage.cancelOrderViaAPI(testOrderId);
@@ -239,7 +251,9 @@ test.describe('P005 预占取消 - UI测试', () => {
 
     // Step 5: 验证库存不再变化
     await inventoryPage.refresh();
-    const secondCancelInventory = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const secondCancelInventory = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     expect(secondCancelInventory.reservedQty).toBe(firstCancelInventory.reservedQty);
     expect(secondCancelInventory.availableQty).toBe(firstCancelInventory.availableQty);

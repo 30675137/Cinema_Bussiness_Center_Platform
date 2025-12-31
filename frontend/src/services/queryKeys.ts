@@ -77,7 +77,7 @@ export const attributeTemplateKeys = new QueryKeyFactory('attributeTemplates') a
 export const skuKeys = {
   skus: () => ['skus'] as const,
   sku: (id: string) => ['skus', 'detail', id] as const,
-  skusPaginated: (page: number, pageSize: number, filters?: Record<string, any>) => 
+  skusPaginated: (page: number, pageSize: number, filters?: Record<string, any>) =>
     ['skus', 'paginated', page, pageSize, filters] as const,
   spus: () => ['skus', 'spus'] as const,
   units: () => ['skus', 'units'] as const,
@@ -119,17 +119,10 @@ export const isQueryKeyEqual = (key1: readonly any[], key2: readonly any[]): boo
 // 常用查询键组合
 export const commonQueryKeys = {
   // 刷新所有相关查询
-  invalidateAll: () => [
-    ...categoryKeys.all(),
-    ...attributeTemplateKeys.all(),
-    ...spuKeys.all(),
-  ],
+  invalidateAll: () => [...categoryKeys.all(), ...attributeTemplateKeys.all(), ...spuKeys.all()],
 
   // 刷新类目相关查询
-  invalidateCategories: () => [
-    ...categoryKeys.all(),
-    ...attributeTemplateKeys.all(),
-  ],
+  invalidateCategories: () => [...categoryKeys.all(), ...attributeTemplateKeys.all()],
 
   // 刷新特定类目的所有相关查询
   invalidateCategory: (categoryId: string) => [

@@ -146,9 +146,11 @@ test.describe('门店SKU库存查询 - 用户故事4: 查看库存详情', () =>
       const drawer = page.locator('.ant-drawer:visible');
       if (await drawer.isVisible()) {
         // 验证存在警告提示（如果有低库存）
-        const warning = drawer.locator('.ant-alert-warning, .low-stock-warning, [data-testid="low-stock-warning"]');
+        const warning = drawer.locator(
+          '.ant-alert-warning, .low-stock-warning, [data-testid="low-stock-warning"]'
+        );
         // 警告可能存在也可能不存在，取决于实际数据
-        const hasWarning = await warning.count() > 0;
+        const hasWarning = (await warning.count()) > 0;
         // 只要验证抽屉正常显示即可
         await expect(drawer).toBeVisible();
       }

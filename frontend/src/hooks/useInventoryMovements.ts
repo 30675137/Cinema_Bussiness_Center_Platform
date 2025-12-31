@@ -50,10 +50,7 @@ export const useMovementsBySKU = (
 /**
  * 按门店获取流水记录
  */
-export const useMovementsByStore = (
-  storeId: string,
-  params?: Partial<InventoryQueryParams>
-) => {
+export const useMovementsByStore = (storeId: string, params?: Partial<InventoryQueryParams>) => {
   return useQuery({
     queryKey: ['movements-by-store', storeId, params],
     queryFn: () =>

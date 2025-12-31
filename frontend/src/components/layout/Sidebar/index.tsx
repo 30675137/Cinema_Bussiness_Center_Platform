@@ -14,7 +14,7 @@ import {
   StarOutlined,
   StarFilled,
   HomeOutlined,
-  CloseOutlined
+  CloseOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useNavigation } from '@/hooks/useNavigation';
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   fixedWidth = false,
   showSearch = true,
   showFavorites = true,
-  forceMobile = false
+  forceMobile = false,
 }) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     setSearchQuery,
     searchResults,
     isFavorite,
-    toggleFavorite
+    toggleFavorite,
   } = useNavigation();
 
   // 使用用户偏好的侧边栏状态
@@ -128,21 +128,20 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   // 转换菜单数据为Ant Design Menu格式
   const transformMenuData = (menus: any[]) => {
-    return menus.map(menu => ({
+    return menus.map((menu) => ({
       key: menu.id,
       label: (
         <span className="menu-item-label">
           {menu.name}
-          {showFavorites && isFavorite(menu.id) && (
-            <StarFilled className="favorite-indicator" />
-          )}
+          {showFavorites && isFavorite(menu.id) && <StarFilled className="favorite-indicator" />}
         </span>
       ),
       icon: getMenuIcon(menu.icon),
-      children: menu.children && menu.children.length > 0 ? transformMenuData(menu.children) : undefined,
+      children:
+        menu.children && menu.children.length > 0 ? transformMenuData(menu.children) : undefined,
       ...(menu.path && {
-        onClick: () => shouldUseDrawer ? handleMobileMenuClick(menu.id) : navigateToMenu(menu.id)
-      })
+        onClick: () => (shouldUseDrawer ? handleMobileMenuClick(menu.id) : navigateToMenu(menu.id)),
+      }),
     }));
   };
 
@@ -213,9 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="sidebar-header">
           <div className="sidebar-title">
             <MenuOutlined className="sidebar-icon" />
-            {!sidebarCollapsed && (
-              <span className="sidebar-title-text">影院商品管理中台</span>
-            )}
+            {!sidebarCollapsed && <span className="sidebar-title-text">影院商品管理中台</span>}
           </div>
 
           {/* 搜索框 */}
@@ -271,10 +268,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           selectedKeys={activeMenu ? [activeMenu.id] : []}
           defaultOpenKeys={expandedMenuIds}
           items={transformMenuData(displayMenus)}
-          onClick={shouldUseDrawer ?
-            ({ key }) => handleMobileMenuClick(key) :
-            handleMenuClick
-          }
+          onClick={shouldUseDrawer ? ({ key }) => handleMobileMenuClick(key) : handleMenuClick}
           onTitleClick={handleMenuToggle}
           style={{ border: 'none' }}
           inlineCollapsed={sidebarCollapsed}
@@ -290,10 +284,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className="sidebar-custom-footer">{footer}</div>
             )}
 
-            <Tooltip
-              title={sidebarCollapsed ? '展开菜单' : '收起菜单'}
-              placement="right"
-            >
+            <Tooltip title={sidebarCollapsed ? '展开菜单' : '收起菜单'} placement="right">
               <Button
                 type="text"
                 icon={sidebarCollapsed ? <RightOutlined /> : <LeftOutlined />}
@@ -339,10 +330,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           width="80%"
           closable={false}
           classNames={{
-            root: cn('sidebar-drawer', className)
+            root: cn('sidebar-drawer', className),
           }}
           styles={{
-            body: { padding: 0 }
+            body: { padding: 0 },
           }}
         >
           {renderSidebarContent()}
@@ -358,10 +349,14 @@ const Sidebar: React.FC<SidebarProps> = ({
       collapsed={sidebarCollapsed}
       collapsedWidth={getResponsiveCollapsedWidth()}
       classNames={{
-        root: cn('sidebar', {
-          'compact': isCompactMode,
-          'mobile': isMobileMode
-        }, className)
+        root: cn(
+          'sidebar',
+          {
+            compact: isCompactMode,
+            mobile: isMobileMode,
+          },
+          className
+        ),
       }}
       styles={{
         root: {
@@ -372,8 +367,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           top: 0,
           bottom: 0,
           background: '#1f2937',
-          ...style
-        }
+          ...style,
+        },
       }}
       trigger={null}
     >

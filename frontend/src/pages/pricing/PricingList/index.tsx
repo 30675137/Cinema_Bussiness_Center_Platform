@@ -18,20 +18,20 @@ const PricingList: React.FC = () => {
           title: '活跃价格策略',
           value: 89,
           prefix: null,
-          trend: { value: 5.3, isPositive: true }
+          trend: { value: 5.3, isPositive: true },
         },
         {
           title: '促销商品',
           value: 234,
           prefix: null,
-          trend: { value: 12.8, isPositive: true }
+          trend: { value: 12.8, isPositive: true },
         },
         {
           title: '平均毛利率',
           value: 32.5,
           prefix: null,
-          trend: { value: 2.1, isPositive: true }
-        }
+          trend: { value: 2.1, isPositive: true },
+        },
       ]}
     >
       <div style={{ textAlign: 'center', padding: '48px' }}>

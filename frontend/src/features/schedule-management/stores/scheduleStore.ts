@@ -1,6 +1,6 @@
 /**
  * Zustand Store for Schedule Management UI State
- * 
+ *
  * Manages UI state (selected date, selected event, filters, viewport scroll)
  * Server state is managed by TanStack Query
  */
@@ -23,7 +23,7 @@ interface ScheduleStore {
     eventTypes?: EventType[];
     statuses?: EventStatus[];
   };
-  
+
   // Actions
   setSelectedDate: (date: string) => void;
   setSelectedEvent: (event: ScheduleEvent | null) => void;
@@ -45,24 +45,20 @@ export const useScheduleStore = create<ScheduleStore>()(
         scrollLeft: 0,
       },
       filters: {},
-      
+
       // Actions
-      setSelectedDate: (date) =>
-        set({ selectedDate: date }),
-      
-      setSelectedEvent: (event) =>
-        set({ selectedEvent: event }),
-      
-      setViewportScroll: (scroll) =>
-        set({ viewportScroll: scroll }),
-      
+      setSelectedDate: (date) => set({ selectedDate: date }),
+
+      setSelectedEvent: (event) => set({ selectedEvent: event }),
+
+      setViewportScroll: (scroll) => set({ viewportScroll: scroll }),
+
       setFilters: (newFilters) =>
         set((state) => ({
           filters: { ...state.filters, ...newFilters },
         })),
-      
-      resetFilters: () =>
-        set({ filters: {} }),
+
+      resetFilters: () => set({ filters: {} }),
     }),
     {
       name: STORAGE_KEY,
@@ -76,4 +72,3 @@ export const useScheduleStore = create<ScheduleStore>()(
     }
   )
 );
-

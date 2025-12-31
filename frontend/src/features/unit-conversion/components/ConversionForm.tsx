@@ -4,21 +4,15 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  message,
-  Typography,
-  Space,
-  Alert,
-} from 'antd';
+import { Modal, Form, Input, InputNumber, Select, message, Typography, Space, Alert } from 'antd';
 import { ArrowRightOutlined, WarningOutlined } from '@ant-design/icons';
 import { useCreateConversion, useUpdateConversion } from '../hooks/useConversions';
 import { useValidateCycle } from '../hooks/useConversionCalculation';
-import { useConversionUIStore, selectIsEditing, selectEditingId } from '../stores/conversionUIStore';
+import {
+  useConversionUIStore,
+  selectIsEditing,
+  selectEditingId,
+} from '../stores/conversionUIStore';
 import { CATEGORY_OPTIONS } from '../utils/categoryMapping';
 import type { CreateConversionRequest, DbUnitCategory } from '../types';
 
@@ -44,7 +38,8 @@ const ConversionForm: React.FC = () => {
   const updateMutation = useUpdateConversion();
   const validateCycleMutation = useValidateCycle();
 
-  const isSubmitting = createMutation.isPending || updateMutation.isPending || validateCycleMutation.isPending;
+  const isSubmitting =
+    createMutation.isPending || updateMutation.isPending || validateCycleMutation.isPending;
 
   // 监听编辑规则变化，填充表单
   useEffect(() => {
@@ -73,9 +68,7 @@ const ConversionForm: React.FC = () => {
 
       // 验证源单位和目标单位不能相同
       if (values.fromUnit === values.toUnit) {
-        form.setFields([
-          { name: 'toUnit', errors: ['源单位和目标单位不能相同'] },
-        ]);
+        form.setFields([{ name: 'toUnit', errors: ['源单位和目标单位不能相同'] }]);
         return;
       }
 
@@ -153,11 +146,7 @@ const ConversionForm: React.FC = () => {
         />
       )}
 
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{ category: 'volume' }}
-      >
+      <Form form={form} layout="vertical" initialValues={{ category: 'volume' }}>
         <Form.Item
           name="fromUnit"
           label="源单位"
@@ -221,7 +210,9 @@ const ConversionForm: React.FC = () => {
               <Space>
                 <Text strong>1 {fromUnit}</Text>
                 <ArrowRightOutlined />
-                <Text strong>{conversionRate} {toUnit}</Text>
+                <Text strong>
+                  {conversionRate} {toUnit}
+                </Text>
               </Space>
             </div>
           </div>

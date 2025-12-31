@@ -2,16 +2,16 @@
  * @spec O003-beverage-order
  * B端待处理订单页面
  */
-import React, { useState } from 'react'
-import { Card, Row, Col, Empty, Spin, Typography, Badge, Space, Button } from 'antd'
-import { ReloadOutlined, SoundOutlined } from '@ant-design/icons'
-import { usePendingOrders } from '../../../hooks/useBeverageOrders'
-import { useVoiceAnnouncement } from '../../../hooks/useVoiceAnnouncement'
-import { useNewOrderNotification } from '../../../hooks/useNewOrderNotification'
-import { BeverageOrderCard } from '../components'
-import type { BeverageOrderDTO } from '../../../types/beverageOrder'
+import React, { useState } from 'react';
+import { Card, Row, Col, Empty, Spin, Typography, Badge, Space, Button } from 'antd';
+import { ReloadOutlined, SoundOutlined } from '@ant-design/icons';
+import { usePendingOrders } from '../../../hooks/useBeverageOrders';
+import { useVoiceAnnouncement } from '../../../hooks/useVoiceAnnouncement';
+import { useNewOrderNotification } from '../../../hooks/useNewOrderNotification';
+import { BeverageOrderCard } from '../components';
+import type { BeverageOrderDTO } from '../../../types/beverageOrder';
 
-const { Title, Text } = Typography
+const { Title, Text } = Typography;
 
 /**
  * B端待处理订单页面
@@ -25,53 +25,51 @@ const { Title, Text } = Typography
  */
 export const PendingOrdersPage: React.FC = () => {
   // TODO: 从用户上下文或配置获取门店ID
-  const [storeId] = useState('00000000-0000-0000-0000-000000000001')
+  const [storeId] = useState('00000000-0000-0000-0000-000000000001');
 
-  const { data: orders, isLoading, error, refetch, isRefetching } = usePendingOrders(storeId)
-  const { isAnnouncing, announceMultipleQueueNumbers, isSupported } = useVoiceAnnouncement()
+  const { data: orders, isLoading, error, refetch, isRefetching } = usePendingOrders(storeId);
+  const { isAnnouncing, announceMultipleQueueNumbers, isSupported } = useVoiceAnnouncement();
 
   // 新订单通知（语音播报 + 桌面通知）
   useNewOrderNotification(orders, {
     enableVoice: true,
     enableDesktop: true,
-  })
+  });
 
   // 按状态分组
   const pendingProductionOrders =
-    orders?.filter((order) => order.status === 'PENDING_PRODUCTION') || []
-  const producingOrders = orders?.filter((order) => order.status === 'PRODUCING') || []
+    orders?.filter((order) => order.status === 'PENDING_PRODUCTION') || [];
+  const producingOrders = orders?.filter((order) => order.status === 'PRODUCING') || [];
 
   const handleOrderClick = (order: BeverageOrderDTO) => {
     // TODO: 导航到订单详情页
-    console.log('查看订单详情:', order)
-  }
+    console.log('查看订单详情:', order);
+  };
 
   const handleVoiceAnnouncement = () => {
     // 播报所有已完成订单的取餐号
-    const completedQueueNumbers = orders
-      ?.filter((order) => order.status === 'COMPLETED' && order.queueNumber)
-      .map((order) => order.queueNumber as string) || []
+    const completedQueueNumbers =
+      orders
+        ?.filter((order) => order.status === 'COMPLETED' && order.queueNumber)
+        .map((order) => order.queueNumber as string) || [];
 
-    announceMultipleQueueNumbers(completedQueueNumbers)
-  }
+    announceMultipleQueueNumbers(completedQueueNumbers);
+  };
 
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: 48 }}>
         <Spin size="large" tip="加载中..." />
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
       <Card>
-        <Empty
-          description={`加载失败: ${error.message}`}
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
+        <Empty description={`加载失败: ${error.message}`} image={Empty.PRESENTED_IMAGE_SIMPLE} />
       </Card>
-    )
+    );
   }
 
   return (
@@ -97,11 +95,7 @@ export const PendingOrdersPage: React.FC = () => {
             >
               {isAnnouncing ? '播报中...' : '语音叫号'}
             </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refetch()}
-              loading={isRefetching}
-            >
+            <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isRefetching}>
               刷新
             </Button>
           </Space>
@@ -160,5 +154,5 @@ export const PendingOrdersPage: React.FC = () => {
         页面每 5 秒自动刷新
       </div>
     </div>
-  )
-}
+  );
+};

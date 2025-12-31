@@ -128,7 +128,7 @@ test.describe('主要菜单可见性', () => {
       'menu-scheduling',
       'menu-order-management',
       'menu-operations',
-      'menu-system-management'
+      'menu-system-management',
     ];
 
     // 验证前10个菜单项的顺序
@@ -206,11 +206,11 @@ test.describe('主要菜单可见性', () => {
     // 测试hover状态
     await firstMenuItem.hover();
 
-    const hoverStyles = await firstMenuItem.evaluate(el => {
+    const hoverStyles = await firstMenuItem.evaluate((el) => {
       const styles = window.getComputedStyle(el);
       return {
         backgroundColor: styles.backgroundColor,
-        cursor: styles.cursor
+        cursor: styles.cursor,
       };
     });
 
@@ -223,7 +223,7 @@ test.describe('主要菜单可见性', () => {
     await page.waitForTimeout(300);
 
     // 验证active状态
-    const isActive = await firstMenuItem.evaluate(el => {
+    const isActive = await firstMenuItem.evaluate((el) => {
       return el.classList.contains('active') || el.getAttribute('aria-expanded') === 'true';
     });
 

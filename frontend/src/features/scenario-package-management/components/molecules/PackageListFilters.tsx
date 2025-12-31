@@ -54,7 +54,7 @@ export const PackageListFilters: React.FC<PackageListFiltersProps> = ({
   loading = false,
 }) => {
   const handleStatusChange = (value: string) => {
-    onStatusChange?.(value as PackageStatus || undefined);
+    onStatusChange?.((value as PackageStatus) || undefined);
   };
 
   const handleSearch = (value: string) => {
@@ -90,11 +90,7 @@ export const PackageListFilters: React.FC<PackageListFiltersProps> = ({
       />
 
       {/* 重置按钮 */}
-      <Button
-        icon={<ReloadOutlined />}
-        onClick={handleReset}
-        disabled={loading}
-      >
+      <Button icon={<ReloadOutlined />} onClick={handleReset} disabled={loading}>
         重置
       </Button>
     </Space>

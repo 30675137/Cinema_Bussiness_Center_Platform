@@ -21,12 +21,12 @@ import {
   generateTestOrderId,
   SKU_NAMES,
   SINGLE_COCKTAIL_ORDER,
-  TransactionType
+  TransactionType,
 } from './fixtures/test-data';
 import {
   resetTestData,
   getInventoryQuantities,
-  verifyTransactionLog
+  verifyTransactionLog,
 } from './helpers/database-helper';
 
 test.describe('P005 订单履约扣减 - UI测试', () => {
@@ -58,7 +58,9 @@ test.describe('P005 订单履约扣减 - UI测试', () => {
 
     // Step 2: 查询预占后的库存（作为基准）
     await inventoryPage.goto();
-    const afterReservation = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterReservation = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('预占后库存:', afterReservation);
 
@@ -73,7 +75,9 @@ test.describe('P005 订单履约扣减 - UI测试', () => {
     console.log('Step 4: 验证UI库存变化');
     await inventoryPage.refresh();
 
-    const afterFulfillment = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
+    const afterFulfillment = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.WHISKEY]
+    );
 
     console.log('履约后库存:', afterFulfillment);
 
@@ -102,7 +106,9 @@ test.describe('P005 订单履约扣减 - UI测试', () => {
     const whiskeyBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.WHISKEY]);
     const colaBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.COLA]);
     const iceBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.ICE_CUBE]);
-    const lemonBefore = await inventoryPage.getInventoryQuantities(SKU_NAMES[TEST_SKUS.LEMON_SLICE]);
+    const lemonBefore = await inventoryPage.getInventoryQuantities(
+      SKU_NAMES[TEST_SKUS.LEMON_SLICE]
+    );
 
     // Step 3: 履约订单
     await orderPage.fulfillOrderViaAPI(testOrderId, TEST_STORE_ID);
@@ -182,7 +188,7 @@ test.describe('P005 订单履约扣减 - UI测试', () => {
       { skuName: '威士忌', quantity: 45, unit: 'ml' },
       { skuName: '可乐', quantity: 150, unit: 'ml' },
       { skuName: '冰块', quantity: 1, unit: '个' },
-      { skuName: '柠檬片', quantity: 1, unit: '个' }
+      { skuName: '柠檬片', quantity: 1, unit: '个' },
     ]);
 
     console.log('✅ BOM组件明细显示正确');
@@ -193,15 +199,13 @@ test.describe('P005 订单履约扣减 - UI测试', () => {
     const quantity = 3; // 3杯
 
     // Step 1: 创建多杯订单
-    await orderPage.createOrderViaAPI(
-      testOrderId,
-      TEST_STORE_ID,
-      [{
+    await orderPage.createOrderViaAPI(testOrderId, TEST_STORE_ID, [
+      {
         skuId: TEST_SKUS.WHISKEY_COLA_COCKTAIL,
         quantity,
-        unit: '杯'
-      }]
-    );
+        unit: '杯',
+      },
+    ]);
 
     // Step 2: 记录预占后库存
     await inventoryPage.goto();

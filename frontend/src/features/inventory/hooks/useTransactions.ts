@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 库存流水查询 Hook
- * 
+ *
  * 提供库存流水记录的查询功能。
  * 实现 T032 任务。
- * 
+ *
  * @since US2 - 查看库存流水记录
  */
 
@@ -86,11 +86,11 @@ async function fetchTransactions(params: TransactionQueryParams): Promise<Transa
 
 /**
  * 库存流水查询 Hook
- * 
+ *
  * @param params 查询参数
  * @param enabled 是否启用查询
  * @returns 查询结果
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useTransactions({ skuId: 'xxx', storeId: 'yyy' });

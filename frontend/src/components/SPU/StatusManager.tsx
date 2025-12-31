@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react';
 import {
   Card,
   Button,
@@ -16,8 +16,8 @@ import {
   Avatar,
   Tag,
   Tooltip,
-  Alert
-} from 'antd'
+  Alert,
+} from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
@@ -28,34 +28,34 @@ import {
   ExclamationCircleOutlined,
   MoreOutlined,
   EyeOutlined,
-  SyncOutlined
-} from '@ant-design/icons'
-import type { MenuProps } from 'antd'
-import type { SPUStatus } from '@/types/spu'
-import { statusColors } from '@/theme'
-import { spuService } from '@/services/spuService'
-import { SPUNotificationService } from '@/components/common/Notification'
+  SyncOutlined,
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import type { SPUStatus } from '@/types/spu';
+import { statusColors } from '@/theme';
+import { spuService } from '@/services/spuService';
+import { SPUNotificationService } from '@/components/common/Notification';
 
-const { Text } = Typography
-const { Option } = Select
-const { TextArea } = Input
+const { Text } = Typography;
+const { Option } = Select;
+const { TextArea } = Input;
 
 interface StatusManagerProps {
-  spuId: string
-  currentStatus: SPUStatus
-  onStatusChange?: (newStatus: SPUStatus, reason?: string) => void
-  showHistory?: boolean
-  compact?: boolean
+  spuId: string;
+  currentStatus: SPUStatus;
+  onStatusChange?: (newStatus: SPUStatus, reason?: string) => void;
+  showHistory?: boolean;
+  compact?: boolean;
 }
 
 interface StatusHistoryItem {
-  id: string
-  status: SPUStatus
-  previousStatus: SPUStatus | null
-  reason: string
-  operator: string
-  timestamp: string
-  description?: string
+  id: string;
+  status: SPUStatus;
+  previousStatus: SPUStatus | null;
+  reason: string;
+  operator: string;
+  timestamp: string;
+  description?: string;
 }
 
 const StatusManager: React.FC<StatusManagerProps> = ({
@@ -63,109 +63,105 @@ const StatusManager: React.FC<StatusManagerProps> = ({
   currentStatus,
   onStatusChange,
   showHistory = true,
-  compact = false
+  compact = false,
 }) => {
-  const [loading, setLoading] = useState(false)
-  const [statusModalVisible, setStatusModalVisible] = useState(false)
-  const [historyModalVisible, setHistoryModalVisible] = useState(false)
-  const [statusForm] = Form.useForm()
-  const [targetStatus, setTargetStatus] = useState<SPUStatus | null>(null)
-  const [statusHistory, setStatusHistory] = useState<StatusHistoryItem[]>([])
+  const [loading, setLoading] = useState(false);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [statusForm] = Form.useForm();
+  const [targetStatus, setTargetStatus] = useState<SPUStatus | null>(null);
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryItem[]>([]);
 
   // 获取当前状态信息
-  const currentStatusInfo = statusColors[currentStatus as keyof typeof statusColors]
+  const currentStatusInfo = statusColors[currentStatus as keyof typeof statusColors];
 
   // 获取可转换的状态列表
   const getAvailableStatuses = (): { status: SPUStatus; label: string; description: string }[] => {
-    const transitions: Record<SPUStatus, { status: SPUStatus; label: string; description: string }[]> = {
+    const transitions: Record<
+      SPUStatus,
+      { status: SPUStatus; label: string; description: string }[]
+    > = {
       draft: [
         { status: 'active', label: '启用', description: '将SPU设置为启用状态，可以正常使用' },
-        { status: 'inactive', label: '停用', description: '将SPU设置为停用状态，暂时不可用' }
+        { status: 'inactive', label: '停用', description: '将SPU设置为停用状态，暂时不可用' },
       ],
       active: [
         { status: 'inactive', label: '停用', description: '将SPU设置为停用状态，暂时不可用' },
-        { status: 'draft', label: '设为草稿', description: '将SPU回退到草稿状态' }
+        { status: 'draft', label: '设为草稿', description: '将SPU回退到草稿状态' },
       ],
       inactive: [
         { status: 'active', label: '启用', description: '将SPU设置为启用状态，可以正常使用' },
-        { status: 'draft', label: '设为草稿', description: '将SPU回退到草稿状态' }
-      ]
-    }
+        { status: 'draft', label: '设为草稿', description: '将SPU回退到草稿状态' },
+      ],
+    };
 
-    return transitions[currentStatus] || []
-  }
+    return transitions[currentStatus] || [];
+  };
 
   // 加载状态历史
   const loadStatusHistory = useCallback(async () => {
     try {
-      setLoading(true)
-      const response = await spuService.getStatusHistory(spuId)
+      setLoading(true);
+      const response = await spuService.getStatusHistory(spuId);
 
       if (response.success) {
-        setStatusHistory(response.data)
+        setStatusHistory(response.data);
       } else {
-        throw new Error(response.message || '加载状态历史失败')
+        throw new Error(response.message || '加载状态历史失败');
       }
     } catch (error) {
-      console.error('Load status history error:', error)
-      message.error('加载状态历史失败')
+      console.error('Load status history error:', error);
+      message.error('加载状态历史失败');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [spuId])
+  }, [spuId]);
 
   // 处理状态变更
   const handleStatusChange = useCallback((status: SPUStatus) => {
-    setTargetStatus(status)
-    setStatusModalVisible(true)
-  }, [])
+    setTargetStatus(status);
+    setStatusModalVisible(true);
+  }, []);
 
   // 确认状态变更
   const confirmStatusChange = useCallback(async () => {
     try {
-      const values = await statusForm.validateFields()
-      setLoading(true)
+      const values = await statusForm.validateFields();
+      setLoading(true);
 
-      const response = await spuService.updateSPUStatus(spuId, targetStatus!, values.reason)
+      const response = await spuService.updateSPUStatus(spuId, targetStatus!, values.reason);
 
       if (response.success) {
-        message.success('状态更新成功')
-        SPUNotificationService.statusChanged(targetStatus!, values.reason)
-        onStatusChange?.(targetStatus!, values.reason)
-        setStatusModalVisible(false)
-        statusForm.resetFields()
-        setTargetStatus(null)
+        message.success('状态更新成功');
+        SPUNotificationService.statusChanged(targetStatus!, values.reason);
+        onStatusChange?.(targetStatus!, values.reason);
+        setStatusModalVisible(false);
+        statusForm.resetFields();
+        setTargetStatus(null);
       } else {
-        throw new Error(response.message || '状态更新失败')
+        throw new Error(response.message || '状态更新失败');
       }
     } catch (error) {
-      console.error('Update status error:', error)
-      message.error('状态更新失败，请重试')
+      console.error('Update status error:', error);
+      message.error('状态更新失败，请重试');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [spuId, targetStatus, statusForm, onStatusChange])
+  }, [spuId, targetStatus, statusForm, onStatusChange]);
 
   // 获取状态历史记录
   const renderStatusHistory = () => {
     if (statusHistory.length === 0) {
-      return (
-        <Alert
-          message="暂无状态变更记录"
-          type="info"
-          showIcon
-          style={{ margin: '16px 0' }}
-        />
-      )
+      return <Alert message="暂无状态变更记录" type="info" showIcon style={{ margin: '16px 0' }} />;
     }
 
     return (
       <Timeline style={{ marginTop: 16 }}>
         {statusHistory.map((item, index) => {
-          const statusInfo = statusColors[item.status as keyof typeof statusColors]
+          const statusInfo = statusColors[item.status as keyof typeof statusColors];
           const previousStatusInfo = item.previousStatus
             ? statusColors[item.previousStatus as keyof typeof statusColors]
-            : null
+            : null;
 
           return (
             <Timeline.Item
@@ -187,9 +183,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({
                       <Text type="secondary">变更</Text>
                     </>
                   )}
-                  {index === 0 && (
-                    <Badge status="success" text="最新" />
-                  )}
+                  {index === 0 && <Badge status="success" text="最新" />}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <UserOutlined style={{ fontSize: '12px' }} />
@@ -201,25 +195,35 @@ const StatusManager: React.FC<StatusManagerProps> = ({
                   </Text>
                 </div>
                 {item.reason && (
-                  <div style={{ marginTop: 4, padding: '8px 12px', backgroundColor: '#f5f5f5', borderRadius: 4 }}>
+                  <div
+                    style={{
+                      marginTop: 4,
+                      padding: '8px 12px',
+                      backgroundColor: '#f5f5f5',
+                      borderRadius: 4,
+                    }}
+                  >
                     <Text style={{ fontSize: '13px' }}>{item.reason}</Text>
                   </div>
                 )}
                 {item.description && (
-                  <Text type="secondary" style={{ fontSize: '12px', marginTop: 4, display: 'block' }}>
+                  <Text
+                    type="secondary"
+                    style={{ fontSize: '12px', marginTop: 4, display: 'block' }}
+                  >
                     {item.description}
                   </Text>
                 )}
               </div>
             </Timeline.Item>
-          )
+          );
         })}
       </Timeline>
-    )
-  }
+    );
+  };
 
   // 构建状态变更菜单
-  const statusMenuItems: MenuProps['items'] = getAvailableStatuses().map(item => ({
+  const statusMenuItems: MenuProps['items'] = getAvailableStatuses().map((item) => ({
     key: item.status,
     label: (
       <div>
@@ -227,23 +231,19 @@ const StatusManager: React.FC<StatusManagerProps> = ({
         <div style={{ fontSize: '12px', color: '#666' }}>{item.description}</div>
       </div>
     ),
-    onClick: () => handleStatusChange(item.status)
-  }))
+    onClick: () => handleStatusChange(item.status),
+  }));
 
   // 紧凑模式渲染
   if (compact) {
-    const availableStatuses = getAvailableStatuses()
+    const availableStatuses = getAvailableStatuses();
     return (
       <Space>
         <Tag color={currentStatusInfo.color} style={{ fontSize: '14px' }}>
           {currentStatusInfo.text}
         </Tag>
         {availableStatuses.length > 0 && (
-          <Dropdown
-            menu={{ items: statusMenuItems }}
-            trigger={['click']}
-            placement="bottomLeft"
-          >
+          <Dropdown menu={{ items: statusMenuItems }} trigger={['click']} placement="bottomLeft">
             <Button size="small" icon={<EditOutlined />}>
               更改状态
             </Button>
@@ -254,15 +254,15 @@ const StatusManager: React.FC<StatusManagerProps> = ({
             size="small"
             icon={<HistoryOutlined />}
             onClick={() => {
-              loadStatusHistory()
-              setHistoryModalVisible(true)
+              loadStatusHistory();
+              setHistoryModalVisible(true);
             }}
           >
             历史记录
           </Button>
         )}
       </Space>
-    )
+    );
   }
 
   // 标准模式渲染
@@ -284,8 +284,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({
               size="small"
               icon={<EyeOutlined />}
               onClick={() => {
-                loadStatusHistory()
-                setHistoryModalVisible(true)
+                loadStatusHistory();
+                setHistoryModalVisible(true);
               }}
             >
               查看历史
@@ -295,14 +295,13 @@ const StatusManager: React.FC<StatusManagerProps> = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Tag
-              color={currentStatusInfo.color}
-              style={{ fontSize: '16px', padding: '6px 16px' }}
-            >
+            <Tag color={currentStatusInfo.color} style={{ fontSize: '16px', padding: '6px 16px' }}>
               {currentStatusInfo.text}
             </Tag>
             <div>
-              <Text strong style={{ fontSize: '14px' }}>当前状态</Text>
+              <Text strong style={{ fontSize: '14px' }}>
+                当前状态
+              </Text>
               <br />
               <Text type="secondary" style={{ fontSize: '12px' }}>
                 {currentStatusInfo.description}
@@ -317,21 +316,12 @@ const StatusManager: React.FC<StatusManagerProps> = ({
                 trigger={['click']}
                 placement="bottomRight"
               >
-                <Button
-                  type="primary"
-                  icon={<EditOutlined />}
-                  loading={loading}
-                >
+                <Button type="primary" icon={<EditOutlined />} loading={loading}>
                   更改状态
                 </Button>
               </Dropdown>
             ) : (
-              <Alert
-                message="当前状态无可变更选项"
-                type="info"
-                showIcon
-                style={{ margin: 0 }}
-              />
+              <Alert message="当前状态无可变更选项" type="info" showIcon style={{ margin: 0 }} />
             )}
           </div>
         </div>
@@ -339,7 +329,9 @@ const StatusManager: React.FC<StatusManagerProps> = ({
         {/* 最近的状态变更 */}
         {statusHistory.length > 0 && !showHistory && (
           <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
-            <Text type="secondary" style={{ fontSize: '12px' }}>最近变更</Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              最近变更
+            </Text>
             <div style={{ marginTop: 8 }}>
               <Text strong>{statusHistory[0].operator}</Text>
               <Text type="secondary" style={{ marginLeft: 8, fontSize: '12px' }}>
@@ -362,9 +354,9 @@ const StatusManager: React.FC<StatusManagerProps> = ({
         title="更改SPU状态"
         open={statusModalVisible}
         onCancel={() => {
-          setStatusModalVisible(false)
-          statusForm.resetFields()
-          setTargetStatus(null)
+          setStatusModalVisible(false);
+          statusForm.resetFields();
+          setTargetStatus(null);
         }}
         onOk={confirmStatusChange}
         confirmLoading={loading}
@@ -377,7 +369,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({
           </Tag>
           <Text>更改为</Text>
           {targetStatus && (
-            <Tag color={statusColors[targetStatus as keyof typeof statusColors].color} style={{ margin: '0 8px' }}>
+            <Tag
+              color={statusColors[targetStatus as keyof typeof statusColors].color}
+              style={{ margin: '0 8px' }}
+            >
               {statusColors[targetStatus as keyof typeof statusColors].text}
             </Tag>
           )}
@@ -407,7 +402,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({
         footer={[
           <Button key="close" onClick={() => setHistoryModalVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={700}
       >
@@ -423,7 +418,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default StatusManager
+export default StatusManager;

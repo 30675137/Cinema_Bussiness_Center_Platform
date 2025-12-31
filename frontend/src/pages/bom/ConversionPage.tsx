@@ -31,11 +31,7 @@ const ConversionPage: React.FC = () => {
     (e: KeyboardEvent) => {
       // 忽略输入框内的按键
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
       }
 

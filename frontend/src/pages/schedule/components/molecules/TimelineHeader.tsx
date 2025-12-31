@@ -8,12 +8,11 @@ interface TimelineHeaderProps {
   interval?: number;
 }
 
-const TimelineHeader: React.FC<TimelineHeaderProps> = ({
-  startHour,
-  endHour,
-  interval = 1,
-}) => {
-  const slots = useMemo(() => generateTimeSlots(startHour, endHour, interval), [startHour, endHour, interval]);
+const TimelineHeader: React.FC<TimelineHeaderProps> = ({ startHour, endHour, interval = 1 }) => {
+  const slots = useMemo(
+    () => generateTimeSlots(startHour, endHour, interval),
+    [startHour, endHour, interval]
+  );
   const widthPercent = 100 / slots.length;
 
   return (
@@ -28,11 +27,14 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({
       }}
     >
       {slots.map((slot) => (
-        <TimeSlot key={slot} label={`${Math.floor(slot)}:${slot % 1 === 0.5 ? '30' : '00'}`} widthPercent={widthPercent} />
+        <TimeSlot
+          key={slot}
+          label={`${Math.floor(slot)}:${slot % 1 === 0.5 ? '30' : '00'}`}
+          widthPercent={widthPercent}
+        />
       ))}
     </div>
   );
 };
 
 export default TimelineHeader;
-

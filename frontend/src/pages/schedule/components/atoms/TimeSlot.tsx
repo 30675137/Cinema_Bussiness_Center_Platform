@@ -26,4 +26,3 @@ const TimeSlot: React.FC<TimeSlotProps> = ({ label, widthPercent }) => {
 };
 
 export default TimeSlot;
-

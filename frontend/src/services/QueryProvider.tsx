@@ -1,6 +1,6 @@
-import React from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // 创建QueryClient实例
 const createQueryClient = () => {
@@ -27,33 +27,31 @@ const createQueryClient = () => {
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       },
     },
-  })
-}
+  });
+};
 
-let queryClientSingleton: QueryClient | undefined = undefined
+let queryClientSingleton: QueryClient | undefined = undefined;
 
 const getQueryClient = () => {
   if (!queryClientSingleton) {
-    queryClientSingleton = createQueryClient()
+    queryClientSingleton = createQueryClient();
   }
-  return queryClientSingleton
-}
+  return queryClientSingleton;
+};
 
 interface QueryProviderProps {
-  children: React.ReactNode
-  client?: QueryClient
+  children: React.ReactNode;
+  client?: QueryClient;
 }
 
 export const QueryProvider: React.FC<QueryProviderProps> = ({
   children,
-  client = getQueryClient()
+  client = getQueryClient(),
 }) => {
   return (
     <QueryClientProvider client={client}>
       {children}
-      {process.env.NODE_ENV === 'development' && (
-        <ReactQueryDevtools initialIsOpen={false} />
-      )}
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
-  )
-}
+  );
+};

@@ -32,16 +32,16 @@ export interface CreateStoreMutationResult {
 
 /**
  * Hook for creating a new store
- * 
+ *
  * Features:
  * - Automatically invalidates store list cache on success
  * - Provides loading and error states
  * - Returns created store data on success
- * 
+ *
  * @example
  * ```tsx
  * const { mutate, isPending, isError } = useCreateStore();
- * 
+ *
  * const handleSubmit = (data: CreateStoreDTO) => {
  *   mutate(data, {
  *     onSuccess: (store) => {

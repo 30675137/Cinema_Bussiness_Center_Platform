@@ -3,34 +3,34 @@
  * 测试分类管理和品牌管理的核心功能
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import CategoryManagementPage from '../../pages/mdm-pim/category/CategoryManagement'
-import BrandManagementPage from '../../pages/BrandManagement'
-import { categoryService } from '../../services/categoryService'
-import { brandService } from '../../services/brandService'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import CategoryManagementPage from '../../pages/mdm-pim/category/CategoryManagement';
+import BrandManagementPage from '../../pages/BrandManagement';
+import { categoryService } from '../../services/categoryService';
+import { brandService } from '../../services/brandService';
 
 // Mock services
-vi.mock('../../services/categoryService')
-vi.mock('../../services/brandService')
+vi.mock('../../services/categoryService');
+vi.mock('../../services/brandService');
 
 describe('分类和品牌管理功能测试', () => {
-  let queryClient: QueryClient
+  let queryClient: QueryClient;
 
   beforeEach(() => {
     queryClient = new QueryClient({
       defaultOptions: {
         queries: {
           retry: false,
-          gcTime: 0
+          gcTime: 0,
         },
         mutations: {
-          retry: false
-        }
-      }
-    })
+          retry: false,
+        },
+      },
+    });
 
     // Mock 分类数据
     const mockCategories = [
@@ -44,9 +44,9 @@ describe('分类和品牌管理功能测试', () => {
         sortOrder: 1,
         parentId: null,
         createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      }
-    ]
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ];
 
     // Mock 品牌数据
     const mockBrands = [
@@ -63,43 +63,42 @@ describe('分类和品牌管理功能测试', () => {
         contactEmail: 'coke@example.com',
         sortOrder: 1,
         createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      }
-    ]
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ];
 
     // Mock service responses
-    ;(categoryService.getCategoryList as any).mockResolvedValue({
+    (categoryService.getCategoryList as any).mockResolvedValue({
       success: true,
       data: {
         list: mockCategories,
         total: mockCategories.length,
         page: 1,
         pageSize: 1000,
-        totalPages: 1
+        totalPages: 1,
       },
       message: '获取成功',
       code: 200,
-      timestamp: Date.now()
-    })
-
-    ;(brandService.getBrandList as any).mockResolvedValue({
+      timestamp: Date.now(),
+    });
+    (brandService.getBrandList as any).mockResolvedValue({
       success: true,
       data: {
         list: mockBrands,
         total: mockBrands.length,
         page: 1,
         pageSize: 1000,
-        totalPages: 1
+        totalPages: 1,
       },
       message: '获取成功',
       code: 200,
-      timestamp: Date.now()
-    })
-  })
+      timestamp: Date.now(),
+    });
+  });
 
   afterEach(() => {
-    vi.clearAllMocks()
-  })
+    vi.clearAllMocks();
+  });
 
   const renderCategoryManagementPage = () => {
     return render(
@@ -108,8 +107,8 @@ describe('分类和品牌管理功能测试', () => {
           <CategoryManagementPage />
         </BrowserRouter>
       </QueryClientProvider>
-    )
-  }
+    );
+  };
 
   const renderBrandManagementPage = () => {
     return render(
@@ -118,60 +117,60 @@ describe('分类和品牌管理功能测试', () => {
           <BrandManagementPage />
         </BrowserRouter>
       </QueryClientProvider>
-    )
-  }
+    );
+  };
 
   describe('分类管理功能测试', () => {
     it('应该正确显示分类管理页面标题', async () => {
-      renderCategoryManagementPage()
+      renderCategoryManagementPage();
 
       await waitFor(() => {
-        expect(screen.getByText('分类管理')).toBeInTheDocument()
-      })
-    })
+        expect(screen.getByText('分类管理')).toBeInTheDocument();
+      });
+    });
 
     it('应该正确加载和显示分类统计数据', async () => {
-      renderCategoryManagementPage()
+      renderCategoryManagementPage();
 
       await waitFor(() => {
-        expect(screen.getByText('总分类数')).toBeInTheDocument()
-      })
-    })
-  })
+        expect(screen.getByText('总分类数')).toBeInTheDocument();
+      });
+    });
+  });
 
   describe('品牌管理功能测试', () => {
     it('应该正确显示品牌管理页面标题', async () => {
-      renderBrandManagementPage()
+      renderBrandManagementPage();
 
       await waitFor(() => {
-        expect(screen.getByText('品牌管理')).toBeInTheDocument()
-      })
-    })
+        expect(screen.getByText('品牌管理')).toBeInTheDocument();
+      });
+    });
 
     it('应该正确加载和显示品牌统计数据', async () => {
-      renderBrandManagementPage()
+      renderBrandManagementPage();
 
       await waitFor(() => {
-        expect(screen.getByText('总品牌数')).toBeInTheDocument()
-      })
-    })
-  })
+        expect(screen.getByText('总品牌数')).toBeInTheDocument();
+      });
+    });
+  });
 
   describe('API服务集成测试', () => {
     it('应该正确调用分类服务API', async () => {
-      renderCategoryManagementPage()
+      renderCategoryManagementPage();
 
       await waitFor(() => {
-        expect(categoryService.getCategoryList).toHaveBeenCalled()
-      })
-    })
+        expect(categoryService.getCategoryList).toHaveBeenCalled();
+      });
+    });
 
     it('应该正确调用品牌服务API', async () => {
-      renderBrandManagementPage()
+      renderBrandManagementPage();
 
       await waitFor(() => {
-        expect(brandService.getBrandList).toHaveBeenCalled()
-      })
-    })
-  })
-})
+        expect(brandService.getBrandList).toHaveBeenCalled();
+      });
+    });
+  });
+});

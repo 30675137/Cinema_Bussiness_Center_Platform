@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 调整状态标签组件
- * 
+ *
  * 显示库存调整记录的状态标签。
  * 实现 T054 任务。
- * 
+ *
  * @since US4 - 大额库存调整审批
  */
 
@@ -30,11 +30,14 @@ export interface AdjustmentStatusTagProps {
 /**
  * 状态配置
  */
-const STATUS_CONFIG: Record<AdjustmentStatus, {
-  text: string;
-  color: string;
-  icon: React.ReactNode;
-}> = {
+const STATUS_CONFIG: Record<
+  AdjustmentStatus,
+  {
+    text: string;
+    color: string;
+    icon: React.ReactNode;
+  }
+> = {
   draft: {
     text: '草稿',
     color: 'default',
@@ -64,7 +67,7 @@ const STATUS_CONFIG: Record<AdjustmentStatus, {
 
 /**
  * 调整状态标签组件
- * 
+ *
  * @example
  * ```tsx
  * <AdjustmentStatusTag status="pending_approval" showIcon />

@@ -79,7 +79,8 @@ const checkWebPSupport = (): Promise<boolean> => {
       webpSupportCache = false;
       resolve(false);
     };
-    webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+    webP.src =
+      'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
   });
 };
 
@@ -187,11 +188,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // 性能监控
-  const {
-    startMeasure,
-    endMeasure,
-    recordCustomMetric
-  } = usePerformance({
+  const { startMeasure, endMeasure, recordCustomMetric } = usePerformance({
     enabled: performanceMonitoring,
     componentName: 'OptimizedImage',
     renderThreshold: 16,
@@ -264,38 +261,44 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   }, [lazy, startMeasure]);
 
   // 处理图片加载成功
-  const handleLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    setLoadingState('loaded');
-    endMeasure('image-load');
+  const handleLoad = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      setLoadingState('loaded');
+      endMeasure('image-load');
 
-    if (performanceMonitoring) {
-      const img = event.currentTarget;
-      recordCustomMetric('imageWidth', img.naturalWidth);
-      recordCustomMetric('imageHeight', img.naturalHeight);
-      recordCustomMetric('loadTime', performance.now());
-    }
+      if (performanceMonitoring) {
+        const img = event.currentTarget;
+        recordCustomMetric('imageWidth', img.naturalWidth);
+        recordCustomMetric('imageHeight', img.naturalHeight);
+        recordCustomMetric('loadTime', performance.now());
+      }
 
-    if (onLoad) {
-      onLoad(event.nativeEvent);
-    }
-  }, [endMeasure, recordCustomMetric, performanceMonitoring, onLoad]);
+      if (onLoad) {
+        onLoad(event.nativeEvent);
+      }
+    },
+    [endMeasure, recordCustomMetric, performanceMonitoring, onLoad]
+  );
 
   // 处理图片加载失败
-  const handleError = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    setLoadingState('error');
-    console.warn('Image failed to load:', currentSrc);
+  const handleError = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      setLoadingState('error');
+      console.warn('Image failed to load:', currentSrc);
 
-    // 尝试降级到原始格式
-    if (currentSrc !== src) {
-      setCurrentSrc(src);
-      setLoadingState('loading');
-      return;
-    }
+      // 尝试降级到原始格式
+      if (currentSrc !== src) {
+        setCurrentSrc(src);
+        setLoadingState('loading');
+        return;
+      }
 
-    if (onError) {
-      onError(event.nativeEvent);
-    }
-  }, [currentSrc, src, onError]);
+      if (onError) {
+        onError(event.nativeEvent);
+      }
+    },
+    [currentSrc, src, onError]
+  );
 
   // 生成响应式图片源
   const generateSrcSet = useCallback(() => {
@@ -402,7 +405,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           {
             'opacity-0': loadingState === 'idle' || loadingState === 'loading',
             'opacity-100': loadingState === 'loaded',
-            'hidden': loadingState === 'error',
+            hidden: loadingState === 'error',
           }
         )}
         style={{
@@ -445,7 +448,7 @@ export const ImagePresets = {
       quality={90}
       cdn={{
         enabled: true,
-        params: { auto: 'compress,format' }
+        params: { auto: 'compress,format' },
       }}
     />
   ),
@@ -468,7 +471,11 @@ export const ImagePresets = {
       lazy={false}
       formatPriority={['webp', 'png']}
       quality={85}
-      placeholder={<div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">👤</div>}
+      placeholder={
+        <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+          👤
+        </div>
+      }
     />
   ),
 
@@ -483,7 +490,7 @@ export const ImagePresets = {
         sm: '768w',
         md: '992w',
         lg: '1200w',
-        xl: '1600w'
+        xl: '1600w',
       }}
     />
   ),

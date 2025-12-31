@@ -18,20 +18,20 @@ const ReviewList: React.FC = () => {
           title: '待审核',
           value: 23,
           prefix: null,
-          trend: { value: -8.5, isPositive: false }
+          trend: { value: -8.5, isPositive: false },
         },
         {
           title: '今日审核',
           value: 45,
           prefix: null,
-          trend: { value: 18.2, isPositive: true }
+          trend: { value: 18.2, isPositive: true },
         },
         {
           title: '审核通过率',
           value: 92.3,
           prefix: null,
-          trend: { value: 1.2, isPositive: true }
-        }
+          trend: { value: 1.2, isPositive: true },
+        },
       ]}
     >
       <div style={{ textAlign: 'center', padding: '48px' }}>

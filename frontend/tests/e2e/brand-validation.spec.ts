@@ -14,7 +14,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证错误提示
     await expect(page.locator('[data-testid="brand-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称不能为空');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称不能为空'
+    );
 
     // 品牌名称输入框应该高亮显示错误状态
     await expect(page.locator('[data-testid="brand-name-input"]')).toHaveClass(/.*error.*/);
@@ -28,7 +30,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证长度错误提示
     await expect(page.locator('[data-testid="brand-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称不能超过100字符');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称不能超过100字符'
+    );
   });
 
   test('应该验证品牌名称不能包含特殊字符', async ({ page }) => {
@@ -38,7 +42,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证特殊字符错误提示
     await expect(page.locator('[data-testid="brand-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称包含非法字符');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称包含非法字符'
+    );
   });
 
   test('应该验证品牌类型必填', async ({ page }) => {
@@ -58,7 +64,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证长度错误提示
     await expect(page.locator('[data-testid="english-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="english-name-error"]')).toContainText('英文名不能超过200字符');
+    await expect(page.locator('[data-testid="english-name-error"]')).toContainText(
+      '英文名不能超过200字符'
+    );
   });
 
   test('应该验证主营类目必选', async ({ page }) => {
@@ -70,7 +78,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证错误提示
     await expect(page.locator('[data-testid="primary-categories-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="primary-categories-error"]')).toContainText('请选择至少一个主营类目');
+    await expect(page.locator('[data-testid="primary-categories-error"]')).toContainText(
+      '请选择至少一个主营类目'
+    );
   });
 
   test('应该验证公司名称长度限制', async ({ page }) => {
@@ -81,7 +91,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证长度错误提示
     await expect(page.locator('[data-testid="company-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="company-error"]')).toContainText('公司名称不能超过200字符');
+    await expect(page.locator('[data-testid="company-error"]')).toContainText(
+      '公司名称不能超过200字符'
+    );
   });
 
   test('应该验证品牌等级长度限制', async ({ page }) => {
@@ -94,7 +106,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证长度错误提示
     await expect(page.locator('[data-testid="brand-level-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-level-error"]')).toContainText('品牌等级不能超过50字符');
+    await expect(page.locator('[data-testid="brand-level-error"]')).toContainText(
+      '品牌等级不能超过50字符'
+    );
   });
 
   test('应该验证品牌标签数量限制', async ({ page }) => {
@@ -110,7 +124,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证标签数量错误提示
     await expect(page.locator('[data-testid="brand-tags-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-tags-error"]')).toContainText('标签不能超过10个');
+    await expect(page.locator('[data-testid="brand-tags-error"]')).toContainText(
+      '标签不能超过10个'
+    );
   });
 
   test('应该验证品牌描述长度限制', async ({ page }) => {
@@ -121,7 +137,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证长度错误提示
     await expect(page.locator('[data-testid="brand-description-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-description-error"]')).toContainText('品牌介绍不能超过1000字符');
+    await expect(page.locator('[data-testid="brand-description-error"]')).toContainText(
+      '品牌介绍不能超过1000字符'
+    );
   });
 
   test('应该实时验证品牌名称', async ({ page }) => {
@@ -133,7 +151,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证实时错误提示
     await expect(page.locator('[data-testid="brand-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称不能为空');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称不能为空'
+    );
 
     // 输入有效内容后错误消失
     await page.fill('[data-testid="brand-name-input"]', '有效品牌名称');
@@ -155,9 +175,9 @@ test.describe('品牌表单验证', () => {
             success: false,
             error: {
               code: 'DUPLICATE_BRAND',
-              message: '品牌名称在同类型中已存在'
-            }
-          })
+              message: '品牌名称在同类型中已存在',
+            },
+          }),
         });
       } else {
         route.fulfill({
@@ -165,8 +185,8 @@ test.describe('品牌表单验证', () => {
           contentType: 'application/json',
           body: JSON.stringify({
             success: true,
-            data: { available: true }
-          })
+            data: { available: true },
+          }),
         });
       }
     });
@@ -181,7 +201,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证重复错误提示
     await expect(page.locator('[data-testid="brand-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText('品牌名称在同类型中已存在');
+    await expect(page.locator('[data-testid="brand-name-error"]')).toContainText(
+      '品牌名称在同类型中已存在'
+    );
 
     // 修改为不重复的名称
     await page.fill('[data-testid="brand-name-input"]', '唯一品牌名称');
@@ -198,7 +220,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证格式错误提示
     await expect(page.locator('[data-testid="english-name-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="english-name-error"]')).toContainText('英文名只能包含英文字母、数字和常用符号');
+    await expect(page.locator('[data-testid="english-name-error"]')).toContainText(
+      '英文名只能包含英文字母、数字和常用符号'
+    );
   });
 
   test('应该验证表单完整性', async ({ page }) => {
@@ -271,7 +295,9 @@ test.describe('品牌表单验证', () => {
 
     // 验证网络错误提示
     await expect(page.locator('[data-testid="network-error"]')).toBeVisible();
-    await expect(page.locator('[data-testid="network-error"]')).toContainText('网络连接异常，请稍后重试');
+    await expect(page.locator('[data-testid="network-error"]')).toContainText(
+      '网络连接异常，请稍后重试'
+    );
 
     // 验证可以重新尝试
     await page.fill('[data-testid="brand-name-input"]', '重新测试品牌');

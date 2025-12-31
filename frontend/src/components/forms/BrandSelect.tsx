@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { Select, Spin, Input, Button } from 'antd'
-import type { SelectProps } from 'antd/es/select'
-import type { Brand } from '@/types/spu'
+import React, { useState, useEffect, useMemo } from 'react';
+import { Select, Spin, Input, Button } from 'antd';
+import type { SelectProps } from 'antd/es/select';
+import type { Brand } from '@/types/spu';
 
-const { Option } = Select
-const { Search } = Input
+const { Option } = Select;
+const { Search } = Input;
 
 interface BrandSelectProps extends Omit<SelectProps, 'options' | 'children'> {
-  brands?: Brand[]
-  loading?: boolean
-  onSearch?: (value: string) => void
-  placeholder?: string
-  allowClear?: boolean
-  showSearch?: boolean
-  filterOption?: boolean | ((input: string, option: any) => boolean)
+  brands?: Brand[];
+  loading?: boolean;
+  onSearch?: (value: string) => void;
+  placeholder?: string;
+  allowClear?: boolean;
+  showSearch?: boolean;
+  filterOption?: boolean | ((input: string, option: any) => boolean);
 }
 
 export const BrandSelect: React.FC<BrandSelectProps> = ({
@@ -28,36 +28,37 @@ export const BrandSelect: React.FC<BrandSelectProps> = ({
   onChange,
   ...restProps
 }) => {
-  const [searchValue, setSearchValue] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [searchValue, setSearchValue] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // 过滤品牌列表
   const filteredBrands = useMemo(() => {
     if (!searchValue || !filterOption) {
-      return brands
+      return brands;
     }
 
-    const lowerSearchValue = searchValue.toLowerCase()
-    return brands.filter(brand =>
-      brand.name.toLowerCase().includes(lowerSearchValue) ||
-      brand.code?.toLowerCase().includes(lowerSearchValue) ||
-      (brand.description && brand.description.toLowerCase().includes(lowerSearchValue))
-    )
-  }, [brands, searchValue, filterOption])
+    const lowerSearchValue = searchValue.toLowerCase();
+    return brands.filter(
+      (brand) =>
+        brand.name.toLowerCase().includes(lowerSearchValue) ||
+        brand.code?.toLowerCase().includes(lowerSearchValue) ||
+        (brand.description && brand.description.toLowerCase().includes(lowerSearchValue))
+    );
+  }, [brands, searchValue, filterOption]);
 
   // 处理搜索
   const handleSearch = (value: string) => {
-    setSearchValue(value)
+    setSearchValue(value);
 
     if (onSearch) {
-      setLoading(true)
-      onSearch(value)
+      setLoading(true);
+      onSearch(value);
       // 模拟搜索延迟
       setTimeout(() => {
-        setLoading(false)
-      }, 300)
+        setLoading(false);
+      }, 300);
     }
-  }
+  };
 
   // 渲染品牌选项
   const renderBrandOption = (brand: Brand) => {
@@ -72,15 +73,13 @@ export const BrandSelect: React.FC<BrandSelectProps> = ({
                 style={{ width: 20, height: 20, marginRight: 8, borderRadius: 2 }}
                 onError={(e) => {
                   // 图片加载失败时隐藏
-                  e.currentTarget.style.display = 'none'
+                  e.currentTarget.style.display = 'none';
                 }}
               />
             )}
             <span style={{ fontWeight: 500 }}>{brand.name}</span>
             {brand.code && (
-              <span style={{ marginLeft: 8, color: '#999', fontSize: '12px' }}>
-                ({brand.code})
-              </span>
+              <span style={{ marginLeft: 8, color: '#999', fontSize: '12px' }}>({brand.code})</span>
             )}
           </div>
           {brand.status && (
@@ -103,29 +102,29 @@ export const BrandSelect: React.FC<BrandSelectProps> = ({
           </div>
         )}
       </Option>
-    )
-  }
+    );
+  };
 
   // 自定义过滤函数
   const customFilterOption = (input: string, option: any) => {
     if (typeof filterOption === 'function') {
-      return filterOption(input, option)
+      return filterOption(input, option);
     }
 
     if (filterOption === false) {
-      return true
+      return true;
     }
 
-    const brand = brands.find(b => b.id === option.value)
-    if (!brand) return false
+    const brand = brands.find((b) => b.id === option.value);
+    if (!brand) return false;
 
-    const lowerInput = input.toLowerCase()
+    const lowerInput = input.toLowerCase();
     return (
       brand.name.toLowerCase().includes(lowerInput) ||
       (brand.code && brand.code.toLowerCase().includes(lowerInput)) ||
       (brand.description && brand.description.toLowerCase().includes(lowerInput))
-    )
-  }
+    );
+  };
 
   return (
     <Select
@@ -137,25 +136,25 @@ export const BrandSelect: React.FC<BrandSelectProps> = ({
       filterOption={customFilterOption}
       onSearch={handleSearch}
       loading={externalLoading || loading}
-      notFoundContent={(externalLoading || loading) ? <Spin size="small" /> : '暂无品牌数据'}
+      notFoundContent={externalLoading || loading ? <Spin size="small" /> : '暂无品牌数据'}
       {...restProps}
     >
       {filteredBrands.map(renderBrandOption)}
     </Select>
-  )
-}
+  );
+};
 
 // 品牌选择组件（带搜索框）
 export const BrandSelectWithSearch: React.FC<BrandSelectProps> = (props) => {
-  const [searchVisible, setSearchVisible] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const handleSearch = (value: string) => {
-    setSearchValue(value)
+    setSearchValue(value);
     if (props.onSearch) {
-      props.onSearch(value)
+      props.onSearch(value);
     }
-  }
+  };
 
   return (
     <div>
@@ -187,8 +186,8 @@ export const BrandSelectWithSearch: React.FC<BrandSelectProps> = (props) => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // 多选品牌组件
 export const BrandMultiSelect: React.FC<BrandSelectProps> = (props) => {
@@ -200,20 +199,20 @@ export const BrandMultiSelect: React.FC<BrandSelectProps> = (props) => {
       maxTagCount="responsive"
       optionFilterProp="children"
     />
-  )
-}
+  );
+};
 
 // 品牌选择组件（只显示已选品牌）
 export const BrandDisplay: React.FC<{
-  brandId?: string
-  brands?: Brand[]
-  showCode?: boolean
-  showStatus?: boolean
+  brandId?: string;
+  brands?: Brand[];
+  showCode?: boolean;
+  showStatus?: boolean;
 }> = ({ brandId, brands = [], showCode = true, showStatus = true }) => {
-  const brand = brands.find(b => b.id === brandId)
+  const brand = brands.find((b) => b.id === brandId);
 
   if (!brand) {
-    return <span style={{ color: '#999' }}>未选择品牌</span>
+    return <span style={{ color: '#999' }}>未选择品牌</span>;
   }
 
   return (
@@ -224,15 +223,13 @@ export const BrandDisplay: React.FC<{
           alt={brand.name}
           style={{ width: 16, height: 16, marginRight: 6, borderRadius: 2 }}
           onError={(e) => {
-            e.currentTarget.style.display = 'none'
+            e.currentTarget.style.display = 'none';
           }}
         />
       )}
       <span style={{ fontWeight: 500 }}>{brand.name}</span>
       {showCode && brand.code && (
-        <span style={{ marginLeft: 6, color: '#999', fontSize: '12px' }}>
-          ({brand.code})
-        </span>
+        <span style={{ marginLeft: 6, color: '#999', fontSize: '12px' }}>({brand.code})</span>
       )}
       {showStatus && brand.status && (
         <span
@@ -249,7 +246,7 @@ export const BrandDisplay: React.FC<{
         </span>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BrandSelect
+export default BrandSelect;

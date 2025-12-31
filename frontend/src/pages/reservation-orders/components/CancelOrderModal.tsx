@@ -4,25 +4,25 @@
  * 填写取消原因
  */
 
-import React, { useState, useCallback, memo } from 'react'
-import { Modal, Radio, Input, Space, Typography, Form } from 'antd'
-import type { RadioChangeEvent } from 'antd'
-import { useCancelReservation } from '../hooks/useOrderOperations'
-import type { CancelOrderModalProps } from '../types/reservation-order.types'
-import { CANCEL_REASON_TYPE_CONFIG, type CancelReasonType } from '../types/reservation-order.types'
+import React, { useState, useCallback, memo } from 'react';
+import { Modal, Radio, Input, Space, Typography, Form } from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import { useCancelReservation } from '../hooks/useOrderOperations';
+import type { CancelOrderModalProps } from '../types/reservation-order.types';
+import { CANCEL_REASON_TYPE_CONFIG, type CancelReasonType } from '../types/reservation-order.types';
 
-const { TextArea } = Input
-const { Text } = Typography
+const { TextArea } = Input;
+const { Text } = Typography;
 
 /**
  * 取消原因类型选项
  */
-const CANCEL_REASON_OPTIONS = (
-  Object.keys(CANCEL_REASON_TYPE_CONFIG) as CancelReasonType[]
-).map((key) => ({
-  value: key,
-  label: CANCEL_REASON_TYPE_CONFIG[key].label,
-}))
+const CANCEL_REASON_OPTIONS = (Object.keys(CANCEL_REASON_TYPE_CONFIG) as CancelReasonType[]).map(
+  (key) => ({
+    value: key,
+    label: CANCEL_REASON_TYPE_CONFIG[key].label,
+  })
+);
 
 /**
  * 取消预约对话框组件
@@ -34,45 +34,45 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
   onSuccess,
 }) => {
   // 取消原因类型
-  const [cancelReasonType, setCancelReasonType] = useState<CancelReasonType>('CUSTOMER_REQUEST')
+  const [cancelReasonType, setCancelReasonType] = useState<CancelReasonType>('CUSTOMER_REQUEST');
   // 取消原因详情
-  const [cancelReason, setCancelReason] = useState<string>('')
+  const [cancelReason, setCancelReason] = useState<string>('');
   // 表单验证错误
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string>('');
 
   // 取消预约 mutation
-  const cancelMutation = useCancelReservation()
+  const cancelMutation = useCancelReservation();
 
   /**
    * 处理原因类型变更
    */
   const handleReasonTypeChange = useCallback((e: RadioChangeEvent) => {
-    setCancelReasonType(e.target.value)
+    setCancelReasonType(e.target.value);
     // 如果选择预设原因，自动填充
     if (e.target.value !== 'OTHER') {
-      const label = CANCEL_REASON_TYPE_CONFIG[e.target.value as CancelReasonType]?.label
-      setCancelReason(label || '')
+      const label = CANCEL_REASON_TYPE_CONFIG[e.target.value as CancelReasonType]?.label;
+      setCancelReason(label || '');
     } else {
-      setCancelReason('')
+      setCancelReason('');
     }
-  }, [])
+  }, []);
 
   /**
    * 处理取消
    */
   const handleConfirm = useCallback(async () => {
     // 验证
-    const reason = cancelReason.trim()
+    const reason = cancelReason.trim();
     if (!reason) {
-      setError('请填写取消原因')
-      return
+      setError('请填写取消原因');
+      return;
     }
     if (reason.length > 200) {
-      setError('取消原因不能超过200个字符')
-      return
+      setError('取消原因不能超过200个字符');
+      return;
     }
 
-    setError('')
+    setError('');
 
     try {
       await cancelMutation.mutateAsync({
@@ -81,28 +81,28 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
           cancelReasonType,
           cancelReason: reason,
         },
-      })
+      });
       // 重置状态
-      setCancelReasonType('CUSTOMER_REQUEST')
-      setCancelReason('')
+      setCancelReasonType('CUSTOMER_REQUEST');
+      setCancelReason('');
       // 触发成功回调
-      onSuccess()
-      onClose()
+      onSuccess();
+      onClose();
     } catch {
       // 错误已在 mutation 中处理
     }
-  }, [orderId, cancelReasonType, cancelReason, cancelMutation, onSuccess, onClose])
+  }, [orderId, cancelReasonType, cancelReason, cancelMutation, onSuccess, onClose]);
 
   /**
    * 处理关闭
    */
   const handleCancel = useCallback(() => {
     // 重置状态
-    setCancelReasonType('CUSTOMER_REQUEST')
-    setCancelReason('')
-    setError('')
-    onClose()
-  }, [onClose])
+    setCancelReasonType('CUSTOMER_REQUEST');
+    setCancelReason('');
+    setError('');
+    onClose();
+  }, [onClose]);
 
   return (
     <Modal
@@ -149,8 +149,8 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
           <TextArea
             value={cancelReason}
             onChange={(e) => {
-              setCancelReason(e.target.value)
-              if (error) setError('')
+              setCancelReason(e.target.value);
+              if (error) setError('');
             }}
             placeholder="请详细描述取消原因..."
             maxLength={200}
@@ -165,7 +165,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
         </Text>
       </Space>
     </Modal>
-  )
-}
+  );
+};
 
-export default memo(CancelOrderModal)
+export default memo(CancelOrderModal);

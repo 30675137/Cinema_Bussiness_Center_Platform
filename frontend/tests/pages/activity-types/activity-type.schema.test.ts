@@ -141,4 +141,3 @@ describe('ActivityType Schema Validation', () => {
     });
   });
 });
-

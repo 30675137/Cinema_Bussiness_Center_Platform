@@ -4,10 +4,7 @@
 
 import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { attributeService } from '../services/attributeService';
-import {
-  attributeTemplateKeys,
-  type AttributeTemplateListParams,
-} from '../types/attribute.types';
+import { attributeTemplateKeys, type AttributeTemplateListParams } from '../types/attribute.types';
 import type { AttributeTemplate, Attribute } from '@/features/attribute-dictionary/types';
 
 const DEFAULT_QUERY_OPTIONS = {
@@ -32,10 +29,7 @@ interface AttributeTemplateListResponse {
  */
 export function useAttributeTemplatesQuery(
   params?: AttributeTemplateListParams,
-  options?: Omit<
-    UseQueryOptions<AttributeTemplateListResponse, Error>,
-    'queryKey' | 'queryFn'
-  >
+  options?: Omit<UseQueryOptions<AttributeTemplateListResponse, Error>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery<AttributeTemplateListResponse, Error>({
     queryKey: attributeTemplateKeys.list(params),
@@ -85,11 +79,11 @@ export function useAttributeTemplateQuery(
 export function useAttributeTemplateByCategoryQuery(
   categoryId: string | undefined,
   options?: Omit<
-    UseQueryOptions<AttributeTemplate & { attributes: Attribute[] } | null, Error>,
+    UseQueryOptions<(AttributeTemplate & { attributes: Attribute[] }) | null, Error>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<AttributeTemplate & { attributes: Attribute[] } | null, Error>({
+  return useQuery<(AttributeTemplate & { attributes: Attribute[] }) | null, Error>({
     queryKey: attributeTemplateKeys.byCategory(categoryId || ''),
     queryFn: async () => {
       if (!categoryId) {
@@ -106,5 +100,3 @@ export function useAttributeTemplateByCategoryQuery(
     ...options,
   });
 }
-
-

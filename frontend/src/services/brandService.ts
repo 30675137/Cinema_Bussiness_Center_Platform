@@ -1,49 +1,49 @@
-import type { Brand } from '@/types/spu'
+import type { Brand } from '@/types/spu';
 
 // API 响应类型定义
 export interface ApiResponse<T = any> {
-  success: boolean
-  data: T
-  message: string
-  code: number
-  timestamp: number
+  success: boolean;
+  data: T;
+  message: string;
+  code: number;
+  timestamp: number;
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<{
-  list: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
+  list: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }> {}
 
 // 品牌创建请求参数
 export interface CreateBrandRequest {
-  name: string
-  code: string
-  status: 'active' | 'inactive'
-  logo?: string
-  description?: string
-  website?: string
-  contactPerson?: string
-  contactPhone?: string
-  contactEmail?: string
-  sortOrder?: number
+  name: string;
+  code: string;
+  status: 'active' | 'inactive';
+  logo?: string;
+  description?: string;
+  website?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  sortOrder?: number;
 }
 
 // 品牌更新请求参数
 export interface UpdateBrandRequest extends Partial<CreateBrandRequest> {
-  id: string
+  id: string;
 }
 
 // 品牌查询参数
 export interface BrandQueryParams {
-  page?: number
-  pageSize?: number
-  keyword?: string
-  status?: 'active' | 'inactive'
-  sortBy?: 'name' | 'code' | 'sortOrder' | 'createdAt'
-  sortOrder?: 'asc' | 'desc'
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  status?: 'active' | 'inactive';
+  sortBy?: 'name' | 'code' | 'sortOrder' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
@@ -51,7 +51,7 @@ export interface BrandQueryParams {
  * 提供品牌相关的API服务，使用Mock数据实现
  */
 class BrandService {
-  private baseUrl = '/api/brands'
+  private baseUrl = '/api/brands';
 
   /**
    * 获取品牌列表
@@ -61,53 +61,54 @@ class BrandService {
   async getBrandList(params: BrandQueryParams = {}): Promise<PaginatedResponse<Brand>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       // 生成Mock数据
-      const allBrands = this.generateMockBrands()
+      const allBrands = this.generateMockBrands();
 
       // 应用筛选条件
-      let filteredData = allBrands.filter(brand => {
+      let filteredData = allBrands.filter((brand) => {
         // 关键词搜索
         if (params.keyword) {
-          const keyword = params.keyword.toLowerCase()
-          const searchableText = `${brand.name} ${brand.code} ${brand.description || ''} ${brand.contactPerson || ''}`.toLowerCase()
+          const keyword = params.keyword.toLowerCase();
+          const searchableText =
+            `${brand.name} ${brand.code} ${brand.description || ''} ${brand.contactPerson || ''}`.toLowerCase();
           if (!searchableText.includes(keyword)) {
-            return false
+            return false;
           }
         }
 
         // 状态筛选
         if (params.status && brand.status !== params.status) {
-          return false
+          return false;
         }
 
-        return true
-      })
+        return true;
+      });
 
       // 排序
       if (params.sortBy) {
         filteredData.sort((a, b) => {
-          let aValue: any = a[params.sortBy as keyof Brand]
-          let bValue: any = b[params.sortBy as keyof Brand]
+          let aValue: any = a[params.sortBy as keyof Brand];
+          let bValue: any = b[params.sortBy as keyof Brand];
 
           if (params.sortBy === 'createdAt' || params.sortBy === 'updatedAt') {
-            aValue = new Date(aValue || '1970-01-01').getTime()
-            bValue = new Date(bValue || '1970-01-01').getTime()
+            aValue = new Date(aValue || '1970-01-01').getTime();
+            bValue = new Date(bValue || '1970-01-01').getTime();
           }
 
-          if (aValue === bValue) return 0
-          const comparison = aValue > bValue ? 1 : -1
-          return params.sortOrder === 'asc' ? comparison : -comparison
-        })
+          if (aValue === bValue) return 0;
+          const comparison = aValue > bValue ? 1 : -1;
+          return params.sortOrder === 'asc' ? comparison : -comparison;
+        });
       }
 
       // 分页处理
-      const page = params.page || 1
-      const pageSize = params.pageSize || 20
-      const startIndex = (page - 1) * pageSize
-      const endIndex = startIndex + pageSize
-      const paginatedData = filteredData.slice(startIndex, endIndex)
+      const page = params.page || 1;
+      const pageSize = params.pageSize || 20;
+      const startIndex = (page - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const paginatedData = filteredData.slice(startIndex, endIndex);
 
       return {
         success: true,
@@ -121,7 +122,7 @@ class BrandService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -135,7 +136,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -147,13 +148,13 @@ class BrandService {
   async getBrandDetail(id: string): Promise<ApiResponse<Brand>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const allBrands = this.generateMockBrands()
-      const brand = allBrands.find(b => b.id === id)
+      const allBrands = this.generateMockBrands();
+      const brand = allBrands.find((b) => b.id === id);
 
       if (!brand) {
-        throw new Error('品牌不存在')
+        throw new Error('品牌不存在');
       }
 
       return {
@@ -162,7 +163,7 @@ class BrandService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -170,7 +171,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -182,38 +183,38 @@ class BrandService {
   async createBrand(data: CreateBrandRequest): Promise<ApiResponse<Brand>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // 验证必填字段
       if (!data.name || data.name.trim() === '') {
-        throw new Error('品牌名称不能为空')
+        throw new Error('品牌名称不能为空');
       }
 
       if (!data.code || data.code.trim() === '') {
-        throw new Error('品牌编码不能为空')
+        throw new Error('品牌编码不能为空');
       }
 
       // 检查编码唯一性
-      const allBrands = this.generateMockBrands()
-      const existingBrand = allBrands.find(brand => brand.code === data.code.trim())
+      const allBrands = this.generateMockBrands();
+      const existingBrand = allBrands.find((brand) => brand.code === data.code.trim());
       if (existingBrand) {
-        throw new Error('品牌编码已存在')
+        throw new Error('品牌编码已存在');
       }
 
       // 验证邮箱格式
       if (data.contactEmail) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(data.contactEmail)) {
-          throw new Error('联系邮箱格式不正确')
+          throw new Error('联系邮箱格式不正确');
         }
       }
 
       // 验证网址格式
       if (data.website) {
         try {
-          new URL(data.website)
+          new URL(data.website);
         } catch {
-          throw new Error('网站地址格式不正确')
+          throw new Error('网站地址格式不正确');
         }
       }
 
@@ -231,8 +232,8 @@ class BrandService {
         contactEmail: data.contactEmail?.trim(),
         sortOrder: data.sortOrder || 0,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      };
 
       return {
         success: true,
@@ -240,7 +241,7 @@ class BrandService {
         message: '品牌创建成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -248,7 +249,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '创建失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -260,19 +261,19 @@ class BrandService {
   async updateBrand(data: UpdateBrandRequest): Promise<ApiResponse<Brand>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
       if (!data.id) {
-        throw new Error('品牌ID不能为空')
+        throw new Error('品牌ID不能为空');
       }
 
       // 验证必填字段
       if (data.name && data.name.trim() === '') {
-        throw new Error('品牌名称不能为空')
+        throw new Error('品牌名称不能为空');
       }
 
       if (data.code && data.code.trim() === '') {
-        throw new Error('品牌编码不能为空')
+        throw new Error('品牌编码不能为空');
       }
 
       // Mock更新逻辑
@@ -288,8 +289,8 @@ class BrandService {
         contactPhone: data.contactPhone,
         contactEmail: data.contactEmail,
         sortOrder: data.sortOrder,
-        updatedAt: new Date().toISOString()
-      } as Brand
+        updatedAt: new Date().toISOString(),
+      } as Brand;
 
       return {
         success: true,
@@ -297,7 +298,7 @@ class BrandService {
         message: '品牌更新成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -305,7 +306,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '更新失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -317,7 +318,7 @@ class BrandService {
   async deleteBrand(id: string): Promise<ApiResponse<null>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // 检查品牌是否被使用（在实际项目中需要检查关联的SPU）
       // const usedBrands = await this.checkBrandUsage(id)
@@ -331,7 +332,7 @@ class BrandService {
         message: '品牌删除成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -339,7 +340,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '删除失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -348,10 +349,12 @@ class BrandService {
    * @param ids 品牌ID列表
    * @returns 删除结果
    */
-  async batchDeleteBrands(ids: string[]): Promise<ApiResponse<{ success: number; failed: number }>> {
+  async batchDeleteBrands(
+    ids: string[]
+  ): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock批量删除结果
       return {
@@ -360,7 +363,7 @@ class BrandService {
         message: `成功删除${ids.length}个品牌`,
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -368,7 +371,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '批量删除失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -381,19 +384,19 @@ class BrandService {
   async updateBrandStatus(id: string, status: 'active' | 'inactive'): Promise<ApiResponse<Brand>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       return {
         success: true,
         data: {
           id,
           status,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
         } as Brand,
         message: '状态更新成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -401,7 +404,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '状态更新失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -417,7 +420,7 @@ class BrandService {
   ): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 800))
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       return {
         success: true,
@@ -425,7 +428,7 @@ class BrandService {
         message: `成功更新${ids.length}个品牌状态`,
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -433,7 +436,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '批量状态更新失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -444,10 +447,10 @@ class BrandService {
   async getActiveBrands(): Promise<ApiResponse<Brand[]>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
-      const allBrands = this.generateMockBrands()
-      const activeBrands = allBrands.filter(brand => brand.status === 'active')
+      const allBrands = this.generateMockBrands();
+      const activeBrands = allBrands.filter((brand) => brand.status === 'active');
 
       return {
         success: true,
@@ -455,7 +458,7 @@ class BrandService {
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -463,7 +466,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '获取失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -479,12 +482,12 @@ class BrandService {
   ): Promise<ApiResponse<{ isUnique: boolean }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-      const allBrands = this.generateMockBrands()
-      const existingBrand = allBrands.find(brand =>
-        brand.code === code && brand.id !== excludeId
-      )
+      const allBrands = this.generateMockBrands();
+      const existingBrand = allBrands.find(
+        (brand) => brand.code === code && brand.id !== excludeId
+      );
 
       return {
         success: true,
@@ -492,7 +495,7 @@ class BrandService {
         message: '验证成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -500,7 +503,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '验证失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -512,7 +515,7 @@ class BrandService {
   async checkBrandUsage(brandId: string): Promise<ApiResponse<{ count: number }>> {
     try {
       // 模拟API请求延迟
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
       // Mock数据 - 在实际项目中这里会查询数据库
       return {
@@ -521,7 +524,7 @@ class BrandService {
         message: '检查成功',
         code: 200,
         timestamp: Date.now(),
-      }
+      };
     } catch (error) {
       return {
         success: false,
@@ -529,7 +532,7 @@ class BrandService {
         message: error instanceof Error ? error.message : '检查失败',
         code: 500,
         timestamp: Date.now(),
-      }
+      };
     }
   }
 
@@ -552,7 +555,7 @@ class BrandService {
         contactEmail: 'coke@example.com',
         sortOrder: 1,
         createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
+        updatedAt: '2024-01-01T00:00:00Z',
       },
       {
         id: 'brand_002',
@@ -567,7 +570,7 @@ class BrandService {
         contactEmail: 'pepsi@example.com',
         sortOrder: 2,
         createdAt: '2024-01-02T00:00:00Z',
-        updatedAt: '2024-01-02T00:00:00Z'
+        updatedAt: '2024-01-02T00:00:00Z',
       },
       {
         id: 'brand_003',
@@ -582,7 +585,7 @@ class BrandService {
         contactEmail: 'nongfu@example.com',
         sortOrder: 3,
         createdAt: '2024-01-03T00:00:00Z',
-        updatedAt: '2024-01-03T00:00:00Z'
+        updatedAt: '2024-01-03T00:00:00Z',
       },
       {
         id: 'brand_004',
@@ -597,7 +600,7 @@ class BrandService {
         contactEmail: 'ksf@example.com',
         sortOrder: 4,
         createdAt: '2024-01-04T00:00:00Z',
-        updatedAt: '2024-01-04T00:00:00Z'
+        updatedAt: '2024-01-04T00:00:00Z',
       },
       {
         id: 'brand_005',
@@ -612,7 +615,7 @@ class BrandService {
         contactEmail: 'uni@example.com',
         sortOrder: 5,
         createdAt: '2024-01-05T00:00:00Z',
-        updatedAt: '2024-01-05T00:00:00Z'
+        updatedAt: '2024-01-05T00:00:00Z',
       },
       {
         id: 'brand_006',
@@ -627,7 +630,7 @@ class BrandService {
         contactEmail: 'wangwang@example.com',
         sortOrder: 6,
         createdAt: '2024-01-06T00:00:00Z',
-        updatedAt: '2024-01-06T00:00:00Z'
+        updatedAt: '2024-01-06T00:00:00Z',
       },
       {
         id: 'brand_007',
@@ -642,7 +645,7 @@ class BrandService {
         contactEmail: 'oreo@example.com',
         sortOrder: 7,
         createdAt: '2024-01-07T00:00:00Z',
-        updatedAt: '2024-01-07T00:00:00Z'
+        updatedAt: '2024-01-07T00:00:00Z',
       },
       {
         id: 'brand_008',
@@ -657,14 +660,14 @@ class BrandService {
         contactEmail: 'lays@example.com',
         sortOrder: 8,
         createdAt: '2024-01-08T00:00:00Z',
-        updatedAt: '2024-01-08T00:00:00Z'
-      }
-    ]
+        updatedAt: '2024-01-08T00:00:00Z',
+      },
+    ];
   }
 }
 
 // 创建服务实例
-export const brandService = new BrandService()
+export const brandService = new BrandService();
 
 // 导出默认服务
-export default brandService
+export default brandService;

@@ -5,7 +5,10 @@
  * @since 2025-12-19
  */
 
-import type { ScenarioPackageDetail, ScenarioPackageSummary } from '@/features/scenario-package-management/types';
+import type {
+  ScenarioPackageDetail,
+  ScenarioPackageSummary,
+} from '@/features/scenario-package-management/types';
 
 // Mock 场景包列表数据
 export const mockScenarioPackages: ScenarioPackageSummary[] = [

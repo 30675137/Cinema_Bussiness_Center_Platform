@@ -1,9 +1,9 @@
 /**
  * P004-inventory-adjustment: 分页工具
- * 
+ *
  * 提供大列表的分页功能和优化配置。
  * 实现 T066 任务。
- * 
+ *
  * @since Phase 8 - Polish
  */
 

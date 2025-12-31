@@ -13,10 +13,7 @@ interface AttributeTypeTagProps {
   size?: 'small' | 'default';
 }
 
-const TYPE_CONFIG: Record<
-  AttributeType,
-  { color: string; text: string }
-> = {
+const TYPE_CONFIG: Record<AttributeType, { color: string; text: string }> = {
   text: {
     color: 'blue',
     text: '文本',
@@ -46,22 +43,14 @@ const TYPE_CONFIG: Record<
 /**
  * Attribute type tag component
  */
-const AttributeTypeTag: React.FC<AttributeTypeTagProps> = ({
-  type,
-  size = 'default',
-}) => {
+const AttributeTypeTag: React.FC<AttributeTypeTagProps> = ({ type, size = 'default' }) => {
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.text;
 
   return (
-    <Tag
-      color={config.color}
-      style={size === 'small' ? { fontSize: 12 } : undefined}
-    >
+    <Tag color={config.color} style={size === 'small' ? { fontSize: 12 } : undefined}>
       {config.text}
     </Tag>
   );
 };
 
 export default AttributeTypeTag;
-
-
