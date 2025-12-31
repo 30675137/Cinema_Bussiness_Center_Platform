@@ -14,7 +14,11 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --fix",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write src/**/*.{ts,tsx,css,md}"
+    "format": "prettier --write src/**/*.{ts,tsx,css,md}",
+    "task:init": "tsx scripts/lark-task-manager.ts init",
+    "task:add": "tsx scripts/lark-task-manager.ts add",
+    "task:list": "tsx scripts/lark-task-manager.ts list",
+    "task:update": "tsx scripts/lark-task-manager.ts update"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
