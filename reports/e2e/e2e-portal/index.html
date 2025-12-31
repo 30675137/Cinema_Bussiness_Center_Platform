@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Test Report Portal</title>
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --success-color: #52c41a;
+            --error-color: #ff4d4f;
+            --warning-color: #faad14;
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #262626;
+            --text-secondary: #8c8c8c;
+            --border-color: #d9d9d9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #096dd9 100%);
+            color: white;
+            padding: 32px 0;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            opacity: 0.85;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 600;
+        }
+
+        .stat-card.success .value { color: var(--success-color); }
+        .stat-card.error .value { color: var(--error-color); }
+        .stat-card.warning .value { color: var(--warning-color); }
+
+        .filters {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .filters label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .filters select, .filters input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .filters input[type="date"] {
+            width: 150px;
+        }
+
+        .report-list {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+
+        .report-list h2 {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .report-item {
+            display: grid;
+            grid-template-columns: 1fr 100px 100px 120px 100px;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .report-item:hover {
+            background-color: #fafafa;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-item .run-id {
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .report-item .run-id:hover {
+            text-decoration: underline;
+        }
+
+        .report-item .timestamp {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .report-item .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .report-item .status.pass {
+            color: var(--success-color);
+        }
+
+        .report-item .status.fail {
+            color: var(--error-color);
+        }
+
+        .report-item .duration {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .report-item .actions button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .report-item .actions button:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .compare-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .compare-modal.active {
+            display: flex;
+        }
+
+        .compare-modal .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .compare-modal h3 {
+            margin-bottom: 16px;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .compare-table th, .compare-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .compare-table th {
+            background: #fafafa;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .report-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>E2E Test Report Portal</h1>
+            <p>影院商品管理中台 - 端到端测试报告聚合</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="label">总运行次数</div>
+                <div class="value" id="total-runs">-</div>
+            </div>
+            <div class="stat-card success">
+                <div class="label">最近通过率</div>
+                <div class="value" id="pass-rate">-</div>
+            </div>
+            <div class="stat-card error">
+                <div class="label">最近失败数</div>
+                <div class="value" id="fail-count">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">平均耗时</div>
+                <div class="value" id="avg-duration">-</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div>
+                <label>状态:</label>
+                <select id="filter-status">
+                    <option value="">全部</option>
+                    <option value="pass">通过</option>
+                    <option value="fail">失败</option>
+                </select>
+            </div>
+            <div>
+                <label>环境:</label>
+                <select id="filter-env">
+                    <option value="">全部</option>
+                    <option value="dev">dev</option>
+                    <option value="staging">staging</option>
+                    <option value="production">production</option>
+                </select>
+            </div>
+            <div>
+                <label>开始日期:</label>
+                <input type="date" id="filter-from">
+            </div>
+            <div>
+                <label>结束日期:</label>
+                <input type="date" id="filter-to">
+            </div>
+        </div>
+
+        <div class="report-list">
+            <h2>测试报告历史</h2>
+            <div id="report-container">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>暂无测试报告</p>
+                    <p style="font-size: 13px; margin-top: 8px;">运行 /e2e orchestrate 生成第一份报告</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="compare-modal" id="compare-modal">
+        <div class="modal-content">
+            <h3>报告对比</h3>
+            <div id="compare-content"></div>
+            <button onclick="closeCompareModal()" style="margin-top: 16px; padding: 8px 16px; cursor: pointer;">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        let reports = [];
+        let selectedForCompare = [];
+
+        async function loadReports() {
+            try {
+                const response = await fetch('reports.json');
+                const data = await response.json();
+                reports = data.reports || [];
+                renderStats();
+                renderReports();
+            } catch (error) {
+                console.error('Failed to load reports:', error);
+            }
+        }
+
+        function renderStats() {
+            document.getElementById('total-runs').textContent = reports.length;
+
+            if (reports.length > 0) {
+                const latest = reports[0];
+                const passRate = latest.summary.total > 0
+                    ? Math.round((latest.summary.passed / latest.summary.total) * 100) + '%'
+                    : '-';
+                document.getElementById('pass-rate').textContent = passRate;
+                document.getElementById('fail-count').textContent = latest.summary.failed;
+
+                const avgDuration = reports.reduce((sum, r) => sum + (r.duration_seconds || 0), 0) / reports.length;
+                document.getElementById('avg-duration').textContent = avgDuration.toFixed(1) + 's';
+            }
+        }
+
+        function renderReports() {
+            const container = document.getElementById('report-container');
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterEnv = document.getElementById('filter-env').value;
+            const filterFrom = document.getElementById('filter-from').value;
+            const filterTo = document.getElementById('filter-to').value;
+
+            let filtered = reports.filter(r => {
+                if (filterStatus === 'pass' && r.summary.failed > 0) return false;
+                if (filterStatus === 'fail' && r.summary.failed === 0) return false;
+                if (filterEnv && r.environment !== filterEnv) return false;
+                if (filterFrom && new Date(r.execution_timestamp) < new Date(filterFrom)) return false;
+                if (filterTo && new Date(r.execution_timestamp) > new Date(filterTo + 'T23:59:59')) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>没有匹配的报告</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(r => `
+                <div class="report-item">
+                    <div>
+                        <a class="run-id" href="${r.report_path}" target="_blank">${r.run_id}</a>
+                        <div class="timestamp">${new Date(r.execution_timestamp).toLocaleString('zh-CN')}</div>
+                        ${r.tags_filter ? `<div style="font-size: 12px; color: #8c8c8c; margin-top: 4px;">Tags: ${r.tags_filter}</div>` : ''}
+                    </div>
+                    <div class="status ${r.summary.failed > 0 ? 'fail' : 'pass'}">
+                        ${r.summary.failed > 0 ? '❌' : '✅'} ${r.summary.passed}/${r.summary.total}
+                    </div>
+                    <div class="duration">${(r.duration_seconds || 0).toFixed(1)}s</div>
+                    <div style="font-size: 13px; color: #8c8c8c;">${r.environment || 'dev'}</div>
+                    <div class="actions">
+                        <button onclick="selectForCompare('${r.run_id}')">对比</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectForCompare(runId) {
+            if (selectedForCompare.includes(runId)) {
+                selectedForCompare = selectedForCompare.filter(id => id !== runId);
+            } else {
+                selectedForCompare.push(runId);
+                if (selectedForCompare.length === 2) {
+                    showCompareModal();
+                }
+            }
+        }
+
+        function showCompareModal() {
+            const [id1, id2] = selectedForCompare;
+            const r1 = reports.find(r => r.run_id === id1);
+            const r2 = reports.find(r => r.run_id === id2);
+
+            if (!r1 || !r2) return;
+
+            const content = `
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>指标</th>
+                            <th>${id1.substring(0, 15)}...</th>
+                            <th>${id2.substring(0, 15)}...</th>
+                            <th>变化</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>通过</td>
+                            <td>${r1.summary.passed}</td>
+                            <td>${r2.summary.passed}</td>
+                            <td style="color: ${r2.summary.passed > r1.summary.passed ? 'green' : r2.summary.passed < r1.summary.passed ? 'red' : 'inherit'}">
+                                ${r2.summary.passed - r1.summary.passed > 0 ? '+' : ''}${r2.summary.passed - r1.summary.passed}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>失败</td>
+                            <td>${r1.summary.failed}</td>
+                            <td>${r2.summary.failed}</td>
+                            <td style="color: ${r2.summary.failed < r1.summary.failed ? 'green' : r2.summary.failed > r1.summary.failed ? 'red' : 'inherit'}">
+                                ${r2.summary.failed - r1.summary.failed > 0 ? '+' : ''}${r2.summary.failed - r1.summary.failed}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>总数</td>
+                            <td>${r1.summary.total}</td>
+                            <td>${r2.summary.total}</td>
+                            <td>${r2.summary.total - r1.summary.total}</td>
+                        </tr>
+                        <tr>
+                            <td>耗时</td>
+                            <td>${(r1.duration_seconds || 0).toFixed(1)}s</td>
+                            <td>${(r2.duration_seconds || 0).toFixed(1)}s</td>
+                            <td>${((r2.duration_seconds || 0) - (r1.duration_seconds || 0)).toFixed(1)}s</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('compare-content').innerHTML = content;
+            document.getElementById('compare-modal').classList.add('active');
+            selectedForCompare = [];
+        }
+
+        function closeCompareModal() {
+            document.getElementById('compare-modal').classList.remove('active');
+        }
+
+        // Initialize
+        document.getElementById('filter-status').addEventListener('change', renderReports);
+        document.getElementById('filter-env').addEventListener('change', renderReports);
+        document.getElementById('filter-from').addEventListener('change', renderReports);
+        document.getElementById('filter-to').addEventListener('change', renderReports);
+
+        loadReports();
+    </script>
+</body>
+</html>

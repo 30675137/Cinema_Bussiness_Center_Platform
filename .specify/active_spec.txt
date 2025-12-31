@@ -1,1 +1,1 @@
-specs/T006-e2e-report-configurator/spec.md
+specs/T007-e2e-test-management/spec.md

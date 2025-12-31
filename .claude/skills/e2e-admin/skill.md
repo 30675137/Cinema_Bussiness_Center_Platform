@@ -1,12 +1,12 @@
 ---
 name: e2e-admin
-description: E2E 测试编排管理器 - 按标签选择场景、自动生成测试脚本、配置测试参数、自动启动跨系统服务、执行 Playwright 测试并生成报告。触发关键词 e2e admin, test orchestration, playwright orchestrator, 测试编排, 场景管理, E2E管理。
-version: 1.1.0
+description: E2E 测试编排管理器 - 按标签选择场景、自动生成测试脚本、配置测试参数、自动启动跨系统服务、执行 Playwright 测试并生成报告。支持服务自动化管理（端口检测、健康检查、进程清理）。触发关键词 e2e admin, test orchestration, playwright orchestrator, 测试编排, 场景管理, E2E管理, 服务管理.
+version: 1.2.0
 ---
 
 # e2e-admin
 
-**@spec T001-e2e-orchestrator**
+**@spec T001-e2e-orchestrator, T007-e2e-test-management**
 
 E2E 测试编排管理器 - 通过 Claude Code 命令调用的 skill，用于编排和执行 Playwright 端到端测试。
 
@@ -120,7 +120,9 @@ e2e-admin 是一个 Claude Code Skill，通过编排多个专业 skill（test-sc
    ↓
 9. 生成报告包 (HTML 报告 + summary.json + artifacts/)
    ↓
-10. 停止开发服务器 → 输出报告路径
+10. 更新报告门户索引 (reports.json) → 新增运行记录
+   ↓
+11. 停止开发服务器 → 输出报告路径
 ```
 
 ### Step 4: 测试脚本生成详解
@@ -284,6 +286,238 @@ ls scenarios/inventory/
 /e2e-admin --skip-data-validation
 ```
 
+## Service Automation (T007 Enhancement)
+
+### Service Configuration
+
+Service automation is configured in `assets/service-config.yaml`:
+
+```yaml
+services:
+  c-end:
+    name: "C端 (Taro H5)"
+    port: 10086
+    directory: "./hall-reserve-taro"
+    start_command: "npm run dev:h5"
+    health_check_url: "http://localhost:10086"
+    startup_timeout: 60000
+    shutdown_signal: SIGTERM
+
+  b-end:
+    name: "B端 (React Admin)"
+    port: 3000
+    directory: "./frontend"
+    start_command: "npm run dev"
+    health_check_url: "http://localhost:3000"
+    startup_timeout: 60000
+
+  backend:
+    name: "后端 (Spring Boot)"
+    port: 8080
+    directory: "./backend"
+    start_command: "./mvnw spring-boot:run"
+    health_check_url: "http://localhost:8080/actuator/health"
+    startup_timeout: 120000
+
+port_conflict_strategy:
+  default: prompt  # prompt | auto-kill | fail
+```
+
+### Port Detection Logic
+
+Before starting services, the orchestrator checks port availability:
+
+```python
+# Pseudo-code for port detection
+def check_port(port: int) -> PortStatus:
+    """
+    Check if a port is available or occupied.
+    Returns: {available: bool, pid: int | None, process_name: str | None}
+    """
+    result = subprocess.run(['lsof', '-i', f':{port}', '-t'], capture_output=True)
+    if result.returncode == 0:
+        pid = int(result.stdout.strip())
+        return PortStatus(available=False, pid=pid)
+    return PortStatus(available=True)
+```
+
+**Output example**:
+```
+🔍 检测端口状态...
+Port 10086 (C端): ✅ 可用
+Port 3000 (B端): ⚠️ 被占用 (PID: 12345, node)
+Port 8080 (后端): ✅ 可用
+```
+
+### Health Check Polling
+
+After starting a service, the orchestrator polls its health endpoint:
+
+```python
+def wait_for_healthy(service: ServiceConfig) -> bool:
+    """
+    Poll health_check_url until healthy or timeout.
+    """
+    start_time = time.time()
+    while time.time() - start_time < service.startup_timeout / 1000:
+        try:
+            response = requests.get(service.health_check_url, timeout=5)
+            if response.status_code == 200:
+                return True
+        except:
+            pass
+        time.sleep(2)  # retry_interval
+    return False
+```
+
+**Output example**:
+```
+🚀 启动服务...
+Starting C端 (npm run dev:h5)...
+  ⏳ Waiting for health check (http://localhost:10086)
+  ✅ Ready in 12.3s
+
+Starting B端 (npm run dev)...
+  ⏳ Waiting for health check (http://localhost:3000)
+  ✅ Ready in 8.1s
+```
+
+### Port Conflict Handling
+
+When a port is occupied, behavior depends on `port_conflict_strategy`:
+
+**Strategy: prompt (default)**
+```
+⚠️  Port 3000 is already in use by PID 12345 (node)
+Options:
+  [K] Kill process and restart
+  [S] Skip this service (may cause test failures)
+  [A] Abort orchestration
+
+Select option:
+```
+
+**Strategy: auto-kill**
+```
+⚠️  Port 3000 is already in use by PID 12345
+🔄 Auto-killing process (port_conflict_strategy: auto-kill)
+✅ Process killed, starting service...
+```
+
+**Strategy: fail**
+```
+❌ Port 3000 is already in use by PID 12345
+Aborting. Set port_conflict_strategy to 'prompt' or 'auto-kill' to handle conflicts.
+```
+
+### Service Cleanup
+
+After test execution (or on error), spawned services are stopped:
+
+```python
+def cleanup_services(pids: List[int]):
+    """
+    Stop all spawned service processes.
+    """
+    for pid in pids:
+        os.kill(pid, signal.SIGTERM)
+        # Wait grace period
+        time.sleep(5)
+        # Force kill if still running
+        if process_exists(pid):
+            os.kill(pid, signal.SIGKILL)
+```
+
+**Output example**:
+```
+🧹 清理服务...
+Stopping C端 (PID 23456)... ✅
+Stopping B端 (PID 23457)... ✅
+```
+
+### Skip Service Start Option
+
+To skip automatic service management:
+
+```bash
+/e2e-admin --tags "module:order" --skip-service-start
+```
+
+This assumes services are already running externally.
+
+## Report Portal Integration (T007 Enhancement)
+
+After each test run, the orchestrator automatically updates the report portal index.
+
+### Report Index Update Logic
+
+```python
+def update_report_index(run_result: RunResult):
+    """
+    Update reports.json with new test run entry.
+
+    Args:
+        run_result: Contains run_id, summary, duration, etc.
+    """
+    index_path = 'reports/e2e/e2e-portal/reports.json'
+
+    # Load existing index
+    with open(index_path, 'r') as f:
+        index = json.load(f)
+
+    # Create new report entry
+    new_entry = {
+        "run_id": run_result.run_id,  # Format: YYYYMMDD-HHMMSS-hash
+        "execution_timestamp": run_result.timestamp,
+        "duration_seconds": run_result.duration,
+        "summary": {
+            "total": run_result.total,
+            "passed": run_result.passed,
+            "failed": run_result.failed,
+            "skipped": run_result.skipped
+        },
+        "environment": run_result.environment,
+        "tags_filter": run_result.tags_filter,
+        "report_path": f"../run-{run_result.run_id}/index.html"
+    }
+
+    # Prepend to reports array (newest first)
+    index['reports'].insert(0, new_entry)
+
+    # Retain only last 30 runs
+    index['reports'] = index['reports'][:30]
+
+    # Update metadata
+    index['generated_at'] = datetime.utcnow().isoformat() + 'Z'
+
+    # Save
+    with open(index_path, 'w') as f:
+        json.dump(index, f, indent=2, ensure_ascii=False)
+```
+
+### Run ID Generation
+
+```python
+def generate_run_id() -> str:
+    """
+    Generate unique run ID in format: YYYYMMDD-HHMMSS-hash
+
+    Example: 20251231-143052-a3f8b921
+    """
+    now = datetime.now()
+    timestamp = now.strftime('%Y%m%d-%H%M%S')
+    hash_suffix = hashlib.sha256(str(now.timestamp()).encode()).hexdigest()[:8]
+    return f"{timestamp}-{hash_suffix}"
+```
+
+**Output example**:
+```
+📊 更新报告门户索引...
+✅ Added run 20251231-143052-a3f8b921 to reports.json
+📁 Portal: reports/e2e/e2e-portal/index.html
+🔗 Report: reports/e2e/run-20251231-143052-a3f8b921/index.html
+```
+
 ## Dependencies
 
 ### 内部依赖
@@ -342,6 +576,15 @@ ls scenarios/inventory/
 ```
 
 ## Version History
+
+**1.2.0** (2025-12-31):
+- **NEW**: Enhanced service automation (T007-e2e-test-management)
+  - Configurable `service-config.yaml` with port, health check, timeout settings
+  - Port conflict handling strategies: prompt, auto-kill, fail
+  - Detailed health check polling with retry logic
+  - Graceful service cleanup with SIGTERM/SIGKILL fallback
+- **NEW**: `--skip-service-start` option for external service management
+- **Improved**: Updated documentation with service automation examples
 
 **1.1.0** (2025-12-30):
 - **NEW**: 集成 e2e-test-generator skill，自动生成选中场景的测试脚本
