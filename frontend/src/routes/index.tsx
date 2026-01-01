@@ -45,6 +45,21 @@ const InventoryTrace = React.lazy(() => import('@/pages/inventory/InventoryTrace
 // Inventory Adjustment Pages (P004)
 const InventoryApproval = React.lazy(() => import('@/pages/inventory/ApprovalPage'));
 
+// Channel Product Config Pages (O005)
+const ChannelProductList = React.lazy(
+  () => import('@/features/channel-product-config/pages/ChannelProductListPage')
+);
+const CreateChannelProduct = React.lazy(() =>
+  import('@/features/channel-product-config/pages/CreateChannelProductPage').then((module) => ({
+    default: module.CreateChannelProductPage,
+  }))
+);
+const EditChannelProduct = React.lazy(() =>
+  import('@/features/channel-product-config/pages/EditChannelProductPage').then((module) => ({
+    default: module.EditChannelProductPage,
+  }))
+);
+
 // Loading component for lazy loaded pages
 const PageLoader: React.FC = () => (
   <div
@@ -160,6 +175,18 @@ export const router = createBrowserRouter([
   {
     path: '/inventory/approvals',
     element: withLayout(InventoryApproval),
+  },
+  {
+    path: '/channel-products/mini-program',
+    element: withLayout(ChannelProductList),
+  },
+  {
+    path: '/channel-products/mini-program/create',
+    element: withLayout(CreateChannelProduct),
+  },
+  {
+    path: '/channel-products/mini-program/:id/edit',
+    element: withLayout(EditChannelProduct),
   },
   {
     path: '*',

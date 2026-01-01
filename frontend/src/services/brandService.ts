@@ -67,7 +67,7 @@ class BrandService {
       const allBrands = this.generateMockBrands();
 
       // 应用筛选条件
-      let filteredData = allBrands.filter((brand) => {
+      const filteredData = allBrands.filter((brand) => {
         // 关键词搜索
         if (params.keyword) {
           const keyword = params.keyword.toLowerCase();

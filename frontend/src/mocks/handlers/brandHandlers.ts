@@ -61,7 +61,7 @@ const mockBrands = [
 // 品牌列表API
 export const getBrandsHandler = http.get('/api/v1/brands', async ({ request }) => {
   // 简化版本，直接返回mock数据，避免复杂的参数处理
-  let filteredBrands = [...mockBrands];
+  const filteredBrands = [...mockBrands];
 
   // 暂时跳过参数处理，只返回基本数据
   const page = 1;

@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.config", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.security", "com.cinema.beverage", "com.cinema.auth", "com.cinema.product"})
-@EnableJpaRepositories(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product"})
-@EntityScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product"})
+@EnableJpaAuditing
+@ComponentScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.config", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.security", "com.cinema.beverage", "com.cinema.auth", "com.cinema.product", "com.cinema.channelproduct"})
+@EnableJpaRepositories(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product", "com.cinema.channelproduct"})
+@EntityScan(basePackages = {"com.cinema.hallstore", "com.cinema.scenariopackage", "com.cinema.common", "com.cinema.reservation", "com.cinema.unitconversion", "com.cinema.inventory", "com.cinema.sku", "com.cinema.order", "com.cinema.beverage", "com.cinema.product", "com.cinema.channelproduct"})
 public class HallStoreBackendApplication {
 
     public static void main(String[] args) {

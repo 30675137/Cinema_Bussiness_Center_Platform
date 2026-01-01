@@ -40,11 +40,11 @@ import {
 // ============================================================================
 
 let mockDictionaryTypes: DictionaryType[] = [...initialDictionaryTypes];
-let mockDictionaryItems: Record<string, DictionaryItem[]> = JSON.parse(
+const mockDictionaryItems: Record<string, DictionaryItem[]> = JSON.parse(
   JSON.stringify(initialDictionaryItems)
 );
 let mockAttributeTemplates: AttributeTemplate[] = [...initialAttributeTemplates];
-let mockAttributes: Record<string, Attribute[]> = JSON.parse(JSON.stringify(initialAttributes));
+const mockAttributes: Record<string, Attribute[]> = JSON.parse(JSON.stringify(initialAttributes));
 
 // ============================================================================
 // Helper functions

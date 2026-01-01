@@ -59,6 +59,11 @@ const CategoryManagementPage = lazy(() => import('./pages/mdm-pim/category/Categ
 const BrandManagementPage = lazy(() => import('./pages/BrandManagement'));
 const BrandListPage = lazy(() => import('./pages/mdm-pim/brand/BrandManagement'));
 
+// 渠道商品配置页面 (@spec O005-channel-product-config)
+const ChannelProductListPage = lazy(() => import('./features/channel-product-config/pages/ChannelProductListPage'));
+const CreateChannelProductPage = lazy(() => import('./features/channel-product-config/pages/CreateChannelProductPage'));
+const EditChannelProductPage = lazy(() => import('./features/channel-product-config/pages/EditChannelProductPage'));
+
 // 属性模板管理页面
 const AttributeTemplatePage = lazy(() => import('./pages/AttributeTemplate'));
 
@@ -209,6 +214,11 @@ const App: React.FC = () => {
 
                 {/* 属性模板管理 */}
                 <Route path="/attribute-templates" element={<AttributeTemplatePage />} />
+
+                {/* 渠道商品配置 (@spec O005-channel-product-config) */}
+                <Route path="/channel-products/mini-program" element={<ChannelProductListPage />} />
+                <Route path="/channel-products/mini-program/create" element={<CreateChannelProductPage />} />
+                <Route path="/channel-products/mini-program/:id/edit" element={<EditChannelProductPage />} />
 
                 {/* 其他页面 */}
                 <Route path="/about" element={<AboutPage />} />

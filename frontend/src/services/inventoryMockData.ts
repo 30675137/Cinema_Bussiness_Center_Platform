@@ -570,7 +570,7 @@ export class InventoryMockService {
     const allData = this.mockInventory;
 
     // 应用筛选
-    let filteredData = allData.filter((item) => {
+    const filteredData = allData.filter((item) => {
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
         return (
@@ -683,7 +683,7 @@ export class InventoryMockService {
     const allData = this.mockMovements();
 
     // 应用筛选
-    let filteredData = allData.filter((item) => {
+    const filteredData = allData.filter((item) => {
       // 关键字搜索
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
@@ -835,7 +835,7 @@ export class InventoryMockService {
     const allData = this.generator.generateInventoryAdjustments();
 
     // 应用筛选
-    let filteredData = allData.filter((item) => {
+    const filteredData = allData.filter((item) => {
       if (filters.status && item.status !== filters.status) {
         return false;
       }

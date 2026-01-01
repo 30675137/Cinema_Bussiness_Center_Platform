@@ -66,7 +66,7 @@ class CategoryService {
       const allCategories = this.generateMockCategories();
 
       // 应用筛选条件
-      let filteredData = allCategories.filter((category) => {
+      const filteredData = allCategories.filter((category) => {
         // 关键词搜索
         if (params.keyword) {
           const keyword = params.keyword.toLowerCase();

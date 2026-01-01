@@ -1,1 +1,1 @@
-specs/O004-beverage-sku-reuse/spec.md
+specs/O005-channel-product-config/spec.md

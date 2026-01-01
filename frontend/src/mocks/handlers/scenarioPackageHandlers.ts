@@ -20,8 +20,8 @@ import type {
 const BASE_URL = 'http://localhost:8080/api';
 
 // 内存中的数据存储（模拟数据库）
-let packages = [...mockScenarioPackages];
-let packageDetails = { ...mockPackageDetails };
+const packages = [...mockScenarioPackages];
+const packageDetails = { ...mockPackageDetails };
 
 export const scenarioPackageHandlers = [
   // 查询场景包列表

@@ -95,12 +95,12 @@ const mockReasons: AdjustmentReason[] = [
 /**
  * 库存调整记录
  */
-let mockAdjustments: InventoryAdjustment[] = [];
+const mockAdjustments: InventoryAdjustment[] = [];
 
 /**
  * 审批记录
  */
-let mockApprovalRecords: ApprovalRecord[] = [];
+const mockApprovalRecords: ApprovalRecord[] = [];
 
 /**
  * 调整单号序列

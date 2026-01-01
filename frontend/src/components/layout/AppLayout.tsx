@@ -347,17 +347,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       ],
     },
     {
-      key: '/beverage',
+      key: '/channel-products',
       icon: <CoffeeOutlined />,
-      label: 'O003-饮品订单管理',
+      label: '渠道商品配置',
       children: [
         {
-          key: '/beverage/list',
-          label: 'US3-饮品配置管理',
-        },
-        {
-          key: '/beverage/orders',
-          label: 'US2-饮品订单/出品',
+          key: '/channel-products/mini-program',
+          label: '小程序商品',
         },
       ],
     },

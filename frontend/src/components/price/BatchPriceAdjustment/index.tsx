@@ -203,7 +203,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     // 计算调整后的价格
     const previewResults = targetProducts.map((product) => {
       let currentPrice = product.currentPrice || 0;
-      let basePrice = product.basePrice || 0;
+      const basePrice = product.basePrice || 0;
       let newPrice = currentPrice;
 
       if (data.priceType === 'base') {

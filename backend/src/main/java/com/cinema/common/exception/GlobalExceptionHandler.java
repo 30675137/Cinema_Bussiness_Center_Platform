@@ -498,16 +498,36 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理业务异常
+     * 处理通用业务异常（com.cinema.common.exception.BusinessException）
+     * <p>
+     * 处理来自各模块的通用业务异常，包括渠道商品配置、库存管理等
+     * 保留原始错误码和消息，让前端能够识别具体的业务错误类型
+     * </p>
+     *
+     * @param ex      业务异常对象
+     * @param request Web 请求
+     * @return 400 Bad Request 响应，包含原始错误码和消息
+     * @spec O005-channel-product-config
+     */
+    @ExceptionHandler(com.cinema.common.exception.BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleCommonBusinessException(
+            com.cinema.common.exception.BusinessException ex, WebRequest request) {
+        logger.warn("Common business exception: {} - {}", ex.getErrorCode(), ex.getMessage());
+        ErrorResponse error = ErrorResponse.of(ex.getErrorCode(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * 处理门店模块业务异常（com.cinema.hallstore.exception.BusinessException）
      *
      * @param ex      异常对象
      * @param request Web 请求
      * @return 400 响应
      */
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(
-            BusinessException ex, WebRequest request) {
-        logger.warn("Business error: {}", ex.getMessage());
+    @ExceptionHandler(com.cinema.hallstore.exception.BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleHallstoreBusinessException(
+            com.cinema.hallstore.exception.BusinessException ex, WebRequest request) {
+        logger.warn("Hallstore business error: {}", ex.getMessage());
         ErrorResponse error = ErrorResponse.of("BUSINESS_ERROR", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

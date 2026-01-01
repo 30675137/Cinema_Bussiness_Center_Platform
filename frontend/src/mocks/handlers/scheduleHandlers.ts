@@ -52,7 +52,7 @@ export const getSchedulesHandler = http.get('/api/schedules', async ({ request }
   }
 
   // 应用筛选
-  let filteredEvents = events.filter((event) => {
+  const filteredEvents = events.filter((event) => {
     if (hallId && event.hallId !== hallId) return false;
     if (type && event.type !== type) return false;
     if (status && event.status !== status) return false;

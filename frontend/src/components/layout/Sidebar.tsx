@@ -72,14 +72,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
       ],
     },
     {
-      key: '/beverage',
+      key: '/channel-products',
       icon: <CoffeeOutlined />,
-      label: '饮品管理',
+      label: '渠道商品配置',
       children: [
         {
-          key: '/beverage/list',
+          key: '/channel-products/mini-program',
           icon: <CoffeeOutlined />,
-          label: '饮品配置',
+          label: '小程序商品',
         },
       ],
     },
@@ -169,6 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onCollapse }) => {
     }
     if (pathname.startsWith('/schedule')) return ['/schedule'];
     if (pathname.startsWith('/inventory')) return ['/inventory'];
+    if (pathname.startsWith('/channel-products')) return ['/channel-products'];
     if (pathname.startsWith('/pricing') || pathname.startsWith('/price')) return ['/pricing'];
     if (pathname.startsWith('/procurement')) return ['/procurement'];
     if (pathname.startsWith('/analytics')) return ['/analytics'];

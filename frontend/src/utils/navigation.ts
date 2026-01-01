@@ -864,7 +864,7 @@ export const searchMenuItems = (
   const results: SearchResult[] = flattenedMenus
     .map((menu) => {
       let score = 0;
-      let matchedFields: string[] = [];
+      const matchedFields: string[] = [];
 
       // 检查各个字段的匹配情况
       searchFields.forEach((field) => {
