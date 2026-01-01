@@ -5,11 +5,44 @@
 **Status**: Draft
 **Input**: 根据spec O005的修改 以及之前的O003的功能,结合小程序的实现情况 调整小程序加载商品的API等逻辑
 
+## Clarifications
+
+### Session 2026-01-02 (Revision 1)
+
+- Q: UI原型的实际技术栈和格式 → A: React 19 + Vite web应用（位于 miniapp-ordering/），使用 lucide-react 图标库，包含AI推荐功能(Gemini API)，Mock数据本地运行
+- Q: 原型代码复用还是完全重写 → A: 完全用Taro+React重写，仅参考UI布局和交互逻辑，不复用web app代码
+- Q: 原型中的页面结构和核心功能 → A: 单页应用，包含订单tab和会员tab，4个核心功能（商品列表+分类筛选、商品详情+规格选择、购物车抽屉、订单列表）
+- Q: 原型特有功能的处理（如影厅选择、AI推荐） → A: 移除影厅选择（不适用），保留AI推荐功能但替换为后端API实现，移除优惠券/积分兑换（列入Out of Scope）
+- Q: 原型中图片资源的处理方式 → A: 原型使用Unsplash外部图片，Taro实现改用默认占位图+后端API返回的真实商品图片
+
+---
+
 ## 背景与问题
 
 ### 问题描述
 
-O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数据从独立的 `beverages` 表迁移到 `channel_product_config` 表。小程序端(hall-reserve-taro)当前基于 O003-beverage-order 实现了饮品订单功能,但需要适配新的渠道商品架构:
+O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数据从独立的 `beverages` 表迁移到 `channel_product_config` 表。小程序端(hall-reserve-taro)当前基于 O003-beverage-order 实现了饮品订单功能,但需要适配新的渠道商品架构。
+
+**UI原型来源**: React 19 + Vite web应用,位于 `miniapp-ordering/` 文件夹。这是一个Cinema Lounge点餐的演示原型,包含商品分类（经典特调/精品咖啡/清爽饮品/主厨小食/积分兑换）、商品列表、规格选择、购物车、会员系统（优惠券/积分）、影厅选择、AI推荐等功能。使用 lucide-react 图标库、Unsplash图片、Gemini API提供AI建议。
+
+**迁移策略**: 参考原型的UI布局和交互逻辑,使用 Taro 4.1.9 + React + TypeScript 完全重写。具体要求:
+- **保留**: 商品列表布局、分类标签栏设计、商品卡片样式、规格选择器UI、购物车抽屉交互、订单列表展示
+- **调整**: 商品分类改为后端API定义的6种分类(ALCOHOL/COFFEE/BEVERAGE/SNACK/MEAL/OTHER)，移除影厅选择，移除优惠券/积分兑换功能
+- **替换**: AI推荐功能使用后端API实现（非Gemini），商品图片使用后端API返回的真实图片（非Unsplash）
+- **重写**: 不复用web app代码，使用Taro组件和API重新实现所有功能
+- 最终产出的代码库位于 `hall-reserve-taro/` 项目中
+
+**样式参考方案**: 参考原型的视觉设计,手动提取关键样式变量到Taro项目:
+- 创建 `hall-reserve-taro/src/styles/variables.scss` 定义颜色主题（参考原型配色）
+- 定义字体变量（参考原型字号体系），使用 `rpx` 单位适配小程序
+- 定义间距变量（参考原型布局间距）
+- 定义圆角/阴影等通用样式（参考原型卡片设计）
+- 所有页面组件引用这些变量,确保样式一致性
+
+**图标与图片方案**:
+- UI图标: 使用 lucide-react 图标库（Taro兼容）或转为SVG/图片资源
+- 商品默认占位图: 自定义占位图存储在 `hall-reserve-taro/src/assets/images/placeholders/`
+- 实际商品图片: 通过后端API动态获取,使用 O005 配置的商品主图和详情图
 
 1. **商品数据源变更**: 从 `beverages` 表迁移到 `channel_product_config` 表
 2. **商品分类扩展**: 从仅支持饮品分类扩展到酒/咖啡/饮料/小食/餐品/其他
@@ -259,10 +292,10 @@ O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数
 - `hall-reserve-taro/src/stores/orderCartStore.ts`:修改购物车 store,使用 `channelProductId`
 
 **页面组件** (新增或修改):
-- `hall-reserve-taro/src/pages/channel-product-menu/`:新增渠道商品菜单页
-- `hall-reserve-taro/src/pages/channel-product-detail/`:新增渠道商品详情页
-- `hall-reserve-taro/src/pages/order-cart/`:修改购物车页,适配新的商品类型
-- `hall-reserve-taro/src/pages/my-orders/`:复用 O003 的订单列表/详情页
+- `hall-reserve-taro/src/pages/channel-product-menu/`:新增渠道商品菜单页（对应原型菜单列表页）
+- `hall-reserve-taro/src/pages/channel-product-detail/`:新增渠道商品详情页（对应原型商品详情页）
+- `hall-reserve-taro/src/pages/order-cart/`:修改购物车页,适配新的商品类型（对应原型购物车页）
+- `hall-reserve-taro/src/pages/member/my-orders/`:订单列表页集成在会员模块下（对应原型会员-订单列表）
 
 ### API 映射表
 

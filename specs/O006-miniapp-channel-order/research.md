@@ -396,6 +396,174 @@ function calculateFinalPrice(
 
 ---
 
+### 7. UI 原型迁移策略
+
+**Research Question**: 如何将 `miniapp-ordering/` 文件夹中的原生微信小程序代码迁移到 Taro 框架,同时保留 UI 样式和交互逻辑?
+
+**Decision**: 完全重写代码,手动提取样式变量和复制图片资源,严格遵循原型的视觉设计和交互流程
+
+**Rationale**:
+- 原生小程序代码(WXML/WXSS/JS)无法直接在 Taro 项目中使用
+- 手动重写确保代码符合项目技术规范(组件化架构、TypeScript 类型安全、状态管理规范)
+- 保留 UI 样式和交互逻辑确保用户体验一致性
+- 提取样式变量到全局配置便于后续维护和主题定制
+
+**原型分析**:
+
+1. **页面结构** (`miniapp-ordering/pages/`):
+   - `menu-list/`: 菜单列表页 → 迁移到 `hall-reserve-taro/src/pages/channel-product-menu/`
+   - `product-detail/`: 商品详情页 → 迁移到 `hall-reserve-taro/src/pages/channel-product-detail/`
+   - `cart/`: 购物车页 → 迁移到 `hall-reserve-taro/src/pages/order-cart/`
+   - `member/orders/`: 订单列表页 → 迁移到 `hall-reserve-taro/src/pages/member/my-orders/`
+
+2. **关键 UI 组件**:
+   - 商品卡片(product-card)
+   - 规格选择器(spec-selector)
+   - 购物车抽屉(cart-drawer)
+   - 分类标签栏(category-tabs)
+
+3. **视觉设计要素** (从原型中提取):
+   - **颜色变量**:
+     - 主色: #FF6B35 (橙红色,按钮、选中态)
+     - 辅助色: #F7931E (金黄色,推荐标签)
+     - 文本色: #333333 (主文本), #999999 (辅助文本)
+     - 背景色: #F5F5F5 (页面背景), #FFFFFF (卡片背景)
+   - **字体变量**:
+     - 大标题: 32rpx / 600 / 1.4
+     - 小标题: 28rpx / 500 / 1.3
+     - 正文: 24rpx / 400 / 1.5
+     - 辅助文字: 20rpx / 400 / 1.4
+   - **间距变量**:
+     - 页面边距: 24rpx
+     - 卡片间距: 16rpx
+     - 组件内边距: 32rpx
+     - 按钮高度: 88rpx
+   - **圆角/阴影**:
+     - 卡片圆角: 16rpx
+     - 按钮圆角: 8rpx
+     - 卡片阴影: 0 4rpx 12rpx rgba(0,0,0,0.08)
+
+**迁移步骤**:
+
+1. **创建样式变量文件** `hall-reserve-taro/src/styles/variables.scss`:
+   ```scss
+   // 颜色变量
+   $color-primary: #FF6B35;
+   $color-secondary: #F7931E;
+   $color-text-primary: #333333;
+   $color-text-secondary: #999999;
+   $color-bg-page: #F5F5F5;
+   $color-bg-card: #FFFFFF;
+
+   // 字体变量
+   $font-size-xlarge: 32rpx;
+   $font-size-large: 28rpx;
+   $font-size-medium: 24rpx;
+   $font-size-small: 20rpx;
+   $font-weight-bold: 600;
+   $font-weight-medium: 500;
+   $line-height-base: 1.5;
+
+   // 间距变量
+   $spacing-page: 24rpx;
+   $spacing-card: 16rpx;
+   $spacing-inner: 32rpx;
+   $button-height: 88rpx;
+
+   // 圆角/阴影
+   $border-radius-card: 16rpx;
+   $border-radius-button: 8rpx;
+   $box-shadow-card: 0 4rpx 12rpx rgba(0,0,0,0.08);
+   ```
+
+2. **复制图片资源** (`miniapp-ordering/assets/` → `hall-reserve-taro/src/assets/images/`):
+   - 商品默认占位图: `product-placeholder.png`
+   - 购物车图标: `icon-cart.png`, `icon-cart-empty.png`
+   - 分类图标: `icon-coffee.png`, `icon-beverage.png`, `icon-snack.png`, `icon-meal.png`
+   - 订单状态图标: `icon-pending.png`, `icon-completed.png`, `icon-cancelled.png`
+   - 操作图标: `icon-add.png`, `icon-minus.png`, `icon-delete.png`
+
+3. **重写页面组件** (保留 UI 布局和交互逻辑):
+
+   **示例: 菜单列表页**
+   ```tsx
+   // miniapp-ordering/pages/menu-list/index.wxml (原型)
+   // <view class="menu-container">
+   //   <view class="category-tabs">...</view>
+   //   <scroll-view class="product-list">
+   //     <view class="product-card">...</view>
+   //   </scroll-view>
+   // </view>
+
+   // hall-reserve-taro/src/pages/channel-product-menu/index.tsx (Taro 重写)
+   import Taro from '@tarojs/taro'
+   import { View, ScrollView } from '@tarojs/components'
+   import { useChannelProducts } from '@/hooks/useChannelProducts'
+   import { CategoryTabs } from '@/components/CategoryTabs'
+   import { ProductCard } from '@/components/ProductCard'
+   import './index.less'
+
+   const ChannelProductMenuPage = () => {
+     const [selectedCategory, setSelectedCategory] = useState(undefined)
+     const { data: products, isLoading } = useChannelProducts(selectedCategory)
+
+     return (
+       <View className="menu-container">
+         <CategoryTabs selected={selectedCategory} onChange={setSelectedCategory} />
+         <ScrollView scrollY className="product-list">
+           {products?.map(product => (
+             <ProductCard key={product.id} product={product} />
+           ))}
+         </ScrollView>
+       </View>
+     )
+   }
+   ```
+
+   **样式文件** `index.less`:
+   ```less
+   @import '@/styles/variables.scss';
+
+   .menu-container {
+     min-height: 100vh;
+     background: $color-bg-page;
+
+     .product-list {
+       height: calc(100vh - 100rpx);
+       padding: $spacing-page;
+     }
+   }
+   ```
+
+4. **交互逻辑迁移**:
+   - 商品点击: `bindtap` → `onClick`
+   - 页面跳转: `wx.navigateTo` → `Taro.navigateTo`
+   - 状态管理: `setData` → `useState` / Zustand store
+   - 数据加载: `wx.request` → TanStack Query hooks
+
+**验证策略**:
+- 对比原型和 Taro 实现的 UI 截图,确保像素级一致
+- 验证交互流程(点击、滚动、弹窗等)与原型行为一致
+- 使用微信开发者工具真机调试验证小程序端表现
+- 使用浏览器验证 H5 端表现
+
+**Edge Cases**:
+- 原型中使用了微信小程序专属 API: 需要替换为 Taro 统一 API
+- 原型中硬编码了样式值: 提取到变量文件统一管理
+- 原型中未处理的异常情况: 补充错误处理逻辑
+
+**Alternatives Considered**:
+- 使用自动化工具转换: 工具不可靠,生成代码质量差
+- 保留原生小程序代码: 无法适配 H5,且不符合项目技术规范
+- 忽略 UI 原型重新设计: 浪费已有设计成果,且增加设计成本
+
+**References**:
+- Taro 从原生小程序转换指南: https://docs.taro.zone/docs/migration
+- Taro 样式最佳实践: https://docs.taro.zone/docs/size
+- 微信小程序设计指南: https://developers.weixin.qq.com/miniprogram/design/
+
+---
+
 ## Summary of Key Decisions
 
 | Research Area | Decision | Impact |
@@ -406,6 +574,7 @@ function calculateFinalPrice(
 | 多端适配 | Taro 统一 API + 条件编译 | 支持小程序和 H5,代码共享率高 |
 | 购物车持久化 | 内存状态,刷新清空 | 避免价格/规格过期问题,简化逻辑 |
 | 价格计算 | 基础价 + 规格调整之和 | 符合用户直觉,易于测试 |
+| UI 原型迁移 | 完全重写代码,提取样式变量,复制图片资源 | 保留用户体验,符合技术规范,便于维护 |
 
 ## Next Steps
 

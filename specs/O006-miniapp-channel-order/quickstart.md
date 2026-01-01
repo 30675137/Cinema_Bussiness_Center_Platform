@@ -88,6 +88,299 @@ hall-reserve-taro/
 
 ---
 
+## UI Prototype Migration
+
+本项目需要将 `miniapp-ordering/` 文件夹中的原生微信小程序代码迁移到 Taro 框架。以下是迁移步骤和最佳实践。
+
+### 第一步:分析原型结构
+
+在开始编码前,先熟悉原型的页面结构和组件:
+
+```bash
+# 查看原型页面结构
+ls miniapp-ordering/pages/
+
+# 输出:
+# menu-list/         - 菜单列表页
+# product-detail/    - 商品详情页
+# cart/              - 购物车页
+# member/orders/     - 订单列表页
+```
+
+**关键文件映射**:
+
+| 原型文件 | Taro 目标文件 | 说明 |
+|---------|-------------|------|
+| `miniapp-ordering/pages/menu-list/` | `hall-reserve-taro/src/pages/channel-product-menu/` | 菜单列表页 |
+| `miniapp-ordering/pages/product-detail/` | `hall-reserve-taro/src/pages/channel-product-detail/` | 商品详情页 |
+| `miniapp-ordering/pages/cart/` | `hall-reserve-taro/src/pages/order-cart/` | 购物车页 |
+| `miniapp-ordering/pages/member/orders/` | `hall-reserve-taro/src/pages/member/my-orders/` | 订单列表页 |
+
+### 第二步:提取样式变量
+
+从原型中提取关键样式变量,统一管理在 Taro 项目中。
+
+**创建样式变量文件** `hall-reserve-taro/src/styles/variables.scss`:
+
+```scss
+/**
+ * @spec O006-miniapp-channel-order
+ * 样式变量 - 从 miniapp-ordering 原型提取
+ */
+
+// 颜色变量
+$color-primary: #FF6B35;        // 主色(橙红色,按钮、选中态)
+$color-secondary: #F7931E;      // 辅助色(金黄色,推荐标签)
+$color-text-primary: #333333;   // 主文本色
+$color-text-secondary: #999999; // 辅助文本色
+$color-bg-page: #F5F5F5;        // 页面背景色
+$color-bg-card: #FFFFFF;        // 卡片背景色
+
+// 字体变量
+$font-size-xlarge: 32rpx;       // 大标题
+$font-size-large: 28rpx;        // 小标题
+$font-size-medium: 24rpx;       // 正文
+$font-size-small: 20rpx;        // 辅助文字
+$font-weight-bold: 600;         // 粗体
+$font-weight-medium: 500;       // 中粗体
+$line-height-base: 1.5;         // 行高
+
+// 间距变量
+$spacing-page: 24rpx;           // 页面边距
+$spacing-card: 16rpx;           // 卡片间距
+$spacing-inner: 32rpx;          // 组件内边距
+$button-height: 88rpx;          // 按钮高度
+
+// 圆角/阴影
+$border-radius-card: 16rpx;     // 卡片圆角
+$border-radius-button: 8rpx;    // 按钮圆角
+$box-shadow-card: 0 4rpx 12rpx rgba(0,0,0,0.08);  // 卡片阴影
+```
+
+**使用样式变量**:
+
+```less
+// hall-reserve-taro/src/pages/channel-product-menu/index.less
+@import '@/styles/variables.scss';
+
+.product-card {
+  background: $color-bg-card;
+  border-radius: $border-radius-card;
+  box-shadow: $box-shadow-card;
+  padding: $spacing-inner;
+  margin-bottom: $spacing-card;
+}
+
+.product-title {
+  font-size: $font-size-large;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.product-price {
+  font-size: $font-size-xlarge;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
+}
+```
+
+### 第三步:复制图片资源
+
+将原型中的图片资源复制到 Taro 项目:
+
+```bash
+# 创建图片目录
+mkdir -p hall-reserve-taro/src/assets/images
+
+# 复制图片资源
+cp miniapp-ordering/assets/*.png hall-reserve-taro/src/assets/images/
+
+# 整理图片分类
+mkdir -p hall-reserve-taro/src/assets/images/{icons,placeholders,categories}
+```
+
+**推荐的图片目录结构**:
+
+```
+hall-reserve-taro/src/assets/images/
+├── icons/              # 操作图标
+│   ├── cart.png
+│   ├── cart-empty.png
+│   ├── add.png
+│   ├── minus.png
+│   └── delete.png
+├── categories/         # 分类图标
+│   ├── coffee.png
+│   ├── beverage.png
+│   ├── snack.png
+│   └── meal.png
+├── orders/            # 订单状态图标
+│   ├── pending.png
+│   ├── completed.png
+│   └── cancelled.png
+└── placeholders/      # 占位图
+    └── product.png
+```
+
+**图片引用示例**:
+
+```typescript
+// 引入图片
+import iconCart from '@/assets/images/icons/cart.png'
+import placeholderProduct from '@/assets/images/placeholders/product.png'
+
+// 使用图片
+<Image src={product.mainImage || placeholderProduct} />
+<Image src={iconCart} className="cart-icon" />
+```
+
+### 第四步:对比原型重写页面
+
+逐页对比原型,使用 Taro 重写 UI 组件。
+
+**原型页面示例** (miniapp-ordering/pages/menu-list/index.wxml):
+```xml
+<!-- 原生小程序 WXML -->
+<view class="menu-container">
+  <view class="category-tabs">
+    <view class="tab {{selectedCategory === 'COFFEE' ? 'active' : ''}}" bindtap="selectCategory" data-category="COFFEE">咖啡</view>
+    <view class="tab {{selectedCategory === 'BEVERAGE' ? 'active' : ''}}" bindtap="selectCategory" data-category="BEVERAGE">饮料</view>
+  </view>
+
+  <scroll-view scroll-y class="product-list">
+    <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <image class="product-image" src="{{item.mainImage}}" mode="aspectFill" />
+      <view class="product-info">
+        <text class="product-name">{{item.displayName}}</text>
+        <text class="product-price">¥{{item.basePrice / 100}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+```
+
+**Taro 重写版本** (hall-reserve-taro/src/pages/channel-product-menu/index.tsx):
+```tsx
+/**
+ * @spec O006-miniapp-channel-order
+ * 渠道商品菜单页 - 从 miniapp-ordering/pages/menu-list 迁移
+ */
+import Taro from '@tarojs/taro'
+import { View, ScrollView, Image } from '@tarojs/components'
+import { useState } from 'react'
+import { useChannelProducts } from '@/hooks/useChannelProducts'
+import { ChannelCategory } from '@/types/channelProduct'
+import placeholderProduct from '@/assets/images/placeholders/product.png'
+import './index.less'
+
+const ChannelProductMenuPage = () => {
+  const [selectedCategory, setSelectedCategory] = useState<ChannelCategory | undefined>()
+  const { data: products, isLoading } = useChannelProducts(selectedCategory)
+
+  const handleCategorySelect = (category: ChannelCategory) => {
+    setSelectedCategory(category)
+  }
+
+  const handleProductClick = (productId: string) => {
+    Taro.navigateTo({ url: `/pages/channel-product-detail/index?id=${productId}` })
+  }
+
+  return (
+    <View className="menu-container">
+      {/* 分类标签栏 */}
+      <View className="category-tabs">
+        <View
+          className={`tab ${selectedCategory === ChannelCategory.COFFEE ? 'active' : ''}`}
+          onClick={() => handleCategorySelect(ChannelCategory.COFFEE)}
+        >
+          咖啡
+        </View>
+        <View
+          className={`tab ${selectedCategory === ChannelCategory.BEVERAGE ? 'active' : ''}`}
+          onClick={() => handleCategorySelect(ChannelCategory.BEVERAGE)}
+        >
+          饮料
+        </View>
+      </View>
+
+      {/* 商品列表 */}
+      <ScrollView scrollY className="product-list">
+        {isLoading && <View className="loading">加载中...</View>}
+        {products?.map(product => (
+          <View
+            key={product.id}
+            className="product-card"
+            onClick={() => handleProductClick(product.id)}
+          >
+            <Image
+              className="product-image"
+              src={product.mainImage || placeholderProduct}
+              mode="aspectFill"
+            />
+            <View className="product-info">
+              <View className="product-name">{product.displayName}</View>
+              <View className="product-price">¥{(product.basePrice / 100).toFixed(2)}</View>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  )
+}
+
+export default ChannelProductMenuPage
+```
+
+**关键迁移点对照**:
+
+| 原型代码 | Taro 替换 | 说明 |
+|---------|---------|------|
+| `<view>` | `<View>` | Taro 组件大写开头 |
+| `<scroll-view>` | `<ScrollView>` | 同上 |
+| `wx:for="{{products}}"` | `{products?.map(product => ...)}` | React map 渲染 |
+| `bindtap="goToDetail"` | `onClick={() => handleProductClick()}` | React 事件处理 |
+| `{{item.displayName}}` | `{product.displayName}` | JSX 表达式 |
+| `wx.navigateTo()` | `Taro.navigateTo()` | Taro 统一 API |
+
+### 第五步:验证 UI 一致性
+
+完成页面重写后,对比验证 UI 表现:
+
+1. **微信小程序端验证**:
+   ```bash
+   npm run dev:weapp
+   # 在微信开发者工具中打开 dist 目录
+   # 对比原型和 Taro 实现的截图
+   ```
+
+2. **H5 端验证**:
+   ```bash
+   npm run dev:h5
+   # 访问 http://localhost:10086
+   # 使用浏览器开发者工具模拟移动端设备
+   ```
+
+3. **检查清单**:
+   - [ ] 布局结构与原型一致
+   - [ ] 颜色、字体、间距与原型一致
+   - [ ] 交互逻辑(点击、滚动、弹窗)与原型一致
+   - [ ] 图片资源正常加载
+   - [ ] 页面跳转正常
+   - [ ] 小程序和 H5 两端表现一致
+
+**调试技巧**:
+
+```bash
+# 使用微信开发者工具的真机调试功能
+# 工具栏 → 预览 → 真机调试
+
+# 对比截图(推荐工具: Beyond Compare, Kaleidoscope)
+# 原型截图路径: miniapp-ordering/screenshots/
+# Taro 实现截图: 在开发者工具中手动截图
+```
+
+---
+
 ## Development Workflow
 
 ### Step 1: 创建类型定义
