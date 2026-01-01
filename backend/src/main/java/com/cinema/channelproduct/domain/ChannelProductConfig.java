@@ -3,7 +3,9 @@ package com.cinema.channelproduct.domain;
 import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.domain.enums.ChannelProductStatus;
 import com.cinema.channelproduct.domain.enums.ChannelType;
+import com.cinema.hallstore.domain.Sku;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
@@ -179,5 +181,42 @@ public class ChannelProductConfig {
      */
     public void restore() {
         this.deletedAt = null;
+    }
+
+    /**
+     * SKU 关联信息（查询时通过 DTO 附加）
+     */
+    @Transient
+    @JsonProperty("sku")
+    private SkuBasicInfoDto skuInfo;
+
+    /**
+     * 设置 SKU 关联信息
+     */
+    @JsonProperty("sku")
+    public void setSkuInfo(SkuBasicInfoDto skuInfo) {
+        this.skuInfo = skuInfo;
+    }
+
+    /**
+     * 获取 SKU 关联信息
+     */
+    @JsonProperty("sku")
+    public SkuBasicInfoDto getSkuInfo() {
+        return skuInfo;
+    }
+
+    /**
+     * SKU 基础信息 DTO（用于查询返回）
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SkuBasicInfoDto {
+        private String id;
+        private String skuCode;   // SKU 编码（来自 Sku.code）
+        private String skuName;   // SKU 名称（来自 Sku.name）
+        private Long price;        // 价格（分）
+        private String imageUrl;    // 主图 URL
     }
 }

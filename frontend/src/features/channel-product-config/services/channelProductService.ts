@@ -21,6 +21,21 @@ import type {
 const BASE_URL = '/api/channel-products';
 
 /**
+ * Convert snake_case keys to camelCase
+ */
+const toCamelCase = (obj: any): any => {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (typeof obj !== 'object') return obj;
+
+  return Object.keys(obj).reduce((acc: any, key: string) => {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    acc[camelKey] = toCamelCase(obj[key]);
+    return acc;
+  }, {});
+};
+
+/**
  * Fetch channel product list
  */
 const fetchChannelProducts = async (
@@ -39,7 +54,16 @@ const fetchChannelProducts = async (
     throw new Error('Failed to fetch channel products');
   }
   const result = await response.json();
-  return result.data;
+
+  // Convert snake_case to camelCase
+  const camelData = toCamelCase(result.data);
+
+  return {
+    items: camelData.content || [],
+    total: camelData.totalElements || 0,
+    page: (camelData.number || 0) + 1,
+    size: camelData.size || 20,
+  };
 };
 
 /**
@@ -51,7 +75,7 @@ const fetchChannelProduct = async (id: string): Promise<ChannelProductConfig> =>
     throw new Error('Failed to fetch channel product');
   }
   const result = await response.json();
-  return result.data;
+  return toCamelCase(result.data);
 };
 
 /**

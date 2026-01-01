@@ -14,8 +14,11 @@ export class ChannelProductPage {
   }
 
   async selectSkuInModal() {
-    // Wait for modal
-    await expect(this.page.locator('.ant-modal-content')).toBeVisible();
+    // First, click the "打开 SKU 选择器" button to open the modal
+    await this.page.getByRole('button', { name: '打开 SKU 选择器' }).click();
+
+    // Wait for modal to appear
+    await expect(this.page.locator('.ant-modal-content')).toBeVisible({ timeout: 10000 });
 
     // Ant Design Table row selection (first row with radio/checkbox usually)
     // Clicking the row should select it if onRow is configured, otherwise look for selection input

@@ -99,8 +99,8 @@ const ChannelProductListPage: React.FC = () => {
 
           <ChannelProductTable
             loading={isLoading || isPagedLoading || isRefetching}
-            dataSource={pagedData?.content || []}
-            total={pagedData?.totalElements || 0}
+            dataSource={pagedData?.items || []}
+            total={pagedData?.total || 0}
             page={pagination.page}
             pageSize={pagination.size}
             onPageChange={handlePageChange}

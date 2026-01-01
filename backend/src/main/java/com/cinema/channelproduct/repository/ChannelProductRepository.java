@@ -8,10 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 /**
  * @spec O005-channel-product-config
@@ -52,4 +55,13 @@ public interface ChannelProductRepository extends JpaRepository<ChannelProductCo
      * 根据渠道类型和分类查询
      */
     Page<ChannelProductConfig> findByChannelTypeAndChannelCategory(ChannelType channelType, ChannelCategory channelCategory, Pageable pageable);
+
+    /**
+     * 查找所有关联的 SKU ID
+     *
+     * @param ids 渠道商品配置 ID 列表
+     * @return SKU ID 列表
+     */
+    @Query("SELECT DISTINCT c.skuId FROM ChannelProductConfig c WHERE c.id IN :ids AND c.deletedAt IS NULL")
+    List<UUID> findDistinctSkuIdsByIdInAndDeletedAtIsNull(@Param("ids") List<UUID> ids);
 }

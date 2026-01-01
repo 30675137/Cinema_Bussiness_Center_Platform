@@ -1,0 +1,115 @@
+---
+# @spec O005-channel-product-config
+# E2E Test Scenario: Channel Product List Display
+# Tests: API data conversion, SKU info display, pagination
+
+scenarioId: E2E-CHANNEL-PRODUCT-001
+title: 渠道商品列表展示测试
+module: channel-product-config
+priority: high
+tags:
+  - channel-product
+  - list-view
+  - sku-display
+  - data-conversion
+
+description: |
+  验证渠道商品列表页面能够正确显示 SKU 信息（名称、编码、图片），
+  并且后端返回的 snake_case 数据能正确转换为前端的 camelCase 格式。
+
+preconditions:
+  - 后端服务运行在 http://localhost:8080
+  - 前端服务运行在 http://localhost:3000
+  - 数据库中至少有一条渠道商品配置记录
+  - SKU 数据已正确关联
+
+testSteps:
+  - step: 1
+    action: 访问渠道商品列表页面
+    page: http://localhost:3000/channel-products/mini-program
+    expectedResult: 页面成功加载，显示商品列表
+
+  - step: 2
+    action: 验证 API 请求格式
+    apiEndpoint: GET /api/channel-products?channelType=MINI_PROGRAM&page=1&size=20
+    expectedResponse:
+      status: 200
+      structure:
+        success: true
+        data:
+          content: array
+          totalElements: number
+          number: number
+          size: number
+    notes: 后端返回 snake_case 格式的分页数据
+
+  - step: 3
+    action: 验证 API 返回的 SKU 信息结构
+    expectedResponse:
+      data.content[0]:
+        sku_id: string (UUID)
+        channel_type: string
+        display_name: string
+        main_image: string (URL)
+        sku:
+          id: string
+          skuCode: string
+          skuName: string
+          price: number
+          imageUrl: string
+
+  - step: 4
+    action: 验证前端数据转换
+    selector: '[data-testid="channel-product-table"]'
+    expectedBehavior: |
+      - snake_case 字段已转换为 camelCase
+      - dataSource 使用 items 而非 content
+      - total 正确显示总记录数
+
+  - step: 5
+    action: 验证商品信息列显示
+    selector: '.ant-table-tbody .ant-table-cell:first-child'
+    expectedElements:
+      - selector: '.ant-avatar'
+        attribute: src
+        value: 包含 Supabase 图片 URL
+      - selector: '.ant-typography-secondary'
+        text: 'SKU: SKU[0-9]+'
+        notes: 显示 SKU 编码
+
+  - step: 6
+    action: 验证 SKU 名称显示
+    selector: '.ant-space-vertical .ant-typography'
+    expectedText: 商品展示名称（如"威士忌可乐鸡尾酒"）
+
+  - step: 7
+    action: 验证图片正确加载
+    selector: '.ant-avatar[shape="square"]'
+    expectedBehavior: |
+      - 图片 src 来自 ChannelProductConfig.mainImage
+      - 图片成功加载（非 404）
+      - 图片尺寸为 64x64
+
+  - step: 8
+    action: 验证分页功能
+    selector: '.ant-pagination'
+    expectedElements:
+      - total 显示正确的总记录数
+      - 当前页码为 1
+      - 每页显示 20 条
+
+expectedResults:
+  - SKU 编码正确显示在商品信息下方
+  - 商品图片从 Supabase 成功加载
+  - 数据格式从 snake_case 正确转换为 camelCase
+  - 列表分页数据结构正确（items, total, page, size）
+
+bugReferences:
+  - issue: "商品信息没有展现 SKU 名称和图片"
+    fixedBy:
+      - 添加 toCamelCase 转换函数
+      - 修改数据访问从 content 到 items
+      - 后端加载 SKU 信息到 transient 字段
+
+regressionRisk: medium
+estimatedDuration: 10分钟

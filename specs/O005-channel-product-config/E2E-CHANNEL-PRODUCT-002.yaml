@@ -1,0 +1,156 @@
+---
+# @spec O005-channel-product-config
+# E2E Test Scenario: Data Conversion Edge Cases
+# Tests: Empty data, null values, nested object conversion
+
+scenarioId: E2E-CHANNEL-PRODUCT-002
+title: 渠道商品数据转换边界测试
+module: channel-product-config
+priority: medium
+tags:
+  - channel-product
+  - data-conversion
+  - edge-cases
+  - null-handling
+
+description: |
+  测试 toCamelCase 转换函数在各种边界情况下的正确性，
+  包括空数据、null 值、嵌套对象、数组等场景。
+
+preconditions:
+  - channelProductService.ts 中已实现 toCamelCase 函数
+
+testData:
+  - case: 空对象
+    input: {}
+    expected: {}
+
+  - case: null 值
+    input: null
+    expected: null
+
+  - case: undefined 值
+    input: undefined
+    expected: undefined
+
+  - case: 简单 snake_case 转换
+    input:
+      sku_id: "123"
+      channel_type: "MINI_PROGRAM"
+      main_image: "url"
+    expected:
+      skuId: "123"
+      channelType: "MINI_PROGRAM"
+      mainImage: "url"
+
+  - case: 嵌套对象转换
+    input:
+      sku_id: "123"
+      sku:
+        sku_code: "SKU001"
+        sku_name: "商品名"
+        image_url: "url"
+    expected:
+      skuId: "123"
+      sku:
+        skuCode: "SKU001"
+        skuName: "商品名"
+        imageUrl: "url"
+
+  - case: 数组转换
+    input:
+      items:
+        - sku_id: "1"
+          sku_name: "商品1"
+        - sku_id: "2"
+          sku_name: "商品2"
+    expected:
+      items:
+        - skuId: "1"
+          skuName: "商品1"
+        - skuId: "2"
+          skuName: "商品2"
+
+  - case: 已经是 camelCase 的字段
+    input:
+      sku:
+        skuCode: "SKU001"
+        skuName: "商品"
+    expected:
+      sku:
+        skuCode: "SKU001"
+        skuName: "商品"
+    notes: 已经是 camelCase 的字段保持不变
+
+  - case: 包含 null 的嵌套对象
+    input:
+      sku_id: "123"
+      main_image: null
+      sku:
+        image_url: null
+    expected:
+      skuId: "123"
+      mainImage: null
+      sku:
+        imageUrl: null
+
+testSteps:
+  - step: 1
+    action: 单元测试 - 空值处理
+    code: |
+      const result = toCamelCase(null);
+      expect(result).toBe(null);
+
+  - step: 2
+    action: 单元测试 - 简单对象转换
+    code: |
+      const input = { sku_id: "123", channel_type: "MINI_PROGRAM" };
+      const result = toCamelCase(input);
+      expect(result.skuId).toBe("123");
+      expect(result.channelType).toBe("MINI_PROGRAM");
+
+  - step: 3
+    action: 单元测试 - 嵌套对象转换
+    code: |
+      const input = {
+        sku_id: "123",
+        sku: {
+          sku_code: "SKU001",
+          sku_name: "商品"
+        }
+      };
+      const result = toCamelCase(input);
+      expect(result.sku.skuCode).toBe("SKU001");
+      expect(result.sku.skuName).toBe("商品");
+
+  - step: 4
+    action: 单元测试 - 数组转换
+    code: |
+      const input = [
+        { sku_id: "1" },
+        { sku_id: "2" }
+      ];
+      const result = toCamelCase(input);
+      expect(result[0].skuId).toBe("1");
+      expect(result[1].skuId).toBe("2");
+
+  - step: 5
+    action: 集成测试 - API 响应转换
+    apiEndpoint: GET /api/channel-products?channelType=MINI_PROGRAM&page=1&size=1
+    expectedBehavior: |
+      1. 获取 API 响应（snake_case）
+      2. 应用 toCamelCase 转换
+      3. 验证所有字段都是 camelCase
+      4. 验证嵌套的 sku 对象也被转换
+
+expectedResults:
+  - toCamelCase 正确处理 null 和 undefined
+  - 简单 snake_case 字段正确转换
+  - 嵌套对象递归转换正确
+  - 数组元素逐个转换正确
+  - 已经是 camelCase 的字段保持不变
+  - 不改变原始对象（纯函数）
+
+regressionRisk: low
+estimatedDuration: 5分钟
+automatable: true

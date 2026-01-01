@@ -109,8 +109,13 @@ public class ChannelProductService {
      */
     @Transactional(readOnly = true)
     public ChannelProductConfig getChannelProduct(UUID id) {
-        return channelProductRepository.findById(id)
+        ChannelProductConfig config = channelProductRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Channel product not found: " + id));
+
+        // 加载 SKU 信息
+        loadSkuInfoForSingle(config);
+
+        return config;
     }
 
     /**
@@ -120,7 +125,7 @@ public class ChannelProductService {
     public Page<ChannelProductConfig> getChannelProducts(ChannelProductQueryParams params) {
 
         Specification<ChannelProductConfig> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
 
             // 软删除过滤
             predicates.add(cb.isNull(root.get("deletedAt")));
@@ -137,10 +142,7 @@ public class ChannelProductService {
                 predicates.add(cb.equal(root.get("status"), params.getStatus()));
             }
 
-            // JOIN SKU for keyword search if needed
-            // 注意：这里简单实现，实际可能需要 JOIN 查询
-
-            return cb.and(predicates.toArray(new Predicate[0]));
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
         };
 
         PageRequest pageRequest = PageRequest.of(
@@ -149,7 +151,63 @@ public class ChannelProductService {
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        return channelProductRepository.findAll(spec, pageRequest);
+        Page<ChannelProductConfig> pageResult = channelProductRepository.findAll(spec, pageRequest);
+
+        // 加载 SKU 信息并填充到每个配置
+        loadSkuInfo(pageResult.getContent());
+
+        return pageResult;
+    }
+
+    /**
+     * 加载单个渠道商品的 SKU 信息
+     */
+    private void loadSkuInfoForSingle(ChannelProductConfig config) {
+        Sku sku = skuRepository.findById(config.getSkuId()).orElse(null);
+        if (sku != null) {
+            // 价格从元转换为分（乘以 100）
+            long priceInCents = sku.getPrice() != null
+                    ? sku.getPrice().multiply(new java.math.BigDecimal("100")).longValue()
+                    : null;
+
+            ChannelProductConfig.SkuBasicInfoDto skuInfo = new ChannelProductConfig.SkuBasicInfoDto(
+                    sku.getId().toString(),
+                    sku.getCode(),           // Sku.code -> skuCode
+                    sku.getName(),           // Sku.name -> skuName
+                    priceInCents,          // 元 -> 分
+                    config.getMainImage()    // 图片使用 ChannelProductConfig 的 mainImage
+            );
+            config.setSkuInfo(skuInfo);
+        }
+    }
+
+    /**
+     * 加载 SKU 信息并填充到渠道商品配置列表
+     */
+    private void loadSkuInfo(List<ChannelProductConfig> configs) {
+        if (configs.isEmpty()) {
+            return;
+        }
+
+        // 填充 SKU 信息到每个配置
+        for (ChannelProductConfig config : configs) {
+            Sku sku = skuRepository.findById(config.getSkuId()).orElse(null);
+            if (sku != null) {
+                // 价格从元转换为分（乘以 100）
+                long priceInCents = sku.getPrice() != null
+                        ? sku.getPrice().multiply(new java.math.BigDecimal("100")).longValue()
+                        : null;
+
+                ChannelProductConfig.SkuBasicInfoDto skuInfo = new ChannelProductConfig.SkuBasicInfoDto(
+                        sku.getId().toString(),
+                        sku.getCode(),           // Sku.code -> skuCode
+                        sku.getName(),           // Sku.name -> skuName
+                        priceInCents,          // 元 -> 分
+                        config.getMainImage()    // 图片使用 ChannelProductConfig 的 mainImage
+                );
+                config.setSkuInfo(skuInfo);
+            }
+        }
     }
 
     /**
