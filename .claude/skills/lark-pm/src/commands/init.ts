@@ -106,10 +106,10 @@ export async function initCommand(): Promise<void> {
     // Step 2: Check for existing tables
     const checkSpinner = ora('检查现有数据表...').start()
     const existingTables = await client.listTables(baseAppToken)
-    checkSpinner.succeed(chalk.green(`发现 ${existingTables.items?.length || 0} 个现有数据表`))
+    checkSpinner.succeed(chalk.green(`发现 ${existingTables.length || 0} 个现有数据表`))
 
-    const requiredTables = ['任务管理', '技术债', 'Bug 跟踪', '功能矩阵', '测试记录']
-    const existingTableNames = new Set(existingTables.items?.map((t: any) => t.name) || [])
+    const requiredTables = ['任务管理', '技术债', 'Bug 跟踪', '功能矩阵', '测试记录', 'Backlog']
+    const existingTableNames = new Set(existingTables.map((t: any) => t.table_name) || [])
     const conflictingTables = requiredTables.filter(name => existingTableNames.has(name))
 
     // Step 3: Handle existing tables
@@ -180,6 +180,9 @@ export async function initCommand(): Promise<void> {
           case '测试记录':
             table = await createTestRecordTable(client, baseAppToken)
             break
+          case 'Backlog':
+            table = await createBacklogTable(client, baseAppToken)
+            break
         }
         if (table) createdTables.push(table)
       }
@@ -189,12 +192,13 @@ export async function initCommand(): Promise<void> {
       // No conflicts, create all tables
       const tableSpinner = ora('创建数据表...').start()
 
-      const tables = await Promise.all([
+      await Promise.all([
         createTaskTable(client, baseAppToken),
         createDebtTable(client, baseAppToken),
         createBugTable(client, baseAppToken),
         createFeatureTable(client, baseAppToken),
         createTestRecordTable(client, baseAppToken),
+        createBacklogTable(client, baseAppToken),
       ])
 
       tableSpinner.succeed(chalk.green('所有数据表创建成功'))
@@ -206,8 +210,8 @@ export async function initCommand(): Promise<void> {
     // Get final table list
     const finalTables = await client.listTables(baseAppToken)
     const tableMap: any = {}
-    for (const table of finalTables.items || []) {
-      switch (table.name) {
+    for (const table of finalTables || []) {
+      switch (table.table_name) {
         case '任务管理':
           tableMap.tasks = table.table_id
           break
@@ -222,6 +226,9 @@ export async function initCommand(): Promise<void> {
           break
         case '测试记录':
           tableMap.testRecords = table.table_id
+          break
+        case 'Backlog':
+          tableMap.backlog = table.table_id
           break
       }
     }
@@ -337,6 +344,27 @@ async function createTestRecordTable(client: LarkClient, appToken: string) {
     { field_name: '测试结果', type: 1 }, // Text
     { field_name: '失败原因', type: 1 }, // Text
     { field_name: '覆盖率', type: 2 }, // Number
+    { field_name: '备注', type: 1 }, // Text
+  ])
+}
+
+/**
+ * Create Backlog table
+ */
+async function createBacklogTable(client: LarkClient, appToken: string) {
+  return client.createTable(appToken, 'Backlog', [
+    { field_name: '标题', type: 1 }, // Text
+    { field_name: '描述', type: 1 }, // Text
+    { field_name: '类型', type: 3 }, // Single select
+    { field_name: '优先级', type: 3 }, // Single select
+    { field_name: '状态', type: 3 }, // Single select
+    { field_name: '提出人', type: 11 }, // User
+    { field_name: '负责人', type: 11 }, // User
+    { field_name: '关联规格', type: 1 }, // Text
+    { field_name: '预估工时', type: 2 }, // Number
+    { field_name: '标签', type: 4 }, // Multi select
+    { field_name: '创建日期', type: 5 }, // Date
+    { field_name: '批准日期', type: 5 }, // Date
     { field_name: '备注', type: 1 }, // Text
   ])
 }

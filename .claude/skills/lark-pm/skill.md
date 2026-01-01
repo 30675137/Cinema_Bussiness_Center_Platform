@@ -1,18 +1,18 @@
 ---
 name: lark-pm
-description: Lark MCP project management tool for Cinema Business Center Platform. Manage tasks, technical debt, bugs, features, and test records through Feishu/Lark Base. Supports CRUD operations, filtering, data export (Excel/CSV), and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, 飞书项目管理, 任务跟踪, Bug管理, 技术债.
-version: 1.0.0
+description: Lark MCP project management tool for Cinema Business Center Platform. Manage tasks, technical debt, bugs, features, test records, and backlog through Feishu/Lark Base. Supports CRUD operations, filtering, data export (Excel/CSV), and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, backlog, 飞书项目管理, 任务跟踪, Bug管理, 技术债, 待办事项.
+version: 1.1.0
 ---
 
 # lark-pm
 
 **@spec T004-lark-project-management**
 
-Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技术债、Bug、功能矩阵和测试记录
+Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技术债、Bug、功能矩阵、测试记录和 Backlog
 
 ## Overview
 
-`lark-pm` is a Claude Code skill that integrates with Lark (Feishu) Base to provide comprehensive project management capabilities. All data is stored in a single Lark Base App with 5 separate tables, enabling real-time collaboration and powerful filtering.
+`lark-pm` is a Claude Code skill that integrates with Lark (Feishu) Base to provide comprehensive project management capabilities. All data is stored in a single Lark Base App with 6 separate tables, enabling real-time collaboration and powerful filtering.
 
 ## Features
 
@@ -21,6 +21,7 @@ Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技�
 - **Bug Tracking** (Bug管理): Report, assign, and resolve bugs with reproduction steps and status flow
 - **Feature Matrix** (功能矩阵): Maintain product feature roadmap with module organization
 - **Test Records** (测试记录): Track test execution, coverage, and results
+- **Backlog Management** (Backlog管理): Manage product backlog with types, priorities, and approval workflow
 
 ## Installation
 
@@ -54,29 +55,56 @@ Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技�
 ## Commands
 
 ### Initialization
-- `init` - Create Base App and all 5 tables
+- `init` - Create Base App and all 6 tables
 
 ### Task Management
-- `task-create` - Create new task
-- `task-list` - List tasks with filtering
-- `task-update` - Update task status/progress
-- `task-delete` - Delete task
+- `task create` - Create new task
+- `task list` - List tasks with filtering
+- `task update` - Update task status/progress
+- `task delete` - Delete task
+- `task export` - Export tasks to Excel/CSV
 
 ### Technical Debt
-- `debt-create` - Record technical debt
-- `debt-list` - List technical debt
-- `debt-update` - Update debt status
+- `debt create` - Record technical debt
+- `debt list` - List technical debt
+- `debt update` - Update debt status
+- `debt delete` - Delete technical debt
+- `debt export` - Export technical debt to Excel/CSV
 
 ### Bug Tracking
-- `bug-create` - Report new bug
-- `bug-list` - List bugs with filtering
-- `bug-update` - Update bug status
-- `bug-stats` - View bug statistics
+- `bug create` - Report new bug
+- `bug list` - List bugs with filtering
+- `bug update` - Update bug status
+- `bug delete` - Delete bug
+- `bug export` - Export bugs to Excel/CSV
+
+### Backlog Management (Product Backlog / 产品待办列表)
+- `backlog create` - Create new backlog item
+- `backlog smart-create` - **智能创建 Product Backlog（自动识别技术债→Spike类型）**
+- `backlog list` - List backlog items with filtering
+- `backlog update` - Update backlog status/priority
+- `backlog delete` - Delete backlog item
+- `backlog export` - Export backlog to Excel/CSV
+
+**Backlog Types** (Spec 管理层级):
+- **Epic**: Large specs / Feature sets (大型规格 / 功能集)
+  - 用途：管理完整的 spec (如 T004-lark-project-management)
+  - 关键词：spec, 规格, 功能集, 大型功能, 史诗, epic
+- **User Story**: User stories / Plans / Tasks (用户故事 / 计划 / 任务)
+  - 用途：spec 中的功能点、实施计划、开发任务
+  - 通过**标签**区分子类型：
+    - `Plan` - 实施计划
+    - `Task` - 开发任务
+    - 无标签 - 纯用户故事
+  - 关键词：plan/计划/规划, task/任务/待办
+- **Spike**: Technical research / Technical Debt (技术调研 / 技术债)
+  - 用途：技术债务、性能优化、架构改进
+  - 关键词：技术债, 需要解决, 缺少, 不支持
 
 ### Feature Matrix
-- `feature-create` - Add feature module
-- `feature-list` - List features
-- `feature-update` - Update feature status
+- `feature create` - Add feature module
+- `feature list` - List features
+- `feature update` - Update feature status
 
 ### Test Records
 - `test-create` - Create test record
@@ -120,6 +148,7 @@ All entities stored in Lark Base tables:
 
 ## Documentation
 
+- [Product Backlog 管理指南](./PRODUCT_BACKLOG_GUIDE.md) - **推荐阅读：如何用 Product Backlog 管理 spec、plan、task**
 - [Specification](../../../specs/T004-lark-project-management/spec.md)
 - [Quick Start Guide](../../../specs/T004-lark-project-management/quickstart.md)
 - [Data Model](../../../specs/T004-lark-project-management/data-model.md)
@@ -151,6 +180,30 @@ All entities stored in Lark Base tables:
 ```bash
 /lark-pm stats --spec I003
 ```
+
+**Smart create Product Backlog with natural language**:
+```bash
+# Epic - 管理完整的 spec
+/lark-pm backlog smart-create "Spec T004: Lark 项目管理集成" --spec-id T004
+
+# User Story (Plan) - 实施计划
+/lark-pm backlog smart-create "制定 Backlog 管理的实施计划"
+
+# User Story (Task) - 开发任务
+/lark-pm backlog smart-create "实现 smart-create 命令的自然语言解析功能"
+
+# Spike - 技术债
+/lark-pm backlog smart-create "需要解决飞书MCP导入Markdown文档的能力"
+
+# With priority and spec ID
+/lark-pm backlog smart-create "紧急：修复库存同步Bug" --priority P0 --spec-id I003
+```
+
+**自动识别规则**:
+- **Epic 关键词**: spec, 规格, 功能集, 大型功能, 史诗, epic
+- **Plan 关键词**: plan, 计划, 规划, 实施计划, 设计方案 → User Story + `Plan` 标签
+- **Task 关键词**: task, 任务, 待办, 实现, 开发, 修复 → User Story + `Task` 标签
+- **Spike 关键词**: 技术债, 需要解决, 缺少, 不支持, 性能优化, 架构优化
 
 ## Contributing
 

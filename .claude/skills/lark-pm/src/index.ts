@@ -7,6 +7,7 @@
 import 'dotenv/config'
 import { Command } from 'commander'
 import { initCommand } from './commands/init.js'
+import { registerAuthCommand } from './commands/auth.js'
 import { listTasksCommand } from './commands/task/list.js'
 import { createTaskCommand } from './commands/task/create.js'
 import { updateTaskCommand } from './commands/task/update.js'
@@ -22,6 +23,13 @@ import { createBugCommand } from './commands/bug/create.js'
 import { updateBugCommand } from './commands/bug/update.js'
 import { deleteBugCommand } from './commands/bug/delete.js'
 import { exportBugsCommand } from './commands/bug/export.js'
+import { listBacklogsCommand } from './commands/backlog/list.js'
+import { createBacklogCommand } from './commands/backlog/create.js'
+import { smartCreateBacklogCommand } from './commands/backlog/smart-create.js'
+import { updateBacklogStatusCommand } from './commands/backlog/update-status.js'
+import { importMarkdownCommand } from './commands/document/import-markdown.js'
+import { getTokenCommand } from './commands/get-token.js'
+import { importReadmeCommand } from './commands/import-readme.js'
 import chalk from 'chalk'
 
 const program = new Command()
@@ -30,6 +38,22 @@ program
   .name('lark-pm')
   .description('Lark MCP 项目管理工具 - 管理任务、技术债、Bug、功能和测试记录')
   .version('1.0.0')
+
+// OAuth authentication
+registerAuthCommand(program)
+
+// Get token command (for Claude to obtain valid UAT)
+program
+  .command('get-token')
+  .description('获取当前有效的 User Access Token（供 Claude 使用）')
+  .action(async () => {
+    try {
+      await getTokenCommand()
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
 
 // Init command
 program
@@ -333,6 +357,110 @@ bugCommand
   .action(async (options) => {
     try {
       await exportBugsCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+// Backlog commands
+const backlogCommand = program.command('backlog').description('Backlog 管理')
+
+backlogCommand
+  .command('list')
+  .description('列出 Backlog')
+  .option('--status <status>', '按状态筛选')
+  .option('--priority <priority>', '按优先级筛选')
+  .option('--type <type>', '按类型筛选')
+  .option('--spec-id <specId>', '按规格 ID 筛选')
+  .option('--assignee <assignee>', '按负责人筛选')
+  .option('--page <number>', '页码（从1开始）', parseInt)
+  .option('--page-size <number>', '每页显示数量（默认20，最大100）', parseInt)
+  .option('--limit <number>', '限制返回数量（已弃用，请使用 --page-size）', parseInt)
+  .action(async (options) => {
+    try {
+      await listBacklogsCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+backlogCommand
+  .command('create')
+  .description('创建 Backlog')
+  .requiredOption('--title <title>', 'Backlog 标题')
+  .option('--description <description>', '详细描述')
+  .option('--type <type>', '类型（功能需求/功能增强/技术债/缺陷修复/技术调研/文档）')
+  .option('--priority <priority>', '优先级（高/中/低）')
+  .option('--status <status>', '状态（待评估/已批准/进行中/已完成/已拒绝）')
+  .option('--reporter <reporter>', '提出人')
+  .option('--assignee <assignee>', '负责人')
+  .option('--spec-id <specId>', '规格 ID（如 T004）')
+  .option('--estimated-effort <number>', '预估工时', parseFloat)
+  .option('--tags <tags...>', '标签列表')
+  .option('--notes <notes>', '备注')
+  .action(async (options) => {
+    try {
+      await createBacklogCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+backlogCommand
+  .command('smart-create <input>')
+  .description('通过自然语言智能创建 Product Backlog（自动识别技术债→Spike类型）')
+  .option('--type <type>', '强制指定类型（User Story/Epic/Spike）')
+  .option('--priority <priority>', '强制指定优先级（P0/P1/P2/P3）')
+  .option('--spec-id <specId>', '规格 ID（如 T004）')
+  .action(async (input, options) => {
+    try {
+      await smartCreateBacklogCommand({ input, ...options })
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+backlogCommand
+  .command('update-status')
+  .description('更新 Product Backlog 记录状态（直接 API 调用，无需重启）')
+  .requiredOption('--record-id <recordId>', 'Record ID')
+  .requiredOption('--status <status>', '新状态（📝 待规划/🚀 进行中/✅ 已完成/❌ 已取消）')
+  .action(async (options) => {
+    try {
+      await updateBacklogStatusCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+// Document commands
+program
+  .command('import-markdown')
+  .description('导入 Markdown 文档到飞书（准备文件，由 Claude 完成实际导入）')
+  .option('--file <path>', '单个 Markdown 文件路径')
+  .option('--directory <path>', 'Markdown 文件目录路径')
+  .option('--recursive', '递归扫描子目录', false)
+  .action(async (options) => {
+    try {
+      await importMarkdownCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+// Import README command (direct API, bypassing MCP)
+program
+  .command('import-readme')
+  .description('导入 README.md 到飞书文档（直接 API 调用，无需重启）')
+  .action(async () => {
+    try {
+      await importReadmeCommand()
     } catch (error) {
       console.error(chalk.red('\n错误:'), (error as Error).message)
       process.exit(1)

@@ -32,10 +32,13 @@
   "author": "Cinema Business Center Platform Team",
   "license": "MIT",
   "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.56.0",
     "chalk": "^5.3.0",
     "cli-table3": "^0.6.3",
     "commander": "^11.1.0",
+    "dotenv": "^17.2.3",
     "json2csv": "^6.0.0-alpha.2",
+    "open": "^11.0.0",
     "ora": "^7.0.1",
     "pino": "^8.16.2",
     "pino-pretty": "^10.2.3",
@@ -43,6 +46,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/json2csv": "^5.0.7",
     "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",

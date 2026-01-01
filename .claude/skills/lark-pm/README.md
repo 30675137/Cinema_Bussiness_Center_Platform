@@ -17,39 +17,35 @@
 
 ### 2. 获取用户访问令牌（User Access Token）
 
-有两种方式获取用户访问令牌：
+#### 方式 A：使用内置 OAuth 命令（推荐）⭐
 
-#### 方式 A：使用飞书开发者工具（推荐）
+**最简单的方式**，运行以下命令自动完成 OAuth 授权：
+
+```bash
+cd .claude/skills/lark-pm
+npm install
+npm run build
+node dist/index.js auth
+```
+
+授权流程：
+1. 命令自动打开浏览器
+2. 登录飞书并点击「同意授权」
+3. Token 自动保存到 `.env` 文件
+
+**✅ 无需重启**：TokenManager 会自动加载新 token，授权完成后立即可用！
+
+技术细节：[TOKEN_MANAGEMENT.md](./TOKEN_MANAGEMENT.md)
+
+#### 方式 B：手动获取（不推荐）
+
 1. 在应用页面点击"开发配置"
-2. 找到"安全设置" → "重定向 URL"，添加 `http://localhost:8080`
+2. 找到"安全设置" → "重定向 URL"，添加 `http://localhost:8080/callback`
 3. 使用以下 URL 在浏览器中获取授权码：
    ```
-   https://open.feishu.cn/open-apis/authen/v1/authorize?app_id=YOUR_APP_ID&redirect_uri=http://localhost:8080&scope=bitable:app
+   https://open.feishu.cn/open-apis/authen/v1/authorize?app_id=YOUR_APP_ID&redirect_uri=http://localhost:8080/callback&scope=bitable:app%20drive:drive
    ```
-4. 授权后浏览器会跳转到 `http://localhost:8080?code=xxxxx`
-5. 复制 code，使用以下命令获取 access_token：
-   ```bash
-   curl -X POST https://open.feishu.cn/open-apis/authen/v1/oidc/access_token \
-     -H 'Content-Type: application/json' \
-     -d '{
-       "grant_type": "authorization_code",
-       "code": "YOUR_CODE",
-       "client_id": "YOUR_APP_ID",
-       "client_secret": "YOUR_APP_SECRET"
-     }'
-   ```
-
-#### 方式 B：使用 Tenant Access Token（简化方式）
-如果只是测试，可以暂时使用 Tenant Access Token：
-```bash
-curl -X POST https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "app_id": "YOUR_APP_ID",
-    "app_secret": "YOUR_APP_SECRET"
-  }'
-```
-**注意**: Tenant Access Token 有效期为 2 小时，需要定期刷新。
+4. 手动复制 code 并调用 API 获取 token（复杂，不推荐）
 
 ### 3. 配置环境变量
 
