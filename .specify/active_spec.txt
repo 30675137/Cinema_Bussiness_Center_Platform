@@ -1,1 +1,1 @@
-specs/O005-channel-product-config/spec.md
+specs/O006-miniapp-channel-order/spec.md
