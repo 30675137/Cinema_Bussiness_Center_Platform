@@ -19,7 +19,7 @@ export interface OAuthTokens {
 export class LarkOAuthHelper {
   private readonly APP_ID: string
   private readonly APP_SECRET: string
-  private readonly REDIRECT_URI = 'http://localhost:8080/callback'
+  private readonly REDIRECT_URI = 'http://localhost:18080/callback'
   private readonly SCOPES = [
     'bitable:app', // 多维表格权限
     'drive:drive', // 云文档权限(包含读写)
@@ -47,8 +47,8 @@ export class LarkOAuthHelper {
       // 1. 启动回调服务器
       const serverSpinner = ora('Step 1: 启动本地回调服务器...').start()
       const server = new OAuthCallbackServer()
-      const codePromise = server.start(8080)
-      serverSpinner.succeed('已启动回调服务器: http://localhost:8080')
+      const codePromise = server.start(18080)
+      serverSpinner.succeed('已启动回调服务器: http://localhost:18080')
 
       // 2. 生成授权 URL
       const urlSpinner = ora('Step 2: 生成授权链接...').start()
