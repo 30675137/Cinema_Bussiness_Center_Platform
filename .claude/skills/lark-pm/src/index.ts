@@ -27,6 +27,7 @@ import { listBacklogsCommand } from './commands/backlog/list.js'
 import { createBacklogCommand } from './commands/backlog/create.js'
 import { smartCreateBacklogCommand } from './commands/backlog/smart-create.js'
 import { updateBacklogStatusCommand } from './commands/backlog/update-status.js'
+import { updateBacklogCommand } from './commands/backlog/update.js'
 import { importMarkdownCommand } from './commands/document/import-markdown.js'
 import { getTokenCommand } from './commands/get-token.js'
 import { importReadmeCommand } from './commands/import-readme.js'
@@ -432,6 +433,25 @@ backlogCommand
   .action(async (options) => {
     try {
       await updateBacklogStatusCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+backlogCommand
+  .command('update')
+  .description('更新 Product Backlog 记录（直接 API 调用，无需重启）')
+  .requiredOption('--record-id <recordId>', 'Record ID')
+  .option('--status <status>', '状态（📝 待规划/🚀 进行中/✅ 已完成/❌ 已取消）')
+  .option('--priority <priority>', '优先级（P0/P1/P2/P3）')
+  .option('--type <type>', '类型（Epic/User Story/Task/Spike）')
+  .option('--spec-id <specId>', '规格 ID（如 T004-lark-project-management）')
+  .option('--assignee <assignee>', '负责人')
+  .option('--description <description>', '描述')
+  .action(async (options) => {
+    try {
+      await updateBacklogCommand(options)
     } catch (error) {
       console.error(chalk.red('\n错误:'), (error as Error).message)
       process.exit(1)

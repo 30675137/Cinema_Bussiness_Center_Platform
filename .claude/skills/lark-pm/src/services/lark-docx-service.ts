@@ -31,49 +31,59 @@ export class LarkDocxService {
   /**
    * 导入 Markdown 文档到飞书
    *
-   * 注意：飞书官方 API 中的 import 接口是内置接口，需要使用特殊的方式调用
-   * 这里使用正确的 API 端点
+   * 正确的流程（根据飞书官方文档）：
+   * 1. 创建一个空的 docx 文档
+   * 2. 将 Markdown 转换为文档块（blocks）
+   * 3. 将块插入到文档中
    */
   async importMarkdown(request: ImportDocxRequest): Promise<string> {
     try {
       logger.info({ fileName: request.file_name }, 'Importing markdown to Feishu')
 
-      // 使用正确的 builtin API 端点
-      const url = 'https://open.feishu.cn/open-apis/docx/v1/documents/import'
-      const tokenManager = this.client['tokenManager']
-      const token = await tokenManager.getToken()
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          file_name: request.file_name,
-          markdown: request.markdown,
-        }),
+      // Step 1: 创建空文档
+      logger.info('Step 1: Creating empty document')
+      const createResponse = await this.client.post('/docx/v1/documents', {
+        title: request.file_name,
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        logger.error({ status: response.status, errorText }, 'Import API request failed')
-        throw new Error(`Import failed: ${response.status} ${errorText}`)
+      const documentId = createResponse.data.document.document_id
+      logger.info({ documentId }, 'Document created')
+
+      // Step 2: 将 Markdown 转换为文档块
+      logger.info('Step 2: Converting markdown to blocks')
+      const convertResponse = await this.client.post(
+        '/docx/v1/documents/blocks/convert',
+        {
+          content: request.markdown,
+          content_type: 'markdown',
+          rich_text_type: 'common',
+        }
+      )
+
+      const blocks = convertResponse.data.blocks
+      logger.info({ blockCount: blocks?.length || 0 }, 'Markdown converted to blocks')
+
+      // Step 3: 将块插入到文档中
+      if (blocks && blocks.length > 0) {
+        logger.info('Step 3: Inserting blocks into document')
+
+        // 获取文档根块 ID
+        const docResponse = await this.client.get(`/docx/v1/documents/${documentId}`)
+        const rootBlockId = docResponse.data.document.body.block_id
+
+        // 批量插入块
+        await this.client.post(
+          `/docx/v1/documents/${documentId}/blocks/${rootBlockId}/children/batch_create`,
+          {
+            children: blocks,
+          }
+        )
+
+        logger.info({ documentId }, 'Blocks inserted successfully')
       }
 
-      const result: any = await response.json()
-
-      if (result.code !== 0) {
-        logger.error({ code: result.code, msg: result.msg }, 'Import API returned error')
-        throw new Error(`Import error: ${result.code} - ${result.msg}`)
-      }
-
-      if (!result.data?.document_id) {
-        throw new Error('Import failed: no document_id returned')
-      }
-
-      logger.info({ documentId: result.data.document_id }, 'Markdown imported successfully')
-      return result.data.document_id
+      logger.info({ documentId }, 'Markdown imported successfully')
+      return documentId
     } catch (error) {
       logger.error({ error }, 'Failed to import markdown')
       throw error

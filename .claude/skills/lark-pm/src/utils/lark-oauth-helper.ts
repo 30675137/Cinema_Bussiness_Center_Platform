@@ -23,6 +23,8 @@ export class LarkOAuthHelper {
   private readonly SCOPES = [
     'bitable:app', // 多维表格权限
     'drive:drive', // 云文档权限(包含读写)
+    'docx:document', // 文档读写权限
+    'docx:document.block', // 文档块操作权限（转换、插入等）
   ]
 
   constructor(appId: string, appSecret: string) {
