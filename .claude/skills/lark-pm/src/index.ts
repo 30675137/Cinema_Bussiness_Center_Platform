@@ -29,6 +29,7 @@ import { smartCreateBacklogCommand } from './commands/backlog/smart-create.js'
 import { updateBacklogStatusCommand } from './commands/backlog/update-status.js'
 import { updateBacklogCommand } from './commands/backlog/update.js'
 import { importMarkdownCommand } from './commands/document/import-markdown.js'
+import { uploadFileCommand } from './commands/drive/upload.js'
 import { getTokenCommand } from './commands/get-token.js'
 import { importReadmeCommand } from './commands/import-readme.js'
 import chalk from 'chalk'
@@ -468,6 +469,22 @@ program
   .action(async (options) => {
     try {
       await importMarkdownCommand(options)
+    } catch (error) {
+      console.error(chalk.red('\n错误:'), (error as Error).message)
+      process.exit(1)
+    }
+  })
+
+// Drive commands
+program
+  .command('drive-upload')
+  .description('上传文件到飞书云盘（保留原始格式）')
+  .requiredOption('--file <path>', '文件路径')
+  .option('--folder <token>', '目标文件夹 Token（可选，默认为根目录）')
+  .option('--name <name>', '文件名称（可选，默认使用原文件名）')
+  .action(async (options) => {
+    try {
+      await uploadFileCommand(options)
     } catch (error) {
       console.error(chalk.red('\n错误:'), (error as Error).message)
       process.exit(1)
