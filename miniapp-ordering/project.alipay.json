@@ -1,8 +1,0 @@
-{
-  "miniprogramRoot": "dist/",
-  "component2": true,
-  "enableAppxNg": true,
-  "axmlStrictCheck": false,
-  "enableParallelLoader": false,
-  "enableDistFileMinify": false
-}
