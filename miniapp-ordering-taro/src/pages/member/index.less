@@ -1,0 +1,228 @@
+// 颜色变量
+@bg-primary: #09090b;
+@bg-secondary: #18181b;
+@bg-tertiary: #27272a;
+@text-primary: #fafafa;
+@text-secondary: #a1a1aa;
+@text-muted: #71717a;
+@accent: #f59e0b;
+@accent-light: rgba(245, 158, 11, 0.1);
+@border-color: #27272a;
+
+.member-page {
+  min-height: 100vh;
+  background: @bg-primary;
+}
+
+.member-content {
+  padding: 32px;
+  padding-bottom: 120px;
+}
+
+// 会员卡片
+.member-card {
+  position: relative;
+  background: linear-gradient(135deg, @bg-tertiary, @bg-secondary);
+  border-radius: 48px;
+  padding: 48px;
+  border: 1px solid rgba(113, 113, 122, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  
+  .card-glow {
+    position: absolute;
+    top: -128px;
+    right: -128px;
+    width: 256px;
+    height: 256px;
+    background: @accent-light;
+    border-radius: 50%;
+    filter: blur(60px);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 80px;
+  }
+  
+  .member-name {
+    font-size: 40px;
+    font-weight: 700;
+    color: @text-primary;
+  }
+  
+  .member-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    
+    .level-badge {
+      background: @accent;
+      color: @bg-primary;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 4px 16px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    
+    .join-date {
+      font-size: 24px;
+      color: @text-muted;
+    }
+  }
+  
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  
+  .points-section {
+    .points-label {
+      font-size: 24px;
+      color: @text-muted;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-weight: 700;
+    }
+    
+    .points-value {
+      display: flex;
+      align-items: baseline;
+      margin-top: 8px;
+      
+      .points-num {
+        font-size: 56px;
+        font-weight: 800;
+        color: @accent;
+      }
+      
+      .points-unit {
+        font-size: 24px;
+        color: @text-muted;
+        margin-left: 8px;
+      }
+    }
+  }
+  
+  .spent-section {
+    text-align: right;
+    
+    .spent-label {
+      font-size: 20px;
+      color: @text-muted;
+    }
+    
+    .spent-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: @text-primary;
+      margin-top: 8px;
+    }
+  }
+}
+
+// 功能入口
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+  
+  .action-item {
+    background: @bg-secondary;
+    border-radius: 32px;
+    padding: 32px;
+    border: 1px solid @border-color;
+    
+    .action-label {
+      display: block;
+      font-size: 24px;
+      color: @text-muted;
+      margin-top: 16px;
+    }
+    
+    .action-value {
+      display: block;
+      font-size: 32px;
+      font-weight: 700;
+      color: @text-primary;
+      margin-top: 4px;
+    }
+  }
+}
+
+// 积分商城
+.points-mall {
+  margin-top: 48px;
+  
+  .mall-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 8px;
+    margin-bottom: 32px;
+    
+    .mall-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: @text-primary;
+    }
+  }
+  
+  .mall-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .mall-item {
+    background: rgba(39, 39, 42, 0.5);
+    border-radius: 32px;
+    padding: 24px;
+    border: 1px solid @border-color;
+    display: flex;
+    align-items: center;
+    
+    .item-image {
+      width: 96px;
+      height: 96px;
+      border-radius: 16px;
+      flex-shrink: 0;
+    }
+    
+    .item-info {
+      flex: 1;
+      margin-left: 24px;
+      
+      .item-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: @text-primary;
+      }
+      
+      .item-points {
+        font-size: 20px;
+        color: @accent;
+        font-weight: 700;
+        margin-top: 4px;
+      }
+    }
+    
+    .redeem-btn {
+      background: @accent;
+      padding: 12px 32px;
+      border-radius: 32px;
+      
+      .btn-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: @bg-primary;
+      }
+    }
+  }
+}
