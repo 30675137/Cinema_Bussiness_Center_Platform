@@ -1,0 +1,124 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * 订单确认页面样式
+ */
+
+.order-confirm {
+  min-height: 100vh;
+  background-color: #09090b; // zinc-950
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 240rpx; // 为底部按钮留空间
+
+  // 内容区域
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24rpx;
+  }
+
+  // 区块
+  &__section {
+    background-color: #18181b; // zinc-900
+    border-radius: 24rpx;
+    padding: 32rpx;
+    margin-bottom: 24rpx;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32rpx;
+  }
+
+  &__section-title {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #fafafa; // zinc-50
+  }
+
+  &__section-count {
+    font-size: 24rpx;
+    color: #a1a1aa; // zinc-400
+  }
+
+  // 商品列表
+  &__items {
+    // 商品项样式由 CartItemCard 控制
+  }
+
+  // 订单汇总
+  &__summary {
+    // 样式
+  }
+
+  &__summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24rpx;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &--total {
+      margin-top: 24rpx;
+      padding-top: 24rpx;
+      border-top: 1px solid #27272a; // zinc-800
+    }
+  }
+
+  &__summary-label {
+    font-size: 28rpx;
+    color: #a1a1aa; // zinc-400
+  }
+
+  &__summary-label-total {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #fafafa; // zinc-50
+  }
+
+  // 空状态操作区域
+  &__empty-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 48rpx;
+    padding: 0 48rpx;
+  }
+
+  // 底部按钮
+  &__footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32rpx 48rpx 48rpx;
+    background: linear-gradient(to top, #09090b 80%, transparent);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 24rpx;
+  }
+
+  &__footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  &__footer-label {
+    font-size: 24rpx;
+    color: #a1a1aa; // zinc-400
+  }
+
+  &__submit-btn {
+    flex: 1;
+  }
+}

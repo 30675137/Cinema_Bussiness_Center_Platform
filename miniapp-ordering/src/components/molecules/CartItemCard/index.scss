@@ -1,0 +1,129 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * 购物车商品项卡片样式
+ */
+
+.cart-item-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1px solid #27272a; // zinc-800
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  // 商品图片
+  &__image-wrapper {
+    flex-shrink: 0;
+    width: 112rpx;
+    height: 112rpx;
+    border-radius: 16rpx;
+    overflow: hidden;
+    background-color: #27272a; // zinc-800
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+  }
+
+  // 商品信息区域
+  &__content {
+    flex: 1;
+    margin-left: 24rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 112rpx;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #fafafa; // zinc-50
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__specs {
+    font-size: 24rpx;
+    color: #a1a1aa; // zinc-400
+    margin-top: 8rpx;
+    line-height: 1.3;
+  }
+
+  &__price {
+    margin-top: 8rpx;
+  }
+
+  // 数量控制器
+  &__quantity-control {
+    flex-shrink: 0;
+    margin-left: 24rpx;
+    display: flex;
+    align-items: center;
+    background-color: rgba(39, 39, 42, 0.5); // zinc-800 with opacity
+    border-radius: 16rpx;
+    padding: 8rpx;
+  }
+
+  &__quantity-btn {
+    width: 56rpx;
+    height: 56rpx;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.9);
+    }
+
+    &--minus {
+      background-color: #27272a; // zinc-800
+
+      &:hover {
+        background-color: #3f3f46; // zinc-700
+      }
+    }
+
+    &--plus {
+      background-color: #f59e0b; // amber-500
+
+      &:hover {
+        background-color: #d97706; // amber-600
+      }
+
+      .cart-item-card__quantity-icon {
+        color: #18181b; // zinc-950
+      }
+    }
+  }
+
+  &__quantity-icon {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #a1a1aa; // zinc-400
+    line-height: 1;
+  }
+
+  &__quantity-text {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #f59e0b; // amber-500
+    min-width: 48rpx;
+    text-align: center;
+    margin: 0 8rpx;
+  }
+}

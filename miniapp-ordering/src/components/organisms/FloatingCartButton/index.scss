@@ -1,0 +1,81 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * 浮动购物车按钮样式
+ */
+
+.floating-cart-button {
+  position: fixed;
+  bottom: 160rpx; // 底部导航高度 + 间距
+  left: 32rpx;
+  right: 32rpx;
+  z-index: 50;
+
+  height: 112rpx;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-radius: 32rpx;
+  box-shadow: 0 16rpx 48rpx rgba(245, 158, 11, 0.3);
+
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // 左侧: 商品数量角标
+  &__badge {
+    width: 56rpx;
+    height: 56rpx;
+    background-color: #18181b; // zinc-950
+    border-radius: 16rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__badge-text {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #f59e0b; // amber-500
+  }
+
+  // 中间: 内容区域
+  &__content {
+    flex: 1;
+    margin-left: 32rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &__label {
+    font-size: 24rpx;
+    font-weight: 700;
+    color: rgba(9, 9, 11, 0.8); // zinc-950 with opacity
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  &__price {
+    margin-top: 4rpx;
+  }
+
+  // 右侧: 箭头图标
+  &__arrow {
+    flex-shrink: 0;
+    margin-left: 16rpx;
+  }
+
+  &__arrow-icon {
+    font-size: 48rpx;
+    font-weight: 700;
+    color: #18181b; // zinc-950
+    line-height: 1;
+  }
+}
