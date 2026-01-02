@@ -1,9 +1,0 @@
-# @spec O006-miniapp-channel-order
-# Placeholder images directory
-#
-# Required files:
-# - product-default.png (商品默认占位图)
-# - empty-cart.png (空购物车图标)
-# - empty-orders.png (空订单图标)
-#
-# TODO: Add actual placeholder images (200x200px PNG format recommended)

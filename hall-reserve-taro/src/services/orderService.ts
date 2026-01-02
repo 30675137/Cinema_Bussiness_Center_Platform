@@ -1,5 +1,5 @@
 /**
- * @spec O003-beverage-order, O006-miniapp-channel-order
+ * @spec O003-beverage-order
  * 订单服务 - 封装订单相关 API 调用
  */
 import {
@@ -84,46 +84,3 @@ export const orderService = {
 }
 
 export default orderService
-
-/**
- * @spec O006-miniapp-channel-order
- * 渠道商品订单服务扩展
- */
-import { post, get } from '../utils/request'
-import type {
-  CreateChannelProductOrderDTO,
-  ChannelProductOrderDTO,
-  OrderListQuery,
-  OrderListResponse,
-} from '../types/order'
-
-/**
- * 创建渠道商品订单
- */
-export async function createChannelProductOrder(
-  request: CreateChannelProductOrderDTO
-): Promise<ChannelProductOrderDTO> {
-  return post<ChannelProductOrderDTO>('/client/channel-orders', {
-    data: request,
-  })
-}
-
-/**
- * 获取订单详情
- */
-export async function getChannelOrderDetail(
-  orderId: string
-): Promise<ChannelProductOrderDTO> {
-  return get<ChannelProductOrderDTO>(`/client/channel-orders/${orderId}`)
-}
-
-/**
- * 获取订单列表
- */
-export async function getChannelOrderList(
-  query?: OrderListQuery
-): Promise<OrderListResponse> {
-  return get<OrderListResponse>('/client/channel-orders', {
-    data: query,
-  })
-}

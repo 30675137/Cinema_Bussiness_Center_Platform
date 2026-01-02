@@ -14,6 +14,9 @@
 - Q: 原型中的页面结构和核心功能 → A: 单页应用，包含订单tab和会员tab，4个核心功能（商品列表+分类筛选、商品详情+规格选择、购物车抽屉、订单列表）
 - Q: 原型特有功能的处理（如影厅选择、AI推荐） → A: 移除影厅选择（不适用），保留AI推荐功能但替换为后端API实现，移除优惠券/积分兑换（列入Out of Scope）
 - Q: 原型中图片资源的处理方式 → A: 原型使用Unsplash外部图片，Taro实现改用默认占位图+后端API返回的真实商品图片
+- Q: miniapp-ordering/ 文件夹的目录结构应该如何组织？原型代码(React web app)应该如何处理？ → A: 在 miniapp-ordering/ 中完全替换为 Taro 项目，保留原型代码在 `_prototype/` 子文件夹作为参考
+- Q: 从原型到 Taro 的样式变量提取方式？如何确保样式 100% 还原？ → A: 从原型 CSS 文件中提取所有样式变量（颜色/字体/间距等），使用脚本或手动转换为 SCSS 变量，确保 100% 还原
+- Q: 原型中的交互动效（如购物车抽屉滑入、分类切换动画等）应该如何处理？ → A: 简化动效，仅保留基础的页面切换过渡，移除复杂动画以提升性能
 
 ---
 
@@ -21,27 +24,42 @@
 
 ### 问题描述
 
-O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数据从独立的 `beverages` 表迁移到 `channel_product_config` 表。小程序端(hall-reserve-taro)当前基于 O003-beverage-order 实现了饮品订单功能,但需要适配新的渠道商品架构。
+O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数据从独立的 `beverages` 表迁移到 `channel_product_config` 表。需要基于新的渠道商品架构实现小程序点餐功能。
 
-**UI原型来源**: React 19 + Vite web应用,位于 `miniapp-ordering/` 文件夹。这是一个Cinema Lounge点餐的演示原型,包含商品分类（经典特调/精品咖啡/清爽饮品/主厨小食/积分兑换）、商品列表、规格选择、购物车、会员系统（优惠券/积分）、影厅选择、AI推荐等功能。使用 lucide-react 图标库、Unsplash图片、Gemini API提供AI建议。
+**UI原型来源**: React 19 + Vite web应用,位于 `miniapp-ordering/` 文件夹（已实现）。这是一个Cinema Lounge点餐的演示原型,包含商品分类（经典特调/精品咖啡/清爽饮品/主厨小食/积分兑换）、商品列表、规格选择、购物车、会员系统（优惠券/积分）、影厅选择、AI推荐等功能。使用 lucide-react 图标库、Unsplash图片、Gemini API提供AI建议。
 
-**迁移策略**: 参考原型的UI布局和交互逻辑,使用 Taro 4.1.9 + React + TypeScript 完全重写。具体要求:
-- **保留**: 商品列表布局、分类标签栏设计、商品卡片样式、规格选择器UI、购物车抽屉交互、订单列表展示
-- **调整**: 商品分类改为后端API定义的6种分类(ALCOHOL/COFFEE/BEVERAGE/SNACK/MEAL/OTHER)，移除影厅选择，移除优惠券/积分兑换功能
-- **替换**: AI推荐功能使用后端API实现（非Gemini），商品图片使用后端API返回的真实图片（非Unsplash）
-- **重写**: 不复用web app代码，使用Taro组件和API重新实现所有功能
-- 最终产出的代码库位于 `hall-reserve-taro/` 项目中
+**⚠️ 核心实施路径（重要）**:
+- **实施位置**: 在 `miniapp-ordering/` 文件夹中直接实现 Taro 重构，**不修改** `hall-reserve-taro/` 旧项目
+- **原型代码处理**: 将现有 React web app 原型代码移动到 `miniapp-ordering/_prototype/` 子文件夹保留作为参考
+- **UI 设计原则**: **UI 设计必须完全基于原型**（布局/配色/字体/间距/交互/动画效果），其他技术实现可以变化
+- **技术栈**: 使用 Taro 4.1.9 + React + TypeScript 完全重写，不复用 web app 代码
 
-**样式参考方案**: 参考原型的视觉设计,手动提取关键样式变量到Taro项目:
-- 创建 `hall-reserve-taro/src/styles/variables.scss` 定义颜色主题（参考原型配色）
-- 定义字体变量（参考原型字号体系），使用 `rpx` 单位适配小程序
-- 定义间距变量（参考原型布局间距）
-- 定义圆角/阴影等通用样式（参考原型卡片设计）
-- 所有页面组件引用这些变量,确保样式一致性
+**UI 迁移策略（严格遵循原型设计）**:
+- **必须保留的 UI 元素**:
+  - 商品列表布局（卡片样式/间距/排版）
+  - 分类标签栏设计（位置/样式）
+  - 商品卡片样式（图片尺寸/文字排版/价格显示/阴影效果）
+  - 规格选择器 UI（弹窗样式/选项布局/选中状态）
+  - 购物车抽屉布局（底部固定/商品列表样式）
+  - 订单列表展示（卡片布局/状态标签/时间轴设计）
+  - 配色方案（主题色/辅助色/文字颜色/背景色）
+  - 字体体系（字号/字重/行高）
+  - 圆角/阴影/间距等视觉细节
+- **动效简化**: 移除原型中的复杂动画（弹簧动画/缓动效果等），仅保留基础的页面切换过渡（淡入淡出），优先保证性能流畅
+- **功能调整**: 商品分类改为后端API定义的6种分类(ALCOHOL/COFFEE/BEVERAGE/SNACK/MEAL/OTHER)，移除影厅选择，移除优惠券/积分兑换功能
+- **技术替换**: AI推荐功能使用后端API实现（非Gemini），商品图片使用后端API返回的真实图片（非Unsplash）
+
+**样式实施方案**: 从原型 CSS 文件中精确提取样式变量到 Taro 项目:
+- **提取方式**: 从 `miniapp-ordering/_prototype/src/` 中的 CSS/SCSS 文件提取所有样式变量（使用脚本或手动转换）
+- 创建 `miniapp-ordering/src/styles/variables.scss` 定义颜色主题（**从原型 CSS 中提取实际颜色值**，如 `#1a1a1a`, `rgb(255,255,255)` 等）
+- 定义字体变量（**从原型 CSS 中提取字号/字重/行高**），将 `px` 单位转换为 `rpx`（转换公式: `rpx = px * 2`）
+- 定义间距变量（**从原型 CSS 中提取 padding/margin 值**），转换为 `rpx` 单位
+- 定义圆角/阴影等通用样式（**从原型 CSS 中提取 border-radius/box-shadow 值**）
+- 所有页面组件引用这些变量,确保样式与原型 100% 一致
 
 **图标与图片方案**:
-- UI图标: 使用 lucide-react 图标库（Taro兼容）或转为SVG/图片资源
-- 商品默认占位图: 自定义占位图存储在 `hall-reserve-taro/src/assets/images/placeholders/`
+- UI图标: 使用 lucide-react 图标库（Taro兼容）或转为SVG/图片资源（**图标样式/大小必须与原型一致**）
+- 商品默认占位图: 自定义占位图存储在 `miniapp-ordering/src/assets/images/placeholders/`
 - 实际商品图片: 通过后端API动态获取,使用 O005 配置的商品主图和详情图
 
 1. **商品数据源变更**: 从 `beverages` 表迁移到 `channel_product_config` 表
@@ -279,23 +297,33 @@ O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数
 
 ### 文件变更清单
 
-**类型定义** (新增或修改):
-- `hall-reserve-taro/src/types/channelProduct.ts`:定义 `ChannelProductDTO`/`ChannelProductSpecDTO`/`ChannelCategory`
-- `hall-reserve-taro/src/types/order.ts`:修改订单项类型,使用 `channelProductId` 替代 `beverageId`
+**⚠️ 实施位置**: 所有文件均在 `miniapp-ordering/` 项目中创建，**不修改** `hall-reserve-taro/` 旧项目
 
-**服务层** (新增或修改):
-- `hall-reserve-taro/src/services/channelProductService.ts`:新增渠道商品 API 调用(列表/详情/规格)
-- `hall-reserve-taro/src/services/orderService.ts`:修改订单创建接口,提交 `channelProductId`
+**原型代码处理**:
+- 将 `miniapp-ordering/` 中现有 React web app 代码移动到 `miniapp-ordering/_prototype/` 子文件夹
+- 在 `miniapp-ordering/` 根目录初始化新的 Taro 4.1.9 项目
 
-**状态管理** (新增或修改):
-- `hall-reserve-taro/src/stores/channelProductStore.ts`:新增渠道商品状态管理(选中分类/当前商品)
-- `hall-reserve-taro/src/stores/orderCartStore.ts`:修改购物车 store,使用 `channelProductId`
+**类型定义** (新增):
+- `miniapp-ordering/src/types/channelProduct.ts`: 定义 `ChannelProductDTO`/`ChannelProductSpecDTO`/`ChannelCategory`
+- `miniapp-ordering/src/types/order.ts`: 定义订单项类型,使用 `channelProductId`
 
-**页面组件** (新增或修改):
-- `hall-reserve-taro/src/pages/channel-product-menu/`:新增渠道商品菜单页（对应原型菜单列表页）
-- `hall-reserve-taro/src/pages/channel-product-detail/`:新增渠道商品详情页（对应原型商品详情页）
-- `hall-reserve-taro/src/pages/order-cart/`:修改购物车页,适配新的商品类型（对应原型购物车页）
-- `hall-reserve-taro/src/pages/member/my-orders/`:订单列表页集成在会员模块下（对应原型会员-订单列表）
+**服务层** (新增):
+- `miniapp-ordering/src/services/channelProductService.ts`: 渠道商品 API 调用(列表/详情/规格)
+- `miniapp-ordering/src/services/orderService.ts`: 订单创建/查询接口
+
+**状态管理** (新增):
+- `miniapp-ordering/src/stores/channelProductStore.ts`: 渠道商品状态管理(选中分类/当前商品)
+- `miniapp-ordering/src/stores/orderCartStore.ts`: 购物车 store
+
+**样式系统** (新增，**严格参考原型**):
+- `miniapp-ordering/src/styles/variables.scss`: 从原型提取的样式变量（颜色/字体/间距/圆角/阴影）
+- `miniapp-ordering/src/styles/mixins.scss`: 通用样式 mixins（卡片/按钮/阴影效果）
+
+**页面组件** (新增，**UI 完全遵循原型设计**):
+- `miniapp-ordering/src/pages/channel-product-menu/`: 渠道商品菜单页（**完全复刻原型菜单列表页 UI**）
+- `miniapp-ordering/src/pages/channel-product-detail/`: 渠道商品详情页（**完全复刻原型商品详情页 UI**）
+- `miniapp-ordering/src/pages/order-cart/`: 购物车页（**完全复刻原型购物车抽屉 UI**）
+- `miniapp-ordering/src/pages/member/my-orders/`: 订单列表页（**完全复刻原型会员-订单列表 UI**）
 
 ### API 映射表
 
