@@ -1,6 +1,7 @@
 package com.cinema.channelproduct.service;
 
 import com.cinema.channelproduct.domain.ChannelProductConfig;
+import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.dto.ChannelProductQueryParams;
 import com.cinema.channelproduct.dto.CreateChannelProductRequest;
 import com.cinema.channelproduct.dto.UpdateChannelProductRequest;
@@ -305,5 +306,79 @@ public class ChannelProductService {
             return "";
         }
         return filename.substring(filename.lastIndexOf(".") + 1);
+    }
+
+    // ==================== 客户端专用方法 (O006) ====================
+
+    /**
+     * 获取小程序商品列表（客户端专用）
+     * 仅返回 ACTIVE 状态的商品
+     *
+     * @spec O006-miniapp-channel-order
+     * @param category 可选的分类筛选
+     * @return 商品列表
+     */
+    @Transactional(readOnly = true)
+    public List<ChannelProductConfig> getMiniProgramProducts(ChannelCategory category) {
+        Specification<ChannelProductConfig> spec = (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            // 软删除过滤
+            predicates.add(cb.isNull(root.get("deletedAt")));
+
+            // 固定小程序渠道
+            predicates.add(cb.equal(root.get("channelType"), com.cinema.channelproduct.domain.enums.ChannelType.MINI_PROGRAM));
+
+            // 仅返回 ACTIVE 状态
+            predicates.add(cb.equal(root.get("status"), ChannelProductStatus.ACTIVE));
+
+            // 可选分类筛选
+            if (category != null) {
+                predicates.add(cb.equal(root.get("channelCategory"), category));
+            }
+
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        // 按推荐优先，然后按排序顺序
+        Sort sort = Sort.by(
+                Sort.Order.desc("isRecommended"),
+                Sort.Order.asc("sortOrder"),
+                Sort.Order.desc("createdAt")
+        );
+
+        List<ChannelProductConfig> products = channelProductRepository.findAll(spec, sort);
+
+        // 加载 SKU 信息
+        loadSkuInfo(products);
+
+        return products;
+    }
+
+    /**
+     * 获取小程序商品详情（客户端专用）
+     *
+     * @spec O006-miniapp-channel-order
+     * @param id 商品ID
+     * @return 商品详情（包含规格）
+     */
+    @Transactional(readOnly = true)
+    public ChannelProductConfig getMiniProgramProductDetail(UUID id) {
+        ChannelProductConfig config = channelProductRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
+
+        // 验证是否为小程序商品且状态为 ACTIVE
+        if (config.getChannelType() != com.cinema.channelproduct.domain.enums.ChannelType.MINI_PROGRAM) {
+            throw new BusinessException("PRD_VAL_002", "Product is not available for mini-program");
+        }
+
+        if (config.getStatus() != ChannelProductStatus.ACTIVE) {
+            throw new BusinessException("PRD_VAL_003", "Product is not active");
+        }
+
+        // 加载 SKU 信息
+        loadSkuInfoForSingle(config);
+
+        return config;
     }
 }

@@ -45,7 +45,7 @@ export default function Index() {
 
       {/* 商品列表 */}
       <ProductList
-        products={data?.data || []}
+        products={data || []}
         isLoading={isLoading}
         enableRefresh
         onRefresh={refetch}

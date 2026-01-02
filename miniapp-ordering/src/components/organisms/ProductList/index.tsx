@@ -45,7 +45,7 @@ export interface ProductListProps {
  *
  *   return (
  *     <ProductList
- *       products={data?.data || []}
+ *       products={data || []}
  *       isLoading={isLoading}
  *       enableRefresh
  *       onRefresh={refetch}

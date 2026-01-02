@@ -37,7 +37,7 @@ export const channelProductsKeys = {
  *
  *   return (
  *     <View>
- *       {data?.data.map(product => (
+ *       {data?.map(product => (
  *         <ProductCard key={product.id} product={product} />
  *       ))}
  *     </View>
@@ -47,7 +47,7 @@ export const channelProductsKeys = {
  * // 按分类筛选
  * function CoffeeProducts() {
  *   const { data } = useChannelProducts(ChannelCategory.COFFEE)
- *   return <ProductList products={data?.data} />
+ *   return <ProductList products={data || []} />
  * }
  * ```
  */

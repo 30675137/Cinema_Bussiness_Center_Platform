@@ -18,18 +18,10 @@ export interface ChannelProductDetailDTO extends ChannelProductDTO {
 }
 
 /**
- * 商品列表响应
- */
-export interface ChannelProductListResponse {
-  data: ChannelProductDTO[]
-  total: number
-}
-
-/**
  * 获取小程序渠道商品列表
  *
  * @param category 按分类筛选(可选)
- * @returns Promise<商品列表响应>
+ * @returns Promise<商品数组>
  *
  * @example
  * ```typescript
@@ -42,12 +34,12 @@ export interface ChannelProductListResponse {
  */
 export const getChannelProducts = async (
   category?: ChannelCategory
-): Promise<ChannelProductListResponse> => {
+): Promise<ChannelProductDTO[]> => {
   const url = category
     ? `/client/channel-products/mini-program?category=${category}`
     : '/client/channel-products/mini-program'
 
-  return get<ChannelProductListResponse>(url)
+  return get<ChannelProductDTO[]>(url)
 }
 
 /**

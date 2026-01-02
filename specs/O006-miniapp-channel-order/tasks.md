@@ -71,7 +71,7 @@ This project uses Taro multi-platform structure:
 
 ### API Services (base layer)
 
-- [ ] T022 [P] Implement channel product API service in miniapp-ordering/src/services/channelProductService.ts (fetchChannelProducts, fetchChannelProductDetail, fetchChannelProductSpecs)
+- [X] T022 [P] Implement channel product API service in miniapp-ordering/src/services/channelProductService.ts (fetchChannelProducts, fetchChannelProductDetail, fetchChannelProductSpecs)
 - [ ] T023 [P] Implement order API service in miniapp-ordering/src/services/orderService.ts (createChannelProductOrder, fetchMyOrders, fetchOrderDetail)
 
 ### State Management Stores
@@ -81,19 +81,19 @@ This project uses Taro multi-platform structure:
 
 ### TanStack Query Hooks
 
-- [ ] T026 [P] Create useChannelProducts hook in miniapp-ordering/src/hooks/useChannelProducts.ts
-- [ ] T027 [P] Create useChannelProductDetail hook in miniapp-ordering/src/hooks/useChannelProductDetail.ts
-- [ ] T028 [P] Create useChannelProductSpecs hook in miniapp-ordering/src/hooks/useChannelProductSpecs.ts
-- [ ] T029 [P] Create useCreateOrder mutation hook in miniapp-ordering/src/hooks/useCreateOrder.ts
-- [ ] T030 [P] Create useMyOrders hook in miniapp-ordering/src/hooks/useMyOrders.ts
+- [X] T026 [P] Create useChannelProducts hook in miniapp-ordering/src/hooks/useChannelProducts.ts
+- [X] T027 [P] Create useChannelProductDetail hook in miniapp-ordering/src/hooks/useChannelProductDetail.ts
+- [X] T028 [P] Create useChannelProductSpecs hook in miniapp-ordering/src/hooks/useChannelProductSpecs.ts
+- [X] T029 [P] Create useCreateOrder mutation hook in miniapp-ordering/src/hooks/useCreateOrder.ts
+- [X] T030 [P] Create useMyOrders hook in miniapp-ordering/src/hooks/useMyOrders.ts
 
 ### Atomic Design Components (Atoms)
 
-- [ ] T031 [P] Create Button atom component in miniapp-ordering/src/components/atoms/Button/ (match prototype button styles)
-- [ ] T032 [P] Create Image atom component with lazy loading in miniapp-ordering/src/components/atoms/Image/
-- [ ] T033 [P] Create Price atom component in miniapp-ordering/src/components/atoms/Price/
-- [ ] T034 [P] Create Loading atom component in miniapp-ordering/src/components/atoms/Loading/
-- [ ] T035 [P] Create EmptyState atom component in miniapp-ordering/src/components/atoms/EmptyState/
+- [X] T031 [P] Create Button atom component in miniapp-ordering/src/components/atoms/Button/ (match prototype button styles)
+- [X] T032 [P] Create Image atom component with lazy loading in miniapp-ordering/src/components/atoms/Image/
+- [X] T033 [P] Create Price atom component in miniapp-ordering/src/components/atoms/Price/
+- [X] T034 [P] Create Loading atom component in miniapp-ordering/src/components/atoms/Loading/
+- [X] T035 [P] Create EmptyState atom component in miniapp-ordering/src/components/atoms/EmptyState/
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -109,14 +109,14 @@ This project uses Taro multi-platform structure:
 
 ### Implementation for User Story 1
 
-- [ ] T036 [P] [US1] Create CategoryTabs molecule component in miniapp-ordering/src/components/molecules/CategoryTabs/ (6 categories: ALCOHOL/COFFEE/BEVERAGE/SNACK/MEAL/OTHER, match prototype tab design)
-- [ ] T037 [P] [US1] Create ProductCard molecule component in miniapp-ordering/src/components/molecules/ProductCard/ (display image, name, price, recommended tag, match prototype card style)
-- [ ] T038 [US1] Create ProductList organism component in miniapp-ordering/src/components/organisms/ProductList/ (grid/list layout, empty state handling)
-- [ ] T039 [US1] Implement product menu page in miniapp-ordering/src/pages/index/index.tsx (integrate CategoryTabs, ProductList, useChannelProducts hook, handle loading/error states)
-- [ ] T040 [US1] Style product menu page in miniapp-ordering/src/pages/index/index.scss (100% match prototype menu list page layout using extracted style variables)
-- [ ] T041 [US1] Configure product menu page routing in miniapp-ordering/src/app.config.ts
-- [ ] T042 [US1] Add image placeholder fallback for failed product images
-- [ ] T043 [US1] Add pull-to-refresh functionality for product list
+- [X] T036 [P] [US1] Create CategoryTabs molecule component in miniapp-ordering/src/components/molecules/CategoryTabs/ (6 categories: ALCOHOL/COFFEE/BEVERAGE/SNACK/MEAL/OTHER, match prototype tab design)
+- [X] T037 [P] [US1] Create ProductCard molecule component in miniapp-ordering/src/components/molecules/ProductCard/ (display image, name, price, recommended tag, match prototype card style)
+- [X] T038 [US1] Create ProductList organism component in miniapp-ordering/src/components/organisms/ProductList/ (grid/list layout, empty state handling)
+- [X] T039 [US1] Implement product menu page in miniapp-ordering/src/pages/index/index.tsx (integrate CategoryTabs, ProductList, useChannelProducts hook, handle loading/error states)
+- [X] T040 [US1] Style product menu page in miniapp-ordering/src/pages/index/index.scss (100% match prototype menu list page layout using extracted style variables)
+- [X] T041 [US1] Configure product menu page routing in miniapp-ordering/src/app.config.ts
+- [X] T042 [US1] Add image placeholder fallback for failed product images
+- [X] T043 [US1] Add pull-to-refresh functionality for product list
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can browse and filter products
 
