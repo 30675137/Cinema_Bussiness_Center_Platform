@@ -206,7 +206,7 @@ export default function OrderPage() {
                         updateCartQuantity(product.id, 1)
                       }}
                     >
-                      <Icon name='plus' size={14} color='#18181b' />
+                      <Icon name='plus' size={28} color='#18181b' />
                     </View>
                   </View>
                 </View>
