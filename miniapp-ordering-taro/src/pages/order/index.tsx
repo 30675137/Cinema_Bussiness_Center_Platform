@@ -147,7 +147,7 @@ export default function OrderPage() {
             onClick={() => setActiveCategory(type)}
           >
             <View className={`category-icon ${activeCategory === type ? 'active' : ''}`}>
-              <Icon name={icon} size={24} />
+              <Icon name={icon} size={48} />
             </View>
             <Text className='category-name'>{type}</Text>
           </View>
@@ -206,7 +206,7 @@ export default function OrderPage() {
                         updateCartQuantity(product.id, 1)
                       }}
                     >
-                      <Icon name='plus' size={14} color='#18181b' />
+                      <Icon name='plus' size={28} color='#18181b' />
                     </View>
                   </View>
                 </View>
