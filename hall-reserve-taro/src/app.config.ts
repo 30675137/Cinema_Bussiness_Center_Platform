@@ -20,7 +20,13 @@ export default defineAppConfig({
     'pages/order/confirm/index',
     'pages/order/payment/index',
     'pages/order/detail/index',
-    'pages/order/list/index'
+    'pages/order/list/index',
+    // 渠道商品页面 (@spec O006-miniapp-channel-order)
+    'pages/products/index',
+    'pages/product-detail/index',
+    'pages/cart/index',
+    'pages/order-list/index',
+    'pages/order-detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',
