@@ -20,6 +20,8 @@ const PersistedConfigSchema = z.object({
       testRecords: z.string().optional(),
       backlog: z.string().optional(),
       productBacklog: z.string().optional(), // Product Backlog (产品待办列表)
+      sprint: z.string().optional(), // Sprint (迭代管理)
+      sprints: z.string().optional(), // Sprint (迭代管理 - 别名)
     })
     .optional(),
 })
@@ -94,6 +96,8 @@ export function getConfig(): {
     testRecords?: string
     backlog?: string
     productBacklog?: string
+    sprint?: string
+    sprints?: string
   }
   userAccessToken?: string
 } {

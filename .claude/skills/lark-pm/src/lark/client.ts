@@ -274,4 +274,67 @@ export class LarkClient {
       }
     )
   }
+
+  /**
+   * Create a new field in a table
+   */
+  async createField(
+    appToken: string,
+    tableId: string,
+    fieldName: string,
+    fieldType: number,
+    property?: any
+  ): Promise<any> {
+    return withRetry(
+      async () => {
+        logger.info({ appToken, tableId, fieldName, fieldType }, 'Creating field')
+        const response = await this.client.bitable.appTableField.create({
+          path: { app_token: appToken, table_id: tableId },
+          data: {
+            field_name: fieldName,
+            type: fieldType,
+            property,
+          },
+        })
+
+        if (response.code !== 0) {
+          this.handleLarkError(response, '创建字段')
+        }
+
+        logger.info({ fieldId: response.data?.field?.field_id }, 'Field created')
+        return response.data?.field
+      },
+      {
+        onRetry: (error, attempt) => {
+          logger.warn({ error, attempt }, 'Retrying createField')
+        },
+      }
+    )
+  }
+
+  /**
+   * List all fields in a table
+   */
+  async listFields(appToken: string, tableId: string): Promise<any[]> {
+    return withRetry(
+      async () => {
+        logger.info({ appToken, tableId }, 'Listing fields')
+        const response = await this.client.bitable.appTableField.list({
+          path: { app_token: appToken, table_id: tableId },
+        })
+
+        if (response.code !== 0) {
+          this.handleLarkError(response, '获取字段列表')
+        }
+
+        logger.info({ count: response.data?.items?.length }, 'Fields listed')
+        return response.data?.items || []
+      },
+      {
+        onRetry: (error, attempt) => {
+          logger.warn({ error, attempt }, 'Retrying listFields')
+        },
+      }
+    )
+  }
 }

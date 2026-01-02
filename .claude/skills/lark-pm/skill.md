@@ -1,7 +1,7 @@
 ---
 name: lark-pm
-description: Lark MCP project management tool for Cinema Business Center Platform. Manage tasks, technical debt, bugs, features, test records, and backlog through Feishu/Lark Base. Supports CRUD operations, filtering, data export (Excel/CSV), and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, backlog, 飞书项目管理, 任务跟踪, Bug管理, 技术债, 待办事项.
-version: 1.1.0
+description: Lark MCP project management tool for Cinema Business Center Platform. Manage tasks, technical debt, bugs, features, test records, and backlog through Feishu/Lark Base. Supports CRUD operations, filtering, data export (Excel/CSV), Sprint management, and project statistics. Trigger keywords lark pm, project management, task tracking, bug tracking, technical debt, backlog, sprint management, 飞书项目管理, 任务跟踪, Bug管理, 技术债, 待办事项, Sprint管理.
+version: 1.2.0
 ---
 
 # lark-pm
@@ -17,6 +17,7 @@ Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技�
 ## Features
 
 - **Task Management** (任务跟踪): Create, update, track work tasks with priorities, status, assignees, and deadlines
+- **Sprint Management** (Sprint管理): Batch import tasks, organize by Sprint tags, track Sprint progress, and manage Sprint lifecycle
 - **Technical Debt** (技术债记录): Record and manage technical debt with severity levels and resolution tracking
 - **Bug Tracking** (Bug管理): Report, assign, and resolve bugs with reproduction steps and status flow
 - **Feature Matrix** (功能矩阵): Maintain product feature roadmap with module organization
@@ -63,6 +64,15 @@ Lark MCP 项目管理工具 - 通过飞书多维表格管理项目任务、技�
 - `task update` - Update task status/progress
 - `task delete` - Delete task
 - `task export` - Export tasks to Excel/CSV
+
+### Sprint Management (NEW in v1.2.0)
+- `sprint import <spec-id>` - Batch import tasks from tasks.md to Lark Base
+- `sprint list <sprint-number>` - List tasks in specific Sprint
+- `sprint stats` - View statistics for all Sprints
+- `sprint progress <sprint-number>` - View Sprint progress (completion rate)
+- `sprint start <sprint-number>` - Mark all Sprint tasks as "in progress"
+- `sprint complete <sprint-number>` - Mark all Sprint tasks as "completed"
+- `sprint export <sprint-number>` - Export Sprint tasks to Excel
 
 ### Technical Debt
 - `debt create` - Record technical debt
@@ -204,6 +214,72 @@ All entities stored in Lark Base tables:
 - **Plan 关键词**: plan, 计划, 规划, 实施计划, 设计方案 → User Story + `Plan` 标签
 - **Task 关键词**: task, 任务, 待办, 实现, 开发, 修复 → User Story + `Task` 标签
 - **Spike 关键词**: 技术债, 需要解决, 缺少, 不支持, 性能优化, 架构优化
+
+## Sprint Management Guide
+
+### Quick Start: O006 Example
+
+**Batch import all tasks for O006**:
+```bash
+/lark-pm sprint import O006
+```
+
+This will:
+1. Parse `specs/O006-miniapp-channel-order/tasks.md`
+2. Import 52 tasks organized into 7 Sprints
+3. Add Sprint tags (`Sprint-1` ~ `Sprint-7`) to each task
+4. Set initial status to `📝 待办`
+
+**View Sprint tasks**:
+```bash
+/lark-pm sprint list 1  # View Sprint 1 tasks
+/lark-pm sprint stats   # View all Sprint statistics
+```
+
+**Track Sprint progress**:
+```bash
+/lark-pm sprint progress 2  # View Sprint 2 completion rate
+```
+
+**Manage Sprint lifecycle**:
+```bash
+/lark-pm sprint start 1     # Start Sprint 1 (mark all as in-progress)
+/lark-pm sprint complete 1  # Complete Sprint 1 (mark all as completed)
+/lark-pm sprint export 1    # Export Sprint 1 report to Excel
+```
+
+### Sprint Organization
+
+Each Phase in `tasks.md` maps to one Sprint:
+
+| Sprint | Phase | Tasks | Hours | Key Deliverables |
+|--------|-------|-------|-------|------------------|
+| Sprint-1 | Setup & Infrastructure | 4 | 1.75h | Branch, environment, config |
+| Sprint-2 | Foundational | 14 | 29h | Types, styles, API, hooks, store |
+| Sprint-3 | User Story 1 | 3 | 9.5h | Product menu page |
+| Sprint-4 | User Story 2 | 4 | 16.5h | Product detail page |
+| Sprint-5 | User Story 3 | 5 | 19h | Cart & order submission |
+| Sprint-6 | User Story 4 | 5 | 17.5h | Order list & status |
+| Sprint-7 | Polish & Testing | 7 | 30h | Polish, tests, docs |
+
+### Advanced Scripts
+
+For advanced Sprint management, use the CLI scripts:
+
+```bash
+cd .claude/skills/lark-pm
+
+# Batch import using TypeScript
+npx tsx scripts/import-o006-tasks.ts
+
+# Sprint management shell commands
+./scripts/manage-sprints.sh import
+./scripts/manage-sprints.sh list 2
+./scripts/manage-sprints.sh stats
+./scripts/manage-sprints.sh progress 3
+```
+
+See [scripts/README.md](./scripts/README.md) for detailed documentation.
 
 ## Contributing
 
