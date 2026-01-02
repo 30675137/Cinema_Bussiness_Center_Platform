@@ -10,23 +10,24 @@ import { channelProductsKeys } from './useChannelProducts'
 /**
  * 获取渠道商品详情
  *
- * @param id 渠道商品 ID
+ * @param id 商品 ID
+ * @param options 查询配置选项
  * @returns TanStack Query 查询结果
  *
  * @example
  * ```typescript
- * function ProductDetailPage({ productId }: { productId: string }) {
- *   const { data: product, isLoading, error } = useChannelProductDetail(productId)
+ * function ProductDetailPage({ id }: { id: string }) {
+ *   const { data, isLoading, error } = useChannelProductDetail(id)
  *
  *   if (isLoading) return <Loading />
  *   if (error) return <Error message="商品不存在" />
  *
  *   return (
  *     <View>
- *       <Image src={product.mainImage} />
- *       <Text>{product.displayName}</Text>
- *       <Text>{product.description}</Text>
- *       <Text>库存状态: {product.stockStatus}</Text>
+ *       <Image src={data.mainImage} />
+ *       <Text>{data.displayName}</Text>
+ *       <Price value={data.basePrice} />
+ *       <Text>{data.description}</Text>
  *     </View>
  *   )
  * }
@@ -36,7 +37,7 @@ export const useChannelProductDetail = (id: string) => {
   return useQuery({
     queryKey: channelProductsKeys.detail(id),
     queryFn: () => getChannelProductDetail(id),
-    enabled: !!id, // 只有当 id 存在时才查询
-    staleTime: 3 * 60 * 1000, // 3分钟
+    staleTime: 10 * 60 * 1000, // 10分钟(商品详情变化较少)
+    enabled: !!id, // 只有当 id 存在时才执行查询
   })
 }

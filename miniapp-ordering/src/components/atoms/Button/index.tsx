@@ -1,15 +1,18 @@
 /**
  * @spec O006-miniapp-channel-order
- * Button 原子组件
+ * Button 原子组件 - 通用按钮
  */
 
-import { View } from '@tarojs/components'
-import type { ReactNode } from 'react'
+import { Button as TaroButton, View } from '@tarojs/components'
+import type { ButtonProps as TaroButtonProps } from '@tarojs/components'
 import './index.scss'
 
 export interface ButtonProps {
+  /** 按钮文本 */
+  children: React.ReactNode
+
   /** 按钮类型 */
-  type?: 'primary' | 'secondary' | 'danger' | 'default'
+  type?: 'primary' | 'secondary' | 'default' | 'danger'
 
   /** 按钮尺寸 */
   size?: 'small' | 'medium' | 'large'
@@ -20,60 +23,67 @@ export interface ButtonProps {
   /** 是否加载中 */
   loading?: boolean
 
-  /** 是否块级按钮(宽度 100%) */
+  /** 是否块级按钮(占满容器宽度) */
   block?: boolean
-
-  /** 按钮文本或子元素 */
-  children: ReactNode
 
   /** 点击事件 */
   onClick?: () => void
 
   /** 自定义类名 */
   className?: string
+
+  /** Taro Button 原生属性 */
+  openType?: TaroButtonProps['openType']
+  formType?: TaroButtonProps['formType']
 }
 
 /**
  * Button 原子组件
  *
- * @description
- * - 支持 4 种类型: primary, secondary, danger, default
- * - 支持 3 种尺寸: small, medium, large
- * - 支持加载状态和禁用状态
- *
  * @example
  * ```typescript
- * // 主要按钮
- * <Button type="primary" onClick={handleClick}>
- *   确认
+ * // 主按钮
+ * <Button type="primary" onClick={handleSubmit}>
+ *   提交订单
  * </Button>
  *
  * // 加载状态
- * <Button loading>
+ * <Button type="primary" loading>
  *   提交中...
  * </Button>
  *
  * // 块级按钮
- * <Button block type="primary">
- *   加入购物车
+ * <Button type="primary" block>
+ *   立即购买
+ * </Button>
+ *
+ * // 危险按钮
+ * <Button type="danger" onClick={handleDelete}>
+ *   删除
+ * </Button>
+ *
+ * // 小尺寸按钮
+ * <Button size="small" type="secondary">
+ *   取消
  * </Button>
  * ```
  */
 export const Button = ({
+  children,
   type = 'default',
   size = 'medium',
   disabled = false,
   loading = false,
   block = false,
-  children,
   onClick,
   className = '',
+  openType,
+  formType,
 }: ButtonProps) => {
   const handleClick = () => {
-    if (disabled || loading) {
-      return
+    if (!disabled && !loading && onClick) {
+      onClick()
     }
-    onClick?.()
   }
 
   const classNames = [
@@ -89,10 +99,16 @@ export const Button = ({
     .join(' ')
 
   return (
-    <View className={classNames} onClick={handleClick}>
-      {loading && <View className="app-button__loading-icon">...</View>}
-      <View className="app-button__text">{children}</View>
-    </View>
+    <TaroButton
+      className={classNames}
+      disabled={disabled || loading}
+      loading={loading}
+      onClick={handleClick}
+      openType={openType}
+      formType={formType}
+    >
+      <View className="app-button__content">{children}</View>
+    </TaroButton>
   )
 }
 

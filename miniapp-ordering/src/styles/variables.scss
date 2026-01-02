@@ -16,9 +16,10 @@ $primary-dark: #0d6efd;
 $secondary-color: #646566;
 $secondary-light: #969799;
 
-// 强调色（价格等）
+// 强调色(价格等)
 $accent-color: #ff6b35;
 $accent-light: #ff976a;
+$accent-color-light: #ff976a;  // 兼容旧代码
 
 // 成功/警告/危险
 $success-color: #07c160;
@@ -30,11 +31,14 @@ $text-color: #323233;
 $text-light: #646566;
 $text-lighter: #969799;
 $text-disabled: #c8c9cc;
+$text-color-inverse: #ffffff;  // 反色文字(用于深色背景)
 
 // 背景色
 $background-color: #f7f8fa;
 $background-white: #ffffff;
 $background-gray: #fafafa;
+$bg-color: #ffffff;           // 主背景色
+$bg-color-secondary: #f7f8fa; // 次背景色
 
 // 边框色
 $border-color: #ebedf0;
@@ -50,6 +54,7 @@ $shadow-dark: rgba(0, 0, 0, 0.12);
 $font-size-xs: 20rpx;   // 10px
 $font-size-sm: 24rpx;   // 12px
 $font-size-md: 28rpx;   // 14px (基础字号)
+$font-size-base: 28rpx; // 14px (基础字号,兼容)
 $font-size-lg: 32rpx;   // 16px
 $font-size-xl: 36rpx;   // 18px
 $font-size-xxl: 40rpx;  // 20px
@@ -69,12 +74,13 @@ $line-height-lg: 1.8;
 
 // ========== 间距系统 ==========
 
-// 内边距（padding）
+// 内边距(padding)
 $padding-xs: 16rpx;   // 8px
 $padding-sm: 24rpx;   // 12px
 $padding-md: 32rpx;   // 16px
 $padding-lg: 48rpx;   // 24px
 $padding-xl: 64rpx;   // 32px
+$padding-xxl: 96rpx;  // 48px
 
 // 外边距（margin）
 $margin-xs: 16rpx;    // 8px
@@ -83,6 +89,13 @@ $margin-md: 32rpx;    // 16px
 $margin-lg: 48rpx;    // 24px
 $margin-xl: 64rpx;    // 32px
 
+// 通用间距(兼容旧代码)
+$spacing-xs: 16rpx;
+$spacing-sm: 24rpx;
+$spacing-md: 32rpx;
+$spacing-lg: 48rpx;
+$spacing-xl: 64rpx;
+
 // ========== 圆角系统 ==========
 
 $border-radius-sm: 8rpx;    // 4px
@@ -90,12 +103,17 @@ $border-radius-md: 16rpx;   // 8px
 $border-radius-lg: 24rpx;   // 12px
 $border-radius-xl: 32rpx;   // 16px
 $border-radius-round: 999rpx; // 圆角
+$border-radius-full: 999rpx;  // 完全圆角(兼容)
 
 // ========== 阴影系统 ==========
 
 $box-shadow-sm: 0 4rpx 12rpx $shadow-color;
 $box-shadow-md: 0 8rpx 24rpx $shadow-color;
 $box-shadow-lg: 0 12rpx 32rpx $shadow-dark;
+
+// 兼容旧代码
+$shadow-sm: 0 4rpx 12rpx $shadow-color;
+$shadow-md: 0 8rpx 24rpx $shadow-color;
 
 // ========== 尺寸系统 ==========
 

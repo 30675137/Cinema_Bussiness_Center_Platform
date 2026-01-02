@@ -1,6 +1,6 @@
 /**
  * @spec O006-miniapp-channel-order
- * 首页样式
+ * 商品菜单页面样式
  */
 
 @import '@/styles/variables.scss';
@@ -8,20 +8,20 @@
 .index {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
   min-height: 100vh;
-  padding: 32rpx;
-}
+  background-color: $background-color;
 
-.title {
-  font-size: $font-size-xxl;
-  font-weight: 600;
-  color: $text-color;
-  margin-bottom: 16rpx;
-}
+  // 固定分类栏在顶部
+  :global(.category-tabs) {
+    position: sticky;
+    top: 0;
+    z-index: $z-index-sticky;
+  }
 
-.subtitle {
-  font-size: $font-size-md;
-  color: $text-light;
+  // 商品列表区域
+  :global(.product-list) {
+    flex: 1;
+    overflow-y: auto;
+  }
 }

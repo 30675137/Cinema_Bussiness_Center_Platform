@@ -18,7 +18,10 @@ const config: UserConfigExport = {
   },
   sourceRoot: 'src',
   outputRoot: 'dist',
-  plugins: [],
+  plugins: [
+    '@tarojs/plugin-framework-react',
+    '@tarojs/plugin-platform-h5'
+  ],
   defineConstants: {},
   copy: {
     patterns: [],
@@ -26,7 +29,7 @@ const config: UserConfigExport = {
   },
   framework: 'react',
   compiler: {
-    type: 'vite',
+    type: 'webpack5' as const,
     vitePlugins: []
   },
   cache: {
@@ -95,7 +98,10 @@ const config: UserConfigExport = {
       }
     },
     devServer: {
-      port: 10086,
+      port: 10186,
+      hot: true,
+      open: false,
+      historyApiFallback: true,
       proxy: {
         '/api': {
           target: 'http://localhost:8080',

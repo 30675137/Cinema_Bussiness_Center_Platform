@@ -1,4 +1,4 @@
-# miniapp-ordering API 对接设计文档
+# miniapp-ordering 后端 API 对接文档
 
 **项目**: CineLounge 点餐小程序  
 **版本**: v1.0  
@@ -9,7 +9,13 @@
 
 ## 📋 文档概述
 
-本文档描述了 miniapp-ordering 原型应用如何对接后端 API 系统。基于现有 API 规格文档（`docs/api/unified-api-spec.md`）的分析，制定分阶段的 API 集成方案。
+本文档定义了 **miniapp-ordering 小程序需要调用的后端 API 接口清单**。文档基于后端 API 规格（`docs/api/unified-api-spec.md`）梳理了小程序端需要对接的接口，并提供前端集成方案。
+
+**文档用途**:
+- ✅ 明确小程序调用哪些后端 API
+- ✅ 定义前端如何封装和调用这些 API
+- ✅ 提供数据类型映射和转换规则
+- ✅ 制定分阶段的 API 集成计划
 
 ---
 
@@ -30,44 +36,45 @@
 
 ---
 
-## 🏗️ 技术架构
+## 🏗️ 调用架构
 
-### 前端技术栈
+### 小程序端（调用方）
 - **框架**: React 19.2.3
 - **构建工具**: Vite 6.2.0
 - **HTTP 客户端**: 原生 fetch（或引入 axios）
 - **状态管理**: React useState/useEffect
 - **类型支持**: TypeScript 5.8.2
 
-### 后端接口
+### 后端 API（被调用方）
 - **基础 URL**: `http://localhost:8080/api`（开发环境）
 - **认证方式**: Bearer Token (JWT)
 - **响应格式**: 统一 JSON 格式
+- **接口前缀**: C端接口统一使用 `/api/client/*` 路径
 
 ---
 
-## 📊 API 可用性分析
+## 📊 小程序需要调用的后端 API
 
-### ✅ 可直接使用的 API（5个）
+### ✅ Phase 1: 核心功能 API（5个）
 
-| 序号 | API 端点 | 功能 | 优先级 | 状态 |
-|-----|---------|------|-------|------|
-| 1 | `GET /client/channel-products/mini-program` | 获取商品列表 | P0 | ✅ 可用 |
-| 2 | `GET /client/channel-products/mini-program/{id}` | 获取商品详情 | P0 | ✅ 可用 |
-| 3 | `POST /api/client/channel-product-orders` | 创建订单 | P0 | ✅ 可用 |
-| 4 | `GET /api/client/channel-product-orders/my` | 查询订单列表 | P0 | ✅ 可用 |
-| 5 | `GET /api/client/channel-product-orders/{id}` | 获取订单详情 | P0 | ✅ 可用 |
+| 序号 | 小程序调用的 API | 功能说明 | 优先级 | 后端状态 |
+|-----|-----------------|---------|-------|----------|
+| 1 | `GET /api/client/channel-products/mini-program` | 小程序获取商品列表 | P0 | ✅ 已实现 |
+| 2 | `GET /api/client/channel-products/mini-program/{id}` | 小程序获取商品详情 | P0 | ✅ 已实现 |
+| 3 | `POST /api/client/channel-product-orders` | 小程序创建订单 | P0 | ✅ 已实现 |
+| 4 | `GET /api/client/channel-product-orders/my` | 小程序查询我的订单 | P0 | ✅ 已实现 |
+| 5 | `GET /api/client/channel-product-orders/{id}` | 小程序获取订单详情 | P0 | ✅ 已实现 |
 
-### 🔶 需要确认的 API（1个）
+### 🔶 Phase 2: 待确认的 API（1个）
 
-| 序号 | API 端点 | 功能 | 问题 | 状态 |
-|-----|---------|------|------|------|
-| 6 | `POST /api/client/channel-product-orders/{id}/pay` | 订单支付 | 需确认接口是否存在 | 🔶 待确认 |
+| 序号 | 小程序需要调用的 API | 功能说明 | 问题 | 后端状态 |
+|-----|---------------------|---------|------|----------|
+| 6 | `POST /api/client/channel-product-orders/{id}/pay` | 小程序发起订单支付 | 需确认后端是否实现 | 🔶 待确认 |
 
-### ❌ 缺失的 API（12个）
+### ❌ Phase 3: 小程序需要但后端未实现的 API
 
-| 分类 | 缺失 API | 优先级 | 解决方案 |
-|-----|---------|-------|---------|
+| 功能分类 | 小程序需要调用的 API | 优先级 | 前端临时方案 |
+|---------|---------------------|-------|-------------|
 | 会员系统 | 会员信息、积分查询、积分获得/兑换 | P1 | 暂时保持 Mock |
 | 优惠券 | 优惠券列表、应用优惠券 | P1 | 暂时保持 Mock |
 | 积分商城 | 积分商品列表、积分兑换 | P2 | 暂时保持 Mock |
@@ -138,9 +145,11 @@
 
 ---
 
-## 🛠️ 技术实现方案
+## 🛠️ 前端 API 调用实现方案
 
-### 1. API 客户端封装
+### 1. 封装 HTTP 客户端
+
+**目的**: 统一小程序调用后端 API 的方式
 
 **创建文件**: `src/services/apiClient.ts`
 
@@ -240,7 +249,9 @@ export const apiClient = new ApiClient(API_BASE_URL);
 
 ---
 
-### 2. 商品服务实现
+### 2. 封装商品 API 调用
+
+**目的**: 小程序通过此服务调用后端商品相关 API
 
 **创建文件**: `src/services/productService.ts`
 
@@ -288,7 +299,7 @@ const CATEGORY_MAP: Record<CategoryType, string> = {
   [CategoryType.REWARDS]: '', // 积分兑换不是分类
 };
 
-// 获取商品列表
+// 小程序调用后端获取商品列表
 export async function getProducts(
   category?: CategoryType,
   page: number = 1,
@@ -301,6 +312,7 @@ export async function getProducts(
       params.category = CATEGORY_MAP[category];
     }
 
+    // 调用后端 API: GET /api/client/channel-products/mini-program
     const response = await apiClient.get<ProductListResponse>(
       '/client/channel-products/mini-program',
       params
@@ -315,9 +327,10 @@ export async function getProducts(
   }
 }
 
-// 获取商品详情
+// 小程序调用后端获取商品详情
 export async function getProductDetail(id: string): Promise<Product | null> {
   try {
+    // 调用后端 API: GET /api/client/channel-products/mini-program/{id}
     const product = await apiClient.get<ChannelProduct>(
       `/client/channel-products/mini-program/${id}`
     );
@@ -372,7 +385,9 @@ function getFallbackProducts(category?: CategoryType): Product[] {
 
 ---
 
-### 3. 订单服务实现
+### 3. 封装订单 API 调用
+
+**目的**: 小程序通过此服务调用后端订单相关 API
 
 **创建文件**: `src/services/orderService.ts`
 
@@ -407,7 +422,7 @@ export interface OrderResponse {
   updatedAt: string;
 }
 
-// 创建订单
+// 小程序调用后端创建订单
 export async function createOrder(cart: CartItem[]): Promise<OrderResponse> {
   const request: CreateOrderRequest = {
     items: cart.map(item => ({
@@ -418,6 +433,7 @@ export async function createOrder(cart: CartItem[]): Promise<OrderResponse> {
   };
 
   try {
+    // 调用后端 API: POST /api/client/channel-product-orders
     const order = await apiClient.post<OrderResponse>(
       '/api/client/channel-product-orders',
       request
@@ -429,7 +445,7 @@ export async function createOrder(cart: CartItem[]): Promise<OrderResponse> {
   }
 }
 
-// 查询订单列表
+// 小程序调用后端查询我的订单列表
 export async function getMyOrders(
   page: number = 1,
   pageSize: number = 10,
@@ -441,6 +457,7 @@ export async function getMyOrders(
       params.status = status;
     }
 
+    // 调用后端 API: GET /api/client/channel-product-orders/my
     const response = await apiClient.get<{
       orders: OrderResponse[];
       total: number;
@@ -453,9 +470,10 @@ export async function getMyOrders(
   }
 }
 
-// 获取订单详情
+// 小程序调用后端获取订单详情
 export async function getOrderDetail(orderId: string): Promise<OrderResponse | null> {
   try {
+    // 调用后端 API: GET /api/client/channel-product-orders/{id}
     const order = await apiClient.get<OrderResponse>(
       `/api/client/channel-product-orders/${orderId}`
     );
@@ -466,10 +484,11 @@ export async function getOrderDetail(orderId: string): Promise<OrderResponse | n
   }
 }
 
-// Mock 支付（待确认真实接口）
+// 小程序调用支付接口（待后端实现）
 export async function mockPayOrder(orderId: string): Promise<boolean> {
   try {
-    // TODO: 确认真实支付接口
+    // TODO: 等待后端实现支付接口
+    // 预期调用: POST /api/client/channel-product-orders/{id}/pay
     // 暂时使用 Mock
     await new Promise(resolve => setTimeout(resolve, 500));
     return true;

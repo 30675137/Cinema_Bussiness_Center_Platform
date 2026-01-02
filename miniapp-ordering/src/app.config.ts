@@ -3,14 +3,14 @@
  * Taro 应用全局配置
  */
 
-export default defineAppConfig({
+export default {
   pages: [
-    'pages/index/index'
+    'pages/index/index' // 商品菜单页面（首页）
   ],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',
-    navigationBarTitleText: 'Cinema Lounge',
+    navigationBarTitleText: '商品菜单',
     navigationBarTextStyle: 'black'
   }
-})
+}
