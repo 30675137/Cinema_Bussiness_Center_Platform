@@ -1,0 +1,41 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * 全局样式
+ */
+
+// 引入全局样式变量
+@import './styles/variables.scss';
+
+// 全局样式重置
+page {
+  background-color: $background-color;
+  color: $text-color;
+  font-size: $font-size-md;
+  line-height: 1.5;
+}
+
+// 通用工具类
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,426 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * SCSS Mixins - 可复用的样式模式
+ */
+
+@import './variables.scss';
+
+// ========== 布局 Mixins ==========
+
+// Flexbox 居中
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Flexbox 垂直居中
+@mixin flex-vertical-center {
+  display: flex;
+  align-items: center;
+}
+
+// Flexbox 水平居中
+@mixin flex-horizontal-center {
+  display: flex;
+  justify-content: center;
+}
+
+// Flexbox 两端对齐
+@mixin flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// Flexbox 列布局
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// ========== 卡片 Mixins ==========
+
+// 基础卡片样式
+@mixin card-base {
+  background-color: $background-white;
+  border-radius: $border-radius-md;
+  overflow: hidden;
+}
+
+// 卡片阴影（小）
+@mixin card-shadow-sm {
+  box-shadow: $box-shadow-sm;
+}
+
+// 卡片阴影（中）
+@mixin card-shadow-md {
+  box-shadow: $box-shadow-md;
+}
+
+// 卡片阴影（大）
+@mixin card-shadow-lg {
+  box-shadow: $box-shadow-lg;
+}
+
+// 完整卡片（带阴影）
+@mixin card {
+  @include card-base;
+  @include card-shadow-sm;
+  padding: $padding-md;
+}
+
+// 商品卡片
+@mixin product-card {
+  @include card-base;
+  @include card-shadow-sm;
+  width: $product-card-width;
+  border-radius: $product-card-border-radius;
+}
+
+// ========== 按钮 Mixins ==========
+
+// 按钮基础样式
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: $border-radius-lg;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $duration-fast $ease-in-out;
+  user-select: none;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+// 主按钮（蓝色）
+@mixin button-primary {
+  @include button-base;
+  background-color: $primary-color;
+  color: $background-white;
+  
+  &:hover {
+    background-color: $primary-dark;
+  }
+  
+  &:disabled {
+    background-color: $text-disabled;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// 次要按钮（灰色边框）
+@mixin button-secondary {
+  @include button-base;
+  background-color: transparent;
+  color: $primary-color;
+  border: 2rpx solid $primary-color;
+  
+  &:hover {
+    background-color: $primary-light;
+  }
+  
+  &:disabled {
+    border-color: $text-disabled;
+    color: $text-disabled;
+    cursor: not-allowed;
+  }
+}
+
+// 危险按钮（红色）
+@mixin button-danger {
+  @include button-base;
+  background-color: $danger-color;
+  color: $background-white;
+  
+  &:disabled {
+    background-color: $text-disabled;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// 按钮尺寸 - 小
+@mixin button-sm {
+  height: $button-height-sm;
+  padding: 0 $padding-md;
+  font-size: $font-size-sm;
+}
+
+// 按钮尺寸 - 中
+@mixin button-md {
+  height: $button-height-md;
+  padding: 0 $padding-lg;
+  font-size: $font-size-md;
+}
+
+// 按钮尺寸 - 大
+@mixin button-lg {
+  height: $button-height-lg;
+  padding: 0 $padding-xl;
+  font-size: $font-size-lg;
+}
+
+// ========== 文本 Mixins ==========
+
+// 文本省略（单行）
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 文本省略（多行）
+@mixin text-ellipsis-multiline($lines: 2) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 文本居中
+@mixin text-center {
+  text-align: center;
+}
+
+// ========== 定位 Mixins ==========
+
+// 固定定位（顶部）
+@mixin fixed-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-index-sticky;
+}
+
+// 固定定位（底部）
+@mixin fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-index-sticky;
+}
+
+// 绝对居中
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// ========== 图片 Mixins ==========
+
+// 响应式图片
+@mixin responsive-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+// 图片封面模式
+@mixin image-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// 图片包含模式
+@mixin image-contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+// 圆形头像
+@mixin avatar($size: 80rpx) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+// ========== 边框 Mixins ==========
+
+// 边框（底部）
+@mixin border-bottom {
+  border-bottom: 1rpx solid $border-color;
+}
+
+// 边框（顶部）
+@mixin border-top {
+  border-top: 1rpx solid $border-color;
+}
+
+// 边框（全部）
+@mixin border-all {
+  border: 1rpx solid $border-color;
+}
+
+// ========== 动画 Mixins ==========
+
+// 淡入动画
+@mixin fade-in {
+  animation: fadeIn $duration-normal $ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 向上滑入动画
+@mixin slide-up {
+  animation: slideUp $duration-normal $ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// 缩放动画
+@mixin scale-in {
+  animation: scaleIn $duration-fast $ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// ========== 状态 Mixins ==========
+
+// 禁用状态
+@mixin disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+// 加载状态
+@mixin loading {
+  position: relative;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    @include absolute-center;
+    width: 40rpx;
+    height: 40rpx;
+    border: 4rpx solid $border-color;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin $duration-slow linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+// ========== 安全区域 Mixins ==========
+
+// 安全区域内边距（底部）
+@mixin safe-area-bottom($padding: 0) {
+  padding-bottom: calc(#{$padding} + env(safe-area-inset-bottom));
+}
+
+// 安全区域内边距（顶部）
+@mixin safe-area-top($padding: 0) {
+  padding-top: calc(#{$padding} + env(safe-area-inset-top));
+}
+
+// ========== 列表 Mixins ==========
+
+// 列表项
+@mixin list-item {
+  display: flex;
+  align-items: center;
+  padding: $padding-md;
+  background-color: $background-white;
+  @include border-bottom;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:active {
+    background-color: $background-gray;
+  }
+}
+
+// 网格布局
+@mixin grid($columns: 2, $gap: $margin-md) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+// ========== 遮罩 Mixins ==========
+
+// 半透明遮罩
+@mixin overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: $z-index-overlay;
+}
+
+// ========== 徽章 Mixins ==========
+
+// 状态徽章
+@mixin badge($bg-color: $primary-color, $text-color: $background-white) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 16rpx;
+  background-color: $bg-color;
+  color: $text-color;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-sm;
+}
+
+// 数字徽章（角标）
+@mixin badge-dot($size: 16rpx, $color: $danger-color) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: $size;
+  height: $size;
+  background-color: $color;
+  border-radius: 50%;
+  border: 2rpx solid $background-white;
+}

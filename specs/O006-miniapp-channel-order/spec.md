@@ -10,6 +10,7 @@
 ### Session 2026-01-02 (Revision 1)
 
 - Q: UI原型的实际技术栈和格式 → A: React 19 + Vite web应用（位于 miniapp-ordering/），使用 lucide-react 图标库，包含AI推荐功能(Gemini API)，Mock数据本地运行
+- Q: 确认原型使用的前端框架 → A: 原型使用 React 实现（用户澄清）
 - Q: 原型代码复用还是完全重写 → A: 完全用Taro+React重写，仅参考UI布局和交互逻辑，不复用web app代码
 - Q: 原型中的页面结构和核心功能 → A: 单页应用，包含订单tab和会员tab，4个核心功能（商品列表+分类筛选、商品详情+规格选择、购物车抽屉、订单列表）
 - Q: 原型特有功能的处理（如影厅选择、AI推荐） → A: 移除影厅选择（不适用），保留AI推荐功能但替换为后端API实现，移除优惠券/积分兑换（列入Out of Scope）

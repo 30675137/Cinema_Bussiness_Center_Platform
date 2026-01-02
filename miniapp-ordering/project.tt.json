@@ -1,0 +1,5 @@
+{
+  "miniprogramRoot": "dist/",
+  "projectname": "miniapp-ordering",
+  "appid": "testAppId"
+}

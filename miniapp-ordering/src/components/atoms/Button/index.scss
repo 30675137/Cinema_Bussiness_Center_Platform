@@ -1,0 +1,92 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * Button 原子组件样式
+ */
+
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+@import '@/styles/theme.scss';
+
+.app-button {
+  @include button-base;
+  @include flex-center;
+  position: relative;
+
+  // 类型变体
+  &--primary {
+    @include button-primary;
+  }
+
+  &--secondary {
+    @include button-secondary;
+  }
+
+  &--danger {
+    @include button-danger;
+  }
+
+  &--default {
+    background-color: $background-white;
+    color: $text-color;
+    border: 2rpx solid $border-color;
+
+    &:hover {
+      background-color: $background-gray;
+    }
+  }
+
+  // 尺寸变体
+  &--small {
+    @include button-sm;
+  }
+
+  &--medium {
+    height: $button-height-md;
+    padding: 0 $padding-md;
+    font-size: $font-size-md;
+  }
+
+  &--large {
+    @include button-lg;
+  }
+
+  // 块级按钮
+  &--block {
+    width: 100%;
+  }
+
+  // 禁用状态
+  &--disabled {
+    @include disabled;
+    cursor: not-allowed;
+  }
+
+  // 加载状态
+  &--loading {
+    @include loading;
+    cursor: not-allowed;
+
+    .app-button__loading-icon {
+      margin-right: $spacing-xs;
+    }
+  }
+
+  // 按钮文本
+  &__text {
+    @include text-ellipsis;
+  }
+
+  // 加载图标
+  &__loading-icon {
+    animation: spin $duration-slow infinite linear;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

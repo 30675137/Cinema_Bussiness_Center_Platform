@@ -1,0 +1,174 @@
+/**
+ * @spec O006-miniapp-channel-order
+ * 主题配置 - Cinema Lounge 品牌主题
+ */
+
+@import './variables.scss';
+
+// ========== 主题颜色映射 ==========
+
+$theme-primary: $primary-color;          // 品牌主色调
+$theme-accent: $accent-color;            // 强调色（价格等）
+$theme-success: $success-color;          // 成功状态
+$theme-warning: $warning-color;          // 警告状态
+$theme-danger: $danger-color;            // 危险/错误状态
+
+$theme-text-primary: $text-color;        // 主要文字
+$theme-text-secondary: $text-light;      // 次要文字
+$theme-text-tertiary: $text-lighter;     // 辅助文字
+$theme-text-disabled: $text-disabled;    // 禁用文字
+
+$theme-bg-primary: $background-white;    // 主背景
+$theme-bg-secondary: $background-gray;   // 次背景
+$theme-bg-page: $background-color;       // 页面背景
+
+$theme-border: $border-color;            // 边框颜色
+$theme-divider: $border-light;           // 分隔线颜色
+
+// ========== 组件主题 ==========
+
+// 导航栏主题
+$navbar-bg: $background-white;
+$navbar-text: $text-color;
+$navbar-border: $border-color;
+
+// TabBar 主题
+$tabbar-bg: $background-white;
+$tabbar-text: $text-light;
+$tabbar-active: $primary-color;
+$tabbar-border: $border-color;
+
+// 按钮主题
+$button-primary-bg: $primary-color;
+$button-primary-text: $background-white;
+$button-secondary-bg: transparent;
+$button-secondary-text: $primary-color;
+$button-secondary-border: $primary-color;
+$button-danger-bg: $danger-color;
+$button-danger-text: $background-white;
+
+// 卡片主题
+$card-bg: $background-white;
+$card-shadow: $box-shadow-sm;
+$card-border-radius: $border-radius-md;
+
+// 输入框主题
+$input-bg: $background-white;
+$input-text: $text-color;
+$input-border: $border-color;
+$input-border-focus: $primary-color;
+$input-placeholder: $text-lighter;
+
+// 标签主题
+$tag-default-bg: $background-gray;
+$tag-default-text: $text-light;
+$tag-primary-bg: $primary-light;
+$tag-primary-text: $primary-color;
+$tag-success-bg: lighten($success-color, 45%);
+$tag-success-text: $success-color;
+$tag-warning-bg: lighten($warning-color, 35%);
+$tag-warning-text: darken($warning-color, 10%);
+$tag-danger-bg: lighten($danger-color, 40%);
+$tag-danger-text: $danger-color;
+
+// ========== 业务组件主题 ==========
+
+// 商品卡片
+$product-card-bg: $card-bg;
+$product-card-shadow: $card-shadow;
+$product-card-border-radius: $product-card-border-radius;
+$product-name-color: $text-color;
+$product-price-color: $accent-color;
+$product-desc-color: $text-light;
+
+// 购物车
+$cart-bg: $background-white;
+$cart-item-bg: $background-white;
+$cart-item-border: $border-color;
+$cart-delete-bg: $danger-color;
+$cart-total-color: $accent-color;
+
+// 订单
+$order-card-bg: $card-bg;
+$order-card-shadow: $card-shadow;
+$order-status-pending: $warning-color;
+$order-status-paid: $primary-color;
+$order-status-processing: $primary-color;
+$order-status-ready: $success-color;
+$order-status-completed: $text-light;
+$order-status-cancelled: $text-lighter;
+
+// 分类标签
+$category-tab-bg: $background-white;
+$category-tab-text: $text-light;
+$category-tab-active-bg: $primary-light;
+$category-tab-active-text: $primary-color;
+$category-tab-active-border: $primary-color;
+
+// ========== 状态主题 ==========
+
+// 库存状态
+$stock-in-stock-color: $success-color;
+$stock-low-stock-color: $warning-color;
+$stock-out-of-stock-color: $danger-color;
+
+// 支付状态
+$payment-pending-color: $warning-color;
+$payment-paid-color: $success-color;
+$payment-failed-color: $danger-color;
+$payment-refunded-color: $text-light;
+
+// 订单状态颜色映射
+$order-status-colors: (
+  'PENDING_PAYMENT': $warning-color,
+  'PENDING_MAKE': $primary-color,
+  'MAKING': $primary-color,
+  'READY': $success-color,
+  'COMPLETED': $text-light,
+  'CANCELLED': $text-lighter
+);
+
+// ========== 深色模式支持（预留） ==========
+
+// 注意：当前仅支持浅色主题，深色模式变量预留
+// 如需启用深色模式，取消下方注释并配置对应变量
+
+// @media (prefers-color-scheme: dark) {
+//   $theme-bg-primary: #1a1a1a;
+//   $theme-bg-secondary: #2a2a2a;
+//   $theme-bg-page: #121212;
+//   $theme-text-primary: #ffffff;
+//   $theme-text-secondary: #b3b3b3;
+//   $theme-border: #3a3a3a;
+// }
+
+// ========== 主题工具函数 ==========
+
+// 根据状态获取颜色
+@function get-status-color($status) {
+  @return map-get($order-status-colors, $status);
+}
+
+// 根据库存状态获取颜色
+@function get-stock-color($stock-status) {
+  @if $stock-status == 'IN_STOCK' {
+    @return $stock-in-stock-color;
+  } @else if $stock-status == 'LOW_STOCK' {
+    @return $stock-low-stock-color;
+  } @else {
+    @return $stock-out-of-stock-color;
+  }
+}
+
+// 根据支付状态获取颜色
+@function get-payment-color($payment-status) {
+  @if $payment-status == 'PENDING' {
+    @return $payment-pending-color;
+  } @else if $payment-status == 'PAID' {
+    @return $payment-paid-color;
+  } @else if $payment-status == 'FAILED' {
+    @return $payment-failed-color;
+  } @else {
+    @return $payment-refunded-color;
+  }
+}
