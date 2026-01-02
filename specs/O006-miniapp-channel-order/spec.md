@@ -17,6 +17,8 @@
 - Q: miniapp-ordering/ 文件夹的目录结构应该如何组织？原型代码(React web app)应该如何处理？ → A: 在 miniapp-ordering/ 中完全替换为 Taro 项目，保留原型代码在 `_prototype/` 子文件夹作为参考
 - Q: 从原型到 Taro 的样式变量提取方式？如何确保样式 100% 还原？ → A: 从原型 CSS 文件中提取所有样式变量（颜色/字体/间距等），使用脚本或手动转换为 SCSS 变量，确保 100% 还原
 - Q: 原型中的交互动效（如购物车抽屉滑入、分类切换动画等）应该如何处理？ → A: 简化动效，仅保留基础的页面切换过渡，移除复杂动画以提升性能
+- Q: Taro 项目的状态管理方案选择？需要管理购物车、商品选择、订单状态等数据。 → A: 使用 Zustand 进行轻量级状态管理（购物车/用户选择等），与原型技术栈保持一致
+- Q: UI 还原验收标准如何设定？如何确保实施结果与原型视觉一致？ → A: 对于每个关键页面（商品列表/详情/购物车/订单），先在 miniapp-ordering/_prototype/ 中截图保存原型效果作为参考，实施时逐页对比验证
 
 ---
 
@@ -238,6 +240,7 @@ O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数
 - **SC-007**: 取餐通知到达率≥95%(订单完成后,用户收到推送通知)
 - **SC-008**: 系统支持高峰期100个并发订单无性能下降
 - **SC-009**: 90%的用户能在首次使用时成功完成下单流程(无需客服协助)
+- **SC-010 (UI 还原验收)**: 每个关键页面（商品列表/详情/购物车/订单）的 Taro 实现与原型截图对比，视觉一致性≥95%（布局/配色/字体/间距/圆角/阴影等关键视觉元素）
 
 ---
 
@@ -301,6 +304,7 @@ O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数
 
 **原型代码处理**:
 - 将 `miniapp-ordering/` 中现有 React web app 代码移动到 `miniapp-ordering/_prototype/` 子文件夹
+- 在 `miniapp-ordering/_prototype/screenshots/` 中保存关键页面的原型截图（商品列表/商品详情/购物车/订单列表），作为 UI 还原的视觉参考标准
 - 在 `miniapp-ordering/` 根目录初始化新的 Taro 4.1.9 项目
 
 **类型定义** (新增):
@@ -311,9 +315,10 @@ O005-channel-product-config 引入了新的渠道商品配置架构,将饮品数
 - `miniapp-ordering/src/services/channelProductService.ts`: 渠道商品 API 调用(列表/详情/规格)
 - `miniapp-ordering/src/services/orderService.ts`: 订单创建/查询接口
 
-**状态管理** (新增):
-- `miniapp-ordering/src/stores/channelProductStore.ts`: 渠道商品状态管理(选中分类/当前商品)
-- `miniapp-ordering/src/stores/orderCartStore.ts`: 购物车 store
+**状态管理** (新增，使用 Zustand):
+- `miniapp-ordering/src/stores/channelProductStore.ts`: 渠道商品状态管理(选中分类/当前商品/加载状态)
+- `miniapp-ordering/src/stores/orderCartStore.ts`: 购物车状态管理(购物车项/总价/数量/持久化)
+- `miniapp-ordering/src/stores/orderStore.ts`: 订单状态管理(订单列表/当前订单/订单状态)
 
 **样式系统** (新增，**严格参考原型**):
 - `miniapp-ordering/src/styles/variables.scss`: 从原型提取的样式变量（颜色/字体/间距/圆角/阴影）
