@@ -1,5 +1,6 @@
 export default defineAppConfig({
   pages: [
+    'pages/menu/index',
     'pages/order/index'
   ],
   window: {

@@ -1,0 +1,151 @@
+/**
+ * @spec O007-miniapp-menu-api
+ * 商品卡片样式 - 深色主题 水平布局
+ */
+
+.product-card {
+  display: flex;
+  flex-direction: row;
+  background-color: #1a1a1a;
+  border-radius: 16rpx;
+  overflow: hidden;
+  padding: 16rpx;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background-color: #222222;
+  }
+}
+
+.product-card.disabled {
+  opacity: 0.6;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  flex-shrink: 0;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background-color: #2a2a2a;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.unavailable-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unavailable-text {
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.info-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rpx 0 4rpx 20rpx;
+  min-width: 0;
+}
+
+.product-name {
+  font-size: 28rpx;
+  color: #ffffff;
+  font-weight: 500;
+  line-height: 40rpx;
+
+  /* 最多显示1行，超出显示省略号 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.points-row {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+}
+
+.points-icon {
+  font-size: 20rpx;
+  color: #f5a623;
+  margin-right: 4rpx;
+}
+
+.points-text {
+  font-size: 22rpx;
+  color: #888888;
+}
+
+.points-value {
+  font-size: 22rpx;
+  color: #f5a623;
+  font-weight: 500;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.price-info {
+  display: flex;
+  align-items: baseline;
+}
+
+.currency {
+  font-size: 24rpx;
+  color: #f5a623;
+  font-weight: 500;
+}
+
+.price {
+  font-size: 32rpx;
+  color: #f5a623;
+  font-weight: 600;
+}
+
+.add-button {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background-color: #f5a623;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.9);
+    background-color: #d4901f;
+  }
+}
+
+.add-icon {
+  font-size: 36rpx;
+  color: #000000;
+  font-weight: 600;
+  line-height: 1;
+}

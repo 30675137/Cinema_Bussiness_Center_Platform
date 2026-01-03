@@ -41,6 +41,21 @@ export const TaskSchema = z.object({
     .regex(/^[A-Z]\d{3}$/, '规格 ID 格式错误 (如 I003)')
     .optional(),
 
+  // 新增字段：任务标识（如 T001, T005）
+  taskId: z
+    .string()
+    .regex(/^T\d{3}$/, '任务标识格式错误 (如 T001)')
+    .optional(),
+
+  // 新增字段：所属阶段（如 Phase 1: Setup & Infrastructure）
+  phase: z.string().max(100, '阶段名称不超过100字符').optional(),
+
+  // 新增字段：用户故事标签（如 US1, US2）
+  storyLabel: z.string().max(10, '用户故事标签不超过10字符').optional(),
+
+  // 新增字段：是否可并行执行
+  isParallel: z.boolean().optional(),
+
   dueDate: z.number().int().positive().optional(),
 
   tags: z.array(z.nativeEnum(TaskTag)).optional(),
@@ -63,6 +78,10 @@ export interface Task {
   status: TaskStatus
   assignees?: string[]
   specId?: string
+  taskId?: string // 任务标识（如 T001）
+  phase?: string // 阶段（如 Phase 1: Setup & Infrastructure）
+  storyLabel?: string // 用户故事标签（如 US1）
+  isParallel?: boolean // 是否可并行执行
   dueDate?: number
   tags?: TaskTag[]
   progress?: number

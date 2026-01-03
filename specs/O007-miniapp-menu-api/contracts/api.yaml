@@ -1,0 +1,506 @@
+openapi: 3.0.3
+info:
+  title: 小程序菜单与商品API集成（阶段一）
+  version: 1.0.0
+  description: |
+    **@spec O007-miniapp-menu-api**
+
+    小程序点餐功能的商品列表与分类菜单API契约定义。
+
+    本API复用现有后端接口 `GET /api/channel-products`，为小程序端提供：
+    - 按分类筛选的商品列表
+    - 商品基本信息（ID、名称、图片、价格、标签）
+    - 分页查询支持
+    - 上下架状态过滤
+
+    **相关规格文档**:
+    - 功能规格: specs/O007-miniapp-menu-api/spec.md
+    - 数据模型: specs/O007-miniapp-menu-api/data-model.md
+    - 技术研究: specs/O007-miniapp-menu-api/research.md
+
+  contact:
+    name: Cinema Business Center Platform Team
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api-dev.cinema-platform.com
+    description: 开发环境
+  - url: https://api-staging.cinema-platform.com
+    description: 预发布环境
+  - url: https://api.cinema-platform.com
+    description: 生产环境
+
+tags:
+  - name: Channel Products
+    description: 渠道商品配置相关接口
+
+paths:
+  /api/channel-products:
+    get:
+      summary: 查询渠道商品列表
+      description: |
+        查询指定渠道和分类的商品列表，支持分页、排序、状态过滤。
+
+        **业务规则**:
+        - 小程序端必须传递 `salesChannel=MINI_PROGRAM_MENU`
+        - 默认只返回 `status=ACTIVE` 的商品
+        - 默认按 `sortOrder` 字段升序排序
+        - 支持按分类筛选（不传则返回所有分类）
+
+        **性能要求** (规则09-quality-standards.md):
+        - API响应时间 P95 ≤ 1秒
+        - 支持分页，默认每页20条
+
+      operationId: getChannelProducts
+      tags:
+        - Channel Products
+      parameters:
+        - name: category
+          in: query
+          description: |
+            商品分类（可选）
+            - `ALCOHOL`: 经典特调
+            - `COFFEE`: 精品咖啡
+            - `BEVERAGE`: 经典饮品
+            - `SNACK`: 主厨小食
+            - `MEAL`: 精品餐食
+            - `OTHER`: 其他商品
+          required: false
+          schema:
+            $ref: '#/components/schemas/ChannelCategory'
+          example: COFFEE
+
+        - name: salesChannel
+          in: query
+          description: |
+            售卖渠道（必需）
+            - `MINI_PROGRAM_MENU`: 小程序点单
+            - `H5_MENU`: H5点单
+          required: true
+          schema:
+            type: string
+            enum:
+              - MINI_PROGRAM_MENU
+              - H5_MENU
+          example: MINI_PROGRAM_MENU
+
+        - name: status
+          in: query
+          description: |
+            上下架状态（可选，默认只返回 ACTIVE）
+            - `ACTIVE`: 上架
+            - `INACTIVE`: 下架
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - INACTIVE
+          example: ACTIVE
+
+        - name: page
+          in: query
+          description: 页码（从1开始，默认1）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+
+        - name: pageSize
+          in: query
+          description: 每页条数（默认20，最大100）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+
+        - name: sortBy
+          in: query
+          description: |
+            排序字段（可选，默认 sortOrder）
+            - `sortOrder`: 排序权重
+            - `createdAt`: 创建时间
+            - `priceInCents`: 价格
+          required: false
+          schema:
+            type: string
+            enum:
+              - sortOrder
+              - createdAt
+              - priceInCents
+            default: sortOrder
+          example: sortOrder
+
+        - name: sortOrder
+          in: query
+          description: |
+            排序方向（可选，默认 ASC）
+            - `ASC`: 升序
+            - `DESC`: 降序
+          required: false
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
+            default: ASC
+          example: ASC
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+              examples:
+                success:
+                  summary: 成功返回咖啡类商品列表
+                  value:
+                    success: true
+                    data:
+                      - id: "cp-001"
+                        productId: "sku-coffee-001"
+                        productName: "美式咖啡"
+                        mainImageUrl: "https://cdn.example.com/coffee-americano.jpg"
+                        category: "COFFEE"
+                        salesChannel: "MINI_PROGRAM_MENU"
+                        status: "ACTIVE"
+                        priceInCents: 2500
+                        sortOrder: 100
+                        tags: ["热销", "推荐"]
+                        stockStatus: "AVAILABLE"
+                        createdAt: "2026-01-01T10:00:00Z"
+                        updatedAt: "2026-01-03T08:30:00Z"
+                      - id: "cp-002"
+                        productId: "sku-coffee-002"
+                        productName: "拿铁咖啡"
+                        mainImageUrl: "https://cdn.example.com/coffee-latte.jpg"
+                        category: "COFFEE"
+                        salesChannel: "MINI_PROGRAM_MENU"
+                        status: "ACTIVE"
+                        priceInCents: 2800
+                        sortOrder: 200
+                        tags: ["新品"]
+                        stockStatus: "AVAILABLE"
+                        createdAt: "2026-01-02T14:20:00Z"
+                        updatedAt: "2026-01-02T14:20:00Z"
+                    total: 15
+                    page: 1
+                    pageSize: 20
+                    timestamp: "2026-01-03T10:00:00Z"
+
+                emptyResult:
+                  summary: 查询结果为空
+                  value:
+                    success: true
+                    data: []
+                    total: 0
+                    page: 1
+                    pageSize: 20
+                    timestamp: "2026-01-03T10:00:00Z"
+
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidCategory:
+                  summary: 无效的分类参数
+                  value:
+                    success: false
+                    error: "INVALID_CATEGORY"
+                    message: "无效的商品分类: INVALID_CATEGORY"
+                    details:
+                      category: "INVALID_CATEGORY"
+                      validCategories: ["ALCOHOL", "COFFEE", "BEVERAGE", "SNACK", "MEAL", "OTHER"]
+                    timestamp: "2026-01-03T10:00:00Z"
+
+                missingSalesChannel:
+                  summary: 缺少必需参数 salesChannel
+                  value:
+                    success: false
+                    error: "MISSING_REQUIRED_PARAM"
+                    message: "缺少必需参数: salesChannel"
+                    details:
+                      requiredParams: ["salesChannel"]
+                    timestamp: "2026-01-03T10:00:00Z"
+
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalError:
+                  summary: 服务器错误
+                  value:
+                    success: false
+                    error: "INTERNAL_SERVER_ERROR"
+                    message: "服务器内部错误，请稍后重试"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+components:
+  schemas:
+    ChannelCategory:
+      type: string
+      enum:
+        - ALCOHOL
+        - COFFEE
+        - BEVERAGE
+        - SNACK
+        - MEAL
+        - OTHER
+      description: |
+        商品分类枚举
+        - `ALCOHOL`: 酒精类饮品（显示为"经典特调"）
+        - `COFFEE`: 咖啡类（显示为"精品咖啡"）
+        - `BEVERAGE`: 非酒精饮品（显示为"经典饮品"）
+        - `SNACK`: 小食类（显示为"主厨小食"）
+        - `MEAL`: 正餐类（显示为"精品餐食"）
+        - `OTHER`: 其他类（显示为"其他商品"）
+
+    SalesChannel:
+      type: string
+      enum:
+        - MINI_PROGRAM_MENU
+        - H5_MENU
+      description: |
+        售卖渠道枚举
+        - `MINI_PROGRAM_MENU`: 小程序点单
+        - `H5_MENU`: H5点单
+
+    ProductStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+      description: |
+        商品上下架状态
+        - `ACTIVE`: 上架
+        - `INACTIVE`: 下架
+
+    StockStatus:
+      type: string
+      enum:
+        - AVAILABLE
+        - OUT_OF_STOCK
+      description: |
+        库存状态
+        - `AVAILABLE`: 有库存
+        - `OUT_OF_STOCK`: 缺货
+
+    ChannelProductDTO:
+      type: object
+      required:
+        - id
+        - productId
+        - productName
+        - mainImageUrl
+        - category
+        - salesChannel
+        - status
+        - priceInCents
+        - sortOrder
+      properties:
+        id:
+          type: string
+          description: 渠道商品配置唯一标识
+          example: "cp-001"
+
+        productId:
+          type: string
+          description: 关联的商品(SKU) ID
+          example: "sku-coffee-001"
+
+        productName:
+          type: string
+          description: 商品名称
+          minLength: 1
+          maxLength: 100
+          example: "美式咖啡"
+
+        mainImageUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 商品主图URL（可为null表示无图片）
+          example: "https://cdn.example.com/coffee-americano.jpg"
+
+        category:
+          $ref: '#/components/schemas/ChannelCategory'
+
+        salesChannel:
+          $ref: '#/components/schemas/SalesChannel'
+
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+
+        priceInCents:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 价格（单位：分）。例如 2500 表示 ¥25.00
+          example: 2500
+
+        sortOrder:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 排序权重（数字越小越靠前）
+          example: 100
+
+        tags:
+          type: array
+          items:
+            type: string
+          description: 商品标签列表（可选）
+          example: ["热销", "推荐", "新品"]
+
+        stockStatus:
+          $ref: '#/components/schemas/StockStatus'
+
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601格式）
+          example: "2026-01-01T10:00:00Z"
+
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间（ISO 8601格式）
+          example: "2026-01-03T08:30:00Z"
+
+    ProductListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - page
+        - pageSize
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求成功标识
+          example: true
+
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductDTO'
+          description: 商品列表数据
+
+        total:
+          type: integer
+          format: int32
+          minimum: 0
+          description: 总记录数
+          example: 15
+
+        page:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 当前页码
+          example: 1
+
+        pageSize:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          description: 每页条数
+          example: 20
+
+        message:
+          type: string
+          description: 可选消息
+          example: "查询成功"
+
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601格式）
+          example: "2026-01-03T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求失败标识
+          example: false
+
+        error:
+          type: string
+          description: 错误代码（符合规则08-api-standards.md异常编号规范）
+          example: "INVALID_CATEGORY"
+
+        message:
+          type: string
+          description: 错误消息（用户友好的中文提示）
+          example: "无效的商品分类"
+
+        details:
+          type: object
+          additionalProperties: true
+          description: 错误详情（可选，包含额外的调试信息）
+          example:
+            category: "INVALID_VALUE"
+            validCategories: ["ALCOHOL", "COFFEE", "BEVERAGE", "SNACK"]
+
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601格式）
+          example: "2026-01-03T10:00:00Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Bearer Token认证（Phase 2实施）
+
+        **获取Token**: POST /api/auth/login
+
+        **使用方式**: 在请求头中添加 `Authorization: Bearer <token>`
+
+        **注意**: Phase 1阶段暂不强制认证，仅预留字段
+
+security:
+  - BearerAuth: []
+
+x-additional-info:
+  spec-id: O007-miniapp-menu-api
+  phase: Phase 1 - 小程序菜单与商品API集成
+  backend-api-status: 100%完成（复用现有接口）
+  frontend-integration: 待实施（Taro框架 + React + TypeScript）
+  related-specs:
+    - O005-channel-product-config
+    - O006-miniapp-channel-order
+  compliance:
+    - rule: 08-api-standards.md
+      description: 统一API响应格式
+    - rule: 09-quality-standards.md
+      description: 性能标准（P95 ≤ 1秒）

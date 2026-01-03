@@ -1,8 +1,8 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
 import { resolve } from 'path'
 
-export default defineConfig<'vite'>(async (merge) => {
-  const baseConfig: UserConfigExport<'vite'> = {
+export default defineConfig<'webpack5'>(async (merge) => {
+  const baseConfig: UserConfigExport<'webpack5'> = {
     projectName: 'miniapp-ordering-taro',
     date: '2025-01-02',
     designWidth: 750,
@@ -40,6 +40,11 @@ export default defineConfig<'vite'>(async (merge) => {
     h5: {
       publicPath: '/',
       staticDirectory: 'static',
+      esnextModules: [
+        '@tanstack/react-query',
+        '@tanstack/query-core',
+        'zustand'
+      ],
       postcss: {
         autoprefixer: {
           enable: true,

@@ -1,0 +1,72 @@
+/**
+ * @spec O007-miniapp-menu-api
+ * 菜单页面样式 - 深色主题
+ */
+
+.menu-page {
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  flex-shrink: 0;
+  height: 100%;
+  overflow-y: auto;
+
+  /* 隐藏滚动条 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.product-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #0a0a0a;
+}
+
+.category-header {
+  padding: 32rpx 24rpx 16rpx;
+  flex-shrink: 0;
+}
+
+.category-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 8rpx;
+}
+
+.category-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #888888;
+}
+
+.product-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24rpx 24rpx;
+
+  /* 隐藏滚动条 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

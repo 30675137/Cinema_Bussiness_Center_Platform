@@ -46,6 +46,10 @@ export class TaskRepository {
     }
 
     if (validated.specId) fields['规格ID'] = validated.specId
+    if (validated.taskId) fields['任务标识'] = validated.taskId
+    if (validated.phase) fields['阶段'] = validated.phase
+    if (validated.storyLabel) fields['用户故事'] = validated.storyLabel
+    if (validated.isParallel !== undefined) fields['可并行'] = validated.isParallel
     if (validated.assignees) fields['负责人'] = validated.assignees
     if (validated.dueDate) fields['截止日期'] = validated.dueDate
     if (validated.tags) fields['标签'] = validated.tags
@@ -121,6 +125,10 @@ export class TaskRepository {
     if (input.priority) fields['优先级'] = input.priority
     if (input.status) fields['状态'] = input.status
     if (input.specId !== undefined) fields['规格ID'] = input.specId
+    if (input.taskId !== undefined) fields['任务标识'] = input.taskId
+    if (input.phase !== undefined) fields['阶段'] = input.phase
+    if (input.storyLabel !== undefined) fields['用户故事'] = input.storyLabel
+    if (input.isParallel !== undefined) fields['可并行'] = input.isParallel
     if (input.assignees !== undefined) fields['负责人'] = input.assignees
     if (input.dueDate !== undefined) fields['截止日期'] = input.dueDate
     if (input.tags !== undefined) fields['标签'] = input.tags

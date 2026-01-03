@@ -16,6 +16,10 @@ export interface CreateTaskOptions {
   priority?: string
   status?: string
   specId?: string
+  taskId?: string // 任务标识（如 T001）
+  phase?: string // 阶段（如 Phase 1: Setup）
+  storyLabel?: string // 用户故事标签（如 US1）
+  isParallel?: boolean // 是否可并行执行
   assignees?: string[]
   dueDate?: number
   tags?: string[]
@@ -49,6 +53,10 @@ export async function createTaskCommand(options: CreateTaskOptions): Promise<voi
     }
 
     if (options.specId) input.specId = options.specId
+    if (options.taskId) input.taskId = options.taskId
+    if (options.phase) input.phase = options.phase
+    if (options.storyLabel) input.storyLabel = options.storyLabel
+    if (options.isParallel !== undefined) input.isParallel = options.isParallel
     if (options.assignees) input.assignees = options.assignees
     if (options.dueDate) input.dueDate = options.dueDate
     if (options.tags) input.tags = options.tags as TaskTag[]

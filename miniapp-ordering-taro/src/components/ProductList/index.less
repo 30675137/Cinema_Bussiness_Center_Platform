@@ -1,0 +1,142 @@
+/**
+ * @spec O007-miniapp-menu-api
+ * 商品列表样式 - 深色主题 列表布局
+ */
+
+.product-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.grid-item {
+  width: 100%;
+}
+
+/* 骨架屏样式 */
+.skeleton-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.skeleton-card {
+  background-color: #1a1a1a;
+  border-radius: 16rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  padding: 16rpx;
+}
+
+.skeleton-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #2a2a2a 25%, #333333 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-info {
+  flex: 1;
+  padding: 8rpx 0 8rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.skeleton-title {
+  height: 36rpx;
+  background: linear-gradient(90deg, #2a2a2a 25%, #333333 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8rpx;
+  width: 80%;
+}
+
+.skeleton-price {
+  height: 32rpx;
+  width: 40%;
+  background: linear-gradient(90deg, #2a2a2a 25%, #333333 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8rpx;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 48rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #ffffff;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  font-size: 26rpx;
+  color: #888888;
+}
+
+/* 错误状态样式 */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 48rpx;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.error-text {
+  font-size: 28rpx;
+  color: #888888;
+  margin-bottom: 32rpx;
+  line-height: 40rpx;
+}
+
+.retry-button {
+  padding: 20rpx 48rpx;
+  background-color: #f5a623;
+  border-radius: 48rpx;
+  transition: all 0.3s ease;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.retry-text {
+  color: #000000;
+  font-size: 28rpx;
+  font-weight: 500;
+}

@@ -1,1 +1,1 @@
-specs/O006-miniapp-channel-order/spec.md
+specs/O007-miniapp-menu-api/spec.md
