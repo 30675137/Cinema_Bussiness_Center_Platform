@@ -1,17 +1,21 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.14.1 → 1.15.0 -->
-<!-- Modified principles: None -->
+<!-- Version change: 1.15.0 → 1.15.1 -->
+<!-- Modified principles:
+  - 十、Lark PM 项目管理集成规则: 新增 R11.5 API 记录规则
+  - R11.4 禁止行为: 新增"禁止新增 API 后不记录到 API 表"
+-->
 <!-- Added sections:
-  - 十、Lark PM 项目管理集成规则 (Lark PM Project Management Integration) - 新增 (v1.15.0)
+  - R11.5 API 记录规则 - 新增 (v1.15.1)
 -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (v1.15.0 - 新增 Lark PM 集成规则)
-  ✅ .claude/skills/lark-pm/skill.md (已存在,规则与宪法对齐)
+  ✅ .specify/memory/constitution.md (v1.15.1 - 新增 API 记录规则)
+  ✅ .claude/skills/lark-pm/skill.md (规则与宪法对齐)
 -->
 <!-- Follow-up TODOs:
   1. 确保所有 Phase 执行时遵循 Lark PM 状态同步规则
   2. 验证 Lark PM Base App Token 配置正确
+  3. 新增 API 时记录到 API 表
 -->
 
 # 影院商品管理中台宪法
@@ -472,8 +476,15 @@ export async function fetchUserReservations(userId: string) {
 - ❌ 禁止 Phase 完成后不更新 Lark PM
 - ❌ 禁止执行结果字段留空
 - ❌ 禁止在 Git Commit 之前标记任务完成
+- ❌ 禁止新增 API 后不记录到 API 表
 
-**基本原理**: Lark PM 集成规则确保开发进度的可见性和可追溯性。通过强制状态同步和执行结果记录,项目干系人可以实时了解开发进展,便于识别风险和调整计划。先提交代码后更新状态的顺序避免了"标记完成但代码未提交"的不一致情况。
+**R11.5 API 记录规则**:
+- 新增 API 接口时,必须记录到 Lark PM 的 API 表 (`tblmNcitMxHPrOMv`)
+- API 记录必须包含:端点路径、HTTP 方法、功能描述、所属 specId
+- 使用 `bitable_v1_appTableRecord_create` 工具创建 API 记录
+- API 表地址: `https://j13juzq4tyn.feishu.cn/base/Y05Mb7greapFiSseRpoc5XkXnrb?table=tblmNcitMxHPrOMv`
+
+**基本原理**: Lark PM 集成规则确保开发进度的可见性和可追溯性。API 记录规则确保所有新增接口都有完整的文档记录,便于团队成员查阅和维护。通过强制状态同步和执行结果记录,项目干系人可以实时了解开发进展,便于识别风险和调整计划。先提交代码后更新状态的顺序避免了"标记完成但代码未提交"的不一致情况。
 
 ## 后端架构与技术栈
 
@@ -763,4 +774,4 @@ export async function fetchUserReservations(userId: string) {
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.15.0 | **制定日期**: 2025-12-14 | **最后修订**: 2026-01-03
+**版本**: 1.15.1 | **制定日期**: 2025-12-14 | **最后修订**: 2026-01-03
