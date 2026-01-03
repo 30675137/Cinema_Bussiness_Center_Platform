@@ -87,9 +87,15 @@ export interface ApiResponse<T> {
 
 /**
  * 商品列表查询参数
+ * @spec O002-miniapp-menu-config
  */
 export interface ProductListParams {
-  /** 分类过滤 */
+  /**
+   * @spec O002-miniapp-menu-config
+   * 分类 ID 筛选（UUID 格式，优先级最高）
+   */
+  categoryId?: string | null
+  /** 分类过滤（编码，优先级次之） */
   category?: ChannelCategory | null
   /** 销售渠道 */
   salesChannel?: string

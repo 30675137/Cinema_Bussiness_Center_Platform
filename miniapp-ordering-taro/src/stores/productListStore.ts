@@ -1,5 +1,6 @@
 /**
  * @spec O007-miniapp-menu-api
+ * @spec O002-miniapp-menu-config
  * 商品列表状态管理
  */
 
@@ -8,29 +9,44 @@ import { ChannelCategory } from '../types/product'
 
 /**
  * 商品列表状态接口
+ * @spec O002-miniapp-menu-config
  */
 export interface ProductListState {
-  /** 当前选中的分类（null 表示"全部"） */
+  /**
+   * @spec O002-miniapp-menu-config
+   * 当前选中的分类 ID（UUID 格式，优先级最高）
+   */
+  selectedCategoryId: string | null
+
+  /** 当前选中的分类编码（null 表示"全部"，向后兼容） */
   selectedCategory: ChannelCategory | null
-  
-  /** 设置选中的分类 */
-  setSelectedCategory: (category: ChannelCategory | null) => void
-  
+
+  /**
+   * @spec O002-miniapp-menu-config
+   * 设置选中的分类（同时设置 ID 和 code）
+   */
+  setSelectedCategory: (
+    categoryId: string | null,
+    category: ChannelCategory | null
+  ) => void
+
   /** 重置状态 */
   reset: () => void
 }
 
 /**
  * 商品列表状态管理 Hook
+ * @spec O002-miniapp-menu-config
  */
 export const useProductListStore = create<ProductListState>((set) => ({
+  selectedCategoryId: null,
   selectedCategory: null,
-  
-  setSelectedCategory: (category) => {
-    set({ selectedCategory: category })
+
+  setSelectedCategory: (categoryId, category) => {
+    set({ selectedCategoryId: categoryId, selectedCategory: category })
   },
-  
+
   reset: () => {
-    set({ selectedCategory: null })
+    set({ selectedCategoryId: null, selectedCategory: null })
   },
 }))

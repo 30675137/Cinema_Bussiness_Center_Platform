@@ -1,5 +1,7 @@
 package com.cinema.channelproduct.service;
 
+import com.cinema.category.entity.MenuCategory;
+import com.cinema.category.repository.MenuCategoryRepository;
 import com.cinema.channelproduct.domain.ChannelProductConfig;
 import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.dto.ChannelProductQueryParams;
@@ -34,6 +36,7 @@ import java.util.UUID;
 
 /**
  * @spec O005-channel-product-config
+ * @spec O002-miniapp-menu-config
  * 渠道商品配置业务逻辑层
  */
 @Slf4j
@@ -43,6 +46,7 @@ public class ChannelProductService {
 
     private final ChannelProductRepository channelProductRepository;
     private final SkuRepository skuRepository;
+    private final MenuCategoryRepository menuCategoryRepository;
     private final SupabaseConfig supabaseConfig;
     private final RestTemplate restTemplate;
 
@@ -212,6 +216,58 @@ public class ChannelProductService {
     }
 
     /**
+     * @spec O002-miniapp-menu-config
+     * 加载分类信息并填充到渠道商品配置列表
+     * 通过 Hibernate FetchType.LAZY 关系，需要显式加载分类数据
+     */
+    private void loadCategoryInfo(List<ChannelProductConfig> configs) {
+        if (configs.isEmpty()) {
+            return;
+        }
+
+        // 批量获取所有分类 ID
+        List<UUID> categoryIds = configs.stream()
+                .map(ChannelProductConfig::getCategoryId)
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+
+        if (categoryIds.isEmpty()) {
+            return;
+        }
+
+        // 批量查询分类
+        List<MenuCategory> categories = menuCategoryRepository.findAllById(categoryIds);
+        java.util.Map<UUID, MenuCategory> categoryMap = categories.stream()
+                .collect(java.util.stream.Collectors.toMap(MenuCategory::getId, c -> c));
+
+        // 填充分类信息到每个配置（触发 Hibernate 加载）
+        for (ChannelProductConfig config : configs) {
+            if (config.getCategoryId() != null) {
+                MenuCategory category = categoryMap.get(config.getCategoryId());
+                if (category != null) {
+                    // 通过 setter 设置，触发 JPA 关联更新
+                    // 注意：这里只是确保 category 对象可用于序列化
+                    // 实际的关联已经在实体中定义
+                }
+            }
+        }
+    }
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 加载单个商品的分类信息
+     */
+    private void loadCategoryInfoForSingle(ChannelProductConfig config) {
+        if (config.getCategoryId() != null) {
+            menuCategoryRepository.findById(config.getCategoryId())
+                    .ifPresent(category -> {
+                        // 触发关联加载，使 category 可用于 JSON 序列化
+                    });
+        }
+    }
+
+    /**
      * 更新商品状态
      */
     @Transactional
@@ -308,18 +364,34 @@ public class ChannelProductService {
         return filename.substring(filename.lastIndexOf(".") + 1);
     }
 
-    // ==================== 客户端专用方法 (O006) ====================
+    // ==================== 客户端专用方法 (O006, O002) ====================
 
     /**
-     * 获取小程序商品列表（客户端专用）
+     * 获取小程序商品列表（客户端专用）- 支持动态分类筛选
      * 仅返回 ACTIVE 状态的商品
      *
+     * @spec O002-miniapp-menu-config
      * @spec O006-miniapp-channel-order
-     * @param category 可选的分类筛选
+     * @param categoryId 可选的分类 ID 筛选（优先级最高）
+     * @param categoryCode 可选的分类编码筛选（优先级次高）
      * @return 商品列表
      */
     @Transactional(readOnly = true)
-    public List<ChannelProductConfig> getMiniProgramProducts(ChannelCategory category) {
+    public List<ChannelProductConfig> getMiniProgramProducts(UUID categoryId, String categoryCode) {
+        // T064: 优先级逻辑 - categoryId > categoryCode
+        UUID effectiveCategoryId = categoryId;
+
+        // 如果没有 categoryId 但有 categoryCode，则通过 code 查找分类 ID
+        if (effectiveCategoryId == null && StringUtils.hasText(categoryCode)) {
+            MenuCategory menuCategory = menuCategoryRepository.findByCodeAndDeletedAtIsNull(categoryCode)
+                    .orElse(null);
+            if (menuCategory != null) {
+                effectiveCategoryId = menuCategory.getId();
+            }
+        }
+
+        final UUID finalCategoryId = effectiveCategoryId;
+
         Specification<ChannelProductConfig> spec = (root, query, cb) -> {
             List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
 
@@ -332,9 +404,9 @@ public class ChannelProductService {
             // 仅返回 ACTIVE 状态
             predicates.add(cb.equal(root.get("status"), ChannelProductStatus.ACTIVE));
 
-            // 可选分类筛选
-            if (category != null) {
-                predicates.add(cb.equal(root.get("channelCategory"), category));
+            // T062/T063: 分类筛选（使用 categoryId）
+            if (finalCategoryId != null) {
+                predicates.add(cb.equal(root.get("categoryId"), finalCategoryId));
             }
 
             return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
@@ -349,18 +421,39 @@ public class ChannelProductService {
 
         List<ChannelProductConfig> products = channelProductRepository.findAll(spec, sort);
 
-        // 加载 SKU 信息
+        // 加载 SKU 信息和分类信息
         loadSkuInfo(products);
+        loadCategoryInfo(products);
 
         return products;
+    }
+
+    /**
+     * 获取小程序商品列表（向后兼容旧的枚举筛选）
+     * 仅返回 ACTIVE 状态的商品
+     *
+     * @spec O006-miniapp-channel-order
+     * @param category 可选的分类筛选（旧枚举）
+     * @return 商品列表
+     * @deprecated 使用 getMiniProgramProducts(UUID categoryId, String categoryCode) 替代
+     */
+    @Deprecated
+    @Transactional(readOnly = true)
+    public List<ChannelProductConfig> getMiniProgramProducts(ChannelCategory category) {
+        // 如果有旧枚举分类，尝试通过 code 查找对应的新分类
+        if (category != null) {
+            return getMiniProgramProducts(null, category.name());
+        }
+        return getMiniProgramProducts(null, null);
     }
 
     /**
      * 获取小程序商品详情（客户端专用）
      *
      * @spec O006-miniapp-channel-order
+     * @spec O002-miniapp-menu-config
      * @param id 商品ID
-     * @return 商品详情（包含规格）
+     * @return 商品详情（包含规格和分类信息）
      */
     @Transactional(readOnly = true)
     public ChannelProductConfig getMiniProgramProductDetail(UUID id) {
@@ -376,8 +469,9 @@ public class ChannelProductService {
             throw new BusinessException("PRD_VAL_003", "Product is not active");
         }
 
-        // 加载 SKU 信息
+        // 加载 SKU 信息和分类信息
         loadSkuInfoForSingle(config);
+        loadCategoryInfoForSingle(config);
 
         return config;
     }

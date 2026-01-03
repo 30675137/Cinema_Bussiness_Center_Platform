@@ -1,5 +1,6 @@
 /**
  * @spec O007-miniapp-menu-api
+ * @spec O002-miniapp-menu-config
  * 菜单页面
  */
 
@@ -18,29 +19,38 @@ import './index.less'
 
 /**
  * 菜单页面组件
+ * @spec O002-miniapp-menu-config
  */
 export default function MenuPage() {
-  // 获取状态管理
-  const { selectedCategory, setSelectedCategory } = useProductListStore()
+  // 获取状态管理 - O002: 同时获取 categoryId 和 category
+  const { selectedCategoryId, selectedCategory, setSelectedCategory } = useProductListStore()
 
   // TabBar 当前激活项
   const [activeTab, setActiveTab] = useState('order')
 
-  // 获取商品列表数据
-  const { data: products = [], isLoading, error, refetch } = useProducts(selectedCategory)
+  // O002: 获取商品列表数据 - 传递 categoryId 和 category
+  const { data: products = [], isLoading, error, refetch } = useProducts({
+    categoryId: selectedCategoryId,
+    category: selectedCategory,
+  })
 
   /**
    * 页面初始化：设置默认分类为第一个分类
+   * @spec O002-miniapp-menu-config
    */
   useEffect(() => {
-    setSelectedCategory(ChannelCategory.ALCOHOL)
+    // O002: 向后兼容 - 硬编码分类没有 UUID，传 null 作为 categoryId
+    setSelectedCategory(null, ChannelCategory.ALCOHOL)
   }, [])
 
   /**
    * 处理分类切换
+   * @spec O002-miniapp-menu-config
    */
   const handleCategoryChange = (category: ChannelCategory | null) => {
-    setSelectedCategory(category)
+    // O002: 向后兼容 - 当使用动态分类时，CategoryTabs 组件需要传递 categoryId
+    // 目前使用硬编码分类，categoryId 为 null
+    setSelectedCategory(null, category)
   }
 
   /**

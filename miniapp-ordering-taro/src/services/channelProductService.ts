@@ -1,5 +1,6 @@
 /**
  * @spec O007-miniapp-menu-api
+ * @spec O002-miniapp-menu-config
  * 渠道商品 API 服务
  */
 
@@ -109,12 +110,17 @@ async function silentLogin(): Promise<string> {
 }
 
 /**
- * 构建查询参数
+ * @spec O002-miniapp-menu-config
+ * 构建查询参数 - 支持 categoryId 优先级
  */
 function buildQueryParams(params: ProductListParams): string {
   const queryParams = new URLSearchParams()
-  
-  if (params.category) {
+
+  // O002: categoryId 优先级最高
+  if (params.categoryId) {
+    queryParams.append('categoryId', params.categoryId)
+  } else if (params.category) {
+    // category (code) 作为后备
     queryParams.append('category', params.category)
   }
   if (params.salesChannel) {
@@ -135,7 +141,7 @@ function buildQueryParams(params: ProductListParams): string {
   if (params.sortOrder) {
     queryParams.append('sortOrder', params.sortOrder)
   }
-  
+
   return queryParams.toString()
 }
 

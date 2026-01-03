@@ -1,5 +1,6 @@
 /**
  * @spec O006-miniapp-channel-order
+ * @spec O002-miniapp-menu-config
  * 渠道商品客户端 DTO - 用于小程序商品列表展示
  */
 package com.cinema.channelproduct.dto;
@@ -34,9 +35,23 @@ public class ChannelProductDTO {
     private String skuId;
 
     /**
-     * 渠道分类
+     * 渠道分类（旧枚举，保留向后兼容）
+     * @deprecated 使用 category 对象替代
      */
+    @Deprecated
     private ChannelCategory channelCategory;
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 分类 ID (UUID字符串)
+     */
+    private String categoryId;
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 分类信息（嵌套对象）
+     */
+    private CategoryInfo category;
 
     /**
      * 展示名称
@@ -82,4 +97,29 @@ public class ChannelProductDTO {
      * 库存状态（预留字段，未来扩展）
      */
     private String stockStatus;
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 分类信息嵌套 DTO
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryInfo {
+        /**
+         * 分类 ID
+         */
+        private String id;
+
+        /**
+         * 分类编码
+         */
+        private String code;
+
+        /**
+         * 显示名称
+         */
+        private String displayName;
+    }
 }

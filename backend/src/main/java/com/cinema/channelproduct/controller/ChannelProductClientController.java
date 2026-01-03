@@ -1,5 +1,6 @@
 package com.cinema.channelproduct.controller;
 
+import com.cinema.category.entity.MenuCategory;
 import com.cinema.channelproduct.domain.ChannelProductConfig;
 import com.cinema.channelproduct.domain.ChannelProductSpec;
 import com.cinema.channelproduct.domain.enums.ChannelCategory;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 /**
  * @spec O006-miniapp-channel-order
+ * @spec O002-miniapp-menu-config
  * 渠道商品客户端 API 控制器
  *
  * 提供以下端点:
@@ -39,18 +41,23 @@ public class ChannelProductClientController {
     private final ChannelProductService channelProductService;
 
     /**
+     * @spec O002-miniapp-menu-config
      * 获取小程序商品列表
      *
-     * @param category 分类筛选（可选）
+     * 筛选参数优先级: categoryId > category (code)
+     *
+     * @param categoryId 分类 ID 筛选（可选，UUID 格式，优先级最高）
+     * @param category 分类编码筛选（可选，支持新分类编码和旧枚举值）
      * @return 商品列表响应
      */
     @GetMapping("/mini-program")
     public ResponseEntity<ApiResponse<List<ChannelProductDTO>>> getMiniProgramProducts(
-            @RequestParam(required = false) ChannelCategory category) {
+            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) String category) {
 
-        log.info("获取小程序商品列表, category={}", category);
+        log.info("获取小程序商品列表, categoryId={}, category={}", categoryId, category);
 
-        List<ChannelProductConfig> configs = channelProductService.getMiniProgramProducts(category);
+        List<ChannelProductConfig> configs = channelProductService.getMiniProgramProducts(categoryId, category);
 
         // 转换为 DTO
         List<ChannelProductDTO> products = configs.stream()
@@ -105,10 +112,11 @@ public class ChannelProductClientController {
     // ==================== 私有辅助方法 ====================
 
     /**
-     * 转换 Entity 为列表 DTO
+     * @spec O002-miniapp-menu-config
+     * 转换 Entity 为列表 DTO（包含分类信息）
      */
     private ChannelProductDTO convertToDTO(ChannelProductConfig config) {
-        return ChannelProductDTO.builder()
+        ChannelProductDTO.ChannelProductDTOBuilder builder = ChannelProductDTO.builder()
                 .id(config.getId().toString())
                 .skuId(config.getSkuId().toString())
                 .channelCategory(config.getChannelCategory())
@@ -122,15 +130,31 @@ public class ChannelProductClientController {
                 .status(config.getStatus())
                 .isRecommended(config.getIsRecommended())
                 .sortOrder(config.getSortOrder())
-                .stockStatus("IN_STOCK") // 预留字段，未来实现库存查询
-                .build();
+                .stockStatus("IN_STOCK"); // 预留字段，未来实现库存查询
+
+        // 填充分类信息
+        if (config.getCategoryId() != null) {
+            builder.categoryId(config.getCategoryId().toString());
+        }
+
+        MenuCategory category = config.getCategory();
+        if (category != null) {
+            builder.category(ChannelProductDTO.CategoryInfo.builder()
+                    .id(category.getId().toString())
+                    .code(category.getCode())
+                    .displayName(category.getDisplayName())
+                    .build());
+        }
+
+        return builder.build();
     }
 
     /**
-     * 转换 Entity 为详情 DTO
+     * @spec O002-miniapp-menu-config
+     * 转换 Entity 为详情 DTO（包含分类信息）
      */
     private ChannelProductDetailDTO convertToDetailDTO(ChannelProductConfig config) {
-        return ChannelProductDetailDTO.builder()
+        ChannelProductDetailDTO.ChannelProductDetailDTOBuilder builder = ChannelProductDetailDTO.builder()
                 .id(config.getId().toString())
                 .skuId(config.getSkuId().toString())
                 .channelCategory(config.getChannelCategory())
@@ -145,7 +169,22 @@ public class ChannelProductClientController {
                 .isRecommended(config.getIsRecommended())
                 .sortOrder(config.getSortOrder())
                 .stockStatus("IN_STOCK") // 预留字段
-                .specs(config.getSpecs())
-                .build();
+                .specs(config.getSpecs());
+
+        // 填充分类信息
+        if (config.getCategoryId() != null) {
+            builder.categoryId(config.getCategoryId().toString());
+        }
+
+        MenuCategory category = config.getCategory();
+        if (category != null) {
+            builder.category(ChannelProductDetailDTO.CategoryInfo.builder()
+                    .id(category.getId().toString())
+                    .code(category.getCode())
+                    .displayName(category.getDisplayName())
+                    .build());
+        }
+
+        return builder.build();
     }
 }
