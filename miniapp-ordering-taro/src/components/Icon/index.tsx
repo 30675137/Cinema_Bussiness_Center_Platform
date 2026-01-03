@@ -9,7 +9,7 @@ import './index.less'
 /**
  * 图标名称类型
  */
-export type IconName = 'cocktail' | 'coffee' | 'beverage' | 'snack' | 'meal' | 'other' | 'search' | 'user'
+export type IconName = 'cocktail' | 'coffee' | 'beverage' | 'snack' | 'meal' | 'other' | 'search' | 'user' | 'location' | 'chevron-right' | 'scan'
 
 /**
  * 图标组件属性
@@ -61,6 +61,18 @@ const SVG_DATA: Record<IconName, { path: string; fill?: boolean }> = {
   // 用户
   user: {
     path: 'M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  },
+  // 位置/定位
+  location: {
+    path: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+  },
+  // 右箭头
+  'chevron-right': {
+    path: 'M9 18l6-6-6-6',
+  },
+  // 扫码
+  scan: {
+    path: 'M3 7V5a2 2 0 0 1 2-2h2 M17 3h2a2 2 0 0 1 2 2v2 M21 17v2a2 2 0 0 1-2 2h-2 M7 21H5a2 2 0 0 1-2-2v-2 M7 12h10 M12 7v10',
   },
 }
 

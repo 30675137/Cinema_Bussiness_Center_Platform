@@ -10,6 +10,7 @@ import { ChannelCategory, ProductCard } from '../../types/product'
 import { useProductListStore } from '../../stores/productListStore'
 import { useProducts } from '../../hooks/useProducts'
 import { getCategoryDisplayName } from '../../utils/category'
+import Header from '../../components/Header'
 import CategoryTabs from '../../components/CategoryTabs'
 import ProductList from '../../components/ProductList'
 import './index.less'
@@ -74,6 +75,14 @@ export default function MenuPage() {
 
   return (
     <View className='menu-page'>
+      {/* 顶部导航栏 */}
+      <Header
+        zoneName='3号厅 VIP区'
+        onSearchClick={() => Taro.showToast({ title: '搜索功能开发中', icon: 'none' })}
+        onScanClick={() => Taro.showToast({ title: '扫码功能开发中', icon: 'none' })}
+        onZoneClick={() => Taro.showToast({ title: '切换区域功能开发中', icon: 'none' })}
+      />
+
       {/* 主体内容：左右布局 */}
       <View className='main-content'>
         {/* 左侧：分类侧边栏 */}
