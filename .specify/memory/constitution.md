@@ -1,21 +1,17 @@
 <!-- Sync Impact Report -->
-<!-- Version change: 1.14.0 → 1.14.1 -->
-<!-- Modified principles:
-  - 七、代码质量与工程化 (Code Quality & Engineering Excellence) - 明确要求使用 Java 17,禁止使用其他版本 (v1.14.1)
+<!-- Version change: 1.14.1 → 1.15.0 -->
+<!-- Modified principles: None -->
+<!-- Added sections:
+  - 十、Lark PM 项目管理集成规则 (Lark PM Project Management Integration) - 新增 (v1.15.0)
 -->
-<!-- Added sections: None -->
 <!-- Removed sections: None -->
 <!-- Templates requiring updates:
-  ✅ .specify/memory/constitution.md (v1.14.1 - 强制要求 Java 17)
-  ⚠ backend/pom.xml (需验证 Java 17 配置)
-  ⚠ backend/.mvn/jvm.config (需创建文件锁定 Java 17)
-  ⚠ .claude/rules/07-backend-architecture.md (需更新 Java 版本要求)
+  ✅ .specify/memory/constitution.md (v1.15.0 - 新增 Lark PM 集成规则)
+  ✅ .claude/skills/lark-pm/skill.md (已存在,规则与宪法对齐)
 -->
 <!-- Follow-up TODOs:
-  1. 验证 backend/pom.xml 中 <java.version> 为 17
-  2. 创建 backend/.mvn/jvm.config 文件指定 JAVA_HOME
-  3. 更新 .claude/rules/07-backend-architecture.md 中的 Java 版本要求
-  4. 在 CI/CD 流水线中强制验证 Java 17
+  1. 确保所有 Phase 执行时遵循 Lark PM 状态同步规则
+  2. 验证 Lark PM Base App Token 配置正确
 -->
 
 # 影院商品管理中台宪法
@@ -437,6 +433,48 @@ export async function fetchUserReservations(userId: string) {
 
 **基本原理**: 分层的认证与权限策略允许开发团队在早期阶段专注于核心业务功能的实现,避免权限系统的复杂性阻塞功能开发进度。B端管理后台作为内部工具,可在原型验证阶段暂不考虑权限控制,待业务逻辑稳定后统一补充。C端面向最终用户,涉及数据安全和隐私保护,必须从一开始按实际需求实现认证授权。这种策略平衡了开发效率和安全需求,确保项目按优先级有序推进。
 
+### 十、Lark PM 项目管理集成规则 (Lark PM Project Management Integration)
+
+当项目使用 Lark PM (飞书多维表格) 进行任务跟踪时,必须遵循以下集成规则,确保开发进度与项目管理系统的一致性。
+
+**R11.1 Phase 状态同步**:
+- 每个 Phase 开始执行时,必须更新 Lark PM 任务状态为 `🚀 进行中`
+- 每个 Phase 完成后,必须更新状态为 `✅完成` 并填写执行结果
+- 状态更新顺序:先 Git Commit,后 Lark PM 更新
+
+**R11.2 执行结果记录**:
+执行结果字段必须包含:
+1. 已完成任务清单(按模块分组)
+2. Git Commit 信息(hash + message + 统计)
+3. 遇到的问题(无则标注"无")
+
+**示例**:
+```markdown
+## 执行结果
+
+### 已完成任务
+- 后端: T027-T033 Service 层完成
+- 前端: T040-T046 组件和页面完成
+
+### Git Commit
+- `baa01ba` feat(O002): implement Phase 3 Admin CRUD
+- 13 files changed, 1777 insertions(+)
+
+### 遇到的问题
+无
+```
+
+**R11.3 临时任务记录**:
+- 发现需要额外任务时(如文档更新),使用 `bitable_v1_appTableRecord_create` 创建新任务
+- 任务标识格式:`<specId>-<类型>` (如 `O002-DOC`)
+
+**R11.4 禁止行为**:
+- ❌ 禁止 Phase 完成后不更新 Lark PM
+- ❌ 禁止执行结果字段留空
+- ❌ 禁止在 Git Commit 之前标记任务完成
+
+**基本原理**: Lark PM 集成规则确保开发进度的可见性和可追溯性。通过强制状态同步和执行结果记录,项目干系人可以实时了解开发进展,便于识别风险和调整计划。先提交代码后更新状态的顺序避免了"标记完成但代码未提交"的不一致情况。
+
 ## 后端架构与技术栈
 
 ### Spring Boot + Supabase 统一后端栈
@@ -725,4 +763,4 @@ export async function fetchUserReservations(userId: string) {
 当开发实践与宪法原则发生冲突时,应以宪法原则为准,必要时通过正式流程
 修订宪法。团队成员都有责任维护宪法的执行,确保项目的长期健康发展。
 
-**版本**: 1.14.1 | **制定日期**: 2025-12-14 | **最后修订**: 2025-12-31
+**版本**: 1.15.0 | **制定日期**: 2025-12-14 | **最后修订**: 2026-01-03

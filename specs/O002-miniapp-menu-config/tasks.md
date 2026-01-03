@@ -132,17 +132,17 @@
 
 ### Backend Implementation for US2
 
-- [ ] T047 [US2] Create `MenuCategoryClientController` in `backend/src/main/java/com/cinema/category/controller/MenuCategoryClientController.java`
-- [ ] T048 [US2] Implement `GET /api/client/menu-categories` endpoint returning visible categories with productCount
-- [ ] T049 [US2] Add caching for client category list (5 minute TTL)
+- [x] T047 [US2] Create `MenuCategoryClientController` in `backend/src/main/java/com/cinema/category/controller/MenuCategoryClientController.java`
+- [x] T048 [US2] Implement `GET /api/client/menu-categories` endpoint returning visible categories with productCount
+- [x] T049 [US2] Add caching for client category list (5 minute TTL)
 
 ### Frontend C端 Implementation for US2
 
-- [ ] T050 [P] [US2] Create `menuCategoryService` in `hall-reserve-taro/src/services/menuCategoryService.ts`
-- [ ] T051 [P] [US2] Create `useMenuCategories` hook in `hall-reserve-taro/src/hooks/useMenuCategories.ts`
-- [ ] T052 [US2] Create `menuCategoryStore` Zustand store in `hall-reserve-taro/src/stores/menuCategoryStore.ts`
-- [ ] T053 [US2] Update menu page to fetch categories from API in `hall-reserve-taro/src/pages/menu/index.tsx`
-- [ ] T054 [US2] Remove hardcoded `CATEGORY_DISPLAY_NAMES` mapping from C端 code
+- [x] T050 [P] [US2] Create `menuCategoryService` in `hall-reserve-taro/src/services/menuCategoryService.ts`
+- [x] T051 [P] [US2] Create `useMenuCategories` hook in `hall-reserve-taro/src/hooks/useMenuCategories.ts`
+- [x] T052 [US2] Create `menuCategoryStore` Zustand store in `hall-reserve-taro/src/stores/menuCategoryStore.ts`
+- [x] T053 [US2] Update menu page to fetch categories from API in `hall-reserve-taro/src/pages/beverage/menu/index.tsx`
+- [x] T054 [US2] Remove hardcoded `CATEGORY_DISPLAY_NAMES` mapping from C端 code
 
 **Checkpoint**: Mini-program displays dynamic categories from API
 

@@ -1,45 +1,95 @@
 /**
  * @spec O003-beverage-order
- * 饮品菜单页面
+ * @spec O002-miniapp-menu-config
+ * 饮品菜单页面 - 使用动态分类
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { View, ScrollView, Text } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useBeverages } from '../../../hooks'
+import { useBeverages, useMenuCategories } from '../../../hooks'
 import { BeverageCard } from '../../../components/BeverageCard'
 import { useBeverageStore } from '../../../stores/beverageStore'
+import { useMenuCategoryStore } from '../../../stores/menuCategoryStore'
 import CartIcon from '../../../components/cart/CartIcon'
 import type { BeverageDTO } from '../../../types/beverage'
+import type { MenuCategoryDTO } from '../../../types/menuCategory'
 import './index.scss'
 
 /**
  * 饮品菜单页面
  *
  * 功能：
+ * - 从 API 动态获取分类列表 (O002)
  * - 分类标签页切换
  * - 饮品列表展示
  * - 点击卡片跳转详情页
  */
 const BeverageMenu: React.FC = () => {
-  const { data, isLoading, error } = useBeverages()
-  const { setSelectedCategory, setCurrentBeverage } = useBeverageStore()
-  const [activeCategory, setActiveCategory] = useState<string>('全部')
+  // O002: 从 API 获取动态分类
+  const {
+    data: categoriesData,
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+  } = useMenuCategories()
 
-  // 获取分类列表
-  const categories = data ? ['全部', ...Object.keys(data)] : ['全部']
+  // O003: 获取饮品数据
+  const { data: beveragesData, isLoading: isBeveragesLoading, error: beveragesError } = useBeverages()
+
+  const { setSelectedCategory: setBeverageCategory, setCurrentBeverage } = useBeverageStore()
+  const { setCategories, selectCategory, selectedCategoryId } = useMenuCategoryStore()
+
+  // 当前选中的分类 code (null 表示 "全部")
+  const [activeCategoryCode, setActiveCategoryCode] = useState<string | null>(null)
+
+  // 同步分类数据到 store
+  useEffect(() => {
+    if (categoriesData && categoriesData.length > 0) {
+      setCategories(categoriesData)
+    }
+  }, [categoriesData, setCategories])
+
+  // 构建分类列表（包含 "全部" 选项）
+  const categories: Array<{ id: string | null; code: string; displayName: string }> = useMemo(() => {
+    const allOption = { id: null, code: 'ALL', displayName: '全部' }
+    if (!categoriesData || categoriesData.length === 0) {
+      return [allOption]
+    }
+    return [
+      allOption,
+      ...categoriesData.map((cat: MenuCategoryDTO) => ({
+        id: cat.id,
+        code: cat.code,
+        displayName: cat.displayName,
+      })),
+    ]
+  }, [categoriesData])
 
   // 获取当前分类的饮品列表
-  const currentBeverages: BeverageDTO[] = React.useMemo(() => {
-    if (!data) return []
-    if (activeCategory === '全部') {
-      return Object.values(data).flat()
-    }
-    return data[activeCategory] || []
-  }, [data, activeCategory])
+  const currentBeverages: BeverageDTO[] = useMemo(() => {
+    if (!beveragesData) return []
 
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category)
-    setSelectedCategory(category === '全部' ? null : category)
+    // 如果选择 "全部"，返回所有饮品
+    if (activeCategoryCode === null || activeCategoryCode === 'ALL') {
+      return Object.values(beveragesData).flat()
+    }
+
+    // 根据分类 code 过滤饮品
+    // beveragesData 的 key 是中文分类名，需要映射
+    const categoryItem = categories.find((c) => c.code === activeCategoryCode)
+    if (categoryItem && categoryItem.displayName && beveragesData[categoryItem.displayName]) {
+      return beveragesData[categoryItem.displayName] || []
+    }
+
+    // 尝试直接用 code 匹配（向后兼容旧版 useBeverages 的 key 格式）
+    return beveragesData[activeCategoryCode] || Object.values(beveragesData).flat().filter(
+      (b: BeverageDTO) => b.category === activeCategoryCode
+    )
+  }, [beveragesData, activeCategoryCode, categories])
+
+  const handleCategoryChange = (category: { id: string | null; code: string }) => {
+    setActiveCategoryCode(category.code === 'ALL' ? null : category.code)
+    selectCategory(category.id)
+    setBeverageCategory(category.code === 'ALL' ? null : category.code)
   }
 
   const handleBeverageClick = (beverage: BeverageDTO) => {
@@ -48,6 +98,9 @@ const BeverageMenu: React.FC = () => {
       url: `/pages/beverage/detail/index?id=${beverage.id}`,
     })
   }
+
+  const isLoading = isCategoriesLoading || isBeveragesLoading
+  const error = categoriesError || beveragesError
 
   if (isLoading) {
     return (
@@ -70,17 +123,22 @@ const BeverageMenu: React.FC = () => {
       {/* 购物车图标 */}
       <CartIcon />
 
-      {/* 分类标签页 */}
+      {/* 分类标签页 - 使用动态分类 */}
       <View className="beverage-menu__tabs">
         <ScrollView scrollX className="beverage-menu__tabs-scroll">
           <View className="beverage-menu__tabs-container">
             {categories.map((category) => (
               <View
-                key={category}
-                className={`beverage-menu__tab ${activeCategory === category ? 'active' : ''}`}
+                key={category.code}
+                className={`beverage-menu__tab ${
+                  (activeCategoryCode === null && category.code === 'ALL') ||
+                  activeCategoryCode === category.code
+                    ? 'active'
+                    : ''
+                }`}
                 onClick={() => handleCategoryChange(category)}
               >
-                <Text className="beverage-menu__tab-text">{category}</Text>
+                <Text className="beverage-menu__tab-text">{category.displayName}</Text>
               </View>
             ))}
           </View>
