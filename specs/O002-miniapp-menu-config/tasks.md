@@ -28,11 +28,11 @@
 
 **Purpose**: Branch creation, environment setup, and project initialization
 
-- [ ] T001 Create feature branch `O002-miniapp-menu-config` from `dev`
-- [ ] T002 Update `.specify/active_spec.txt` to point to `specs/O002-miniapp-menu-config/spec.md`
-- [ ] T003 [P] Verify backend development environment (Java 17, Maven, Supabase connection)
-- [ ] T004 [P] Verify frontend B端 environment (React 19, Ant Design 6, TypeScript)
-- [ ] T005 [P] Verify frontend C端 environment (Taro 4.x, React)
+- [x] T001 Create feature branch `O002-miniapp-menu-config` from `dev`
+- [x] T002 Update `.specify/active_spec.txt` to point to `specs/O002-miniapp-menu-config/spec.md`
+- [x] T003 [P] Verify backend development environment (Java 17.0.9, Maven, Supabase connection)
+- [x] T004 [P] Verify frontend B端 environment (React 19.2.0, Ant Design 6.1.0, TypeScript 5.9.3)
+- [x] T005 [P] Verify frontend C端 environment (Taro 4.1.9, React 18.3.1)
 
 **Estimated Time**: 1.5 hours
 
