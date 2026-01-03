@@ -46,39 +46,39 @@
 
 ### Database Schema
 
-- [ ] T006 Create database migration script `V202601030001__add_menu_category.sql` in `backend/src/main/resources/db/migration/`
-- [ ] T007 Create `menu_category` table with all fields per data-model.md in migration script
-- [ ] T008 Create `category_audit_log` table in migration script
-- [ ] T009 Add `category_id` column to `channel_product_config` table in migration script
-- [ ] T010 Create indexes for `menu_category` table (sort_order, is_visible, code)
-- [ ] T011 Create unique partial index for `is_default=true` constraint
-- [ ] T012 Create trigger for automatic `updated_at` timestamp update
+- [x] T006 Create database migration script `V202601030001__add_menu_category.sql` in `backend/src/main/resources/db/migration/`
+- [x] T007 Create `menu_category` table with all fields per data-model.md in migration script
+- [x] T008 Create `category_audit_log` table in migration script
+- [x] T009 Add `category_id` column to `channel_product_config` table in migration script
+- [x] T010 Create indexes for `menu_category` table (sort_order, is_visible, code)
+- [x] T011 Create unique partial index for `is_default=true` constraint
+- [x] T012 Create trigger for automatic `updated_at` timestamp update
 
 ### Backend Entity Layer
 
-- [ ] T013 [P] Create `MenuCategory` JPA entity in `backend/src/main/java/com/cinema/category/entity/MenuCategory.java`
-- [ ] T014 [P] Create `CategoryAuditLog` JPA entity in `backend/src/main/java/com/cinema/category/entity/CategoryAuditLog.java`
-- [ ] T015 Modify `ChannelProductConfig` entity to add `category` ManyToOne relationship in `backend/src/main/java/com/cinema/product/entity/ChannelProductConfig.java`
+- [x] T013 [P] Create `MenuCategory` JPA entity in `backend/src/main/java/com/cinema/category/entity/MenuCategory.java`
+- [x] T014 [P] Create `CategoryAuditLog` JPA entity in `backend/src/main/java/com/cinema/category/entity/CategoryAuditLog.java`
+- [x] T015 Modify `ChannelProductConfig` entity to add `category` ManyToOne relationship in `backend/src/main/java/com/cinema/channelproduct/domain/ChannelProductConfig.java`
 
 ### Backend Repository Layer
 
-- [ ] T016 [P] Create `MenuCategoryRepository` with custom queries in `backend/src/main/java/com/cinema/category/repository/MenuCategoryRepository.java`
-- [ ] T017 [P] Create `CategoryAuditLogRepository` in `backend/src/main/java/com/cinema/category/repository/CategoryAuditLogRepository.java`
+- [x] T016 [P] Create `MenuCategoryRepository` with custom queries in `backend/src/main/java/com/cinema/category/repository/MenuCategoryRepository.java`
+- [x] T017 [P] Create `CategoryAuditLogRepository` in `backend/src/main/java/com/cinema/category/repository/CategoryAuditLogRepository.java`
 
 ### Backend DTO Layer
 
-- [ ] T018 [P] Create `MenuCategoryDTO` in `backend/src/main/java/com/cinema/category/dto/MenuCategoryDTO.java`
-- [ ] T019 [P] Create `CreateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/CreateMenuCategoryRequest.java`
-- [ ] T020 [P] Create `UpdateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/UpdateMenuCategoryRequest.java`
-- [ ] T021 [P] Create `BatchUpdateSortOrderRequest` in `backend/src/main/java/com/cinema/category/dto/BatchUpdateSortOrderRequest.java`
-- [ ] T022 [P] Create `ClientMenuCategoryDTO` (simplified for C端) in `backend/src/main/java/com/cinema/category/dto/ClientMenuCategoryDTO.java`
-- [ ] T023 [P] Create `DeleteCategoryResponse` in `backend/src/main/java/com/cinema/category/dto/DeleteCategoryResponse.java`
+- [x] T018 [P] Create `MenuCategoryDTO` in `backend/src/main/java/com/cinema/category/dto/MenuCategoryDTO.java`
+- [x] T019 [P] Create `CreateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/CreateMenuCategoryRequest.java`
+- [x] T020 [P] Create `UpdateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/UpdateMenuCategoryRequest.java`
+- [x] T021 [P] Create `BatchUpdateSortOrderRequest` in `backend/src/main/java/com/cinema/category/dto/BatchUpdateSortOrderRequest.java`
+- [x] T022 [P] Create `ClientMenuCategoryDTO` (simplified for C端) in `backend/src/main/java/com/cinema/category/dto/ClientMenuCategoryDTO.java`
+- [x] T023 [P] Create `DeleteCategoryResponse` in `backend/src/main/java/com/cinema/category/dto/DeleteCategoryResponse.java`
 
 ### Frontend Type Definitions
 
-- [ ] T024 [P] Create `MenuCategoryDTO` TypeScript type in `frontend/src/features/menu-category/types/index.ts`
-- [ ] T025 [P] Create request/response types in `frontend/src/features/menu-category/types/index.ts`
-- [ ] T026 [P] Create C端 `MenuCategoryDTO` type in `hall-reserve-taro/src/types/menuCategory.ts`
+- [x] T024 [P] Create `MenuCategoryDTO` TypeScript type in `frontend/src/features/menu-category/types/index.ts`
+- [x] T025 [P] Create request/response types in `frontend/src/features/menu-category/types/index.ts`
+- [x] T026 [P] Create C端 `MenuCategoryDTO` type in `hall-reserve-taro/src/types/menuCategory.ts`
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 

@@ -1,5 +1,6 @@
 package com.cinema.channelproduct.domain;
 
+import com.cinema.category.entity.MenuCategory;
 import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.domain.enums.ChannelProductStatus;
 import com.cinema.channelproduct.domain.enums.ChannelType;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * @spec O005-channel-product-config
+ * @spec O005-channel-product-config, O002-miniapp-menu-config
  * 渠道商品配置实体
  * 记录 SKU 成品在特定销售渠道的展示配置
  */
@@ -42,6 +43,7 @@ import java.util.UUID;
     indexes = {
         @Index(name = "idx_channel_product_channel_type", columnList = "channel_type"),
         @Index(name = "idx_channel_product_category", columnList = "channel_category"),
+        @Index(name = "idx_channel_product_category_id", columnList = "category_id"),
         @Index(name = "idx_channel_product_status", columnList = "status"),
         @Index(name = "idx_channel_product_sku_id", columnList = "sku_id")
     }
@@ -80,11 +82,30 @@ public class ChannelProductConfig {
     private String displayName;
 
     /**
-     * 渠道分类
+     * 渠道分类（旧枚举，保留用于向后兼容）
+     * @deprecated 使用 category 字段替代
      */
+    @Deprecated
     @Enumerated(EnumType.STRING)
     @Column(name = "channel_category", nullable = false, length = 50)
     private ChannelCategory channelCategory;
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 商品分类（外键关联 menu_category）
+     * 替代原 channel_category 枚举
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonProperty("category")
+    private MenuCategory category;
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 分类 ID（用于 DTO 映射，只读）
+     */
+    @Column(name = "category_id", insertable = false, updatable = false)
+    private UUID categoryId;
 
     /**
      * 渠道价格（分），空则使用 SKU 价格
