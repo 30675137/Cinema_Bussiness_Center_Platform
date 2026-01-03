@@ -12,6 +12,13 @@ import {
 } from '../types/product'
 import { formatPrice } from '../utils/price'
 import { MOCK_PRODUCTS, filterByCategory } from './mockData'
+import {
+  ApiError,
+  ApiErrorCode,
+  createApiError,
+  createNetworkError,
+  createTimeoutError,
+} from '../utils/error'
 
 /**
  * 是否使用 Mock 数据
@@ -55,31 +62,49 @@ async function getAuthToken(): Promise<string> {
 
 /**
  * 静默登录（处理 401 错误）
+ * @throws {ApiError} 登录失败时抛出认证错误
  */
 async function silentLogin(): Promise<string> {
   try {
     // 微信小程序环境
     if (process.env.TARO_ENV === 'weapp') {
       const { code } = await Taro.login()
-      
+
       // 调用后端换取 token
       const response = await Taro.request({
         url: `${BASE_URL}/api/auth/login`,
         method: 'POST',
         data: { code },
+        timeout: 10000,
       })
-      
+
       const token = response.data.data?.token
       if (token) {
         Taro.setStorageSync('auth_token', token)
         return token
       }
+
+      throw new ApiError(
+        ApiErrorCode.UNAUTHORIZED,
+        '登录失败，未获取到有效凭证',
+        401
+      )
     }
-    
+
+    // H5 环境：返回空 token，后续会触发登录引导
     return ''
   } catch (error) {
     console.error('静默登录失败:', error)
-    throw new Error('登录失败，请重试')
+
+    if (error instanceof ApiError) {
+      throw error
+    }
+
+    throw new ApiError(
+      ApiErrorCode.UNAUTHORIZED,
+      '登录失败，请重试',
+      401
+    )
   }
 }
 
@@ -167,10 +192,10 @@ export async function fetchProducts(
   // 真实 API 请求
   const queryString = buildQueryParams(params)
   const url = `${BASE_URL}/api/client/channel-products${queryString ? `?${queryString}` : ''}`
-  
+
   try {
     const token = await getAuthToken()
-    
+
     const response = await Taro.request({
       url,
       method: 'GET',
@@ -180,12 +205,12 @@ export async function fetchProducts(
       },
       timeout: 10000,
     })
-    
+
     // 处理 401 错误（Token 过期）
     if (response.statusCode === 401) {
       console.log('Token 过期，尝试静默登录')
       const newToken = await silentLogin()
-      
+
       // 使用新 token 重试
       const retryResponse = await Taro.request({
         url,
@@ -196,19 +221,63 @@ export async function fetchProducts(
         },
         timeout: 10000,
       })
-      
+
+      // 重试后仍然失败
+      if (retryResponse.statusCode !== 200) {
+        throw createApiError(
+          retryResponse.statusCode,
+          retryResponse.data?.message,
+          { url, retried: true }
+        )
+      }
+
       return retryResponse.data as ApiResponse<ChannelProductDTO[]>
     }
-    
+
     // 处理其他错误状态码
     if (response.statusCode !== 200) {
-      throw new Error(`请求失败: ${response.statusCode}`)
+      throw createApiError(
+        response.statusCode,
+        response.data?.message,
+        { url }
+      )
     }
-    
+
     return response.data as ApiResponse<ChannelProductDTO[]>
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('获取商品列表失败:', error)
-    throw new Error(error.message || '网络请求失败')
+
+    // 已经是 ApiError，直接抛出
+    if (error instanceof ApiError) {
+      throw error
+    }
+
+    // 判断错误类型
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase()
+
+      // 网络超时
+      if (msg.includes('timeout') || msg.includes('超时')) {
+        throw createTimeoutError('请求超时，请检查网络后重试')
+      }
+
+      // 网络错误
+      if (
+        msg.includes('network') ||
+        msg.includes('fail') ||
+        msg.includes('连接')
+      ) {
+        throw createNetworkError('网络连接失败，请检查网络')
+      }
+    }
+
+    // 未知错误
+    throw new ApiError(
+      ApiErrorCode.UNKNOWN,
+      '请求失败，请稍后重试',
+      undefined,
+      { originalError: String(error) }
+    )
   }
 }
 

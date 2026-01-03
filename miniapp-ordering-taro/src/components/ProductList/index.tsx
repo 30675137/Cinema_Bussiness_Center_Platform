@@ -5,7 +5,10 @@
 
 import { View, Text } from '@tarojs/components'
 import { ProductCard as ProductCardType } from '../../types/product'
+import { ApiError } from '../../utils/error'
 import ProductCard from '../ProductCard'
+import ProductListSkeleton from '../ProductListSkeleton'
+import ErrorState from '../ErrorState'
 import './index.less'
 
 /**
@@ -19,7 +22,7 @@ export interface ProductListProps {
   /** 加载状态 */
   loading?: boolean
   /** 错误信息 */
-  error?: Error | null
+  error?: ApiError | Error | null
   /** 重试回调 */
   onRetry?: () => void
 }
@@ -35,25 +38,6 @@ export default function ProductList({
   onRetry,
 }: ProductListProps) {
   /**
-   * 渲染加载骨架屏
-   */
-  const renderSkeleton = () => {
-    return (
-      <View className='skeleton-grid'>
-        {Array.from({ length: 6 }).map((_, index) => (
-          <View key={index} className='skeleton-card'>
-            <View className='skeleton-image' />
-            <View className='skeleton-info'>
-              <View className='skeleton-title' />
-              <View className='skeleton-price' />
-            </View>
-          </View>
-        ))}
-      </View>
-    )
-  }
-
-  /**
    * 渲染空状态
    */
   const renderEmpty = () => {
@@ -62,25 +46,6 @@ export default function ProductList({
         <Text className='empty-icon'>📦</Text>
         <Text className='empty-text'>暂无商品</Text>
         <Text className='empty-hint'>换个分类看看吧</Text>
-      </View>
-    )
-  }
-
-  /**
-   * 渲染错误状态
-   */
-  const renderError = () => {
-    return (
-      <View className='error-state'>
-        <Text className='error-icon'>⚠️</Text>
-        <Text className='error-text'>
-          {error?.message || '加载失败'}
-        </Text>
-        {onRetry && (
-          <View className='retry-button' onClick={onRetry}>
-            <Text className='retry-text'>重试</Text>
-          </View>
-        )}
       </View>
     )
   }
@@ -100,14 +65,14 @@ export default function ProductList({
     )
   }
 
-  // 加载状态
+  // 加载状态 - 使用骨架屏组件
   if (loading) {
-    return renderSkeleton()
+    return <ProductListSkeleton count={6} />
   }
 
-  // 错误状态
+  // 错误状态 - 使用错误状态组件
   if (error) {
-    return renderError()
+    return <ErrorState error={error} onRetry={onRetry} />
   }
 
   // 空状态

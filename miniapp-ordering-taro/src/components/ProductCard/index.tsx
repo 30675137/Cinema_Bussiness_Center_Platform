@@ -4,7 +4,7 @@
  */
 
 import { View, Image, Text } from '@tarojs/components'
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { ProductCard as ProductCardType } from '../../types/product'
 import './index.less'
 
@@ -22,8 +22,9 @@ export interface ProductCardProps {
 
 /**
  * 商品卡片组件 - 水平布局
+ * 使用 memo 优化渲染性能
  */
-export default function ProductCard({ product, onClick, onAdd }: ProductCardProps) {
+const ProductCard = memo(function ProductCard({ product, onClick, onAdd }: ProductCardProps) {
   const [imageError, setImageError] = useState(false)
 
   /**
@@ -112,4 +113,6 @@ export default function ProductCard({ product, onClick, onAdd }: ProductCardProp
       </View>
     </View>
   )
-}
+})
+
+export default ProductCard

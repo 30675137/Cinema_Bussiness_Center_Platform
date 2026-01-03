@@ -4,6 +4,7 @@
  */
 
 import { View, Text } from '@tarojs/components'
+import { useRef, useCallback } from 'react'
 import { ChannelCategory } from '../../types/product'
 import { getCategoryDisplayName, getCategoryIcon } from '../../utils/category'
 import Icon, { IconName } from '../Icon'
@@ -41,6 +42,9 @@ export default function CategoryTabs({
   activeCategory,
   onCategoryChange,
 }: CategoryTabsProps) {
+  // 防抖定时器
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // 构建 Tab 列表：分类列表（不再需要"全部"选项）
   const tabs: CategoryTabItem[] = categories.map((cat) => ({
     value: cat,
@@ -49,11 +53,22 @@ export default function CategoryTabs({
   }))
 
   /**
-   * 处理 Tab 点击
+   * 处理 Tab 点击（带防抖）
    */
-  const handleTabClick = (category: ChannelCategory | null) => {
-    onCategoryChange(category)
-  }
+  const handleTabClick = useCallback(
+    (category: ChannelCategory | null) => {
+      // 清除之前的定时器
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+      }
+
+      // 设置防抖延迟（300ms）
+      debounceTimer.current = setTimeout(() => {
+        onCategoryChange(category)
+      }, 300)
+    },
+    [onCategoryChange]
+  )
 
   return (
     <View className='category-sidebar'>
