@@ -228,14 +228,14 @@
 
 ### Backend Implementation for US4
 
-- [ ] T074 [US4] Implement `toggleVisibility()` in MenuCategoryService with default category protection
-- [ ] T075 [US4] Implement `PATCH /api/admin/menu-categories/{id}/visibility` endpoint
+- [x] T074 [US4] Implement `toggleVisibility()` in MenuCategoryService with default category protection
+- [x] T075 [US4] Implement `PATCH /api/admin/menu-categories/{id}/visibility` endpoint
 
 ### Frontend B端 Implementation for US4
 
-- [ ] T076 [P] [US4] Add `useToggleVisibility` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [ ] T077 [US4] Add visibility toggle switch to `CategoryTable` component
-- [ ] T078 [US4] Show hidden category indicator in table row
+- [x] T076 [P] [US4] Add `useToggleVisibility` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
+- [x] T077 [US4] Add visibility toggle switch to `CategoryTable` component
+- [x] T078 [US4] Show hidden category indicator in table row
 
 **Checkpoint**: Admin can toggle category visibility
 

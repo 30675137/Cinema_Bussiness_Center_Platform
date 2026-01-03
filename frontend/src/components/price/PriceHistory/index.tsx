@@ -39,7 +39,7 @@ import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
 
 import { usePriceHistoryQuery } from '@/stores/priceStore';
-import { PriceHistory, PriceChangeType } from '@/types/price';
+import { PriceHistory as PriceHistoryType, PriceChangeType } from '@/types/price';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -54,8 +54,8 @@ interface PriceHistoryProps {
 const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilter = true }) => {
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [compareModalVisible, setCompareModalVisible] = useState(false);
-  const [selectedHistory, setSelectedHistory] = useState<PriceHistory | null>(null);
-  const [compareItems, setCompareItems] = useState<PriceHistory[]>([]);
+  const [selectedHistory, setSelectedHistory] = useState<PriceHistoryType | null>(null);
+  const [compareItems, setCompareItems] = useState<PriceHistoryType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [changeTypeFilter, setChangeTypeFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
@@ -92,7 +92,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
       title: '商品信息',
       key: 'product',
       width: 200,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space direction="vertical" size={0}>
           <Text strong>{record.productName}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
@@ -124,7 +124,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
       title: '价格变动',
       key: 'priceChange',
       width: 150,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space direction="vertical" size={0}>
           <div>
             <Text delete style={{ fontSize: 12, color: '#999' }}>
@@ -147,7 +147,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
       title: '变动幅度',
       key: 'changePercent',
       width: 100,
-      render: (_, record: PriceHistory) => {
+      render: (_, record: PriceHistoryType) => {
         if (record.changePercent === undefined) return '-';
         const color =
           record.changePercent > 0 ? '#52c41a' : record.changePercent < 0 ? '#ff4d4f' : '#999';
@@ -182,7 +182,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
       dataIndex: 'operatorName',
       key: 'operatorName',
       width: 120,
-      render: (name: string, record: PriceHistory) => (
+      render: (name: string, record: PriceHistoryType) => (
         <Space>
           <Avatar size="small" icon={<UserOutlined />} />
           <Space direction="vertical" size={0}>
@@ -217,7 +217,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
       title: '操作',
       key: 'actions',
       width: 100,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space>
           <Tooltip title="查看详情">
             <Button
@@ -241,13 +241,13 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
   ];
 
   // 查看详情
-  const handleViewDetail = (record: PriceHistory) => {
+  const handleViewDetail = (record: PriceHistoryType) => {
     setSelectedHistory(record);
     setDetailModalVisible(true);
   };
 
   // 加入对比
-  const handleAddToCompare = (record: PriceHistory) => {
+  const handleAddToCompare = (record: PriceHistoryType) => {
     if (compareItems.length >= 5) {
       message.warning('最多只能对比5条记录');
       return;
