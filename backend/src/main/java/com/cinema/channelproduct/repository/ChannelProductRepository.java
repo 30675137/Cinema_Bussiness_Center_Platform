@@ -12,12 +12,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.jpa.repository.Modifying;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 
 /**
  * @spec O005-channel-product-config
+ * @spec O002-miniapp-menu-config
  * 渠道商品配置数据访问层
  */
 @Repository
@@ -64,4 +67,35 @@ public interface ChannelProductRepository extends JpaRepository<ChannelProductCo
      */
     @Query("SELECT DISTINCT c.skuId FROM ChannelProductConfig c WHERE c.id IN :ids AND c.deletedAt IS NULL")
     List<UUID> findDistinctSkuIdsByIdInAndDeletedAtIsNull(@Param("ids") List<UUID> ids);
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 统计分类下的商品数量
+     *
+     * @param categoryId 分类 ID
+     * @return 商品数量
+     */
+    @Query("SELECT COUNT(c) FROM ChannelProductConfig c WHERE c.categoryId = :categoryId AND c.deletedAt IS NULL")
+    int countByCategoryId(@Param("categoryId") UUID categoryId);
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 批量更新商品分类（用于删除分类时迁移商品）
+     *
+     * @param oldCategoryId 原分类 ID
+     * @param newCategoryId 新分类 ID
+     */
+    @Modifying
+    @Query("UPDATE ChannelProductConfig c SET c.categoryId = :newCategoryId WHERE c.categoryId = :oldCategoryId AND c.deletedAt IS NULL")
+    void updateCategoryId(@Param("oldCategoryId") UUID oldCategoryId, @Param("newCategoryId") UUID newCategoryId);
+
+    /**
+     * @spec O002-miniapp-menu-config
+     * 根据分类 ID 查询商品
+     *
+     * @param categoryId 分类 ID
+     * @param pageable 分页参数
+     * @return 商品列表
+     */
+    Page<ChannelProductConfig> findByCategoryIdAndDeletedAtIsNull(@Param("categoryId") UUID categoryId, Pageable pageable);
 }

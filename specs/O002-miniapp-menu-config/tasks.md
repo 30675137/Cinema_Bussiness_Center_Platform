@@ -94,29 +94,29 @@
 
 ### Backend Implementation for US1
 
-- [ ] T027 [US1] Create `MenuCategoryService` with CRUD operations in `backend/src/main/java/com/cinema/category/service/MenuCategoryService.java`
-- [ ] T028 [US1] Implement `createCategory()` with code uniqueness validation in MenuCategoryService
-- [ ] T029 [US1] Implement `updateCategory()` with default category protection in MenuCategoryService
-- [ ] T030 [US1] Implement `deleteCategory()` with product migration to default category in MenuCategoryService
-- [ ] T031 [US1] Implement `getCategories()` with includeHidden and includeProductCount options in MenuCategoryService
-- [ ] T032 [US1] Implement `getCategoryById()` in MenuCategoryService
-- [ ] T033 [US1] Create `CategoryAuditService` for audit logging in `backend/src/main/java/com/cinema/category/service/CategoryAuditService.java`
-- [ ] T034 [US1] Create `MenuCategoryAdminController` with CRUD endpoints in `backend/src/main/java/com/cinema/category/controller/MenuCategoryAdminController.java`
-- [ ] T035 [US1] Implement `GET /api/admin/menu-categories` endpoint
-- [ ] T036 [US1] Implement `POST /api/admin/menu-categories` endpoint
-- [ ] T037 [US1] Implement `GET /api/admin/menu-categories/{id}` endpoint
-- [ ] T038 [US1] Implement `PUT /api/admin/menu-categories/{id}` endpoint
-- [ ] T039 [US1] Implement `DELETE /api/admin/menu-categories/{id}` endpoint with confirm parameter
+- [x] T027 [US1] Create `MenuCategoryService` with CRUD operations in `backend/src/main/java/com/cinema/category/service/MenuCategoryService.java`
+- [x] T028 [US1] Implement `createCategory()` with code uniqueness validation in MenuCategoryService
+- [x] T029 [US1] Implement `updateCategory()` with default category protection in MenuCategoryService
+- [x] T030 [US1] Implement `deleteCategory()` with product migration to default category in MenuCategoryService
+- [x] T031 [US1] Implement `getCategories()` with includeHidden and includeProductCount options in MenuCategoryService
+- [x] T032 [US1] Implement `getCategoryById()` in MenuCategoryService
+- [x] T033 [US1] Create `CategoryAuditService` for audit logging in `backend/src/main/java/com/cinema/category/service/CategoryAuditService.java`
+- [x] T034 [US1] Create `MenuCategoryAdminController` with CRUD endpoints in `backend/src/main/java/com/cinema/category/controller/MenuCategoryAdminController.java`
+- [x] T035 [US1] Implement `GET /api/admin/menu-categories` endpoint
+- [x] T036 [US1] Implement `POST /api/admin/menu-categories` endpoint
+- [x] T037 [US1] Implement `GET /api/admin/menu-categories/{id}` endpoint
+- [x] T038 [US1] Implement `PUT /api/admin/menu-categories/{id}` endpoint
+- [x] T039 [US1] Implement `DELETE /api/admin/menu-categories/{id}` endpoint with confirm parameter
 
 ### Frontend B端 Implementation for US1
 
-- [ ] T040 [P] [US1] Create `menuCategoryService` API client in `frontend/src/features/menu-category/services/menuCategoryService.ts`
-- [ ] T041 [P] [US1] Create TanStack Query hooks in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [ ] T042 [US1] Create `CategoryTable` component in `frontend/src/features/menu-category/components/CategoryTable.tsx`
-- [ ] T043 [US1] Create `CategoryForm` component (create/edit modal) in `frontend/src/features/menu-category/components/CategoryForm.tsx`
-- [ ] T044 [US1] Create `DeleteCategoryDialog` component in `frontend/src/features/menu-category/components/DeleteCategoryDialog.tsx`
-- [ ] T045 [US1] Create `MenuCategoryPage` page component in `frontend/src/pages/menu-category/MenuCategoryPage.tsx`
-- [ ] T046 [US1] Add route for `/menu-category` in router configuration
+- [x] T040 [P] [US1] Create `menuCategoryService` API client in `frontend/src/features/menu-category/services/menuCategoryService.ts`
+- [x] T041 [P] [US1] Create TanStack Query hooks in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
+- [x] T042 [US1] Create `CategoryTable` component in `frontend/src/features/menu-category/components/CategoryTable.tsx`
+- [x] T043 [US1] Create `CategoryForm` component (create/edit modal) in `frontend/src/features/menu-category/components/CategoryForm.tsx`
+- [x] T044 [US1] Create `DeleteCategoryDialog` component in `frontend/src/features/menu-category/components/DeleteCategoryDialog.tsx`
+- [x] T045 [US1] Create `MenuCategoryPage` page component in `frontend/src/pages/menu-category/MenuCategoryPage.tsx`
+- [x] T046 [US1] Add route for `/menu-category` in router configuration
 
 **Checkpoint**: At this point, admin can fully manage categories (CRUD) - core MVP complete
 

@@ -13,6 +13,7 @@ import ReviewList from '@/pages/review/ReviewList';
 import InventoryList from '@/pages/inventory/InventoryList';
 import { InventoryPage } from '@/pages/inventory';
 import { BeverageListPage } from '@/features/beverage-config/pages';
+import { MenuCategoryPage } from '@/pages/menu-category/MenuCategoryPage';
 
 // 路由配置
 const routes = [
@@ -92,6 +93,10 @@ const routes = [
         element: <BeverageListPage />,
       },
     ],
+  },
+  {
+    path: '/menu-category',
+    element: <MenuCategoryPage />,
   },
 ];
 
