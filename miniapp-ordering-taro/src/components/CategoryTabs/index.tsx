@@ -69,7 +69,7 @@ export default function CategoryTabs({
               <View className={`icon-wrapper ${isActive ? 'active' : ''}`}>
                 <Icon
                   name={tab.icon}
-                  size={24}
+                  size={1}
                   color={isActive ? '#f5a623' : '#666666'}
                 />
               </View>

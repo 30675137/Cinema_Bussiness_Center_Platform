@@ -50,13 +50,19 @@
 }
 
 .icon-wrapper {
-  width: 64rpx;
-  height: 64rpx;
+  width: 48rpx;
+  height: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 8rpx;
   transition: all 0.3s ease;
+
+  // 强制控制图标大小
+  .icon {
+    width: 36rpx !important;
+    height: 36rpx !important;
+  }
 }
 
 .icon-wrapper.active {
