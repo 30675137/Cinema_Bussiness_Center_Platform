@@ -4,7 +4,7 @@
  */
 
 import { View, Text } from '@tarojs/components'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { ChannelCategory, ProductCard } from '../../types/product'
 import { useProductListStore } from '../../stores/productListStore'
@@ -13,6 +13,7 @@ import { getCategoryDisplayName } from '../../utils/category'
 import Header from '../../components/Header'
 import CategoryTabs from '../../components/CategoryTabs'
 import ProductList from '../../components/ProductList'
+import TabBar from '../../components/TabBar'
 import './index.less'
 
 /**
@@ -21,6 +22,9 @@ import './index.less'
 export default function MenuPage() {
   // 获取状态管理
   const { selectedCategory, setSelectedCategory } = useProductListStore()
+
+  // TabBar 当前激活项
+  const [activeTab, setActiveTab] = useState('order')
 
   // 获取商品列表数据
   const { data: products = [], isLoading, error, refetch } = useProducts(selectedCategory)
@@ -73,6 +77,22 @@ export default function MenuPage() {
     ? getCategoryDisplayName(selectedCategory)
     : '全部商品'
 
+  // TabBar 配置
+  const tabBarTabs = [
+    { key: 'order', label: '点餐', icon: 'cart' as const },
+    { key: 'member', label: '会员中心', icon: 'user' as const },
+  ]
+
+  /**
+   * 处理 TabBar 切换
+   */
+  const handleTabChange = (key: string) => {
+    setActiveTab(key)
+    if (key === 'member') {
+      Taro.showToast({ title: '会员中心开发中', icon: 'none' })
+    }
+  }
+
   return (
     <View className='menu-page'>
       {/* 顶部导航栏 */}
@@ -114,6 +134,13 @@ export default function MenuPage() {
           </View>
         </View>
       </View>
+
+      {/* 底部导航栏 */}
+      <TabBar
+        tabs={tabBarTabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
     </View>
   )
 }
