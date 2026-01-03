@@ -17,6 +17,7 @@ import {
   useUpdateMenuCategory,
   useDeleteMenuCategory,
   useToggleCategoryVisibility,
+  useBatchUpdateSortOrder,
 } from '../../features/menu-category/hooks/useMenuCategories';
 import type {
   MenuCategoryDTO,
@@ -57,6 +58,7 @@ export const MenuCategoryPage: React.FC = () => {
   const updateMutation = useUpdateMenuCategory();
   const deleteMutation = useDeleteMenuCategory();
   const toggleVisibilityMutation = useToggleCategoryVisibility();
+  const sortMutation = useBatchUpdateSortOrder();
 
   // 打开创建表单
   const handleCreate = useCallback(() => {
@@ -101,22 +103,25 @@ export const MenuCategoryPage: React.FC = () => {
   );
 
   // 打开删除对话框
-  const handleDelete = useCallback(async (category: MenuCategoryDTO) => {
-    setDeletingCategory(category);
-    setDeleteDialogOpen(true);
+  const handleDelete = useCallback(
+    async (category: MenuCategoryDTO) => {
+      setDeletingCategory(category);
+      setDeleteDialogOpen(true);
 
-    // 预览删除影响
-    try {
-      const preview = await deleteMutation.mutateAsync({
-        id: category.id,
-        confirm: false,
-      });
-      setDeletePreview(preview);
-    } catch {
-      // 如果获取预览失败，仍然允许删除
-      setDeletePreview(null);
-    }
-  }, [deleteMutation]);
+      // 预览删除影响
+      try {
+        const preview = await deleteMutation.mutateAsync({
+          id: category.id,
+          confirm: false,
+        });
+        setDeletePreview(preview);
+      } catch {
+        // 如果获取预览失败，仍然允许删除
+        setDeletePreview(null);
+      }
+    },
+    [deleteMutation]
+  );
 
   // 确认删除
   const handleDeleteConfirm = useCallback(async () => {
@@ -159,6 +164,19 @@ export const MenuCategoryPage: React.FC = () => {
     [toggleVisibilityMutation]
   );
 
+  // 处理排序变更
+  const handleSortChange = useCallback(
+    async (items: { id: string; sortOrder: number }[]) => {
+      try {
+        await sortMutation.mutateAsync({ items });
+        message.success('排序已更新');
+      } catch (error) {
+        message.error(error instanceof Error ? error.message : '排序更新失败');
+      }
+    },
+    [sortMutation]
+  );
+
   return (
     <div style={{ padding: 24 }}>
       <Card>
@@ -191,6 +209,8 @@ export const MenuCategoryPage: React.FC = () => {
             onDelete={handleDelete}
             onToggleVisibility={handleToggleVisibility}
             toggleVisibilityLoading={toggleVisibilityId}
+            onSortChange={handleSortChange}
+            sortLoading={sortMutation.isPending}
           />
         </Spin>
       </Card>

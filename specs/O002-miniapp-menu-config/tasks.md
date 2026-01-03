@@ -180,16 +180,16 @@
 
 ### Backend Implementation for US6
 
-- [ ] T062 [US6] Modify product list query to support `categoryId` parameter in `ChannelProductService`
-- [ ] T063 [US6] Add backward compatible `category` (code) parameter support in product list query
-- [ ] T064 [US6] Implement priority logic: `categoryId` takes precedence over `category`
-- [ ] T065 [US6] Add nested `category` object to `ChannelProductDTO` response
-- [ ] T066 [US6] Update `GET /api/client/channel-products/mini-program` endpoint
+- [x] T062 [US6] Modify product list query to support `categoryId` parameter in `ChannelProductService`
+- [x] T063 [US6] Add backward compatible `category` (code) parameter support in product list query
+- [x] T064 [US6] Implement priority logic: `categoryId` takes precedence over `category`
+- [x] T065 [US6] Add nested `category` object to `ChannelProductDTO` response
+- [x] T066 [US6] Update `GET /api/client/channel-products/mini-program` endpoint
 
 ### Frontend C端 Implementation for US6
 
-- [ ] T067 [US6] Update product list hook to use `categoryId` parameter in `hall-reserve-taro/src/hooks/useProducts.ts`
-- [ ] T068 [US6] Update menu page to pass selected category ID to product list
+- [x] T067 [US6] Update product list hook to use `categoryId` parameter in `miniapp-ordering-taro/src/hooks/useProducts.ts`
+- [x] T068 [US6] Update menu page to pass selected category ID to product list
 
 **Checkpoint**: Products correctly filtered by both new and legacy parameters
 
@@ -205,14 +205,14 @@
 
 ### Backend Implementation for US3
 
-- [ ] T069 [US3] Implement `batchUpdateSortOrder()` in MenuCategoryService
-- [ ] T070 [US3] Implement `PUT /api/admin/menu-categories/batch-sort` endpoint in MenuCategoryAdminController
+- [x] T069 [US3] Implement `batchUpdateSortOrder()` in MenuCategoryService
+- [x] T070 [US3] Implement `PUT /api/admin/menu-categories/batch-sort` endpoint in MenuCategoryAdminController
 
 ### Frontend B端 Implementation for US3
 
-- [ ] T071 [P] [US3] Add `useBatchUpdateSortOrder` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [ ] T072 [US3] Add drag-and-drop reordering to `CategoryTable` component using `@dnd-kit/sortable`
-- [ ] T073 [US3] Implement optimistic update for sort order changes
+- [x] T071 [P] [US3] Add `useBatchUpdateSortOrder` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
+- [x] T072 [US3] Add drag-and-drop reordering to `CategoryTable` component using `@dnd-kit/sortable`
+- [x] T073 [US3] Implement optimistic update for sort order changes
 
 **Checkpoint**: Admin can reorder categories with drag-and-drop
 

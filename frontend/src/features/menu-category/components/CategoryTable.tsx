@@ -1,6 +1,6 @@
 /**
  * @spec O002-miniapp-menu-config
- * 分类表格组件
+ * 分类表格组件 - 支持拖拽排序
  */
 
 import React from 'react';
@@ -14,6 +14,23 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { MenuCategoryDTO } from '../types';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const { Text } = Typography;
 
@@ -24,7 +41,30 @@ interface CategoryTableProps {
   onDelete: (category: MenuCategoryDTO) => void;
   onToggleVisibility: (id: string, isVisible: boolean) => void;
   toggleVisibilityLoading?: string | null;
+  onSortChange?: (items: { id: string; sortOrder: number }[]) => void;
+  sortLoading?: boolean;
 }
+
+// 可拖拽行组件
+interface SortableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
+  'data-row-key': string;
+}
+
+const SortableRow: React.FC<SortableRowProps> = (props) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props['data-row-key'],
+  });
+
+  const style: React.CSSProperties = {
+    ...props.style,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: 'move',
+    ...(isDragging ? { position: 'relative', zIndex: 9999, opacity: 0.8 } : {}),
+  };
+
+  return <tr {...props} ref={setNodeRef} style={style} {...attributes} {...listeners} />;
+};
 
 export const CategoryTable: React.FC<CategoryTableProps> = ({
   data,
@@ -33,15 +73,44 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
   onDelete,
   onToggleVisibility,
   toggleVisibilityLoading,
+  onSortChange,
+  sortLoading = false,
 }) => {
+  // 拖拽传感器配置
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // 处理拖拽结束
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = data.findIndex((item) => item.id === active.id);
+      const newIndex = data.findIndex((item) => item.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newData = arrayMove(data, oldIndex, newIndex);
+        const sortItems = newData.map((item, index) => ({
+          id: item.id,
+          sortOrder: (index + 1) * 10,
+        }));
+        onSortChange?.(sortItems);
+      }
+    }
+  };
+
   const columns: ColumnsType<MenuCategoryDTO> = [
     {
       title: '',
       key: 'drag',
       width: 40,
-      render: () => (
-        <HolderOutlined style={{ cursor: 'grab', color: '#999' }} />
-      ),
+      render: () => <HolderOutlined style={{ cursor: 'grab', color: '#999' }} />,
     },
     {
       title: '排序',
@@ -49,9 +118,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
       key: 'sortOrder',
       width: 70,
       align: 'center',
-      render: (sortOrder: number) => (
-        <Text type="secondary">{sortOrder}</Text>
-      ),
+      render: (sortOrder: number) => <Text type="secondary">{sortOrder}</Text>,
     },
     {
       title: '图标',
@@ -81,9 +148,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
       render: (code: string, record: MenuCategoryDTO) => (
         <Space>
           <Text code>{code}</Text>
-          {record.isDefault && (
-            <Tag color="blue">默认</Tag>
-          )}
+          {record.isDefault && <Tag color="blue">默认</Tag>}
         </Space>
       ),
     },
@@ -109,11 +174,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
       key: 'productCount',
       width: 100,
       align: 'center',
-      render: (count: number) => (
-        <Tag color={count > 0 ? 'green' : 'default'}>
-          {count ?? 0} 件
-        </Tag>
-      ),
+      render: (count: number) => <Tag color={count > 0 ? 'green' : 'default'}>{count ?? 0} 件</Tag>,
     },
     {
       title: '描述',
@@ -154,11 +215,7 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
       render: (_: unknown, record: MenuCategoryDTO) => (
         <Space size="small">
           <Tooltip title="编辑">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(record)}
-            />
+            <Button type="text" icon={<EditOutlined />} onClick={() => onEdit(record)} />
           </Tooltip>
           <Tooltip title={record.isDefault ? '默认分类不可删除' : '删除'}>
             <Button
@@ -175,17 +232,24 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
   ];
 
   return (
-    <Table
-      dataSource={data}
-      columns={columns}
-      loading={loading}
-      rowKey="id"
-      pagination={false}
-      size="middle"
-      rowClassName={(record) =>
-        record.isVisible ? '' : 'category-row-hidden'
-      }
-    />
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext items={data.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+        <Table
+          dataSource={data}
+          columns={columns}
+          loading={loading || sortLoading}
+          rowKey="id"
+          pagination={false}
+          size="middle"
+          components={{
+            body: {
+              row: SortableRow,
+            },
+          }}
+          rowClassName={(record) => (record.isVisible ? '' : 'category-row-hidden')}
+        />
+      </SortableContext>
+    </DndContext>
   );
 };
 
