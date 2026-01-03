@@ -158,13 +158,13 @@
 
 ### Migration Implementation for US5
 
-- [ ] T055 [US5] Create data migration script `V202601030002__migrate_category_data.sql` in `backend/src/main/resources/db/migration/`
-- [ ] T056 [US5] Insert initial category data (ALCOHOL→经典特调, COFFEE→精品咖啡, etc.) in migration script
-- [ ] T057 [US5] Set OTHER category as `is_default=true` in migration script
-- [ ] T058 [US5] Update `channel_product_config.category_id` based on `channel_category` enum values
-- [ ] T059 [US5] Handle products with null/invalid category by assigning to default category
-- [ ] T060 [US5] Add validation query to verify migration completeness
-- [ ] T061 [US5] Create rollback script `R202601030002__rollback_category_migration.sql`
+- [x] T055 [US5] Create data migration script `V2026_01_03_002__migrate_category_data.sql` in `backend/src/main/resources/db/migration/`
+- [x] T056 [US5] Insert initial category data (ALCOHOL→经典特调, COFFEE→精品咖啡, etc.) in migration script
+- [x] T057 [US5] Set OTHER category as `is_default=true` in migration script
+- [x] T058 [US5] Update `channel_product_config.category_id` based on `channel_category` enum values
+- [x] T059 [US5] Handle products with null/invalid category by assigning to default category
+- [x] T060 [US5] Add validation query to verify migration completeness
+- [x] T061 [US5] Create rollback script `R2026_01_03_002__rollback_category_migration.sql`
 
 **Checkpoint**: All existing data migrated, zero data loss
 
