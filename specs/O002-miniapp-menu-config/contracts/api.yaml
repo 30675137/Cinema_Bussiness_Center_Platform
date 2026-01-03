@@ -3,7 +3,7 @@ info:
   title: 小程序菜单分类配置 API
   version: 1.0.0
   description: |
-    **@spec O001-miniapp-menu-config**
+    **@spec O002-miniapp-menu-config**
 
     小程序菜单分类的完整 CRUD API，整合原 `ChannelCategory` 枚举为动态可配置的分类系统。
 
@@ -435,7 +435,7 @@ paths:
       description: |
         获取小程序商品列表，支持通过分类 ID 或分类编码筛选。
 
-        **变更说明** (O001 整合后):
+        **变更说明** (O002 整合后):
         - 新增 `categoryId` 参数（UUID，推荐使用）
         - 保留 `category` 参数（枚举编码，向后兼容）
         - 返回数据中包含 `category` 对象（嵌套分类信息）
@@ -965,7 +965,7 @@ security:
   - BearerAuth: []
 
 x-additional-info:
-  spec-id: O001-miniapp-menu-config
+  spec-id: O002-miniapp-menu-config
   integration-with: O007-miniapp-menu-api
   migration-required: true
   migration-steps:

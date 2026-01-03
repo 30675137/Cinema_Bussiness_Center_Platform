@@ -1,6 +1,6 @@
 # Feature Specification: 小程序菜单分类动态配置
 
-**Feature Branch**: `O001-miniapp-menu-config`
+**Feature Branch**: `O002-miniapp-menu-config`
 **Created**: 2026-01-03
 **Updated**: 2026-01-03
 **Status**: Draft

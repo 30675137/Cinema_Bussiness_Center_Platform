@@ -1,6 +1,6 @@
 # Data Model: 小程序菜单配置（商品分类动态整合）
 
-**Feature**: O001-miniapp-menu-config | **Branch**: `O001-miniapp-menu-config` | **Date**: 2026-01-03
+**Feature**: O002-miniapp-menu-config | **Branch**: `O002-miniapp-menu-config` | **Date**: 2026-01-03
 
 ## 概述
 
@@ -56,7 +56,7 @@
 **数据库表定义**:
 
 ```sql
--- @spec O001-miniapp-menu-config
+-- @spec O002-miniapp-menu-config
 -- 菜单分类表
 CREATE TABLE menu_category (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -124,7 +124,7 @@ CREATE TRIGGER trg_menu_category_updated_at
 
 ```java
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 菜单分类实体
  */
 @Data
@@ -240,7 +240,7 @@ public class MenuCategory {
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 菜单分类 DTO
  */
 export interface MenuCategoryDTO {
@@ -279,7 +279,7 @@ export interface MenuCategoryDTO {
 }
 
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 创建分类请求
  */
 export interface CreateMenuCategoryRequest {
@@ -292,7 +292,7 @@ export interface CreateMenuCategoryRequest {
 }
 
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 更新分类请求
  */
 export interface UpdateMenuCategoryRequest {
@@ -304,7 +304,7 @@ export interface UpdateMenuCategoryRequest {
 }
 
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 批量更新排序请求
  */
 export interface BatchUpdateSortOrderRequest {
@@ -324,7 +324,7 @@ export interface BatchUpdateSortOrderRequest {
 **数据库表修改**:
 
 ```sql
--- @spec O001-miniapp-menu-config
+-- @spec O002-miniapp-menu-config
 -- Step 1: 添加新的外键字段
 ALTER TABLE channel_product_config
 ADD COLUMN category_id UUID;
@@ -346,7 +346,7 @@ CREATE INDEX idx_channel_product_category_id ON channel_product_config(category_
 
 ```java
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 渠道商品配置实体（修改版）
  */
 @Entity
@@ -380,7 +380,7 @@ public class ChannelProductConfig {
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 渠道商品 DTO（修改版）
  */
 export interface ChannelProductDTO {
@@ -417,7 +417,7 @@ export interface ChannelProductDTO {
 **数据库表定义**:
 
 ```sql
--- @spec O001-miniapp-menu-config
+-- @spec O002-miniapp-menu-config
 -- 分类操作审计日志表
 CREATE TABLE category_audit_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -464,7 +464,7 @@ CREATE INDEX idx_category_audit_log_created_at ON category_audit_log(created_at)
 ### 迁移脚本
 
 ```sql
--- @spec O001-miniapp-menu-config
+-- @spec O002-miniapp-menu-config
 -- 数据迁移脚本：从 ChannelCategory 枚举迁移到 menu_category 表
 
 -- ============================================
@@ -534,7 +534,7 @@ ALTER COLUMN category_id SET NOT NULL;
 ### 回滚脚本
 
 ```sql
--- @spec O001-miniapp-menu-config
+-- @spec O002-miniapp-menu-config
 -- 回滚脚本（如需回退到枚举方案）
 
 -- Step 1: 恢复 channel_category 枚举字段
@@ -563,7 +563,7 @@ DROP TABLE IF EXISTS menu_category;
 ### B端管理 API
 
 ```yaml
-# @spec O001-miniapp-menu-config
+# @spec O002-miniapp-menu-config
 # 菜单分类管理 API
 
 # 获取分类列表（管理后台）
@@ -625,7 +625,7 @@ Response:
 ### C端小程序 API
 
 ```yaml
-# @spec O001-miniapp-menu-config
+# @spec O002-miniapp-menu-config
 # 小程序菜单分类 API
 
 # 获取可见分类列表（小程序用）
@@ -664,7 +664,7 @@ Response:
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 菜单分类 Store（小程序端）
  */
 import { create } from 'zustand';
@@ -707,7 +707,7 @@ export const useMenuCategoryStore = create<MenuCategoryState>((set) => ({
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 菜单分类 Query Keys
  */
 export const menuCategoryQueryKeys = {
@@ -719,7 +719,7 @@ export const menuCategoryQueryKeys = {
 };
 
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 获取分类列表 Hook
  */
 export const useMenuCategories = () => {
@@ -732,7 +732,7 @@ export const useMenuCategories = () => {
 };
 
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 获取分类商品列表 Hook
  */
 export const useProductsByCategory = (categoryId: string | null) => {
@@ -753,7 +753,7 @@ export const useProductsByCategory = (categoryId: string | null) => {
 
 ```java
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 删除分类业务逻辑
  */
 @Service
@@ -815,7 +815,7 @@ public class MenuCategoryService {
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 支持旧的 category 枚举参数
  */
 // 旧 API（保持兼容）
@@ -830,7 +830,7 @@ GET /api/client/channel-products/mini-program?categoryCode=COFFEE
 
 ```typescript
 /**
- * @spec O001-miniapp-menu-config
+ * @spec O002-miniapp-menu-config
  * 分类映射辅助函数（向后兼容）
  */
 
