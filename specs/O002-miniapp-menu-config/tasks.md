@@ -251,19 +251,19 @@
 
 ### Backend Implementation for US7
 
-- [ ] T079 [US7] Add icon URL and description validation in MenuCategoryService
-- [ ] T080 [US7] Ensure icon/description fields included in all category responses
+- [x] T079 [US7] Add icon URL and description validation in MenuCategoryService
+- [x] T080 [US7] Ensure icon/description fields included in all category responses
 
 ### Frontend B端 Implementation for US7
 
-- [ ] T081 [US7] Add icon URL input field to `CategoryForm` component
-- [ ] T082 [US7] Add description textarea to `CategoryForm` component
-- [ ] T083 [US7] Add icon preview in `CategoryTable` component
+- [x] T081 [US7] Add icon URL input field to `CategoryForm` component
+- [x] T082 [US7] Add description textarea to `CategoryForm` component
+- [x] T083 [US7] Add icon preview in `CategoryTable` component
 
 ### Frontend C端 Implementation for US7
 
-- [ ] T084 [US7] Display category icons in menu sidebar in `hall-reserve-taro/src/pages/menu/index.tsx`
-- [ ] T085 [US7] Handle missing icons with fallback display
+- [x] T084 [US7] Display category icons in menu sidebar in `hall-reserve-taro/src/pages/beverage/menu/index.tsx`
+- [x] T085 [US7] Handle missing icons with fallback display
 
 **Checkpoint**: Categories display with icons and descriptions
 

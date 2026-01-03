@@ -4,7 +4,7 @@
  * 饮品菜单页面 - 使用动态分类
  */
 import React, { useState, useEffect, useMemo } from 'react'
-import { View, ScrollView, Text } from '@tarojs/components'
+import { View, ScrollView, Text, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useBeverages, useMenuCategories } from '../../../hooks'
 import { BeverageCard } from '../../../components/BeverageCard'
@@ -49,8 +49,8 @@ const BeverageMenu: React.FC = () => {
   }, [categoriesData, setCategories])
 
   // 构建分类列表（包含 "全部" 选项）
-  const categories: Array<{ id: string | null; code: string; displayName: string }> = useMemo(() => {
-    const allOption = { id: null, code: 'ALL', displayName: '全部' }
+  const categories: Array<{ id: string | null; code: string; displayName: string; iconUrl?: string }> = useMemo(() => {
+    const allOption = { id: null, code: 'ALL', displayName: '全部', iconUrl: undefined }
     if (!categoriesData || categoriesData.length === 0) {
       return [allOption]
     }
@@ -60,6 +60,7 @@ const BeverageMenu: React.FC = () => {
         id: cat.id,
         code: cat.code,
         displayName: cat.displayName,
+        iconUrl: cat.iconUrl,
       })),
     ]
   }, [categoriesData])
@@ -138,6 +139,18 @@ const BeverageMenu: React.FC = () => {
                 }`}
                 onClick={() => handleCategoryChange(category)}
               >
+                {/* T084/T085: 显示分类图标，无图标时显示文字首字符作为 fallback */}
+                {category.iconUrl ? (
+                  <Image
+                    className="beverage-menu__tab-icon"
+                    src={category.iconUrl}
+                    mode="aspectFit"
+                  />
+                ) : (
+                  <View className="beverage-menu__tab-icon-fallback">
+                    <Text>{category.displayName.charAt(0)}</Text>
+                  </View>
+                )}
                 <Text className="beverage-menu__tab-text">{category.displayName}</Text>
               </View>
             ))}
