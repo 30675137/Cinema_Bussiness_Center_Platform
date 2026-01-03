@@ -1,1 +1,1 @@
-specs/O007-miniapp-menu-api/spec.md
+specs/O001-miniapp-menu-config/spec.md
