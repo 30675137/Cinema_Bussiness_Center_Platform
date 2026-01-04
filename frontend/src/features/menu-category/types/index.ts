@@ -3,6 +3,100 @@
  * 菜单分类类型定义（B端管理后台）
  */
 
+import { z } from 'zod';
+
+// ============================================================================
+// Zod 验证 Schema (T087)
+// ============================================================================
+
+/**
+ * 分类编码验证规则
+ * - 必须以字母开头
+ * - 只能包含大写字母、数字和下划线
+ * - 长度 2-50 字符
+ */
+export const categoryCodeSchema = z
+  .string()
+  .min(2, '编码长度至少2字符')
+  .max(50, '编码长度不能超过50字符')
+  .regex(/^[A-Za-z][A-Za-z0-9_]*$/, '编码必须以字母开头，只能包含字母、数字和下划线')
+  .transform((val) => val.toUpperCase());
+
+/**
+ * 显示名称验证规则
+ */
+export const displayNameSchema = z
+  .string()
+  .min(1, '显示名称不能为空')
+  .max(50, '名称长度不能超过50字符')
+  .transform((val) => val.trim());
+
+/**
+ * URL 验证规则（可选）
+ */
+export const optionalUrlSchema = z
+  .string()
+  .url('请输入有效的 URL 地址')
+  .max(500, 'URL 长度不能超过500字符')
+  .optional()
+  .or(z.literal(''));
+
+/**
+ * 描述验证规则（可选）
+ */
+export const descriptionSchema = z
+  .string()
+  .max(500, '描述长度不能超过500字符')
+  .optional();
+
+/**
+ * 创建分类请求 Schema
+ */
+export const createMenuCategorySchema = z.object({
+  code: categoryCodeSchema,
+  displayName: displayNameSchema,
+  sortOrder: z.number().int().min(0).max(9999).optional(),
+  isVisible: z.boolean().optional().default(true),
+  iconUrl: optionalUrlSchema,
+  description: descriptionSchema,
+});
+
+/**
+ * 更新分类请求 Schema
+ */
+export const updateMenuCategorySchema = z.object({
+  displayName: displayNameSchema.optional(),
+  sortOrder: z.number().int().min(0).max(9999).optional(),
+  isVisible: z.boolean().optional(),
+  iconUrl: optionalUrlSchema,
+  description: descriptionSchema,
+});
+
+/**
+ * 切换可见性请求 Schema
+ */
+export const toggleVisibilitySchema = z.object({
+  isVisible: z.boolean(),
+});
+
+/**
+ * 批量更新排序请求 Schema
+ */
+export const batchUpdateSortOrderSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string().uuid('无效的分类 ID'),
+      sortOrder: z.number().int().min(0).max(9999),
+    })
+  ).min(1, '至少需要一个排序项'),
+});
+
+// 从 Schema 推导类型
+export type CreateMenuCategoryInput = z.infer<typeof createMenuCategorySchema>;
+export type UpdateMenuCategoryInput = z.infer<typeof updateMenuCategorySchema>;
+export type ToggleVisibilityInput = z.infer<typeof toggleVisibilitySchema>;
+export type BatchUpdateSortOrderInput = z.infer<typeof batchUpdateSortOrderSchema>;
+
 // ============================================================================
 // 基础类型
 // ============================================================================

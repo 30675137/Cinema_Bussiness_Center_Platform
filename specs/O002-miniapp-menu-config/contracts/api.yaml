@@ -170,8 +170,8 @@ paths:
                   summary: 编码重复
                   value:
                     success: false
-                    error: "DUPLICATE_CATEGORY_CODE"
-                    message: "分类编码 'SEASONAL' 已存在"
+                    error: "CAT_DUP_001"
+                    message: "分类编码已存在: SEASONAL"
                     details:
                       code: "SEASONAL"
                     timestamp: "2026-01-03T10:00:00Z"
@@ -289,8 +289,8 @@ paths:
                   summary: 不可删除默认分类
                   value:
                     success: false
-                    error: "CANNOT_DELETE_DEFAULT_CATEGORY"
-                    message: "默认分类不可删除"
+                    error: "CAT_BIZ_001"
+                    message: "默认分类不能删除"
                     timestamp: "2026-01-03T10:00:00Z"
 
   /api/admin/menu-categories/batch-sort:
@@ -352,19 +352,13 @@ paths:
         - BearerAuth: []
       parameters:
         - $ref: '#/components/parameters/CategoryId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - isVisible
-              properties:
-                isVisible:
-                  type: boolean
-                  description: 是否可见
-                  example: false
+        - name: isVisible
+          in: query
+          description: 是否可见
+          required: true
+          schema:
+            type: boolean
+          example: false
       responses:
         '200':
           description: 更新成功
@@ -372,6 +366,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuCategoryResponse'
+        '400':
+          description: 业务规则错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                cannotHideDefault:
+                  summary: 不可隐藏默认分类
+                  value:
+                    success: false
+                    error: "CAT_BIZ_002"
+                    message: "默认分类不能隐藏"
+                    timestamp: "2026-01-03T10:00:00Z"
 
 # =============================================================================
 # C端小程序 API
@@ -950,7 +958,7 @@ components:
             notFound:
               value:
                 success: false
-                error: "CATEGORY_NOT_FOUND"
+                error: "CAT_NTF_001"
                 message: "分类不存在"
                 timestamp: "2026-01-03T10:00:00Z"
 
@@ -974,3 +982,34 @@ x-additional-info:
     - 更新 channel_product_config.category_id 外键
     - 部署新 API 端点
     - 前端切换到新 API
+
+x-error-codes:
+  description: |
+    菜单分类模块错误码规范
+    格式: CAT_<类别>_<序号>
+
+  codes:
+    CAT_NTF_001:
+      httpStatus: 404
+      message: "分类不存在"
+      description: "请求的分类 ID 在数据库中未找到"
+
+    CAT_DUP_001:
+      httpStatus: 409
+      message: "分类编码已存在"
+      description: "创建分类时 code 字段重复"
+
+    CAT_VAL_001:
+      httpStatus: 400
+      message: "分类编码格式错误"
+      description: "code 必须以大写字母开头，只能包含大写字母、数字和下划线"
+
+    CAT_BIZ_001:
+      httpStatus: 400
+      message: "默认分类不能删除"
+      description: "isDefault=true 的分类不允许删除操作"
+
+    CAT_BIZ_002:
+      httpStatus: 400
+      message: "默认分类不能隐藏"
+      description: "isDefault=true 的分类不允许设置 isVisible=false"

@@ -126,9 +126,9 @@
 
 **分类菜单**:
 
-- **FR-005**: 系统必须显示5个分类选项:"全部"、"经典特调"(ALCOHOL)、"精品咖啡"(COFFEE)、"经典饮品"(BEVERAGE)、"主厨小食"(SNACK)
-- **FR-006**: 系统必须在前端维护分类枚举到显示名称的映射字典
-- **FR-007**: 系统必须在用户点击分类时，调用对应category参数的API接口
+- **FR-005**: 系统必须调用 `GET /api/client/menu-categories` 获取动态分类列表，在前端显示"全部"选项加上后端返回的所有可见分类（参考 O002-miniapp-menu-config 规格）
+- **FR-006**: 系统必须使用后端返回的 `displayName` 作为分类显示名称，不再使用前端硬编码映射
+- **FR-007**: 系统必须在用户点击分类时，使用分类的 `id`（categoryId）参数调用商品列表API接口
 - **FR-008**: 系统必须高亮显示当前选中的分类标签
 
 **商品卡片展示**:
@@ -187,6 +187,7 @@
 
 - **O006-miniapp-channel-order**: 依赖后端渠道商品配置功能和API端点的完整实现
 - **O005-channel-product-config**: 依赖后端渠道商品配置的数据模型和业务逻辑
+- **O002-miniapp-menu-config**: 依赖动态分类配置系统。分类数据通过 `GET /api/client/menu-categories` API 获取，不再使用硬编码枚举
 - **后端API**: 依赖 `GET /api/client/channel-products/mini-program` 接口可用且返回符合DTO定义的数据
 - **认证服务**: 依赖 Taro 项目的认证模块提供有效的 JWT Token
 - **Taro框架**: 依赖 Taro 4.1.9 的网络请求API(Taro.request)和图片组件(Taro.Image)
@@ -199,6 +200,7 @@
 
 - 后端 `GET /api/client/channel-products/mini-program` API 已实现且稳定可用
 - 后端返回的 `ChannelProductDTO` 数据格式与文档定义一致
+- **分类数据通过 O002-miniapp-menu-config 规格提供的 API 动态获取**，前端不再硬编码分类枚举映射
 - 小程序用户已通过静默登录或授权登录，所有API请求携带有效Token
 - **商品图片URL为Supabase Storage的公开访问链接，无需额外认证** (已澄清: Phase 1使用公开URL简化实现，安全优化已记录为技术债)
 - **商品数据通过后台轮询保持新鲜，每1分钟自动刷新** (已澄清: TanStack Query refetchInterval=60000ms，缓存staleTime=5分钟，平衡新鲜度与性能)

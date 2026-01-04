@@ -271,34 +271,34 @@
 
 ---
 
-## Phase 10: Polish & Cross-Cutting Concerns
+## Phase 10: Polish & Cross-Cutting Concerns ✅ COMPLETED
 
 **Purpose**: Improvements that affect multiple user stories
 
 ### Error Handling & Validation
 
-- [ ] T086 [P] Add comprehensive error codes per API standards (CAT_NTF_001, CAT_VAL_001, etc.)
-- [ ] T087 [P] Add Zod validation schemas for frontend forms
-- [ ] T088 Add global exception handler for category-related errors
+- [x] T086 [P] Add comprehensive error codes per API standards (CAT_NTF_001, CAT_VAL_001, etc.)
+- [x] T087 [P] Add Zod validation schemas for frontend forms
+- [x] T088 Add global exception handler for category-related errors
 
 ### Performance & Caching
 
-- [ ] T089 Verify category list API response time < 200ms
-- [ ] T090 Verify mini-program menu load time < 1s
-- [ ] T091 Configure TanStack Query staleTime (5 min) and refetchInterval (1 min)
+- [x] T089 Verify category list API response time < 200ms
+- [x] T090 Verify mini-program menu load time < 1s
+- [x] T091 Configure TanStack Query staleTime (5 min) and refetchInterval (1 min)
 
 ### Documentation
 
-- [ ] T092 [P] Update API documentation with new endpoints
-- [ ] T093 [P] Add operator guide for category management
-- [ ] T094 Update O007 spec to reference O002 for category data
+- [x] T092 [P] Update API documentation with new endpoints
+- [x] T093 [P] Add operator guide for category management
+- [x] T094 Update O007 spec to reference O002 for category data
 
 ### Final Validation
 
-- [ ] T095 Run full migration script on test database
-- [ ] T096 Verify backward compatibility with legacy `category` parameter
-- [ ] T097 Verify default category protection (cannot delete/hide)
-- [ ] T098 Verify audit logging for all category operations
+- [x] T095 Run full migration script on test database
+- [x] T096 Verify backward compatibility with legacy `category` parameter
+- [x] T097 Verify default category protection (cannot delete/hide)
+- [x] T098 Verify audit logging for all category operations
 
 **Estimated Time**: 6 hours
 

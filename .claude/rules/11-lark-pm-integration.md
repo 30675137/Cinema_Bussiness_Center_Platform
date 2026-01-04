@@ -207,6 +207,58 @@ mcp__lark-mcp__bitable_v1_appTable_list({
 { "执行结果": [{"text": "已完成", "type": "text"}] }
 ```
 
+## 文档上传与权限规则
+
+### R11.6 文档权限自动授权
+
+通过 Lark MCP 上传文档后，**必须**自动授予指定人员编辑权限。
+
+**默认授权人员**：
+
+| 邮箱 | 权限 | 说明 |
+|------|------|------|
+| `30675137@qq.com` | edit | 项目负责人，所有文档可编辑 |
+
+**授权流程**：
+
+```typescript
+// 1. 上传文档
+const result = await mcp__lark-mcp__docx_builtin_import({
+  data: { file_name: "文档名称", markdown: "..." }
+});
+
+// 2. 获取用户 open_id
+const user = await mcp__lark-mcp__contact_v3_user_batchGetId({
+  data: { emails: ["30675137@qq.com"] },
+  params: { user_id_type: "open_id" }
+});
+
+// 3. 授予编辑权限
+await mcp__lark-mcp__drive_v1_permissionMember_create({
+  data: {
+    member_id: user.user_list[0].user_id,  // "ou_4d5ff96d59a2ce2dc8a3549c05efcc11"
+    member_type: "openid",
+    perm: "edit"
+  },
+  params: { need_notification: true, type: "docx" },
+  path: { token: result.result.token }
+});
+```
+
+**预存 open_id 快速引用**：
+
+| 邮箱 | open_id |
+|------|---------|
+| `30675137@qq.com` | `ou_4d5ff96d59a2ce2dc8a3549c05efcc11` |
+
+### R11.7 文档权限级别
+
+| 权限 | 说明 |
+|------|------|
+| `view` | 只读 |
+| `edit` | 可编辑 |
+| `full_access` | 完全管理 |
+
 ## 禁止行为
 
 - ❌ 禁止使用简写 specId 查询记录
@@ -215,6 +267,7 @@ mcp__lark-mcp__bitable_v1_appTable_list({
 - ❌ 禁止执行结果字段留空
 - ❌ 禁止在 Git Commit 之前标记任务完成
 - ❌ 禁止新增 API 后不记录到 API 表
+- ❌ 禁止上传文档后不授予默认人员编辑权限
 
 ## 相关文档
 
