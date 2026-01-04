@@ -355,6 +355,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           key: '/channel-products/mini-program',
           label: '小程序商品',
         },
+        {
+          key: '/menu-category',
+          label: 'O002-菜单分类',
+        },
       ],
     },
     {
