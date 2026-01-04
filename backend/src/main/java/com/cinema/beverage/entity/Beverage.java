@@ -6,6 +6,7 @@ package com.cinema.beverage.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -75,10 +76,12 @@ public class Beverage {
 
     /**
      * 详情图片列表 (JSON数组)
+     * FIXME: 临时修复 Hibernate 6.x 类型冲突问题 (O002-miniapp-menu-config)
+     * TODO: 在开发 O003-beverage-order 时重新审视此修改
      */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "detail_images", columnDefinition = "jsonb")
-    private String[] detailImages;
+    private List<String> detailImages;
 
     /**
      * 基础价格 (单位: 元)
