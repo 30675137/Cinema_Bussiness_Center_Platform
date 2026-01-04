@@ -70,7 +70,7 @@ public class MenuCategoryController {
         } catch (CategoryNotFoundException e) {
             log.warn("Category not found: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         }
     }
 
@@ -93,7 +93,7 @@ public class MenuCategoryController {
         } catch (Exception e) {
             log.error("Failed to create category: {}", request.getCode(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.failure("CAT_VAL_003", e.getMessage()));
+                    .body(ApiResponse.failure("CAT_VAL_003: " + e.getMessage()));
         }
     }
 
@@ -117,16 +117,15 @@ public class MenuCategoryController {
         } catch (CategoryNotFoundException e) {
             log.warn("Category not found: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         } catch (DefaultCategoryException e) {
             log.warn("Cannot modify default category: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         } catch (OptimisticLockingFailureException e) {
             log.warn("Optimistic locking failure for category: {}", id);
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.failure("CAT_CONFLICT_001",
-                            "数据已被其他用户修改，请刷新后重试"));
+                    .body(ApiResponse.failure("CAT_CONFLICT_001: 数据已被其他用户修改，请刷新后重试"));
         }
     }
 
@@ -150,11 +149,11 @@ public class MenuCategoryController {
         } catch (CategoryNotFoundException e) {
             log.warn("Category not found: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         } catch (DefaultCategoryException e) {
             log.warn("Cannot delete default category: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         }
     }
 
@@ -179,11 +178,11 @@ public class MenuCategoryController {
         } catch (CategoryNotFoundException e) {
             log.warn("Category not found: {}", id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         } catch (DefaultCategoryException e) {
             log.warn("Cannot hide default category: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .body(ApiResponse.failure(e.getErrorCode(), e.getMessage()));
+                    .body(ApiResponse.failure(e.getErrorCode() + ": " + e.getMessage()));
         }
     }
 
@@ -205,7 +204,7 @@ public class MenuCategoryController {
         } catch (Exception e) {
             log.error("Failed to batch sort categories", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.failure("CAT_VAL_004", "批量排序失败: " + e.getMessage()));
+                    .body(ApiResponse.failure("CAT_VAL_004: 批量排序失败: " + e.getMessage()));
         }
     }
 

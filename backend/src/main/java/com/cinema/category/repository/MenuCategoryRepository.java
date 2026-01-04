@@ -24,6 +24,12 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, UUID
     Optional<MenuCategory> findByCode(String code);
 
     /**
+     * 根据编码查找分类（排除软删除）
+     * 用于动态分类筛选
+     */
+    Optional<MenuCategory> findByCodeAndDeletedAtIsNull(String code);
+
+    /**
      * 检查编码是否已存在
      */
     boolean existsByCode(String code);

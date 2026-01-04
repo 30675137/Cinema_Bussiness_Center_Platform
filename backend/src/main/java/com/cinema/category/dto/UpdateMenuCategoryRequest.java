@@ -1,5 +1,6 @@
 package com.cinema.category.dto;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateMenuCategoryRequest {
+
+    /**
+     * 乐观锁版本号（必需，用于并发控制）
+     */
+    @NotNull(message = "版本号不能为空，用于检测并发编辑冲突")
+    private Long version;
 
     /**
      * 显示名称

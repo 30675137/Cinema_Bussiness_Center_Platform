@@ -132,6 +132,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- SpringDoc OpenAPI for Swagger/OpenAPI 3.0 documentation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
         <!-- Lombok (可选，后续如果不想用可以移除) -->
         <dependency>
             <groupId>org.projectlombok</groupId>

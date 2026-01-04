@@ -52,7 +52,7 @@ public class MenuCategoryService {
         }
 
         // 获取最大排序序号
-        Integer maxSortOrder = menuCategoryRepository.findMaxSortOrder().orElse(0);
+        Integer maxSortOrder = menuCategoryRepository.findMaxSortOrder();
 
         MenuCategory category = MenuCategory.builder()
                 .code(request.getCode().toUpperCase())
@@ -184,7 +184,7 @@ public class MenuCategoryService {
 
         List<MenuCategory> categories;
         if (includeHidden) {
-            categories = menuCategoryRepository.findAllByOrderBySortOrderAsc();
+            categories = menuCategoryRepository.findAllOrderBySortOrder();
         } else {
             categories = menuCategoryRepository.findAllVisible();
         }
