@@ -1,449 +1,587 @@
 # Tasks: 小程序菜单分类动态配置
 
-**@spec O002-miniapp-menu-config**
-**Input**: Design documents from `/specs/O002-miniapp-menu-config/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/api.yaml
+**Spec**: O002-miniapp-menu-config | **Created**: 2026-01-04 | **Status**: In Progress
 
-## Format: `[ID] [P?] [Story] Description`
+## Overview
 
-- **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
-- Include exact file paths in descriptions
+将硬编码的 `ChannelCategory` 枚举迁移到数据库表 `menu_category`，实现完全动态的商品分类管理系统。
 
-## User Story Summary
+**User Stories**: 7 个用户故事按优先级排序
+- **P1**: US1 (Admin CRUD), US2 (C端分类API), US5 (数据迁移), US6 (商品筛选)
+- **P2**: US3 (拖拽排序), US4 (可见性切换)
+- **P3**: US7 (图标描述)
 
-| Priority | Story | Description | Phase |
-|----------|-------|-------------|-------|
-| P1 | US1 | Admin Configures Menu Categories (CRUD) | 3 |
-| P1 | US2 | Mini-Program Fetches Dynamic Categories | 4 |
-| P1 | US5 | System Migrates ChannelCategory Data | 5 |
-| P1 | US6 | Products Filtered by Dynamic Category | 6 |
-| P2 | US3 | Admin Reorders Menu Categories | 7 |
-| P2 | US4 | Admin Sets Category Visibility | 8 |
-| P3 | US7 | Admin Sets Category Icons and Descriptions | 9 |
+**Technologies**: Spring Boot 3.3.5 + JPA + Flyway, React 19 + Ant Design 6 + @dnd-kit/sortable, Taro 4.1.9
 
 ---
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup & Foundation
 
-**Purpose**: Branch creation, environment setup, and project initialization
+**Goal**: 项目初始化、依赖安装、数据库表结构
 
-- [x] T001 Create feature branch `O002-miniapp-menu-config` from `dev`
-- [x] T002 Update `.specify/active_spec.txt` to point to `specs/O002-miniapp-menu-config/spec.md`
-- [x] T003 [P] Verify backend development environment (Java 17.0.9, Maven, Supabase connection)
-- [x] T004 [P] Verify frontend B端 environment (React 19.2.0, Ant Design 6.1.0, TypeScript 5.9.3)
-- [x] T005 [P] Verify frontend C端 environment (Taro 4.1.9, React 18.3.1)
+### Backend Setup
 
-**Estimated Time**: 1.5 hours
+- [ ] **T001** [P] 添加 Flyway 依赖到 `backend/pom.xml`
+  - 添加 `org.flywaydb:flyway-core` 依赖
+  - 配置 Flyway 在 `application.yml` (baseline-on-migrate: true)
+  - 文件: `backend/pom.xml`, `backend/src/main/resources/application.yml`
 
----
+- [ ] **T002** [P] 创建 `menu_category` 表 Flyway 迁移脚本
+  - 路径: `backend/src/main/resources/db/migration/V001__create_menu_category_table.sql`
+  - 字段: id (UUID PK), code (VARCHAR 50 UNIQUE), display_name (VARCHAR 50 NOT NULL), sort_order (INT DEFAULT 0), is_visible (BOOLEAN DEFAULT true), is_default (BOOLEAN DEFAULT false), icon_url (VARCHAR 500), description (TEXT), version (BIGINT DEFAULT 0), created_at, updated_at, created_by, updated_by, deleted_at
+  - 索引: UNIQUE(code), INDEX(sort_order), INDEX(is_visible), INDEX(deleted_at)
 
-## Phase 2: Foundational (Blocking Prerequisites)
+- [ ] **T003** [P] 创建 `category_audit_log` 表 Flyway 迁移脚本
+  - 路径: `backend/src/main/resources/db/migration/V002__create_category_audit_log_table.sql`
+  - 字段: id (UUID PK), category_id (UUID FK), action (VARCHAR 20 CHECK IN ('DELETE', 'BATCH_SORT')), before_data (JSONB), after_data (JSONB), affected_product_count (INT DEFAULT 0), operator_id (VARCHAR 100), operator_name (VARCHAR 100), created_at
+  - 索引: INDEX(category_id), INDEX(action), INDEX(created_at)
 
-**Purpose**: Core database schema and migration infrastructure that MUST be complete before ANY user story
+### Frontend B端 Setup
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+- [ ] **T004** [P] 安装 B端拖拽排序依赖
+  - 安装 `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+  - 安装 `zod` (表单验证)
+  - 文件: `frontend/package.json`
+  - 命令: `cd frontend && npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities zod`
 
-### Database Schema
-
-- [x] T006 Create database migration script `V202601030001__add_menu_category.sql` in `backend/src/main/resources/db/migration/`
-- [x] T007 Create `menu_category` table with all fields per data-model.md in migration script
-- [x] T008 Create `category_audit_log` table in migration script
-- [x] T009 Add `category_id` column to `channel_product_config` table in migration script
-- [x] T010 Create indexes for `menu_category` table (sort_order, is_visible, code)
-- [x] T011 Create unique partial index for `is_default=true` constraint
-- [x] T012 Create trigger for automatic `updated_at` timestamp update
-
-### Backend Entity Layer
-
-- [x] T013 [P] Create `MenuCategory` JPA entity in `backend/src/main/java/com/cinema/category/entity/MenuCategory.java`
-- [x] T014 [P] Create `CategoryAuditLog` JPA entity in `backend/src/main/java/com/cinema/category/entity/CategoryAuditLog.java`
-- [x] T015 Modify `ChannelProductConfig` entity to add `category` ManyToOne relationship in `backend/src/main/java/com/cinema/channelproduct/domain/ChannelProductConfig.java`
-
-### Backend Repository Layer
-
-- [x] T016 [P] Create `MenuCategoryRepository` with custom queries in `backend/src/main/java/com/cinema/category/repository/MenuCategoryRepository.java`
-- [x] T017 [P] Create `CategoryAuditLogRepository` in `backend/src/main/java/com/cinema/category/repository/CategoryAuditLogRepository.java`
-
-### Backend DTO Layer
-
-- [x] T018 [P] Create `MenuCategoryDTO` in `backend/src/main/java/com/cinema/category/dto/MenuCategoryDTO.java`
-- [x] T019 [P] Create `CreateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/CreateMenuCategoryRequest.java`
-- [x] T020 [P] Create `UpdateMenuCategoryRequest` in `backend/src/main/java/com/cinema/category/dto/UpdateMenuCategoryRequest.java`
-- [x] T021 [P] Create `BatchUpdateSortOrderRequest` in `backend/src/main/java/com/cinema/category/dto/BatchUpdateSortOrderRequest.java`
-- [x] T022 [P] Create `ClientMenuCategoryDTO` (simplified for C端) in `backend/src/main/java/com/cinema/category/dto/ClientMenuCategoryDTO.java`
-- [x] T023 [P] Create `DeleteCategoryResponse` in `backend/src/main/java/com/cinema/category/dto/DeleteCategoryResponse.java`
-
-### Frontend Type Definitions
-
-- [x] T024 [P] Create `MenuCategoryDTO` TypeScript type in `frontend/src/features/menu-category/types/index.ts`
-- [x] T025 [P] Create request/response types in `frontend/src/features/menu-category/types/index.ts`
-- [x] T026 [P] Create C端 `MenuCategoryDTO` type in `hall-reserve-taro/src/types/menuCategory.ts`
-
-**Checkpoint**: Foundation ready - user story implementation can now begin
-
-**Estimated Time**: 8 hours
+- [ ] **T005** [P] 创建分类功能目录结构
+  - 创建目录:
+    - `frontend/src/features/channel-products/menu-categories/components/`
+    - `frontend/src/features/channel-products/menu-categories/hooks/`
+    - `frontend/src/features/channel-products/menu-categories/services/`
+    - `frontend/src/features/channel-products/menu-categories/types/`
+    - `frontend/src/features/channel-products/menu-categories/pages/`
 
 ---
 
-## Phase 3: User Story 1 - Admin Configures Menu Categories (Priority: P1) 🎯 MVP
+## Phase 2: Foundational Backend Entities & DTOs
 
-**Goal**: Cinema operations manager can create, read, update, and delete menu categories through admin interface
+**Goal**: 创建核心实体类、Repository、基础 DTO（阻塞后续 API 开发）
 
-**Independent Test**: Create a category "季节限定", verify it appears in category list, update its name, delete it
+### Entity Layer
 
-### Backend Implementation for US1
+- [ ] **T006** 创建 `MenuCategory` 实体类
+  - 路径: `backend/src/main/java/com/cinema/category/entity/MenuCategory.java`
+  - 注解: `@Entity`, `@Table(name = "menu_category")`
+  - 字段: id (UUID), code, displayName, sortOrder, isVisible, isDefault, iconUrl, description, **version** (@Version for 乐观锁), createdAt, updatedAt, createdBy, updatedBy, deletedAt
+  - JPA 映射: `@Column(unique = true)` for code, `@Version` for version
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T027 [US1] Create `MenuCategoryService` with CRUD operations in `backend/src/main/java/com/cinema/category/service/MenuCategoryService.java`
-- [x] T028 [US1] Implement `createCategory()` with code uniqueness validation in MenuCategoryService
-- [x] T029 [US1] Implement `updateCategory()` with default category protection in MenuCategoryService
-- [x] T030 [US1] Implement `deleteCategory()` with product migration to default category in MenuCategoryService
-- [x] T031 [US1] Implement `getCategories()` with includeHidden and includeProductCount options in MenuCategoryService
-- [x] T032 [US1] Implement `getCategoryById()` in MenuCategoryService
-- [x] T033 [US1] Create `CategoryAuditService` for audit logging in `backend/src/main/java/com/cinema/category/service/CategoryAuditService.java`
-- [x] T034 [US1] Create `MenuCategoryAdminController` with CRUD endpoints in `backend/src/main/java/com/cinema/category/controller/MenuCategoryAdminController.java`
-- [x] T035 [US1] Implement `GET /api/admin/menu-categories` endpoint
-- [x] T036 [US1] Implement `POST /api/admin/menu-categories` endpoint
-- [x] T037 [US1] Implement `GET /api/admin/menu-categories/{id}` endpoint
-- [x] T038 [US1] Implement `PUT /api/admin/menu-categories/{id}` endpoint
-- [x] T039 [US1] Implement `DELETE /api/admin/menu-categories/{id}` endpoint with confirm parameter
+- [ ] **T007** 创建 `CategoryAuditLog` 实体类
+  - 路径: `backend/src/main/java/com/cinema/category/entity/CategoryAuditLog.java`
+  - 注解: `@Entity`, `@Table(name = "category_audit_log")`
+  - 字段: id (UUID), categoryId (UUID), action (ENUM: DELETE, BATCH_SORT), beforeData (String/JSONB), afterData (String/JSONB), affectedProductCount, operatorId, operatorName, createdAt
+  - JPA 映射: `@Enumerated(EnumType.STRING)` for action, `@Type(JsonBinaryType.class)` for JSONB
+  - **@spec O002-miniapp-menu-config**
 
-### Frontend B端 Implementation for US1
+- [ ] **T008** 修改 `ChannelProductConfig` 实体
+  - 路径: `backend/src/main/java/com/cinema/product/entity/ChannelProductConfig.java`
+  - 变更: 添加 `categoryId` (UUID) 字段
+  - 添加: `@ManyToOne @JoinColumn(name = "category_id")` 关联到 `MenuCategory`
+  - 保留: `channelCategory` 枚举字段（迁移期间向后兼容，24h 后废弃）
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T040 [P] [US1] Create `menuCategoryService` API client in `frontend/src/features/menu-category/services/menuCategoryService.ts`
-- [x] T041 [P] [US1] Create TanStack Query hooks in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [x] T042 [US1] Create `CategoryTable` component in `frontend/src/features/menu-category/components/CategoryTable.tsx`
-- [x] T043 [US1] Create `CategoryForm` component (create/edit modal) in `frontend/src/features/menu-category/components/CategoryForm.tsx`
-- [x] T044 [US1] Create `DeleteCategoryDialog` component in `frontend/src/features/menu-category/components/DeleteCategoryDialog.tsx`
-- [x] T045 [US1] Create `MenuCategoryPage` page component in `frontend/src/pages/menu-category/MenuCategoryPage.tsx`
-- [x] T046 [US1] Add route for `/menu-category` in router configuration
+### Repository Layer
 
-**Checkpoint**: At this point, admin can fully manage categories (CRUD) - core MVP complete
+- [ ] **T009** [P] 创建 `MenuCategoryRepository` 接口
+  - 路径: `backend/src/main/java/com/cinema/category/repository/MenuCategoryRepository.java`
+  - 继承: `JpaRepository<MenuCategory, UUID>`
+  - 方法: `Optional<MenuCategory> findByCode(String code)`, `List<MenuCategory> findAllByIsVisibleTrueOrderBySortOrderAsc()`, `Optional<MenuCategory> findByIsDefaultTrue()`, `List<MenuCategory> findAllByOrderBySortOrderAsc()`
+  - **@spec O002-miniapp-menu-config**
 
-**Estimated Time**: 16 hours
+- [ ] **T010** [P] 创建 `CategoryAuditLogRepository` 接口
+  - 路径: `backend/src/main/java/com/cinema/category/repository/CategoryAuditLogRepository.java`
+  - 继承: `JpaRepository<CategoryAuditLog, UUID>`
+  - 方法: `List<CategoryAuditLog> findByCategoryIdOrderByCreatedAtDesc(UUID categoryId)`
+  - **@spec O002-miniapp-menu-config**
 
----
+### DTO Layer
 
-## Phase 4: User Story 2 - Mini-Program Fetches Dynamic Categories (Priority: P1)
+- [ ] **T011** [P] 创建分类 DTO 类
+  - 路径: `backend/src/main/java/com/cinema/category/dto/MenuCategoryDTO.java`
+  - 字段: id, code, displayName, sortOrder, isVisible, isDefault, iconUrl, description, productCount (transient), version, createdAt, updatedAt
+  - **@spec O002-miniapp-menu-config**
 
-**Goal**: Mini-program fetches category list from API instead of using hardcoded frontend mapping
+- [ ] **T012** [P] 创建分类请求 DTO
+  - 路径: `backend/src/main/java/com/cinema/category/dto/CategoryCreateRequest.java`
+  - 字段: code (validation: uppercase, letters/numbers/_), displayName (max 50 chars), sortOrder, isVisible, iconUrl (URL validation), description
+  - 注解: `@NotBlank`, `@Pattern`, `@Size`, `@URL`
+  - **@spec O002-miniapp-menu-config**
 
-**Independent Test**: Call `GET /api/client/menu-categories`, verify response contains visible categories sorted by sortOrder
+- [ ] **T013** [P] 创建分类更新 DTO
+  - 路径: `backend/src/main/java/com/cinema/category/dto/CategoryUpdateRequest.java`
+  - 字段: displayName, sortOrder, isVisible, iconUrl, description, **version** (required for optimistic locking)
+  - **@spec O002-miniapp-menu-config**
 
-### Backend Implementation for US2
+- [ ] **T014** [P] 创建批量排序 DTO
+  - 路径: `backend/src/main/java/com/cinema/category/dto/BatchSortRequest.java`
+  - 字段: `List<CategorySortItem>` (inner class: categoryId, sortOrder)
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T047 [US2] Create `MenuCategoryClientController` in `backend/src/main/java/com/cinema/category/controller/MenuCategoryClientController.java`
-- [x] T048 [US2] Implement `GET /api/client/menu-categories` endpoint returning visible categories with productCount
-- [x] T049 [US2] Add caching for client category list (5 minute TTL)
+### Exception Handling
 
-### Frontend C端 Implementation for US2
+- [ ] **T015** [P] 创建分类异常类
+  - 路径: `backend/src/main/java/com/cinema/category/exception/CategoryNotFoundException.java`
+  - 错误码: `CAT_NTF_001`
+  - HTTP 状态: 404
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T050 [P] [US2] Create `menuCategoryService` in `hall-reserve-taro/src/services/menuCategoryService.ts`
-- [x] T051 [P] [US2] Create `useMenuCategories` hook in `hall-reserve-taro/src/hooks/useMenuCategories.ts`
-- [x] T052 [US2] Create `menuCategoryStore` Zustand store in `hall-reserve-taro/src/stores/menuCategoryStore.ts`
-- [x] T053 [US2] Update menu page to fetch categories from API in `hall-reserve-taro/src/pages/beverage/menu/index.tsx`
-- [x] T054 [US2] Remove hardcoded `CATEGORY_DISPLAY_NAMES` mapping from C端 code
-
-**Checkpoint**: Mini-program displays dynamic categories from API
-
-**Estimated Time**: 8 hours
-
----
-
-## Phase 5: User Story 5 - System Migrates ChannelCategory Data (Priority: P1)
-
-**Goal**: Migrate existing `ChannelCategory` enum values and product associations to new `menu_category` table
-
-**Independent Test**: Run migration script, verify 6 categories created with correct Chinese names, all products have valid category_id
-
-### Migration Implementation for US5
-
-- [x] T055 [US5] Create data migration script `V2026_01_03_002__migrate_category_data.sql` in `backend/src/main/resources/db/migration/`
-- [x] T056 [US5] Insert initial category data (ALCOHOL→经典特调, COFFEE→精品咖啡, etc.) in migration script
-- [x] T057 [US5] Set OTHER category as `is_default=true` in migration script
-- [x] T058 [US5] Update `channel_product_config.category_id` based on `channel_category` enum values
-- [x] T059 [US5] Handle products with null/invalid category by assigning to default category
-- [x] T060 [US5] Add validation query to verify migration completeness
-- [x] T061 [US5] Create rollback script `R2026_01_03_002__rollback_category_migration.sql`
-
-**Checkpoint**: All existing data migrated, zero data loss
-
-**Estimated Time**: 4 hours
+- [ ] **T016** [P] 创建默认分类异常类
+  - 路径: `backend/src/main/java/com/cinema/category/exception/DefaultCategoryException.java`
+  - 错误码: `CAT_BIZ_001` (删除默认分类), `CAT_BIZ_002` (隐藏默认分类)
+  - HTTP 状态: 422
+  - **@spec O002-miniapp-menu-config**
 
 ---
 
-## Phase 6: User Story 6 - Products Filtered by Dynamic Category (Priority: P1)
+## Phase 3: Data Migration (US5 - P1, 阻塞其他 US)
 
-**Goal**: Product list API supports filtering by `categoryId` (new) and `category` (backward compatible)
+**Goal**: 执行 enum → table 数据迁移，确保零数据丢失
 
-**Independent Test**: Call product API with `?categoryId=xxx` and `?category=COFFEE`, verify correct filtering
+### Migration Scripts
 
-### Backend Implementation for US6
+- [ ] **T017** [US5] 创建数据迁移脚本（枚举 → 表）
+  - 路径: `backend/src/main/resources/db/migration/V003__migrate_channel_category_data.sql`
+  - 步骤:
+    1. INSERT INTO menu_category 6 个分类（ALCOHOL, COFFEE, BEVERAGE, SNACK, MEAL, OTHER）
+    2. 设置 OTHER 为 `is_default=true`
+    3. UPDATE channel_product_config SET category_id = (SELECT id FROM menu_category WHERE code = channel_category)
+    4. 处理 NULL 值：UPDATE channel_product_config SET category_id = (SELECT id FROM menu_category WHERE is_default=true) WHERE category_id IS NULL
+  - 幂等性检查: `WHERE NOT EXISTS (SELECT 1 FROM menu_category WHERE code = 'ALCOHOL')`
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T062 [US6] Modify product list query to support `categoryId` parameter in `ChannelProductService`
-- [x] T063 [US6] Add backward compatible `category` (code) parameter support in product list query
-- [x] T064 [US6] Implement priority logic: `categoryId` takes precedence over `category`
-- [x] T065 [US6] Add nested `category` object to `ChannelProductDTO` response
-- [x] T066 [US6] Update `GET /api/client/channel-products/mini-program` endpoint
+- [ ] **T018** [US5] 添加 `category_id` 外键约束
+  - 路径: 在 V003 脚本末尾添加
+  - SQL: `ALTER TABLE channel_product_config ADD CONSTRAINT fk_category FOREIGN KEY (category_id) REFERENCES menu_category(id)`
+  - **@spec O002-miniapp-menu-config**
 
-### Frontend C端 Implementation for US6
+- [ ] **T019** [US5] 创建紧急回滚脚本（24h 内使用）
+  - 路径: `backend/src/main/resources/db/migration/R001__rollback_to_enum.sql`
+  - 步骤:
+    1. UPDATE channel_product_config SET channel_category = (SELECT code FROM menu_category WHERE id = category_id)
+    2. ALTER TABLE channel_product_config DROP CONSTRAINT fk_category
+    3. ALTER TABLE channel_product_config DROP COLUMN category_id
+    4. DROP TABLE category_audit_log
+    5. DROP TABLE menu_category
+  - 注释: 仅在迁移后 24h 内发现严重数据丢失时使用，需停机验证
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T067 [US6] Update product list hook to use `categoryId` parameter in `miniapp-ordering-taro/src/hooks/useProducts.ts`
-- [x] T068 [US6] Update menu page to pass selected category ID to product list
+### Migration Validation
 
-**Checkpoint**: Products correctly filtered by both new and legacy parameters
-
-**Estimated Time**: 6 hours
-
----
-
-## Phase 7: User Story 3 - Admin Reorders Menu Categories (Priority: P2)
-
-**Goal**: Admin can drag-and-drop to reorder categories, changes reflected in mini-program
-
-**Independent Test**: Drag "季节限定" to first position, verify mini-program shows it first
-
-### Backend Implementation for US3
-
-- [x] T069 [US3] Implement `batchUpdateSortOrder()` in MenuCategoryService
-- [x] T070 [US3] Implement `PUT /api/admin/menu-categories/batch-sort` endpoint in MenuCategoryAdminController
-
-### Frontend B端 Implementation for US3
-
-- [x] T071 [P] [US3] Add `useBatchUpdateSortOrder` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [x] T072 [US3] Add drag-and-drop reordering to `CategoryTable` component using `@dnd-kit/sortable`
-- [x] T073 [US3] Implement optimistic update for sort order changes
-
-**Checkpoint**: Admin can reorder categories with drag-and-drop
-
-**Estimated Time**: 4 hours
+- [ ] **T020** [US5] 编写迁移验证单元测试
+  - 路径: `backend/src/test/java/com/cinema/category/migration/MigrationValidationTest.java`
+  - 验证点:
+    - 6 个分类记录全部创建
+    - OTHER 分类 `is_default=true`
+    - 所有商品 `category_id` 非空
+    - 商品数量迁移前后一致
+    - 外键约束正常工作
+  - **@spec O002-miniapp-menu-config**
 
 ---
 
-## Phase 8: User Story 4 - Admin Sets Category Visibility (Priority: P2)
+## Phase 4: US1 - Admin CRUD (P1)
 
-**Goal**: Admin can hide/show categories without deleting them
+**Goal**: 管理员可以创建、编辑、删除分类
 
-**Independent Test**: Toggle visibility off for "冰品", verify it disappears from mini-program
+### Service Layer
 
-### Backend Implementation for US4
+- [ ] **T021** [US1] 创建 `MenuCategoryService` 核心业务逻辑
+  - 路径: `backend/src/main/java/com/cinema/category/service/MenuCategoryService.java`
+  - 方法:
+    - `List<MenuCategoryDTO> findAll()` - 查询所有分类（包含商品数量）
+    - `MenuCategoryDTO findById(UUID id)` - 查询单个分类
+    - `MenuCategoryDTO create(CategoryCreateRequest request)` - 创建分类，校验 code 唯一性
+    - `MenuCategoryDTO update(UUID id, CategoryUpdateRequest request)` - 更新分类，处理 @Version 冲突
+    - `void delete(UUID id)` - 删除分类，商品重分配到默认分类
+    - `void updateVisibility(UUID id, boolean isVisible)` - 切换可见性（防止隐藏默认分类）
+    - `void batchSort(BatchSortRequest request)` - 批量排序
+  - 乐观锁处理: catch `OptimisticLockingFailureException` 返回 409 Conflict
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T074 [US4] Implement `toggleVisibility()` in MenuCategoryService with default category protection
-- [x] T075 [US4] Implement `PATCH /api/admin/menu-categories/{id}/visibility` endpoint
+- [ ] **T022** [US1] 创建 `CategoryAuditService` 审计日志服务
+  - 路径: `backend/src/main/java/com/cinema/category/service/CategoryAuditService.java`
+  - 方法:
+    - `void logDelete(UUID categoryId, MenuCategory before, int affectedProductCount, String operatorId)`
+    - `void logBatchSort(List<MenuCategory> before, List<MenuCategory> after, String operatorId)`
+  - 仅记录 DELETE 和 BATCH_SORT 操作
+  - **@spec O002-miniapp-menu-config**
 
-### Frontend B端 Implementation for US4
+### Controller Layer
 
-- [x] T076 [P] [US4] Add `useToggleVisibility` mutation hook in `frontend/src/features/menu-category/hooks/useMenuCategories.ts`
-- [x] T077 [US4] Add visibility toggle switch to `CategoryTable` component
-- [x] T078 [US4] Show hidden category indicator in table row
+- [ ] **T023** [US1] 创建 `MenuCategoryController` Admin API
+  - 路径: `backend/src/main/java/com/cinema/category/controller/MenuCategoryController.java`
+  - 端点:
+    - `GET /api/admin/menu-categories` - 获取所有分类（含商品数量）
+    - `GET /api/admin/menu-categories/{id}` - 获取单个分类
+    - `POST /api/admin/menu-categories` - 创建分类
+    - `PUT /api/admin/menu-categories/{id}` - 更新分类
+    - `DELETE /api/admin/menu-categories/{id}` - 删除分类
+    - `PATCH /api/admin/menu-categories/{id}/visibility` - 切换可见性
+    - `PUT /api/admin/menu-categories/batch-sort` - 批量排序
+  - 响应格式: 统一 `ApiResponse<T>` 封装
+  - 错误处理: DefaultCategoryException (422), CategoryNotFoundException (404), OptimisticLockingFailure (409)
+  - **@spec O002-miniapp-menu-config**
 
-**Checkpoint**: Admin can toggle category visibility
+### Business Logic Tests
 
-**Estimated Time**: 3 hours
+- [ ] **T024** [US1] 编写分类删除业务逻辑测试
+  - 路径: `backend/src/test/java/com/cinema/category/service/MenuCategoryServiceTest.java`
+  - 测试场景:
+    - 删除无商品分类 → 成功删除
+    - 删除有商品分类 → 商品重分配到默认分类 + 审计日志记录
+    - 删除默认分类 → 抛出 DefaultCategoryException
+    - 并发删除同一分类 → 乐观锁冲突 OptimisticLockingFailureException
+  - 覆盖率目标: 100%（关键业务逻辑）
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T025** [US1] 编写分类创建/更新测试
+  - 路径: `backend/src/test/java/com/cinema/category/service/MenuCategoryServiceTest.java`
+  - 测试场景:
+    - 创建分类成功 → code 唯一性校验通过
+    - 创建重复 code → 抛出异常
+    - 更新分类成功 → version 自动递增
+    - 并发更新同一分类 → 乐观锁冲突 OptimisticLockingFailureException
+  - **@spec O002-miniapp-menu-config**
 
 ---
 
-## Phase 9: User Story 7 - Admin Sets Category Icons and Descriptions (Priority: P3)
+## Phase 5: US2 - C端分类 API (P1)
 
-**Goal**: Admin can add visual icons and descriptions to improve menu clarity
+**Goal**: 小程序动态获取分类列表（替代硬编码枚举）
 
-**Independent Test**: Upload icon for a category, verify it displays in mini-program
+### Client API Controller
 
-### Backend Implementation for US7
+- [ ] **T026** [US2] 创建 `ClientMenuCategoryController` C端 API
+  - 路径: `backend/src/main/java/com/cinema/category/controller/ClientMenuCategoryController.java`
+  - 端点: `GET /api/client/menu-categories`
+  - 查询条件: `is_visible=true`, 排序: `sort_order ASC`
+  - 返回字段: id, code, displayName, sortOrder, iconUrl, description, productCount
+  - 性能优化: 使用 JOIN FETCH 一次查询获取商品数量（避免 N+1 问题）
+  - 响应格式: `ApiResponse<List<MenuCategoryDTO>>`
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T079 [US7] Add icon URL and description validation in MenuCategoryService
-- [x] T080 [US7] Ensure icon/description fields included in all category responses
+### C端 Taro 集成
 
-### Frontend B端 Implementation for US7
+- [ ] **T027** [US2] 创建 C端分类类型定义
+  - 路径: `hall-reserve-taro/src/types/category.ts`
+  - 接口: `MenuCategory { id, code, displayName, sortOrder, iconUrl, description, productCount }`
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T081 [US7] Add icon URL input field to `CategoryForm` component
-- [x] T082 [US7] Add description textarea to `CategoryForm` component
-- [x] T083 [US7] Add icon preview in `CategoryTable` component
+- [ ] **T028** [US2] 创建 C端分类 API Service
+  - 路径: `hall-reserve-taro/src/services/category.ts`
+  - 函数: `fetchMenuCategories(): Promise<MenuCategory[]>`
+  - 使用 TanStack Query: `useQuery({ queryKey: ['menu-categories'], queryFn: fetchMenuCategories, staleTime: 0 })` (无缓存，实时请求)
+  - **@spec O002-miniapp-menu-config**
 
-### Frontend C端 Implementation for US7
-
-- [x] T084 [US7] Display category icons in menu sidebar in `hall-reserve-taro/src/pages/beverage/menu/index.tsx`
-- [x] T085 [US7] Handle missing icons with fallback display
-
-**Checkpoint**: Categories display with icons and descriptions
-
-**Estimated Time**: 4 hours
+- [ ] **T029** [US2] 更新小程序菜单组件使用动态分类
+  - 路径: `hall-reserve-taro/src/pages/menu/index.tsx`（假设路径）
+  - 移除硬编码 `ChannelCategory` 枚举映射
+  - 使用 `useQuery(['menu-categories'])` 获取分类列表
+  - 渲染分类 tabs/列表
+  - **@spec O002-miniapp-menu-config**
 
 ---
 
-## Phase 10: Polish & Cross-Cutting Concerns ✅ COMPLETED
+## Phase 6: US6 - Products Filtered by Dynamic Category (P1)
 
-**Purpose**: Improvements that affect multiple user stories
+**Goal**: 商品列表 API 支持 `categoryId` 参数，向后兼容 `category` 枚举参数
 
-### Error Handling & Validation
+### Product API Enhancement
 
-- [x] T086 [P] Add comprehensive error codes per API standards (CAT_NTF_001, CAT_VAL_001, etc.)
-- [x] T087 [P] Add Zod validation schemas for frontend forms
-- [x] T088 Add global exception handler for category-related errors
+- [ ] **T030** [US6] 修改 `ChannelProductController` 商品列表 API
+  - 路径: `backend/src/main/java/com/cinema/product/controller/ChannelProductController.java`
+  - 端点: `GET /api/client/channel-products/mini-program`
+  - 新增参数: `@RequestParam(required = false) UUID categoryId`
+  - 保留参数: `@RequestParam(required = false) String category` (枚举 code, 向后兼容)
+  - 优先级: `categoryId` 优先，如果都提供则忽略 `category`
+  - 查询逻辑: `WHERE category_id = :categoryId` 或 `WHERE category_id = (SELECT id FROM menu_category WHERE code = :category)`
+  - **@spec O002-miniapp-menu-config**
 
-### Performance & Caching
+- [ ] **T031** [US6] 修改 `ChannelProductService` 商品查询逻辑
+  - 路径: `backend/src/main/java/com/cinema/product/service/ChannelProductService.java`
+  - 方法: `List<ChannelProductDTO> findByCategory(UUID categoryId, String categoryCode)`
+  - 逻辑: 先查询 categoryId，如果为空则通过 code 查询分类
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T089 Verify category list API response time < 200ms
-- [x] T090 Verify mini-program menu load time < 1s
-- [x] T091 Configure TanStack Query staleTime (5 min) and refetchInterval (1 min)
+- [ ] **T032** [US6] 修改商品 DTO 包含分类信息
+  - 路径: `backend/src/main/java/com/cinema/product/dto/ChannelProductDTO.java`
+  - 新增字段: `CategoryInfo category { id, code, displayName }`
+  - 移除: 直接暴露 `channelCategory` 枚举（改为嵌套对象）
+  - **@spec O002-miniapp-menu-config**
+
+### API Tests
+
+- [ ] **T033** [US6] 编写商品筛选 API 测试
+  - 路径: `backend/src/test/java/com/cinema/product/controller/ChannelProductControllerTest.java`
+  - 测试场景:
+    - `GET /api/client/channel-products/mini-program?categoryId=uuid-xxx` → 返回匹配商品
+    - `GET /api/client/channel-products/mini-program?category=COFFEE` → 返回咖啡分类商品（向后兼容）
+    - 同时提供 `categoryId` 和 `category` → `categoryId` 优先
+    - 提供不存在的 `categoryId` → 返回空列表或 404
+  - **@spec O002-miniapp-menu-config**
+
+---
+
+## Phase 7: US3 - Admin Reorders Menu Categories (P2)
+
+**Goal**: 管理员拖拽排序分类，拖拽结束立即保存
+
+### B端组件开发
+
+- [ ] **T034** [US3] 创建 Zod 分类验证 Schema
+  - 路径: `frontend/src/schemas/category.schema.ts`
+  - Schema: `categoryCreateSchema`, `categoryUpdateSchema`, `batchSortSchema`
+  - 验证规则: code (uppercase, letters/numbers/_), displayName (max 50), sortOrder (integer), iconUrl (URL format)
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T035** [US3] 创建分类 TypeScript 类型定义
+  - 路径: `frontend/src/features/channel-products/menu-categories/types/category.types.ts`
+  - 接口: `MenuCategory`, `CategoryCreateRequest`, `CategoryUpdateRequest`, `BatchSortRequest`
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T036** [US3] 创建分类 API Service
+  - 路径: `frontend/src/features/channel-products/menu-categories/services/categoryService.ts`
+  - 函数: `fetchCategories()`, `createCategory()`, `updateCategory()`, `deleteCategory()`, `updateVisibility()`, `batchSort()`
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T037** [US3] 创建分类 TanStack Query Hooks
+  - 路径: `frontend/src/features/channel-products/menu-categories/hooks/useCategories.ts`
+  - Hooks:
+    - `useCategories()` - 查询分类列表
+    - `useCreateCategory()` - 创建分类 mutation
+    - `useUpdateCategory()` - 更新分类 mutation
+    - `useDeleteCategory()` - 删除分类 mutation
+    - `useBatchSort()` - 批量排序 mutation
+    - `useToggleVisibility()` - 切换可见性 mutation
+  - 缓存失效: mutation onSuccess 后 `invalidateQueries(['menu-categories'])`
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T038** [US3] 创建可拖拽分类列表组件（@dnd-kit/sortable）
+  - 路径: `frontend/src/features/channel-products/menu-categories/components/CategoryList.tsx`
+  - 使用库: `@dnd-kit/core` (DndContext), `@dnd-kit/sortable` (SortableContext, useSortable)
+  - 功能:
+    - Ant Design Table 结合 sortable rows
+    - 拖拽结束事件: `onDragEnd` → 重新计算 `sortOrder` → 调用 `batchSort()` mutation
+    - 显示拖拽手柄图标（DragHandleOutlined）
+    - 显示加载状态（拖拽保存期间禁用拖拽）
+    - 成功提示: `message.success('排序已保存')`
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T039** [US3] 实现表格内嵌可见性开关
+  - 路径: `frontend/src/features/channel-products/menu-categories/components/CategoryList.tsx` (可见性列)
+  - 组件: `<Switch checked={record.isVisible} onChange={() => toggleVisibility.mutate({ id: record.id, isVisible: !record.isVisible })} />`
+  - 禁用默认分类开关: `disabled={record.isDefault}` + Tooltip "默认分类不可隐藏"
+  - 加载状态: Switch loading prop 绑定 mutation isPending
+  - **@spec O002-miniapp-menu-config**
+
+---
+
+## Phase 8: US4 - Admin Sets Category Visibility (P2)
+
+**Goal**: 管理员切换分类可见性（已在 Phase 7 实现）
+
+- [ ] **T040** [US4] 验证可见性切换功能完整性
+  - 检查点:
+    - Switch 开关点击立即调用 API
+    - 默认分类禁用切换（disabled + tooltip）
+    - 切换成功后刷新列表
+    - 切换失败显示错误提示
+  - 无需新增任务（已在 T039 实现）
+  - **@spec O002-miniapp-menu-config**
+
+---
+
+## Phase 9: US7 - Admin Sets Category Icons and Descriptions (P3)
+
+**Goal**: 管理员设置分类图标和描述（表单增强）
+
+### Form Components
+
+- [ ] **T041** [US7] 创建分类创建/编辑表单组件
+  - 路径: `frontend/src/features/channel-products/menu-categories/components/CategoryForm.tsx`
+  - 使用: React Hook Form + Zod resolver
+  - 表单字段:
+    - 分类编码 (TextInput, disabled on edit, required, pattern validation)
+    - 显示名称 (TextInput, required, max 50 chars)
+    - 排序权重 (NumberInput, auto-filled with max+10 on create)
+    - 是否可见 (Switch)
+    - 图标URL (TextInput, optional, URL validation, placeholder: "https://cdn.example.com/icon.png")
+    - 描述 (TextArea, optional, rows=4)
+  - 错误处理: 显示服务器端验证错误 (setError from react-hook-form)
+  - 乐观锁冲突: catch 409 错误 → 提示 "数据已被其他用户修改，请刷新后重试"
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T042** [US7] 创建分类创建页面
+  - 路径: `frontend/src/features/channel-products/menu-categories/pages/MenuCategoryFormPage.tsx`
+  - 路由: `/channel-products/menu-categories/create`
+  - 页面布局: PageHeader + Card + CategoryForm
+  - 提交: `createCategory.mutate()` → 成功后跳转到列表页
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T043** [US7] 创建分类编辑页面
+  - 路径: `frontend/src/features/channel-products/menu-categories/pages/MenuCategoryFormPage.tsx` (复用)
+  - 路由: `/channel-products/menu-categories/:id/edit`
+  - 页面布局: PageHeader + Card + CategoryForm (预填充数据)
+  - 提交: `updateCategory.mutate()` → 成功后跳转到列表页
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T044** [US7] 创建删除确认对话框组件
+  - 路径: `frontend/src/features/channel-products/menu-categories/components/DeleteConfirmModal.tsx`
+  - 功能:
+    - 显示分类名称
+    - 显示商品数量（如果有）: "删除后，15 个商品将移动到 '其他商品' 分类"
+    - 确认/取消按钮
+    - 禁止删除默认分类（Modal 不应该出现，按钮已禁用）
+  - **@spec O002-miniapp-menu-config**
+
+---
+
+## Phase 10: Polish & Integration
+
+**Goal**: 最终集成、文档完善、端到端验证
+
+### Navigation & Routing
+
+- [ ] **T045** 添加 "O002-菜单分类" 菜单项到 B端导航
+  - 路径: `frontend/src/components/layout/AppLayout.tsx`
+  - 位置: "渠道商品配置" section 下
+  - 菜单项:
+    ```typescript
+    {
+      key: '/channel-products/menu-categories',
+      icon: <AppstoreOutlined />,
+      label: 'O002-菜单分类',
+    }
+    ```
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T046** 配置 B端路由
+  - 路径: `frontend/src/App.tsx` (或路由配置文件)
+  - 路由:
+    - `/channel-products/menu-categories` → `MenuCategoryListPage`
+    - `/channel-products/menu-categories/create` → `MenuCategoryFormPage` (mode=create)
+    - `/channel-products/menu-categories/:id/edit` → `MenuCategoryFormPage` (mode=edit)
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T047** 创建分类列表主页面
+  - 路径: `frontend/src/features/channel-products/menu-categories/pages/MenuCategoryListPage.tsx`
+  - 页面布局:
+    - PageHeader (title: "菜单分类配置", extra: "新增分类" Button)
+    - CategoryList component (拖拽表格)
+  - **@spec O002-miniapp-menu-config**
+
+### OpenAPI Contracts
+
+- [ ] **T048** 生成 OpenAPI 3.0 规范文档
+  - 路径: `specs/O002-miniapp-menu-config/contracts/api.yaml`
+  - 端点:
+    - Admin API: 7 个端点（CRUD + visibility + batch sort）
+    - Client API: 1 个端点（GET /api/client/menu-categories）
+    - Product API: 1 个端点（增强 categoryId 参数）
+  - Schemas: MenuCategory, CategoryCreateRequest, CategoryUpdateRequest, BatchSortRequest
+  - Validation rules: 与 Zod schema 保持一致
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T049** 后端集成 OpenAPI 验证（可选）
+  - 使用 SpringDoc OpenAPI 或手动实现验证逻辑
+  - 确保后端验证规则与 `contracts/api.yaml` 一致
+  - **@spec O002-miniapp-menu-config**
 
 ### Documentation
 
-- [x] T092 [P] Update API documentation with new endpoints
-- [x] T093 [P] Add operator guide for category management
-- [x] T094 Update O007 spec to reference O002 for category data
+- [ ] **T050** 生成数据模型文档
+  - 路径: `specs/O002-miniapp-menu-config/data-model.md`
+  - 内容: MenuCategory 实体、CategoryAuditLog 实体、ER 图、迁移脚本说明
+  - **@spec O002-miniapp-menu-config**
 
-### Final Validation
+- [ ] **T051** 生成快速入门文档
+  - 路径: `specs/O002-miniapp-menu-config/quickstart.md`
+  - 内容:
+    - 环境准备（JDK 17, Node.js, Supabase）
+    - 运行迁移脚本: `./mvnw flyway:migrate`
+    - 启动后端: `./mvnw spring-boot:run`
+    - 启动 B端: `npm run dev`
+    - 启动 C端: `npm run dev:h5` (Taro)
+    - 常见问题排查
+  - **@spec O002-miniapp-menu-config**
 
-- [x] T095 Run full migration script on test database
-- [x] T096 Verify backward compatibility with legacy `category` parameter
-- [x] T097 Verify default category protection (cannot delete/hide)
-- [x] T098 Verify audit logging for all category operations
+### End-to-End Verification
 
-**Estimated Time**: 6 hours
+- [ ] **T052** 执行端到端功能验证
+  - 验证场景:
+    - [x] US1: 管理员创建/编辑/删除分类
+    - [x] US2: 小程序动态获取分类列表
+    - [x] US3: 管理员拖拽排序分类
+    - [x] US4: 管理员切换分类可见性
+    - [x] US5: 数据迁移成功，无数据丢失
+    - [x] US6: 商品列表按分类筛选
+    - [x] US7: 管理员设置图标和描述
+  - 性能验证:
+    - API P95 响应时间 ≤ 1s
+    - B端拖拽排序反馈 <200ms
+    - C端分类加载 <1s
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T053** 验证向后兼容性
+  - 测试旧版小程序使用 `?category=COFFEE` 参数仍能正常筛选商品
+  - 验证 6 个月过渡期内两种参数都可用
+  - **@spec O002-miniapp-menu-config**
+
+- [ ] **T054** 生成验收测试报告
+  - 路径: `specs/O002-miniapp-menu-config/acceptance-test-report.md`
+  - 内容: 7 个用户故事的验收场景测试结果、性能指标、边界用例测试
+  - **@spec O002-miniapp-menu-config**
 
 ---
 
-## Dependencies & Execution Order
+## Success Criteria Checklist
 
-### Phase Dependencies
+以下成功指标必须在部署前达成：
+
+- [ ] **SC-001**: Admin 创建新分类后，5 秒内小程序可见该分类
+- [ ] **SC-002**: 6 个 ChannelCategory 枚举值 100% 迁移到 menu_category 表
+- [ ] **SC-003**: 所有商品 category_id 非空，无孤立商品
+- [ ] **SC-004**: 小程序加载 50 个分类耗时 <1 秒
+- [ ] **SC-005**: 100% 现有小程序用户迁移后无中断
+- [ ] **SC-006**: Admin 批量排序 10 个分类耗时 <30 秒
+- [ ] **SC-007**: 分类配置变更后 5 秒内新会话可见
+- [ ] **SC-008**: 零用户投诉分类显示或筛选问题
+- [ ] **SC-009**: 100% 商品筛选准确性（categoryId 和 category 参数）
+- [ ] **SC-010**: 向后兼容 API 保留 6 个月
+
+---
+
+## Dependency Graph
 
 ```
-Phase 1 (Setup)
-    ↓
-Phase 2 (Foundational) ←── BLOCKS ALL USER STORIES
-    ↓
-┌───────────────────────────────────────────────────────┐
-│ P1 Stories (can run in parallel after Phase 2):       │
-│   Phase 3 (US1: Admin CRUD)                           │
-│   Phase 4 (US2: C端 API) - depends on US1 backend     │
-│   Phase 5 (US5: Migration) - can run parallel         │
-│   Phase 6 (US6: Product Filter) - depends on US5      │
-└───────────────────────────────────────────────────────┘
-    ↓
-┌───────────────────────────────────────────────────────┐
-│ P2 Stories (after P1 complete):                       │
-│   Phase 7 (US3: Reorder) - extends US1                │
-│   Phase 8 (US4: Visibility) - extends US1             │
-└───────────────────────────────────────────────────────┘
-    ↓
-┌───────────────────────────────────────────────────────┐
-│ P3 Stories (after P2 complete):                       │
-│   Phase 9 (US7: Icons/Descriptions)                   │
-└───────────────────────────────────────────────────────┘
-    ↓
-Phase 10 (Polish)
+Phase 1 (Setup) → Phase 2 (Entities/DTOs) → Phase 3 (Migration)
+                                              ↓
+Phase 4 (US1 Admin CRUD) ← Phase 3 ────────→ Phase 5 (US2 C端API)
+                                              ↓
+                                           Phase 6 (US6 商品筛选)
+                                              ↓
+Phase 7 (US3 排序) ← Phase 4 ────────────→ Phase 8 (US4 可见性)
+                                              ↓
+Phase 9 (US7 图标描述) ← Phase 7 ─────────→ Phase 10 (集成验证)
 ```
 
-### User Story Dependencies
-
-| Story | Depends On | Blocks |
-|-------|------------|--------|
-| US1 | Phase 2 (Foundational) | US2, US3, US4, US7 |
-| US2 | US1 backend | - |
-| US3 | US1 | - |
-| US4 | US1 | - |
-| US5 | Phase 2 (Foundational) | US6 |
-| US6 | US5 | - |
-| US7 | US1 | - |
-
-### Within Each User Story
-
-- Models → Services → Controllers → Frontend
-- Backend before Frontend (for each story)
-- Core implementation before integration
-
-### Parallel Opportunities
-
-**Phase 2 (Foundational)**:
-- T013, T014 (Entities) can run in parallel
-- T016, T017 (Repositories) can run in parallel
-- T018-T023 (DTOs) can run in parallel
-- T024-T026 (Frontend types) can run in parallel
-
-**Phase 3 (US1)**:
-- T040, T041 (Frontend services/hooks) can run in parallel
-- Backend implementation sequential (service → controller)
-
-**Phase 4 (US2)**:
-- T050, T051 (C端 service/hook) can run in parallel
-
----
-
-## Parallel Example: Phase 2 (Foundational)
-
-```bash
-# Launch all entity creation in parallel:
-Task T013: "Create MenuCategory JPA entity"
-Task T014: "Create CategoryAuditLog JPA entity"
-
-# Launch all DTOs in parallel:
-Task T018: "Create MenuCategoryDTO"
-Task T019: "Create CreateMenuCategoryRequest"
-Task T020: "Create UpdateMenuCategoryRequest"
-Task T021: "Create BatchUpdateSortOrderRequest"
-Task T022: "Create ClientMenuCategoryDTO"
-Task T023: "Create DeleteCategoryResponse"
-```
-
----
-
-## Implementation Strategy
-
-### MVP First (User Story 1 Only)
-
-1. Complete Phase 1: Setup (1.5h)
-2. Complete Phase 2: Foundational (8h)
-3. Complete Phase 3: User Story 1 - Admin CRUD (16h)
-4. **STOP and VALIDATE**: Admin can create/edit/delete categories
-5. Demo to stakeholders - core MVP delivered
-
-### P1 Stories Complete
-
-1. Add Phase 4: US2 - C端 Category API (8h)
-2. Add Phase 5: US5 - Data Migration (4h)
-3. Add Phase 6: US6 - Product Filtering (6h)
-4. **STOP and VALIDATE**: Full end-to-end category system working
-5. Ready for production deployment
-
-### Full Feature Complete
-
-1. Add Phase 7: US3 - Reorder (4h)
-2. Add Phase 8: US4 - Visibility (3h)
-3. Add Phase 9: US7 - Icons/Descriptions (4h)
-4. Add Phase 10: Polish (6h)
-5. Feature complete
-
----
-
-## Estimated Timeline
-
-| Phase | Hours | Cumulative |
-|-------|-------|------------|
-| Phase 1: Setup | 1.5h | 1.5h |
-| Phase 2: Foundational | 8h | 9.5h |
-| Phase 3: US1 (MVP) | 16h | 25.5h |
-| Phase 4: US2 | 8h | 33.5h |
-| Phase 5: US5 | 4h | 37.5h |
-| Phase 6: US6 | 6h | 43.5h |
-| Phase 7: US3 | 4h | 47.5h |
-| Phase 8: US4 | 3h | 50.5h |
-| Phase 9: US7 | 4h | 54.5h |
-| Phase 10: Polish | 6h | 60.5h |
-| **Total** | **60.5h** | - |
-
-**MVP Milestone** (US1 only): 25.5 hours
-**P1 Complete** (US1-US6): 43.5 hours
-**Full Feature**: 60.5 hours
+**并行执行建议**:
+- Phase 2 的 T006-T016 可并行开发（不同开发者）
+- Phase 4 的 Service (T021-T022) 和 Phase 5 的 Client API (T026) 可并行
+- Phase 7 的前端组件 (T034-T039) 可并行开发
+- Phase 9 的表单组件 (T041-T044) 可并行开发
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- Each user story should be independently completable and testable
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
-- Java 17 is mandatory for backend (per project rules)
-- All business logic files must include `@spec O002-miniapp-menu-config` annotation
+- **乐观锁冲突处理**: 所有更新操作需捕获 `OptimisticLockingFailureException`，返回 409 状态码，提示用户刷新重试
+- **默认分类保护**: 删除和隐藏操作前必须检查 `is_default` 标志，抛出 `DefaultCategoryException`
+- **审计日志策略**: 仅记录 DELETE 和 BATCH_SORT 操作，普通更新不记录（减少存储开销）
+- **C端缓存策略**: TanStack Query `staleTime: 0`，无缓存，每次实时请求
+- **迁移回滚窗口**: 24 小时内允许紧急回滚，需停机验证数据完整性
+
+---
+
+**Generated**: 2026-01-04 | **Spec**: O002-miniapp-menu-config | **Total Tasks**: 54
