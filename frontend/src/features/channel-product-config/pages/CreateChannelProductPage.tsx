@@ -4,10 +4,24 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Space, App, Steps, Card, Descriptions, Typography, Divider, Modal } from 'antd';
+import {
+  Form,
+  Button,
+  Space,
+  App,
+  Steps,
+  Card,
+  Descriptions,
+  Typography,
+  Divider,
+  Modal,
+} from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useChannelProductStore } from '../stores/useChannelProductStore';
-import { useCreateChannelProduct, useDeleteChannelProduct } from '../services/channelProductService';
+import {
+  useCreateChannelProduct,
+  useDeleteChannelProduct,
+} from '../services/channelProductService';
 import { ChannelSkuSelector } from '../components/ChannelSkuSelector';
 import { ChannelProductBasicForm } from '../components/ChannelProductBasicForm';
 import type { CreateChannelProductFormData } from '../schemas/channelProductSchema';
@@ -256,9 +270,7 @@ export const CreateChannelProductPage: React.FC = () => {
           <Typography.Paragraph>
             该 SKU <strong>{selectedSku?.name}</strong> 已经为"小程序"渠道配置过商品。
           </Typography.Paragraph>
-          <Typography.Paragraph type="secondary">
-            您可以选择：
-          </Typography.Paragraph>
+          <Typography.Paragraph type="secondary">您可以选择：</Typography.Paragraph>
 
           <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             <Button

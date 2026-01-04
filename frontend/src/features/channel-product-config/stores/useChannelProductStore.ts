@@ -1,15 +1,12 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Zustand store for Channel Product Configuration UI state
  */
 
 import { create } from 'zustand';
 import { ChannelType } from '../types';
-import type {
-  ChannelProductConfig,
-  ChannelCategory,
-  ChannelProductStatus,
-} from '../types';
+import type { ChannelProductConfig, ChannelProductStatus } from '../types';
 
 interface ChannelProductState {
   // ========================================
@@ -17,7 +14,7 @@ interface ChannelProductState {
   // ========================================
   filters: {
     channelType: ChannelType;
-    channelCategory?: ChannelCategory;
+    categoryId?: string; // UUID，关联 menu_category.id
     status?: ChannelProductStatus;
     keyword?: string;
   };
@@ -55,7 +52,7 @@ export const useChannelProductStore = create<ChannelProductState>((set) => ({
   // ========================================
   filters: {
     channelType: ChannelType.MINI_PROGRAM,
-    channelCategory: undefined,
+    categoryId: undefined,
     status: undefined,
     keyword: '',
   },
@@ -80,7 +77,7 @@ export const useChannelProductStore = create<ChannelProductState>((set) => ({
     set({
       filters: {
         channelType: ChannelType.MINI_PROGRAM,
-        channelCategory: undefined,
+        categoryId: undefined,
         status: undefined,
         keyword: '',
       },

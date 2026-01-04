@@ -1,6 +1,10 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * MSW Mock Handlers for Channel Product APIs
+ *
+ * Note: Channel product CRUD operations use real backend APIs.
+ * Only image upload is mocked here.
  */
 
 import { http, HttpResponse } from 'msw';

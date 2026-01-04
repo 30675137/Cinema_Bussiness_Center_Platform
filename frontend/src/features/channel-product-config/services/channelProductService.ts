@@ -1,5 +1,6 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Frontend Service for Channel Product Configuration API
  */
 
@@ -43,7 +44,7 @@ const fetchChannelProducts = async (
 ): Promise<ChannelProductListResponse> => {
   const queryParams = new URLSearchParams();
   if (params.channelType) queryParams.append('channelType', params.channelType);
-  if (params.channelCategory) queryParams.append('channelCategory', params.channelCategory);
+  if (params.categoryId) queryParams.append('categoryId', params.categoryId);
   if (params.status) queryParams.append('status', params.status);
   if (params.keyword) queryParams.append('keyword', params.keyword);
   if (params.page) queryParams.append('page', params.page.toString());

@@ -1,10 +1,11 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Edit Channel Product Page
  */
 
 import React, { useEffect } from 'react';
-import { Form, Button, Space, App, Typography, Spin, Card, Divider } from 'antd';
+import { Form, Button, Space, App, Typography, Spin, Card } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useChannelProduct, useUpdateChannelProduct } from '../services/channelProductService';
 import { ChannelProductBasicForm } from '../components/ChannelProductBasicForm';
@@ -27,7 +28,7 @@ export const EditChannelProductPage: React.FC = () => {
     if (product) {
       form.setFieldsValue({
         displayName: product.displayName,
-        channelCategory: product.channelCategory,
+        categoryId: product.categoryId,
         channelPrice: product.channelPrice,
         mainImage: product.mainImage,
         description: product.description,
@@ -94,7 +95,7 @@ export const EditChannelProductPage: React.FC = () => {
         </Card>
 
         <Form form={form} layout="vertical" onFinish={handleFinish}>
-          <ChannelProductBasicForm />
+          <ChannelProductBasicForm mode="edit" currentCategory={product?.category} />
         </Form>
       </Space>
     </div>

@@ -1,19 +1,15 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Channel Product Filter Component
  */
 
 import React from 'react';
 import { Form, Select, Input, Row, Col, Space, Button } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import {
-  ChannelCategory,
-  ChannelProductStatus,
-  ChannelType,
-  CHANNEL_CATEGORY_LABELS,
-  CHANNEL_PRODUCT_STATUS_LABELS,
-} from '../types';
+import { ChannelProductStatus, ChannelType, CHANNEL_PRODUCT_STATUS_LABELS } from '../types';
 import { useChannelProductStore } from '../stores/useChannelProductStore';
+import { CategorySelect } from './CategorySelect';
 
 export const ChannelProductFilter: React.FC = () => {
   const { filters, setFilters, resetFilters } = useChannelProductStore();
@@ -55,14 +51,8 @@ export const ChannelProductFilter: React.FC = () => {
         </Col>
 
         <Col span={6}>
-          <Form.Item name="channelCategory" label="分类" style={{ width: '100%' }}>
-            <Select placeholder="全部分类" allowClear style={{ width: 150 }}>
-              {Object.values(ChannelCategory).map((category) => (
-                <Select.Option key={category} value={category}>
-                  {CHANNEL_CATEGORY_LABELS[category]}
-                </Select.Option>
-              ))}
-            </Select>
+          <Form.Item name="categoryId" label="分类" style={{ width: '100%' }}>
+            <CategorySelect mode="create" placeholder="全部分类" allowClear />
           </Form.Item>
         </Col>
 

@@ -1,18 +1,16 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Channel Product Basic Info Form
  */
 
 import React from 'react';
 import { Form, Input, InputNumber, Select, Switch, Card, Row, Col } from 'antd';
-import {
-  ChannelCategory,
-  ChannelProductStatus,
-  CHANNEL_CATEGORY_LABELS,
-  CHANNEL_PRODUCT_STATUS_LABELS,
-} from '../types';
+import { ChannelProductStatus, CHANNEL_PRODUCT_STATUS_LABELS } from '../types';
+import type { MenuCategoryDTO } from '@/features/menu-category/types';
 import type { CreateChannelProductFormData } from '../schemas/channelProductSchema';
 import { ChannelProductImageUpload } from './ChannelProductImageUpload';
+import { CategorySelect } from './CategorySelect';
 
 const { TextArea } = Input;
 
@@ -22,12 +20,18 @@ export interface ChannelProductBasicFormProps {
   initialValues?: Partial<CreateChannelProductFormData>;
   onValuesChange?: (changedValues: any, allValues: any) => void;
   disabled?: boolean;
+  /** 表单模式：创建或编辑 */
+  mode?: 'create' | 'edit';
+  /** 编辑模式下，当前商品关联的分类（可能已隐藏） */
+  currentCategory?: MenuCategoryDTO;
 }
 
 export const ChannelProductBasicForm: React.FC<ChannelProductBasicFormProps> = ({
   initialValues,
   onValuesChange,
   disabled = false,
+  mode = 'create',
+  currentCategory,
 }) => {
   return (
     <Card title="基础信息" bordered={false}>
@@ -44,18 +48,17 @@ export const ChannelProductBasicForm: React.FC<ChannelProductBasicFormProps> = (
 
         <Col span={12}>
           <Form.Item
-            name="channelCategory"
+            name="categoryId"
             label="渠道分类"
             required
             rules={[{ required: true, message: '请选择渠道分类' }]}
           >
-            <Select placeholder="请选择分类" disabled={disabled}>
-              {Object.values(ChannelCategory).map((category) => (
-                <Select.Option key={category} value={category}>
-                  {CHANNEL_CATEGORY_LABELS[category]}
-                </Select.Option>
-              ))}
-            </Select>
+            <CategorySelect
+              mode={mode}
+              currentCategory={currentCategory}
+              disabled={disabled}
+              placeholder="请选择分类"
+            />
           </Form.Item>
         </Col>
       </Row>

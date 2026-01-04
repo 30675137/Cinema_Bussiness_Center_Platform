@@ -1,7 +1,10 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * TypeScript type definitions for Channel Product Configuration
  */
+
+import type { MenuCategoryDTO } from '@/features/menu-category/types';
 
 // ============================================================================
 // Enums
@@ -13,16 +16,6 @@ export enum ChannelType {
   POS = 'POS',
   DELIVERY = 'DELIVERY',
   ECOMMERCE = 'ECOMMERCE',
-}
-
-/** 渠道分类 */
-export enum ChannelCategory {
-  ALCOHOL = 'ALCOHOL',
-  COFFEE = 'COFFEE',
-  BEVERAGE = 'BEVERAGE',
-  SNACK = 'SNACK',
-  MEAL = 'MEAL',
-  OTHER = 'OTHER',
 }
 
 /** 商品状态 */
@@ -47,16 +40,6 @@ export enum SpecType {
 // ============================================================================
 // Label Mappings
 // ============================================================================
-
-/** 渠道分类标签 */
-export const CHANNEL_CATEGORY_LABELS: Record<ChannelCategory, string> = {
-  [ChannelCategory.ALCOHOL]: '酒',
-  [ChannelCategory.COFFEE]: '咖啡',
-  [ChannelCategory.BEVERAGE]: '饮料',
-  [ChannelCategory.SNACK]: '小食',
-  [ChannelCategory.MEAL]: '餐品',
-  [ChannelCategory.OTHER]: '其他',
-};
 
 /** 商品状态标签 */
 export const CHANNEL_PRODUCT_STATUS_LABELS: Record<ChannelProductStatus, string> = {
@@ -88,7 +71,7 @@ export type SpecOption = {
   priceAdjust: number; // 分
   isDefault: boolean;
   sortOrder: number;
-}
+};
 
 /** 规格配置 */
 export type ChannelProductSpec = {
@@ -98,7 +81,7 @@ export type ChannelProductSpec = {
   required: boolean;
   multiSelect: boolean;
   options: SpecOption[];
-}
+};
 
 /** SKU 基础信息（查询时 JOIN） */
 export type SkuBasicInfo = {
@@ -107,7 +90,7 @@ export type SkuBasicInfo = {
   skuName: string;
   price: number;
   imageUrl: string | null;
-}
+};
 
 /** 渠道商品配置 */
 export type ChannelProductConfig = {
@@ -115,7 +98,7 @@ export type ChannelProductConfig = {
   skuId: string;
   channelType: ChannelType;
   displayName: string | null;
-  channelCategory: ChannelCategory;
+  categoryId: string; // UUID，关联 menu_category.id
   channelPrice: number | null; // 分
   mainImage: string | null;
   detailImages: string[];
@@ -130,7 +113,10 @@ export type ChannelProductConfig = {
 
   // 关联的 SKU 信息（查询时 JOIN）
   sku?: SkuBasicInfo;
-}
+
+  // 关联的分类信息（查询时 JOIN）
+  category?: MenuCategoryDTO;
+};
 
 // ============================================================================
 // Request/Response DTOs
@@ -141,7 +127,7 @@ export type CreateChannelProductRequest = {
   skuId: string;
   channelType?: ChannelType;
   displayName?: string;
-  channelCategory: ChannelCategory;
+  categoryId: string; // UUID，关联 menu_category.id
   channelPrice?: number;
   mainImage?: string;
   detailImages?: string[];
@@ -150,12 +136,12 @@ export type CreateChannelProductRequest = {
   isRecommended?: boolean;
   status?: ChannelProductStatus;
   sortOrder?: number;
-}
+};
 
 /** 更新请求 */
 export type UpdateChannelProductRequest = {
   displayName?: string;
-  channelCategory?: ChannelCategory;
+  categoryId?: string; // UUID，关联 menu_category.id
   channelPrice?: number | null;
   mainImage?: string | null;
   detailImages?: string[];
@@ -164,17 +150,17 @@ export type UpdateChannelProductRequest = {
   isRecommended?: boolean;
   status?: ChannelProductStatus;
   sortOrder?: number;
-}
+};
 
 /** 查询参数 */
 export type ChannelProductQueryParams = {
   channelType?: ChannelType;
-  channelCategory?: ChannelCategory;
+  categoryId?: string; // UUID，关联 menu_category.id
   status?: ChannelProductStatus;
   keyword?: string; // 搜索名称或 SKU 编码
   page?: number;
   size?: number;
-}
+};
 
 /** 列表响应 */
 export type ChannelProductListResponse = {
@@ -182,9 +168,9 @@ export type ChannelProductListResponse = {
   total: number;
   page: number;
   size: number;
-}
+};
 
 /** 状态更新请求 */
 export type UpdateStatusRequest = {
   status: ChannelProductStatus;
-}
+};

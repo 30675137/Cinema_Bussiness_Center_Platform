@@ -1,10 +1,11 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Zod validation schemas for Channel Product Configuration forms
  */
 
 import { z } from 'zod';
-import { ChannelType, ChannelCategory, ChannelProductStatus, SpecType } from '../types';
+import { ChannelType, ChannelProductStatus, SpecType } from '../types';
 
 // ============================================================================
 // Spec Option Schema
@@ -47,6 +48,17 @@ export const channelProductSpecSchema = z.object({
 export type ChannelProductSpecFormData = z.infer<typeof channelProductSpecSchema>;
 
 // ============================================================================
+// Category ID Schema
+// ============================================================================
+
+/**
+ * 分类 ID 验证 Schema
+ */
+export const categoryIdSchema = z
+  .string({ required_error: '请选择商品分类' })
+  .uuid('无效的分类 ID 格式');
+
+// ============================================================================
 // Create Channel Product Schema
 // ============================================================================
 
@@ -54,7 +66,7 @@ export const createChannelProductSchema = z.object({
   skuId: z.string().uuid('请选择有效的 SKU'),
   channelType: z.nativeEnum(ChannelType).optional().default(ChannelType.MINI_PROGRAM),
   displayName: z.string().max(100, '展示名称不能超过100字符').optional().nullable(),
-  channelCategory: z.nativeEnum(ChannelCategory),
+  categoryId: categoryIdSchema,
   channelPrice: z
     .number()
     .int('价格必须为整数（分）')
@@ -78,7 +90,7 @@ export type CreateChannelProductFormData = z.infer<typeof createChannelProductSc
 
 export const updateChannelProductSchema = z.object({
   displayName: z.string().max(100, '展示名称不能超过100字符').optional().nullable(),
-  channelCategory: z.nativeEnum(ChannelCategory).optional(),
+  categoryId: categoryIdSchema.optional(),
   channelPrice: z
     .number()
     .int('价格必须为整数（分）')
@@ -102,7 +114,7 @@ export type UpdateChannelProductFormData = z.infer<typeof updateChannelProductSc
 
 export const channelProductQuerySchema = z.object({
   channelType: z.nativeEnum(ChannelType).optional(),
-  channelCategory: z.nativeEnum(ChannelCategory).optional(),
+  categoryId: z.string().uuid().optional(),
   status: z.nativeEnum(ChannelProductStatus).optional(),
   keyword: z.string().optional(),
   page: z.number().int().positive().optional().default(1),

@@ -1,0 +1,478 @@
+openapi: 3.0.3
+info:
+  title: Channel Product Config API - Category Migration
+  description: |
+    B端商品配置 API 变更说明（O008-channel-product-category-migration）
+
+    ## 变更概述
+    - 将 `channelCategory` (枚举) 改为 `categoryId` (UUID)
+    - 复用 O002 的 `/api/admin/menu-categories` API 获取分类列表
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+paths:
+  /admin/channel-products:
+    get:
+      summary: 获取商品配置列表
+      operationId: getChannelProducts
+      tags:
+        - Channel Product
+      parameters:
+        - name: channelType
+          in: query
+          schema:
+            $ref: '#/components/schemas/ChannelType'
+        - name: categoryId
+          in: query
+          description: 分类 ID (UUID)，替代原 channelCategory 枚举
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/ChannelProductStatus'
+        - name: keyword
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelProductListResponse'
+
+    post:
+      summary: 创建商品配置
+      operationId: createChannelProduct
+      tags:
+        - Channel Product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChannelProductRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelProductResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/channel-products/{id}:
+    get:
+      summary: 获取商品配置详情
+      operationId: getChannelProduct
+      tags:
+        - Channel Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelProductResponse'
+        '404':
+          description: 商品不存在
+
+    put:
+      summary: 更新商品配置
+      operationId: updateChannelProduct
+      tags:
+        - Channel Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChannelProductRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChannelProductResponse'
+
+    delete:
+      summary: 删除商品配置
+      operationId: deleteChannelProduct
+      tags:
+        - Channel Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+
+  /admin/menu-categories:
+    get:
+      summary: 获取菜单分类列表（复用 O002 API）
+      operationId: getMenuCategories
+      tags:
+        - Menu Category (O002)
+      parameters:
+        - name: includeHidden
+          in: query
+          description: 是否包含隐藏分类
+          schema:
+            type: boolean
+            default: false
+        - name: includeProductCount
+          in: query
+          description: 是否包含商品数量
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryListResponse'
+
+components:
+  schemas:
+    # ============================================
+    # 枚举类型
+    # ============================================
+    ChannelType:
+      type: string
+      enum:
+        - MINI_PROGRAM
+        - POS
+        - DELIVERY
+        - ECOMMERCE
+      description: 渠道类型
+
+    ChannelProductStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - OUT_OF_STOCK
+      description: 商品状态
+
+    # ============================================
+    # 商品配置相关
+    # ============================================
+    ChannelProductConfig:
+      type: object
+      required:
+        - id
+        - skuId
+        - categoryId
+        - status
+        - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+        channelType:
+          $ref: '#/components/schemas/ChannelType'
+        displayName:
+          type: string
+          nullable: true
+        categoryId:
+          type: string
+          format: uuid
+          description: 分类 ID，关联 menu_category.id
+        category:
+          $ref: '#/components/schemas/MenuCategoryDTO'
+          description: 关联的分类信息（查询时可选返回）
+        channelPrice:
+          type: integer
+          nullable: true
+          description: 渠道价格（分）
+        mainImage:
+          type: string
+          nullable: true
+        detailImages:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+          nullable: true
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductSpec'
+        isRecommended:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        sku:
+          $ref: '#/components/schemas/SkuBasicInfo'
+
+    CreateChannelProductRequest:
+      type: object
+      required:
+        - skuId
+        - categoryId
+      properties:
+        skuId:
+          type: string
+          format: uuid
+        channelType:
+          $ref: '#/components/schemas/ChannelType'
+        displayName:
+          type: string
+          maxLength: 100
+        categoryId:
+          type: string
+          format: uuid
+          description: 分类 ID（必填）
+        channelPrice:
+          type: integer
+          minimum: 1
+          description: 渠道价格（分）
+        mainImage:
+          type: string
+        detailImages:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+          maxLength: 500
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductSpec'
+        isRecommended:
+          type: boolean
+          default: false
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+        sortOrder:
+          type: integer
+          default: 0
+
+    UpdateChannelProductRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          maxLength: 100
+        categoryId:
+          type: string
+          format: uuid
+          description: 分类 ID
+        channelPrice:
+          type: integer
+          nullable: true
+        mainImage:
+          type: string
+          nullable: true
+        detailImages:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductSpec'
+        isRecommended:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+        sortOrder:
+          type: integer
+
+    ChannelProductSpec:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        required:
+          type: boolean
+        multiSelect:
+          type: boolean
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecOption'
+
+    SpecOption:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        priceAdjust:
+          type: integer
+        isDefault:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    SkuBasicInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        skuCode:
+          type: string
+        skuName:
+          type: string
+        price:
+          type: integer
+        imageUrl:
+          type: string
+          nullable: true
+
+    # ============================================
+    # 菜单分类（复用 O002）
+    # ============================================
+    MenuCategoryDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        displayName:
+          type: string
+        sortOrder:
+          type: integer
+        isVisible:
+          type: boolean
+        isDefault:
+          type: boolean
+        iconUrl:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        productCount:
+          type: integer
+
+    # ============================================
+    # 响应格式
+    # ============================================
+    ChannelProductResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/ChannelProductConfig'
+        timestamp:
+          type: string
+          format: date-time
+
+    ChannelProductListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductConfig'
+        total:
+          type: integer
+        page:
+          type: integer
+        size:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    MenuCategoryListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuCategoryDTO'
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误编号
+        message:
+          type: string
+          description: 错误消息
+        details:
+          type: object
+        timestamp:
+          type: string
+          format: date-time

@@ -1,19 +1,14 @@
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * Channel Product List Table
  */
 
 import React from 'react';
 import { Table, Tag, Space, Button, Popconfirm, Avatar, Typography } from 'antd';
 import { EditOutlined, DeleteOutlined, PictureOutlined } from '@ant-design/icons';
-import type {
-  ChannelProductConfig,
-} from '../types';
-import {
-  ChannelProductStatus,
-  CHANNEL_PRODUCT_STATUS_LABELS,
-  CHANNEL_CATEGORY_LABELS,
-} from '../types';
+import type { ChannelProductConfig } from '../types';
+import { ChannelProductStatus, CHANNEL_PRODUCT_STATUS_LABELS } from '../types';
 
 const { Text } = Typography;
 
@@ -59,11 +54,10 @@ export const ChannelProductTable: React.FC<ChannelProductTableProps> = ({
     },
     {
       title: '分类',
-      dataIndex: 'channelCategory',
       key: 'category',
       width: 100,
-      render: (category: any) => (
-        <Tag>{CHANNEL_CATEGORY_LABELS[category as keyof typeof CHANNEL_CATEGORY_LABELS]}</Tag>
+      render: (_: any, record: ChannelProductConfig) => (
+        <Tag>{record.category?.displayName || '未知分类'}</Tag>
       ),
     },
     {
