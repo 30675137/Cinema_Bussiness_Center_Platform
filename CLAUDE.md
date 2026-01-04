@@ -519,6 +519,7 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 ## Active Technologies
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟 (O007-miniapp-menu-api)
 - Supabase (PostgreSQL) 作为主要后端数据源 (O002-miniapp-menu-config)
+- Mock data (MSW handlers + localStorage)，后端使用 Supabase (PostgreSQL) (O008-channel-product-category-migration)
 
 ## Recent Changes
 - O007-miniapp-menu-api: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
