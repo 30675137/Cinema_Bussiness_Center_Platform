@@ -1,7 +1,7 @@
 ---
 name: doc-writer
-description: 设计文档编写专家。当用户需要以下内容时使用此skill：(1) 技术设计文档（TDD）；(2) 系统架构设计文档；(3) 详细设计文档（DDD）；(4) 接口设计文档；(5) 数据库设计文档；(6) 从现有规格文档生成设计文档；(7) 合并多个相关规格的设计文档。触发词：设计文档、TDD、DDD、架构设计、详细设计、技术方案、系统设计、接口设计、数据库设计、写设计文档、生成设计文档、合并文档、文档合并。
-version: 2.1.0
+description: 设计文档编写专家。当用户需要以下内容时使用此skill：(1) 技术设计文档（TDD）；(2) 系统架构设计文档；(3) 详细设计文档（DDD）；(4) 接口设计文档；(5) 数据库设计文档；(6) 从现有规格文档生成设计文档；(7) 合并多个相关规格的设计文档；(8) 全量扫描生成统一文档。触发词：设计文档、TDD、DDD、架构设计、详细设计、技术方案、系统设计、接口设计、数据库设计、写设计文档、生成设计文档、合并文档、文档合并、全量扫描、扫描所有、统一文档、汇总文档。
+version: 2.2.0
 ---
 
 # 设计文档编写专家
@@ -20,6 +20,7 @@ version: 2.1.0
 | `/doc update` | 增量更新（只更新变更的文档） |
 | `/doc merge` | 合并多个相关规格的设计文档（支持 auto-dedup, preserve-all, interactive 策略） |
 | `/doc matrix` | 生成产品功能矩阵 |
+| `/doc scan <type>` | 全量扫描所有 spec 生成统一文档（支持 api, db, tdd, arch） |
 | `/doc help` | 显示帮助信息 |
 
 **示例**:
@@ -29,6 +30,8 @@ version: 2.1.0
 /doc init             # 全量初始化所有文档
 /doc update           # 增量更新变更的文档
 /doc merge tdd P003 P004 --output P003-P004-merged   # 合并 P003 和 P004 的 TDD 文档
+/doc scan api         # 扫描所有 spec 生成统一 API 文档
+/doc scan db          # 扫描所有 spec 生成统一数据库设计文档
 ```
 
 ## 意图识别关键词
@@ -46,6 +49,7 @@ version: 2.1.0
 | README 文档 | `readme` | README、项目说明、项目介绍 |
 | 发布说明 | `release-notes` | 发布、CHANGELOG、更新日志、版本说明 |
 | 功能矩阵 | `matrix` | 功能矩阵、功能列表、功能清单、产品矩阵 |
+| 全量扫描 | `scan` | 全量扫描、扫描所有、统一文档、汇总文档、汇总API、统一API |
 
 **使用示例**：
 ```bash
@@ -300,6 +304,152 @@ docs/
 
 详细合并工作流程见：`.claude/skills/doc-writer/MERGE-WORKFLOW.md`
 
+### 11. 全量扫描统一文档
+
+扫描 `specs/` 目录下所有 spec，将同类型内容汇总到一个统一的文档中。
+
+**命令格式**：
+```bash
+/doc scan <type> [--output <filename>] [--group-by <system|module|none>]
+```
+
+**支持的文档类型**：
+| 类型 | 说明 | 输出文件名 |
+|------|------|-----------|
+| `api` | 统一 API 接口文档 | `unified-api.md` |
+| `db` | 统一数据库设计文档 | `unified-database.md` |
+| `tdd` | 统一技术设计概览 | `unified-tdd.md` |
+| `arch` | 统一架构设计概览 | `unified-architecture.md` |
+
+**参数说明**：
+| 参数 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `<type>` | 是 | - | 文档类型：api, db, tdd, arch |
+| `--output` | 否 | unified-{type}.md | 自定义输出文件名 |
+| `--group-by` | 否 | module | 分组方式：system（按系统）、module（按模块）、none（不分组） |
+
+**使用场景**：
+- 生成项目完整的 API 接口手册，供前端或外部系统参考
+- 汇总所有数据表定义，生成完整的数据字典
+- 生成项目技术设计概览，用于技术评审或新人入职
+
+**示例**：
+```bash
+# 扫描所有 spec，生成统一 API 文档（默认按模块分组）
+/doc scan api
+
+# 生成统一数据库设计文档，按系统分组
+/doc scan db --group-by system
+
+# 生成统一 API 文档，自定义文件名
+/doc scan api --output project-api-v1.md
+
+# 生成不分组的扁平 API 列表
+/doc scan api --group-by none
+```
+
+**工作流程**：
+
+1. **扫描阶段**
+   ```
+   扫描 specs/ 目录下所有 spec 文件夹：
+   specs/
+   ├── P001-user-management/
+   │   ├── spec.md
+   │   ├── data-model.md
+   │   └── contracts/api.yaml
+   ├── P002-product-catalog/
+   │   ├── spec.md
+   │   ├── data-model.md
+   │   └── contracts/api.yaml
+   └── P003-inventory-query/
+       ├── spec.md
+       ├── data-model.md
+       └── contracts/api.yaml
+   ```
+
+2. **提取阶段**
+   - 读取每个 spec 的元数据（System, Module, SubModule）
+   - 根据文档类型提取对应内容：
+     - `api`: 从 `contracts/api.yaml` 或 `spec.md` 提取 API 端点
+     - `db`: 从 `data-model.md` 提取表定义
+     - `tdd`: 从 `spec.md` 和 `plan.md` 提取技术概要
+     - `arch`: 从 `plan.md` 提取架构信息
+
+3. **去重阶段**
+   - 检测重复的 API 端点（相同路径+方法）
+   - 检测重复的表定义（相同表名）
+   - 合并重复内容，标注来源
+
+4. **生成阶段**
+   - 按 `--group-by` 参数组织文档结构
+   - 生成目录导航
+   - 添加统计摘要
+   - 输出到 `docs/unified/` 目录
+
+**输出示例**（`/doc scan api`）：
+```markdown
+# 统一 API 接口文档
+
+**生成时间**: 2025-12-27 10:00:00
+**扫描范围**: specs/ (共 15 个 spec)
+**API 总数**: 48 个端点
+
+## 目录
+
+- [用户管理模块](#用户管理模块) (12 个端点)
+- [商品管理模块](#商品管理模块) (18 个端点)
+- [库存管理模块](#库存管理模块) (10 个端点)
+- [订单管理模块](#订单管理模块) (8 个端点)
+
+---
+
+## 用户管理模块
+
+### P001-user-management: 用户管理
+
+| 方法 | 路径 | 说明 | 认证 |
+|------|------|------|------|
+| GET | /api/users | 获取用户列表 | 是 |
+| POST | /api/users | 创建用户 | 是 |
+| GET | /api/users/{id} | 获取用户详情 | 是 |
+| PUT | /api/users/{id} | 更新用户信息 | 是 |
+| DELETE | /api/users/{id} | 删除用户 | 是 |
+
+### P005-user-auth: 用户认证
+
+| 方法 | 路径 | 说明 | 认证 |
+|------|------|------|------|
+| POST | /api/auth/login | 用户登录 | 否 |
+| POST | /api/auth/logout | 用户登出 | 是 |
+| POST | /api/auth/refresh | 刷新 Token | 是 |
+
+---
+
+## 商品管理模块
+
+...
+```
+
+**输出位置**：
+```
+docs/
+└── unified/
+    ├── unified-api.md          # 统一 API 文档
+    ├── unified-database.md     # 统一数据库设计
+    ├── unified-tdd.md          # 统一技术概览
+    └── unified-architecture.md # 统一架构概览
+```
+
+**与其他命令的区别**：
+
+| 命令 | 输入 | 输出 | 用途 |
+|------|------|------|------|
+| `/doc api` | 单个 spec | 单个 API 文档 | 为单个功能生成详细 API 文档 |
+| `/doc init` | 所有 spec | 多个独立文档 | 为每个 spec 生成独立文档 |
+| `/doc merge` | 2-N 个 spec | 1 个合并文档 | 合并相关 spec 的文档 |
+| `/doc scan api` | 所有 spec | 1 个统一文档 | 汇总全部 API 到一个文档 |
+
 ## 工作流程
 
 ### Step 1: 收集设计信息
@@ -480,6 +630,21 @@ erDiagram
 ---
 
 ## 变更日志
+
+### v2.2.0 (2025-01-04)
+
+**新增功能**:
+- `/doc scan <type>` 命令 - 全量扫描所有 spec 生成统一文档
+- 支持 api, db, tdd, arch 四种文档类型的统一生成
+- 支持三种分组方式：system（按系统）、module（按模块）、none（不分组）
+- 自动去重重复的 API 端点和表定义
+- 生成带目录导航和统计摘要的文档
+
+**新增触发词**:
+- 全量扫描、扫描所有、统一文档、汇总文档、汇总API、统一API
+
+**输出目录**:
+- 统一文档输出到 `docs/unified/` 目录
 
 ### v2.1.0 (2025-12-27)
 
