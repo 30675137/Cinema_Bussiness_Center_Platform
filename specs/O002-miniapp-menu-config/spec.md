@@ -2,7 +2,7 @@
 
 **Feature Branch**: `O002-miniapp-menu-config`
 **Created**: 2026-01-03
-**Updated**: 2026-01-03
+**Updated**: 2026-01-04
 **Status**: Draft
 **Input**: 开发后端的菜单配置功能，为小程序的左侧边栏实现可配置。整合现有 `ChannelCategory` 枚举和新的 `menu_category` 表，实现完全动态的商品分类管理，使用 O007 目前小程序中的分类作为初始数据。
 
@@ -157,6 +157,18 @@
 
 ---
 
+## Clarifications
+
+### Session 2026-01-04
+
+- Q: 分类列表页应该采用什么样的表格交互模式？ → A: 标准 Ant Design 表格 + 独立表单页（编辑按钮跳转到独立表单页，适合复杂表单和验证）
+- Q: 拖拽排序后的保存时机是什么？ → A: 拖拽结束立即保存（调用批量排序 API，显示加载状态和成功提示）
+- Q: 可见性切换的操作方式是什么？ → A: 表格内嵌 Switch 开关（可见性列包含状态徽章 + 开关，点击立即切换并保存）
+- Q: 拖拽排序功能使用什么拖拽库？ → A: @dnd-kit/sortable（现代化、性能好、维护活跃、与 Ant Design 兼容性好）
+- Q: 菜单标签的显示格式是什么？ → A: O002-菜单分类（显示 spec ID 前缀，便于开发人员快速识别功能模块）
+
+---
+
 ## Requirements
 
 ### Functional Requirements
@@ -199,6 +211,22 @@
 - **FR-025**: Migration MUST assign products with null/invalid `channel_category` to the default category
 - **FR-026**: Migration MUST be idempotent (can be run multiple times safely)
 - **FR-027**: System MUST provide rollback script to restore original enum-based structure if needed
+
+**Frontend Requirements (B端管理界面)**
+
+- **FR-028**: System MUST add a "O002-菜单分类" menu item under "渠道商品配置" section in the admin platform navigation
+- **FR-029**: Menu category list page MUST be accessible at route `/channel-products/menu-categories`
+- **FR-030**: Category list page MUST use standard Ant Design Table component with separate form pages for create/edit operations
+- **FR-031**: Category list table MUST display columns: 分类编码 (code), 显示名称 (display_name), 排序 (sort_order), 商品数量 (product count), 可见性 (status badge + inline Switch toggle that immediately calls `PATCH /api/admin/menu-categories/{id}/visibility` on change), 操作 (action buttons: Edit, Delete)
+- **FR-032**: Category list page MUST support drag-and-drop row reordering using @dnd-kit/sortable library with visual feedback during drag operation and automatic save on drop (no manual save button required)
+- **FR-033**: Category list page MUST include "新增分类" button in page header that navigates to `/channel-products/menu-categories/create`
+- **FR-034**: Category create/edit form page MUST include fields: 分类编码 (text input, disabled on edit), 显示名称 (text input, required, max 50 chars), 排序权重 (number input, auto-filled with max+10 on create), 是否可见 (switch toggle), 图标URL (text input, optional, URL validation), 描述 (textarea, optional)
+- **FR-035**: Category form MUST validate code format (uppercase letters, numbers, underscores only, must start with letter) on client side before submission
+- **FR-036**: Category form MUST display server-side validation errors inline next to corresponding form fields
+- **FR-037**: Category list table row actions MUST disable "删除" button for default category with tooltip "默认分类不可删除"
+- **FR-038**: Category list table MUST disable visibility Switch for default category with tooltip "默认分类不可隐藏"
+- **FR-039**: Drag-and-drop reorder operation MUST immediately call batch sort API (`PUT /api/admin/menu-categories/batch-sort`) on drop, display loading indicator during save, and show success message on completion
+- **FR-040**: Category delete action MUST show confirmation modal with product count warning if category has associated products
 
 ### Key Entities
 
@@ -269,6 +297,7 @@
 - **Supabase database**: For storing category configuration and migration
 - **Admin management platform**: Frontend interface for category management (B端)
 - **Mini-program Taro application**: Frontend consumer of category configuration API (C端)
+- **@dnd-kit/sortable**: React drag-and-drop library for table row reordering (@dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities required)
 
 ---
 
