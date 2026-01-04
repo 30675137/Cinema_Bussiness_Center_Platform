@@ -147,8 +147,8 @@
 
 - What happens when admin deletes a category while products from that category are currently in customer shopping carts? (Expected: Products remain in cart with updated category reference to default, cart functionality unaffected)
 - What happens when the default category already has many products and admin deletes another category with hundreds of products? (Expected: All products migrate successfully, performance impact acceptable)
-- How does the system handle concurrent category updates from multiple admin users? (Expected: Optimistic locking or last-write-wins, no data corruption)
-- What happens when the mini-program API request fails during category data fetch? (Expected: Show cached data or error state with retry button)
+- How does the system handle concurrent category updates from multiple admin users? (Expected: Optimistic locking with @Version field detects conflicts; user receives error message prompting refresh and retry; no data corruption)
+- What happens when the mini-program API request fails during category data fetch? (Expected: Show error state with retry button; no cached data fallback since caching is disabled for real-time accuracy)
 - How does the system handle category names that exceed maximum character limits? (Expected: Validation rejects the request with clear error message)
 - What happens when an admin tries to create a duplicate category code? (Expected: System rejects with "分类编码已存在" error)
 - What happens if admin tries to hide or delete the default category? (Expected: System prevents with clear error message)
@@ -166,6 +166,11 @@
 - Q: 可见性切换的操作方式是什么？ → A: 表格内嵌 Switch 开关（可见性列包含状态徽章 + 开关，点击立即切换并保存）
 - Q: 拖拽排序功能使用什么拖拽库？ → A: @dnd-kit/sortable（现代化、性能好、维护活跃、与 Ant Design 兼容性好）
 - Q: 菜单标签的显示格式是什么？ → A: O002-菜单分类（显示 spec ID 前缀，便于开发人员快速识别功能模块）
+- Q: 当多个管理员同时编辑同一个分类时，系统应该采用哪种并发控制策略？ → A: 乐观锁（Optimistic Locking）- 使用 @Version 字段检测冲突，冲突时提示用户刷新重试
+- Q: 小程序获取分类列表时，应该采用什么样的缓存策略？ → A: 无缓存（每次都实时请求 API，确保数据绝对实时）
+- Q: 分类审计日志应该采用什么样的保留策略？ → A: 仅记录关键操作 + 简化存储（只记录删除、批量排序等关键变更，普通更新如名称修改、可见性切换不记录，最小化存储开销）
+- Q: 前后端表单验证应该采用什么样的同步策略？ → A: Zod + OpenAPI 生成（前端使用 Zod schema 定义验证规则，后端通过 OpenAPI 规范 contracts/api.yaml 生成对应验证逻辑，确保前后端验证一致）
+- Q: 数据迁移回滚应该在什么条件下触发？回滚流程应该如何执行？ → A: 24h 内紧急回滚 + 停机验证（仅当迁移后 24 小时内发现严重数据丢失或业务中断时允许回滚，需要停机维护，执行完整数据验证后才能恢复服务）
 
 ---
 
@@ -185,8 +190,9 @@
 - **FR-008**: System MUST automatically reassign all products to the default category when their assigned category is deleted
 - **FR-009**: System MUST designate one category as `is_default=true` that cannot be deleted or hidden (but can be renamed and reordered)
 - **FR-010**: System MUST display a confirmation dialog when admin deletes a category with existing products, showing the count of products that will be moved
-- **FR-011**: System MUST provide audit logging for all category configuration changes (create, update, delete, reorder) in `category_audit_log` table
+- **FR-011**: System MUST provide audit logging for critical category operations (delete, batch sort) in `category_audit_log` table; routine updates (display name, visibility, icon URL) are NOT logged to minimize storage overhead
 - **FR-012**: System MUST support optional icon image URL with validation (accepted formats: PNG, JPG, WebP; valid URL format)
+- **FR-012a**: System MUST use optimistic locking (@Version field) to detect concurrent edits; when update conflict occurs, system MUST return error response prompting user to refresh and retry
 
 **Category API (C端)**
 
@@ -194,6 +200,8 @@
 - **FR-014**: Client category API MUST only return categories where `is_visible=true`, sorted by `sort_order` ascending
 - **FR-015**: Client category API MUST include `productCount` for each category (count of ACTIVE products)
 - **FR-016**: Mini-program MUST call category API to get dynamic category list instead of using hardcoded frontend mapping
+- **FR-016a**: Mini-program MUST NOT cache category data locally; MUST fetch fresh data from API on every page load to ensure real-time accuracy
+- **FR-016b**: When category API request fails, mini-program MUST display error state with retry button; no cached fallback data
 
 **Product-Category Integration**
 
@@ -210,7 +218,7 @@
 - **FR-024**: Migration MUST update all `channel_product_config` records to set `category_id` based on their existing `channel_category` value
 - **FR-025**: Migration MUST assign products with null/invalid `channel_category` to the default category
 - **FR-026**: Migration MUST be idempotent (can be run multiple times safely)
-- **FR-027**: System MUST provide rollback script to restore original enum-based structure if needed
+- **FR-027**: System MUST provide rollback script to restore original enum-based structure if needed; rollback is ONLY permitted within 24 hours of migration completion and ONLY when severe data loss or business interruption is detected; rollback requires scheduled downtime and MUST include complete data integrity verification before service restoration
 
 **Frontend Requirements (B端管理界面)**
 
@@ -227,6 +235,7 @@
 - **FR-038**: Category list table MUST disable visibility Switch for default category with tooltip "默认分类不可隐藏"
 - **FR-039**: Drag-and-drop reorder operation MUST immediately call batch sort API (`PUT /api/admin/menu-categories/batch-sort`) on drop, display loading indicator during save, and show success message on completion
 - **FR-040**: Category delete action MUST show confirmation modal with product count warning if category has associated products
+- **FR-041**: System MUST use Zod schema for frontend form validation and maintain corresponding validation rules in `contracts/api.yaml` OpenAPI specification; backend validation logic MUST be generated from or aligned with the OpenAPI spec to ensure frontend-backend validation consistency
 
 ### Key Entities
 
@@ -239,6 +248,7 @@
   - `is_default`: Default category flag (boolean, only one can be true)
   - `icon_url`: Optional icon image URL
   - `description`: Optional description text
+  - `version`: Optimistic locking version number (Long, auto-incremented by JPA @Version)
   - `created_at`, `updated_at`: Timestamps
   - `created_by`, `updated_by`: Admin user IDs
   - `deleted_at`: Soft delete timestamp
@@ -247,10 +257,10 @@
   - `category_id`: Foreign key to `menu_category.id` (replaces `channel_category` enum)
   - Other attributes unchanged
 
-- **Category Audit Log**: Records all category configuration changes. Key attributes:
+- **Category Audit Log**: Records critical category configuration changes. Key attributes:
   - `category_id`: Reference to the affected category
-  - `action`: Operation type (CREATE, UPDATE, DELETE, REORDER)
-  - `before_data`, `after_data`: JSON snapshots
+  - `action`: Operation type (DELETE, BATCH_SORT) - only critical operations are logged
+  - `before_data`, `after_data`: JSON snapshots of category state
   - `affected_product_count`: Number of products impacted (for deletions)
   - `operator_id`, `operator_name`: Who made the change
   - `created_at`: When the change occurred
@@ -278,14 +288,14 @@
 
 - The existing O007 `ChannelCategory` enum is the primary data source for initial category migration
 - Admin users have appropriate permissions to manage menu configuration (role-based access control exists)
-- Mini-program has TanStack Query infrastructure for API data fetching and caching
+- Mini-program uses TanStack Query for API data fetching (caching disabled for category API to ensure real-time data)
 - Category icons are hosted on Supabase Storage or CDN with public access
 - The "其他商品" (OTHER) category will serve as the permanent default category
 - Products reassigned to the default category during deletion will not affect customer shopping carts or active orders
 - Multi-store support is out of scope (categories are global across all stores)
 - Category localization (multiple languages) is out of scope (Chinese only)
 - Category nesting (sub-categories) is out of scope (single-level hierarchy only)
-- The old `channel_category` enum column will be retained for rollback capability during transition period
+- The old `channel_category` enum column will be retained for at least 24 hours after migration to support emergency rollback; permanent removal requires additional planning and stakeholder approval
 
 ---
 
