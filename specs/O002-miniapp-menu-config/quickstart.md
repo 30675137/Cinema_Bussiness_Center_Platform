@@ -10,11 +10,12 @@
 
 1. [功能概述](#1-功能概述)
 2. [环境准备](#2-环境准备)
-3. [后端 API 快速使用](#3-后端-api-快速使用)
-4. [前端 B端 集成](#4-前端-b端-集成)
-5. [前端 C端 集成](#5-前端-c端-集成)
-6. [常见场景示例](#6-常见场景示例)
-7. [故障排查](#7-故障排查)
+3. [功能验证与访问](#3-功能验证与访问)
+4. [后端 API 快速使用](#4-后端-api-快速使用)
+5. [前端 B端 集成](#5-前端-b端-集成)
+6. [前端 C端 集成](#6-前端-c端-集成)
+7. [常见场景示例](#7-常见场景示例)
+8. [故障排查](#8-故障排查)
 
 ---
 
@@ -112,9 +113,364 @@ npm run dev:h5
 
 ---
 
-## 3. 后端 API 快速使用
+## 3. 功能验证与访问
 
-### 3.1 管理员 API（B端）
+### 3.1 B端管理后台访问
+
+#### 访问路径
+
+**开发环境**:
+```
+http://localhost:3000/menu-category
+```
+
+**导航路径**:
+```
+登录后台 → 侧边栏 → 渠道商品配置 → O002-菜单分类
+```
+
+#### 菜单配置验证
+
+检查 `frontend/src/components/layout/AppLayout.tsx` 中是否已添加菜单项：
+
+```typescript
+{
+  key: '/menu-category',
+  icon: <AppstoreOutlined />,
+  label: 'O002-菜单分类',
+  path: '/menu-category'
+}
+```
+
+---
+
+### 3.2 数据库验证
+
+#### 验证数据迁移是否成功
+
+**连接 Supabase 数据库**:
+```bash
+# 使用 psql 连接（需要 Supabase 连接信息）
+psql -h <SUPABASE_HOST> -U postgres -d postgres
+```
+
+**检查表结构**:
+```sql
+-- 检查 menu_category 表是否存在
+\d menu_category
+
+-- 检查初始数据是否迁移成功（应该有 6 个分类）
+SELECT code, display_name, sort_order, is_visible, is_default
+FROM menu_category
+ORDER BY sort_order;
+
+-- 期望输出：
+-- ALCOHOL    | 经典特调 | 10 | true  | false
+-- COFFEE     | 精品咖啡 | 20 | true  | false
+-- BEVERAGE   | 饮品     | 30 | true  | false
+-- SNACK      | 小食     | 40 | true  | false
+-- MEAL       | 套餐     | 50 | true  | false
+-- OTHER      | 其他商品 | 100| true  | true
+```
+
+**检查商品关联**:
+```sql
+-- 检查所有商品是否都有 category_id
+SELECT COUNT(*) as total_products,
+       COUNT(category_id) as products_with_category
+FROM channel_product_config;
+-- total_products 应该等于 products_with_category
+
+-- 检查每个分类的商品数量
+SELECT mc.code, mc.display_name, COUNT(cpc.id) as product_count
+FROM menu_category mc
+LEFT JOIN channel_product_config cpc ON cpc.category_id = mc.id
+WHERE mc.deleted_at IS NULL
+GROUP BY mc.id, mc.code, mc.display_name
+ORDER BY mc.sort_order;
+```
+
+**检查审计日志表**:
+```sql
+-- 检查 category_audit_log 表是否存在
+\d category_audit_log
+
+-- 查看审计日志（如果有删除或排序操作）
+SELECT action, category_id, affected_product_count, created_at
+FROM category_audit_log
+ORDER BY created_at DESC
+LIMIT 10;
+```
+
+---
+
+### 3.3 功能完整性检查
+
+#### 后端 API 健康检查
+
+```bash
+# 1. 检查后端服务是否运行
+curl http://localhost:8080/actuator/health
+# 期望: {"status":"UP"}
+
+# 2. 检查分类列表 API
+curl -X GET "http://localhost:8080/api/admin/menu-categories" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+# 期望: 返回 6 个初始分类
+
+# 3. 检查 C端分类 API
+curl -X GET "http://localhost:8080/api/client/menu-categories"
+# 期望: 返回可见分类列表（is_visible=true）
+```
+
+#### 前端功能检查清单
+
+**B端管理后台**:
+- [ ] 能够访问 `/menu-category` 页面
+- [ ] 表格显示所有分类（包括隐藏分类）
+- [ ] 每个分类显示商品数量
+- [ ] "新建分类"按钮可点击
+- [ ] 表格支持拖拽排序
+- [ ] 可见性开关可切换
+- [ ] 编辑按钮打开表单
+- [ ] 删除按钮触发确认对话框
+
+**C端小程序**:
+- [ ] 菜单页显示分类标签
+- [ ] 点击分类标签筛选商品
+- [ ] 隐藏的分类不显示
+- [ ] 分类按 `sort_order` 排序
+- [ ] 显示每个分类的商品数量
+
+---
+
+### 3.4 端到端验证流程
+
+#### 验证流程 1: 创建分类 → 小程序可见
+
+```bash
+# 步骤 1: B端创建新分类
+curl -X POST "http://localhost:8080/api/admin/menu-categories" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "TEST_CATEGORY",
+    "displayName": "测试分类",
+    "sortOrder": 999,
+    "isVisible": true,
+    "description": "端到端测试分类"
+  }'
+
+# 步骤 2: 验证数据库
+psql -c "SELECT code, display_name FROM menu_category WHERE code='TEST_CATEGORY';"
+
+# 步骤 3: C端获取分类列表
+curl http://localhost:8080/api/client/menu-categories | jq '.data[] | select(.code=="TEST_CATEGORY")'
+
+# 步骤 4: 小程序 H5 页面验证
+# 访问 http://localhost:10086 → 菜单页 → 应该看到"测试分类"标签
+
+# 步骤 5: 清理测试数据
+curl -X DELETE "http://localhost:8080/api/admin/menu-categories/{category_id}?confirm=true" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### 验证流程 2: 隐藏分类 → 小程序不可见
+
+```bash
+# 步骤 1: 隐藏"小食"分类
+curl -X PATCH "http://localhost:8080/api/admin/menu-categories/{snack_category_id}/visibility?isVisible=false" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+
+# 步骤 2: C端验证（不应返回 SNACK 分类）
+curl http://localhost:8080/api/client/menu-categories | jq '.data[] | select(.code=="SNACK")'
+# 期望输出：空（不返回任何结果）
+
+# 步骤 3: 小程序验证
+# 访问小程序菜单页 → "小食"标签应该消失
+
+# 步骤 4: 恢复可见性
+curl -X PATCH "http://localhost:8080/api/admin/menu-categories/{snack_category_id}/visibility?isVisible=true" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+```
+
+#### 验证流程 3: 拖拽排序 → 顺序变更
+
+```bash
+# 步骤 1: 记录当前排序
+curl http://localhost:8080/api/client/menu-categories | jq '.data[].displayName'
+
+# 步骤 2: B端执行批量排序（将"精品咖啡"移到第一位）
+curl -X PUT "http://localhost:8080/api/admin/menu-categories/batch-sort" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      { "id": "{coffee_id}", "sortOrder": 5 },
+      { "id": "{alcohol_id}", "sortOrder": 10 },
+      { "id": "{beverage_id}", "sortOrder": 20 }
+    ]
+  }'
+
+# 步骤 3: 验证新排序
+curl http://localhost:8080/api/client/menu-categories | jq '.data[].displayName'
+# 期望："精品咖啡"排在第一位
+
+# 步骤 4: 检查审计日志
+psql -c "SELECT action, created_at FROM category_audit_log WHERE action='BATCH_SORT' ORDER BY created_at DESC LIMIT 1;"
+```
+
+#### 验证流程 4: 删除分类 → 商品迁移
+
+```bash
+# 步骤 1: 创建测试分类并关联商品
+# （假设已创建"测试分类"并分配了 5 个商品）
+
+# 步骤 2: 预览删除影响
+curl -X DELETE "http://localhost:8080/api/admin/menu-categories/{test_category_id}?confirm=false" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+# 期望输出：affectedProductCount = 5
+
+# 步骤 3: 确认删除
+curl -X DELETE "http://localhost:8080/api/admin/menu-categories/{test_category_id}?confirm=true" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+
+# 步骤 4: 验证商品已迁移到默认分类
+psql -c "SELECT COUNT(*) FROM channel_product_config WHERE category_id = (SELECT id FROM menu_category WHERE is_default=true);"
+
+# 步骤 5: 检查审计日志
+psql -c "SELECT action, affected_product_count FROM category_audit_log WHERE action='DELETE' ORDER BY created_at DESC LIMIT 1;"
+# 期望：affected_product_count = 5
+```
+
+---
+
+### 3.5 性能验证
+
+#### API 响应时间验证
+
+```bash
+# 使用 curl 测量 API 响应时间
+time curl -X GET "http://localhost:8080/api/admin/menu-categories?includeProductCount=true" \
+  -H "Authorization: Bearer <JWT_TOKEN>"
+
+# 期望：P95 响应时间 ≤ 1 秒
+
+# 使用 Apache Bench 压力测试
+ab -n 100 -c 10 -H "Authorization: Bearer <JWT_TOKEN>" \
+  "http://localhost:8080/api/client/menu-categories"
+
+# 期望：
+# - 95% 请求 < 1000ms
+# - 无失败请求
+```
+
+#### 前端性能验证
+
+**B端拖拽排序**:
+```typescript
+// 在浏览器 Console 中监控拖拽排序时间
+console.time('drag-sort');
+// 手动拖拽分类
+// 等待保存完成
+console.timeEnd('drag-sort');
+
+// 期望：< 200ms
+```
+
+**C端分类加载**:
+```bash
+# 使用 Chrome DevTools → Network 面板
+# 访问小程序菜单页，查看 /api/client/menu-categories 请求耗时
+
+# 期望：
+# - 请求耗时 < 500ms
+# - 首屏渲染 < 1.5s
+```
+
+---
+
+### 3.6 向后兼容性验证
+
+```bash
+# 验证旧版 API 参数仍然可用
+
+# 方式 1: 使用新参数 categoryId（推荐）
+curl "http://localhost:8080/api/client/channel-products/mini-program?categoryId={coffee_uuid}" | jq '.data | length'
+
+# 方式 2: 使用旧参数 category（向后兼容）
+curl "http://localhost:8080/api/client/channel-products/mini-program?category=COFFEE" | jq '.data | length'
+
+# 验证两种方式返回相同结果
+diff <(curl -s "...?categoryId={uuid}" | jq '.data') \
+     <(curl -s "...?category=COFFEE" | jq '.data')
+
+# 期望：无差异
+```
+
+---
+
+### 3.7 问题排查工具
+
+#### 查看后端日志
+
+```bash
+# 查看 Spring Boot 日志
+tail -f backend/logs/application.log | grep -i "category"
+
+# 查看特定操作日志
+grep "DELETE.*category" backend/logs/application.log
+grep "BATCH_SORT" backend/logs/application.log
+```
+
+#### 数据库查询工具
+
+```sql
+-- 快速诊断脚本
+WITH category_stats AS (
+  SELECT
+    mc.code,
+    mc.display_name,
+    mc.is_visible,
+    mc.is_default,
+    COUNT(cpc.id) as product_count
+  FROM menu_category mc
+  LEFT JOIN channel_product_config cpc ON cpc.category_id = mc.id
+  WHERE mc.deleted_at IS NULL
+  GROUP BY mc.id
+)
+SELECT * FROM category_stats ORDER BY product_count DESC;
+
+-- 检查孤立商品（没有分类的商品）
+SELECT id, sku_id, display_name
+FROM channel_product_config
+WHERE category_id IS NULL
+LIMIT 10;
+```
+
+#### 前端调试工具
+
+```typescript
+// 在浏览器 Console 中调试 TanStack Query 缓存
+import { useQueryClient } from '@tanstack/react-query';
+
+const queryClient = useQueryClient();
+
+// 查看缓存的分类数据
+console.log(queryClient.getQueryData(['menu-categories']));
+
+// 手动刷新分类列表
+queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+
+// 清除所有缓存
+queryClient.clear();
+```
+
+---
+
+## 4. 后端 API 快速使用
+
+### 4.1 管理员 API（B端）
 
 #### 获取分类列表
 
@@ -266,7 +622,7 @@ curl -X PATCH "http://localhost:8080/api/admin/menu-categories/uuid-001/visibili
 
 ---
 
-### 3.2 客户端 API（C端）
+### 4.2 客户端 API（C端）
 
 #### 获取可见分类列表
 
@@ -340,9 +696,9 @@ curl -X GET "http://localhost:8080/api/client/channel-products/mini-program?cate
 
 ---
 
-## 4. 前端 B端 集成
+## 5. 前端 B端 集成
 
-### 4.1 使用 TanStack Query Hooks
+### 5.1 使用 TanStack Query Hooks
 
 ```typescript
 import {
@@ -408,7 +764,7 @@ export const MenuCategoryPage: React.FC = () => {
 
 ---
 
-### 4.2 使用拖拽排序组件
+### 5.2 使用拖拽排序组件
 
 ```typescript
 import { CategoryTable } from '@/features/menu-category/components';
@@ -432,7 +788,7 @@ import { CategoryTable } from '@/features/menu-category/components';
 
 ---
 
-### 4.3 使用表单组件
+### 5.3 使用表单组件
 
 ```typescript
 import { CategoryForm } from '@/features/menu-category/components';
@@ -459,9 +815,9 @@ const [editingCategory, setEditingCategory] = useState<MenuCategoryDTO | null>(n
 
 ---
 
-## 5. 前端 C端 集成
+## 6. 前端 C端 集成
 
-### 5.1 Taro 小程序集成
+### 6.1 Taro 小程序集成
 
 ```typescript
 import Taro from '@tarojs/taro';
@@ -506,7 +862,7 @@ export const CategoryTabs: React.FC = () => {
 
 ---
 
-### 5.2 按分类查询商品
+### 6.2 按分类查询商品
 
 ```typescript
 const fetchProducts = async (categoryId: string | null) => {
@@ -537,9 +893,9 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-## 6. 常见场景示例
+## 7. 常见场景示例
 
-### 6.1 场景：新增一个"节日特惠"分类
+### 7.1 场景：新增一个"节日特惠"分类
 
 **步骤**:
 
@@ -558,7 +914,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 6.2 场景：隐藏"季节限定"分类
+### 7.2 场景：隐藏"季节限定"分类
 
 **步骤**:
 
@@ -569,7 +925,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 6.3 场景：调整分类顺序（拖拽排序）
+### 7.3 场景：调整分类顺序（拖拽排序）
 
 **步骤**:
 
@@ -589,7 +945,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 6.4 场景：删除分类（商品迁移）
+### 7.4 场景：删除分类（商品迁移）
 
 **步骤**:
 
@@ -610,7 +966,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 6.5 场景：修改分类名称和图标
+### 7.5 场景：修改分类名称和图标
 
 **步骤**:
 
@@ -633,9 +989,9 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-## 7. 故障排查
+## 8. 故障排查
 
-### 7.1 分类编码重复错误
+### 8.1 分类编码重复错误
 
 **错误信息**:
 ```json
@@ -653,7 +1009,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 7.2 默认分类不能删除
+### 8.2 默认分类不能删除
 
 **错误信息**:
 ```json
@@ -673,7 +1029,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 7.3 乐观锁冲突
+### 8.3 乐观锁冲突
 
 **错误信息**:
 ```json
@@ -693,7 +1049,7 @@ export const ProductList: React.FC<{ categoryId: string | null }> = ({ categoryI
 
 ---
 
-### 7.4 小程序看不到新创建的分类
+### 8.4 小程序看不到新创建的分类
 
 **可能原因**:
 
@@ -709,7 +1065,7 @@ queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
 
 ---
 
-### 7.5 拖拽排序不生效
+### 8.5 拖拽排序不生效
 
 **可能原因**:
 

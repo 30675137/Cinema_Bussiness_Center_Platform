@@ -232,40 +232,42 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
   ];
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={data.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <Table
-          dataSource={data}
-          columns={columns}
-          loading={loading || sortLoading}
-          rowKey="id"
-          pagination={false}
-          size="middle"
-          components={{
-            body: {
-              row: SortableRow,
-            },
-          }}
-          rowClassName={(record) => (record.isVisible ? '' : 'category-row-hidden')}
-          locale={{
-            emptyText: (
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                {/* Antd Empty 组件 */}
-                <div
-                  style={{
-                    padding: '20px',
-                    textAlign: 'center',
-                    color: '#999',
-                  }}
-                >
-                  暂无数据
+    <div style={{ position: 'relative', zIndex: 1 }}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={data.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+          <Table
+            dataSource={data}
+            columns={columns}
+            loading={loading || sortLoading}
+            rowKey="id"
+            pagination={false}
+            size="middle"
+            components={{
+              body: {
+                row: SortableRow,
+              },
+            }}
+            rowClassName={(record) => (record.isVisible ? '' : 'category-row-hidden')}
+            locale={{
+              emptyText: (
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  {/* Antd Empty 组件 */}
+                  <div
+                    style={{
+                      padding: '20px',
+                      textAlign: 'center',
+                      color: '#999',
+                    }}
+                  >
+                    暂无数据
+                  </div>
                 </div>
-              </div>
-            ),
-          }}
-        />
-      </SortableContext>
-    </DndContext>
+              ),
+            }}
+          />
+        </SortableContext>
+      </DndContext>
+    </div>
   );
 };
 

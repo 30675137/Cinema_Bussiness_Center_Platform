@@ -1,0 +1,189 @@
+{
+  "app_token": "Y05Mb7greapFiSseRpoc5XkXnrb",
+  "tables": {
+    "spec": {
+      "name": "需求规约列表Spec",
+      "table_id": "tblpQ6i8HRR0IInZ",
+      "description": "用于管理需求规约(Spec)，支持SDD开发流程",
+      "fields": {
+        "Spec标识": {
+          "field_id": "fldhuD5fQk",
+          "type": "Text",
+          "is_primary": true,
+          "description": "Spec唯一标识符（索引字段）"
+        },
+        "状态": {
+          "field_id": "fldzBEAcGk",
+          "type": "SingleSelect",
+          "options": ["To Do", "Doing", "Done", "📝 待规划", "🚀 开发中", "✅ 已完成"]
+        },
+        "平台": {
+          "field_id": "fld2TCFxUd",
+          "type": "MultiSelect",
+          "options": ["商品运营平台", "小程序订单（miniapp-ordering）", "Pos端售卖", "小程序预约"]
+        },
+        "Spec说明": {
+          "field_id": "fldzBMnL5C",
+          "type": "Text"
+        },
+        "相关文档": {
+          "field_id": "fldlEfPnqK",
+          "type": "Text"
+        },
+        "测试报告": {
+          "field_id": "fld8bj0COT",
+          "type": "Text"
+        },
+        "创建时间": {
+          "field_id": "fld8liWG6Y",
+          "type": "CreatedTime",
+          "format": "yyyy/MM/dd HH:mm"
+        }
+      }
+    },
+    "product_backlog": {
+      "name": "产品待办列表 (Product Backlog)",
+      "table_id": "tblDiernIQoFU9Yr",
+      "description": "用于管理产品待办项，包括Epic、User Story、功能需求等",
+      "fields": {
+        "标题": {
+          "field_id": "fldSvSR40m",
+          "type": "Text",
+          "is_primary": true,
+          "description": "待办项标题（索引字段）"
+        },
+        "类型": {
+          "field_id": "fldkB2ehrP",
+          "type": "SingleSelect",
+          "options": ["Epic", "User Story", "Spike", "功能需求", "功能优化", "BUG", "优化"]
+        },
+        "优先级": {
+          "field_id": "fldgWaCjdM",
+          "type": "SingleSelect",
+          "options": ["🔴 P0", "🟠 P1", "🟡 P2", "🟢 P3", "🔴 高", "中"]
+        },
+        "状态": {
+          "field_id": "fldKCzWBcZ",
+          "type": "SingleSelect",
+          "options": ["📝 待规划", "🎯 已规划", "🚀 开发中", "✅ 已完成", "❌ 已废弃", "📝 待评估", "待处理"]
+        },
+        "故事点": {
+          "field_id": "fldovf7E9s",
+          "type": "SingleSelect",
+          "options": ["1", "2", "3", "5", "8", "13", "21"]
+        },
+        "负责人": {
+          "field_id": "fldcYaxHmD",
+          "type": "User",
+          "multiple": false
+        },
+        "spec_id": {
+          "field_id": "fldYQg88gk",
+          "type": "Text",
+          "description": "规格标识符 (如 I003, P004)"
+        },
+        "关联Spec": {
+          "field_id": "fldQKvg5xV",
+          "type": "Text"
+        },
+        "验收标准": {
+          "field_id": "fldYp5Z7QV",
+          "type": "Text"
+        },
+        "描述": {
+          "field_id": "fldG33PAd4",
+          "type": "Text"
+        },
+        "业务价值": {
+          "field_id": "fld44EJOmT",
+          "type": "Number"
+        },
+        "说明": {
+          "field_id": "fldgl6RHEh",
+          "type": "Text"
+        },
+        "创建时间": {
+          "field_id": "fldTAvzS6T",
+          "type": "CreatedTime",
+          "format": "yyyy/MM/dd"
+        },
+        "最后更新时间": {
+          "field_id": "fldsGYtIHa",
+          "type": "ModifiedTime",
+          "format": "yyyy/MM/dd HH:mm"
+        },
+        "父记录": {
+          "field_id": "fldtFjaCfu",
+          "type": "SingleLink",
+          "linked_table": "tblDiernIQoFU9Yr"
+        }
+      }
+    },
+    "task": {
+      "name": "任务管理（Task）",
+      "table_id": "tblucYhJLq5TJ5xA",
+      "description": "用于管理具体任务，包括开发、测试、文档等任务",
+      "fields": {
+        "标题": {
+          "field_id": "fldWSVJvAP",
+          "type": "Text",
+          "is_primary": true,
+          "description": "任务标题（索引字段）"
+        },
+        "任务标识": {
+          "field_id": "fldNCF1xyW",
+          "type": "Text"
+        },
+        "优先级": {
+          "field_id": "fldAJs3N3w",
+          "type": "SingleSelect",
+          "options": ["🔴 高", "🟡 中", "🟢 低", "⚪ 普通", "P2-高"]
+        },
+        "状态": {
+          "field_id": "fldG63aGsM",
+          "type": "SingleSelect",
+          "options": ["📝 待办", "🚀 进行中", "✅完成", "❌ 已取消", "🚗停车场"]
+        },
+        "规格ID": {
+          "field_id": "fldQ3kg5PQ",
+          "type": "Text"
+        },
+        "阶段": {
+          "field_id": "fldzneVaZn",
+          "type": "Text"
+        },
+        "执行人": {
+          "field_id": "fldzOnMwJl",
+          "type": "User",
+          "multiple": true
+        },
+        "执行结果": {
+          "field_id": "fldNo3FaWW",
+          "type": "Text"
+        },
+        "失败原因": {
+          "field_id": "fldeRT1ONA",
+          "type": "Text"
+        },
+        "备注": {
+          "field_id": "fldq9joMox",
+          "type": "Text"
+        },
+        "标签": {
+          "field_id": "fldhXqfjs1",
+          "type": "MultiSelect",
+          "options": ["Frontend", "Backend", "Test", "Docs", "Design", "Infra", "文档", "O002"]
+        },
+        "最后更新时间": {
+          "field_id": "fldVFBiATa",
+          "type": "ModifiedTime",
+          "format": "yyyy/MM/dd HH:mm"
+        },
+        "相关文档": {
+          "field_id": "fld2j80VZV",
+          "type": "Text"
+        }
+      }
+    }
+  }
+}
