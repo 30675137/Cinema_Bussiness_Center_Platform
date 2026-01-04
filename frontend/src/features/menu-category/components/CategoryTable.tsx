@@ -21,8 +21,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
@@ -247,6 +247,22 @@ export const CategoryTable: React.FC<CategoryTableProps> = ({
             },
           }}
           rowClassName={(record) => (record.isVisible ? '' : 'category-row-hidden')}
+          locale={{
+            emptyText: (
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                {/* Antd Empty 组件 */}
+                <div
+                  style={{
+                    padding: '20px',
+                    textAlign: 'center',
+                    color: '#999',
+                  }}
+                >
+                  暂无数据
+                </div>
+              </div>
+            ),
+          }}
         />
       </SortableContext>
     </DndContext>

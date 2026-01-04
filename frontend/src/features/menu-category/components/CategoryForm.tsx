@@ -109,6 +109,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       confirmLoading={loading}
       destroyOnClose
       width={520}
+      zIndex={1050}
     >
       <Form
         form={form}

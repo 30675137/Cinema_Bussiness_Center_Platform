@@ -287,3 +287,24 @@ export function isApiErrorResponse(response: unknown): response is ApiErrorRespo
     'message' in response
   );
 }
+
+// ============================================
+// Product Form Types
+// ============================================
+
+/**
+ * Product form step enum
+ */
+export enum FormStep {
+  BASIC_INFO = 'basic_info',
+  CONTENT = 'content',
+  SPECS = 'specs',
+  BOM = 'bom',
+  CHANNEL_OVERRIDE = 'channel_override',
+}
+
+/**
+ * Product form schema (placeholder for Zod validation)
+ * Note: Actual Zod schema should be defined in a separate validation file
+ */
+export const ProductFormSchema = {} as any; // Placeholder - replace with actual Zod schema

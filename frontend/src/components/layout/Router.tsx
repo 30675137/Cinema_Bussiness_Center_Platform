@@ -55,6 +55,8 @@ const ConversionPage = lazy(() => import('@/pages/bom/ConversionPage'));
 const ChannelProductListPage = lazy(() => import('@/features/channel-product-config/pages/ChannelProductListPage'));
 const CreateChannelProductPage = lazy(() => import('@/features/channel-product-config/pages/CreateChannelProductPage').then(module => ({ default: module.CreateChannelProductPage })));
 const EditChannelProductPage = lazy(() => import('@/features/channel-product-config/pages/EditChannelProductPage').then(module => ({ default: module.EditChannelProductPage })));
+// O002-miniapp-menu-config: 菜单分类管理
+const MenuCategoryPage = lazy(() => import('@/pages/menu-category/MenuCategoryPage').then(module => ({ default: module.MenuCategoryPage })));
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));
@@ -976,7 +978,21 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  // 渠道商品配置 (O005-channel-product-config)
+  // O002-miniapp-menu-config: 菜单分类管理
+  {
+    path: '/menu-category',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <MenuCategoryPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
   {
     path: '/channel-products/mini-program',
     element: (
