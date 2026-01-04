@@ -1,6 +1,5 @@
 package com.cinema.category.service;
 
-import com.cinema.category.dto.BatchUpdateSortOrderRequest;
 import com.cinema.category.entity.CategoryAuditLog;
 import com.cinema.category.entity.CategoryAuditLog.AuditAction;
 import com.cinema.category.entity.MenuCategory;
@@ -17,6 +16,9 @@ import java.util.stream.Collectors;
 /**
  * @spec O002-miniapp-menu-config
  * 分类审计日志服务
+ *
+ * 根据 FR-011：仅记录关键操作（DELETE, BATCH_SORT）
+ * 普通更新（如名称修改、可见性切换）不记录，以最小化存储开销
  */
 @Slf4j
 @Service
@@ -26,95 +28,51 @@ public class CategoryAuditService {
     private final CategoryAuditLogRepository auditLogRepository;
 
     /**
-     * 记录创建操作
+     * 记录删除操作（关键操作）
+     *
+     * @param category 被删除的分类
+     * @param affectedProductCount 受影响的商品数量
      */
     @Async
-    public void logCreate(MenuCategory category) {
-        log.debug("Logging CREATE audit for category: {}", category.getId());
-
-        CategoryAuditLog auditLog = CategoryAuditLog.builder()
-                .categoryId(category.getId())
-                .action(AuditAction.CREATE)
-                .newValues(buildCategorySnapshot(category))
-                .build();
-
-        auditLogRepository.save(auditLog);
-    }
-
-    /**
-     * 记录更新操作
-     */
-    @Async
-    public void logUpdate(MenuCategory category, String oldValues, String newValues) {
-        log.debug("Logging UPDATE audit for category: {}", category.getId());
-
-        CategoryAuditLog auditLog = CategoryAuditLog.builder()
-                .categoryId(category.getId())
-                .action(AuditAction.UPDATE)
-                .oldValues(oldValues)
-                .newValues(newValues)
-                .build();
-
-        auditLogRepository.save(auditLog);
-    }
-
-    /**
-     * 记录删除操作
-     */
-    @Async
-    public void logDelete(MenuCategory category, int migratedProductCount) {
-        log.debug("Logging DELETE audit for category: {}", category.getId());
-
-        String details = String.format("{\"migratedProductCount\":%d}", migratedProductCount);
+    public void logDelete(MenuCategory category, int affectedProductCount) {
+        log.info("Logging DELETE audit for category: id={}, code={}, affectedProducts={}",
+                category.getId(), category.getCode(), affectedProductCount);
 
         CategoryAuditLog auditLog = CategoryAuditLog.builder()
                 .categoryId(category.getId())
                 .action(AuditAction.DELETE)
-                .oldValues(buildCategorySnapshot(category))
-                .newValues(details)
+                .beforeData(buildCategorySnapshotMap(category))
+                .changeDescription(String.format("删除分类 '%s'，%d 个商品迁移到默认分类",
+                        category.getDisplayName(), affectedProductCount))
+                .affectedProductCount(affectedProductCount)
                 .build();
 
         auditLogRepository.save(auditLog);
     }
 
     /**
-     * 记录重排序操作
+     * 记录批量排序操作（关键操作）
+     *
+     * @param beforeCategories 排序前的分类列表
+     * @param afterCategories 排序后的分类列表
      */
     @Async
-    public void logReorder(List<BatchUpdateSortOrderRequest.SortOrderItem> items) {
-        log.debug("Logging REORDER audit for {} categories", items.size());
+    public void logBatchSort(List<MenuCategory> beforeCategories, List<MenuCategory> afterCategories) {
+        log.info("Logging BATCH_SORT audit for {} categories", afterCategories.size());
 
-        String itemsJson = items.stream()
-                .map(item -> String.format("{\"id\":\"%s\",\"sortOrder\":%d}", item.getId(), item.getSortOrder()))
-                .collect(Collectors.joining(",", "[", "]"));
-
-        // 为每个分类记录一条审计日志
-        for (BatchUpdateSortOrderRequest.SortOrderItem item : items) {
+        // 为整个批量操作记录一条审计日志
+        // 使用第一个分类的 ID 作为关联，实际影响多个分类
+        if (!afterCategories.isEmpty()) {
             CategoryAuditLog auditLog = CategoryAuditLog.builder()
-                    .categoryId(item.getId())
-                    .action(AuditAction.REORDER)
-                    .newValues(String.format("{\"sortOrder\":%d}", item.getSortOrder()))
+                    .categoryId(afterCategories.get(0).getId())
+                    .action(AuditAction.BATCH_SORT)
+                    .beforeData(buildBatchSortSnapshotMap(beforeCategories))
+                    .afterData(buildBatchSortSnapshotMap(afterCategories))
+                    .changeDescription(String.format("批量排序 %d 个分类", afterCategories.size()))
                     .build();
 
             auditLogRepository.save(auditLog);
         }
-    }
-
-    /**
-     * 记录切换可见性操作
-     */
-    @Async
-    public void logToggleVisibility(MenuCategory category, boolean oldVisibility, boolean newVisibility) {
-        log.debug("Logging TOGGLE_VISIBILITY audit for category: {}", category.getId());
-
-        CategoryAuditLog auditLog = CategoryAuditLog.builder()
-                .categoryId(category.getId())
-                .action(AuditAction.TOGGLE_VISIBILITY)
-                .oldValues(String.format("{\"isVisible\":%s}", oldVisibility))
-                .newValues(String.format("{\"isVisible\":%s}", newVisibility))
-                .build();
-
-        auditLogRepository.save(auditLog);
     }
 
     /**
@@ -125,18 +83,35 @@ public class CategoryAuditService {
     }
 
     /**
-     * 构建分类快照
+     * 构建分类快照（Map 格式）
      */
-    private String buildCategorySnapshot(MenuCategory category) {
-        return String.format(
-                "{\"code\":\"%s\",\"displayName\":\"%s\",\"sortOrder\":%d,\"isVisible\":%s,\"isDefault\":%s,\"iconUrl\":\"%s\",\"description\":\"%s\"}",
-                category.getCode(),
-                category.getDisplayName(),
-                category.getSortOrder(),
-                category.getIsVisible(),
-                category.getIsDefault(),
-                category.getIconUrl() != null ? category.getIconUrl() : "",
-                category.getDescription() != null ? category.getDescription() : ""
-        );
+    private java.util.Map<String, Object> buildCategorySnapshotMap(MenuCategory category) {
+        java.util.Map<String, Object> snapshot = new java.util.HashMap<>();
+        snapshot.put("code", category.getCode());
+        snapshot.put("displayName", category.getDisplayName());
+        snapshot.put("sortOrder", category.getSortOrder());
+        snapshot.put("isVisible", category.getIsVisible());
+        snapshot.put("isDefault", category.getIsDefault());
+        snapshot.put("iconUrl", category.getIconUrl() != null ? category.getIconUrl() : "");
+        snapshot.put("description", category.getDescription() != null ? category.getDescription() : "");
+        return snapshot;
+    }
+
+    /**
+     * 构建批量排序快照（Map 格式）
+     */
+    private java.util.Map<String, Object> buildBatchSortSnapshotMap(List<MenuCategory> categories) {
+        java.util.Map<String, Object> snapshot = new java.util.HashMap<>();
+        snapshot.put("count", categories.size());
+        snapshot.put("categories", categories.stream()
+                .map(cat -> {
+                    java.util.Map<String, Object> item = new java.util.HashMap<>();
+                    item.put("id", cat.getId().toString());
+                    item.put("code", cat.getCode());
+                    item.put("sortOrder", cat.getSortOrder());
+                    return item;
+                })
+                .collect(Collectors.toList()));
+        return snapshot;
     }
 }

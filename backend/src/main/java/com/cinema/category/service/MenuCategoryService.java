@@ -66,8 +66,7 @@ public class MenuCategoryService {
 
         MenuCategory saved = menuCategoryRepository.save(category);
 
-        // 记录审计日志
-        categoryAuditService.logCreate(saved);
+        // 根据 FR-011：创建操作不记录审计日志，仅记录关键操作（DELETE, BATCH_SORT）
 
         log.info("Created menu category: id={}, code={}", saved.getId(), saved.getCode());
         return MenuCategoryDTO.fromEntity(saved);
@@ -82,9 +81,6 @@ public class MenuCategoryService {
 
         MenuCategory category = menuCategoryRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("CAT_NTF_001", "分类不存在: " + id));
-
-        // 保存更新前的状态用于审计
-        String oldValues = buildAuditSnapshot(category);
 
         // 更新字段
         if (request.getDisplayName() != null) {
@@ -116,8 +112,7 @@ public class MenuCategoryService {
 
         MenuCategory saved = menuCategoryRepository.save(category);
 
-        // 记录审计日志
-        categoryAuditService.logUpdate(saved, oldValues, buildAuditSnapshot(saved));
+        // 根据 FR-011：更新操作不记录审计日志，仅记录关键操作（DELETE, BATCH_SORT）
 
         log.info("Updated menu category: id={}, code={}", saved.getId(), saved.getCode());
         return MenuCategoryDTO.fromEntity(saved);
@@ -162,11 +157,11 @@ public class MenuCategoryService {
                     productCount, id, defaultCategory.getId());
         }
 
-        // 记录审计日志
+        // 记录审计日志（FR-011：删除操作需要审计）
         categoryAuditService.logDelete(category, productCount);
 
         // 软删除分类
-        menuCategoryRepository.softDeleteById(id, LocalDateTime.now());
+        menuCategoryRepository.softDeleteById(id);
 
         log.info("Deleted menu category: id={}, code={}, migratedProducts={}",
                 id, category.getCode(), productCount);
@@ -240,18 +235,28 @@ public class MenuCategoryService {
     }
 
     /**
-     * 批量更新排序
+     * 批量更新排序（FR-011：需要审计）
      */
     @Transactional
     public void batchUpdateSortOrder(BatchUpdateSortOrderRequest request) {
         log.info("Batch updating sort order for {} categories", request.getItems().size());
 
+        // 获取排序前的分类状态
+        List<UUID> categoryIds = request.getItems().stream()
+                .map(BatchUpdateSortOrderRequest.SortOrderItem::getId)
+                .collect(Collectors.toList());
+        List<MenuCategory> beforeCategories = menuCategoryRepository.findAllByIdInOrderBySortOrder(categoryIds);
+
+        // 执行批量更新
         for (BatchUpdateSortOrderRequest.SortOrderItem item : request.getItems()) {
             menuCategoryRepository.updateSortOrder(item.getId(), item.getSortOrder());
         }
 
-        // 记录审计日志
-        categoryAuditService.logReorder(request.getItems());
+        // 获取排序后的分类状态
+        List<MenuCategory> afterCategories = menuCategoryRepository.findAllByIdInOrderBySortOrder(categoryIds);
+
+        // 记录审计日志（FR-011：批量排序需要审计）
+        categoryAuditService.logBatchSort(beforeCategories, afterCategories);
 
         log.info("Batch updated sort order completed");
     }
@@ -276,8 +281,7 @@ public class MenuCategoryService {
 
         MenuCategory saved = menuCategoryRepository.save(category);
 
-        // 记录审计日志
-        categoryAuditService.logToggleVisibility(saved, oldVisibility, isVisible);
+        // 根据 FR-011：可见性切换不记录审计日志，仅记录关键操作（DELETE, BATCH_SORT）
 
         log.info("Toggled visibility for category: id={}, from={} to={}", id, oldVisibility, isVisible);
         return MenuCategoryDTO.fromEntity(saved);
@@ -299,17 +303,5 @@ public class MenuCategoryService {
             return false;
         }
         return code.matches("^[A-Z][A-Z0-9_]{1,49}$");
-    }
-
-    /**
-     * 构建审计快照
-     */
-    private String buildAuditSnapshot(MenuCategory category) {
-        return String.format("{\"displayName\":\"%s\",\"sortOrder\":%d,\"isVisible\":%s,\"iconUrl\":\"%s\",\"description\":\"%s\"}",
-                category.getDisplayName(),
-                category.getSortOrder(),
-                category.getIsVisible(),
-                category.getIconUrl() != null ? category.getIconUrl() : "",
-                category.getDescription() != null ? category.getDescription() : "");
     }
 }
