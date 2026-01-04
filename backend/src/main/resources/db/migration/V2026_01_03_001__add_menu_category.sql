@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS menu_category (
     -- 分类描述（可选）
     description TEXT,
 
+    -- 乐观锁版本号（JPA @Version）
+    version BIGINT NOT NULL DEFAULT 0,
+
     -- 审计字段
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -58,6 +61,7 @@ COMMENT ON COLUMN menu_category.display_name IS '显示名称（中文）';
 COMMENT ON COLUMN menu_category.sort_order IS '排序序号，越小越靠前';
 COMMENT ON COLUMN menu_category.is_visible IS '是否在小程序中可见';
 COMMENT ON COLUMN menu_category.is_default IS '是否为默认分类（不可删除）';
+COMMENT ON COLUMN menu_category.version IS '乐观锁版本号，用于并发控制（JPA @Version）';
 
 -- ============================================
 -- T08: 创建 category_audit_log 表
