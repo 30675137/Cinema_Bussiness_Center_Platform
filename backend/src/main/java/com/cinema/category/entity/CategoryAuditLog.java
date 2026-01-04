@@ -107,32 +107,22 @@ public class CategoryAuditLog {
 
     /**
      * 审计操作类型枚举
+     *
+     * 根据 FR-011：仅记录关键操作（DELETE, BATCH_SORT）
+     * 普通更新（如名称修改、可见性切换）不记录，以最小化存储开销
      */
     public enum AuditAction {
         /**
-         * 创建分类
-         */
-        CREATE,
-
-        /**
-         * 更新分类
-         */
-        UPDATE,
-
-        /**
          * 删除分类
+         * 触发条件：管理员删除分类，导致商品重分配到默认分类
          */
         DELETE,
 
         /**
-         * 重新排序
+         * 批量排序
+         * 触发条件：管理员拖拽排序多个分类
          */
-        REORDER,
-
-        /**
-         * 切换可见性
-         */
-        TOGGLE_VISIBILITY
+        BATCH_SORT
     }
 
     /**

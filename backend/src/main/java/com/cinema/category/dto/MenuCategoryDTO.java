@@ -64,6 +64,11 @@ public class MenuCategoryDTO {
     private Integer productCount;
 
     /**
+     * 乐观锁版本号
+     */
+    private Long version;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createdAt;
@@ -90,6 +95,7 @@ public class MenuCategoryDTO {
                 .iconUrl(entity.getIconUrl())
                 .description(entity.getDescription())
                 .productCount(entity.getProductCount())
+                .version(entity.getVersion())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

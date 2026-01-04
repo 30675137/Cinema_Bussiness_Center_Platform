@@ -89,6 +89,16 @@ public class MenuCategory {
     private String description;
 
     /**
+     * 乐观锁版本号（JPA @Version）
+     * 用于检测并发编辑冲突
+     * 每次更新时自动递增
+     */
+    @Version
+    @Column(name = "version", nullable = false)
+    @Builder.Default
+    private Long version = 0L;
+
+    /**
      * 创建时间
      */
     @CreatedDate
