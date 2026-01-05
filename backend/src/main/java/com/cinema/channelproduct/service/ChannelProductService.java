@@ -125,6 +125,7 @@ public class ChannelProductService {
 
     /**
      * 获取渠道商品列表（分页筛选）
+     * @spec O008-channel-product-category-migration
      */
     @Transactional(readOnly = true)
     public Page<ChannelProductConfig> getChannelProducts(ChannelProductQueryParams params) {
@@ -139,7 +140,10 @@ public class ChannelProductService {
                 predicates.add(cb.equal(root.get("channelType"), params.getChannelType()));
             }
 
-            if (params.getChannelCategory() != null) {
+            // 优先使用 categoryId，否则使用 channelCategory
+            if (params.getCategoryId() != null) {
+                predicates.add(cb.equal(root.get("categoryId"), params.getCategoryId()));
+            } else if (params.getChannelCategory() != null) {
                 predicates.add(cb.equal(root.get("channelCategory"), params.getChannelCategory()));
             }
 
@@ -160,6 +164,14 @@ public class ChannelProductService {
 
         // 加载 SKU 信息并填充到每个配置
         loadSkuInfo(pageResult.getContent());
+        
+        // 强制初始化 category 懒加载字段，避免序列化时出现代理对象错误
+        pageResult.getContent().forEach(config -> {
+            if (config.getCategory() != null) {
+                // 访问 category 的任意属性触发懒加载初始化
+                config.getCategory().getDisplayName();
+            }
+        });
 
         return pageResult;
     }

@@ -1,0 +1,275 @@
+# React 前端代码检测规则
+# Code Health Guardian - React Rules
+
+version: "1.0.0"
+
+# 文件级规则
+file_rules:
+  # 文件大小限制
+  max_lines:
+    warning: 200
+    error: 400
+    message: "组件文件过大，建议拆分为子组件"
+
+  # 导入数量限制
+  max_imports:
+    warning: 15
+    error: 25
+    message: "导入过多，可能职责过重"
+
+# 组件规则
+component_rules:
+  # 组件行数
+  max_component_lines:
+    warning: 150
+    error: 300
+    message: "组件过大，建议拆分"
+
+  # Props 数量
+  max_props:
+    warning: 8
+    error: 15
+    message: "Props 过多，考虑使用组合或 Context"
+
+  # 状态数量
+  max_state_variables:
+    warning: 5
+    error: 10
+    message: "状态变量过多，考虑使用 useReducer 或状态管理库"
+
+# 函数规则
+function_rules:
+  # 函数行数
+  max_lines:
+    warning: 30
+    error: 60
+    message: "函数过长，建议拆分"
+
+  # 参数数量
+  max_parameters:
+    warning: 4
+    error: 7
+    message: "参数过多，考虑使用对象参数"
+
+  # 嵌套深度
+  max_nesting:
+    warning: 3
+    error: 5
+    message: "嵌套过深，提取逻辑或使用早返回"
+
+# 复杂度规则
+complexity_rules:
+  cyclomatic:
+    warning: 8
+    error: 15
+    message: "圈复杂度过高"
+
+  cognitive:
+    warning: 12
+    error: 20
+    message: "认知复杂度过高，代码难以理解"
+
+# 代码异味检测
+code_smells:
+  # 巨型组件
+  - id: giant_component
+    name: "巨型组件"
+    pattern: "组件超过 200 行"
+    severity: high
+    suggestion: "拆分为多个子组件，每个组件负责单一职责"
+
+  # Props 透传
+  - id: prop_drilling
+    name: "Props 透传"
+    pattern: "props 透传超过 2 层"
+    severity: medium
+    suggestion: "使用 React Context 或状态管理库（Redux/Zustand）"
+
+  # 内联样式滥用
+  - id: inline_style_abuse
+    name: "内联样式滥用"
+    pattern: "单组件超过 5 个 inline style"
+    severity: low
+    suggestion: "使用 CSS Modules、styled-components 或 Tailwind"
+
+  # useEffect 过载
+  - id: useeffect_overload
+    name: "useEffect 过载"
+    pattern: "单个 useEffect 超过 20 行或包含多个独立副作用"
+    severity: medium
+    suggestion: "拆分为多个 useEffect，每个处理单一副作用"
+
+  # 回调地狱
+  - id: callback_hell
+    name: "回调地狱"
+    pattern: "嵌套回调超过 3 层"
+    severity: medium
+    suggestion: "使用 async/await 或 Promise.all"
+
+  # any 类型滥用
+  - id: any_abuse
+    name: "any 类型滥用"
+    pattern: "TypeScript 文件中 any 出现超过 3 次"
+    severity: medium
+    suggestion: "定义正确的 TypeScript 类型"
+
+  # 魔法数字
+  - id: magic_numbers
+    name: "魔法数字"
+    pattern: "硬编码数值（非 0, 1, -1）"
+    severity: low
+    suggestion: "提取为命名常量"
+
+  # 条件渲染过多
+  - id: conditional_render_overload
+    name: "条件渲染过多"
+    pattern: "单组件超过 5 个条件渲染"
+    severity: medium
+    suggestion: "提取为子组件或使用 Map/策略模式"
+
+  # 未使用的变量/导入
+  - id: unused_code
+    name: "未使用的代码"
+    pattern: "存在未使用的变量、函数或导入"
+    severity: low
+    suggestion: "删除未使用的代码"
+
+  # 重复的事件处理
+  - id: duplicate_handlers
+    name: "重复的事件处理"
+    pattern: "相似的 onClick/onChange 处理函数"
+    severity: medium
+    suggestion: "提取为公共处理函数或自定义 Hook"
+
+# 重构模式建议
+refactor_patterns:
+  # 提取组件
+  - id: extract_component
+    name: "提取组件"
+    trigger:
+      - "重复的 JSX 结构"
+      - "组件过大"
+      - "条件渲染过多"
+    template: |
+      // 提取前
+      <div className="card">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+
+      // 提取后
+      const Card = ({ title, description }) => (
+        <div className="card">
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+      );
+
+  # 提取自定义 Hook
+  - id: extract_hook
+    name: "提取自定义 Hook"
+    trigger:
+      - "重复的状态逻辑"
+      - "useEffect 过载"
+      - "相似的数据获取逻辑"
+    template: |
+      // 提取前
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      useEffect(() => {
+        fetch(url).then(res => res.json()).then(setData).finally(() => setLoading(false));
+      }, [url]);
+
+      // 提取后
+      const useFetch = (url) => {
+        const [data, setData] = useState(null);
+        const [loading, setLoading] = useState(true);
+        useEffect(() => {
+          fetch(url).then(res => res.json()).then(setData).finally(() => setLoading(false));
+        }, [url]);
+        return { data, loading };
+      };
+
+  # 使用 Context
+  - id: use_context
+    name: "使用 Context 替代 Props 透传"
+    trigger:
+      - "props 透传超过 2 层"
+    template: |
+      // 创建 Context
+      const ThemeContext = createContext();
+
+      // Provider
+      const ThemeProvider = ({ children }) => {
+        const [theme, setTheme] = useState('light');
+        return (
+          <ThemeContext.Provider value={{ theme, setTheme }}>
+            {children}
+          </ThemeContext.Provider>
+        );
+      };
+
+      // 使用
+      const useTheme = () => useContext(ThemeContext);
+
+  # 使用 useReducer
+  - id: use_reducer
+    name: "使用 useReducer 管理复杂状态"
+    trigger:
+      - "状态变量过多"
+      - "状态更新逻辑复杂"
+    template: |
+      // 提取前
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [errors, setErrors] = useState({});
+      const [submitting, setSubmitting] = useState(false);
+
+      // 提取后
+      const formReducer = (state, action) => {
+        switch (action.type) {
+          case 'SET_FIELD': return { ...state, [action.field]: action.value };
+          case 'SET_ERRORS': return { ...state, errors: action.errors };
+          case 'SUBMIT_START': return { ...state, submitting: true };
+          case 'SUBMIT_END': return { ...state, submitting: false };
+          default: return state;
+        }
+      };
+      const [state, dispatch] = useReducer(formReducer, initialState);
+
+# 重复代码检测配置
+duplicate_detection:
+  min_lines: 5
+  min_tokens: 50
+  ignore_patterns:
+    - "import.*from"
+    - "export default"
+    - "console.log"
+
+  # JSX 结构相似度检测
+  jsx_similarity_threshold: 0.8
+
+# 依赖分析配置
+dependency_analysis:
+  # 核心模块（高扇入是正常的）
+  core_modules:
+    - "components/common"
+    - "hooks"
+    - "utils"
+    - "constants"
+
+  # 分层规则
+  layer_rules:
+    - name: "pages -> components"
+      from: "pages"
+      to: "components"
+      allowed: true
+    - name: "components -> hooks"
+      from: "components"
+      to: "hooks"
+      allowed: true
+    - name: "components -> pages"
+      from: "components"
+      to: "pages"
+      allowed: false
+      message: "组件不应该依赖页面"

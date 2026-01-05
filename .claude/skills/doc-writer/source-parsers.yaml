@@ -1,7 +1,7 @@
 # Source Parser Configuration for Doc-Writer Skill
 # Defines how different file formats are parsed for document generation
 
-version: "1.0.0"
+version: "1.1.0"
 
 # Parser definitions for different file formats
 parsers:
@@ -55,9 +55,51 @@ parsers:
       - "requirements"
       - "entities"
 
+  # SQL parser (for database schema and migrations)
+  sql:
+    extensions: [".sql"]
+    # 解析 CREATE TABLE 语句
+    table_pattern: "CREATE\\s+TABLE\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?(\\w+)"
+    # 解析列定义
+    column_pattern: "^\\s*(\\w+)\\s+(\\w+(?:\\([^)]+\\))?)"
+    # 解析外键约束
+    foreign_key_pattern: "REFERENCES\\s+(\\w+)\\s*\\((\\w+)\\)"
+    # 解析索引
+    index_pattern: "CREATE\\s+(?:UNIQUE\\s+)?INDEX\\s+(?:IF\\s+NOT\\s+EXISTS\\s+)?(\\w+)\\s+ON\\s+(\\w+)"
+    # 解析注释
+    comment_pattern: "--\\s*(.+)$"
+    # 解析检查约束
+    check_pattern: "CHECK\\s*\\(([^)]+)\\)"
+    # 支持的数据库方言
+    dialects:
+      - postgresql
+      - mysql
+      - sqlite
+
 # Default source paths for scanning
 default_source_paths:
   - "specs/"
+
+# Database source paths for scanning (用于数据库设计文档)
+database_source_paths:
+  # 主 schema 文件
+  schema_files:
+    - "backend/src/main/resources/db/schema.sql"
+    - "src/main/resources/db/schema.sql"
+    - "database/schema.sql"
+    - "db/schema.sql"
+  # 迁移脚本目录
+  migration_dirs:
+    - "backend/src/main/resources/db/migration/"
+    - "src/main/resources/db/migration/"
+    - "database/migrations/"
+    - "db/migrations/"
+  # 种子数据目录
+  seed_dirs:
+    - "backend/src/main/resources/db/seed/"
+    - "src/main/resources/db/seed/"
+    - "database/seeds/"
+    - "db/seeds/"
 
 # Output configuration
 output:

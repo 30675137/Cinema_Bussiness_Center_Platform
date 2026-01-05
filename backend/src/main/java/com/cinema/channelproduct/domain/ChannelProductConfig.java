@@ -5,6 +5,7 @@ import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.domain.enums.ChannelProductStatus;
 import com.cinema.channelproduct.domain.enums.ChannelType;
 import com.cinema.hallstore.domain.Sku;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -51,6 +52,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ChannelProductConfig {
 
     /**

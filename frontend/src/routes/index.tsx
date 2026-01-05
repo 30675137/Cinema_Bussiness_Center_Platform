@@ -1,82 +1,57 @@
-import React from 'react';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import { Suspense } from 'react';
+import React from 'react'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import { Suspense } from 'react'
 
 // Layout components
-import Header from '@/components/layout/Header';
-import Sidebar from '@/components/layout/Sidebar';
-import ContentLayout from '@/components/layout/Content';
-import QueryProvider from '@/services/QueryProvider';
+import Header from '@/components/layout/Header'
+import Sidebar from '@/components/layout/Sidebar'
+import ContentLayout from '@/components/layout/Content'
+import QueryProvider from '@/services/QueryProvider'
 
 // Common components
-import Loading from '@/components/common/Loading';
+import Loading from '@/components/common/Loading'
 
 // Lazy load page components
-const Dashboard = React.lazy(() => import('@/pages/Dashboard'));
+const Dashboard = React.lazy(() => import('@/pages/Dashboard'))
 
 // SPU Pages
-const SPUList = React.lazy(() => import('@/pages/SPUList'));
-const SPUCreate = React.lazy(() => import('@/pages/SPUCreate'));
-const SPUDetail = React.lazy(() => import('@/pages/SPUDetail'));
+const SPUList = React.lazy(() => import('@/pages/SPUList'))
+const SPUCreate = React.lazy(() => import('@/pages/SPUCreate'))
+const SPUDetail = React.lazy(() => import('@/pages/SPUDetail'))
 
 // Category Pages
-const CategoryManagement = React.lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'));
-
-// Attribute Dictionary Pages
-const AttributeManagement = React.lazy(() => import('@/pages/mdm-pim/attribute'));
+const CategoryManagement = React.lazy(() => import('@/pages/mdm-pim/category/CategoryManagement'))
 
 // Brand Pages
-const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'));
+const BrandManagement = React.lazy(() => import('@/pages/BrandManagement'))
 
 // Attribute Template Pages
-const AttributeTemplate = React.lazy(() => import('@/pages/AttributeTemplate'));
+const AttributeTemplate = React.lazy(() => import('@/pages/AttributeTemplate'))
 
-// Schedule Management Pages
-const ScheduleManagement = React.lazy(() => import('@/pages/schedule'));
 // Legacy product pages
-const ProductList = React.lazy(() => import('@/pages/product/ProductList'));
-const ProductForm = React.lazy(() => import('@/pages/product/ProductForm'));
+const ProductList = React.lazy(() => import('@/pages/product/ProductList'))
+const ProductForm = React.lazy(() => import('@/pages/product/ProductForm'))
 
 // Other existing pages
-const PriceManagement = React.lazy(() => import('@/pages/price/PriceManagement'));
-const PricingConfig = React.lazy(() => import('@/pages/pricing/PricingConfig'));
-const InventoryTrace = React.lazy(() => import('@/pages/inventory/InventoryTrace'));
-
-// Inventory Adjustment Pages (P004)
-const InventoryApproval = React.lazy(() => import('@/pages/inventory/ApprovalPage'));
-
-// Channel Product Config Pages (O005)
-const ChannelProductList = React.lazy(
-  () => import('@/features/channel-product-config/pages/ChannelProductListPage')
-);
-const CreateChannelProduct = React.lazy(() =>
-  import('@/features/channel-product-config/pages/CreateChannelProductPage').then((module) => ({
-    default: module.CreateChannelProductPage,
-  }))
-);
-const EditChannelProduct = React.lazy(() =>
-  import('@/features/channel-product-config/pages/EditChannelProductPage').then((module) => ({
-    default: module.EditChannelProductPage,
-  }))
-);
+const PriceManagement = React.lazy(() => import('@/pages/price/PriceManagement'))
+const PricingConfig = React.lazy(() => import('@/pages/pricing/PricingConfig'))
+const InventoryTrace = React.lazy(() => import('@/pages/inventory/InventoryTrace'))
 
 // Loading component for lazy loaded pages
 const PageLoader: React.FC = () => (
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '200px',
-    }}
-  >
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '200px'
+  }}>
     <Loading size="large" />
   </div>
-);
+)
 
 // Main App Layout component
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(false)
 
   return (
     <QueryProvider>
@@ -85,13 +60,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div style={{ display: 'flex', flex: 1 }}>
           <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
           <ContentLayout title="">
-            <Suspense fallback={<PageLoader />}>{children}</Suspense>
+            <Suspense fallback={<PageLoader />}>
+              {children}
+            </Suspense>
           </ContentLayout>
         </div>
       </div>
     </QueryProvider>
-  );
-};
+  )
+}
 
 // Route wrapper with layout
 const withLayout = (Component: React.ComponentType) => {
@@ -99,8 +76,8 @@ const withLayout = (Component: React.ComponentType) => {
     <AppLayout>
       <Component />
     </AppLayout>
-  );
-};
+  )
+}
 
 // Create router
 export const router = createBrowserRouter([
@@ -133,20 +110,12 @@ export const router = createBrowserRouter([
     element: withLayout(CategoryManagement),
   },
   {
-    path: '/mdm-pim/attribute',
-    element: withLayout(AttributeManagement),
-  },
-  {
     path: '/brand',
     element: withLayout(BrandManagement),
   },
   {
     path: '/attribute-template',
     element: withLayout(AttributeTemplate),
-  },
-  {
-    path: '/schedule/gantt',
-    element: withLayout(ScheduleManagement),
   },
   {
     path: '/product',
@@ -173,30 +142,14 @@ export const router = createBrowserRouter([
     element: withLayout(InventoryTrace),
   },
   {
-    path: '/inventory/approvals',
-    element: withLayout(InventoryApproval),
-  },
-  {
-    path: '/channel-products/mini-program',
-    element: withLayout(ChannelProductList),
-  },
-  {
-    path: '/channel-products/mini-program/create',
-    element: withLayout(CreateChannelProduct),
-  },
-  {
-    path: '/channel-products/mini-program/:id/edit',
-    element: withLayout(EditChannelProduct),
-  },
-  {
     path: '*',
     element: <Navigate to="/dashboard" replace />,
   },
-]);
+])
 
 // Router provider component
 export const AppRouter: React.FC = () => {
-  return <RouterProvider router={router} />;
-};
+  return <RouterProvider router={router} />
+}
 
-export default AppRouter;
+export default AppRouter

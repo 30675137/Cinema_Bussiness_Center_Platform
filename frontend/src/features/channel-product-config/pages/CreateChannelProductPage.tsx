@@ -26,7 +26,7 @@ import { ChannelSkuSelector } from '../components/ChannelSkuSelector';
 import { ChannelProductBasicForm } from '../components/ChannelProductBasicForm';
 import type { CreateChannelProductFormData } from '../schemas/channelProductSchema';
 import type { SKU } from '@/types/sku';
-import { ChannelType, ChannelCategory, ChannelProductStatus } from '../types';
+import { ChannelType, ChannelProductStatus } from '../types';
 
 const { Title } = Typography;
 
@@ -69,7 +69,7 @@ export const CreateChannelProductPage: React.FC = () => {
       displayName: sku.name, // Default to SKU name
       channelPrice: sku.standardCost, // Default to standard cost (business rule may vary)
       mainImage: null, // SKU type usually doesn't have image url directly exposed in basic type, assume manual entry or separate query
-      channelCategory: ChannelCategory.OTHER, // Default
+      // categoryId will be selected by user in the form
       status: ChannelProductStatus.ACTIVE,
       sortOrder: 0,
       isRecommended: false,
@@ -85,10 +85,20 @@ export const CreateChannelProductPage: React.FC = () => {
     }
 
     try {
-      const payload: CreateChannelProductFormData = {
-        ...values,
+      // Convert null values to undefined for API compatibility
+      const payload = {
         skuId: selectedSku.id,
         channelType: ChannelType.MINI_PROGRAM, // Hardcoded for MVP
+        displayName: values.displayName || undefined,
+        categoryId: values.categoryId,
+        channelPrice: values.channelPrice ?? undefined,
+        mainImage: values.mainImage || undefined,
+        detailImages: values.detailImages,
+        description: values.description || undefined,
+        specs: values.specs,
+        isRecommended: values.isRecommended,
+        status: values.status,
+        sortOrder: values.sortOrder,
       };
 
       await createMutation.mutateAsync(payload);

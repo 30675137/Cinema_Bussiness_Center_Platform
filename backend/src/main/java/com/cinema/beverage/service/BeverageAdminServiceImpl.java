@@ -143,8 +143,8 @@ public class BeverageAdminServiceImpl implements BeverageAdminService {
             .basePrice(new BigDecimal(request.getBasePrice()).divide(new BigDecimal("100"))) // 分 -> 元
             .description(request.getDescription())
             .imageUrl(request.getMainImage())
-            .detailImages(request.getDetailImages() != null ?
-                request.getDetailImages().toArray(new String[0]) : new String[0])
+            .detailImages(request.getDetailImages() != null && !request.getDetailImages().isEmpty() ?
+                request.getDetailImages() : List.of())
             .isRecommended(request.getIsRecommended() != null ? request.getIsRecommended() : false)
             .status(request.getStatus() != null ?
                 Beverage.BeverageStatus.valueOf(request.getStatus().name()) :
@@ -179,7 +179,7 @@ public class BeverageAdminServiceImpl implements BeverageAdminService {
         dto.setDescription(beverage.getDescription());
         dto.setMainImage(beverage.getImageUrl());
         dto.setDetailImages(beverage.getDetailImages() != null ?
-            List.of(beverage.getDetailImages()) : List.of());
+            beverage.getDetailImages() : List.of());
         dto.setIsRecommended(beverage.getIsRecommended());
         dto.setStatus(beverage.getStatus());
         dto.setCreatedAt(beverage.getCreatedAt().toString());
@@ -230,8 +230,8 @@ public class BeverageAdminServiceImpl implements BeverageAdminService {
         if (request.getMainImage() != null) {
             beverage.setImageUrl(request.getMainImage());
         }
-        if (request.getDetailImages() != null) {
-            beverage.setDetailImages(request.getDetailImages().toArray(new String[0]));
+        if (request.getDetailImages() != null && !request.getDetailImages().isEmpty()) {
+            beverage.setDetailImages(request.getDetailImages());
         }
         if (request.getIsRecommended() != null) {
             beverage.setIsRecommended(request.getIsRecommended());

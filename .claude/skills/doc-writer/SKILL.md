@@ -1,7 +1,7 @@
 ---
 name: doc-writer
 description: 设计文档编写专家。当用户需要以下内容时使用此skill：(1) 技术设计文档（TDD）；(2) 系统架构设计文档；(3) 详细设计文档（DDD）；(4) 接口设计文档；(5) 数据库设计文档；(6) 从现有规格文档生成设计文档；(7) 合并多个相关规格的设计文档；(8) 全量扫描生成统一文档。触发词：设计文档、TDD、DDD、架构设计、详细设计、技术方案、系统设计、接口设计、数据库设计、写设计文档、生成设计文档、合并文档、文档合并、全量扫描、扫描所有、统一文档、汇总文档。
-version: 2.2.0
+version: 2.3.0
 ---
 
 # 设计文档编写专家
@@ -225,6 +225,16 @@ docs/
 - 数据字典
 - 数据迁移方案
 
+**数据来源（综合分析）**：
+1. **Spec 数据模型**：`specs/{specId}/data-model.md` - 业务层面的数据模型设计
+2. **数据库 Schema**：`backend/src/main/resources/db/schema.sql` - 实际数据库表结构
+3. **迁移脚本**：`backend/src/main/resources/db/migration/*.sql` - 表结构演进历史
+
+**综合分析策略**：
+- 以 SQL 文件为"实际状态"（ground truth）
+- 以 spec data-model 为"设计意图"
+- 对比分析差异，生成更完整准确的文档
+
 ### 6. 用户手册
 生成用户操作手册，包含：
 - 功能概述与特性
@@ -372,7 +382,11 @@ docs/
    - 读取每个 spec 的元数据（System, Module, SubModule）
    - 根据文档类型提取对应内容：
      - `api`: 从 `contracts/api.yaml` 或 `spec.md` 提取 API 端点
-     - `db`: 从 `data-model.md` 提取表定义
+     - `db`: **综合分析以下来源**：
+       - 从 `specs/{specId}/data-model.md` 提取业务数据模型设计
+       - 从 `backend/src/main/resources/db/schema.sql` 提取实际表结构
+       - 从 `backend/src/main/resources/db/migration/*.sql` 提取迁移历史
+       - 对比 spec 设计与实际 SQL，标注差异
      - `tdd`: 从 `spec.md` 和 `plan.md` 提取技术概要
      - `arch`: 从 `plan.md` 提取架构信息
 
@@ -461,6 +475,10 @@ docs/
 - 读取 `specs/{specId}/data-model.md` 获取数据模型
 - 读取 `specs/{specId}/contracts/api.yaml` 获取 API 定义
 - 读取 `specs/{specId}/research.md` 获取技术决策
+- **数据库文档额外读取**（当生成 db 类型文档时）：
+  - 扫描 `backend/src/main/resources/db/schema.sql` 获取实际表结构
+  - 扫描 `backend/src/main/resources/db/migration/*.sql` 获取迁移历史
+  - 综合分析 spec data-model 与实际 SQL 的对应关系
 
 **手动模式**（用户提供信息）：
 向用户确认以下信息：
@@ -630,6 +648,23 @@ erDiagram
 ---
 
 ## 变更日志
+
+### v2.3.0 (2025-01-05)
+
+**新增功能**:
+- 数据库设计文档支持综合分析多数据源
+  - 扫描 `backend/src/main/resources/db/schema.sql` 获取实际表结构
+  - 扫描 `backend/src/main/resources/db/migration/*.sql` 获取迁移历史
+  - 结合 `specs/{specId}/data-model.md` 的业务设计意图
+  - 对比分析设计与实现的差异
+
+**配置更新**:
+- `source-parsers.yaml` 新增 SQL 解析器配置
+- 新增 `database_source_paths` 配置项，支持多种项目结构
+
+**改进**:
+- 数据库文档生成以 SQL 为"实际状态"，以 spec 为"设计意图"
+- 自动检测项目中的 db 目录结构
 
 ### v2.2.0 (2025-01-04)
 

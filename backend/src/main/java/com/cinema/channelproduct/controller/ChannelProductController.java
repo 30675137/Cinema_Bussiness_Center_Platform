@@ -60,11 +60,13 @@ public class ChannelProductController {
 
     /**
      * 查询渠道商品列表
+     * @spec O008-channel-product-category-migration
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ChannelProductConfig>>> list(
             @RequestParam(required = false, defaultValue = "MINI_PROGRAM") ChannelType channelType,
             @RequestParam(required = false) ChannelCategory channelCategory,
+            @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) ChannelProductStatus status,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,
@@ -73,6 +75,7 @@ public class ChannelProductController {
         ChannelProductQueryParams params = ChannelProductQueryParams.builder()
                 .channelType(channelType)
                 .channelCategory(channelCategory)
+                .categoryId(categoryId)
                 .status(status)
                 .keyword(keyword)
                 .page(page)

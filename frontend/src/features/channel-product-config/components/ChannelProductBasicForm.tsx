@@ -49,9 +49,9 @@ export const ChannelProductBasicForm: React.FC<ChannelProductBasicFormProps> = (
         <Col span={12}>
           <Form.Item
             name="categoryId"
-            label="渠道分类"
+            label="菜单分类"
             required
-            rules={[{ required: true, message: '请选择渠道分类' }]}
+            rules={[{ required: true, message: '请选择菜单分类' }]}
           >
             <CategorySelect
               mode={mode}

@@ -1,0 +1,140 @@
+{
+  "$schema": "./config-schema.json",
+  "version": "1.0.0",
+  "projectName": "My Project",
+  "projectType": "fullstack",
+
+  "frontend": {
+    "type": "react",
+    "language": "typescript",
+    "srcDir": "src",
+    "testDir": "src/__tests__",
+    "extensions": [".ts", ".tsx", ".js", ".jsx"],
+    "ignore": [
+      "node_modules",
+      "build",
+      "dist",
+      "coverage",
+      "*.min.js",
+      "*.bundle.js"
+    ]
+  },
+
+  "backend": {
+    "type": "java",
+    "framework": "spring-boot",
+    "srcDir": "src/main/java",
+    "testDir": "src/test/java",
+    "extensions": [".java"],
+    "ignore": [
+      "target",
+      "build",
+      ".gradle",
+      "*.class"
+    ]
+  },
+
+  "thresholds": {
+    "file": {
+      "maxLines": {
+        "warning": 300,
+        "error": 500
+      },
+      "maxImports": {
+        "warning": 15,
+        "error": 25
+      }
+    },
+    "function": {
+      "maxLines": {
+        "warning": 50,
+        "error": 100
+      },
+      "maxParameters": {
+        "warning": 5,
+        "error": 8
+      },
+      "maxNesting": {
+        "warning": 4,
+        "error": 6
+      }
+    },
+    "complexity": {
+      "cyclomatic": {
+        "warning": 10,
+        "error": 20
+      },
+      "cognitive": {
+        "warning": 15,
+        "error": 25
+      }
+    },
+    "duplication": {
+      "minLines": 6,
+      "maxDuplicationRate": {
+        "warning": 5,
+        "error": 10
+      }
+    },
+    "dependencies": {
+      "maxFanOut": {
+        "warning": 10,
+        "error": 20
+      }
+    }
+  },
+
+  "ignore": {
+    "global": [
+      "**/node_modules/**",
+      "**/target/**",
+      "**/build/**",
+      "**/dist/**",
+      "**/.git/**",
+      "**/coverage/**",
+      "**/*.min.js",
+      "**/*.bundle.js",
+      "**/*.generated.*"
+    ],
+    "duplicateDetection": [
+      "**/test/**",
+      "**/__tests__/**",
+      "**/mock/**"
+    ],
+    "complexityAnalysis": [
+      "**/test/**",
+      "**/__tests__/**"
+    ]
+  },
+
+  "rules": {
+    "react": {
+      "enabled": true,
+      "rulesFile": "rules/react-rules.yaml"
+    },
+    "java": {
+      "enabled": true,
+      "rulesFile": "rules/java-rules.yaml"
+    }
+  },
+
+  "reports": {
+    "outputDir": ".code-health/reports",
+    "format": ["markdown", "json"],
+    "keepHistory": 10,
+    "autoUploadToLark": false
+  },
+
+  "debts": {
+    "storageFile": ".code-health/debts.json",
+    "autoId": true,
+    "idPrefix": "DEBT",
+    "defaultPriority": "medium",
+    "defaultType": "code"
+  },
+
+  "lark": {
+    "enabled": true,
+    "configFile": "lark-config.json"
+  }
+}

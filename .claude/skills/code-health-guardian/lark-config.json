@@ -1,0 +1,184 @@
+{
+  "lark": {
+    "enabled": true,
+    "appToken": "Y05Mb7greapFiSseRpoc5XkXnrb",
+    "tables": {
+      "techDebt": {
+        "tableId": "tblu4HHVNsj6LoOR",
+        "tableName": "技术债务",
+        "description": "代码健康守护者 - 技术债务跟踪表",
+        "fields": [
+          {
+            "name": "标识",
+            "type": 1,
+            "description": "债务唯一标识，如 DEBT-001"
+          },
+          {
+            "name": "标题",
+            "type": 1,
+            "description": "债务简述"
+          },
+          {
+            "name": "类型",
+            "type": 3,
+            "description": "债务类型",
+            "options": [
+              {"name": "🏗️ 设计债务", "color": 0},
+              {"name": "💻 代码债务", "color": 1},
+              {"name": "🧪 测试债务", "color": 2},
+              {"name": "📝 文档债务", "color": 3},
+              {"name": "📦 依赖债务", "color": 4}
+            ]
+          },
+          {
+            "name": "优先级",
+            "type": 3,
+            "description": "处理优先级",
+            "options": [
+              {"name": "🔴 紧急", "color": 0},
+              {"name": "🟠 高", "color": 1},
+              {"name": "🟡 中", "color": 2},
+              {"name": "🟢 低", "color": 3}
+            ]
+          },
+          {
+            "name": "状态",
+            "type": 3,
+            "description": "处理状态",
+            "options": [
+              {"name": "📝 待处理", "color": 0},
+              {"name": "🚀 处理中", "color": 1},
+              {"name": "✅ 已解决", "color": 2},
+              {"name": "❌ 已废弃", "color": 3}
+            ]
+          },
+          {
+            "name": "模块",
+            "type": 1,
+            "description": "所属模块"
+          },
+          {
+            "name": "文件路径",
+            "type": 1,
+            "description": "相关文件路径"
+          },
+          {
+            "name": "详细描述",
+            "type": 1,
+            "description": "债务详细描述"
+          },
+          {
+            "name": "重构建议",
+            "type": 1,
+            "description": "建议的重构方案"
+          },
+          {
+            "name": "预估工作量",
+            "type": 3,
+            "description": "预估修复时间",
+            "options": [
+              {"name": "1h", "color": 0},
+              {"name": "4h", "color": 1},
+              {"name": "1d", "color": 2},
+              {"name": "3d", "color": 3},
+              {"name": "1w", "color": 4},
+              {"name": "2w+", "color": 5}
+            ]
+          },
+          {
+            "name": "负责人",
+            "type": 11,
+            "description": "处理负责人"
+          },
+          {
+            "name": "创建日期",
+            "type": 5,
+            "description": "债务发现日期"
+          },
+          {
+            "name": "解决日期",
+            "type": 5,
+            "description": "债务解决日期"
+          },
+          {
+            "name": "影响范围",
+            "type": 3,
+            "description": "影响范围评估",
+            "options": [
+              {"name": "🔴 全局", "color": 0},
+              {"name": "🟠 多模块", "color": 1},
+              {"name": "🟡 单模块", "color": 2},
+              {"name": "🟢 单文件", "color": 3}
+            ]
+          },
+          {
+            "name": "关联Spec",
+            "type": 1,
+            "description": "关联的Spec标识"
+          },
+          {
+            "name": "备注",
+            "type": 1,
+            "description": "其他备注信息"
+          }
+        ]
+      },
+      "healthReport": {
+        "tableId": "",
+        "tableName": "健康报告记录",
+        "description": "代码健康报告历史记录",
+        "fields": [
+          {
+            "name": "报告日期",
+            "type": 5,
+            "description": "报告生成日期"
+          },
+          {
+            "name": "健康评分",
+            "type": 2,
+            "description": "综合健康评分 (0-100)"
+          },
+          {
+            "name": "严重问题数",
+            "type": 2,
+            "description": "严重问题数量"
+          },
+          {
+            "name": "高优先级问题数",
+            "type": 2,
+            "description": "高优先级问题数量"
+          },
+          {
+            "name": "重复代码率",
+            "type": 2,
+            "description": "重复代码百分比"
+          },
+          {
+            "name": "技术债务数",
+            "type": 2,
+            "description": "待处理技术债务数量"
+          },
+          {
+            "name": "报告链接",
+            "type": 15,
+            "description": "详细报告文档链接"
+          }
+        ]
+      }
+    }
+  },
+  "users": {
+    "defaultAssignee": "ou_4d5ff96d59a2ce2dc8a3549c05efcc11",
+    "shareConfig": {
+      "autoShare": true,
+      "defaultPerm": "full_access",
+      "shareToUsers": ["ou_4d5ff96d59a2ce2dc8a3549c05efcc11"]
+    }
+  },
+  "sync": {
+    "autoSync": false,
+    "syncInterval": "daily",
+    "syncOnDebtAdd": true,
+    "syncOnReportGenerate": true
+  }
+}

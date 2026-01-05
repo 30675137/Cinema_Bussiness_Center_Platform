@@ -8,8 +8,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * @spec O005-channel-product-config
+ * @spec O008-channel-product-category-migration
  * 渠道商品查询参数
  */
 @Data
@@ -18,7 +21,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChannelProductQueryParams {
     private ChannelType channelType;
+    
+    /**
+     * @deprecated 使用 categoryId 替代
+     */
+    @Deprecated
     private ChannelCategory channelCategory;
+    
+    /**
+     * @spec O008-channel-product-category-migration
+     * 分类 ID（关联 menu_category.id）
+     */
+    private UUID categoryId;
+    
     private ChannelProductStatus status;
     private String keyword;
     @Builder.Default
