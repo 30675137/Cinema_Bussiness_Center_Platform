@@ -7,10 +7,10 @@
 import { View, Text } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { ChannelCategory, ProductCard } from '../../types/product'
+import { ProductCard } from '../../types/product'
 import { useProductListStore } from '../../stores/productListStore'
 import { useProducts } from '../../hooks/useProducts'
-import { getCategoryDisplayName } from '../../utils/category'
+import { useMenuCategories, MenuCategoryDTO } from '../../hooks/useMenuCategories'
 import Header from '../../components/Header'
 import CategoryTabs from '../../components/CategoryTabs'
 import ProductList from '../../components/ProductList'
@@ -18,39 +18,56 @@ import TabBar from '../../components/TabBar'
 import './index.less'
 
 /**
+ * @spec O007-miniapp-menu-api
  * 菜单页面组件
- * @spec O002-miniapp-menu-config
  */
 export default function MenuPage() {
-  // 获取状态管理 - O002: 同时获取 categoryId 和 category
+  // 状态管理 - 分类 ID 和分类编码
   const { selectedCategoryId, selectedCategory, setSelectedCategory } = useProductListStore()
 
   // TabBar 当前激活项
   const [activeTab, setActiveTab] = useState('order')
 
-  // O002: 获取商品列表数据 - 传递 categoryId 和 category
-  const { data: products = [], isLoading, error, refetch } = useProducts({
+  // O007: 获取动态分类列表
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    error: categoriesError,
+  } = useMenuCategories()
+
+  // O007: 获取商品列表数据 - 传递 categoryId
+  const {
+    data: products = [],
+    isLoading: isProductsLoading,
+    error: productsError,
+    refetch,
+  } = useProducts({
     categoryId: selectedCategoryId,
     category: selectedCategory,
   })
 
   /**
+   * @spec O007-miniapp-menu-api
    * 页面初始化：设置默认分类为第一个分类
-   * @spec O002-miniapp-menu-config
    */
   useEffect(() => {
-    // O002: 向后兼容 - 硬编码分类没有 UUID，传 null 作为 categoryId
-    setSelectedCategory(null, ChannelCategory.ALCOHOL)
-  }, [])
+    // O007: 动态分类加载完成后，设置默认分类
+    if (categories.length > 0 && !selectedCategoryId) {
+      const firstCategory = categories[0]
+      setSelectedCategory(firstCategory.id, firstCategory.code)
+    }
+  }, [categories, selectedCategoryId])
 
   /**
+   * @spec O007-miniapp-menu-api
    * 处理分类切换
-   * @spec O002-miniapp-menu-config
    */
-  const handleCategoryChange = (category: ChannelCategory | null) => {
-    // O002: 向后兼容 - 当使用动态分类时，CategoryTabs 组件需要传递 categoryId
-    // 目前使用硬编码分类，categoryId 为 null
-    setSelectedCategory(null, category)
+  const handleCategoryChange = (category: MenuCategoryDTO | null) => {
+    if (category) {
+      setSelectedCategory(category.id, category.code)
+    } else {
+      setSelectedCategory(null, null)
+    }
   }
 
   /**
@@ -58,7 +75,6 @@ export default function MenuPage() {
    */
   const handleProductClick = (product: ProductCard) => {
     console.log('商品点击:', product)
-    // TODO: 跳转到商品详情页（占位逻辑）
     Taro.showToast({
       title: `即将查看 ${product.name}`,
       icon: 'none',
@@ -74,18 +90,9 @@ export default function MenuPage() {
     Taro.stopPullDownRefresh()
   })
 
-  // 核心分类列表（排除 MEAL 和 OTHER）
-  const coreCategories: ChannelCategory[] = [
-    ChannelCategory.ALCOHOL,
-    ChannelCategory.COFFEE,
-    ChannelCategory.BEVERAGE,
-    ChannelCategory.SNACK,
-  ]
-
-  // 获取当前分类名称
-  const currentCategoryName = selectedCategory
-    ? getCategoryDisplayName(selectedCategory)
-    : '全部商品'
+  // O007: 获取当前分类名称
+  const currentCategory = categories.find((c) => c.id === selectedCategoryId)
+  const currentCategoryName = currentCategory?.displayName || '全部商品'
 
   // TabBar 配置
   const tabBarTabs = [
@@ -103,6 +110,10 @@ export default function MenuPage() {
     }
   }
 
+  // 加载状态
+  const isLoading = isCategoriesLoading || isProductsLoading
+  const error = categoriesError || productsError
+
   return (
     <View className='menu-page'>
       {/* 顶部导航栏 */}
@@ -118,8 +129,8 @@ export default function MenuPage() {
         {/* 左侧：分类侧边栏 */}
         <View className='sidebar'>
           <CategoryTabs
-            categories={coreCategories}
-            activeCategory={selectedCategory}
+            categories={categories}
+            activeCategoryId={selectedCategoryId}
             onCategoryChange={handleCategoryChange}
           />
         </View>

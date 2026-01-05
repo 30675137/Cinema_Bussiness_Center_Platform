@@ -5,29 +5,29 @@
  */
 
 import { create } from 'zustand'
-import { ChannelCategory } from '../types/product'
 
 /**
+ * @spec O007-miniapp-menu-api
  * 商品列表状态接口
- * @spec O002-miniapp-menu-config
  */
 export interface ProductListState {
   /**
-   * @spec O002-miniapp-menu-config
-   * 当前选中的分类 ID（UUID 格式，优先级最高）
+   * 当前选中的分类 ID（UUID 格式）
    */
   selectedCategoryId: string | null
 
-  /** 当前选中的分类编码（null 表示"全部"，向后兼容） */
-  selectedCategory: ChannelCategory | null
+  /**
+   * 当前选中的分类编码（字符串，如 'COFFEE', 'ALCOHOL'）
+   */
+  selectedCategory: string | null
 
   /**
-   * @spec O002-miniapp-menu-config
+   * @spec O007-miniapp-menu-api
    * 设置选中的分类（同时设置 ID 和 code）
    */
   setSelectedCategory: (
     categoryId: string | null,
-    category: ChannelCategory | null
+    categoryCode: string | null
   ) => void
 
   /** 重置状态 */
@@ -35,15 +35,15 @@ export interface ProductListState {
 }
 
 /**
+ * @spec O007-miniapp-menu-api
  * 商品列表状态管理 Hook
- * @spec O002-miniapp-menu-config
  */
 export const useProductListStore = create<ProductListState>((set) => ({
   selectedCategoryId: null,
   selectedCategory: null,
 
-  setSelectedCategory: (categoryId, category) => {
-    set({ selectedCategoryId: categoryId, selectedCategory: category })
+  setSelectedCategory: (categoryId, categoryCode) => {
+    set({ selectedCategoryId: categoryId, selectedCategory: categoryCode })
   },
 
   reset: () => {

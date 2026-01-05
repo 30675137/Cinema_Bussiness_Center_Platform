@@ -23,7 +23,7 @@ import {
 
 /**
  * 是否使用 Mock 数据
- * 开发环境下默认使用 Mock
+ * 开发环境使用 Mock，生产环境调用后端 API
  */
 const USE_MOCK = process.env.NODE_ENV === 'development'
 

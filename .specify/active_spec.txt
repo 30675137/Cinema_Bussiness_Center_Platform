@@ -1,1 +1,1 @@
-specs/O008-channel-product-category-migration/spec.md
+specs/O007-miniapp-menu-api/spec.md

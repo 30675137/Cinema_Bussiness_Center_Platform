@@ -231,11 +231,12 @@ export const MOCK_PRODUCTS: ChannelProductDTO[] = [
 ]
 
 /**
+ * @spec O007-miniapp-menu-api
  * 按分类过滤商品
  */
 export function filterByCategory(
   products: ChannelProductDTO[],
-  category: ChannelCategory | null
+  category: string | null
 ): ChannelProductDTO[] {
   if (!category) {
     return products

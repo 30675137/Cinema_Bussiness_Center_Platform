@@ -1,15 +1,14 @@
 /**
  * @spec O007-miniapp-menu-api
- * @spec O002-miniapp-menu-config
  * 商品列表 Hook
  */
 
 import { useQuery } from '@tanstack/react-query'
-import { ChannelCategory, ProductCard } from '../types/product'
+import { ProductCard } from '../types/product'
 import { fetchProducts, toProductCard } from '../services/channelProductService'
 
 /**
- * @spec O002-miniapp-menu-config
+ * @spec O007-miniapp-menu-api
  * 商品列表查询参数
  */
 interface UseProductsParams {
@@ -18,9 +17,9 @@ interface UseProductsParams {
    */
   categoryId?: string | null
   /**
-   * 分类编码（向后兼容，优先级次之）
+   * 分类编码（字符串，向后兼容）
    */
-  category?: ChannelCategory | null
+  category?: string | null
 }
 
 /**

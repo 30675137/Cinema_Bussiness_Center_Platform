@@ -21,19 +21,19 @@ export const CATEGORY_DISPLAY_NAMES: Record<ChannelCategory, string> = {
  * 分类图标映射 (SVG path data)
  * 使用简洁的线性图标风格
  */
-export const CATEGORY_ICONS: Record<ChannelCategory, string> = {
+export const CATEGORY_ICONS: Record<string, string> = {
   // 鸡尾酒杯图标
-  [ChannelCategory.ALCOHOL]: 'cocktail',
+  ALCOHOL: 'cocktail',
   // 咖啡杯图标
-  [ChannelCategory.COFFEE]: 'coffee',
+  COFFEE: 'coffee',
   // 饮品杯图标
-  [ChannelCategory.BEVERAGE]: 'beverage',
+  BEVERAGE: 'beverage',
   // 小食图标
-  [ChannelCategory.SNACK]: 'snack',
+  SNACK: 'snack',
   // 餐食图标
-  [ChannelCategory.MEAL]: 'meal',
+  MEAL: 'meal',
   // 其他图标
-  [ChannelCategory.OTHER]: 'other',
+  OTHER: 'other',
 }
 
 /**
@@ -46,10 +46,11 @@ export function getCategoryDisplayName(category: ChannelCategory): string {
 }
 
 /**
+ * @spec O007-miniapp-menu-api
  * 获取分类图标名称
- * @param category 分类枚举值
+ * @param categoryCode 分类编码（字符串）
  * @returns 图标名称
  */
-export function getCategoryIcon(category: ChannelCategory): string {
-  return CATEGORY_ICONS[category] || 'other'
+export function getCategoryIcon(categoryCode: string): string {
+  return CATEGORY_ICONS[categoryCode] || 'other'
 }

@@ -5,8 +5,8 @@
 
 import { View, Text } from '@tarojs/components'
 import { useRef, useCallback } from 'react'
-import { ChannelCategory } from '../../types/product'
-import { getCategoryDisplayName, getCategoryIcon } from '../../utils/category'
+import { MenuCategoryDTO } from '../../services/menuCategoryService'
+import { getCategoryIcon } from '../../utils/category'
 import Icon, { IconName } from '../Icon'
 import './index.less'
 
@@ -14,8 +14,10 @@ import './index.less'
  * 分类 Tab 项
  */
 interface CategoryTabItem {
-  /** 分类值（null 表示"全部"） */
-  value: ChannelCategory | null
+  /** 分类 ID */
+  id: string
+  /** 分类编码 */
+  code: string
   /** 显示文本 */
   label: string
   /** 图标名称 */
@@ -23,40 +25,43 @@ interface CategoryTabItem {
 }
 
 /**
+ * @spec O007-miniapp-menu-api
  * 分类侧边栏组件属性
  */
 export interface CategoryTabsProps {
-  /** 可选的分类列表 */
-  categories: ChannelCategory[]
-  /** 当前激活的分类 */
-  activeCategory: ChannelCategory | null
+  /** 分类列表（动态获取） */
+  categories: MenuCategoryDTO[]
+  /** 当前激活的分类 ID */
+  activeCategoryId: string | null
   /** 分类切换回调 */
-  onCategoryChange: (category: ChannelCategory | null) => void
+  onCategoryChange: (category: MenuCategoryDTO | null) => void
 }
 
 /**
+ * @spec O007-miniapp-menu-api
  * 分类侧边栏组件
  */
 export default function CategoryTabs({
   categories,
-  activeCategory,
+  activeCategoryId,
   onCategoryChange,
 }: CategoryTabsProps) {
   // 防抖定时器
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // 构建 Tab 列表：分类列表（不再需要"全部"选项）
+  // 构建 Tab 列表
   const tabs: CategoryTabItem[] = categories.map((cat) => ({
-    value: cat,
-    label: getCategoryDisplayName(cat),
-    icon: getCategoryIcon(cat) as IconName,
+    id: cat.id,
+    code: cat.code,
+    label: cat.displayName,
+    icon: getCategoryIcon(cat.code) as IconName,
   }))
 
   /**
    * 处理 Tab 点击（带防抖）
    */
   const handleTabClick = useCallback(
-    (category: ChannelCategory | null) => {
+    (categoryId: string) => {
       // 清除之前的定时器
       if (debounceTimer.current) {
         clearTimeout(debounceTimer.current)
@@ -64,22 +69,23 @@ export default function CategoryTabs({
 
       // 设置防抖延迟（300ms）
       debounceTimer.current = setTimeout(() => {
+        const category = categories.find((c) => c.id === categoryId) || null
         onCategoryChange(category)
       }, 300)
     },
-    [onCategoryChange]
+    [categories, onCategoryChange]
   )
 
   return (
     <View className='category-sidebar'>
       <View className='tab-list'>
         {tabs.map((tab) => {
-          const isActive = activeCategory === tab.value
+          const isActive = activeCategoryId === tab.id
           return (
             <View
-              key={tab.value || 'all'}
+              key={tab.id}
               className={`tab-item ${isActive ? 'active' : ''}`}
-              onClick={() => handleTabClick(tab.value)}
+              onClick={() => handleTabClick(tab.id)}
             >
               <View className={`icon-wrapper ${isActive ? 'active' : ''}`}>
                 <Icon
