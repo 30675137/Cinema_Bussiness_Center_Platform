@@ -10,6 +10,7 @@ import {
   ProductListParams,
   ApiResponse,
   ProductCard,
+  ChannelCategory,
 } from '../types/product'
 import { formatPrice } from '../utils/price'
 import { MOCK_PRODUCTS, filterByCategory } from './mockData'
@@ -23,9 +24,9 @@ import {
 
 /**
  * 是否使用 Mock 数据
- * 开发环境使用 Mock，生产环境调用后端 API
+ * O009 联调验证：关闭 Mock，直接调用后端 API
  */
-const USE_MOCK = process.env.NODE_ENV === 'development'
+const USE_MOCK = false
 
 /**
  * 根据环境判断 API 基础 URL
@@ -197,7 +198,7 @@ export async function fetchProducts(
   
   // 真实 API 请求
   const queryString = buildQueryParams(params)
-  const url = `${BASE_URL}/api/client/channel-products${queryString ? `?${queryString}` : ''}`
+  const url = `${BASE_URL}/api/client/channel-products/mini-program${queryString ? `?${queryString}` : ''}`
 
   try {
     const token = await getAuthToken()
@@ -295,12 +296,12 @@ export async function fetchProducts(
 export function toProductCard(dto: ChannelProductDTO): ProductCard {
   return {
     id: dto.id,
-    name: dto.productName,
-    imageUrl: dto.mainImageUrl || '/assets/images/placeholder.svg',
-    priceText: formatPrice(dto.priceInCents),
-    tags: dto.tags,
+    name: dto.displayName || dto.productName || '',
+    imageUrl: dto.mainImage || dto.mainImageUrl || '/assets/images/placeholder.svg',
+    priceText: formatPrice(dto.basePrice ?? dto.priceInCents ?? 0),
+    tags: dto.tags || [],
     minSalesUnit: '杯', // 默认单位
     isAvailable: dto.status === 'ACTIVE' && dto.stockStatus === 'IN_STOCK',
-    category: dto.category,
+    category: (typeof dto.category === 'string' ? dto.category : dto.category?.code || 'OTHER') as ChannelCategory,
   }
 }

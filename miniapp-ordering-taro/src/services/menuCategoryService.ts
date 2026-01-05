@@ -26,9 +26,9 @@ export interface MenuCategoryDTO {
 
 /**
  * 是否使用 Mock 数据
- * 开发环境使用 Mock，生产环境调用后端 API
+ * O009 联调验证：关闭 Mock，直接调用后端 API
  */
-const USE_MOCK = process.env.NODE_ENV === 'development'
+const USE_MOCK = false
 
 /**
  * Mock 分类数据

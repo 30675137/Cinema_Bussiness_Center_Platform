@@ -22,29 +22,56 @@ export enum ChannelCategory {
 }
 
 /**
+ * 分类信息（嵌套对象）
+ */
+export interface CategoryInfo {
+  id: string
+  code: string
+  displayName: string
+}
+
+/**
  * 渠道商品 DTO（后端返回数据）
  */
 export interface ChannelProductDTO {
   /** 商品ID */
   id: string
-  /** 产品ID */
-  productId: string
-  /** 商品名称 */
-  productName: string
-  /** 主图URL */
-  mainImageUrl: string | null
-  /** 分类 */
-  category: ChannelCategory
+  /** SKU ID */
+  skuId?: string
+  /** 产品ID（兼容旧字段） */
+  productId?: string
+  /** 商品名称（后端实际字段） */
+  displayName: string
+  /** 商品名称（兼容旧字段） */
+  productName?: string
+  /** 主图（后端实际字段） */
+  mainImage: string | null
+  /** 主图URL（兼容旧字段） */
+  mainImageUrl?: string | null
+  /** 详情图 */
+  detailImages?: string[]
+  /** 描述 */
+  description?: string | null
+  /** 分类对象（后端实际返回） */
+  category: CategoryInfo | ChannelCategory
+  /** 分类ID */
+  categoryId?: string
+  /** 渠道分类 */
+  channelCategory?: string
   /** 销售渠道 */
-  salesChannel: string
+  salesChannel?: string
   /** 状态 */
   status: 'ACTIVE' | 'INACTIVE'
-  /** 价格（分） */
-  priceInCents: number
+  /** 基础价格（元，后端实际字段） */
+  basePrice: number
+  /** 价格（分，兼容旧字段） */
+  priceInCents?: number
+  /** 是否推荐 */
+  isRecommended?: boolean
   /** 排序 */
   sortOrder: number
   /** 标签 */
-  tags: string[]
+  tags?: string[]
   /** 库存状态 */
   stockStatus: 'IN_STOCK' | 'OUT_OF_STOCK' | 'LOW_STOCK'
 }
