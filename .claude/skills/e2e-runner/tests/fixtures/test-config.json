@@ -1,8 +1,0 @@
-{
-  "env_profile": "test",
-  "baseURL": "http://localhost:3000",
-  "report_output_dir": "./tests/fixtures/reports",
-  "retries": 0,
-  "timeout": 30000,
-  "testMatch": "tests/fixtures/example.spec.ts"
-}
