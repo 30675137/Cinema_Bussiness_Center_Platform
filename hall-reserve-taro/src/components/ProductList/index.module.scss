@@ -93,3 +93,67 @@
   color: #999;
   text-align: center;
 }
+
+/* 加载更多指示器 */
+.loadMoreContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 24rpx;
+  margin: 0 24rpx 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+}
+
+.loadMoreText {
+  font-size: 28rpx;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.loadingText {
+  font-size: 28rpx;
+  color: #999;
+  font-weight: 500;
+}
+
+/* 无更多数据提示 */
+.noMoreContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 24rpx;
+  margin: 0 24rpx 24rpx;
+}
+
+.noMoreText {
+  font-size: 24rpx;
+  color: #ccc;
+  position: relative;
+  padding: 0 32rpx;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 80rpx;
+    height: 1rpx;
+    background: #e5e5e5;
+  }
+
+  &::before {
+    left: -100rpx;
+  }
+
+  &::after {
+    right: -100rpx;
+  }
+}
