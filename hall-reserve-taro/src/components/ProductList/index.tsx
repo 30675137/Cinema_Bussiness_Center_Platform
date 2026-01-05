@@ -5,7 +5,7 @@
  */
 
 import { View, Text } from '@tarojs/components'
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import ProductCard from '../ProductCard'
 import { useInfiniteProducts } from '@/hooks/useProducts'
 import { mapToProductCard } from '@/types/product'
@@ -90,12 +90,12 @@ const ProductList = ({ categoryId, onProductClick, onLoadMore }: Props) => {
   }, [allProducts])
 
   // 处理加载更多
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
       onLoadMore?.()
     }
-  }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, onLoadMore])
 
   // 加载骨架屏
   if (isLoading) {

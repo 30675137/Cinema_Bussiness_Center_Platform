@@ -4,6 +4,7 @@
  * 展示商品图片、名称、价格、推荐标签
  */
 
+import { memo } from 'react'
 import { View, Image, Text } from '@tarojs/components'
 import type { ProductCard as ProductCardProps } from '@/types/product'
 import { getImageSrc } from '@/utils/imageLoader'
@@ -14,7 +15,7 @@ interface Props extends ProductCardProps {
   onClick?: () => void
 }
 
-const ProductCard = ({
+const ProductCard = memo<Props>(({
   id,
   name,
   price,
@@ -56,6 +57,8 @@ const ProductCard = ({
       </View>
     </View>
   )
-}
+})
+
+ProductCard.displayName = 'ProductCard'
 
 export default ProductCard
