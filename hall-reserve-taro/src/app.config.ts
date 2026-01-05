@@ -20,7 +20,10 @@ export default defineAppConfig({
     'pages/order/confirm/index',
     'pages/order/payment/index',
     'pages/order/detail/index',
-    'pages/order/list/index'
+    'pages/order/list/index',
+    // 商品列表页面 (O009)
+    'pages/product-list/index',
+    'pages/product-detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',
