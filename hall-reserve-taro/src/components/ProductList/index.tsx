@@ -23,6 +23,36 @@ interface Props {
 }
 
 /**
+ * 获取友好的错误提示信息
+ */
+const getErrorMessage = (error: Error | null): string => {
+  if (!error) return '加载失败，请重试'
+
+  // 网络错误
+  if (error.message.includes('Network') || error.message.includes('网络')) {
+    return '网络连接失败，请检查网络后重试'
+  }
+
+  // 超时错误
+  if (error.message.includes('timeout') || error.message.includes('超时')) {
+    return '请求超时，请稍后重试'
+  }
+
+  // 服务器错误
+  if (error.message.includes('500') || error.message.includes('服务器')) {
+    return '服务器错误，请稍后重试'
+  }
+
+  // 404 错误
+  if (error.message.includes('404') || error.message.includes('not found')) {
+    return '请求的资源不存在'
+  }
+
+  // 默认错误信息
+  return error.message || '加载失败，请重试'
+}
+
+/**
  * 商品排序函数：推荐商品优先，相同推荐状态按 sortOrder 升序
  */
 const sortProducts = (products: ChannelProductDTO[]): ChannelProductDTO[] => {
@@ -89,8 +119,18 @@ const ProductList = ({ categoryId, onProductClick, onLoadMore }: Props) => {
     return (
       <View className={styles.errorContainer}>
         <Text className={styles.errorText}>
-          加载失败：{error?.message || '未知错误'}
+          {getErrorMessage(error)}
         </Text>
+        <View
+          className={styles.retryButton}
+          onClick={() => {
+            // 重新获取第一页数据
+            fetchNextPage({ cancelRefetch: false })
+          }}
+          data-testid="retry-button"
+        >
+          <Text className={styles.retryButtonText}>重试</Text>
+        </View>
       </View>
     )
   }

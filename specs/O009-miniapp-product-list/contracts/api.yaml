@@ -1,0 +1,594 @@
+openapi: 3.0.3
+info:
+  title: 小程序商品列表 API
+  description: |
+    @spec O009-miniapp-product-list
+
+    小程序商品列表功能的 API 契约文档，定义了动态菜单分类获取和渠道商品查询接口。
+
+    **核心功能**:
+    - 获取动态菜单分类列表（支持可见性筛选）
+    - 获取渠道商品列表（支持分类筛选、分页）
+    - 使用 UUID 格式的 categoryId 进行筛选
+    - 推荐商品优先排序
+
+    **依赖规格**:
+    - O007-miniapp-menu-api: 商品 API 基础接口
+    - O008-channel-product-category-migration: 动态分类系统
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+    email: dev@cinema-platform.com
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api-staging.cinema-platform.com
+    description: 测试环境
+  - url: https://api.cinema-platform.com
+    description: 生产环境
+
+tags:
+  - name: menu-categories
+    description: 菜单分类管理接口
+  - name: channel-products
+    description: 渠道商品查询接口
+
+paths:
+  /api/client/menu-categories:
+    get:
+      tags:
+        - menu-categories
+      summary: 获取菜单分类列表
+      description: |
+        获取所有可见的菜单分类列表，用于小程序商品列表页的分类导航栏。
+
+        **业务规则**:
+        - 仅返回 `isVisible=true` 的分类
+        - 按 `sortOrder` 升序排序
+        - 不支持分页（分类数量通常 < 20）
+
+        **缓存策略**:
+        - 前端缓存 30 分钟（分类变化频率低）
+        - 使用 TanStack Query 管理缓存
+      operationId: getMenuCategories
+      parameters:
+        - name: Authorization
+          in: header
+          description: JWT Token（格式：`Bearer {token}`）
+          required: true
+          schema:
+            type: string
+            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: 成功获取分类列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+              examples:
+                success:
+                  summary: 成功返回分类列表
+                  value:
+                    success: true
+                    data:
+                      - id: "550e8400-e29b-41d4-a716-446655440000"
+                        code: "ALCOHOL"
+                        displayName: "经典特调"
+                        iconUrl: "https://storage.supabase.co/icons/alcohol.png"
+                        productCount: 15
+                        isVisible: true
+                        sortOrder: 1
+                        createdAt: "2025-12-01T10:00:00Z"
+                        updatedAt: "2025-12-01T10:00:00Z"
+                      - id: "550e8400-e29b-41d4-a716-446655440001"
+                        code: "COFFEE"
+                        displayName: "精品咖啡"
+                        iconUrl: "https://storage.supabase.co/icons/coffee.png"
+                        productCount: 20
+                        isVisible: true
+                        sortOrder: 2
+                        createdAt: "2025-12-01T10:00:00Z"
+                        updatedAt: "2025-12-01T10:00:00Z"
+                    total: 2
+                    timestamp: "2026-01-05T10:00:00Z"
+
+                empty:
+                  summary: 无可见分类（异常情况）
+                  value:
+                    success: true
+                    data: []
+                    total: 0
+                    timestamp: "2026-01-05T10:00:00Z"
+
+        '401':
+          description: 未认证或 Token 过期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "AUTH_TOKEN_EXPIRED"
+                message: "Token 已过期，请重新登录"
+                timestamp: "2026-01-05T10:00:00Z"
+
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INTERNAL_SERVER_ERROR"
+                message: "服务器内部错误，请稍后重试"
+                timestamp: "2026-01-05T10:00:00Z"
+
+  /api/client/channel-products:
+    get:
+      tags:
+        - channel-products
+      summary: 获取渠道商品列表
+      description: |
+        获取指定渠道和分类的商品列表，支持分页加载。
+
+        **业务规则**:
+        - 仅返回 `status=ACTIVE` 的商品
+        - 仅返回指定 `channel` 的商品（如 MINIAPP）
+        - 如果 `categoryId` 未传递，返回所有商品
+        - 商品排序规则：
+          1. 推荐商品（`isRecommended=true`）优先
+          2. 推荐商品内部按 `sortOrder` 升序
+          3. 非推荐商品按 `sortOrder` 升序
+
+        **分页说明**:
+        - 默认每页 20 条（`pageSize=20`）
+        - 第一页 `page=1`（1-based）
+        - `hasNext` 字段指示是否有下一页
+
+        **缓存策略**:
+        - 前端缓存 5 分钟
+        - 后台轮询 1 分钟刷新
+      operationId: getChannelProducts
+      parameters:
+        - name: Authorization
+          in: header
+          description: JWT Token（格式：`Bearer {token}`）
+          required: true
+          schema:
+            type: string
+            example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+        - name: categoryId
+          in: query
+          description: 菜单分类ID（UUID格式），不传则返回所有商品
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+        - name: channel
+          in: query
+          description: 销售渠道（默认 MINIAPP）
+          required: false
+          schema:
+            type: string
+            enum: [MINIAPP, POS]
+            default: MINIAPP
+          example: MINIAPP
+
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          example: 1
+
+        - name: pageSize
+          in: query
+          description: 每页数量（默认20）
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+
+      responses:
+        '200':
+          description: 成功获取商品列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+              examples:
+                success:
+                  summary: 成功返回商品列表（推荐商品优先）
+                  value:
+                    success: true
+                    data:
+                      - id: "660e8400-e29b-41d4-a716-446655440000"
+                        skuId: "770e8400-e29b-41d4-a716-446655440000"
+                        categoryId: "550e8400-e29b-41d4-a716-446655440000"
+                        displayName: "经典拿铁"
+                        basePrice: 2800
+                        mainImage: "https://storage.supabase.co/products/latte.jpg"
+                        isRecommended: true
+                        sortOrder: 1
+                        status: "ACTIVE"
+                        channel: "MINIAPP"
+                        createdAt: "2025-12-01T10:00:00Z"
+                        updatedAt: "2025-12-01T10:00:00Z"
+                      - id: "660e8400-e29b-41d4-a716-446655440001"
+                        skuId: "770e8400-e29b-41d4-a716-446655440001"
+                        categoryId: "550e8400-e29b-41d4-a716-446655440000"
+                        displayName: "卡布奇诺"
+                        basePrice: 2600
+                        mainImage: "https://storage.supabase.co/products/cappuccino.jpg"
+                        isRecommended: true
+                        sortOrder: 2
+                        status: "ACTIVE"
+                        channel: "MINIAPP"
+                      - id: "660e8400-e29b-41d4-a716-446655440002"
+                        skuId: "770e8400-e29b-41d4-a716-446655440002"
+                        categoryId: "550e8400-e29b-41d4-a716-446655440000"
+                        displayName: "美式咖啡"
+                        basePrice: 2000
+                        mainImage: "https://storage.supabase.co/products/americano.jpg"
+                        isRecommended: false
+                        sortOrder: 3
+                        status: "ACTIVE"
+                        channel: "MINIAPP"
+                    total: 50
+                    page: 1
+                    pageSize: 20
+                    hasNext: true
+                    timestamp: "2026-01-05T10:00:00Z"
+
+                empty:
+                  summary: 无商品（分类下无商品）
+                  value:
+                    success: true
+                    data: []
+                    total: 0
+                    page: 1
+                    pageSize: 20
+                    hasNext: false
+                    timestamp: "2026-01-05T10:00:00Z"
+
+                lastPage:
+                  summary: 最后一页（hasNext=false）
+                  value:
+                    success: true
+                    data:
+                      - id: "660e8400-e29b-41d4-a716-446655440010"
+                        skuId: "770e8400-e29b-41d4-a716-446655440010"
+                        categoryId: "550e8400-e29b-41d4-a716-446655440000"
+                        displayName: "焦糖玛奇朵"
+                        basePrice: 3200
+                        mainImage: "https://storage.supabase.co/products/macchiato.jpg"
+                        isRecommended: false
+                        sortOrder: 10
+                        status: "ACTIVE"
+                        channel: "MINIAPP"
+                    total: 50
+                    page: 3
+                    pageSize: 20
+                    hasNext: false
+                    timestamp: "2026-01-05T10:00:00Z"
+
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INVALID_CATEGORY_ID"
+                message: "分类ID格式无效，必须为UUID格式"
+                details:
+                  categoryId: "invalid-uuid"
+                timestamp: "2026-01-05T10:00:00Z"
+
+        '401':
+          description: 未认证或 Token 过期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "AUTH_TOKEN_EXPIRED"
+                message: "Token 已过期，请重新登录"
+                timestamp: "2026-01-05T10:00:00Z"
+
+        '404':
+          description: 分类不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "CATEGORY_NOT_FOUND"
+                message: "指定的分类不存在"
+                details:
+                  categoryId: "550e8400-e29b-41d4-a716-999999999999"
+                timestamp: "2026-01-05T10:00:00Z"
+
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INTERNAL_SERVER_ERROR"
+                message: "服务器内部错误，请稍后重试"
+                timestamp: "2026-01-05T10:00:00Z"
+
+components:
+  schemas:
+    MenuCategoryDTO:
+      type: object
+      required:
+        - id
+        - code
+        - displayName
+        - isVisible
+        - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 分类ID（UUID格式）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        code:
+          type: string
+          pattern: '^[A-Z_]{2,50}$'
+          description: 分类编码（唯一，大写字母+下划线）
+          example: "COFFEE"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 分类显示名称
+          example: "精品咖啡"
+        iconUrl:
+          type: string
+          format: uri
+          description: 分类图标URL（可选）
+          example: "https://storage.supabase.co/icons/coffee.png"
+        productCount:
+          type: integer
+          minimum: 0
+          description: 该分类下的商品数量（可选）
+          example: 20
+        isVisible:
+          type: boolean
+          description: 是否可见
+          example: true
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序序号（升序）
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601格式）
+          example: "2025-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间（ISO 8601格式）
+          example: "2025-12-01T10:00:00Z"
+
+    ChannelProductDTO:
+      type: object
+      required:
+        - id
+        - skuId
+        - categoryId
+        - displayName
+        - basePrice
+        - mainImage
+        - isRecommended
+        - sortOrder
+        - status
+        - channel
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 商品配置ID（UUID格式）
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        skuId:
+          type: string
+          format: uuid
+          description: 关联的SKU ID（UUID格式）
+          example: "770e8400-e29b-41d4-a716-446655440000"
+        categoryId:
+          type: string
+          format: uuid
+          description: 关联的菜单分类ID（UUID格式）
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: 商品显示名称
+          example: "经典拿铁"
+        basePrice:
+          type: integer
+          minimum: 0
+          description: 最小销售单位价格（单位：分）
+          example: 2800
+        mainImage:
+          type: string
+          format: uri
+          description: 商品主图URL（Supabase Storage公开URL）
+          example: "https://storage.supabase.co/products/latte.jpg"
+        isRecommended:
+          type: boolean
+          description: 是否为推荐商品
+          example: true
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序序号（升序）
+          example: 1
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+          description: 商品状态
+          example: "ACTIVE"
+        channel:
+          type: string
+          enum: [MINIAPP, POS]
+          description: 销售渠道
+          example: "MINIAPP"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601格式）
+          example: "2025-12-01T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间（ISO 8601格式）
+          example: "2025-12-01T10:00:00Z"
+
+    CategoryListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuCategoryDTO'
+          description: 分类数据数组
+        total:
+          type: integer
+          minimum: 0
+          description: 总分类数量
+          example: 5
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601格式）
+          example: "2026-01-05T10:00:00Z"
+
+    ProductListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - hasNext
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductDTO'
+          description: 商品数据数组
+        total:
+          type: integer
+          minimum: 0
+          description: 总商品数量
+          example: 50
+        page:
+          type: integer
+          minimum: 1
+          description: 当前页码（可选，从1开始）
+          example: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          description: 每页数量（可选，默认20）
+          example: 20
+        hasNext:
+          type: boolean
+          description: 是否有下一页
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601格式）
+          example: "2026-01-05T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功（错误时为false）
+          example: false
+        error:
+          type: string
+          description: 错误编码（如 AUTH_TOKEN_EXPIRED, CATEGORY_NOT_FOUND）
+          example: "AUTH_TOKEN_EXPIRED"
+        message:
+          type: string
+          description: 错误消息（用户友好）
+          example: "Token 已过期，请重新登录"
+        details:
+          type: object
+          additionalProperties: true
+          description: 错误详情（可选，包含额外上下文）
+          example:
+            categoryId: "invalid-uuid"
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601格式）
+          example: "2026-01-05T10:00:00Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        使用 JWT Token 进行认证。
+
+        **Token 获取流程**:
+        1. 小程序调用 `wx.login()` 获取 code
+        2. 前端调用 `/api/auth/login` 换取 JWT Token
+        3. 将 Token 存储到 `Taro.setStorageSync('token', token)`
+
+        **Token 刷新流程**:
+        1. API 返回 401 错误
+        2. 前端拦截器触发静默登录 `wx.login()`
+        3. 调用 `/api/auth/refresh` 换取新 Token
+        4. 重试原请求
+
+security:
+  - BearerAuth: []

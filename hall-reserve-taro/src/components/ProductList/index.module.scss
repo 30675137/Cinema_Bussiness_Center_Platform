@@ -77,6 +77,27 @@
   color: #999;
   text-align: center;
   line-height: 1.6;
+  margin-bottom: 32rpx;
+}
+
+.retryButton {
+  padding: 24rpx 48rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 16rpx rgba(102, 126, 234, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+}
+
+.retryButtonText {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 600;
 }
 
 /* 空状态 */
