@@ -5,11 +5,12 @@
 # =====================================================
 
 spring:
-  # 数据源配置（Supabase PostgreSQL - 开发环境）
+  # 数据源配置（本地 Supabase PostgreSQL）
+  # 连接格式: postgresql://postgres:[PASSWORD]@127.0.0.1:5432/postgres
   datasource:
-    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require
-    username: postgres.fxhgyxceqrmnpezluaht
-    password: ${DB_PASSWORD:ppkZ8sGUEHB0qjFs}
+    url: jdbc:postgresql://${DB_HOST:127.0.0.1}:${DB_PORT:54322}/postgres
+    username: postgres
+    password: 2d6ca90031e5ba51d8200b03922c37b7
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -19,16 +20,16 @@ spring:
   # JPA 开发环境配置
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update  # 开发环境自动更新表结构
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
 
-  # Flyway 开发环境
+  # Flyway 开发环境 (暂时禁用，迁移依赖需要整理)
   flyway:
-    enabled: true
+    enabled: false
 
 # 日志配置 - 开发环境详细日志
 logging:

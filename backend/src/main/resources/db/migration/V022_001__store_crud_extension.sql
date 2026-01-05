@@ -1,18 +1,8 @@
 -- ============================================================
 -- Feature 022-store-crud Database Migration
--- 门店管理CRUD功能 - 扩展stores表并创建操作日志表
+-- 门店管理CRUD功能 - 创建操作日志表
+-- Note: stores表及version字段已在V007_001中创建
 -- ============================================================
-
--- 1. Extend stores table with version field for optimistic locking
--- Note: status column already exists as VARCHAR, just need to add version
-ALTER TABLE stores
-ADD COLUMN IF NOT EXISTS version BIGINT NOT NULL DEFAULT 0;
-
--- Create index for status field (for filtering active stores)
-CREATE INDEX IF NOT EXISTS idx_stores_status ON stores(status);
-
--- Add comment for new fields
-COMMENT ON COLUMN stores.version IS '乐观锁版本号,每次UPDATE自动递增';
 
 -- ============================================================
 
