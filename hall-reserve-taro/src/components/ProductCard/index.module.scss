@@ -1,0 +1,72 @@
+/**
+ * @spec O009-miniapp-product-list
+ * ProductCard component styles
+ */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background: #f5f5f5;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  z-index: 10;
+  padding: 8rpx 16rpx;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+  border-radius: 8rpx;
+  box-shadow: 0 4rpx 8rpx rgba(255, 71, 87, 0.3);
+}
+
+.badgeText {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+}
+
+.image {
+  width: 100%;
+  height: 320rpx;
+  background: #f5f5f5;
+  object-fit: cover;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding: 24rpx;
+}
+
+.name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 78rpx; /* 2行文字高度 */
+}
+
+.price {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ff4757;
+  line-height: 1;
+}
