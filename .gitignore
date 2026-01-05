@@ -7,8 +7,9 @@ target/
 *.iml
 .vscode/
 
-# Claude skills (auto-generated)
-.claude/skills/
+# Claude skills (auto-generated, keep ops-expert)
+.claude/skills/*
+!.claude/skills/ops-expert/
 
 # Dependencies
 node_modules/
