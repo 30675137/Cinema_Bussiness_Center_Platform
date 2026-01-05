@@ -68,12 +68,16 @@ public class ChannelProductService {
             throw new BusinessException("PRD_DUP_001", "Product already configured for this channel");
         }
 
-        // 3. 构建实体
+        // 3. 查询菜单分类
+        MenuCategory category = menuCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("菜单分类不存在: " + request.getCategoryId()));
+
+        // 4. 构建实体
         ChannelProductConfig config = ChannelProductConfig.builder()
                 .skuId(request.getSkuId())
                 .channelType(request.getChannelType())
                 .displayName(StringUtils.hasText(request.getDisplayName()) ? request.getDisplayName() : sku.getName())
-                .channelCategory(request.getChannelCategory())
+                .category(category)
                 .channelPrice(request.getChannelPrice())
                 .mainImage(request.getMainImage())
                 .detailImages(request.getDetailImages())
@@ -96,7 +100,11 @@ public class ChannelProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Channel product not found: " + id));
 
         if (request.getDisplayName() != null) config.setDisplayName(request.getDisplayName());
-        if (request.getChannelCategory() != null) config.setChannelCategory(request.getChannelCategory());
+        if (request.getCategoryId() != null) {
+            MenuCategory category = menuCategoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("菜单分类不存在: " + request.getCategoryId()));
+            config.setCategory(category);
+        }
         if (request.getChannelPrice() != null) config.setChannelPrice(request.getChannelPrice());
         if (request.getMainImage() != null) config.setMainImage(request.getMainImage());
         if (request.getDetailImages() != null) config.setDetailImages(request.getDetailImages());

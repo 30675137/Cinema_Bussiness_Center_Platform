@@ -90,7 +90,8 @@ public class ChannelProductConfig {
     @Deprecated
     @Enumerated(EnumType.STRING)
     @Column(name = "channel_category", nullable = false, length = 50)
-    private ChannelCategory channelCategory;
+    @Builder.Default
+    private ChannelCategory channelCategory = ChannelCategory.OTHER;
 
     /**
      * @spec O002-miniapp-menu-config

@@ -1,7 +1,6 @@
 package com.cinema.channelproduct.dto;
 
 import com.cinema.channelproduct.domain.ChannelProductSpec;
-import com.cinema.channelproduct.domain.enums.ChannelCategory;
 import com.cinema.channelproduct.domain.enums.ChannelProductStatus;
 import com.cinema.channelproduct.domain.enums.ChannelType;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,10 +41,11 @@ public class CreateChannelProductRequest {
     private String displayName;
 
     /**
-     * 渠道分类
+     * @spec O008-channel-product-category-migration
+     * 菜单分类 ID（关联 menu_category.id）
      */
-    @NotNull(message = "渠道分类不能为空")
-    private ChannelCategory channelCategory;
+    @NotNull(message = "菜单分类不能为空")
+    private UUID categoryId;
 
     /**
      * 渠道价格（分）
