@@ -2,34 +2,21 @@ spring:
   application:
     name: cinema-hall-store-backend
 
-  # 数据源配置（Supabase PostgreSQL - Pooler 模式）
-  datasource:
-    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require
-    username: postgres.fxhgyxceqrmnpezluaht
-    password: ppkZ8sGUEHB0qjFs
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 2
-      connection-timeout: 30000
+  # 默认激活 dev 环境
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
-  # JPA 配置
+  # JPA 公共配置
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: none # 暂时禁用，避免启动失败
-    show-sql: true
     properties:
       hibernate:
-        format_sql: true
-        use_sql_comments: true
         jdbc:
           lob:
             non_contextual_creation: true
 
-  # Flyway 配置
+  # Flyway 公共配置
   flyway:
-    enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
@@ -93,17 +80,8 @@ beverage:
     # 订单号前缀
     order-number-prefix: BORDT # 格式: BORDT + yyyyMMddHHmmss + 4位随机数
 
-# 日志配置
+# 日志公共配置（级别由环境配置文件指定）
 logging:
-  level:
-    root: INFO
-    com.cinema.hallstore: DEBUG
-    com.cinema.beverage: DEBUG # 饮品模块日志
-    org.springframework.web: DEBUG
-    org.springframework.web.reactive.function.client: TRACE
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   file:
     name: ${LOG_PATH:../cinema-backend.log}
     max-size: 10MB

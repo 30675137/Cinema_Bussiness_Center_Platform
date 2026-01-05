@@ -1,0 +1,46 @@
+# =====================================================
+# 开发环境配置 (Development)
+# 启动方式: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# 或: java -jar app.jar --spring.profiles.active=dev
+# =====================================================
+
+spring:
+  # 数据源配置（Supabase PostgreSQL - 开发环境）
+  datasource:
+    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require
+    username: postgres.fxhgyxceqrmnpezluaht
+    password: ${DB_PASSWORD:ppkZ8sGUEHB0qjFs}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  # JPA 开发环境配置
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  # Flyway 开发环境
+  flyway:
+    enabled: true
+
+# 日志配置 - 开发环境详细日志
+logging:
+  level:
+    root: INFO
+    com.cinema.hallstore: DEBUG
+    com.cinema.beverage: DEBUG
+    com.cinema.product: DEBUG
+    com.cinema.client: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.reactive.function.client: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %clr(%-5level) %cyan([%thread]) %logger{36} - %msg%n"

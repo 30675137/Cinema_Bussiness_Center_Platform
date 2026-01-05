@@ -1,0 +1,46 @@
+# =====================================================
+# 测试环境配置 (Test)
+# 启动方式: mvn spring-boot:run -Dspring-boot.run.profiles=test
+# 或: java -jar app.jar --spring.profiles.active=test
+# =====================================================
+
+spring:
+  # 数据源配置（测试环境 - 可配置独立测试数据库）
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require}
+    username: ${TEST_DB_USERNAME:postgres.fxhgyxceqrmnpezluaht}
+    password: ${TEST_DB_PASSWORD:ppkZ8sGUEHB0qjFs}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 3
+      minimum-idle: 1
+      connection-timeout: 30000
+
+  # JPA 测试环境配置
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+
+  # Flyway 测试环境
+  flyway:
+    enabled: true
+
+# 日志配置 - 测试环境精简日志
+logging:
+  level:
+    root: WARN
+    com.cinema: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{HH:mm:ss} %-5level [%thread] %logger{20} - %msg%n"
+
+# 测试环境特定配置
+beverage:
+  payment:
+    mock-delay-ms: 100  # 测试环境缩短 mock 延迟
