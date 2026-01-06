@@ -14,7 +14,8 @@ import './index.less'
  * 固定定位在底部导航栏上方，显示购物车总金额和商品件数
  */
 export const FloatingCartButton = memo(() => {
-  const { totalItems, cartTotal, toggleCartDrawer } = useCartStore()
+  // ✅ 修复：订阅 cart 状态，而不是只订阅函数
+  const { cart, toggleCartDrawer } = useCartStore()
 
   /**
    * 获取当前页面路径
@@ -32,24 +33,40 @@ export const FloatingCartButton = memo(() => {
   }, [currentRoute])
 
   /**
-   * 条件渲染：购物车有商品 且 当前在商品列表页
+   * ✅ 修复：基于 cart.items 计算总数量
    */
-  const shouldShow = totalItems() > 0 && isProductListPage
+  const totalItemsCount = useMemo(() => {
+    return cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  }, [cart.items])
 
   /**
-   * 格式化角标数字（超过99显示99+）
+   * 条件渲染：购物车有商品 且 当前在商品列表页
+   */
+  const shouldShow = totalItemsCount > 0 && isProductListPage
+
+  /**
+   * ✅ 修复：格式化角标数字（超过99显示99+）
    */
   const badgeText = useMemo(() => {
-    const count = totalItems()
-    return count > 99 ? '99+' : count.toString()
-  }, [totalItems])
+    return totalItemsCount > 99 ? '99+' : totalItemsCount.toString()
+  }, [totalItemsCount])
+
+  /**
+   * ✅ 修复：计算总金额（基于 cart.items）
+   */
+  const totalAmount = useMemo(() => {
+    return cart.items.reduce(
+      (sum, item) => sum + item.product.price * item.quantity,
+      0
+    )
+  }, [cart.items])
 
   /**
    * 格式化总金额
    */
   const totalPriceText = useMemo(() => {
-    return formatPrice(cartTotal())
-  }, [cartTotal])
+    return formatPrice(totalAmount)
+  }, [totalAmount])
 
   /**
    * 处理点击事件

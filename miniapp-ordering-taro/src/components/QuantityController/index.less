@@ -6,26 +6,27 @@
 .quantity-controller {
   display: flex;
   align-items: center;
-  gap: 16rpx; /* 8px */
+  gap: 6rpx; /* 再次减小间距：3px */
 }
 
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64rpx; /* 32px */
-  height: 64rpx; /* 32px */
+  width: 44rpx; /* 再次减小：22px */
+  height: 44rpx; /* 再次减小：22px */
   border-radius: 50%;
   transition: all 0.2s ease;
+  flex-shrink: 0; /* 防止被压缩 */
 
   .icon {
-    font-size: 36rpx; /* 18px */
+    font-size: 26rpx; /* 再次减小图标：13px */
     font-weight: 600;
     line-height: 1;
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
     opacity: 0.8;
   }
 }
@@ -56,10 +57,10 @@
 }
 
 .quantity {
-  font-size: 28rpx; /* 14px */
+  font-size: 24rpx; /* 减小字体：12px */
   font-weight: 700;
   color: #f59e0b; /* amber-500 */
-  min-width: 32rpx; /* 16px */
+  min-width: 40rpx; /* 增加最小宽度：20px，确保两位数显示 */
   text-align: center;
   line-height: 1;
 }

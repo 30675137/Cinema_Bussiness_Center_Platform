@@ -16,7 +16,8 @@ import './index.less'
  * 从底部滑入的购物车详情界面
  */
 export const CartDrawer = memo(() => {
-  const { cart, isCartOpen, toggleCartDrawer, updateQuantity, cartTotal, subtotal } = useCartStore()
+  // ✅ 修复：订阅 cart 状态
+  const { cart, isCartOpen, toggleCartDrawer, updateQuantity } = useCartStore()
 
   /**
    * 处理遮罩层点击（关闭抽屉）
@@ -72,10 +73,19 @@ export const CartDrawer = memo(() => {
   }
 
   /**
-   * 计算小计和实付金额
+   * ✅ 修复：基于 cart.items 计算小计和实付金额
    */
-  const subtotalAmount = useMemo(() => subtotal(), [subtotal])
-  const totalAmount = useMemo(() => cartTotal(), [cartTotal])
+  const subtotalAmount = useMemo(() => {
+    return cart.items.reduce(
+      (sum, item) => sum + item.product.price * item.quantity,
+      0
+    )
+  }, [cart.items])
+
+  const totalAmount = useMemo(() => {
+    // 目前小计与总金额相同（无优惠）
+    return subtotalAmount
+  }, [subtotalAmount])
 
   // 不显示抽屉时返回 null
   if (!isCartOpen) {
