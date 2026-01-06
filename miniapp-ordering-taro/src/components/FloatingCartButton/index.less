@@ -1,0 +1,77 @@
+/**
+ * @spec O010-shopping-cart
+ * 浮动购物车按钮样式
+ */
+
+.floating-cart-button {
+  position: fixed;
+  bottom: 192rpx; /* 96px - 底部导航栏上方 */
+  left: 32rpx; /* 16px */
+  right: 32rpx; /* 16px */
+  height: 112rpx; /* 56px - h-14 */
+  background-color: #f59e0b; /* amber-500 */
+  border-radius: 32rpx; /* rounded-2xl */
+  box-shadow: 0 50rpx 100rpx rgba(245, 158, 11, 0.25); /* shadow-2xl */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx; /* 12px */
+  z-index: 100;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* 左侧角标 */
+.badge {
+  background-color: #18181b; /* zinc-950 */
+  border-radius: 16rpx; /* rounded-lg */
+  padding: 8rpx 16rpx; /* 4px 8px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64rpx; /* 32px */
+}
+
+.badge-text {
+  font-size: 28rpx; /* 14px */
+  font-weight: 700;
+  color: #f59e0b; /* amber-500 */
+  line-height: 1;
+}
+
+/* 中间内容区 */
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-text {
+  font-size: 28rpx; /* 14px */
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6); /* 半透明黑色 */
+}
+
+/* 右侧价格区 */
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 8rpx; /* 4px */
+}
+
+.total-price {
+  font-size: 36rpx; /* 18px */
+  font-weight: 700;
+  color: #18181b; /* zinc-950 */
+}
+
+.arrow {
+  font-size: 48rpx; /* 24px */
+  color: #18181b; /* zinc-950 */
+  font-weight: 300;
+  line-height: 1;
+}

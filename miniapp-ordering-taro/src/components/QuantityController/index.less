@@ -1,0 +1,65 @@
+/**
+ * @spec O010-shopping-cart
+ * 数量控制器组件样式
+ */
+
+.quantity-controller {
+  display: flex;
+  align-items: center;
+  gap: 16rpx; /* 8px */
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx; /* 32px */
+  height: 64rpx; /* 32px */
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  .icon {
+    font-size: 36rpx; /* 18px */
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.btn-decrease {
+  background-color: #27272a; /* zinc-800 */
+
+  .icon {
+    color: #a1a1aa; /* zinc-400 */
+  }
+
+  &:hover .icon {
+    color: #fff;
+  }
+}
+
+.btn-increase {
+  background-color: #f59e0b; /* amber-500 */
+  box-shadow: 0 8rpx 16rpx rgba(245, 158, 11, 0.1);
+
+  .icon {
+    color: #18181b; /* zinc-950 */
+  }
+
+  &:hover {
+    background-color: #fbbf24; /* amber-400 */
+  }
+}
+
+.quantity {
+  font-size: 28rpx; /* 14px */
+  font-weight: 700;
+  color: #f59e0b; /* amber-500 */
+  min-width: 32rpx; /* 16px */
+  text-align: center;
+  line-height: 1;
+}

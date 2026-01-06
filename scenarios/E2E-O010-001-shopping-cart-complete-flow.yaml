@@ -1,0 +1,238 @@
+# @spec T001-e2e-scenario-author
+# E2E 测试场景：购物车完整流程验证
+scenario_id: E2E-O010-001
+spec_ref: O010-shopping-cart
+title: 购物车完整流程验证 - 添加商品到结算
+tags:
+  module: [order, cart]
+  channel: [h5, weapp]
+  deploy: [saas]
+  priority: p1
+  smoke: true
+
+description: |
+  验证用户从商品列表页添加商品、查看浮动购物车按钮、打开购物车抽屉、
+  修改商品数量、清空购物车、跳转结算页面的完整流程。
+
+preconditions:
+  role: user
+  testdata_ref: shoppingCartTestData.scenario_001
+  initial_state:
+    - 用户已登录
+    - 购物车为空
+    - 在商品列表页 (/pages/menu/index)
+
+steps:
+  # Step 1: 导航到商品列表页
+  - action: navigate
+    system: c-end
+    params:
+      url: /pages/menu/index
+    description: 打开商品列表页（Taro H5）
+
+  # Step 2: 验证初始状态 - 购物车按钮不显示
+  - action: check_element_not_visible
+    system: c-end
+    params:
+      selector: .floating-cart-button
+    description: 验证购物车为空时浮动按钮不显示
+
+  # Step 3: 添加第一个商品
+  - action: click
+    system: c-end
+    params:
+      selector: .product-card:nth-child(1) .add-button
+    description: 点击第一个商品的"+"按钮
+
+  # Step 4: 验证浮动按钮出现
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .floating-cart-button
+    description: 验证浮动购物车按钮显示
+
+  # Step 5: 验证角标数量为 1
+  - action: check_text
+    system: c-end
+    params:
+      selector: .badge-text
+      expected: "1"
+    description: 验证角标显示 "1"
+
+  # Step 6: 增加商品数量到 3
+  - action: click
+    system: c-end
+    params:
+      selector: .product-card:nth-child(1) .btn-increase
+    description: 点击"+"按钮增加数量
+
+  - action: click
+    system: c-end
+    params:
+      selector: .product-card:nth-child(1) .btn-increase
+    description: 再次点击"+"按钮
+
+  # Step 7: 验证角标数量为 3
+  - action: check_text
+    system: c-end
+    params:
+      selector: .badge-text
+      expected: "3"
+    description: 验证角标更新为 "3"
+
+  # Step 8: 添加第二个商品
+  - action: click
+    system: c-end
+    params:
+      selector: .product-card:nth-child(2) .add-button
+    description: 添加第二个商品
+
+  # Step 9: 验证角标数量为 4
+  - action: check_text
+    system: c-end
+    params:
+      selector: .badge-text
+      expected: "4"
+    description: 验证角标更新为 "4"（3+1）
+
+  # Step 10: 点击浮动购物车按钮
+  - action: click
+    system: c-end
+    params:
+      selector: .floating-cart-button
+    description: 点击浮动购物车按钮打开抽屉
+
+  # Step 11: 验证抽屉打开
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .cart-drawer
+    description: 验证购物车抽屉显示
+
+  # Step 12: 验证抽屉标题
+  - action: check_text
+    system: c-end
+    params:
+      selector: .drawer-title
+      expected: "订单汇总"
+    description: 验证抽屉标题为"订单汇总"
+
+  # Step 13: 验证商品列表显示 2 个商品
+  - action: check_element_count
+    system: c-end
+    params:
+      selector: .cart-item
+      expected: 2
+    description: 验证购物车中有 2 个商品
+
+  # Step 14: 在抽屉中减少第一个商品数量
+  - action: click
+    system: c-end
+    params:
+      selector: .cart-item:nth-child(1) .btn-decrease
+    description: 点击第一个商品的"-"按钮
+
+  # Step 15: 验证第一个商品数量减少
+  - action: check_text
+    system: c-end
+    params:
+      selector: .cart-item:nth-child(1) .quantity
+      expected: "2"
+    description: 验证第一个商品数量变为 "2"
+
+  # Step 16: 验证总金额更新
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .total-amount
+    description: 验证总金额显示
+
+  # Step 17: 删除第二个商品（数量减到 0）
+  - action: click
+    system: c-end
+    params:
+      selector: .cart-item:nth-child(2) .btn-decrease
+    description: 点击第二个商品的"-"按钮删除
+
+  # Step 18: 验证商品列表只剩 1 个商品
+  - action: check_element_count
+    system: c-end
+    params:
+      selector: .cart-item
+      expected: 1
+    description: 验证购物车中只剩 1 个商品
+
+  # Step 19: 点击支付按钮
+  - action: click
+    system: c-end
+    params:
+      selector: .pay-button
+    description: 点击"立即支付"按钮
+
+  # Step 20: 验证跳转到订单确认页
+  - action: check_url
+    system: c-end
+    params:
+      expected: /pages/order-confirm/index
+    description: 验证跳转到订单确认页
+
+assertions:
+  # UI 断言
+  - type: ui
+    check: element_visible
+    params:
+      selector: .floating-cart-button
+    description: 浮动购物车按钮显示
+
+  - type: ui
+    check: element_visible
+    params:
+      selector: .cart-drawer
+    description: 购物车抽屉显示
+
+  - type: ui
+    check: element_count
+    params:
+      selector: .cart-item
+      expected: 1
+    description: 购物车中有 1 个商品（删除后）
+
+  # 状态断言
+  - type: state
+    check: cart_total_items
+    params:
+      expected: 2
+    description: 购物车总件数为 2（第一个商品 x2）
+
+  - type: state
+    check: cart_total_price
+    params:
+      operator: greater_than
+      expected: 0
+    description: 购物车总金额大于 0
+
+  # 导航断言
+  - type: navigation
+    check: url_equals
+    params:
+      expected: /pages/order-confirm/index
+    description: 成功跳转到订单确认页
+
+postconditions:
+  - 购物车中有 1 个商品，数量为 2
+  - 用户在订单确认页
+  - 购物车状态已持久化到本地存储
+
+testdata:
+  scenario_001:
+    h5BaseUrl: http://localhost:10086
+    menu_page: /pages/menu/index
+    products:
+      - id: "product-001"
+        name: "威士忌可乐鸡尾酒"
+        price: 4800  # 48.00 元，单位：分
+        image: "/assets/products/whiskey-cola.jpg"
+      - id: "product-002"
+        name: "经典马提尼"
+        price: 5600  # 56.00 元，单位：分
+        image: "/assets/products/martini.jpg"
