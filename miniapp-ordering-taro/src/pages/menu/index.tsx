@@ -1,6 +1,7 @@
 /**
  * @spec O007-miniapp-menu-api
  * @spec O002-miniapp-menu-config
+ * @spec O010-shopping-cart
  * 菜单页面
  */
 
@@ -15,6 +16,8 @@ import Header from '../../components/Header'
 import CategoryTabs from '../../components/CategoryTabs'
 import ProductList from '../../components/ProductList'
 import TabBar from '../../components/TabBar'
+import { FloatingCartButton } from '../../components/FloatingCartButton'
+import { CartDrawer } from '../../components/CartDrawer'
 import './index.less'
 
 /**
@@ -156,12 +159,18 @@ export default function MenuPage() {
         </View>
       </View>
 
+      {/* O010: 浮动购物车按钮（固定在底部导航栏上方） */}
+      <FloatingCartButton />
+
       {/* 底部导航栏 */}
       <TabBar
         tabs={tabBarTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
+
+      {/* O010: 购物车抽屉（全屏遮罩） */}
+      <CartDrawer />
     </View>
   )
 }

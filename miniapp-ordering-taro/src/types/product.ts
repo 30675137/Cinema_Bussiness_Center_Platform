@@ -9,6 +9,8 @@
 export enum ChannelCategory {
   /** 经典特调 */
   ALCOHOL = 'ALCOHOL',
+  /** 特调饮品 */
+  COCKTAIL = 'COCKTAIL',
   /** 精品咖啡 */
   COFFEE = 'COFFEE',
   /** 经典饮品 */
@@ -17,6 +19,8 @@ export enum ChannelCategory {
   SNACK = 'SNACK',
   /** 主厨正餐 */
   MEAL = 'MEAL',
+  /** 甜点蛋糕 */
+  DESSERT = 'DESSERT',
   /** 其他 */
   OTHER = 'OTHER',
 }

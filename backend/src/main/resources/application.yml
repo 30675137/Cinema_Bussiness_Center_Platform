@@ -29,7 +29,7 @@ spring:
 
   # Flyway 配置
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0

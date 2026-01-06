@@ -294,6 +294,21 @@ export async function fetchProducts(
  * @returns 商品卡片数据
  */
 export function toProductCard(dto: ChannelProductDTO): ProductCard {
+  // 提取分类 code，优先使用 category 对象的 code
+  let categoryCode: string = 'OTHER'
+
+  if (typeof dto.category === 'string') {
+    categoryCode = dto.category
+  } else if (dto.category?.code) {
+    categoryCode = dto.category.code
+  }
+
+  // 验证 categoryCode 是否是有效的 ChannelCategory 枚举值
+  const validCategories = Object.values(ChannelCategory)
+  const finalCategory = validCategories.includes(categoryCode as ChannelCategory)
+    ? (categoryCode as ChannelCategory)
+    : ChannelCategory.OTHER
+
   return {
     id: dto.id,
     name: dto.displayName || dto.productName || '',
@@ -302,6 +317,6 @@ export function toProductCard(dto: ChannelProductDTO): ProductCard {
     tags: dto.tags || [],
     minSalesUnit: '杯', // 默认单位
     isAvailable: dto.status === 'ACTIVE' && dto.stockStatus === 'IN_STOCK',
-    category: (typeof dto.category === 'string' ? dto.category : dto.category?.code || 'OTHER') as ChannelCategory,
+    category: finalCategory,
   }
 }
