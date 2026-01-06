@@ -1,0 +1,72 @@
+/**
+ * @spec O010-shopping-cart
+ * QuantityController 组件样式
+ *
+ * 设计要求：
+ * - 减少按钮：zinc-800 背景色
+ * - 增加按钮：amber-500 背景色
+ * - 按钮间距：8px
+ * - 按钮尺寸：32x32 rpx
+ * - 数字居中显示
+ */
+
+.controller {
+  display: flex;
+  align-items: center;
+  gap: 16rpx; /* 8px */
+}
+
+/* 减少按钮 */
+.decreaseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx; /* 32px */
+  height: 64rpx; /* 32px */
+  background-color: #27272a; /* zinc-800 */
+  border-radius: 12rpx; /* 6px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 点击效果 */
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* 增加按钮 */
+.increaseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx; /* 32px */
+  height: 64rpx; /* 32px */
+  background-color: #f59e0b; /* amber-500 */
+  border-radius: 12rpx; /* 6px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 点击效果 */
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* 按钮文字 */
+.buttonText {
+  color: #ffffff;
+  font-size: 36rpx; /* 18px */
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 数量显示 */
+.quantity {
+  min-width: 48rpx; /* 24px */
+  text-align: center;
+  color: #f59e0b; /* amber-500 */
+  font-size: 32rpx; /* 16px */
+  font-weight: 600;
+}

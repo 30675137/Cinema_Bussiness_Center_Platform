@@ -1,0 +1,73 @@
+/**
+ * @spec O010-shopping-cart
+ * 购物车抽屉滑入动画
+ *
+ * 动画规格:
+ * - 时长: 350ms
+ * - 缓动函数: cubic-bezier(0.16, 1, 0.3, 1)
+ * - 从底部滑入
+ */
+
+/* 抽屉滑入动画 */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 抽屉滑出动画 */
+@keyframes slideOutDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* 遮罩层淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 遮罩层淡出动画 */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* 应用滑入动画的类 */
+.cart-slide-in {
+  animation: slideInUp 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 应用滑出动画的类 */
+.cart-slide-out {
+  animation: slideOutDown 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 应用遮罩淡入动画的类 */
+.mask-fade-in {
+  animation: fadeIn 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 应用遮罩淡出动画的类 */
+.mask-fade-out {
+  animation: fadeOut 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

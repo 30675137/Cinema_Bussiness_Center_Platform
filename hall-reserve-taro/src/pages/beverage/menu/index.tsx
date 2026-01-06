@@ -1,7 +1,8 @@
 /**
  * @spec O003-beverage-order
  * @spec O002-miniapp-menu-config
- * 饮品菜单页面 - 使用动态分类
+ * @spec O010-shopping-cart
+ * 饮品菜单页面 - 使用动态分类 + 购物车功能
  */
 import React, { useState, useEffect, useMemo } from 'react'
 import { View, ScrollView, Text, Image } from '@tarojs/components'
@@ -11,6 +12,8 @@ import { BeverageCard } from '../../../components/BeverageCard'
 import { useBeverageStore } from '../../../stores/beverageStore'
 import { useMenuCategoryStore } from '../../../stores/menuCategoryStore'
 import CartIcon from '../../../components/cart/CartIcon'
+import { CartDrawer } from '../../../components/CartDrawer'
+import { FloatingCartButton } from '../../../components/FloatingCartButton'
 import type { BeverageDTO } from '../../../types/beverage'
 import type { MenuCategoryDTO } from '../../../types/menuCategory'
 import './index.scss'
@@ -172,6 +175,10 @@ const BeverageMenu: React.FC = () => {
           </View>
         )}
       </ScrollView>
+
+      {/* 购物车功能 (@spec O010-shopping-cart) */}
+      <FloatingCartButton />
+      <CartDrawer />
     </View>
   )
 }

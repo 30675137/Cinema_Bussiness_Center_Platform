@@ -1,0 +1,111 @@
+/**
+ * @spec O010-shopping-cart
+ * FloatingCartButton 组件样式
+ *
+ * 设计要求：
+ * - 固定定位在页面底部
+ * - 距离底部导航 96px (192rpx)
+ * - 背景色：amber-500
+ * - 高度：56px (112rpx)
+ * - 圆角：rounded-2xl (32rpx)
+ * - z-index: 50
+ * - 点击动画：active:scale-0.98
+ * - H5 悬停动画：hover:scale-1.02
+ */
+
+.floatingButton {
+  position: fixed;
+  bottom: 192rpx; /* 96px - 距离底部导航 */
+  left: 32rpx; /* 16px */
+  right: 32rpx; /* 16px */
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  height: 112rpx; /* 56px */
+  padding: 0 32rpx; /* 0 16px */
+
+  background-color: #f59e0b; /* amber-500 */
+  border-radius: 32rpx; /* 16px - rounded-2xl */
+  box-shadow: 0 8rpx 24rpx rgba(245, 158, 11, 0.4);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 点击效果 */
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* H5 悬停效果 */
+@media (hover: hover) {
+  .floatingButton:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12rpx 32rpx rgba(245, 158, 11, 0.5);
+  }
+}
+
+/* 角标 */
+.badge {
+  position: absolute;
+  top: -16rpx; /* -8px */
+  left: 32rpx; /* 16px */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40rpx; /* 20px */
+  height: 40rpx; /* 20px */
+  padding: 0 12rpx; /* 0 6px */
+
+  background-color: #18181b; /* zinc-950 */
+  border-radius: 16rpx; /* 8px - rounded-lg */
+  border: 2rpx solid #f59e0b; /* amber-500 边框 */
+}
+
+.badgeText {
+  font-size: 20rpx; /* 10px */
+  font-weight: 700;
+  color: #f59e0b; /* amber-500 */
+  line-height: 1;
+}
+
+/* 按钮内容 */
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* 左侧文字 */
+.label {
+  font-size: 32rpx; /* 16px */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1;
+}
+
+/* 右侧区域 */
+.right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx; /* 8px */
+}
+
+/* 总金额 */
+.price {
+  font-size: 36rpx; /* 18px */
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+/* 箭头图标 */
+.arrow {
+  font-size: 32rpx; /* 16px */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1;
+}

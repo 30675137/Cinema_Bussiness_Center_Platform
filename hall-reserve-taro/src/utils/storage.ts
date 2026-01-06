@@ -7,6 +7,7 @@
 import Taro from '@tarojs/taro'
 import { User } from '../types/user'
 import { Token } from '../types/auth'
+import type { CartItem } from '../types/cart' // @spec O010-shopping-cart
 
 /**
  * 存储键常量
@@ -16,6 +17,7 @@ const STORAGE_KEYS = {
   REFRESH_TOKEN: 'refresh_token',
   TOKEN_EXPIRES_AT: 'token_expires_at',
   USER_INFO: 'user_info',
+  CART: 'cart', // @spec O010-shopping-cart
 } as const
 
 /**
@@ -168,4 +170,68 @@ export const isLoggedIn = (): boolean => {
   const user = getUser()
 
   return !!(token && user)
+}
+
+// ========== 购物车存储 (@spec O010-shopping-cart) ==========
+
+/**
+ * 保存购物车到本地存储
+ * @spec O010-shopping-cart
+ */
+export const saveCart = (cart: CartItem[]): void => {
+  try {
+    Taro.setStorageSync(STORAGE_KEYS.CART, cart)
+  } catch (error) {
+    console.error('[Storage] Failed to save cart:', error)
+  }
+}
+
+/**
+ * 从本地存储加载购物车
+ * @spec O010-shopping-cart
+ * @returns 购物车项数组（如果加载失败或数据无效，返回空数组）
+ */
+export const loadCart = (): CartItem[] => {
+  try {
+    const cart = Taro.getStorageSync(STORAGE_KEYS.CART)
+
+    // 验证数据结构
+    if (!Array.isArray(cart)) {
+      console.warn('[Storage] Invalid cart data structure, resetting to empty cart')
+      return []
+    }
+
+    // 过滤无效项
+    const validItems = cart.filter(item =>
+      item.product &&
+      typeof item.product.id === 'string' &&
+      typeof item.product.price === 'number' &&
+      typeof item.quantity === 'number' &&
+      item.quantity > 0
+    )
+
+    // 如果有无效项被过滤，更新存储
+    if (validItems.length !== cart.length) {
+      console.warn(`[Storage] Filtered ${cart.length - validItems.length} invalid cart items`)
+      saveCart(validItems)
+    }
+
+    return validItems
+  } catch (error) {
+    console.error('[Storage] Failed to load cart:', error)
+    return []
+  }
+}
+
+/**
+ * 清空购物车本地存储
+ * @spec O010-shopping-cart
+ */
+export const clearCartStorage = (): void => {
+  try {
+    Taro.removeStorageSync(STORAGE_KEYS.CART)
+    console.log('[Storage] Cart cleared')
+  } catch (error) {
+    console.error('[Storage] Failed to clear cart:', error)
+  }
 }

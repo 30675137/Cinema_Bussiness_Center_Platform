@@ -1,5 +1,6 @@
 /**
  * @spec O009-miniapp-product-list
+ * @spec O010-shopping-cart
  * ProductCard component styles
  */
 
@@ -68,5 +69,46 @@
   font-size: 32rpx;
   font-weight: 700;
   color: #ff4757;
+  line-height: 1;
+}
+
+/* ========== 购物车控制器样式 (@spec O010-shopping-cart) ========== */
+
+/* 底部区域：价格 + 购物车控制器 */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 购物车控制器容器 */
+.cartControl {
+  flex-shrink: 0;
+}
+
+/* 添加到购物车按钮 */
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64rpx; /* 32px */
+  height: 64rpx; /* 32px */
+  background-color: #f59e0b; /* amber-500 */
+  border-radius: 12rpx; /* 6px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 点击效果 */
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* 添加按钮文字 */
+.addButtonText {
+  color: #ffffff;
+  font-size: 36rpx; /* 18px */
+  font-weight: 600;
   line-height: 1;
 }

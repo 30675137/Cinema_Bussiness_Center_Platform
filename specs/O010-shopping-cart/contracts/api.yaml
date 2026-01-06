@@ -1,0 +1,125 @@
+# API Contracts: O010-shopping-cart
+
+**Feature**: 小程序购物车功能
+**Spec ID**: O010-shopping-cart
+**Created**: 2026-01-06
+**Status**: N/A - Frontend-Only Feature
+
+---
+
+## 说明
+
+本功能为**纯前端实现**，购物车数据仅存储在小程序本地存储（Taro.setStorageSync），**不涉及后端 API 集成**。
+
+因此，本目录不包含 OpenAPI 3.0 规范文件。
+
+---
+
+## 数据存储方式
+
+- **存储位置**: Taro 本地存储（微信小程序 `wx.setStorageSync` / H5 `localStorage`）
+- **存储键名**: `'cart'`
+- **数据结构**: `CartItem[]` 数组（详见 `data-model.md`）
+
+---
+
+## 未来扩展可能性
+
+如果未来需要将购物车数据同步到后端（如实现多端同步、购物车历史记录等功能），可在此目录添加以下 API 规范：
+
+### 可能的后端 API（未实现）
+
+```yaml
+# 示例：购物车同步 API（未实现）
+openapi: 3.0.0
+info:
+  title: 购物车同步 API
+  version: 1.0.0
+paths:
+  /api/client/cart:
+    get:
+      summary: 获取用户购物车
+      description: 从后端获取用户的购物车数据（多端同步）
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CartItem'
+
+    post:
+      summary: 同步购物车到后端
+      description: 将本地购物车数据同步到后端
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CartItem'
+      responses:
+        '200':
+          description: 同步成功
+
+components:
+  schemas:
+    CartItem:
+      type: object
+      required:
+        - product
+        - quantity
+      properties:
+        product:
+          $ref: '#/components/schemas/CartProduct'
+        quantity:
+          type: integer
+          minimum: 1
+        selectedOptions:
+          type: object
+          additionalProperties:
+            type: string
+
+    CartProduct:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - image
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: integer
+          description: 价格（单位：分）
+        image:
+          type: string
+          format: uri
+```
+
+---
+
+## 相关文档
+
+- **数据模型**: `specs/O010-shopping-cart/data-model.md`
+- **功能规格**: `specs/O010-shopping-cart/spec.md`
+- **实现计划**: `specs/O010-shopping-cart/plan.md`
+
+---
+
+**Created by**: Claude Code
+**Branch**: O010-shopping-cart
