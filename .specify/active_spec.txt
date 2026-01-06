@@ -1,1 +1,1 @@
-specs/O007-miniapp-menu-api/spec.md
+specs/O011-order-checkout/spec.md

@@ -1,0 +1,269 @@
+/**
+ * @spec O011-order-checkout
+ * 支付成功页样式
+ */
+.order-success-page {
+  min-height: 100vh;
+  background-color: #09090b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+/* 成功图标区域 */
+.success-icon-wrapper {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 40rpx;
+}
+
+.success-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: scaleIn 0.5s ease-out;
+  z-index: 2;
+}
+
+.check-mark {
+  font-size: 56rpx;
+  color: #ffffff;
+  font-weight: bold;
+  animation: checkDraw 0.3s ease-out 0.3s both;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes checkDraw {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 波纹动画 */
+.success-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 4rpx solid #22c55e;
+  animation: ripple 1.5s ease-out infinite;
+}
+
+.ripple-1 {
+  animation-delay: 0s;
+}
+
+.ripple-2 {
+  animation-delay: 0.5s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* 成功标题 */
+.success-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #fafafa;
+  margin-bottom: 12rpx;
+}
+
+.success-subtitle {
+  font-size: 28rpx;
+  color: #71717a;
+  margin-bottom: 48rpx;
+}
+
+/* 取餐号区域（突出显示） */
+.pickup-section {
+  width: 100%;
+  background: linear-gradient(135deg, #27272a 0%, #18181b 100%);
+  border-radius: 24rpx;
+  padding: 40rpx;
+  text-align: center;
+  margin-bottom: 32rpx;
+  border: 2rpx solid #3f3f46;
+}
+
+.pickup-label {
+  display: block;
+  font-size: 28rpx;
+  color: #a1a1aa;
+  margin-bottom: 16rpx;
+}
+
+.pickup-number {
+  display: block;
+  font-size: 96rpx;
+  font-weight: 800;
+  color: #f97316;
+  letter-spacing: 8rpx;
+  line-height: 1.2;
+  text-shadow: 0 4rpx 16rpx rgba(249, 115, 22, 0.3);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    text-shadow: 0 4rpx 16rpx rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    text-shadow: 0 4rpx 24rpx rgba(249, 115, 22, 0.5);
+  }
+}
+
+.pickup-hint {
+  display: block;
+  font-size: 24rpx;
+  color: #71717a;
+  margin-top: 16rpx;
+}
+
+/* 订单信息卡片 */
+.order-info-card {
+  width: 100%;
+  background-color: #18181b;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.info-row:not(:last-child) {
+  border-bottom: 1rpx solid #27272a;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #71717a;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #fafafa;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+}
+
+.info-value.amount {
+  color: #f97316;
+  font-weight: 600;
+}
+
+/* 温馨提示 */
+.tips-section {
+  width: 100%;
+  background-color: rgba(249, 115, 22, 0.1);
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  margin-bottom: 48rpx;
+  border: 1rpx solid rgba(249, 115, 22, 0.2);
+}
+
+.tips-title {
+  display: block;
+  font-size: 24rpx;
+  color: #f97316;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.tips-content {
+  display: block;
+  font-size: 24rpx;
+  color: #a1a1aa;
+  line-height: 1.5;
+}
+
+/* 底部按钮区域 */
+.bottom-actions {
+  width: 100%;
+  display: flex;
+  gap: 24rpx;
+  margin-top: auto;
+}
+
+.action-button {
+  flex: 1;
+  padding: 28rpx;
+  border-radius: 48rpx;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.action-button.secondary {
+  background-color: #27272a;
+  border: 2rpx solid #3f3f46;
+}
+
+.action-button.secondary:active {
+  background-color: #3f3f46;
+}
+
+.action-button.secondary .button-text {
+  color: #a1a1aa;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.action-button.primary:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.action-button.primary .button-text {
+  color: #ffffff;
+}
+
+.button-text {
+  font-size: 32rpx;
+  font-weight: 600;
+}

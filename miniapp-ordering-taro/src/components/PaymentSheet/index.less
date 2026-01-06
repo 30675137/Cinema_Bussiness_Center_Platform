@@ -1,0 +1,140 @@
+/**
+ * @spec O011-order-checkout
+ * 支付方式选择抽屉样式
+ */
+.payment-sheet-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.payment-sheet {
+  width: 100%;
+  background-color: #18181b;
+  border-radius: 32rpx 32rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 标题栏 */
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #27272a;
+}
+
+.sheet-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.close-button {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #27272a;
+  border-radius: 50%;
+}
+
+.close-icon {
+  font-size: 28rpx;
+  color: #a1a1aa;
+}
+
+/* 支付方式列表 */
+.payment-list {
+  padding: 16rpx 0;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  transition: background-color 0.2s;
+}
+
+.payment-option:active {
+  background-color: #27272a;
+}
+
+.option-icon {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #27272a;
+  border-radius: 16rpx;
+  margin-right: 24rpx;
+}
+
+.icon-emoji {
+  font-size: 40rpx;
+}
+
+.option-label {
+  flex: 1;
+  font-size: 32rpx;
+  color: #fafafa;
+}
+
+.option-arrow {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow-icon {
+  font-size: 36rpx;
+  color: #52525b;
+}
+
+/* 取消按钮 */
+.cancel-button {
+  margin: 16rpx 32rpx 32rpx;
+  padding: 28rpx;
+  background-color: #27272a;
+  border-radius: 16rpx;
+  text-align: center;
+}
+
+.cancel-text {
+  font-size: 32rpx;
+  color: #a1a1aa;
+}
+
+.cancel-button:active {
+  background-color: #3f3f46;
+}

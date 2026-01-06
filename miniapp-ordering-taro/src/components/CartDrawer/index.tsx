@@ -64,8 +64,22 @@ export const CartDrawer = memo(() => {
 
   /**
    * 处理支付按钮点击
+   * @spec O011-order-checkout
    */
   const handlePayment = () => {
+    // 检查购物车是否为空
+    if (cart.items.length === 0) {
+      Taro.showToast({
+        title: '购物车为空',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    // 关闭购物车抽屉
+    toggleCartDrawer()
+
     // 导航到订单确认页
     Taro.navigateTo({
       url: '/pages/order-confirm/index'

@@ -1,0 +1,248 @@
+/**
+ * @spec O011-order-checkout
+ * 订单确认页样式
+ */
+.order-confirm-page {
+  min-height: 100vh;
+  background-color: #09090b;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+  padding: 24rpx;
+  padding-bottom: 180rpx;
+}
+
+/* 通用区块样式 */
+.section {
+  background-color: #18181b;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.item-count {
+  font-size: 26rpx;
+  color: #71717a;
+}
+
+/* 商品列表区域 */
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.product-item {
+  display: flex;
+  gap: 20rpx;
+}
+
+.product-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.product-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #fafafa;
+  line-height: 1.4;
+}
+
+.product-options {
+  font-size: 24rpx;
+  color: #71717a;
+  margin-top: 8rpx;
+}
+
+.product-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.product-price {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #f97316;
+}
+
+.product-quantity {
+  font-size: 26rpx;
+  color: #a1a1aa;
+}
+
+/* 备注输入区域 */
+.remark-input-wrapper {
+  position: relative;
+}
+
+.remark-input {
+  width: 100%;
+  min-height: 160rpx;
+  background-color: #27272a;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #fafafa;
+  box-sizing: border-box;
+}
+
+.remark-placeholder {
+  color: #52525b;
+}
+
+.remark-count {
+  position: absolute;
+  right: 20rpx;
+  bottom: 20rpx;
+  font-size: 24rpx;
+  color: #52525b;
+}
+
+/* 金额汇总区域 */
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.amount-row:not(:last-child) {
+  border-bottom: 1rpx solid #27272a;
+}
+
+.amount-label {
+  font-size: 28rpx;
+  color: #a1a1aa;
+}
+
+.amount-value {
+  font-size: 28rpx;
+  color: #fafafa;
+}
+
+.amount-value.discount {
+  color: #22c55e;
+}
+
+.amount-value.total {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #f97316;
+}
+
+.total-row {
+  padding-top: 24rpx;
+}
+
+/* 底部支付栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background-color: #18181b;
+  border-top: 1rpx solid #27272a;
+}
+
+.pay-summary {
+  display: flex;
+  align-items: baseline;
+}
+
+.pay-label {
+  font-size: 28rpx;
+  color: #a1a1aa;
+}
+
+.pay-amount {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #f97316;
+  margin-left: 8rpx;
+}
+
+.pay-button {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  padding: 24rpx 64rpx;
+  border-radius: 48rpx;
+}
+
+.pay-button-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* 支付加载遮罩 */
+.payment-loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #27272a;
+  border-top-color: #f97316;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 32rpx;
+  color: #fafafa;
+}
