@@ -1,0 +1,397 @@
+# Cinema Business Center Platform - Docker Compose
+# 影院商品管理中台 - Docker 编排配置
+# 包含：Supabase (自建) + Frontend + Backend + Miniapp
+#
+# 使用方式:
+#   默认启动必要服务: docker compose -f docker-compose.test.yml up -d
+#   启动全部服务:     docker compose -f docker-compose.test.yml --profile full up -d
+#   启动含 Studio:    docker compose -f docker-compose.test.yml --profile studio up -d
+
+services:
+  # ============================================
+  # Supabase 核心服务 (必要)
+  # ============================================
+
+  # PostgreSQL 数据库
+  supabase-db:
+    image: supabase/postgres:15.1.0.117
+    container_name: ${PROJECT_NAME:-cinema}-supabase-db
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # GoTrue 认证服务
+  supabase-auth:
+    image: supabase/gotrue:v2.132.3
+    container_name: ${PROJECT_NAME:-cinema}-supabase-auth
+    restart: unless-stopped
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${GOTRUE_PORT:-9999}:9999"
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:9999}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${POSTGRES_DB:-postgres}?sslmode=disable
+      GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
+      GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP:-true}
+      GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
+
+  # PostgREST API 服务
+  supabase-rest:
+    image: postgrest/postgrest:v11.2.2
+    container_name: ${PROJECT_NAME:-cinema}-supabase-rest
+    restart: unless-stopped
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${POSTGREST_PORT:-3001}:3000"
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${POSTGRES_DB:-postgres}
+      PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS:-public,storage}
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+
+  # Storage 存储服务
+  supabase-storage:
+    image: supabase/storage-api:v0.43.11
+    container_name: ${PROJECT_NAME:-cinema}-supabase-storage
+    restart: unless-stopped
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${STORAGE_PORT:-5001}:5000"
+    environment:
+      ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIn0.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUifQ.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE}
+      POSTGREST_URL: http://supabase-rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${POSTGRES_DB:-postgres}
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - supabase-storage-data:/var/lib/storage
+
+  # ============================================
+  # Supabase 可选服务 (profile: full/studio)
+  # ============================================
+
+  # Realtime 实时订阅服务
+  supabase-realtime:
+    image: supabase/realtime:v2.25.35
+    container_name: ${PROJECT_NAME:-cinema}-supabase-realtime
+    restart: unless-stopped
+    profiles: ["full", "realtime"]
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${REALTIME_PORT:-4000}:4000"
+    environment:
+      PORT: 4000
+      DB_HOST: supabase-db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-postgres}
+      DB_SSL: "false"
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      REPLICATION_MODE: RLS
+      REPLICATION_POLL_INTERVAL: 100
+      SECURE_CHANNELS: "true"
+      SLOT_NAME: supabase_realtime_rls
+      TEMPORARY_SLOT: "true"
+
+  # Supabase Meta (pg-meta for Studio)
+  supabase-meta:
+    image: supabase/postgres-meta:v0.68.0
+    container_name: ${PROJECT_NAME:-cinema}-supabase-meta
+    restart: unless-stopped
+    profiles: ["full", "studio"]
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: ${POSTGRES_DB:-postgres}
+      PG_META_DB_USER: ${POSTGRES_USER:-postgres}
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+  # Kong API Gateway (统一入口)
+  supabase-kong:
+    image: kong:2.8.1
+    container_name: ${PROJECT_NAME:-cinema}-supabase-kong
+    restart: unless-stopped
+    profiles: ["full", "studio"]
+    ports:
+      - "${KONG_HTTP_PORT:-8000}:8000"
+      - "${KONG_HTTPS_PORT:-8443}:8443"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml:ro
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  # Supabase Studio (Dashboard)
+  supabase-studio:
+    image: supabase/studio:20240101-8e4a094
+    container_name: ${PROJECT_NAME:-cinema}-supabase-studio
+    restart: unless-stopped
+    profiles: ["full", "studio"]
+    ports:
+      - "${STUDIO_PORT:-54323}:3000"
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION:-Default Organization}
+      DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT:-Default Project}
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL:-http://localhost:8000}
+      SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQxNzY5MjAwLCJleHAiOjE3OTk1MzU2MDB9.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUiLCJpYXQiOjE2NDE3NjkyMDAsImV4cCI6MTc5OTUzNTYwMH0.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q}
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjQxNzY5MjAwLCJleHAiOjE3OTk1MzU2MDB9.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+      supabase-meta:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/profile').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+  # Edge Functions (Deno Runtime)
+  supabase-edge-functions:
+    image: supabase/edge-runtime:v1.29.1
+    container_name: ${PROJECT_NAME:-cinema}-supabase-edge-functions
+    restart: unless-stopped
+    profiles: ["full", "functions"]
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${EDGE_FUNCTIONS_PORT:-54321}:9000"
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIn0.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUifQ.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE}
+      SUPABASE_DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${POSTGRES_DB:-postgres}
+      VERIFY_JWT: "false"
+    volumes:
+      - ./supabase/functions:/home/deno/functions:ro
+
+  # Imgproxy (图片处理服务)
+  supabase-imgproxy:
+    image: darthsim/imgproxy:v3.18
+    container_name: ${PROJECT_NAME:-cinema}-supabase-imgproxy
+    restart: unless-stopped
+    profiles: ["full"]
+    ports:
+      - "${IMGPROXY_PORT:-5002}:8080"
+    environment:
+      IMGPROXY_BIND: ":8080"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+    healthcheck:
+      test: ["CMD", "imgproxy", "health"]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+  # Inbucket (本地邮件测试服务)
+  supabase-inbucket:
+    image: inbucket/inbucket:3.0.3
+    container_name: ${PROJECT_NAME:-cinema}-supabase-inbucket
+    restart: unless-stopped
+    profiles: ["full", "mail"]
+    ports:
+      - "${INBUCKET_WEB_PORT:-54324}:9000"
+      - "${INBUCKET_SMTP_PORT:-54325}:2500"
+      - "${INBUCKET_POP3_PORT:-54326}:1100"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000/"]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+  # Analytics (日志分析 - Logflare)
+  supabase-analytics:
+    image: supabase/logflare:1.4.0
+    container_name: ${PROJECT_NAME:-cinema}-supabase-analytics
+    restart: unless-stopped
+    profiles: ["full", "analytics"]
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    ports:
+      - "${LOGFLARE_PORT:-4001}:4000"
+    environment:
+      LOGFLARE_NODE_HOST: 127.0.0.1
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_DATABASE: ${POSTGRES_DB:-postgres}
+      DB_HOSTNAME: supabase-db
+      DB_PORT: 5432
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_SCHEMA: _analytics
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY:-your-super-secret-and-long-logflare-key}
+      LOGFLARE_SINGLE_TENANT: "true"
+      LOGFLARE_SUPABASE_MODE: "true"
+      POSTGRES_BACKEND_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/${POSTGRES_DB:-postgres}
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  # Vector (日志收集服务)
+  supabase-vector:
+    image: timberio/vector:0.34.0-alpine
+    container_name: ${PROJECT_NAME:-cinema}-supabase-vector
+    restart: unless-stopped
+    profiles: ["full", "analytics"]
+    depends_on:
+      supabase-analytics:
+        condition: service_healthy
+    volumes:
+      - ./supabase/vector.yml:/etc/vector/vector.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY:-your-super-secret-and-long-logflare-key}
+    command: ["--config", "/etc/vector/vector.yml"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9001/health"]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+
+  # ============================================
+  # 应用服务
+  # ============================================
+
+  # 前端服务 (Vite)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: ${PROJECT_NAME:-cinema}-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8080}
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-http://localhost:3001}
+      VITE_SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIn0.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI}
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 后端服务 (Java Spring Boot)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-cinema}-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_DATASOURCE_URL: jdbc:postgresql://supabase-db:5432/${POSTGRES_DB:-postgres}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SUPABASE_URL: http://supabase-rest:3000
+      SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIn0.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUifQ.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE}
+      SUPABASE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # 小程序/H5 服务 (Taro)
+  miniapp:
+    build:
+      context: ./miniapp-ordering-taro
+      dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-cinema}-miniapp
+    restart: unless-stopped
+    ports:
+      - "${MINIAPP_PORT:-10086}:80"
+    environment:
+      TARO_APP_API_URL: ${TARO_APP_API_URL:-http://localhost:8080}
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# ============================================
+# 数据卷
+# ============================================
+volumes:
+  supabase-db-data:
+    driver: local
+  supabase-storage-data:
+    driver: local
+
+# ============================================
+# 网络
+# ============================================
+networks:
+  default:
+    name: ${PROJECT_NAME:-cinema}-network
