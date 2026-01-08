@@ -521,5 +521,46 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 - Supabase (PostgreSQL) 作为主要后端数据源 (O002-miniapp-menu-config)
 - Mock data (MSW handlers + localStorage)，后端使用 Supabase (PostgreSQL) (O008-channel-product-category-migration)
 
+## Supabase REST API (PostgREST) 使用规则
+
+**重要限制**：`supabase-rest` (PostgREST) 服务仅供 Supabase 内部组件使用（如 supabase-studio），**后端和前端项目禁止直接调用此服务**。
+
+### 规则说明
+
+1. **后端数据访问**：必须使用 **Spring Data JPA** 直接访问 PostgreSQL，不得使用 WebClient 调用 PostgREST API
+2. **前端数据访问**：必须通过后端 API (`/api/*`) 获取数据，不得直接调用 PostgREST
+3. **已完成迁移的模块**：
+   - ✅ SKU (SkuRepository → SkuJpaRepository)
+   - ✅ SPU (SpuRepository → SpuJpaRepository)
+   - ✅ Store (StoreRepository → StoreJpaRepository)
+   - ✅ StoreOperationLog (StoreOperationLogRepository → StoreOperationLogJpaRepository)
+
+4. **如需使用 supabase-rest**：必须先与项目负责人确认，并记录使用原因
+
+### 技术原因
+
+- JPA 直连 PostgreSQL 性能更好，避免额外的 HTTP 调用
+- 减少服务依赖，简化部署架构
+- 避免 PostgREST 的认证/权限配置复杂性
+- 更好的事务管理和错误处理
+
+### Docker Compose 配置
+
+`supabase-rest` 服务使用 profile 控制，默认不启动：
+```yaml
+profiles: ["rest", "full"]  # 需要时使用 --profile rest 启动
+```
+
+### 修改后需重新构建
+
+如果修改了 Repository 层代码，必须重新构建 backend：
+```bash
+cd backend && mvn clean package -DskipTests
+docker compose -f docker-compose.test.yml --env-file .env.test build backend
+docker compose -f docker-compose.test.yml --env-file .env.test up -d backend
+```
+
+---
+
 ## Recent Changes
 - O007-miniapp-menu-api: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟
