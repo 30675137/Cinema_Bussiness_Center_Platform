@@ -25,7 +25,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     volumes:
       - supabase-db-data:/var/lib/postgresql/data
-      - ./supabase/migrations:/docker-entrypoint-initdb.d/migrations:ro
+      # 使用 schema 目录（纯建表脚本，不含数据）用于 test 环境
+      - ./supabase/schema:/docker-entrypoint-initdb.d/migrations:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -59,11 +60,12 @@ services:
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP:-true}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
 
-  # PostgREST API 服务
+  # PostgREST API 服务 (可选 - 后端已改用 JPA 直接访问数据库)
   supabase-rest:
     image: postgrest/postgrest:v11.2.2
     container_name: ${PROJECT_NAME:-cinema}-supabase-rest
     restart: unless-stopped
+    profiles: ["rest", "full"]  # 默认不启动，需要时使用 --profile rest
     depends_on:
       supabase-db:
         condition: service_healthy
@@ -76,11 +78,12 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
       PGRST_DB_USE_LEGACY_GUCS: "false"
 
-  # Storage 存储服务
+  # Storage 存储服务 (可选 - 如果不使用 Supabase Storage 可以不启动)
   supabase-storage:
     image: supabase/storage-api:v0.43.11
     container_name: ${PROJECT_NAME:-cinema}-supabase-storage
     restart: unless-stopped
+    profiles: ["storage", "full"]  # 默认不启动
     depends_on:
       supabase-db:
         condition: service_healthy
@@ -161,7 +164,7 @@ services:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
       KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,request-termination
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
     volumes:
@@ -335,6 +338,7 @@ services:
       retries: 3
 
   # 后端服务 (Java Spring Boot)
+  # 注意：SKU 等数据通过 JPA 直接访问 PostgreSQL，不再依赖 supabase-rest
   backend:
     build:
       context: ./backend
@@ -348,7 +352,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://supabase-db:5432/${POSTGRES_DB:-postgres}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      SUPABASE_URL: http://supabase-rest:3000
+      # Supabase REST API - 提供 fallback URL 以避免启动失败
+      # 注意：SKU 已改用 JPA，但其他 Repository 仍可能依赖此配置
+      SUPABASE_URL: ${SUPABASE_URL:-http://supabase-rest:3000}
       SUPABASE_ANON_KEY: ${ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJhbm9uIn0.ZopqoUt20nEV9cklpv9e3yw3PVyZLmKs5qLD6nGL1SI}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1sb2NhbCIsInJvbGUiOiJzZXJ2aWNlX3JvbGUifQ.M2d2z4SFn5C7HlJlaSLfrzuYim9nbY_XI40uWFN3hEE}
       SUPABASE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
