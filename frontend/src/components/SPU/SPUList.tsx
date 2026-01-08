@@ -75,6 +75,14 @@ const SPUList: React.FC<SPUListProps> = ({
   // 获取状态标签
   const getStatusTag = (status: SPUStatus) => {
     const statusInfo = statusColors[status as keyof typeof statusColors];
+    // 如果状态不存在，使用默认值
+    if (!statusInfo) {
+      return (
+        <Tag color="default" style={{ fontSize: '12px' }}>
+          {status || '未知'}
+        </Tag>
+      );
+    }
     return (
       <Tag color={statusInfo.color} style={{ fontSize: '12px' }}>
         {statusInfo.text}

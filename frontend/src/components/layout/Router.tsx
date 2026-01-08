@@ -17,6 +17,7 @@ const InventoryMovements = lazy(() => import('@/pages/inventory/InventoryMovemen
 const InventoryAudit = lazy(() => import('@/pages/inventory/InventoryAudit'));
 // SPU 和 SKU 管理页面
 const SPUListPage = lazy(() => import('@/pages/SPUList'));
+const SPUCreatePage = lazy(() => import('@/pages/SPUCreate'));
 const SPUDetailPage = lazy(() => import('@/pages/SPUDetail'));
 const SkuListPage = lazy(() => import('@/pages/product/sku/SkuListPage'));
 // 类目和品牌管理页面
@@ -198,6 +199,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <SPUListPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // SPU 创建路由（必须在 /spu/:id 之前）
+  {
+    path: '/spu/create',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SPUCreatePage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

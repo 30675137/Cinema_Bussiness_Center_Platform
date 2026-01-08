@@ -1,5 +1,5 @@
 // SPU 状态枚举
-type SPUStatus = 'draft' | 'active' | 'inactive';
+type SPUStatus = 'draft' | 'active' | 'inactive' | 'archived';
 
 // SPU 产品类型枚举
 export type ProductType = 'raw_material' | 'packaging' | 'finished_product' | 'combo';
