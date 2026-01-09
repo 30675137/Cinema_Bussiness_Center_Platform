@@ -669,5 +669,8 @@ class BrandService {
 // 创建服务实例
 export const brandService = new BrandService();
 
+// 导出别名 brandAPI
+export const brandAPI = brandService;
+
 // 导出默认服务
 export default brandService;

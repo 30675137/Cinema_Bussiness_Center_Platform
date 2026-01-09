@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Card, Button, Space, message, Typography, Breadcrumb } from 'antd';
+import { Card, Button, Space, message, Typography } from 'antd';
 import { PlusOutlined, ExportOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category } from '@/types/spu';
 import type { PaginatedResponse } from '@/services/spuService';
 import { spuService } from '@/services/spuService';
+import { brandAPI } from '@/services/brandService';
+import { categoryAPI } from '@/services/categoryService';
 import SPUFilter from '@/components/SPU/SPUFilter';
 import SPUList from '@/components/SPU/SPUList';
 import BatchOperations from '@/components/SPU/BatchOperations';
@@ -14,7 +16,7 @@ const { Title } = Typography;
 
 interface SPUListPageProps {}
 
-const SPUListPage: React.FC<SPUListProps> = () => {
+const SPUListPage: React.FC<SPUListPageProps> = () => {
   const navigate = useNavigate();
 
   // 状态管理
@@ -78,128 +80,41 @@ const SPUListPage: React.FC<SPUListProps> = () => {
     }
   };
 
-  // 加载品牌数据 - 从真实API获取
+  // 加载品牌数据
   const loadBrands = async (): Promise<Brand[]> => {
     try {
-      const response = await fetch('/api/v1/brands');
-      const result = await response.json();
-      if (result.success && Array.isArray(result.data)) {
-        return result.data.map((brand: any) => ({
-          id: brand.id,
-          name: brand.name,
-          code: brand.brand_code || brand.brandCode,
-          status: brand.status || 'active',
-        }));
+      const response = await brandAPI.getBrandList({ page: 1, pageSize: 100 });
+      if (response && response.data) {
+        // 适配不同的 API 响应结构
+        if (Array.isArray(response.data)) {
+          return response.data;
+        } else if (response.data.list && Array.isArray(response.data.list)) {
+          return response.data.list;
+        }
       }
+      return [];
     } catch (error) {
       console.error('Failed to load brands:', error);
+      return [];
     }
-    return [];
   };
 
-  // Mock加载分类数据
+  // 加载分类数据
   const loadCategories = async (): Promise<Category[]> => {
-    // 模拟API延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return [
-      {
-        id: 'category_001',
-        name: '食品饮料',
-        code: 'food_beverage',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_002',
-            name: '饮料',
-            code: 'beverage',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_003',
-                name: '碳酸饮料',
-                code: 'carbonated',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_004',
-                name: '果汁饮料',
-                code: 'juice',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_005',
-                name: '茶饮料',
-                code: 'tea',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-            ],
-          },
-          {
-            id: 'category_006',
-            name: '零食',
-            code: 'snacks',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_007',
-                name: '饼干',
-                code: 'cookies',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-              {
-                id: 'category_008',
-                name: '薯片',
-                code: 'chips',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'category_009',
-        name: '日用百货',
-        code: 'daily_goods',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_010',
-            name: '洗护用品',
-            code: 'personal_care',
-            level: 2,
-            status: 'active',
-            parentId: 'category_009',
-            children: [
-              {
-                id: 'category_011',
-                name: '洗发水',
-                code: 'shampoo',
-                level: 3,
-                status: 'active',
-                parentId: 'category_010',
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    try {
+      const response = await categoryAPI.getCategoryList({ page: 1, pageSize: 100 });
+      if (response && response.data) {
+        if (Array.isArray(response.data)) {
+          return response.data;
+        } else if (response.data.list && Array.isArray(response.data.list)) {
+          return response.data.list;
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+      return [];
+    }
   };
 
   // 加载SPU列表数据
@@ -218,7 +133,6 @@ const SPUListPage: React.FC<SPUListProps> = () => {
           pageSize: response.data.pageSize,
           total: response.data.total,
         }));
-        // 移除这行以避免无限循环：setQueryParams(prev => ({ ...prev, page: response.data.page, pageSize: response.data.pageSize }))
       } else {
         message.error(response.message || '获取SPU列表失败');
       }
@@ -560,4 +474,3 @@ const SPUListPage: React.FC<SPUListProps> = () => {
 };
 
 export default SPUListPage;
-export { SPUListPage };

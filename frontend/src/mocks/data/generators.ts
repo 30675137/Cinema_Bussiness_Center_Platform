@@ -1,6 +1,6 @@
-import { SPUItem, SPUStatus, SPUAttribute, ProductImage } from '@/types/spu';
-import { CategoryItem, CategoryStatus, CategoryLevel } from '@/types/category';
-import { BrandItem, BrandStatus } from '@/types/brand';
+import type { SPUItem, SPUStatus, SPUAttribute, ProductImage } from '@/types/spu';
+import type { CategoryItem, CategoryStatus, CategoryLevel } from '@/types/category';
+import type { BrandItem, BrandStatus } from '@/types/brand';
 
 // 影院商品相关数据
 const cinemaProducts = {

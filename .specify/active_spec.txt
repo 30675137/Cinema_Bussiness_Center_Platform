@@ -1,1 +1,1 @@
-specs/O011-order-checkout/spec.md
+specs/P007-fix-spu-batch-delete/spec.md

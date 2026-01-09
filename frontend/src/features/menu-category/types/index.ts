@@ -44,10 +44,7 @@ export const optionalUrlSchema = z
 /**
  * 描述验证规则（可选）
  */
-export const descriptionSchema = z
-  .string()
-  .max(500, '描述长度不能超过500字符')
-  .optional();
+export const descriptionSchema = z.string().max(500, '描述长度不能超过500字符').optional();
 
 /**
  * 创建分类请求 Schema
@@ -83,12 +80,14 @@ export const toggleVisibilitySchema = z.object({
  * 批量更新排序请求 Schema
  */
 export const batchUpdateSortOrderSchema = z.object({
-  items: z.array(
-    z.object({
-      id: z.string().uuid('无效的分类 ID'),
-      sortOrder: z.number().int().min(0).max(9999),
-    })
-  ).min(1, '至少需要一个排序项'),
+  items: z
+    .array(
+      z.object({
+        id: z.string().uuid('无效的分类 ID'),
+        sortOrder: z.number().int().min(0).max(9999),
+      })
+    )
+    .min(1, '至少需要一个排序项'),
 });
 
 // 从 Schema 推导类型
@@ -355,4 +354,4 @@ export const CategoryErrorCodes = {
   INVALID_DISPLAY_NAME: 'CAT_VAL_002',
 } as const;
 
-export type CategoryErrorCode = typeof CategoryErrorCodes[keyof typeof CategoryErrorCodes];
+export type CategoryErrorCode = (typeof CategoryErrorCodes)[keyof typeof CategoryErrorCodes];

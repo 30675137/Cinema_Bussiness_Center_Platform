@@ -25,8 +25,7 @@ import type {
 export const menuCategoryKeys = {
   all: ['menuCategories'] as const,
   lists: () => [...menuCategoryKeys.all, 'list'] as const,
-  list: (params: GetMenuCategoriesParams) =>
-    [...menuCategoryKeys.lists(), params] as const,
+  list: (params: GetMenuCategoriesParams) => [...menuCategoryKeys.lists(), params] as const,
   details: () => [...menuCategoryKeys.all, 'detail'] as const,
   detail: (id: string) => [...menuCategoryKeys.details(), id] as const,
 };
@@ -61,8 +60,7 @@ export function useCreateMenuCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CreateMenuCategoryRequest) =>
-      createMenuCategory(request),
+    mutationFn: (request: CreateMenuCategoryRequest) => createMenuCategory(request),
     onSuccess: () => {
       // 刷新分类列表
       queryClient.invalidateQueries({ queryKey: menuCategoryKeys.lists() });
@@ -115,8 +113,7 @@ export function useBatchUpdateSortOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: BatchUpdateSortOrderRequest) =>
-      batchUpdateSortOrder(request),
+    mutationFn: (request: BatchUpdateSortOrderRequest) => batchUpdateSortOrder(request),
     onMutate: async (request) => {
       // 乐观更新
       await queryClient.cancelQueries({ queryKey: menuCategoryKeys.lists() });

@@ -4,15 +4,13 @@
  */
 
 import React, { useEffect } from 'react';
-import {
-  Modal,
-  Form,
-  Input,
-  InputNumber,
-  Switch,
-  message,
-} from 'antd';
-import type { MenuCategoryDTO, CreateMenuCategoryRequest, UpdateMenuCategoryRequest, CategoryFormMode } from '../types';
+import { Modal, Form, Input, InputNumber, Switch, message } from 'antd';
+import type {
+  MenuCategoryDTO,
+  CreateMenuCategoryRequest,
+  UpdateMenuCategoryRequest,
+  CategoryFormMode,
+} from '../types';
 
 const { TextArea } = Input;
 
@@ -149,24 +147,11 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           <Input placeholder="请输入显示名称，如 季节限定" />
         </Form.Item>
 
-        <Form.Item
-          name="sortOrder"
-          label="排序序号"
-          extra="数字越小排序越靠前"
-        >
-          <InputNumber
-            placeholder="留空自动分配"
-            min={0}
-            max={9999}
-            style={{ width: '100%' }}
-          />
+        <Form.Item name="sortOrder" label="排序序号" extra="数字越小排序越靠前">
+          <InputNumber placeholder="留空自动分配" min={0} max={9999} style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item
-          name="isVisible"
-          label="是否可见"
-          valuePropName="checked"
-        >
+        <Form.Item name="isVisible" label="是否可见" valuePropName="checked">
           <Switch
             checkedChildren="显示"
             unCheckedChildren="隐藏"
@@ -190,12 +175,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
           label="分类描述"
           rules={[{ max: 500, message: '描述长度不能超过500字符' }]}
         >
-          <TextArea
-            placeholder="请输入分类描述（可选）"
-            rows={3}
-            showCount
-            maxLength={500}
-          />
+          <TextArea placeholder="请输入分类描述（可选）" rows={3} showCount maxLength={500} />
         </Form.Item>
       </Form>
     </Modal>

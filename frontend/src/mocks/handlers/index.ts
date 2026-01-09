@@ -28,6 +28,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // SPU相关API处理器
 export const spuHandlers = [
   // 获取SPU列表
+  // @spec P007-fix-spu-batch-delete
   http.get('/api/spu/list', async ({ request }) => {
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
@@ -39,7 +40,9 @@ export const spuHandlers = [
 
     await delay(500); // 模拟网络延迟
 
-    const allSPU = generateMockSPUList(100);
+    // 使用持久化的 Mock 数据而非每次重新生成
+    const { mockSPUStore } = await import('../data/mockSPUStore');
+    const allSPU = mockSPUStore.getAll();
 
     // 应用筛选条件
     const filteredSPU = allSPU.filter((spu) => {
@@ -150,18 +153,45 @@ export const spuHandlers = [
   }),
 
   // 批量操作
+  // @spec P007-fix-spu-batch-delete
   http.post('/api/spu/batch', async ({ request }) => {
     await delay(1000);
 
-    const { operation, ids } = (await request.json()) as any;
+    const { operation, ids } = (await request.json()) as {
+      operation: string;
+      ids: string[];
+    };
 
+    // 处理批量删除操作
+    if (operation === 'delete') {
+      const { mockSPUStore } = await import('../data/mockSPUStore');
+      const result = mockSPUStore.deleteMany(ids);
+
+      return HttpResponse.json({
+        success: true,
+        data: {
+          processedCount: result.success,
+          failedCount: result.failed,
+        },
+        message:
+          result.failed > 0
+            ? `成功删除 ${result.success} 个 SPU,失败 ${result.failed} 个`
+            : `成功删除 ${result.success} 个 SPU`,
+        code: 200,
+        timestamp: Date.now(),
+      });
+    }
+
+    // 其他操作(updateStatus, copy 等)暂不处理
     return HttpResponse.json({
       success: true,
       data: {
         processedCount: ids.length,
-        operation,
+        failedCount: 0,
       },
       message: `批量${operation}操作成功`,
+      code: 200,
+      timestamp: Date.now(),
     });
   }),
 ];

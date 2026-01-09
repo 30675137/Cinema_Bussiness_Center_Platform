@@ -21,10 +21,7 @@ export const channelProductHandlers = [
       const file = formData.get('file') as File;
 
       if (!file) {
-        return HttpResponse.json(
-          { success: false, message: '未找到上传文件' },
-          { status: 400 }
-        );
+        return HttpResponse.json({ success: false, message: '未找到上传文件' }, { status: 400 });
       }
 
       // 模拟生成 Supabase Storage 公开 URL
@@ -36,10 +33,7 @@ export const channelProductHandlers = [
         message: '图片上传成功',
       });
     } catch (error) {
-      return HttpResponse.json(
-        { success: false, message: '图片上传失败' },
-        { status: 500 }
-      );
+      return HttpResponse.json({ success: false, message: '图片上传失败' }, { status: 500 });
     }
   }),
 ];

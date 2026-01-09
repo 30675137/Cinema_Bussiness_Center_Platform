@@ -66,9 +66,7 @@ export const DeleteCategoryDialog: React.FC<DeleteCategoryDialogProps> = ({
                   删除后将自动迁移到默认分类
                   <Text strong>「{deletePreview.targetCategoryName}」</Text>。
                 </Paragraph>
-                <Text type="secondary">
-                  商品迁移后，您可以在默认分类中重新分配它们。
-                </Text>
+                <Text type="secondary">商品迁移后，您可以在默认分类中重新分配它们。</Text>
               </div>
             }
             style={{ marginBottom: 16 }}

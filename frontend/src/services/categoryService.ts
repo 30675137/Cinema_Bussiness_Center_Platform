@@ -714,5 +714,8 @@ class CategoryService {
 // 创建服务实例
 export const categoryService = new CategoryService();
 
+// 导出别名 categoryAPI
+export const categoryAPI = categoryService;
+
 // 导出默认服务
 export default categoryService;
