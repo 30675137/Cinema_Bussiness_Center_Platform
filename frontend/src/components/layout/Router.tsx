@@ -53,11 +53,25 @@ const OrderDetailPage = lazy(() => import('@/pages/orders/OrderDetailPage'));
 const ConversionPage = lazy(() => import('@/pages/bom/ConversionPage'));
 // 饮品配置管理页面 (O003-beverage-order) - 已移除，替换为 O005
 // O005-channel-product-config
-const ChannelProductListPage = lazy(() => import('@/features/channel-product-config/pages/ChannelProductListPage'));
-const CreateChannelProductPage = lazy(() => import('@/features/channel-product-config/pages/CreateChannelProductPage').then(module => ({ default: module.CreateChannelProductPage })));
-const EditChannelProductPage = lazy(() => import('@/features/channel-product-config/pages/EditChannelProductPage').then(module => ({ default: module.EditChannelProductPage })));
+const ChannelProductListPage = lazy(
+  () => import('@/features/channel-product-config/pages/ChannelProductListPage')
+);
+const CreateChannelProductPage = lazy(() =>
+  import('@/features/channel-product-config/pages/CreateChannelProductPage').then((module) => ({
+    default: module.CreateChannelProductPage,
+  }))
+);
+const EditChannelProductPage = lazy(() =>
+  import('@/features/channel-product-config/pages/EditChannelProductPage').then((module) => ({
+    default: module.EditChannelProductPage,
+  }))
+);
 // O002-miniapp-menu-config: 菜单分类管理
-const MenuCategoryPage = lazy(() => import('@/pages/menu-category/MenuCategoryPage').then(module => ({ default: module.MenuCategoryPage })));
+const MenuCategoryPage = lazy(() =>
+  import('@/pages/menu-category/MenuCategoryPage').then((module) => ({
+    default: module.MenuCategoryPage,
+  }))
+);
 // 暂时使用现有组件替代，后续可以实现具体页面
 const PricingPreview = lazy(() => import('@/pages/pricing/PricingConfig'));
 const AuditPending = lazy(() => import('@/pages/product/ProductList'));

@@ -31,9 +31,7 @@ export async function getMenuCategories(
     searchParams.set('includeProductCount', String(params.includeProductCount));
   }
 
-  const url = searchParams.toString()
-    ? `${API_BASE}?${searchParams.toString()}`
-    : API_BASE;
+  const url = searchParams.toString() ? `${API_BASE}?${searchParams.toString()}` : API_BASE;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -147,9 +145,7 @@ export async function deleteMenuCategory(
 /**
  * 批量更新排序
  */
-export async function batchUpdateSortOrder(
-  request: BatchUpdateSortOrderRequest
-): Promise<void> {
+export async function batchUpdateSortOrder(request: BatchUpdateSortOrderRequest): Promise<void> {
   const response = await fetch(`${API_BASE}/batch-sort`, {
     method: 'PUT',
     headers: {

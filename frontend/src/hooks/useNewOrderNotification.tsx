@@ -2,11 +2,11 @@
  * @spec O003-beverage-order
  * 新订单通知 Hook
  */
-import { useEffect, useRef } from 'react'
-import { notification } from 'antd'
-import { BellOutlined } from '@ant-design/icons'
-import { useVoiceAnnouncement } from './useVoiceAnnouncement'
-import type { BeverageOrderDTO } from '../types/beverageOrder'
+import { useEffect, useRef } from 'react';
+import { notification } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
+import { useVoiceAnnouncement } from './useVoiceAnnouncement';
+import type { BeverageOrderDTO } from '../types/beverageOrder';
 
 /**
  * 新订单通知配置
@@ -15,22 +15,22 @@ interface NewOrderNotificationConfig {
   /**
    * 是否启用语音提醒
    */
-  enableVoice?: boolean
+  enableVoice?: boolean;
 
   /**
    * 是否启用桌面通知
    */
-  enableDesktop?: boolean
+  enableDesktop?: boolean;
 
   /**
    * 自定义通知标题
    */
-  title?: string
+  title?: string;
 
   /**
    * 通知持续时间（秒）
    */
-  duration?: number
+  duration?: number;
 }
 
 /**
@@ -48,28 +48,31 @@ export const useNewOrderNotification = (
   orders: BeverageOrderDTO[] | undefined,
   config?: NewOrderNotificationConfig
 ) => {
-  const { enableVoice = true, enableDesktop = true, title = '新订单提醒', duration = 4.5 } = config || {}
+  const {
+    enableVoice = true,
+    enableDesktop = true,
+    title = '新订单提醒',
+    duration = 4.5,
+  } = config || {};
 
-  const { announceNewOrder } = useVoiceAnnouncement()
-  const previousOrderIdsRef = useRef<Set<string>>(new Set())
+  const { announceNewOrder } = useVoiceAnnouncement();
+  const previousOrderIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!orders || orders.length === 0) {
-      return
+      return;
     }
 
     // 获取当前订单ID集合
-    const currentOrderIds = new Set(orders.map((order) => order.id))
+    const currentOrderIds = new Set(orders.map((order) => order.id));
 
     // 检测新订单（存在于当前但不在之前的集合中）
-    const newOrders = orders.filter(
-      (order) => !previousOrderIdsRef.current.has(order.id)
-    )
+    const newOrders = orders.filter((order) => !previousOrderIdsRef.current.has(order.id));
 
     // 如果是初次加载，只记录ID不触发通知
     if (previousOrderIdsRef.current.size === 0) {
-      previousOrderIdsRef.current = currentOrderIds
-      return
+      previousOrderIdsRef.current = currentOrderIds;
+      return;
     }
 
     // 如果有新订单，触发通知
@@ -82,24 +85,24 @@ export const useNewOrderNotification = (
           icon: <BellOutlined style={{ color: '#1890ff' }} />,
           duration,
           placement: 'topRight',
-        })
-      })
+        });
+      });
 
       // 语音播报
       if (enableVoice) {
-        announceNewOrder()
+        announceNewOrder();
       }
 
       // 桌面通知
       if (enableDesktop && 'Notification' in window) {
-        requestDesktopNotification(newOrders)
+        requestDesktopNotification(newOrders);
       }
     }
 
     // 更新订单ID集合
-    previousOrderIdsRef.current = currentOrderIds
-  }, [orders, enableVoice, enableDesktop, title, duration, announceNewOrder])
-}
+    previousOrderIdsRef.current = currentOrderIds;
+  }, [orders, enableVoice, enableDesktop, title, duration, announceNewOrder]);
+};
 
 /**
  * 请求桌面通知权限并发送通知
@@ -107,13 +110,13 @@ export const useNewOrderNotification = (
 const requestDesktopNotification = async (newOrders: BeverageOrderDTO[]) => {
   // 检查浏览器是否支持桌面通知
   if (!('Notification' in window)) {
-    return
+    return;
   }
 
   // 请求权限
-  let permission = Notification.permission
+  let permission = Notification.permission;
   if (permission === 'default') {
-    permission = await Notification.requestPermission()
+    permission = await Notification.requestPermission();
   }
 
   // 如果已授权，发送通知
@@ -124,7 +127,7 @@ const requestDesktopNotification = async (newOrders: BeverageOrderDTO[]) => {
         icon: '/favicon.ico',
         tag: `order-${order.id}`,
         requireInteraction: true, // 需要用户交互才关闭
-      })
-    })
+      });
+    });
   }
-}
+};
