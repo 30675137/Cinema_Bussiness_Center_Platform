@@ -365,40 +365,82 @@ class SPUService {
       queryParams.append('pageSize', String(params.pageSize || 20));
 
       const queryString = queryParams.toString();
-      const url = `/spus${queryString ? `?${queryString}` : ''}`;
+      const url = `/spu/list${queryString ? `?${queryString}` : ''}`;
 
       // 调用后端API
       const response = await apiService.get<{
         success: boolean;
-        data: BackendSpu[];
-        total: number;
-        page: number;
-        pageSize: number;
-        totalPages: number;
+        data: {
+          list: BackendSpu[];
+          pagination: {
+            current: number;
+            pageSize: number;
+            total: number;
+            totalPages: number;
+          };
+        };
       }>(url);
 
-      const backendResponse = response as unknown as {
-        success: boolean;
-        data: BackendSpu[];
-        total: number;
-        page: number;
-        pageSize: number;
-        totalPages: number;
-      };
+      // 处理不同的响应结构
+      let list: SPUItem[] = [];
+      let total = 0;
+      let page = params.page || 1;
+      let pageSize = params.pageSize || 20;
+      let totalPages = 0;
 
-      // 转换数据格式
-      const list = (backendResponse.data || []).map(transformBackendSpu);
+      if (response.data && Array.isArray(response.data)) {
+        // 旧格式: data 是数组
+        const backendData = response as unknown as {
+          data: BackendSpu[];
+          total: number;
+          page: number;
+          pageSize: number;
+          totalPages: number;
+        };
+        list = (backendData.data || []).map(transformBackendSpu);
+        total = backendData.total || list.length;
+        page = backendData.page || page;
+        pageSize = backendData.pageSize || pageSize;
+        totalPages = backendData.totalPages || 0;
+      } else if (response.data && 'list' in response.data) {
+        // 新格式: data 包含 list 和 pagination
+        const dataObj = response.data as {
+          list: BackendSpu[];
+          pagination?: {
+            current: number;
+            pageSize: number;
+            total: number;
+            totalPages: number;
+          };
+          total?: number;
+          page?: number;
+          pageSize?: number;
+          totalPages?: number;
+        };
+
+        list = (dataObj.list || []).map(transformBackendSpu);
+
+        if (dataObj.pagination) {
+          total = dataObj.pagination.total;
+          page = dataObj.pagination.current;
+          pageSize = dataObj.pagination.pageSize;
+          totalPages = dataObj.pagination.totalPages;
+        } else {
+          total = dataObj.total || list.length;
+          page = dataObj.page || page;
+          pageSize = dataObj.pageSize || pageSize;
+          totalPages = dataObj.totalPages || 0;
+        }
+      }
 
       return {
         success: true,
         data: {
           list,
-          total: backendResponse.total || list.length,
-          page: backendResponse.page || params.page || 1,
-          pageSize: backendResponse.pageSize || params.pageSize || 20,
-          totalPages:
-            backendResponse.totalPages ||
-            Math.ceil((backendResponse.total || list.length) / (params.pageSize || 20)),
+          total,
+          page,
+          pageSize,
+          totalPages: totalPages || Math.ceil(total / pageSize),
         },
         message: '获取成功',
         code: 200,
@@ -430,7 +472,7 @@ class SPUService {
   async deleteSPU(id: string): Promise<ApiResponse<null>> {
     try {
       // 调用后端API删除
-      await apiService.delete(`/spus/${id}`);
+      await apiService.delete(`/spu/${id}`);
 
       return {
         success: true,
