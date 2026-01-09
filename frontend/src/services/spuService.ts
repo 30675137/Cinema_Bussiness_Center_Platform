@@ -453,20 +453,37 @@ class SPUService {
 
   /**
    * 批量删除SPU
+   * @spec P007-fix-spu-batch-delete
    * @param ids SPU ID列表
    * @returns 删除结果
    */
   async batchDeleteSPU(ids: string[]): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const response = await fetch('/api/spu/batch', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          operation: 'delete',
+          ids,
+        }),
+      });
 
-      // Mock批量删除结果
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
       return {
-        success: true,
-        data: { success: ids.length, failed: 0 },
-        message: `成功删除${ids.length}个SPU`,
-        code: 200,
+        success: result.success,
+        data: {
+          success: result.data.processedCount,
+          failed: result.data.failedCount,
+        },
+        message: result.message,
+        code: response.status,
         timestamp: Date.now(),
       };
     } catch (error) {
