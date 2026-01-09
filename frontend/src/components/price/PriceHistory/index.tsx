@@ -30,10 +30,10 @@ import {
   FilterOutlined,
   UserOutlined,
   ClockCircleOutlined,
-  TrendingUpOutlined,
-  TrendingDownOutlined,
+  RiseOutlined,
+  FallOutlined,
   InfoCircleOutlined,
-  CompareOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
@@ -64,9 +64,9 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
 
   // 价格变动类型配置
   const changeTypeConfig = {
-    create: { color: 'green', text: '新建价格', icon: <TrendingUpOutlined /> },
-    update: { color: 'blue', text: '价格调整', icon: <TrendingUpOutlined /> },
-    delete: { color: 'red', text: '删除价格', icon: <TrendingDownOutlined /> },
+    create: { color: 'green', text: '新建价格', icon: <RiseOutlined /> },
+    update: { color: 'blue', text: '价格调整', icon: <RiseOutlined /> },
+    delete: { color: 'red', text: '删除价格', icon: <FallOutlined /> },
     batch_update: { color: 'purple', text: '批量调整', icon: <HistoryOutlined /> },
     import: { color: 'orange', text: '导入更新', icon: <DownloadOutlined /> },
     rule_applied: { color: 'cyan', text: '规则应用', icon: <InfoCircleOutlined /> },
@@ -231,7 +231,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
             <Button
               type="text"
               size="small"
-              icon={<CompareOutlined />}
+              icon={<SwapOutlined />}
               onClick={() => handleAddToCompare(record)}
             />
           </Tooltip>
@@ -345,7 +345,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
             <Statistic
               title="价格上涨"
               value={priceIncrease}
-              prefix={<TrendingUpOutlined />}
+              prefix={<RiseOutlined />}
               valueStyle={{ color: '#ff4d4f' }}
               suffix={`/ ${totalChanges}`}
             />
@@ -356,7 +356,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
             <Statistic
               title="价格下跌"
               value={priceDecrease}
-              prefix={<TrendingDownOutlined />}
+              prefix={<FallOutlined />}
               valueStyle={{ color: '#52c41a' }}
               suffix={`/ ${totalChanges}`}
             />
@@ -396,7 +396,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilte
             <Space>
               {compareItems.length > 0 && (
                 <Badge count={compareItems.length}>
-                  <Button icon={<CompareOutlined />} onClick={handleCompare}>
+                  <Button icon={<SwapOutlined />} onClick={handleCompare}>
                     价格对比
                   </Button>
                 </Badge>

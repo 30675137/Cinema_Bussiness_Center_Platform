@@ -18,8 +18,8 @@ import {
   LineChartOutlined,
   BarChartOutlined,
   AreaChartOutlined,
-  TrendingUpOutlined,
-  TrendingDownOutlined,
+  RiseOutlined,
+  FallOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -122,7 +122,6 @@ const mockTrendsData = {
     totalTransactions: 2847,
     peakInventory: 12500,
     lowStockDays: 2,
-    totalTransactions: 2847,
     avgTurnoverRate: 0.85,
   },
 };
@@ -403,7 +402,7 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
             title="峰值库存"
             value={trendsData.summary.peakInventory}
             suffix="件"
-            prefix={<TrendingUpOutlined />}
+            prefix={<RiseOutlined />}
             valueStyle={{ fontSize: '16px', color: '#52c41a' }}
           />
         </Col>
@@ -432,7 +431,7 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
         <Row style={{ marginBottom: '16px' }}>
           <Col span={24}>
             <Space>
-              <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
+              <FallOutlined style={{ color: '#ff4d4f' }} />
               <Text type="danger">{trendsData.summary.lowStockDays}天出现低库存情况，需要关注</Text>
             </Space>
           </Col>
@@ -458,9 +457,9 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
                     return (
                       <Space>
                         {change >= 0 ? (
-                          <TrendingUpOutlined style={{ color: '#52c41a' }} />
+                          <RiseOutlined style={{ color: '#52c41a' }} />
                         ) : (
-                          <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
+                          <FallOutlined style={{ color: '#ff4d4f' }} />
                         )}
                         <Text style={{ color: change >= 0 ? '#52c41a' : '#ff4d4f' }}>
                           {change >= 0 ? '+' : ''}
@@ -482,9 +481,9 @@ const InventoryTrendsChart: React.FC<InventoryTrendsChartProps> = ({
                     return (
                       <Space>
                         {change >= 0 ? (
-                          <TrendingUpOutlined style={{ color: '#52c41a' }} />
+                          <RiseOutlined style={{ color: '#52c41a' }} />
                         ) : (
-                          <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
+                          <FallOutlined style={{ color: '#ff4d4f' }} />
                         )}
                         <Text style={{ color: change >= 0 ? '#52c41a' : '#ff4d4f' }}>
                           {change >= 0 ? '+' : ''}

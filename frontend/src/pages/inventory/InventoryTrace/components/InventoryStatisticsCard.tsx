@@ -156,9 +156,8 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
             <Statistic
               title="总库存价值"
               value={statistics.totalValue}
-              prefix="¥"
-              precision={0}
               prefix={<DollarOutlined />}
+              precision={0}
               valueStyle={{ color: '#cf1322' }}
             />
           </Card>
