@@ -212,6 +212,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
                   allowClear
                 >
                   <Option value="饮料">饮料</Option>
+                  <Option value="酒水">酒水</Option>
                   <Option value="食品">食品</Option>
                   <Option value="服装">服装</Option>
                   <Option value="电子">电子产品</Option>
