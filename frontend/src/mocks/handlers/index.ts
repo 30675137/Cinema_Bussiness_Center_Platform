@@ -94,6 +94,7 @@ export const spuHandlers = [
   }),
 
   // 创建SPU
+  // @spec B001-fix-brand-creation
   http.post('/api/spu/create', async ({ request }) => {
     await delay(800);
 
@@ -109,6 +110,10 @@ export const spuHandlers = [
         creator: '当前用户',
         modifier: '当前用户',
       };
+
+      // 将新创建的 SPU 添加到 mockSPUStore
+      const { mockSPUStore } = await import('../data/mockSPUStore');
+      mockSPUStore.add(createdSPU);
 
       return HttpResponse.json({
         success: true,
@@ -212,7 +217,9 @@ export const legacyCategoryHandlers = [
 
 // 导出所有处理器
 export const handlers = [
-  ...spuHandlers,
+  // SPU相关使用真实后端 API，已禁用 mock
+  // @spec B001-fix-brand-creation
+  // ...spuHandlers,
   ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
   ...legacyCategoryHandlers, // 旧版兼容处理器
   ...brandHandlers, // 使用新的brandHandlers

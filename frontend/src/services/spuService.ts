@@ -128,14 +128,12 @@ class SPUService {
 
   /**
    * 创建SPU
+   * @spec B001-fix-brand-creation
    * @param data SPU创建数据
    * @returns 创建的SPU信息
    */
   async createSPU(data: CreateSPURequest): Promise<ApiResponse<SPUItem>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // 验证必填字段
       if (!data.name || data.name.trim() === '') {
         throw new Error('SPU名称不能为空');
@@ -162,18 +160,16 @@ class SPUService {
         throw new Error('请至少上传一张商品图片');
       }
 
-      // 生成新的SPU数据
-      const newSPU: SPUItem = {
-        id: this.generateId(),
-        code: generateSPUCode(),
+      // 构建后端请求数据（转换为snake_case）
+      const requestData = {
         name: data.name.trim(),
-        shortName: data.shortName?.trim(),
+        short_name: data.shortName?.trim(),
         description: data.description.trim(),
         unit: data.unit?.trim(),
-        brandId: data.brandId,
-        categoryId: data.categoryId,
+        brand_id: data.brandId,
+        category_id: data.categoryId,
         status: data.status || 'draft',
-        productType: data.productType, // 产品类型
+        product_type: data.productType,
         tags: data.tags || [],
         images: data.images
           .filter((img) => img.status === 'done' && img.url)
@@ -185,21 +181,40 @@ class SPUService {
           })),
         specifications: data.specifications || [],
         attributes: data.attributes || [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: 'current_user', // Mock用户ID
-        updatedBy: 'current_user',
       };
 
-      // Mock响应
+      // 调用后端API创建SPU
+      const response = await fetch('/api/spu/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || '创建失败');
+      }
+
+      // 转换后端返回的数据为前端格式
+      const createdSPU = transformBackendSpu(result.data);
+
       return {
         success: true,
-        data: newSPU,
-        message: 'SPU创建成功',
+        data: createdSPU,
+        message: result.message || 'SPU创建成功',
         code: 200,
         timestamp: Date.now(),
       };
     } catch (error) {
+      console.error('Create SPU error:', error);
       return {
         success: false,
         data: null as any,
@@ -275,69 +290,43 @@ class SPUService {
 
   /**
    * 获取SPU详情
+   * @spec B001-fix-brand-creation
    * @param id SPU ID
    * @returns SPU详情
    */
   async getSPUDetail(id: string): Promise<ApiResponse<SPUItem>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // 调用后端API获取SPU详情
+      const response = await fetch(`/api/spu/${id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-      // Mock数据（在实际项目中这里会从数据库获取）
-      const mockSPU: SPUItem = {
-        id,
-        code: `SPU20241211001`,
-        name: '可口可乐500ml',
-        shortName: '可乐500ml',
-        description: '经典可口可乐500ml瓶装，清爽口感，解渴佳品。',
-        unit: '瓶',
-        brandId: 'brand_001',
-        brand: {
-          id: 'brand_001',
-          name: '可口可乐',
-          code: 'COKE',
-          status: 'active',
-        },
-        categoryId: 'category_003',
-        category: {
-          id: 'category_003',
-          name: '碳酸饮料',
-          code: 'carbonated',
-          level: 3,
-          status: 'active',
-        },
-        status: 'active',
-        tags: ['饮料', '碳酸', '经典'],
-        images: [
-          {
-            id: 'img_001',
-            url: '/images/products/coke-500ml-1.jpg',
-            alt: '可口可乐500ml正面图',
-            sort: 1,
-          },
-        ],
-        specifications: [
-          { name: '容量', value: '500ml' },
-          { name: '包装', value: '瓶装' },
-        ],
-        attributes: [
-          { name: '保质期', value: '12个月' },
-          { name: '储存条件', value: '常温保存' },
-        ],
-        createdAt: '2024-12-11T10:00:00Z',
-        updatedAt: '2024-12-11T10:00:00Z',
-        createdBy: 'admin',
-        updatedBy: 'admin',
-      };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || '获取失败');
+      }
+
+      // 转换后端返回的数据为前端格式
+      const spuData = transformBackendSpu(result.data);
 
       return {
         success: true,
-        data: mockSPU,
+        data: spuData,
         message: '获取成功',
         code: 200,
         timestamp: Date.now(),
       };
     } catch (error) {
+      console.error('Get SPU detail error:', error);
       return {
         success: false,
         data: null as any,

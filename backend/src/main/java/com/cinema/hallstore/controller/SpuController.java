@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -87,6 +88,7 @@ public class SpuController {
      * 创建SPU
      * POST /api/spu/create 或 POST /api/spus
      *
+     * @spec B001-fix-brand-creation
      * @param spu SPU数据
      */
     @PostMapping({"", "/create"})
@@ -95,6 +97,17 @@ public class SpuController {
             if (spu.getId() == null) {
                 spu.setId(UUID.randomUUID());
             }
+            // 自动生成SPU编码
+            if (spu.getCode() == null || spu.getCode().isEmpty()) {
+                spu.setCode("SPU" + System.currentTimeMillis());
+            }
+            // 手动设置时间字段（避免JPA审计的LocalDateTime/OffsetDateTime转换问题）
+            OffsetDateTime now = OffsetDateTime.now();
+            if (spu.getCreatedAt() == null) {
+                spu.setCreatedAt(now);
+            }
+            spu.setUpdatedAt(now);
+
             Spu createdSpu = spuRepository.save(spu);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(createdSpu));
@@ -138,5 +151,60 @@ public class SpuController {
 
         spuRepository.deleteById(id);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    /**
+     * 批量操作SPU
+     * POST /api/spu/batch
+     *
+     * @spec B001-fix-brand-creation
+     * @param request 批量操作请求 {operation: "delete", ids: [...]}
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<Map<String, Object>> batchOperation(@RequestBody Map<String, Object> request) {
+        String operation = (String) request.get("operation");
+        @SuppressWarnings("unchecked")
+        List<String> ids = (List<String>) request.get("ids");
+
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "未提供要操作的SPU ID"
+            ));
+        }
+
+        if ("delete".equals(operation)) {
+            int successCount = 0;
+            int failedCount = 0;
+
+            for (String idStr : ids) {
+                try {
+                    UUID id = UUID.fromString(idStr);
+                    if (spuRepository.existsById(id)) {
+                        spuRepository.deleteById(id);
+                        successCount++;
+                    } else {
+                        failedCount++;
+                    }
+                } catch (IllegalArgumentException e) {
+                    failedCount++;
+                }
+            }
+
+            String message = failedCount > 0
+                    ? String.format("成功删除 %d 个 SPU，失败 %d 个", successCount, failedCount)
+                    : String.format("成功删除 %d 个 SPU", successCount);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "data", Map.of("processedCount", successCount, "failedCount", failedCount),
+                    "message", message
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "不支持的操作类型: " + operation
+        ));
     }
 }
