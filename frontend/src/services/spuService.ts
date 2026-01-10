@@ -171,13 +171,13 @@ class SPUService {
         status: data.status || 'draft',
         product_type: data.productType,
         tags: data.tags || [],
-        images: data.images
-          .filter((img) => img.status === 'done' && img.url)
-          .map((img) => ({
-            id: img.uid,
-            url: img.url!,
-            alt: img.name,
-            sort: 0,
+        images: (data.images || [])
+          .filter((img: any) => img.url)
+          .map((img: any, index: number) => ({
+            id: img.uid || `img_${index}`,
+            url: img.url,
+            alt: img.alt || img.name || `image${index}`,
+            sort: img.sort ?? index,
           })),
         specifications: data.specifications || [],
         attributes: data.attributes || [],
@@ -253,14 +253,14 @@ class SPUService {
         status: data.status?.toUpperCase() || 'DRAFT',
         product_type: data.productType,
         tags: data.tags || [],
-        images: data.images
-          ?.filter((img) => img.status === 'done' && img.url)
-          .map((img) => ({
-            id: img.uid,
-            url: img.url!,
-            alt: img.name,
-            sort: 0,
-          })) || [],
+        images: (data.images || [])
+          .filter((img: any) => img.url)
+          .map((img: any, index: number) => ({
+            id: img.uid || `img_${index}`,
+            url: img.url,
+            alt: img.alt || img.name || `image${index}`,
+            sort: img.sort ?? index,
+          })),
         specifications: data.specifications || [],
         attributes: data.attributes || [],
       };

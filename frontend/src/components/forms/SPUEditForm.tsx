@@ -104,11 +104,12 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
 
           // 设置图片
           if (spuData.images && spuData.images.length > 0) {
-            const uploadFiles = spuData.images.map((image, index) => ({
-              uid: `-${index}`,
+            const uploadFiles = spuData.images.map((image: any, index: number) => ({
+              uid: image.id || `-${index}`,
               name: image.alt || `image${index}`,
               status: 'done' as const,
               url: image.url,
+              thumbUrl: image.url,
               response: { url: image.url },
             }));
             setFileList(uploadFiles);
@@ -149,6 +150,16 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     setHasChanges(true);
   }, []);
 
+  // 将文件转换为 base64 URL
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   // 处理保存
   const handleSave = useCallback(async () => {
     try {
@@ -161,17 +172,35 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
         return;
       }
 
+      // 处理图片：将本地文件转换为 base64 URL
+      const processedImages = await Promise.all(
+        fileList
+          .filter((file) => file.status === 'done' || file.originFileObj)
+          .map(async (file, index) => {
+            let url = file.response?.url || file.url;
+
+            // 如果是本地文件（有 originFileObj），转换为 base64
+            if (!url && file.originFileObj) {
+              url = await fileToBase64(file.originFileObj);
+            }
+
+            return {
+              uid: file.uid,
+              url: url || '',
+              alt: file.name || `image${index}`,
+              isPrimary: index === 0,
+              sort: index,
+            };
+          })
+      );
+
+      // 过滤掉没有 URL 的图片
+      const validImages = processedImages.filter((img) => img.url);
+
       const submitData = {
         ...values,
         attributes: templateAttributes,
-        images: fileList
-          .filter((file) => file.status === 'done' || file.originFileObj)
-          .map((file, index) => ({
-            url: file.response?.url || file.url,
-            alt: file.name || `image${index}`,
-            isPrimary: index === 0,
-            sort: index,
-          })),
+        images: validImages,
       };
 
       let response;
