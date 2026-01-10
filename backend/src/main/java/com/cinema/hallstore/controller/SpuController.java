@@ -2,7 +2,7 @@ package com.cinema.hallstore.controller;
 
 import com.cinema.hallstore.domain.Spu;
 import com.cinema.hallstore.dto.ApiResponse;
-import com.cinema.hallstore.repository.SpuRepository;
+import com.cinema.hallstore.repository.SpuJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +15,16 @@ import java.util.UUID;
  * SPU管理控制器
  * - 提供SPU CRUD接口
  * - 支持 /api/spu (前端路径) 和 /api/spus (REST规范) 双路径
+ *
+ * @spec P001-spu-management
  */
 @RestController
 @RequestMapping({"/api/spu", "/api/spus"})
 public class SpuController {
 
-    private final SpuRepository spuRepository;
+    private final SpuJpaRepository spuRepository;
 
-    public SpuController(SpuRepository spuRepository) {
+    public SpuController(SpuJpaRepository spuRepository) {
         this.spuRepository = spuRepository;
     }
 
@@ -46,7 +48,8 @@ public class SpuController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize) {
 
-        List<Spu> spus = spuRepository.findAll(status, categoryId, brandId, keyword);
+        // 使用 JPA Repository 的综合查询方法
+        List<Spu> spus = spuRepository.findAllWithFilters(status, categoryId, brandId, keyword);
 
         // 简单分页
         int start = (page - 1) * pageSize;
@@ -110,13 +113,13 @@ public class SpuController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Spu>> updateSpu(@PathVariable UUID id, @RequestBody Spu spu) {
-        if (!spuRepository.findById(id).isPresent()) {
+        if (!spuRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.failure("SPU_NOT_FOUND", "SPU不存在", null));
         }
-        
+
         spu.setId(id);
-        Spu updatedSpu = spuRepository.update(spu);
+        Spu updatedSpu = spuRepository.save(spu);
         return ResponseEntity.ok(ApiResponse.success(updatedSpu));
     }
 
@@ -128,11 +131,11 @@ public class SpuController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSpu(@PathVariable UUID id) {
-        if (!spuRepository.findById(id).isPresent()) {
+        if (!spuRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.failure("SPU_NOT_FOUND", "SPU不存在", null));
         }
-        
+
         spuRepository.deleteById(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }

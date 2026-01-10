@@ -148,37 +148,43 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   // 获取操作按钮
   const getActionButtons = () => {
     if (mode === 'view') {
-      return <Button onClick={handleClose}>关闭</Button>;
+      return (
+        <div style={{ textAlign: 'right' }}>
+          <Button onClick={handleClose}>关闭</Button>
+        </div>
+      );
     }
 
     return (
-      <Space>
-        <Button
-          onClick={handleClose}
-          disabled={isCreating || isUpdating}
-          data-testid="cancel-brand-button"
-        >
-          取消
-        </Button>
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={isCreating || isUpdating}
-          icon={mode === 'create' ? <SaveOutlined /> : undefined}
-          onClick={() => {
-            // 触发表单提交
-            const form = document.querySelector(
-              '[data-testid="brand-form"] form'
-            ) as HTMLFormElement;
-            if (form) {
-              form.requestSubmit();
-            }
-          }}
-          data-testid="save-brand-button"
-        >
-          {mode === 'create' ? '新建品牌' : '保存修改'}
-        </Button>
-      </Space>
+      <div style={{ textAlign: 'right' }}>
+        <Space>
+          <Button
+            onClick={handleClose}
+            disabled={isCreating || isUpdating}
+            data-testid="cancel-brand-button"
+          >
+            取消
+          </Button>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isCreating || isUpdating}
+            icon={mode === 'create' ? <SaveOutlined /> : undefined}
+            onClick={() => {
+              // 触发表单提交
+              const form = document.querySelector(
+                '[data-testid="brand-form"] form'
+              ) as HTMLFormElement;
+              if (form) {
+                form.requestSubmit();
+              }
+            }}
+            data-testid="save-brand-button"
+          >
+            {mode === 'create' ? '新建品牌' : '保存修改'}
+          </Button>
+        </Space>
+      </div>
     );
   };
 
