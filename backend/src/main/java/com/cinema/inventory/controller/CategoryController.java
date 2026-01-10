@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 商品分类 API 控制器
- * 提供分类列表查询接口。
- * 
+ * 提供分类列表查询和创建接口。
+ *
  * @since P003-inventory-query
+ * @spec B001-fix-brand-creation
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -27,6 +29,39 @@ public class CategoryController {
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
+    }
+
+    /**
+     * 创建商品分类
+     * @spec B001-fix-brand-creation
+     *
+     * POST /api/categories
+     */
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> createCategory(@RequestBody Map<String, Object> request) {
+        logger.info("POST /api/categories - request={}", request);
+
+        String code = (String) request.get("code");
+        String name = (String) request.get("name");
+        String parentIdStr = (String) request.get("parent_id");
+        UUID parentId = parentIdStr != null ? UUID.fromString(parentIdStr) : null;
+        int level = request.get("level") != null ? ((Number) request.get("level")).intValue() : 1;
+        int sortOrder = request.get("sort_order") != null ? ((Number) request.get("sort_order")).intValue() : 0;
+
+        if (name == null || name.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "分类名称不能为空"
+            ));
+        }
+
+        Category created = categoryService.createCategory(code, name, parentId, level, sortOrder);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "data", created,
+                "message", "分类创建成功"
+        ));
     }
 
     /**

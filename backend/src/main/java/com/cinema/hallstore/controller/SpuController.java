@@ -121,19 +121,59 @@ public class SpuController {
      * 更新SPU
      * PUT /api/spus/{id}
      *
+     * @spec B001-fix-brand-creation
      * @param id  SPU ID
-     * @param spu SPU数据
+     * @param updateData SPU更新数据
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Spu>> updateSpu(@PathVariable UUID id, @RequestBody Spu spu) {
-        if (!spuRepository.existsById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.failure("SPU_NOT_FOUND", "SPU不存在", null));
-        }
+    public ResponseEntity<ApiResponse<Spu>> updateSpu(@PathVariable UUID id, @RequestBody Spu updateData) {
+        return spuRepository.findById(id)
+                .map(existingSpu -> {
+                    // 合并更新：只更新提供的字段，保留原有值
+                    if (updateData.getName() != null) {
+                        existingSpu.setName(updateData.getName());
+                    }
+                    if (updateData.getShortName() != null) {
+                        existingSpu.setShortName(updateData.getShortName());
+                    }
+                    if (updateData.getDescription() != null) {
+                        existingSpu.setDescription(updateData.getDescription());
+                    }
+                    if (updateData.getCategoryId() != null) {
+                        existingSpu.setCategoryId(updateData.getCategoryId());
+                    }
+                    if (updateData.getBrandId() != null) {
+                        existingSpu.setBrandId(updateData.getBrandId());
+                    }
+                    if (updateData.getStatus() != null) {
+                        existingSpu.setStatus(updateData.getStatus());
+                    }
+                    if (updateData.getProductType() != null) {
+                        existingSpu.setProductType(updateData.getProductType());
+                    }
+                    if (updateData.getUnit() != null) {
+                        existingSpu.setUnit(updateData.getUnit());
+                    }
+                    if (updateData.getTags() != null) {
+                        existingSpu.setTags(updateData.getTags());
+                    }
+                    if (updateData.getImages() != null) {
+                        existingSpu.setImages(updateData.getImages());
+                    }
+                    if (updateData.getSpecifications() != null) {
+                        existingSpu.setSpecifications(updateData.getSpecifications());
+                    }
+                    if (updateData.getAttributes() != null) {
+                        existingSpu.setAttributes(updateData.getAttributes());
+                    }
+                    // 更新时间戳
+                    existingSpu.setUpdatedAt(OffsetDateTime.now());
 
-        spu.setId(id);
-        Spu updatedSpu = spuRepository.save(spu);
-        return ResponseEntity.ok(ApiResponse.success(updatedSpu));
+                    Spu savedSpu = spuRepository.save(existingSpu);
+                    return ResponseEntity.ok(ApiResponse.success(savedSpu));
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.failure("SPU_NOT_FOUND", "SPU不存在", null)));
     }
 
     /**

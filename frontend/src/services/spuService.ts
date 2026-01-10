@@ -43,7 +43,7 @@ function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
     brandName: backendSpu.brand_name,
     categoryId: backendSpu.category_id || '',
     categoryName: backendSpu.category_name,
-    status: (backendSpu.status || 'draft') as SPUStatus,
+    status: ((backendSpu.status || 'draft').toLowerCase()) as SPUStatus,
     productType: backendSpu.product_type as ProductType, // 产品类型
     tags: backendSpu.tags || [],
     images: Array.isArray(backendSpu.images) ? backendSpu.images : [],
@@ -227,14 +227,12 @@ class SPUService {
 
   /**
    * 更新SPU
+   * @spec B001-fix-brand-creation
    * @param data SPU更新数据
    * @returns 更新后的SPU信息
    */
   async updateSPU(data: UpdateSPURequest): Promise<ApiResponse<SPUItem>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
       if (!data.id) {
         throw new Error('SPU ID不能为空');
       }
@@ -244,20 +242,20 @@ class SPUService {
         throw new Error('SPU名称不能为空');
       }
 
-      // Mock更新逻辑（在实际项目中这里会调用真实API）
-      const updatedSPU: Partial<SPUItem> = {
-        id: data.id,
-        code: data.code,
+      // 构建后端请求数据（转换为snake_case）
+      const requestData = {
         name: data.name?.trim(),
-        shortName: data.shortName?.trim(),
+        short_name: data.shortName?.trim(),
         description: data.description?.trim(),
         unit: data.unit?.trim(),
-        brandId: data.brandId,
-        categoryId: data.categoryId,
-        status: data.status,
+        brand_id: data.brandId,
+        category_id: data.categoryId,
+        status: data.status?.toUpperCase() || 'DRAFT',
+        product_type: data.productType,
         tags: data.tags || [],
-        images:
-          data.images?.map((img) => ({
+        images: data.images
+          ?.filter((img) => img.status === 'done' && img.url)
+          .map((img) => ({
             id: img.uid,
             url: img.url!,
             alt: img.name,
@@ -265,19 +263,40 @@ class SPUService {
           })) || [],
         specifications: data.specifications || [],
         attributes: data.attributes || [],
-        updatedAt: new Date().toISOString(),
-        updatedBy: 'current_user',
       };
 
-      // Mock响应
+      // 调用后端API更新SPU
+      const response = await fetch(`/api/spu/${data.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || '更新失败');
+      }
+
+      // 转换后端返回的数据为前端格式
+      const updatedSPU = transformBackendSpu(result.data);
+
       return {
         success: true,
-        data: updatedSPU as SPUItem,
-        message: 'SPU更新成功',
+        data: updatedSPU,
+        message: result.message || 'SPU更新成功',
         code: 200,
         timestamp: Date.now(),
       };
     } catch (error) {
+      console.error('Update SPU error:', error);
       return {
         success: false,
         data: null as any,

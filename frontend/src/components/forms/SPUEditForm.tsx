@@ -143,23 +143,11 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     }
   }, [mode, spuId, initialData, form, loadSPUData]);
 
-  // 监听表单变化
-  useEffect(() => {
-    const handleFormChange = () => {
-      if (currentData) {
-        const currentValues = form.getFieldsValue();
-        const hasFormChanges = Object.keys(currentValues).some((key) => {
-          const currentValue = currentValues[key];
-          const originalValue = (currentData as any)[key];
-          return JSON.stringify(currentValue) !== JSON.stringify(originalValue);
-        });
-        setHasChanges(hasFormChanges || fileList.some((file) => file.originFileObj));
-      }
-    };
-
-    // Ant Design Form 没有 onFieldsChange API
-    // 表单变化通过 Form 的 onValuesChange prop 处理
-  }, [form, currentData, fileList]);
+  // 表单变化处理函数
+  const handleValuesChange = useCallback(() => {
+    // 只要有任何表单值变化，就标记为有变化
+    setHasChanges(true);
+  }, []);
 
   // 处理保存
   const handleSave = useCallback(async () => {
@@ -190,7 +178,14 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
       if (mode === 'create') {
         response = await spuService.createSPU(submitData);
       } else {
-        response = await spuService.updateSPU(spuId!, submitData);
+        // 更新时需要把 id 包含在 data 中，确保 id 不被覆盖
+        const updateId = spuId || currentData?.id;
+        if (!updateId) {
+          throw new Error('SPU ID不能为空，请刷新页面重试');
+        }
+        // 构建最终更新对象
+        const updatePayload = { ...submitData, id: updateId };
+        response = await spuService.updateSPU(updatePayload);
       }
 
       if (response.success) {
@@ -209,7 +204,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     } finally {
       setSubmitting(false);
     }
-  }, [form, fileList, mode, spuId, onSave]);
+  }, [form, fileList, mode, spuId, currentData, onSave, templateValid, templateAttributes]);
 
   // 处理预览
   const handlePreview = useCallback(() => {
@@ -284,6 +279,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     <Form
       form={form}
       layout="vertical"
+      onValuesChange={handleValuesChange}
       initialValues={{
         status: 'draft',
       }}

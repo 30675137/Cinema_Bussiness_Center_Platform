@@ -12,8 +12,9 @@ import java.util.*;
  * 商品分类服务层
  * 使用 JPA Repository 访问数据库，与项目其他模块保持一致
  * 提供分类列表查询等业务逻辑。
- * 
+ *
  * @since P003-inventory-query
+ * @spec B001-fix-brand-creation
  */
 @Service
 public class CategoryService {
@@ -27,8 +28,35 @@ public class CategoryService {
     }
 
     /**
+     * 创建分类
+     * @spec B001-fix-brand-creation
+     *
+     * @param code 分类编码
+     * @param name 分类名称
+     * @param parentId 父分类ID（null表示顶级分类）
+     * @param level 层级（1=一级，2=二级，3=三级）
+     * @param sortOrder 排序序号
+     * @return 创建的分类
+     */
+    public Category createCategory(String code, String name, UUID parentId, int level, int sortOrder) {
+        logger.info("Creating category: code={}, name={}, parentId={}, level={}", code, name, parentId, level);
+
+        Category category = new Category();
+        category.setCode(code);
+        category.setName(name);
+        category.setParentId(parentId);
+        category.setLevel(level);
+        category.setSortOrder(sortOrder);
+        category.setStatus("ACTIVE");
+
+        Category saved = categoryJpaRepository.save(category);
+        logger.info("Category created: id={}, name={}", saved.getId(), saved.getName());
+        return saved;
+    }
+
+    /**
      * 获取所有激活状态的分类列表（树形结构）
-     * 
+     *
      * @return 分类树
      */
     public List<Category> listCategories() {

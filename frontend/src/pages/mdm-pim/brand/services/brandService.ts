@@ -87,7 +87,7 @@ function transformRequestToBackend(data: CreateBrandRequest | UpdateBrandRequest
  * 提供品牌相关的所有API调用接口
  */
 class BrandService {
-  private readonly baseURL = '/api/v1/brands';
+  private readonly baseURL = '/api/brands';
 
   /**
    * 获取品牌列表

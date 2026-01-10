@@ -12,9 +12,10 @@ import {
 import SPUDetail from '@/components/SPU/SPUDetail';
 import SPUEditForm from '@/components/forms/SPUEditForm';
 import StatusManager from '@/components/SPU/StatusManager';
-import type { SPUItem, SPUStatus } from '@/types/spu';
+import type { SPUItem, SPUStatus, Brand, Category } from '@/types/spu';
 import { spuService } from '@/services/spuService';
 import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
+import { brandService } from '@/pages/mdm-pim/brand/services/brandService';
 
 const { Title } = Typography;
 
@@ -30,6 +31,33 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
   const [currentSPU, setCurrentSPU] = useState<SPUItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
+  const [brands, setBrands] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  // 加载品牌和分类数据
+  useEffect(() => {
+    const loadReferenceData = async () => {
+      try {
+        // 并行加载品牌和分类
+        const [brandsResponse, categoriesResponse] = await Promise.all([
+          brandService.getBrands({ pageSize: 100 }),
+          fetch('/api/categories').then(res => res.json()),
+        ]);
+
+        if (brandsResponse.data) {
+          setBrands(brandsResponse.data);
+        }
+
+        if (categoriesResponse.success && categoriesResponse.data) {
+          setCategories(categoriesResponse.data);
+        }
+      } catch (error) {
+        console.error('Load reference data error:', error);
+      }
+    };
+
+    loadReferenceData();
+  }, []);
 
   // 加载 SPU 数据
   useEffect(() => {
@@ -78,26 +106,13 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
     navigate(`/spu/${id}/edit`);
   };
 
-  // 处理保存
-  const handleSave = async (updatedData: SPUItem) => {
-    if (!id) return;
-
-    try {
-      setLoading(true);
-      const response = await spuService.updateSPU(id, updatedData);
-      if (response.success) {
-        setCurrentSPU(response.data || updatedData);
-        message.success('SPU更新成功');
-        navigate(`/spu/${id}`); // 保存后跳转到详情页
-      } else {
-        message.error(response.message || '更新失败');
-      }
-    } catch (error) {
-      console.error('Update SPU error:', error);
-      message.error('更新失败，请重试');
-    } finally {
-      setLoading(false);
-    }
+  // 处理保存 - SPUEditForm 已经完成保存，这里只需更新本地状态
+  const handleSave = (updatedData: SPUItem) => {
+    // SPUEditForm 已经成功调用 spuService.updateSPU()
+    // 这里只需要更新本地状态并导航
+    setCurrentSPU(updatedData);
+    message.success('SPU更新成功');
+    navigate(`/spu/${id}`); // 保存后跳转到详情页
   };
 
   // 处理取消
@@ -253,6 +268,8 @@ const SPUDetailPage: React.FC<SPUDetailPageProps> = () => {
           onSave={handleSave}
           onCancel={handleCancel}
           loading={loading}
+          brands={brands}
+          categories={categories}
         />
       )}
     </div>
