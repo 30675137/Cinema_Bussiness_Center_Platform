@@ -8,6 +8,7 @@ import com.cinema.hallstore.domain.enums.SkuType;
 import com.cinema.hallstore.dto.SkuCreateRequest;
 import com.cinema.hallstore.repository.BomComponentRepository;
 import com.cinema.hallstore.repository.ComboItemRepository;
+import com.cinema.hallstore.repository.SkuJpaRepository;
 import com.cinema.hallstore.repository.SkuRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,12 +176,15 @@ public class SkuService {
      * 更新SKU基本信息
      */
     @Transactional
-    public Sku update(UUID id, String name, String mainUnit, String[] storeScope,
+    public Sku update(UUID id, String name, UUID spuId, String mainUnit, String[] storeScope,
                       BigDecimal standardCost, BigDecimal wasteRate, BigDecimal price, SkuStatus status) {
         Sku sku = findById(id);
 
         if (name != null) {
             sku.setName(name);
+        }
+        if (spuId != null) {
+            sku.setSpuId(spuId);
         }
         if (mainUnit != null) {
             sku.setMainUnit(mainUnit);

@@ -51,8 +51,18 @@ function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
     unit: backendSpu.unit,
     brandId: backendSpu.brand_id || '',
     brandName: backendSpu.brand_name,
+    // 构建 brand 对象，供 SPUDetail 组件使用
+    brand: backendSpu.brand_id ? {
+      id: backendSpu.brand_id,
+      name: backendSpu.brand_name || '',
+    } : undefined,
     categoryId: backendSpu.category_id || '',
     categoryName: backendSpu.category_name,
+    // 构建 category 对象，供 SPUDetail 组件使用
+    category: backendSpu.category_id ? {
+      id: backendSpu.category_id,
+      name: backendSpu.category_name || '',
+    } : undefined,
     status: ((backendSpu.status || 'draft').toLowerCase()) as SPUStatus,
     // @spec P008-sku-type-refactor: productType 已移除
     tags: backendSpu.tags || [],

@@ -1,17 +1,18 @@
 /**
  * SKU测试数据 - 影院酒吧场景
  * @since P001-sku-master-data
+ * @updated P008-sku-type-refactor 添加莫吉托原料和包材
  *
  * 数据结构：
- * - 5个原料 SKU (威士忌、可乐糖浆、薄荷叶、玉米粒、黄油)
- * - 5个包材 SKU (玻璃杯、纸杯、吸管、爆米花桶(大)、爆米花袋(小))
- * - 8个成品 SKU (含BOM配置)
+ * - 10个原料 SKU (威士忌、可乐糖浆、薄荷叶、玉米粒、黄油、白朗姆酒、青柠汁、薄荷糖浆、苏打水、青柠)
+ * - 7个包材 SKU (玻璃杯、纸杯、吸管、爆米花桶(大)、爆米花袋(小)、高脚杯、杯垫)
+ * - 9个成品 SKU (含BOM配置，包括莫吉托)
  * - 3个套餐 SKU (含子项配置)
  */
 
 import type { SKU, BomComponent, ComboItem, SkuType, SkuStatus } from '@/types/sku';
 
-// ==================== 原料 SKU (5个) ====================
+// ==================== 原料 SKU (10个) ====================
 
 export const rawMaterials: SKU[] = [
   {
@@ -159,9 +160,155 @@ export const rawMaterials: SKU[] = [
     updatedBy: 'system',
     updatedByName: '系统',
   },
+  // ==================== 莫吉托原料 (5个) ====================
+  {
+    id: '550e8400-e29b-41d4-a716-446655440006',
+    code: '6901234567006',
+    name: '白朗姆酒',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 80.0, // 80元/瓶(700ml)，约0.114元/ml
+    wasteRate: 0,
+    spuId: 'spu-white-rum',
+    spuName: '白朗姆酒',
+    brand: '百加得',
+    category: '酒水 > 烈酒',
+    categoryId: 'cat-spirits',
+    spec: '700ml',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567006',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    code: '6901234567007',
+    name: '青柠汁',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 20.0, // 20元/瓶(500ml)，约0.04元/ml
+    wasteRate: 0,
+    spuId: 'spu-lime-juice',
+    spuName: '青柠汁',
+    brand: '鲜榨原料',
+    category: '饮料 > 果汁',
+    categoryId: 'cat-juice',
+    spec: '500ml',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567007',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    code: '6901234567008',
+    name: '薄荷糖浆',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 25.0, // 25元/瓶(750ml)，约0.033元/ml
+    wasteRate: 0,
+    spuId: 'spu-mint-syrup',
+    spuName: '薄荷糖浆',
+    brand: 'Monin',
+    category: '饮料 > 糖浆',
+    categoryId: 'cat-syrup',
+    spec: '750ml',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567008',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440009',
+    code: '6901234567009',
+    name: '苏打水',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 5.0, // 5元/瓶(500ml)，约0.01元/ml
+    wasteRate: 0,
+    spuId: 'spu-soda-water',
+    spuName: '苏打水',
+    brand: '屈臣氏',
+    category: '饮料 > 汽水',
+    categoryId: 'cat-soda',
+    spec: '500ml',
+    mainUnit: 'ml',
+    mainUnitId: 'unit-ml',
+    salesUnits: [],
+    mainBarcode: '6901234567009',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440010',
+    code: '6901234567010',
+    name: '青柠',
+    skuType: 'raw_material' as SkuType,
+    storeScope: [],
+    standardCost: 2.0, // 2元/个
+    wasteRate: 0,
+    spuId: 'spu-lime',
+    spuName: '青柠',
+    brand: '新鲜果蔬',
+    category: '配料 > 水果',
+    categoryId: 'cat-fruits',
+    spec: '个',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567010',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
 ];
 
-// ==================== 包材 SKU (5个) ====================
+// ==================== 包材 SKU (7个) ====================
 
 export const packagingMaterials: SKU[] = [
   {
@@ -309,9 +456,68 @@ export const packagingMaterials: SKU[] = [
     updatedBy: 'system',
     updatedByName: '系统',
   },
+  // ==================== 莫吉托包材 (2个) ====================
+  {
+    id: '550e8400-e29b-41d4-a716-446655440016',
+    code: '6901234567016',
+    name: '高脚杯',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 12.0, // 12元/个（可重复使用，算损耗摊销）
+    wasteRate: 0,
+    spuId: 'spu-highball-glass',
+    spuName: '高脚杯',
+    brand: '优质玻璃',
+    category: '包材 > 杯具',
+    categoryId: 'cat-cups',
+    spec: '350ml',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567016',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440017',
+    code: '6901234567017',
+    name: '杯垫',
+    skuType: 'packaging' as SkuType,
+    storeScope: [],
+    standardCost: 0.5, // 0.5元/个
+    wasteRate: 0,
+    spuId: 'spu-coaster',
+    spuName: '杯垫',
+    brand: '影院包材',
+    category: '包材 > 配件',
+    categoryId: 'cat-accessories',
+    spec: '标准',
+    mainUnit: '个',
+    mainUnitId: 'unit-piece',
+    salesUnits: [],
+    mainBarcode: '6901234567017',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
 ];
 
-// ==================== 成品 SKU (8个) ====================
+// ==================== 成品 SKU (9个) ====================
 
 export const finishedProducts: SKU[] = [
   {
@@ -535,6 +741,37 @@ export const finishedProducts: SKU[] = [
     mainUnitId: 'unit-bag',
     salesUnits: [],
     mainBarcode: '6901234567028',
+    otherBarcodes: [],
+    manageInventory: true,
+    allowNegativeStock: false,
+    status: 'enabled' as SkuStatus,
+    createdAt: '2025-12-24T10:00:00Z',
+    updatedAt: '2025-12-24T10:00:00Z',
+    createdBy: 'system',
+    createdByName: '系统',
+    updatedBy: 'system',
+    updatedByName: '系统',
+  },
+  // ==================== 莫吉托成品 ====================
+  {
+    id: '550e8400-e29b-41d4-a716-446655440029',
+    code: '6901234567029',
+    name: '莫吉托',
+    skuType: 'finished_product' as SkuType,
+    storeScope: [],
+    // 成本计算: (45ml×0.114 + 30ml×0.04 + 15ml×0.033 + 90ml×0.01 + 3g×0.1 + 0.5个×2 + 12 + 0.1 + 0.5) × 1.05 = 22.71
+    standardCost: 22.71,
+    wasteRate: 5.0, // 5%损耗率
+    spuId: 'spu-mojito',
+    spuName: '莫吉托',
+    brand: '自制饮品',
+    category: '酒水 > 调酒',
+    categoryId: 'cat-cocktail',
+    spec: '标准杯',
+    mainUnit: '杯',
+    mainUnitId: 'unit-cup',
+    salesUnits: [],
+    mainBarcode: '6901234567029',
     otherBarcodes: [],
     manageInventory: true,
     allowNegativeStock: false,
@@ -903,6 +1140,118 @@ export const bomConfigurations: Record<string, BomComponent[]> = {
       totalCost: 0.8,
       isOptional: false,
       sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+  ],
+
+  // 莫吉托的BOM (Mojito)
+  '550e8400-e29b-41d4-a716-446655440029': [
+    {
+      id: 'bom-009-01',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440006', // 白朗姆酒
+      quantity: 45,
+      unit: 'ml',
+      unitCost: 0.114, // 80元/700ml
+      totalCost: 5.13,
+      isOptional: false,
+      sortOrder: 1,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-02',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440007', // 青柠汁
+      quantity: 30,
+      unit: 'ml',
+      unitCost: 0.04, // 20元/500ml
+      totalCost: 1.2,
+      isOptional: false,
+      sortOrder: 2,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-03',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440008', // 薄荷糖浆
+      quantity: 15,
+      unit: 'ml',
+      unitCost: 0.033, // 25元/750ml
+      totalCost: 0.5,
+      isOptional: false,
+      sortOrder: 3,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-04',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440009', // 苏打水
+      quantity: 90,
+      unit: 'ml',
+      unitCost: 0.01, // 5元/500ml
+      totalCost: 0.9,
+      isOptional: false,
+      sortOrder: 4,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-05',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440003', // 薄荷叶
+      quantity: 3,
+      unit: 'g',
+      unitCost: 0.1, // 5元/50g
+      totalCost: 0.3,
+      isOptional: false,
+      sortOrder: 5,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-06',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440010', // 青柠
+      quantity: 0.5,
+      unit: '个',
+      unitCost: 2.0, // 2元/个
+      totalCost: 1.0,
+      isOptional: false,
+      sortOrder: 6,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-07',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440016', // 高脚杯
+      quantity: 1,
+      unit: '个',
+      unitCost: 12.0,
+      totalCost: 12.0,
+      isOptional: false,
+      sortOrder: 7,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-08',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440013', // 吸管
+      quantity: 1,
+      unit: '根',
+      unitCost: 0.1,
+      totalCost: 0.1,
+      isOptional: false,
+      sortOrder: 8,
+      createdAt: '2025-12-24T10:00:00Z',
+    },
+    {
+      id: 'bom-009-09',
+      finishedProductId: '550e8400-e29b-41d4-a716-446655440029',
+      componentId: '550e8400-e29b-41d4-a716-446655440017', // 杯垫
+      quantity: 1,
+      unit: '个',
+      unitCost: 0.5,
+      totalCost: 0.5,
+      isOptional: false,
+      sortOrder: 9,
       createdAt: '2025-12-24T10:00:00Z',
     },
   ],

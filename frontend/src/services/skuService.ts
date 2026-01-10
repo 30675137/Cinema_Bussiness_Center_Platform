@@ -6,6 +6,7 @@
 
 import type {
   SKU,
+  SKUDetail,
   SkuQueryParams,
   SkuListResponse,
   SkuFormData,
@@ -28,17 +29,17 @@ export interface ISkuService {
   /**
    * 根据ID获取SKU详情
    */
-  getSkuById(id: string): Promise<SKU>;
+  getSkuById(id: string): Promise<SKUDetail>;
 
   /**
    * 创建新SKU
    */
-  createSku(formData: SkuFormData): Promise<SKU>;
+  createSku(formData: SkuFormData): Promise<SKUDetail>;
 
   /**
    * 更新SKU
    */
-  updateSku(id: string, formData: SkuFormData): Promise<SKU>;
+  updateSku(id: string, formData: SkuFormData): Promise<SKUDetail>;
 
   /**
    * 切换SKU状态
@@ -256,7 +257,7 @@ async function getSpuCache(): Promise<Map<string, BackendSpu>> {
 function transformBackendSku(
   backendSku: BackendSkuData,
   spuMap?: Map<string, BackendSpu>
-): SKU & { bomComponents?: any[] } {
+): SKUDetail {
   // 兼容 camelCase 和 snake_case（列表API返回snake_case，详情API返回camelCase）
   const spuId = backendSku.spuId || backendSku.spu_id || '';
   const skuType = backendSku.skuType || backendSku.sku_type || '';
@@ -388,7 +389,7 @@ class SkuServiceImpl implements ISkuService {
     };
   }
 
-  async getSkuById(id: string): Promise<SKU> {
+  async getSkuById(id: string): Promise<SKUDetail> {
     // 先获取SPU缓存
     const spuMap = await getSpuCache();
 
@@ -399,7 +400,7 @@ class SkuServiceImpl implements ISkuService {
     return transformBackendSku(backendResponse.data, spuMap);
   }
 
-  async createSku(formData: SkuFormData): Promise<SKU> {
+  async createSku(formData: SkuFormData): Promise<SKUDetail> {
     // 后端枚举使用小写值: draft, enabled, disabled, raw_material, finished_product, combo, packaging
     const statusValue = formData.status?.toLowerCase() || 'draft';
     // SKU类型从SPU继承，默认为 raw_material
@@ -434,7 +435,7 @@ class SkuServiceImpl implements ISkuService {
     return transformBackendSku(backendResponse.data);
   }
 
-  async updateSku(id: string, formData: SkuFormData): Promise<SKU> {
+  async updateSku(id: string, formData: SkuFormData): Promise<SKUDetail> {
     // 后端枚举使用小写值
     const statusValue = formData.status?.toLowerCase();
 
@@ -442,6 +443,7 @@ class SkuServiceImpl implements ISkuService {
       `/skus/${id}`,
       {
         name: formData.name,
+        spuId: formData.spuId, // 添加spuId字段
         mainUnit: formData.mainUnitId,
         status: statusValue,
         standardCost: formData.standardCost, // 标准成本（原料/包材类型）
@@ -453,7 +455,7 @@ class SkuServiceImpl implements ISkuService {
     return transformBackendSku(backendResponse.data);
   }
 
-  async toggleSkuStatus(id: string, status: SkuStatus): Promise<SKU> {
+  async toggleSkuStatus(id: string, status: SkuStatus): Promise<SKUDetail> {
     // 后端枚举使用小写值
     const statusValue = status.toLowerCase();
 

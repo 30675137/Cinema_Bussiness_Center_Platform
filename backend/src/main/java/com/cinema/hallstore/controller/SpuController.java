@@ -2,7 +2,9 @@ package com.cinema.hallstore.controller;
 
 import com.cinema.hallstore.domain.Spu;
 import com.cinema.hallstore.dto.ApiResponse;
+import com.cinema.hallstore.repository.BrandJpaRepository;
 import com.cinema.hallstore.repository.SpuJpaRepository;
+import com.cinema.inventory.repository.CategoryJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +27,15 @@ import java.util.UUID;
 public class SpuController {
 
     private final SpuJpaRepository spuRepository;
+    private final BrandJpaRepository brandRepository;
+    private final CategoryJpaRepository categoryRepository;
 
-    public SpuController(SpuJpaRepository spuRepository) {
+    public SpuController(SpuJpaRepository spuRepository, 
+                         BrandJpaRepository brandRepository,
+                         CategoryJpaRepository categoryRepository) {
         this.spuRepository = spuRepository;
+        this.brandRepository = brandRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
@@ -40,6 +48,7 @@ public class SpuController {
      * @param keyword   关键词搜索(名称/编码)
      * @param page      页码
      * @param pageSize  每页大小
+     * @spec B001-fix-brand-creation - 填充品牌和分类名称
      */
     @GetMapping({"", "/list"})
     public ResponseEntity<Map<String, Object>> getSpus(
@@ -52,6 +61,11 @@ public class SpuController {
 
         // 使用 JPA Repository 的综合查询方法
         List<Spu> spus = spuRepository.findAllWithFilters(status, categoryId, brandId, keyword);
+
+        // 填充品牌和分类名称
+        for (Spu spu : spus) {
+            fillBrandAndCategoryName(spu);
+        }
 
         // 简单分页
         int start = (page - 1) * pageSize;
@@ -76,11 +90,15 @@ public class SpuController {
      * GET /api/spus/{id}
      *
      * @param id SPU ID
+     * @spec B001-fix-brand-creation - 填充品牌和分类名称
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Spu>> getSpu(@PathVariable UUID id) {
         return spuRepository.findById(id)
-                .map(spu -> ResponseEntity.ok(ApiResponse.success(spu)))
+                .map(spu -> {
+                    fillBrandAndCategoryName(spu);
+                    return ResponseEntity.ok(ApiResponse.success(spu));
+                })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(ApiResponse.failure("SPU_NOT_FOUND", "SPU不存在", null)));
     }
@@ -251,5 +269,32 @@ public class SpuController {
                 "success", false,
                 "message", "不支持的操作类型: " + operation
         ));
+    }
+
+    /**
+     * 填充SPU的品牌名称和分类名称
+     * @spec B001-fix-brand-creation
+     */
+    private void fillBrandAndCategoryName(Spu spu) {
+        // 填充品牌名称
+        if (spu.getBrandId() != null && spu.getBrandName() == null) {
+            try {
+                UUID brandUuid = UUID.fromString(spu.getBrandId());
+                brandRepository.findById(brandUuid)
+                        .ifPresent(brand -> spu.setBrandName(brand.getName()));
+            } catch (IllegalArgumentException ignored) {
+                // 无效的UUID格式，忽略
+            }
+        }
+        // 填充分类名称
+        if (spu.getCategoryId() != null && spu.getCategoryName() == null) {
+            try {
+                UUID categoryUuid = UUID.fromString(spu.getCategoryId());
+                categoryRepository.findById(categoryUuid)
+                        .ifPresent(category -> spu.setCategoryName(category.getName()));
+            } catch (IllegalArgumentException ignored) {
+                // 无效的UUID格式，忽略
+            }
+        }
     }
 }
