@@ -1,5 +1,31 @@
+/**
+ * @spec B001-fix-brand-creation
+ * SPU相关类型定义
+ */
+
 // SPU 状态枚举
 type SPUStatus = 'draft' | 'active' | 'inactive' | 'archived';
+
+// 品牌类型（用于SPU表单）
+export interface Brand {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  status?: 'active' | 'inactive';
+  logo?: string;
+}
+
+// 分类类型（用于SPU表单，支持树形结构）
+export interface Category {
+  id: string;
+  name: string;
+  code?: string;
+  parentId?: string;
+  level?: number;
+  status?: 'active' | 'inactive';
+  children?: Category[];
+}
 
 // SPU 产品类型枚举
 export type ProductType = 'raw_material' | 'packaging' | 'finished_product' | 'combo';

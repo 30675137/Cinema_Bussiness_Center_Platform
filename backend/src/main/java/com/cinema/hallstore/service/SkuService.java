@@ -233,7 +233,8 @@ public class SkuService {
             comboItemRepository.deleteByComboId(id);
         }
 
-        skuRepository.delete(id);
+        // 使用 deleteAndFlush 立即执行 SQL，以便在方法内捕获约束异常
+        skuRepository.deleteAndFlush(id);
     }
 
     /**

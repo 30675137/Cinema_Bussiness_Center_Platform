@@ -98,6 +98,12 @@ export interface ISkuService {
       sortOrder?: number;
     }>
   ): Promise<{ calculatedCost: number }>;
+
+  /**
+   * 批量删除SKU
+   * @spec B001-fix-brand-creation
+   */
+  batchDeleteSkus(ids: string[]): Promise<{ success: number; failed: number }>;
 }
 
 /**
@@ -584,6 +590,38 @@ class SkuServiceImpl implements ISkuService {
       { id: '袋', code: 'BAG', name: '袋', type: 'inventory' },
       { id: '份', code: 'PORTION', name: '份', type: 'inventory' },
     ];
+  }
+
+  /**
+   * 批量删除SKU
+   * @spec B001-fix-brand-creation
+   */
+  async batchDeleteSkus(ids: string[]): Promise<{ success: number; failed: number }> {
+    const response = await fetch('/api/skus/batch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        operation: 'delete',
+        ids,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || '批量删除失败');
+    }
+
+    return {
+      success: result.data.processedCount,
+      failed: result.data.failedCount,
+    };
   }
 }
 

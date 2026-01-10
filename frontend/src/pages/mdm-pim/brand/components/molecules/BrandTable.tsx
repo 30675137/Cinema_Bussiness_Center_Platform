@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Space, Button, Empty, Tooltip } from 'antd';
+import { Table, Space, Button, Empty, Tooltip, Popconfirm } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { Brand, BrandTableProps } from '../../types/brand.types';
@@ -18,6 +18,7 @@ const BrandTable: React.FC<BrandTableProps> = ({
   onView,
   onEdit,
   onStatusChange,
+  onDelete,
 }) => {
   // 格式化时间
   const formatDate = (dateString: string) => {
@@ -172,6 +173,28 @@ const BrandTable: React.FC<BrandTableProps> = ({
                 type="text"
                 data-testid="brand-status-actions"
               />
+
+              {/* 删除按钮 */}
+              {onDelete && (
+                <Popconfirm
+                  title="确认删除"
+                  description={`确定要删除品牌「${record.name}」吗？`}
+                  onConfirm={() => onDelete(record)}
+                  okText="确定"
+                  cancelText="取消"
+                  okButtonProps={{ danger: true }}
+                >
+                  <Tooltip title="删除">
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      icon={<DeleteOutlined />}
+                      data-testid="delete-button"
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              )}
             </Space>
           </div>
         );
