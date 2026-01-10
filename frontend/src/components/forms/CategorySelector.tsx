@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Cascader, Spin, TreeSelect } from 'antd';
 import type { CascaderProps, TreeSelectProps } from 'antd';
-import type { Category } from '@/types/spu';
+import type { CategoryItem } from '@/types/category';
+
+type DefaultOptionType = Record<string, any>;
 
 interface CategorySelectorProps extends Omit<CascaderProps, 'options' | 'children'> {
-  categories?: Category[];
+  categories?: CategoryItem[];
   loading?: boolean;
   placeholder?: string;
   allowClear?: boolean;
@@ -42,51 +44,79 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   // 构建级联数据结构
   const cascaderOptions = useMemo(() => {
-    const buildOptions = (categories: Category[], level = 1): any[] => {
-      return categories.map((category) => {
-        const option: any = {
-          [fieldNames.label!]: category.name,
-          [fieldNames.value!]: category.id,
-          isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
-        };
+    const buildOptions = (categories: CategoryItem[], level = 1): any[] => {
+      return categories
+        .filter((category) => category && category.id && category.name) // 过滤无效数据
+        .map((category) => {
+          const option: any = {
+            [fieldNames.label!]: category.name,
+            [fieldNames.value!]: category.id,
+            isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
+          };
 
-        // 添加额外信息
-        option.disabled = category.status === 'inactive';
-        option.category = category;
+          // 添加额外信息
+          option.disabled = category.status === 'inactive';
+          option.category = category;
 
-        if (category.children && category.children.length > 0 && level < maxLevel) {
-          option[fieldNames.children!] = buildOptions(category.children, level + 1);
-        }
+          if (category.children && category.children.length > 0 && level < maxLevel) {
+            option[fieldNames.children!] = buildOptions(category.children, level + 1);
+          }
 
-        return option;
-      });
+          return option;
+        });
     };
 
     return buildOptions(categories);
   }, [categories, maxLevel, fieldNames]);
 
   // 自定义显示渲染
-  const displayRender = (labels: string[], selectedOptions: any[]) => {
+  const displayRender = (labels: string[], selectedOptions?: DefaultOptionType[]) => {
     return labels.join(' / ');
   };
 
   // 处理值变化
-  const handleChange = (value: (string | number)[], selectedOptions: any[]) => {
+  const handleChange = (value: (string | number | null)[] | null, selectedOptions: DefaultOptionType[]) => {
     if (onChange) {
-      onChange(value, selectedOptions);
+      // 返回选中的最后一级 ID（叶子节点）
+      const leafValue = value && value.length > 0 ? value[value.length - 1] : undefined;
+      onChange(leafValue as any, selectedOptions as any);
     }
   };
 
   // 自定义过滤函数
-  const filter = (inputValue: string, path: any[]) => {
+  const filter = (inputValue: string, path: DefaultOptionType[]) => {
     return path.some((option) =>
-      option[fieldNames.label].toLowerCase().includes(inputValue.toLowerCase())
+      option[fieldNames.label!]?.toString().toLowerCase().includes(inputValue.toLowerCase())
     );
   };
 
+  // 将单个 ID 值转换为路径数组
+  const cascaderValue = useMemo(() => {
+    if (!value) return undefined;
+    
+    // 如果已经是数组，直接返回
+    if (Array.isArray(value)) return value;
+    
+    // 如果是字符串 ID，需要找到完整路径
+    const findPath = (categories: CategoryItem[], targetId: string, path: string[] = []): string[] | null => {
+      for (const category of categories) {
+        if (category.id === targetId) {
+          return [...path, category.id];
+        }
+        if (category.children && category.children.length > 0) {
+          const result = findPath(category.children, targetId, [...path, category.id]);
+          if (result) return result;
+        }
+      }
+      return null;
+    };
+    
+    return findPath(categories, value as string) || undefined;
+  }, [value, categories]);
+
   return (
     <Cascader
-      value={value}
+      value={cascaderValue}
       onChange={handleChange}
       options={cascaderOptions}
       placeholder={placeholder}
@@ -94,13 +124,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       showSearch={showSearch}
       changeOnSelect={changeOnSelect}
       displayRender={displayRender}
-      filter={filter}
       loading={externalLoading || loading}
       notFoundContent={externalLoading || loading ? <Spin size="small" /> : '暂无分类数据'}
-      expandIcon={(props) => {
-        return <span {...props}>{props.isLeaf ? '' : '▶'}</span>;
-      }}
-      {...restProps}
     />
   );
 };
@@ -109,7 +134,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
  * 分类树形选择器
  */
 interface CategoryTreeSelectorProps extends Omit<TreeSelectProps, 'treeData' | 'children'> {
-  categories?: Category[];
+  categories?: CategoryItem[];
   loading?: boolean;
   placeholder?: string;
   allowClear?: boolean;
@@ -134,19 +159,21 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
 }) => {
   // 构建树形数据结构
   const treeData = useMemo(() => {
-    const buildTreeData = (categories: Category[], level = 1): any[] => {
-      return categories.map((category) => ({
-        title: category.name,
-        value: category.id,
-        key: category.id,
-        disabled: category.status === 'inactive',
-        isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
-        category,
-        children:
-          category.children && category.children.length > 0 && level < maxLevel
-            ? buildTreeData(category.children, level + 1)
-            : undefined,
-      }));
+    const buildTreeData = (categories: CategoryItem[], level = 1): any[] => {
+      return categories
+        .filter((category) => category && category.id && category.name) // 过滤无效数据
+        .map((category) => ({
+          title: category.name,
+          value: category.id,
+          key: category.id,
+          disabled: category.status === 'inactive',
+          isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
+          category,
+          children:
+            category.children && category.children.length > 0 && level < maxLevel
+              ? buildTreeData(category.children, level + 1)
+              : undefined,
+        }));
     };
 
     return buildTreeData(categories);
@@ -193,13 +220,11 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
       multiple={multiple}
       treeCheckStrictly={checkStrictly}
       treeNodeLabelProp="title"
-      treeNodeValueProp="value"
       loading={externalLoading}
       notFoundContent={externalLoading ? <Spin size="small" /> : '暂无分类数据'}
       dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
       treeDefaultExpandAll={false}
       treeLine={{ showLeafIcon: false }}
-      titleRender={treeNodeRender}
       {...restProps}
     />
   );
@@ -210,7 +235,7 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
  */
 interface CategoryPathProps {
   categoryId?: string;
-  categories?: Category[];
+  categories?: CategoryItem[];
   separator?: string;
   showCode?: boolean;
   maxLength?: number;
@@ -225,10 +250,10 @@ export const CategoryPath: React.FC<CategoryPathProps> = ({
 }) => {
   const categoryPath = useMemo(() => {
     const findPath = (
-      categories: Category[],
+      categories: CategoryItem[],
       targetId: string,
-      path: Category[] = []
-    ): Category[] | null => {
+      path: CategoryItem[] = []
+    ): CategoryItem[] | null => {
       for (const category of categories) {
         if (category.id === targetId) {
           return [...path, category];
@@ -275,10 +300,10 @@ export const CategoryBreadcrumb: React.FC<CategoryPathProps> = (props) => {
 
   const categoryPath = useMemo(() => {
     const findPath = (
-      categories: Category[],
+      categories: CategoryItem[],
       targetId: string,
-      path: Category[] = []
-    ): Category[] | null => {
+      path: CategoryItem[] = []
+    ): CategoryItem[] | null => {
       for (const category of categories) {
         if (category.id === targetId) {
           return [...path, category];
