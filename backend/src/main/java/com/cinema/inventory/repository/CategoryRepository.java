@@ -59,7 +59,11 @@ public class CategoryRepository {
                     .bodyToMono(new ParameterizedTypeReference<List<SupabaseRow>>() {})
                     .block(supabaseConfig.getTimeoutDuration());
 
-            return rows == null ? List.of() : rows.stream().map(this::toDomain).collect(Collectors.toList());
+            // 过滤掉无效数据（id 或 name 为空的记录）
+            return rows == null ? List.of() : rows.stream()
+                    .filter(row -> row.id != null && row.name != null && !row.name.trim().isEmpty())
+                    .map(this::toDomain)
+                    .collect(Collectors.toList());
         } catch (WebClientResponseException e) {
             logger.error("Error fetching categories. Status: {}, Body: {}", 
                     e.getStatusCode(), e.getResponseBodyAsString());
