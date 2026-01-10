@@ -52,11 +52,12 @@ public class StoreInventoryRepository {
      */
     public List<StoreInventory> findByParams(InventoryQueryParams params) {
         try {
-            // 使用 Supabase 的嵌入查询来获取关联的 SKU 和 Category 信息
+            // 使用 Supabase 的嵌入查询来获取关联的 SKU 和门店信息
+            // 注意：skus 表没有 category_id 字段，分类信息暂不支持
             UriComponentsBuilder builder = UriComponentsBuilder
                     .fromUriString("/store_inventory")
                     .queryParam("select", "id,store_id,sku_id,on_hand_qty,available_qty,reserved_qty,safety_stock,created_at,updated_at," +
-                            "skus!inner(code,name,main_unit,category_id,categories(id,name))," +
+                            "skus!inner(code,name,main_unit)," +
                             "stores!inner(code,name)")
                     .queryParam("order", "updated_at.desc");
 
@@ -65,17 +66,18 @@ public class StoreInventoryRepository {
                 builder.queryParam("store_id", "eq." + params.getStoreId());
             }
 
-            // 分类筛选
-            if (params.getCategoryId() != null) {
-                builder.queryParam("skus.category_id", "eq." + params.getCategoryId());
-            }
+            // 分类筛选暂不支持（skus 表没有 category_id 字段）
+            // if (params.getCategoryId() != null) {
+            //     builder.queryParam("skus.category_id", "eq." + params.getCategoryId());
+            // }
 
-            // 关键词搜索（SKU 名称或编码）
-            if (params.getKeyword() != null && !params.getKeyword().isBlank()) {
-                // 使用 or 条件搜索 name 或 code
-                String keyword = params.getKeyword().trim();
-                builder.queryParam("or", "(skus.name.ilike.*" + keyword + "*,skus.code.ilike.*" + keyword + "*)");
-            }
+            // 关键词搜索暂不支持
+            // Supabase REST API 的 or 条件不支持嵌套表字段（如 skus.name）的语法
+            // 如需关键词搜索，应迁移到 JPA Repository 使用 JPQL 查询
+            // if (params.getKeyword() != null && !params.getKeyword().isBlank()) {
+            //     String keyword = params.getKeyword().trim();
+            //     builder.queryParam("or", "(skus.name.ilike.*" + keyword + "*,skus.code.ilike.*" + keyword + "*)");
+            // }
 
             // 分页
             int page = params.getPage() != null ? params.getPage() : 1;
@@ -166,7 +168,7 @@ public class StoreInventoryRepository {
             String uri = UriComponentsBuilder
                     .fromUriString("/store_inventory")
                     .queryParam("select", "id,store_id,sku_id,on_hand_qty,available_qty,reserved_qty,safety_stock,created_at,updated_at," +
-                            "skus!inner(code,name,main_unit,category_id,categories(id,name))," +
+                            "skus!inner(code,name,main_unit)," +
                             "stores!inner(code,name)")
                     .queryParam("id", "eq." + id)
                     .build()
@@ -239,21 +241,10 @@ public class StoreInventoryRepository {
         @JsonProperty("main_unit")
         public String mainUnit;
 
-        @JsonProperty("category_id")
-        public UUID categoryId;
-
-        @JsonProperty("categories")
-        public CategoryInfo categories;
+        // 注意：skus 表没有 category_id 字段，分类信息暂不支持
     }
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private static class CategoryInfo {
-        @JsonProperty("id")
-        public UUID id;
-
-        @JsonProperty("name")
-        public String name;
-    }
+    // CategoryInfo 内部类已移除，因为 skus 表没有 category_id 字段
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class StoreInfo {
@@ -272,7 +263,7 @@ public class StoreInventoryRepository {
             String uri = UriComponentsBuilder
                     .fromUriString("/store_inventory")
                     .queryParam("select", "id,store_id,sku_id,on_hand_qty,available_qty,reserved_qty,safety_stock,created_at,updated_at," +
-                            "skus!inner(code,name,main_unit,category_id,categories(id,name))," +
+                            "skus!inner(code,name,main_unit)," +
                             "stores!inner(code,name)")
                     .queryParam("sku_id", "eq." + skuId)
                     .queryParam("store_id", "eq." + storeId)
@@ -386,12 +377,8 @@ public class StoreInventoryRepository {
             inventory.setSkuCode(row.skus.code);
             inventory.setSkuName(row.skus.name);
             inventory.setMainUnit(row.skus.mainUnit);
-            inventory.setCategoryId(row.skus.categoryId);
-            
-            // 设置分类信息
-            if (row.skus.categories != null) {
-                inventory.setCategoryName(row.skus.categories.name);
-            }
+            // 注意：skus 表没有 category_id 字段，分类信息暂不支持
+            // categoryId 和 categoryName 保持为 null
         }
 
         // 设置门店信息
