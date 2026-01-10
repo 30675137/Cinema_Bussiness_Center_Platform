@@ -32,7 +32,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { showError, showSuccess } from '@/utils/errorHandler';
 import type { SkuFormData, SKU } from '@/types/sku';
-import { SkuStatus } from '@/types/sku';
+import { SkuStatus, SkuType } from '@/types/sku';
+import { skuFormSchema, type SkuFormValues } from './schema';
 import { useSkuStore } from '@/stores/skuStore';
 import {
   useCreateSkuMutation,
@@ -105,49 +106,9 @@ const steps = [
 ];
 
 /**
- * Zod 验证 Schema
+ * @spec P008-sku-type-refactor
+ * SKU表单验证使用统一的 schema.ts
  */
-const salesUnitSchema = z.object({
-  unitId: z.string().min(1, '请选择销售单位'),
-  conversionRate: z.number().min(0.01, '换算关系必须大于0'),
-  enabled: z.boolean().optional().default(true),
-});
-
-const barcodeSchema = z.object({
-  code: z.string().min(1, '请输入条码'),
-  remark: z.string().optional(),
-});
-
-const skuFormSchema = z.object({
-  // 基础信息
-  spuId: z.string().min(1, '请选择所属SPU'),
-  name: z.string().min(1, '请输入SKU名称').max(200, 'SKU名称不能超过200个字符'),
-  code: z.string().optional(),
-
-  // 规格属性
-  spec: z.string().max(200, '规格不能超过200个字符').optional(),
-  flavor: z.string().optional(),
-  packaging: z.string().optional(),
-
-  // 单位配置
-  mainUnitId: z.string().min(1, '请选择主库存单位'),
-  salesUnits: z.array(salesUnitSchema).optional().default([]),
-
-  // 条码信息
-  mainBarcode: z.string().min(1, '请输入主条码'),
-  otherBarcodes: z.array(barcodeSchema).optional().default([]),
-
-  // 库存配置
-  manageInventory: z.boolean().optional().default(true),
-  allowNegativeStock: z.boolean().optional().default(false),
-  minOrderQty: z.number().min(0).optional(),
-  minSaleQty: z.number().min(0).optional(),
-
-  // 状态
-  status: z.nativeEnum(SkuStatus).optional().default(SkuStatus.DRAFT),
-});
-
-type SkuFormValues = z.infer<typeof skuFormSchema>;
 
 interface SkuFormProps {
   open: boolean;
@@ -167,14 +128,19 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
   const { closeFormDrawer } = useSkuStore();
 
   // React Hook Form
+  // @spec P008-sku-type-refactor: 添加 skuType 默认值
   const form = useForm<SkuFormValues>({
     resolver: zodResolver(skuFormSchema),
     defaultValues: {
       status: SkuStatus.DRAFT,
+      skuType: undefined, // 创建时必须选择
       manageInventory: true,
       allowNegativeStock: false,
       salesUnits: [],
       otherBarcodes: [],
+      bomComponents: [],
+      comboItems: [],
+      storeScope: [],
     },
     mode: 'onChange',
   });
@@ -215,6 +181,7 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
   }, [open, watch]);
 
   // 初始化表单数据
+  // @spec P008-sku-type-refactor: 添加 skuType 初始化
   useEffect(() => {
     if (open) {
       if (mode === 'edit' && skuData) {
@@ -223,6 +190,7 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
           spuId: skuData.spuId,
           name: skuData.name,
           code: skuData.code,
+          skuType: skuData.skuType, // @spec P008-sku-type-refactor
           spec: skuData.spec,
           flavor: skuData.flavor,
           packaging: skuData.packaging,
@@ -237,6 +205,9 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
             code: b.code,
             remark: b.remark,
           })),
+          standardCost: skuData.standardCost, // @spec P008-sku-type-refactor
+          wasteRate: skuData.wasteRate, // @spec P008-sku-type-refactor
+          storeScope: skuData.storeScope || [], // @spec P008-sku-type-refactor
           manageInventory: skuData.manageInventory,
           allowNegativeStock: skuData.allowNegativeStock,
           minOrderQty: skuData.minOrderQty,
@@ -247,12 +218,17 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
         setHasUnsavedChanges(false);
       } else {
         // 创建模式：重置表单
+        // @spec P008-sku-type-refactor: skuType 必须在创建时选择
         reset({
           status: SkuStatus.DRAFT,
+          skuType: undefined,
           manageInventory: true,
           allowNegativeStock: false,
           salesUnits: [],
           otherBarcodes: [],
+          bomComponents: [],
+          comboItems: [],
+          storeScope: [],
         });
         setHasUnsavedChanges(false);
         setCurrentStep(FormStep.BASIC_INFO);
@@ -265,11 +241,15 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
     const fieldLabels: Record<string, string> = {
       spuId: '所属SPU',
       name: 'SKU名称',
+      skuType: 'SKU类型', // @spec P008-sku-type-refactor
       mainUnitId: '主库存单位',
       mainBarcode: '主条码',
       spec: '规格/型号',
       flavor: '口味',
       packaging: '包装形式',
+      standardCost: '标准成本', // @spec P008-sku-type-refactor
+      wasteRate: '损耗率', // @spec P008-sku-type-refactor
+      storeScope: '门店范围', // @spec P008-sku-type-refactor
       manageInventory: '是否管理库存',
       allowNegativeStock: '是否允许负库存',
       minOrderQty: '最小起订量',
@@ -315,6 +295,7 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
   }, []);
 
   // 验证当前步骤
+  // @spec P008-sku-type-refactor: 添加 skuType 验证
   const validateCurrentStep = useCallback(async (): Promise<{
     isValid: boolean;
     failedFields: string[];
@@ -323,7 +304,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
     let fieldsToCheck: string[] = [];
     switch (currentStep) {
       case FormStep.BASIC_INFO:
-        fieldsToCheck = ['spuId', 'name'];
+        // @spec P008-sku-type-refactor: skuType 为必填字段
+        fieldsToCheck = ['spuId', 'name', 'skuType'];
         break;
       case FormStep.UNIT_BARCODE:
         fieldsToCheck = ['mainUnitId', 'mainBarcode'];
@@ -366,7 +348,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
       const values = getValues();
       switch (step) {
         case FormStep.BASIC_INFO:
-          return !!(values.spuId && values.name);
+          // @spec P008-sku-type-refactor: 添加 skuType 检查
+          return !!(values.spuId && values.name && values.skuType);
         case FormStep.UNIT_BARCODE:
           return !!(values.mainUnitId && values.mainBarcode);
         case FormStep.SPEC_ATTR:
@@ -383,12 +366,13 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
   );
 
   // 检查步骤错误状态
+  // @spec P008-sku-type-refactor: 添加 skuType 错误检查
   const checkStepErrors = useCallback(
     (step: FormStep): boolean => {
       const currentErrors = errors;
       switch (step) {
         case FormStep.BASIC_INFO:
-          return !!(currentErrors.spuId || currentErrors.name);
+          return !!(currentErrors.spuId || currentErrors.name || currentErrors.skuType);
         case FormStep.UNIT_BARCODE:
           return !!(currentErrors.mainUnitId || currentErrors.mainBarcode);
         case FormStep.SPEC_ATTR:
@@ -501,10 +485,12 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
         }
 
         // 构建表单数据
+        // @spec P008-sku-type-refactor: 添加 skuType 到表单数据
         const formData: SkuFormData = {
           spuId: values.spuId,
           name: values.name,
           code: mode === 'edit' ? values.code : undefined,
+          skuType: values.skuType, // @spec P008-sku-type-refactor
           spec: values.spec,
           flavor: values.flavor,
           packaging: values.packaging,
@@ -519,6 +505,8 @@ export const SkuForm: React.FC<SkuFormProps> = ({ open, mode, skuId, onClose, on
             code: b.code,
             remark: b.remark,
           })),
+          standardCost: values.standardCost, // @spec P008-sku-type-refactor
+          storeScope: values.storeScope || [], // @spec P008-sku-type-refactor
           manageInventory: values.manageInventory ?? true,
           allowNegativeStock: values.allowNegativeStock ?? false,
           minOrderQty: values.minOrderQty,

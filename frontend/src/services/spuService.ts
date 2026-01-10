@@ -1,4 +1,4 @@
-import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category, ProductType } from '@/types/spu';
+import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category } from '@/types/spu';
 import { generateSPUCode } from '@/utils/spuHelpers';
 import { apiService } from './api';
 
@@ -12,6 +12,7 @@ const statusColors: Record<string, { text: string; color: string }> = {
 
 /**
  * 后端SPU数据结构（API返回格式 - snake_case）
+ * @spec P008-sku-type-refactor: product_type 已移除
  */
 interface BackendSpu {
   id: string;
@@ -24,7 +25,7 @@ interface BackendSpu {
   brand_id?: string;
   brand_name?: string;
   status: string;
-  product_type?: string; // 产品类型: raw_material, packaging, finished_product, combo
+  // @spec P008-sku-type-refactor: product_type 已移除，SKU 类型由 SKU.skuType 管理
   unit?: string;
   tags?: string[];
   images?: any;
@@ -38,6 +39,7 @@ interface BackendSpu {
 
 /**
  * 将后端SPU数据转换为前端格式
+ * @spec P008-sku-type-refactor: productType 已移除
  */
 function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
   return {
@@ -52,7 +54,7 @@ function transformBackendSpu(backendSpu: BackendSpu): SPUItem {
     categoryId: backendSpu.category_id || '',
     categoryName: backendSpu.category_name,
     status: ((backendSpu.status || 'draft').toLowerCase()) as SPUStatus,
-    productType: backendSpu.product_type as ProductType, // 产品类型
+    // @spec P008-sku-type-refactor: productType 已移除
     tags: backendSpu.tags || [],
     images: Array.isArray(backendSpu.images) ? backendSpu.images : [],
     specifications: Array.isArray(backendSpu.specifications) ? backendSpu.specifications : [],
@@ -82,6 +84,7 @@ export interface PaginatedResponse<T> extends ApiResponse<{
 }> {}
 
 // SPU 创建请求参数
+// @spec P008-sku-type-refactor: productType 已移除
 export interface CreateSPURequest {
   name: string;
   shortName?: string;
@@ -90,7 +93,7 @@ export interface CreateSPURequest {
   brandId: string;
   categoryId: string;
   status: SPUStatus;
-  productType: ProductType; // 产品类型（必填）
+  // productType 已移除 - SKU 类型由 SKU.skuType 管理
   tags?: string[];
   images: Array<{
     uid: string;
@@ -110,11 +113,12 @@ export interface CreateSPURequest {
 }
 
 // SPU 更新请求参数
+// @spec P008-sku-type-refactor: productType 已移除
 export interface UpdateSPURequest extends Partial<CreateSPURequest> {
   id: string;
   code?: string;
   status?: SPUStatus;
-  productType?: ProductType; // 产品类型
+  // productType 已移除 - SKU 类型由 SKU.skuType 管理
   tags?: string[];
   images?: Array<{
     uid: string;
@@ -159,16 +163,14 @@ class SPUService {
         throw new Error('商品描述不能为空');
       }
 
-      // 验证产品类型
-      if (!data.productType) {
-        throw new Error('请选择产品类型');
-      }
+      // @spec P008-sku-type-refactor: productType 验证已移除
 
       if (!data.images || data.images.length === 0) {
         throw new Error('请至少上传一张商品图片');
       }
 
       // 构建后端请求数据（转换为snake_case）
+      // @spec P008-sku-type-refactor: product_type 已移除
       const requestData = {
         name: data.name.trim(),
         short_name: data.shortName?.trim(),
@@ -177,7 +179,7 @@ class SPUService {
         brand_id: data.brandId,
         category_id: data.categoryId,
         status: data.status || 'draft',
-        product_type: data.productType,
+        // product_type 已移除 - SKU 类型由 SKU.skuType 管理
         tags: data.tags || [],
         images: (data.images || [])
           .filter((img: any) => img.url)
@@ -251,6 +253,7 @@ class SPUService {
       }
 
       // 构建后端请求数据（转换为snake_case）
+      // @spec P008-sku-type-refactor: product_type 已移除
       const requestData = {
         name: data.name?.trim(),
         short_name: data.shortName?.trim(),
@@ -259,7 +262,7 @@ class SPUService {
         brand_id: data.brandId,
         category_id: data.categoryId,
         status: data.status?.toUpperCase() || 'DRAFT',
-        product_type: data.productType,
+        // product_type 已移除 - SKU 类型由 SKU.skuType 管理
         tags: data.tags || [],
         images: (data.images || [])
           .filter((img: any) => img.url)

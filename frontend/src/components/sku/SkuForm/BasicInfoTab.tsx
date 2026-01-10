@@ -224,13 +224,15 @@ export const BasicInfoTab: React.FC<BasicInfoTabProps> = ({
         />
       </Form.Item>
 
-      {/* SKU类型选择器 (P001-sku-master-data) */}
+      {/* SKU类型选择器 (P001-sku-master-data)
+          @spec P008-sku-type-refactor: 编辑模式下类型只读，创建后不可修改 */}
       <Form.Item
         label="SKU类型"
         required
         validateStatus={errors.skuType ? 'error' : undefined}
         help={errors.skuType?.message as string}
         id="field-skuType"
+        extra={mode === 'edit' ? 'SKU 类型创建后不可修改' : undefined}
       >
         <Controller
           name="skuType"

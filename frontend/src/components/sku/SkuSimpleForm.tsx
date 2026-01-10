@@ -47,9 +47,9 @@ import { useStoresQuery } from '@/pages/stores/hooks/useStoresQuery';
 import { useQueryClient } from '@tanstack/react-query';
 import { skuKeys } from '@/services';
 import { skuService } from '@/services/skuService';
-import { SkuStatus, SkuType } from '@/types/sku';
+import { SkuStatus, SkuType, SKU_TYPE_CONFIG } from '@/types/sku';
 import type { SPU } from '@/types/sku';
-import { PRODUCT_TYPE_OPTIONS } from '@/types/spu';
+// @spec P008-sku-type-refactor: PRODUCT_TYPE_OPTIONS 已移除，使用 SKU_TYPE_CONFIG
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -71,10 +71,11 @@ interface BOMItem {
   cost: number;
 }
 
-// 简化版表单Schema
+// @spec P008-sku-type-refactor: 简化版表单Schema，添加 skuType 字段
 const simpleFormSchema = z.object({
   spuId: z.string().min(1, '请选择所属SPU'),
   name: z.string().min(1, '请输入商品名称').max(200, '商品名称不能超过200个字符'),
+  skuType: z.nativeEnum(SkuType), // SKU类型（创建时必选，编辑时只读）
   price: z.number().min(0, '零售价不能为负'),
   standardCost: z.number().min(0, '标准成本不能为负').optional(),
   status: z.nativeEnum(SkuStatus),
@@ -137,6 +138,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
     defaultValues: {
       spuId: '',
       name: '',
+      skuType: SkuType.FINISHED_PRODUCT, // @spec P008-sku-type-refactor: 默认成品类型
       price: 0,
       standardCost: 0,
       status: SkuStatus.DRAFT,
@@ -146,24 +148,25 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
 
   const price = watch('price') || 0;
   const spuId = watch('spuId');
+  const skuTypeFromForm = watch('skuType'); // @spec P008-sku-type-refactor: 从表单获取类型
 
   // 获取选中的SPU信息
   const selectedSpu = spus.find((spu: SPU) => spu.id === spuId);
 
-  // 获取当前产品类型（编辑模式优先使用 skuData.skuType，否则使用 selectedSpu.productType）
-  const currentProductType = useMemo(() => {
+  // @spec P008-sku-type-refactor: 创建模式从表单获取，编辑模式从 skuData 获取
+  const currentSkuType = useMemo(() => {
     if (isEditMode && skuData?.skuType) {
       return skuData.skuType;
     }
-    return (selectedSpu as any)?.productType || '';
-  }, [isEditMode, skuData?.skuType, selectedSpu]);
+    return skuTypeFromForm; // 创建模式从表单获取
+  }, [isEditMode, skuData?.skuType, skuTypeFromForm]);
 
   // 是否为原料/包材类型
   const isRawOrPackaging =
-    currentProductType === 'raw_material' || currentProductType === 'packaging';
+    currentSkuType === SkuType.RAW_MATERIAL || currentSkuType === SkuType.PACKAGING;
 
   // 是否为套餐类型
-  const isComboType = currentProductType === 'combo';
+  const isComboType = currentSkuType === SkuType.COMBO;
 
   // 根据产品类型选择数据源：套餐可选成品，成品只能选原料/包材
   const ingredients: Ingredient[] = useMemo(() => {
@@ -294,6 +297,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           setValue('spuId', skuData.spuId, { shouldValidate: true });
         }
         setValue('name', skuData.name || '', { shouldValidate: true });
+        // @spec P008-sku-type-refactor: 编辑模式填充 skuType
+        setValue('skuType', skuData.skuType || SkuType.FINISHED_PRODUCT, { shouldValidate: true });
         setValue('price', (skuData as any).price || 0); // 零售价（成品/套餐类型）
         setValue('standardCost', skuData.standardCost || 0);
         setValue('status', skuData.status || SkuStatus.DRAFT, { shouldValidate: true });
@@ -388,12 +393,11 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       } else {
         // 创建模式
         const autoCode = `SKU${Date.now()}`;
-        // 从SPU继承产品类型
-        const spuWithType = selectedSpu as any;
-        const inheritedSkuType = (spuWithType?.productType as SkuType) || SkuType.RAW_MATERIAL;
+        // @spec P008-sku-type-refactor: 从表单获取用户选择的 SKU 类型
+        const selectedSkuType = values.skuType;
 
-        // 根据产品类型构建不同的子项数据
-        const isComboTypeCreate = inheritedSkuType === 'combo';
+        // 根据SKU类型构建不同的子项数据
+        const isComboTypeCreate = selectedSkuType === SkuType.COMBO;
 
         // BOM组件数据（成品类型需要）
         const bomComponents =
@@ -423,7 +427,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           name: values.name,
           mainUnitId: mainUnitId,
           status: values.status,
-          skuType: inheritedSkuType, // 从SPU继承类型
+          skuType: selectedSkuType, // @spec P008-sku-type-refactor: 使用表单选择的类型
           standardCost: values.standardCost, // 标准成本（原料/包材必填）
           bomComponents, // BOM组件（成品类型必填）
           comboItems, // 套餐子项（套餐类型必填）
@@ -525,25 +529,45 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
                         </Form.Item>
                       </Col>
                     </Row>
-                    {/* 产品类型（从SPU继承） */}
-                    <Form.Item label="产品类型">
-                      {(() => {
-                        const spuWithType = selectedSpu as any;
-                        const productType = spuWithType.productType;
-                        const typeConfig = PRODUCT_TYPE_OPTIONS.find(
-                          (opt) => opt.value === productType
-                        );
-                        return typeConfig ? (
+                    {/* @spec P008-sku-type-refactor: 创建模式可选择，编辑模式只读 */}
+                    <Form.Item
+                      label="SKU类型"
+                      required={!isEditMode}
+                      validateStatus={errors.skuType ? 'error' : undefined}
+                      help={errors.skuType?.message}
+                      extra={isEditMode ? 'SKU 类型创建后不可修改' : undefined}
+                    >
+                      {isEditMode ? (
+                        // 编辑模式：只读显示
+                        currentSkuType && SKU_TYPE_CONFIG[currentSkuType] ? (
                           <Tag
-                            color={typeConfig.color}
+                            color={SKU_TYPE_CONFIG[currentSkuType].color}
                             style={{ fontSize: 14, padding: '4px 12px' }}
                           >
-                            {typeConfig.label}
+                            {SKU_TYPE_CONFIG[currentSkuType].text}
                           </Tag>
                         ) : (
-                          <Text type="secondary">未设置（请先在SPU中配置产品类型）</Text>
-                        );
-                      })()}
+                          <Text type="secondary">未知类型</Text>
+                        )
+                      ) : (
+                        // 创建模式：可选择
+                        <Controller
+                          name="skuType"
+                          control={control}
+                          render={({ field }) => (
+                            <Select {...field} placeholder="请选择SKU类型">
+                              {Object.entries(SKU_TYPE_CONFIG).map(([value, config]) => (
+                                <Option key={value} value={value}>
+                                  <Tag color={config.color} style={{ marginRight: 8 }}>
+                                    {config.text}
+                                  </Tag>
+                                  {config.description}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        />
+                      )}
                     </Form.Item>
                   </>
                 )}
