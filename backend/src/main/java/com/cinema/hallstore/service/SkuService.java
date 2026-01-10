@@ -279,7 +279,8 @@ public class SkuService {
         if (sku.getSkuType() != SkuType.FINISHED_PRODUCT) {
             throw new IllegalArgumentException("只有成品类型的SKU才有BOM配置");
         }
-        return bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(id);
+        // 使用带 JOIN FETCH 的查询，加载组件SKU信息供前端展示
+        return bomComponentJpaRepository.findByFinishedProductIdWithComponent(id);
     }
 
     /**

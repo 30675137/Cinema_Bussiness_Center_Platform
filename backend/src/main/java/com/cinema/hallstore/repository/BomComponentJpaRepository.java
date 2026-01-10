@@ -2,6 +2,8 @@ package com.cinema.hallstore.repository;
 
 import com.cinema.hallstore.domain.BomComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,9 +19,16 @@ import java.util.UUID;
 public interface BomComponentJpaRepository extends JpaRepository<BomComponent, UUID> {
 
     /**
-     * 按成品ID查询BOM组件列表
+     * 按成品ID查询BOM组件列表（不加载关联实体）
      */
     List<BomComponent> findByFinishedProductIdOrderBySortOrderAsc(UUID finishedProductId);
+
+    /**
+     * 按成品ID查询BOM组件列表，同时加载组件SKU信息
+     * 用于需要展示组件名称的场景（如编辑页面）
+     */
+    @Query("SELECT bc FROM BomComponent bc LEFT JOIN FETCH bc.component WHERE bc.finishedProductId = :finishedProductId ORDER BY bc.sortOrder ASC")
+    List<BomComponent> findByFinishedProductIdWithComponent(@Param("finishedProductId") UUID finishedProductId);
 
     /**
      * 按组件ID查询引用该组件的BOM列表(检查依赖)
