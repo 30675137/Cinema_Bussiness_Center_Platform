@@ -11,8 +11,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 品牌实体类
@@ -27,7 +28,7 @@ public class Brand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @Column(name = "brand_code", nullable = false, unique = true, length = 50)
     @JsonProperty("brand_code")
@@ -73,12 +74,12 @@ public class Brand {
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     @JsonProperty("created_at")
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
     @JsonProperty("updated_at")
-    private OffsetDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "created_by", length = 100)
     @JsonProperty("created_by")

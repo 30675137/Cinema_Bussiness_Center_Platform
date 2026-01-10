@@ -28,6 +28,8 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   const [formHasChanges, setFormHasChanges] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingAction, setPendingAction] = useState<() => void>(() => {});
+  // @spec B001-fix-brand-creation - 存储待上传的 logo 文件（用于创建模式）
+  const [pendingLogoFile, setPendingLogoFile] = useState<File | null>(null);
 
   const { createBrand, updateBrand, uploadLogo, isCreating, isUpdating, isUploadingLogo } =
     useBrandActions();
@@ -35,6 +37,7 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   // 重置表单变更状态
   const resetFormChanges = () => {
     setFormHasChanges(false);
+    setPendingLogoFile(null); // 清理待上传的 logo
   };
 
   // 标记表单已变更
@@ -69,6 +72,7 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   };
 
   // 处理表单提交
+  // @spec B001-fix-brand-creation - 创建后上传 logo
   const handleSubmit = async (data: CreateBrandRequest | UpdateBrandRequest) => {
     try {
       let result;
@@ -82,6 +86,18 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
         }
 
         result = await createBrand(data as CreateBrandRequest);
+
+        // 创建成功后，如果有待上传的 logo，则上传
+        if (result && pendingLogoFile) {
+          try {
+            await uploadLogo({ id: result.id, file: pendingLogoFile });
+            message.success('Logo上传成功');
+          } catch (logoError) {
+            console.error('Logo上传失败:', logoError);
+            message.warning('品牌创建成功，但Logo上传失败，请稍后在编辑页面重新上传');
+          }
+          setPendingLogoFile(null);
+        }
       } else if (mode === 'edit' && brand) {
         // 编辑模式
         const businessValidation = await validateBrandBusinessRules(
@@ -111,9 +127,17 @@ const BrandDrawer: React.FC<BrandDrawerProps> = ({
   };
 
   // 处理Logo上传
+  // @spec B001-fix-brand-creation - 支持创建模式下暂存 logo
   const handleLogoUpload = async (file: File) => {
-    if (!brand) return;
+    // 创建模式：暂存文件，在品牌创建成功后再上传
+    if (!brand) {
+      setPendingLogoFile(file);
+      markFormChanged();
+      // 不抛出错误，让 BrandLogoUpload 组件显示预览
+      return;
+    }
 
+    // 编辑模式：直接上传
     try {
       await uploadLogo({ id: brand.id, file });
       message.success('Logo上传成功');

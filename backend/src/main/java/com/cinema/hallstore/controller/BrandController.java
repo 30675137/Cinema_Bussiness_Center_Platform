@@ -1,32 +1,47 @@
 package com.cinema.hallstore.controller;
 
+import com.cinema.hallstore.config.SupabaseConfig;
 import com.cinema.hallstore.domain.Brand;
-import com.cinema.hallstore.repository.BrandRepository;
+import com.cinema.hallstore.repository.BrandJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 /**
  * 品牌管理API Controller
  * 提供品牌的CRUD操作
+ *
+ * @spec B001-fix-brand-creation
  */
 @RestController
 @RequestMapping("/api/v1/brands")
 public class BrandController {
 
     private static final Logger logger = LoggerFactory.getLogger(BrandController.class);
-    private final BrandRepository brandRepository;
+    private final BrandJpaRepository brandRepository;
+    private final SupabaseConfig supabaseConfig;
+    private final RestTemplate restTemplate;
 
-    public BrandController(BrandRepository brandRepository) {
+    @Value("${supabase.storage.bucket:brand-logos}")
+    private String bucketName;
+
+    public BrandController(BrandJpaRepository brandRepository,
+                           SupabaseConfig supabaseConfig,
+                           RestTemplate restTemplate) {
         this.brandRepository = brandRepository;
+        this.supabaseConfig = supabaseConfig;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -43,32 +58,8 @@ public class BrandController {
         logger.debug("Getting brands with keyword={}, brandType={}, status={}, page={}, pageSize={}",
                 keyword, brandType, status, page, pageSize);
 
-        List<Brand> allBrands;
-        
-        // 根据筛选条件查询
-        if (keyword != null && !keyword.isEmpty()) {
-            allBrands = brandRepository.search(keyword);
-        } else if (status != null && !status.isEmpty()) {
-            allBrands = brandRepository.findByStatus(status);
-        } else if (brandType != null && !brandType.isEmpty()) {
-            allBrands = brandRepository.findByBrandType(brandType);
-        } else {
-            allBrands = brandRepository.findAll();
-        }
-
-        // 额外过滤
-        if (allBrands != null) {
-            if (status != null && !status.isEmpty() && keyword != null) {
-                allBrands = allBrands.stream()
-                        .filter(b -> status.equals(b.getStatus()))
-                        .collect(Collectors.toList());
-            }
-            if (brandType != null && !brandType.isEmpty() && (keyword != null || status != null)) {
-                allBrands = allBrands.stream()
-                        .filter(b -> brandType.equals(b.getBrandType()))
-                        .collect(Collectors.toList());
-            }
-        }
+        // 使用 JPA 综合查询方法，支持关键词、品牌类型、状态筛选
+        List<Brand> allBrands = brandRepository.findAllWithFilters(keyword, brandType, status);
 
         int total = allBrands != null ? allBrands.size() : 0;
         int totalPages = (int) Math.ceil((double) total / pageSize);
@@ -84,7 +75,7 @@ public class BrandController {
         response.put("success", true);
         response.put("data", pagedBrands);
         response.put("message", "查询成功");
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         // 分页信息
         Map<String, Object> pagination = new HashMap<>();
@@ -105,8 +96,9 @@ public class BrandController {
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getBrandById(@PathVariable String id) {
         logger.debug("Getting brand by id: {}", id);
-        
-        Optional<Brand> brand = brandRepository.findById(id);
+
+        UUID brandId = UUID.fromString(id);
+        Optional<Brand> brand = brandRepository.findById(brandId);
         
         Map<String, Object> response = new HashMap<>();
         if (brand.isPresent()) {
@@ -116,7 +108,7 @@ public class BrandController {
             usageStats.put("brandId", b.getId());
             usageStats.put("spuCount", 0);
             usageStats.put("skuCount", 0);
-            usageStats.put("calculatedAt", OffsetDateTime.now().toString());
+            usageStats.put("calculatedAt", Instant.now().toString());
             
             Map<String, Object> data = new HashMap<>();
             data.put("brand", b);
@@ -130,7 +122,7 @@ public class BrandController {
             response.put("success", false);
             response.put("message", "品牌不存在");
         }
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         return ResponseEntity.ok(response);
     }
@@ -141,27 +133,29 @@ public class BrandController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> createBrand(@RequestBody Brand brand) {
         logger.debug("Creating brand: {}", brand.getName());
-        
+
+        // UUID 由 JPA 自动生成，无需手动设置
+
         // 生成品牌编码
         if (brand.getBrandCode() == null || brand.getBrandCode().isEmpty()) {
             brand.setBrandCode("BRAND" + System.currentTimeMillis());
         }
-        
+
         // 设置默认状态
         if (brand.getStatus() == null) {
             brand.setStatus("draft");
         }
-        
+
         brand.setCreatedBy("system");
         brand.setUpdatedBy("system");
-        
+
         Brand saved = brandRepository.save(brand);
         
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("data", saved);
         response.put("message", "创建成功");
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         return ResponseEntity.ok(response);
     }
@@ -175,8 +169,9 @@ public class BrandController {
             @RequestBody Brand brand
     ) {
         logger.debug("Updating brand: {}", id);
-        
-        Optional<Brand> existing = brandRepository.findById(id);
+
+        UUID brandId = UUID.fromString(id);
+        Optional<Brand> existing = brandRepository.findById(brandId);
         
         Map<String, Object> response = new HashMap<>();
         if (existing.isPresent()) {
@@ -204,7 +199,7 @@ public class BrandController {
             response.put("success", false);
             response.put("message", "品牌不存在");
         }
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         return ResponseEntity.ok(response);
     }
@@ -215,13 +210,14 @@ public class BrandController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteBrand(@PathVariable String id) {
         logger.debug("Deleting brand: {}", id);
-        
-        brandRepository.deleteById(id);
+
+        UUID brandId = UUID.fromString(id);
+        brandRepository.deleteById(brandId);
         
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "删除成功");
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         return ResponseEntity.ok(response);
     }
@@ -235,8 +231,9 @@ public class BrandController {
             @RequestBody Map<String, String> statusRequest
     ) {
         logger.debug("Updating brand status: {} to {}", id, statusRequest.get("status"));
-        
-        Optional<Brand> existing = brandRepository.findById(id);
+
+        UUID brandId = UUID.fromString(id);
+        Optional<Brand> existing = brandRepository.findById(brandId);
         
         Map<String, Object> response = new HashMap<>();
         if (existing.isPresent()) {
@@ -253,7 +250,7 @@ public class BrandController {
             response.put("success", false);
             response.put("message", "品牌不存在");
         }
-        response.put("timestamp", OffsetDateTime.now().toString());
+        response.put("timestamp", Instant.now().toString());
         
         return ResponseEntity.ok(response);
     }
@@ -267,19 +264,17 @@ public class BrandController {
             @RequestParam String brandType,
             @RequestParam(required = false) String excludeId
     ) {
-        List<Brand> brands = brandRepository.search(name);
-        
-        boolean isDuplicate = brands != null && brands.stream()
-                .filter(b -> name.equals(b.getName()) && brandType.equals(b.getBrandType()))
-                .anyMatch(b -> excludeId == null || !excludeId.equals(b.getId()));
-        
+        // 使用 JPA 方法直接检查重复
+        UUID excludeUuid = (excludeId != null && !excludeId.isEmpty()) ? UUID.fromString(excludeId) : null;
+        boolean isDuplicate = brandRepository.existsByNameAndBrandType(name, brandType, excludeUuid);
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         Map<String, Boolean> data = new HashMap<>();
         data.put("isDuplicate", isDuplicate);
         response.put("data", data);
-        response.put("timestamp", OffsetDateTime.now().toString());
-        
+        response.put("timestamp", Instant.now().toString());
+
         return ResponseEntity.ok(response);
     }
 
@@ -292,17 +287,98 @@ public class BrandController {
             @RequestParam(required = false) String excludeId
     ) {
         Optional<Brand> brand = brandRepository.findByBrandCode(code);
-        
-        boolean exists = brand.isPresent() && 
-                (excludeId == null || !excludeId.equals(brand.get().getId()));
-        
+
+        UUID excludeUuid = (excludeId != null && !excludeId.isEmpty()) ? UUID.fromString(excludeId) : null;
+        boolean exists = brand.isPresent() &&
+                (excludeUuid == null || !excludeUuid.equals(brand.get().getId()));
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         Map<String, Boolean> data = new HashMap<>();
         data.put("exists", exists);
         response.put("data", data);
-        response.put("timestamp", OffsetDateTime.now().toString());
-        
+        response.put("timestamp", Instant.now().toString());
+
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * @spec B001-fix-brand-creation
+     * 上传品牌Logo
+     */
+    @PostMapping("/{id}/logo")
+    public ResponseEntity<Map<String, Object>> uploadLogo(
+            @PathVariable String id,
+            @RequestParam("logo") MultipartFile file
+    ) {
+        logger.debug("Uploading logo for brand: {}", id);
+
+        UUID brandId = UUID.fromString(id);
+        Optional<Brand> existing = brandRepository.findById(brandId);
+
+        Map<String, Object> response = new HashMap<>();
+        if (existing.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "品牌不存在");
+            response.put("timestamp", Instant.now().toString());
+            return ResponseEntity.status(404).body(response);
+        }
+
+        try {
+            // 生成唯一文件名
+            String originalFileName = file.getOriginalFilename();
+            String extension = originalFileName != null && originalFileName.contains(".")
+                    ? originalFileName.substring(originalFileName.lastIndexOf("."))
+                    : ".png";
+            String fileName = "brand-logos/" + brandId + "-" + System.currentTimeMillis() + extension;
+
+            // 上传到 Supabase Storage
+            String storageUrl = supabaseConfig.getUrl() + "/storage/v1/object/" + bucketName + "/" + fileName;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(supabaseConfig.getServiceRoleKey());
+            headers.set("apikey", supabaseConfig.getServiceRoleKey());
+            headers.setContentType(MediaType.parseMediaType(
+                    file.getContentType() != null ? file.getContentType() : "image/png"
+            ));
+
+            HttpEntity<byte[]> entity = new HttpEntity<>(file.getBytes(), headers);
+
+            ResponseEntity<String> uploadResponse = restTemplate.exchange(
+                    storageUrl,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
+
+            if (!uploadResponse.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("上传失败: " + uploadResponse.getStatusCode());
+            }
+
+            // 生成公开访问URL
+            String publicUrl = supabaseConfig.getUrl() + "/storage/v1/object/public/" + bucketName + "/" + fileName;
+
+            // 更新品牌的logoUrl
+            Brand toUpdate = existing.get();
+            toUpdate.setLogoUrl(publicUrl);
+            toUpdate.setUpdatedBy("system");
+            brandRepository.save(toUpdate);
+
+            response.put("success", true);
+            Map<String, String> data = new HashMap<>();
+            data.put("logoUrl", publicUrl);
+            response.put("data", data);
+            response.put("message", "Logo上传成功");
+            response.put("timestamp", Instant.now().toString());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            logger.error("Logo上传失败: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "Logo上传失败: " + e.getMessage());
+            response.put("timestamp", Instant.now().toString());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }

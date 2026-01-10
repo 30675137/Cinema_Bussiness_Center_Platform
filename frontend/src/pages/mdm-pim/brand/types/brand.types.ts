@@ -215,6 +215,7 @@ export interface BrandTableProps {
   onView: (brand: Brand) => void;
   onEdit: (brand: Brand) => void;
   onStatusChange: (brand: Brand, status: BrandStatus) => void;
+  onDelete?: (brand: Brand) => void;
 }
 
 export interface BrandFormProps {
@@ -321,8 +322,10 @@ export const VALIDATION_RULES = {
 // TanStack Query Keys
 export const brandQueryKeys = {
   all: ['brands'],
-  lists: ['brands', 'list'],
+  lists: () => ['brands', 'list'],
+  list: (params?: BrandQueryParams) => ['brands', 'list', params],
   details: ['brands', 'detail'],
+  detail: (id: string) => ['brands', 'detail', id],
   usageStats: (id: string) => ['brands', 'detail', id, 'usage-stats'],
 } as const;
 

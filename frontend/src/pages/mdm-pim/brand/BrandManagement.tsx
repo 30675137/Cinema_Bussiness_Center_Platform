@@ -1,43 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { message, Modal } from 'antd';
 import type { Brand } from './types/brand.types';
 import { BrandStatus } from './types/brand.types';
 import { brandService } from './services/brandService';
 import BrandList from './components/organisms/BrandList';
-import BrandDrawer from './components/organisms/BrandDrawer';
 
 /**
+ * @spec B001-fix-brand-creation
  * 品牌管理页面组件
- * 整合品牌列表功能和品牌详情抽屉，提供完整的品牌管理页面
+ * 使用 BrandList 组件渲染完整的品牌列表和抽屉管理界面
  */
 const BrandManagement: React.FC = () => {
-  // 抽屉状态管理
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit' | 'view'>('view');
-  const [currentBrand, setCurrentBrand] = useState<Brand | undefined>();
-
-  // 处理品牌查看
-  const handleBrandView = (brand: Brand) => {
-    setCurrentBrand(brand);
-    setDrawerMode('view');
-    setDrawerVisible(true);
-  };
-
-  // 处理品牌编辑
-  const handleBrandEdit = (brand: Brand) => {
-    setCurrentBrand(brand);
-    setDrawerMode('edit');
-    setDrawerVisible(true);
-  };
-
-  // 处理新建品牌
-  const handleBrandCreate = () => {
-    setCurrentBrand(undefined);
-    setDrawerMode('create');
-    setDrawerVisible(true);
-  };
-
-  // 处理品牌状态变更
+  // 处理品牌状态变更（启用/停用/删除）
   const handleBrandStatusChange = async (brand: Brand, newStatus: BrandStatus) => {
     let confirmTitle = '';
     let confirmContent = '';
@@ -83,40 +57,10 @@ const BrandManagement: React.FC = () => {
     });
   };
 
-  // 处理抽屉关闭
-  const handleDrawerClose = () => {
-    setDrawerVisible(false);
-    setCurrentBrand(undefined);
-  };
-
-  // 处理品牌操作成功
-  const handleBrandSuccess = () => {
-    message.success('操作成功');
-    handleDrawerClose();
-    // 刷新列表数据
-    window.location.reload();
-  };
-
   return (
     <div className="brand-list-page">
-      {/* 品牌列表组件 */}
-      <BrandList
-        onBrandView={handleBrandView}
-        onBrandEdit={handleBrandEdit}
-        onBrandCreate={handleBrandCreate}
-        onBrandStatusChange={handleBrandStatusChange}
-      />
-
-      {/* 品牌详情抽屉 */}
-      {drawerVisible && (
-        <BrandDrawer
-          visible={drawerVisible}
-          brand={currentBrand}
-          mode={drawerMode}
-          onClose={handleDrawerClose}
-          onSuccess={handleBrandSuccess}
-        />
-      )}
+      {/* BrandList 内部管理抽屉状态和渲染 */}
+      <BrandList onBrandStatusChange={handleBrandStatusChange} />
     </div>
   );
 };

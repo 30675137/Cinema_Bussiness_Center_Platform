@@ -64,6 +64,25 @@ function transformBrand(backend: BackendBrand): Brand {
 }
 
 /**
+ * @spec B001-fix-brand-creation
+ * 转换前端请求数据为后端格式 (camelCase -> snake_case)
+ */
+function transformRequestToBackend(data: CreateBrandRequest | UpdateBrandRequest): Record<string, any> {
+  const result: Record<string, any> = {};
+  if (data.name !== undefined) result.name = data.name;
+  if ('brandType' in data && data.brandType !== undefined) result.brand_type = data.brandType;
+  if ('englishName' in data && data.englishName !== undefined) result.english_name = data.englishName;
+  if ('primaryCategories' in data && data.primaryCategories !== undefined) result.primary_categories = data.primaryCategories;
+  if ('company' in data && data.company !== undefined) result.company = data.company;
+  if ('brandLevel' in data && data.brandLevel !== undefined) result.brand_level = data.brandLevel;
+  if ('tags' in data && data.tags !== undefined) result.tags = data.tags;
+  if ('description' in data && data.description !== undefined) result.description = data.description;
+  if ('logoUrl' in data && data.logoUrl !== undefined) result.logo_url = data.logoUrl;
+  if ('status' in data && data.status !== undefined) result.status = data.status;
+  return result;
+}
+
+/**
  * 品牌管理API服务
  * 提供品牌相关的所有API调用接口
  */
@@ -137,16 +156,20 @@ class BrandService {
   }
 
   /**
+   * @spec B001-fix-brand-creation
    * 创建品牌
    */
   async createBrand(data: CreateBrandRequest): Promise<Brand> {
     try {
+      // 转换为后端格式 (snake_case)
+      const backendData = transformRequestToBackend(data);
+
       const response = await fetch(`${this.baseURL}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(backendData),
       });
       const result = await response.json();
 
@@ -154,23 +177,28 @@ class BrandService {
         throw new Error(result.message || '创建品牌失败');
       }
 
-      return result.data;
+      // 转换响应为前端格式
+      return transformBrand(result.data);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : '网络错误');
     }
   }
 
   /**
+   * @spec B001-fix-brand-creation
    * 更新品牌信息
    */
   async updateBrand(id: string, data: UpdateBrandRequest): Promise<Brand> {
     try {
+      // 转换为后端格式 (snake_case)
+      const backendData = transformRequestToBackend(data);
+
       const response = await fetch(`${this.baseURL}/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(backendData),
       });
       const result = await response.json();
 
@@ -178,7 +206,8 @@ class BrandService {
         throw new Error(result.message || '更新品牌失败');
       }
 
-      return result.data;
+      // 转换响应为前端格式
+      return transformBrand(result.data);
     } catch (error) {
       throw new Error(error instanceof Error ? error.message : '网络错误');
     }
