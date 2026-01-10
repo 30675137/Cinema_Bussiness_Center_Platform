@@ -18,6 +18,7 @@ import java.util.UUID;
  * - 支持 /api/spu (前端路径) 和 /api/spus (REST规范) 双路径
  *
  * @spec P001-spu-management
+ * @spec P008-sku-type-refactor - 移除 productType 字段
  */
 @RestController
 @RequestMapping({"/api/spu", "/api/spus"})
@@ -154,9 +155,7 @@ public class SpuController {
                     if (updateData.getStatus() != null) {
                         existingSpu.setStatus(updateData.getStatus());
                     }
-                    if (updateData.getProductType() != null) {
-                        existingSpu.setProductType(updateData.getProductType());
-                    }
+                    // @spec P008-sku-type-refactor: productType 已移除，SKU 类型由 SKU.skuType 管理
                     if (updateData.getUnit() != null) {
                         existingSpu.setUnit(updateData.getUnit());
                     }

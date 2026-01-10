@@ -27,9 +27,8 @@ import type {
   Category,
   AttributeTemplate,
   AttributeTemplateItem,
-  ProductType,
 } from '@/types/spu';
-import { PRODUCT_TYPE_OPTIONS } from '@/types/spu';
+// @spec P008-sku-type-refactor: ProductType 已移除，SKU 类型由 SKU.skuType 管理
 import { BrandSelect } from './BrandSelect';
 import { CategorySelector } from './CategorySelector';
 import AttributeEditor from '@/components/Attribute/AttributeEditor';
@@ -46,7 +45,7 @@ interface SPUFormData {
   brandId: string;
   categoryId: string;
   status: SPUStatus;
-  productType?: ProductType; // 产品类型，SKU创建时继承
+  // @spec P008-sku-type-refactor: productType 已移除，SKU 类型由 SKU.skuType 管理
   tags: string[];
   images: UploadFile[];
   specifications: Array<{ name: string; value: string }>;
@@ -197,7 +196,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
         brandId: initialValues.brandId || '',
         categoryId: initialValues.categoryId || '',
         status: initialValues.status || 'draft',
-        productType: initialValues.productType,
+        // @spec P008-sku-type-refactor: productType 已移除
         tags: initialValues.tags || [],
         specifications: initialValues.specifications || [{ name: '', value: '' }],
         attributeTemplateId: initialValues.attributeTemplateId || '',
@@ -219,7 +218,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
       onValuesChange={onValuesChange}
       initialValues={{
         status: 'draft',
-        productType: undefined,
+        // @spec P008-sku-type-refactor: productType 已移除，SKU 类型由 SKU.skuType 管理
         specifications: [{ name: '', value: '' }],
         attributeTemplateId: '',
         attributeValues: {},
@@ -273,29 +272,14 @@ const SPUForm: React.FC<SPUFormProps> = ({
           </Col>
         </Row>
 
+        {/* @spec P008-sku-type-refactor: productType 选择器已移除，SKU 类型由 SKU.skuType 管理 */}
         <Row gutter={16}>
-          <Col span={6}>
+          <Col span={8}>
             <Form.Item name="unit" label="标准单位">
               <Input placeholder="如：瓶/包/盒等（可选）" />
             </Form.Item>
           </Col>
-          <Col span={6}>
-            <Form.Item
-              name="productType"
-              label="产品类型"
-              tooltip="产品类型决定了SKU的用途，创建SKU时将继承此类型"
-              rules={[{ required: true, message: '请选择产品类型' }]}
-            >
-              <Select placeholder="请选择产品类型">
-                {PRODUCT_TYPE_OPTIONS.map((opt) => (
-                  <Option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Form.Item
               name="status"
               label="状态"
@@ -308,7 +292,7 @@ const SPUForm: React.FC<SPUFormProps> = ({
               </Select>
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Form.Item name="tags" label="标签">
               <Select
                 mode="tags"
