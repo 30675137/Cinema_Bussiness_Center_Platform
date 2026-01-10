@@ -27,16 +27,11 @@ export interface Category {
   children?: Category[];
 }
 
-// SPU 产品类型枚举
-export type ProductType = 'raw_material' | 'packaging' | 'finished_product' | 'combo';
-
-// 产品类型选项配置
-export const PRODUCT_TYPE_OPTIONS = [
-  { value: 'raw_material', label: '原料', color: 'blue' },
-  { value: 'packaging', label: '包材', color: 'green' },
-  { value: 'finished_product', label: '成品', color: 'orange' },
-  { value: 'combo', label: '套餐', color: 'purple' },
-] as const;
+/**
+ * @spec P008-sku-type-refactor
+ * ProductType 已移除 - SKU 类型由 SKU.skuType 管理
+ * 参见 frontend/src/types/sku.ts 中的 SkuType 枚举
+ */
 
 // 基础SPU类型
 export interface SPUItem {
@@ -71,8 +66,7 @@ export interface SPUItem {
   status: SPUStatus;
   auditStatus?: 'approved' | 'pending' | 'rejected';
 
-  // 产品类型（SKU继承此类型）
-  productType?: ProductType;
+  // @spec P008-sku-type-refactor: productType 已移除，SKU 类型由 SKU.skuType 管理
 
   // 属性信息
   attributes?: SPUAttribute[];
@@ -155,6 +149,7 @@ export interface ProductImage {
 }
 
 // SPU 创建表单数据
+// @spec P008-sku-type-refactor: productType 已移除
 export interface SPUCreationForm {
   name: string;
   shortName?: string;
@@ -162,7 +157,7 @@ export interface SPUCreationForm {
   unit?: string;
   categoryId: string;
   brandId: string;
-  productType: ProductType; // 产品类型（必填）
+  // productType 已移除 - SKU 类型由 SKU.skuType 管理
   attributes: Record<string, any>;
   tags: string[];
   images: ProductImage[];

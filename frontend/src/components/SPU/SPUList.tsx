@@ -9,8 +9,8 @@ import {
   MoreOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import type { SPUItem, SPUStatus, ProductType } from '@/types/spu';
-import { PRODUCT_TYPE_OPTIONS } from '@/types/spu';
+import type { SPUItem, SPUStatus } from '@/types/spu';
+// @spec P008-sku-type-refactor: ProductType 和 PRODUCT_TYPE_OPTIONS 已移除，SKU 类型由 SKU.skuType 管理
 import { formatSPUStatus, formatSPUDate, formatSpecifications } from '@/utils/spuHelpers';
 import { statusColors } from '@/theme';
 
@@ -90,17 +90,7 @@ const SPUList: React.FC<SPUListProps> = ({
     );
   };
 
-  // 获取产品类型标签
-  const getProductTypeTag = (productType?: ProductType) => {
-    if (!productType) return '-';
-    const typeOption = PRODUCT_TYPE_OPTIONS.find((opt) => opt.value === productType);
-    if (!typeOption) return '-';
-    return (
-      <Tag color={typeOption.color} style={{ fontSize: '12px' }}>
-        {typeOption.label}
-      </Tag>
-    );
-  };
+  // @spec P008-sku-type-refactor: getProductTypeTag 函数已移除，SKU 类型由 SKU.skuType 管理
 
   // 获取品牌标签
   const getBrandTag = (brand?: { name: string; code?: string }) => {
@@ -341,14 +331,7 @@ const SPUList: React.FC<SPUListProps> = ({
         </div>
       ),
     },
-    {
-      title: '产品类型',
-      dataIndex: 'productType',
-      key: 'productType',
-      width: 90,
-      align: 'center',
-      render: (productType: ProductType) => getProductTypeTag(productType),
-    },
+    // @spec P008-sku-type-refactor: productType 列已移除，SKU 类型由 SKU.skuType 管理
     {
       title: '规格参数',
       dataIndex: 'specifications',

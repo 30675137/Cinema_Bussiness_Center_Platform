@@ -1,1 +1,1 @@
-specs/P007-fix-spu-batch-delete/spec.md
+specs/P008-sku-type-refactor

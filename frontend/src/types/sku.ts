@@ -56,6 +56,7 @@ export interface Barcode {
 
 /**
  * SPU接口（关联实体）
+ * @spec P008-sku-type-refactor: productType 已移除
  */
 export interface SPU {
   /** SPU ID */
@@ -70,8 +71,7 @@ export interface SPU {
   category: string;
   /** 类目ID */
   categoryId: string;
-  /** 产品类型（SKU继承此类型） */
-  productType?: 'raw_material' | 'packaging' | 'finished_product' | 'combo';
+  // productType 已移除 - SKU 类型由 SKU.skuType 管理
 }
 
 /**
@@ -452,12 +452,13 @@ export interface ComboItemInput {
 /**
  * SKU类型配置
  * @since P001-sku-master-data
+ * @spec P008-sku-type-refactor: 添加 description 字段用于类型选择器提示
  */
-export const SKU_TYPE_CONFIG: Record<SkuType, { color: string; text: string }> = {
-  [SkuType.RAW_MATERIAL]: { color: 'blue', text: '原料' },
-  [SkuType.PACKAGING]: { color: 'green', text: '包材' },
-  [SkuType.FINISHED_PRODUCT]: { color: 'orange', text: '成品' },
-  [SkuType.COMBO]: { color: 'purple', text: '套餐' },
+export const SKU_TYPE_CONFIG: Record<SkuType, { color: string; text: string; description: string }> = {
+  [SkuType.RAW_MATERIAL]: { color: 'blue', text: '原料', description: '需手动输入标准成本' },
+  [SkuType.PACKAGING]: { color: 'green', text: '包材', description: '需手动输入标准成本' },
+  [SkuType.FINISHED_PRODUCT]: { color: 'orange', text: '成品', description: '需配置BOM，成本自动计算' },
+  [SkuType.COMBO]: { color: 'purple', text: '套餐', description: '需配置子项，成本自动计算' },
 };
 
 /**
