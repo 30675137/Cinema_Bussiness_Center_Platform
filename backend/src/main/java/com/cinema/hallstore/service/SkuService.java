@@ -6,7 +6,7 @@ import com.cinema.hallstore.domain.Sku;
 import com.cinema.hallstore.domain.enums.SkuStatus;
 import com.cinema.hallstore.domain.enums.SkuType;
 import com.cinema.hallstore.dto.SkuCreateRequest;
-import com.cinema.hallstore.repository.BomComponentRepository;
+import com.cinema.hallstore.repository.BomComponentJpaRepository;
 import com.cinema.hallstore.repository.ComboItemRepository;
 import com.cinema.hallstore.repository.SkuJpaRepository;
 import com.cinema.hallstore.repository.SkuRepository;
@@ -26,18 +26,18 @@ import java.util.UUID;
 public class SkuService {
 
     private final SkuRepository skuRepository;
-    private final BomComponentRepository bomComponentRepository;
+    private final BomComponentJpaRepository bomComponentJpaRepository;
     private final ComboItemRepository comboItemRepository;
     private final CostCalculationService costCalculationService;
     private final StoreScopeValidationService storeScopeValidationService;
 
     public SkuService(SkuRepository skuRepository,
-                      BomComponentRepository bomComponentRepository,
+                      BomComponentJpaRepository bomComponentJpaRepository,
                       ComboItemRepository comboItemRepository,
                       CostCalculationService costCalculationService,
                       StoreScopeValidationService storeScopeValidationService) {
         this.skuRepository = skuRepository;
-        this.bomComponentRepository = bomComponentRepository;
+        this.bomComponentJpaRepository = bomComponentJpaRepository;
         this.comboItemRepository = comboItemRepository;
         this.costCalculationService = costCalculationService;
         this.storeScopeValidationService = storeScopeValidationService;
@@ -128,11 +128,11 @@ public class SkuService {
                         .sortOrder(input.getSortOrder() != null ? input.getSortOrder() : 0)
                         .build();
 
-                bomComponentRepository.save(bomComponent);
+                bomComponentJpaRepository.save(bomComponent);
             }
 
             // 计算并更新成本
-            List<BomComponent> components = bomComponentRepository.findByFinishedProductId(createdSku.getId());
+            List<BomComponent> components = bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(createdSku.getId());
             BigDecimal calculatedCost = costCalculationService.calculateFinishedProductCost(
                     components, createdSku.getWasteRate());
             createdSku.setStandardCost(calculatedCost);
@@ -219,7 +219,7 @@ public class SkuService {
         Sku sku = findById(id);
 
         // 检查是否被BOM引用
-        List<BomComponent> bomUsages = bomComponentRepository.findByComponentId(id);
+        List<BomComponent> bomUsages = bomComponentJpaRepository.findByComponentId(id);
         if (!bomUsages.isEmpty()) {
             throw new IllegalStateException("该SKU正在被 " + bomUsages.size() + " 个成品的BOM使用,无法删除");
         }
@@ -232,7 +232,7 @@ public class SkuService {
 
         // 删除相关数据
         if (sku.getSkuType() == SkuType.FINISHED_PRODUCT) {
-            bomComponentRepository.deleteByFinishedProductId(id);
+            bomComponentJpaRepository.deleteByFinishedProductId(id);
         } else if (sku.getSkuType() == SkuType.COMBO) {
             comboItemRepository.deleteByComboId(id);
         }
@@ -250,7 +250,7 @@ public class SkuService {
 
         BigDecimal newCost;
         if (sku.getSkuType() == SkuType.FINISHED_PRODUCT) {
-            List<BomComponent> components = bomComponentRepository.findByFinishedProductId(id);
+            List<BomComponent> components = bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(id);
             if (components.isEmpty()) {
                 throw new IllegalStateException("成品SKU没有BOM配置");
             }
@@ -279,7 +279,7 @@ public class SkuService {
         if (sku.getSkuType() != SkuType.FINISHED_PRODUCT) {
             throw new IllegalArgumentException("只有成品类型的SKU才有BOM配置");
         }
-        return bomComponentRepository.findByFinishedProductId(id);
+        return bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(id);
     }
 
     /**
@@ -304,7 +304,7 @@ public class SkuService {
         }
 
         // 删除旧的BOM配置
-        bomComponentRepository.deleteByFinishedProductId(finishedProductId);
+        bomComponentJpaRepository.deleteByFinishedProductId(finishedProductId);
 
         // 创建新的BOM配置
         for (SkuCreateRequest.BomComponentInput input : componentInputs) {
@@ -326,7 +326,7 @@ public class SkuService {
                     .sortOrder(input.getSortOrder() != null ? input.getSortOrder() : 0)
                     .build();
 
-            bomComponentRepository.save(bomComponent);
+            bomComponentJpaRepository.save(bomComponent);
         }
 
         // 更新损耗率(如果提供)
@@ -335,7 +335,7 @@ public class SkuService {
         }
 
         // 重新计算成本
-        List<BomComponent> components = bomComponentRepository.findByFinishedProductId(finishedProductId);
+        List<BomComponent> components = bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(finishedProductId);
         BigDecimal calculatedCost = costCalculationService.calculateFinishedProductCost(
                 components, sku.getWasteRate());
         sku.setStandardCost(calculatedCost);
@@ -404,7 +404,7 @@ public class SkuService {
                     .build();
 
             // 获取所有组件SKU
-            List<BomComponent> bomComponents = bomComponentRepository.findByFinishedProductId(id);
+            List<BomComponent> bomComponents = bomComponentJpaRepository.findByFinishedProductIdOrderBySortOrderAsc(id);
             List<Sku> componentSkus = bomComponents.stream()
                     .map(bc -> skuRepository.findById(bc.getComponentId()).orElse(null))
                     .filter(s -> s != null)
