@@ -46,11 +46,28 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   const cascaderOptions = useMemo(() => {
     const buildOptions = (categories: CategoryItem[], level = 1): any[] => {
       return categories
-        .filter((category) => category && category.id && category.name) // 过滤无效数据
+        .filter((category) => {
+          // 更严格的过滤：确保 id 和 name 都是有效的非空字符串
+          const isValid = category && 
+                         category.id && 
+                         category.name && 
+                         typeof category.id === 'string' && 
+                         typeof category.name === 'string' &&
+                         category.id.trim() !== '' && 
+                         category.name.trim() !== '';
+          
+          if (!isValid) {
+            console.warn('过滤无效分类:', category);
+          }
+          
+          return isValid;
+        })
         .map((category) => {
           const option: any = {
-            [fieldNames.label!]: category.name,
-            [fieldNames.value!]: category.id,
+            // 使用 Cascader 标准字段名，避免 fieldNames 配置冲突
+            label: category.name,
+            value: category.id,
+            key: category.id,
             isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
           };
 
@@ -59,7 +76,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           option.category = category;
 
           if (category.children && category.children.length > 0 && level < maxLevel) {
-            option[fieldNames.children!] = buildOptions(category.children, level + 1);
+            option.children = buildOptions(category.children, level + 1);
           }
 
           return option;
@@ -67,7 +84,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
     };
 
     return buildOptions(categories);
-  }, [categories, maxLevel, fieldNames]);
+  }, [categories, maxLevel]);
 
   // 自定义显示渲染
   const displayRender = (labels: string[], selectedOptions?: DefaultOptionType[]) => {
@@ -86,7 +103,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   // 自定义过滤函数
   const filter = (inputValue: string, path: DefaultOptionType[]) => {
     return path.some((option) =>
-      option[fieldNames.label!]?.toString().toLowerCase().includes(inputValue.toLowerCase())
+      option.label?.toString().toLowerCase().includes(inputValue.toLowerCase())
     );
   };
 
@@ -161,11 +178,26 @@ export const CategoryTreeSelector: React.FC<CategoryTreeSelectorProps> = ({
   const treeData = useMemo(() => {
     const buildTreeData = (categories: CategoryItem[], level = 1): any[] => {
       return categories
-        .filter((category) => category && category.id && category.name) // 过滤无效数据
+        .filter((category) => {
+          // 更严格的过滤：确保 id 和 name 都是有效的非空字符串
+          const isValid = category && 
+                         category.id && 
+                         category.name && 
+                         typeof category.id === 'string' && 
+                         typeof category.name === 'string' &&
+                         category.id.trim() !== '' && 
+                         category.name.trim() !== '';
+          
+          if (!isValid) {
+            console.warn('过滤无效分类(树形选择器):', category);
+          }
+          
+          return isValid;
+        })
         .map((category) => ({
           title: category.name,
           value: category.id,
-          key: category.id,
+          key: category.id, // 确保 key 是唯一的
           disabled: category.status === 'inactive',
           isLeaf: level >= maxLevel || !category.children || category.children.length === 0,
           category,

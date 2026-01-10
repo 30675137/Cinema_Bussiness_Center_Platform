@@ -1,15 +1,16 @@
 package com.cinema.inventory.service;
 
 import com.cinema.inventory.domain.Category;
-import com.cinema.inventory.repository.CategoryRepository;
+import com.cinema.inventory.repository.CategoryJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * 商品分类服务层
+ * 使用 JPA Repository 访问数据库，与项目其他模块保持一致
  * 提供分类列表查询等业务逻辑。
  * 
  * @since P003-inventory-query
@@ -19,10 +20,10 @@ public class CategoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryJpaRepository categoryJpaRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public CategoryService(CategoryJpaRepository categoryJpaRepository) {
+        this.categoryJpaRepository = categoryJpaRepository;
     }
 
     /**
@@ -32,9 +33,10 @@ public class CategoryService {
      */
     public List<Category> listCategories() {
         logger.debug("Getting all active categories as tree");
-        List<Category> categories = categoryRepository.findAllAsTree();
-        logger.info("Found {} top-level categories", categories.size());
-        return categories;
+        List<Category> allCategories = categoryJpaRepository.findAllActive();
+        List<Category> tree = buildTree(allCategories);
+        logger.info("Found {} top-level categories", tree.size());
+        return tree;
     }
 
     /**
@@ -45,6 +47,37 @@ public class CategoryService {
      */
     public List<Category> listCategoriesByStatus(String status) {
         logger.debug("Getting categories by status: {}", status);
-        return categoryRepository.findByStatus(status);
+        return categoryJpaRepository.findValidByStatus(status);
+    }
+    
+    /**
+     * 构建分类树
+     * 
+     * @param allCategories 所有分类列表
+     * @return 根节点列表
+     */
+    private List<Category> buildTree(List<Category> allCategories) {
+        Map<UUID, Category> categoryMap = new HashMap<>();
+        List<Category> rootCategories = new ArrayList<>();
+
+        // 建立映射
+        for (Category category : allCategories) {
+            categoryMap.put(category.getId(), category);
+            category.setChildren(new ArrayList<>());
+        }
+
+        // 构建父子关系
+        for (Category category : allCategories) {
+            if (category.getParentId() == null) {
+                rootCategories.add(category);
+            } else {
+                Category parent = categoryMap.get(category.getParentId());
+                if (parent != null) {
+                    parent.getChildren().add(category);
+                }
+            }
+        }
+
+        return rootCategories;
     }
 }

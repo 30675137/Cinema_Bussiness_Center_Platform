@@ -1,5 +1,9 @@
 package com.cinema.inventory.domain;
 
+import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,19 +16,42 @@ import java.util.UUID;
  * 
  * @since P003-inventory-query
  */
+@Entity
+@Table(name = "categories")
 public class Category {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    
+    @Column(name = "code", length = 50)
     private String code;
+    
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
+    
+    @Column(name = "parent_id")
     private UUID parentId;
+    
+    @Column(name = "level", nullable = false)
     private Integer level;
+    
+    @Column(name = "sort_order")
     private Integer sortOrder;
+    
+    @Column(name = "status", nullable = false, length = 20)
     private String status;
+    
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
     
-    /** 子分类列表，用于树形结构展示 */
+    /** 子分类列表，用于树形结构展示（仅用于业务逻辑，不映射到数据库） */
+    @Transient
     private List<Category> children = new ArrayList<>();
 
     // Getters and Setters

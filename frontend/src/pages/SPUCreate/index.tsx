@@ -63,14 +63,32 @@ const SPUCreatePage: React.FC = () => {
     }
   };
 
+  // 过滤无效分类（递归处理，确保所有节点都有有效的id）
+  const filterValidCategories = (categories: Category[]): Category[] => {
+    return categories
+      .filter((cat) => {
+        const isValid = cat && cat.id && typeof cat.id === 'string' && cat.id.trim() !== '';
+        if (!isValid) {
+          console.warn('[SPUCreate] 过滤无效分类:', cat);
+        }
+        return isValid;
+      })
+      .map((cat) => ({
+        ...cat,
+        children: cat.children ? filterValidCategories(cat.children) : undefined,
+      }));
+  };
+
   // 加载分类数据 - 从 API 获取
   const loadCategories = async (): Promise<Category[]> => {
     try {
       // getCategoryTree(false) 获取完整树结构（非懒加载）
       const response = await categoryService.getCategoryTree(false);
       if (response.success && response.data) {
-        // CategoryTree[] 类型兼容 Category[]，可直接使用
-        return response.data as unknown as Category[];
+        // 过滤并验证分类数据，确保没有空id
+        const validCategories = filterValidCategories(response.data as unknown as Category[]);
+        console.log('[SPUCreate] Loaded categories:', validCategories.length);
+        return validCategories;
       }
       return [];
     } catch (error) {
