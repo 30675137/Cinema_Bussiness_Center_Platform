@@ -52,4 +52,27 @@ public class CategoryController {
                 "data", categories
         ));
     }
+
+    /**
+     * 获取商品分类树形结构
+     * 
+     * GET /api/categories/tree?lazy=true
+     */
+    @GetMapping("/tree")
+    public ResponseEntity<Map<String, Object>> getCategoryTree(
+            @RequestParam(defaultValue = "true") boolean lazy) {
+
+        logger.info("GET /api/categories/tree - lazy={}", lazy);
+
+        // 目前返回所有分类，前端自行组织树形结构
+        // TODO: 后续可以在Service层实现真正的树形结构返回
+        List<Category> categories = categoryService.listCategories();
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "data", categories,
+                "message", "获取成功",
+                "code", 200
+        ));
+    }
 }

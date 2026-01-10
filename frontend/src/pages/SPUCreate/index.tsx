@@ -8,6 +8,7 @@ import type { Brand, Category } from '@/types/spu';
 import type { CreateSPURequest } from '@/services/spuService';
 import { spuService } from '@/services/spuService';
 import { brandService } from '@/pages/mdm-pim/brand/services/brandService';
+import { categoryService } from '@/services/categoryService';
 import { validateSPUForm } from '@/utils/validation';
 import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
 
@@ -62,109 +63,20 @@ const SPUCreatePage: React.FC = () => {
     }
   };
 
-  // Mock加载分类数据
+  // 加载分类数据 - 从 API 获取
   const loadCategories = async (): Promise<Category[]> => {
-    // 模拟API延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return [
-      {
-        id: 'category_001',
-        name: '食品饮料',
-        code: 'food_beverage',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_002',
-            name: '饮料',
-            code: 'beverage',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_003',
-                name: '碳酸饮料',
-                code: 'carbonated',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_004',
-                name: '果汁饮料',
-                code: 'juice',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_005',
-                name: '茶饮料',
-                code: 'tea',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-            ],
-          },
-          {
-            id: 'category_006',
-            name: '零食',
-            code: 'snacks',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_007',
-                name: '膨化食品',
-                code: 'puffed',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-              {
-                id: 'category_008',
-                name: '坚果炒货',
-                code: 'nuts',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'category_009',
-        name: '日用百货',
-        code: 'daily_goods',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_010',
-            name: '洗护用品',
-            code: 'personal_care',
-            level: 2,
-            status: 'active',
-            parentId: 'category_009',
-            children: [
-              {
-                id: 'category_011',
-                name: '洗发水',
-                code: 'shampoo',
-                level: 3,
-                status: 'active',
-                parentId: 'category_010',
-              },
-            ],
-          },
-        ],
-      },
-    ];
+    try {
+      // getCategoryTree(false) 获取完整树结构（非懒加载）
+      const response = await categoryService.getCategoryTree(false);
+      if (response.success && response.data) {
+        // CategoryTree[] 类型兼容 Category[]，可直接使用
+        return response.data as unknown as Category[];
+      }
+      return [];
+    } catch (error) {
+      console.error('Load categories error:', error);
+      return [];
+    }
   };
 
   // 处理表单提交
