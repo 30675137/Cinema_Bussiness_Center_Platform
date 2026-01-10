@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Spin, Alert, Empty, Pagination, Space, Typography } from 'antd';
+import { Card, Button, Spin, Alert, Empty, Pagination, Space, Typography, message } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import type {
@@ -13,6 +13,7 @@ import BrandSearchForm from '../molecules/BrandSearchForm';
 import BrandFilters from '../molecules/BrandFilters';
 import BrandTable from '../molecules/BrandTable';
 import BrandDrawer from './BrandDrawer';
+import { useBrandActions } from '../../hooks/useBrandActions';
 
 const { Title } = Typography;
 
@@ -21,6 +22,7 @@ interface BrandListProps {
   onBrandEdit?: (brand: Brand) => void;
   onBrandCreate?: () => void;
   onBrandStatusChange?: (brand: Brand, status: BrandStatus) => void;
+  onBrandDelete?: (brand: Brand) => void;
 }
 
 /**
@@ -32,6 +34,7 @@ const BrandList: React.FC<BrandListProps> = ({
   onBrandEdit,
   onBrandCreate,
   onBrandStatusChange,
+  onBrandDelete,
 }) => {
   // 状态管理
   const [filters, setFilters] = useState<BrandFiltersType>({});
@@ -44,6 +47,9 @@ const BrandList: React.FC<BrandListProps> = ({
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit' | 'view'>('create');
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+
+  // 使用品牌操作 hook
+  const { deleteBrand, loading: actionLoading } = useBrandActions();
 
   // 获取品牌列表数据
   const {
@@ -113,6 +119,18 @@ const BrandList: React.FC<BrandListProps> = ({
   // 处理品牌状态变更
   const handleBrandStatusChange = (brand: Brand, status: BrandStatus) => {
     onBrandStatusChange?.(brand, status);
+  };
+
+  // 处理品牌删除
+  const handleBrandDelete = async (brand: Brand) => {
+    try {
+      await deleteBrand(brand.id);
+      message.success(`品牌「${brand.name}」删除成功`);
+      refetch(); // 刷新列表
+      onBrandDelete?.(brand);
+    } catch (error) {
+      message.error(`删除失败: ${error instanceof Error ? error.message : '未知错误'}`);
+    }
   };
 
   // 处理新建品牌
@@ -228,6 +246,7 @@ const BrandList: React.FC<BrandListProps> = ({
           onView={handleBrandView}
           onEdit={handleBrandEdit}
           onStatusChange={handleBrandStatusChange}
+          onDelete={handleBrandDelete}
         />
 
         {/* 分页 */}

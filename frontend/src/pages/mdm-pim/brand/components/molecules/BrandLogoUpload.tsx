@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Button, Image, Progress, message, Modal, Space, Typography, Spin } from 'antd';
 import {
   PlusOutlined,
@@ -52,6 +52,15 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // @spec B001-fix-brand-creation - 组件卸载时清理 blob URL 防止内存泄漏
+  useEffect(() => {
+    return () => {
+      if (uploadState.previewUrl && uploadState.previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(uploadState.previewUrl);
+      }
+    };
+  }, [uploadState.previewUrl]);
+
   // 验证文件
   const validateFile = (file: File): { valid: boolean; error?: string } => {
     // 文件大小检查
@@ -94,6 +103,11 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
       return;
     }
 
+    // 清理之前的预览 URL（如果存在且是 blob URL）
+    if (uploadState.previewUrl && uploadState.previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(uploadState.previewUrl);
+    }
+
     // 创建预览URL
     const previewUrl = URL.createObjectURL(file);
 
@@ -111,17 +125,20 @@ const BrandLogoUpload: React.FC<BrandLogoUploadProps> = ({
         await onUpload(file);
       }
 
-      // 上传成功
+      // 上传成功 - 保留 previewUrl 用于显示预览
+      // 不在这里 revoke URL，让它在组件卸载或选择新文件时清理
       setUploadState((prev) => ({
         ...prev,
         uploading: false,
         progress: 100,
+        // 保留当前的 previewUrl 以便继续显示预览
       }));
 
-      // 清理临时URL
-      URL.revokeObjectURL(previewUrl);
+      // 注意：不再立即调用 URL.revokeObjectURL(previewUrl)
+      // 预览 URL 会在选择新文件时自动清理（见 confirmDelete 和下次 handleFileSelect）
 
-      message.success('Logo上传成功');
+      // @spec B001-fix-brand-creation - 不在这里显示成功消息
+      // 成功消息由 BrandDrawer 在适当时机显示（创建后或编辑时上传成功后）
     } catch (error) {
       console.error('Logo上传失败:', error);
 

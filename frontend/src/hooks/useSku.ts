@@ -256,3 +256,29 @@ export const useCheckBarcodeMutation = () => {
     },
   });
 };
+
+/**
+ * 批量删除SKU Hook
+ * @spec B001-fix-brand-creation
+ */
+export const useBatchDeleteSkuMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids: string[]): Promise<{ success: number; failed: number }> => {
+      return skuService.batchDeleteSkus(ids);
+    },
+    onSuccess: (data) => {
+      if (data.failed > 0) {
+        message.warning(`成功删除 ${data.success} 个 SKU，失败 ${data.failed} 个`);
+      } else {
+        showSuccess(`成功删除 ${data.success} 个 SKU`);
+      }
+      // 刷新SKU列表
+      queryClient.invalidateQueries({ queryKey: skuKeys.skus() });
+    },
+    onError: (error: any) => {
+      showError(error, '批量删除失败');
+    },
+  });
+};

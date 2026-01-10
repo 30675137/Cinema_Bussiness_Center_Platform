@@ -11,9 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -28,7 +25,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "spus")
-@EntityListeners(AuditingEntityListener.class)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Spu {
 
@@ -138,14 +134,12 @@ public class Spu {
     /**
      * 创建时间
      */
-    @CreatedDate
     @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
     /**
      * 更新时间
      */
-    @LastModifiedDate
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 

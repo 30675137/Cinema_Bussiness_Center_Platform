@@ -267,6 +267,28 @@ function generateCategoriesDirectly(): Category[] {
   return categories;
 }
 
+// 验证分类数据是否有效
+function isValidCategory(cat: any): cat is Category {
+  return (
+    cat &&
+    typeof cat.id === 'string' &&
+    cat.id.trim() !== '' &&
+    typeof cat.name === 'string' &&
+    cat.name.trim() !== ''
+  );
+}
+
+// 过滤并验证分类数据
+function filterValidCategories(categories: any[]): Category[] {
+  return categories.filter((cat) => {
+    if (!isValidCategory(cat)) {
+      console.warn('[categoryMockData] 过滤无效分类:', cat);
+      return false;
+    }
+    return true;
+  });
+}
+
 // 初始化并获取所有类目（扁平列表）
 export function getAllCategories(): Category[] {
   try {
@@ -279,15 +301,31 @@ export function getAllCategories(): Category[] {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            console.log(
-              '[getAllCategories] Loaded from localStorage:',
-              parsed.length,
-              'categories'
-            );
-            return parsed;
+            // 验证并过滤无效数据
+            const validCategories = filterValidCategories(parsed);
+            if (validCategories.length > 0) {
+              console.log(
+                '[getAllCategories] Loaded from localStorage:',
+                validCategories.length,
+                'valid categories (filtered from',
+                parsed.length,
+                ')'
+              );
+              // 如果有无效数据被过滤，重新保存
+              if (validCategories.length !== parsed.length) {
+                console.warn('[getAllCategories] Some invalid categories were filtered, re-saving...');
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(validCategories));
+              }
+              return validCategories;
+            } else {
+              // 所有数据都无效，清除并重新生成
+              console.warn('[getAllCategories] All categories invalid, clearing and regenerating...');
+              localStorage.removeItem(STORAGE_KEY);
+            }
           }
         } catch (e) {
           console.warn('[getAllCategories] Failed to parse saved category data:', e);
+          localStorage.removeItem(STORAGE_KEY);
         }
       }
     }
@@ -296,19 +334,20 @@ export function getAllCategories(): Category[] {
 
     // 如果没有保存的数据，直接生成新数据（避免循环调用）
     const categories = generateCategoriesDirectly();
-    console.log('[getAllCategories] Generated', categories.length, 'categories');
+    const validCategories = filterValidCategories(categories);
+    console.log('[getAllCategories] Generated', validCategories.length, 'valid categories');
 
     // 保存到 localStorage
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(validCategories));
         console.log('[getAllCategories] Saved to localStorage');
       } catch (e) {
         console.warn('[getAllCategories] Failed to save category data to localStorage:', e);
       }
     }
 
-    return categories;
+    return validCategories;
   } catch (error) {
     console.error('[getAllCategories] Error:', error);
     throw error;

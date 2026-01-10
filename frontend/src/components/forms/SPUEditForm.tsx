@@ -104,11 +104,12 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
 
           // 设置图片
           if (spuData.images && spuData.images.length > 0) {
-            const uploadFiles = spuData.images.map((image, index) => ({
-              uid: `-${index}`,
+            const uploadFiles = spuData.images.map((image: any, index: number) => ({
+              uid: image.id || `-${index}`,
               name: image.alt || `image${index}`,
               status: 'done' as const,
               url: image.url,
+              thumbUrl: image.url,
               response: { url: image.url },
             }));
             setFileList(uploadFiles);
@@ -143,23 +144,21 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     }
   }, [mode, spuId, initialData, form, loadSPUData]);
 
-  // 监听表单变化
-  useEffect(() => {
-    const handleFormChange = () => {
-      if (currentData) {
-        const currentValues = form.getFieldsValue();
-        const hasFormChanges = Object.keys(currentValues).some((key) => {
-          const currentValue = currentValues[key];
-          const originalValue = (currentData as any)[key];
-          return JSON.stringify(currentValue) !== JSON.stringify(originalValue);
-        });
-        setHasChanges(hasFormChanges || fileList.some((file) => file.originFileObj));
-      }
-    };
+  // 表单变化处理函数
+  const handleValuesChange = useCallback(() => {
+    // 只要有任何表单值变化，就标记为有变化
+    setHasChanges(true);
+  }, []);
 
-    // Ant Design Form 没有 onFieldsChange API
-    // 表单变化通过 Form 的 onValuesChange prop 处理
-  }, [form, currentData, fileList]);
+  // 将文件转换为 base64 URL
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   // 处理保存
   const handleSave = useCallback(async () => {
@@ -173,24 +172,49 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
         return;
       }
 
+      // 处理图片：将本地文件转换为 base64 URL
+      const processedImages = await Promise.all(
+        fileList
+          .filter((file) => file.status === 'done' || file.originFileObj)
+          .map(async (file, index) => {
+            let url = file.response?.url || file.url;
+
+            // 如果是本地文件（有 originFileObj），转换为 base64
+            if (!url && file.originFileObj) {
+              url = await fileToBase64(file.originFileObj);
+            }
+
+            return {
+              uid: file.uid,
+              url: url || '',
+              alt: file.name || `image${index}`,
+              isPrimary: index === 0,
+              sort: index,
+            };
+          })
+      );
+
+      // 过滤掉没有 URL 的图片
+      const validImages = processedImages.filter((img) => img.url);
+
       const submitData = {
         ...values,
         attributes: templateAttributes,
-        images: fileList
-          .filter((file) => file.status === 'done' || file.originFileObj)
-          .map((file, index) => ({
-            url: file.response?.url || file.url,
-            alt: file.name || `image${index}`,
-            isPrimary: index === 0,
-            sort: index,
-          })),
+        images: validImages,
       };
 
       let response;
       if (mode === 'create') {
         response = await spuService.createSPU(submitData);
       } else {
-        response = await spuService.updateSPU(spuId!, submitData);
+        // 更新时需要把 id 包含在 data 中，确保 id 不被覆盖
+        const updateId = spuId || currentData?.id;
+        if (!updateId) {
+          throw new Error('SPU ID不能为空，请刷新页面重试');
+        }
+        // 构建最终更新对象
+        const updatePayload = { ...submitData, id: updateId };
+        response = await spuService.updateSPU(updatePayload);
       }
 
       if (response.success) {
@@ -209,7 +233,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     } finally {
       setSubmitting(false);
     }
-  }, [form, fileList, mode, spuId, onSave]);
+  }, [form, fileList, mode, spuId, currentData, onSave, templateValid, templateAttributes]);
 
   // 处理预览
   const handlePreview = useCallback(() => {
@@ -284,6 +308,7 @@ const SPUEditForm: React.FC<SPUEditFormProps> = ({
     <Form
       form={form}
       layout="vertical"
+      onValuesChange={handleValuesChange}
       initialValues={{
         status: 'draft',
       }}

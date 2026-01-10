@@ -1,12 +1,14 @@
 package com.cinema.hallstore.controller;
 
 import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.domain.Spu;
 import com.cinema.hallstore.domain.enums.SkuStatus;
 import com.cinema.hallstore.domain.enums.SkuType;
 import com.cinema.hallstore.dto.ApiResponse;
 import com.cinema.hallstore.dto.SkuCreateRequest;
 import com.cinema.hallstore.dto.SkuDetailDTO;
 import com.cinema.hallstore.dto.SkuUpdateRequest;
+import com.cinema.hallstore.repository.SpuJpaRepository;
 import com.cinema.hallstore.service.SkuService;
 import com.cinema.hallstore.service.StoreScopeValidationService;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,9 +33,11 @@ import java.util.UUID;
 public class SkuController {
 
     private final SkuService skuService;
+    private final SpuJpaRepository spuRepository;
 
-    public SkuController(SkuService skuService) {
+    public SkuController(SkuService skuService, SpuJpaRepository spuRepository) {
         this.skuService = skuService;
+        this.spuRepository = spuRepository;
     }
 
     /**
@@ -81,6 +86,16 @@ public class SkuController {
         try {
             Sku sku = skuService.findById(id);
             SkuDetailDTO detail = SkuDetailDTO.from(sku);
+
+            // 从SPU获取品牌和分类信息
+            if (sku.getSpuId() != null) {
+                spuRepository.findById(sku.getSpuId()).ifPresent(spu -> {
+                    detail.setBrandId(spu.getBrandId());
+                    detail.setBrandName(spu.getBrandName());
+                    detail.setCategoryId(spu.getCategoryId());
+                    detail.setCategoryName(spu.getCategoryName());
+                });
+            }
 
             // 根据类型加载BOM或套餐子项
             if (sku.getSkuType() == SkuType.FINISHED_PRODUCT) {
@@ -227,5 +242,66 @@ public class SkuController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.failure("INVALID_OPERATION", e.getMessage(), null));
         }
+    }
+
+    /**
+     * 批量操作SKU
+     * POST /api/skus/batch
+     *
+     * @spec B001-fix-brand-creation
+     * @param request 批量操作请求 {operation: "delete", ids: [...]}
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<Map<String, Object>> batchOperation(@RequestBody Map<String, Object> request) {
+        String operation = (String) request.get("operation");
+        @SuppressWarnings("unchecked")
+        List<String> ids = (List<String>) request.get("ids");
+
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "未提供要操作的SKU ID"
+            ));
+        }
+
+        if ("delete".equals(operation)) {
+            int successCount = 0;
+            int failedCount = 0;
+            List<String> failedIds = new java.util.ArrayList<>();
+
+            for (String idStr : ids) {
+                try {
+                    UUID id = UUID.fromString(idStr);
+                    skuService.delete(id);
+                    successCount++;
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    failedCount++;
+                    failedIds.add(idStr);
+                } catch (DataAccessException e) {
+                    // 数据库约束异常（如外键约束）
+                    failedCount++;
+                    failedIds.add(idStr);
+                }
+            }
+
+            String message = failedCount > 0
+                    ? String.format("成功删除 %d 个 SKU，失败 %d 个（可能被其他数据引用）", successCount, failedCount)
+                    : String.format("成功删除 %d 个 SKU", successCount);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "data", Map.of(
+                            "processedCount", successCount,
+                            "failedCount", failedCount,
+                            "failedIds", failedIds
+                    ),
+                    "message", message
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "不支持的操作类型: " + operation
+        ));
     }
 }

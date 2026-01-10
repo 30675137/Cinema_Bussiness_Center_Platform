@@ -7,6 +7,8 @@ import { SPUNotificationService } from '@/components/common/Notification';
 import type { Brand, Category } from '@/types/spu';
 import type { CreateSPURequest } from '@/services/spuService';
 import { spuService } from '@/services/spuService';
+import { brandService } from '@/pages/mdm-pim/brand/services/brandService';
+import { categoryService } from '@/services/categoryService';
 import { validateSPUForm } from '@/utils/validation';
 import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
 
@@ -39,156 +41,60 @@ const SPUCreatePage: React.FC = () => {
     }
   };
 
-  // Mock加载品牌数据
+  // 加载品牌数据 - 从后端 API 获取
   const loadBrands = async (): Promise<Brand[]> => {
-    // 模拟API延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return [
-      {
-        id: 'brand_001',
-        name: '可口可乐',
-        code: 'COKE',
-        description: '全球知名碳酸饮料品牌',
-        status: 'active',
-        logo: '/images/brands/coke.png',
-      },
-      {
-        id: 'brand_002',
-        name: '百事可乐',
-        code: 'PEPSI',
-        description: '全球知名碳酸饮料品牌',
-        status: 'active',
-        logo: '/images/brands/pepsi.png',
-      },
-      {
-        id: 'brand_003',
-        name: '农夫山泉',
-        code: 'NONGFU',
-        description: '中国知名饮用水品牌',
-        status: 'active',
-        logo: '/images/brands/nongfu.png',
-      },
-      {
-        id: 'brand_004',
-        name: '康师傅',
-        code: 'KSF',
-        description: '知名食品饮料品牌',
-        status: 'active',
-      },
-      {
-        id: 'brand_005',
-        name: '统一',
-        code: 'UNI',
-        description: '知名食品饮料品牌',
-        status: 'active',
-      },
-    ];
+    try {
+      const response = await brandService.getBrands({ pageSize: 100, status: 'enabled' });
+      if (response.data) {
+        // 转换为 SPU 表单所需的 Brand 格式
+        return response.data.map((brand) => ({
+          id: brand.id,
+          name: brand.name,
+          code: brand.brandCode,
+          description: brand.description,
+          status: brand.status === 'enabled' ? 'active' : 'inactive',
+          logo: brand.logoUrl,
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Load brands error:', error);
+      return [];
+    }
   };
 
-  // Mock加载分类数据
-  const loadCategories = async (): Promise<Category[]> => {
-    // 模拟API延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  // 过滤无效分类（递归处理，确保所有节点都有有效的id）
+  const filterValidCategories = (categories: Category[]): Category[] => {
+    return categories
+      .filter((cat) => {
+        const isValid = cat && cat.id && typeof cat.id === 'string' && cat.id.trim() !== '';
+        if (!isValid) {
+          console.warn('[SPUCreate] 过滤无效分类:', cat);
+        }
+        return isValid;
+      })
+      .map((cat) => ({
+        ...cat,
+        children: cat.children ? filterValidCategories(cat.children) : undefined,
+      }));
+  };
 
-    return [
-      {
-        id: 'category_001',
-        name: '食品饮料',
-        code: 'food_beverage',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_002',
-            name: '饮料',
-            code: 'beverage',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_003',
-                name: '碳酸饮料',
-                code: 'carbonated',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_004',
-                name: '果汁饮料',
-                code: 'juice',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-              {
-                id: 'category_005',
-                name: '茶饮料',
-                code: 'tea',
-                level: 3,
-                status: 'active',
-                parentId: 'category_002',
-              },
-            ],
-          },
-          {
-            id: 'category_006',
-            name: '零食',
-            code: 'snacks',
-            level: 2,
-            status: 'active',
-            parentId: 'category_001',
-            children: [
-              {
-                id: 'category_007',
-                name: '膨化食品',
-                code: 'puffed',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-              {
-                id: 'category_008',
-                name: '坚果炒货',
-                code: 'nuts',
-                level: 3,
-                status: 'active',
-                parentId: 'category_006',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'category_009',
-        name: '日用百货',
-        code: 'daily_goods',
-        level: 1,
-        status: 'active',
-        children: [
-          {
-            id: 'category_010',
-            name: '洗护用品',
-            code: 'personal_care',
-            level: 2,
-            status: 'active',
-            parentId: 'category_009',
-            children: [
-              {
-                id: 'category_011',
-                name: '洗发水',
-                code: 'shampoo',
-                level: 3,
-                status: 'active',
-                parentId: 'category_010',
-              },
-            ],
-          },
-        ],
-      },
-    ];
+  // 加载分类数据 - 从 API 获取
+  const loadCategories = async (): Promise<Category[]> => {
+    try {
+      // getCategoryTree(false) 获取完整树结构（非懒加载）
+      const response = await categoryService.getCategoryTree(false);
+      if (response.success && response.data) {
+        // 过滤并验证分类数据，确保没有空id
+        const validCategories = filterValidCategories(response.data as unknown as Category[]);
+        console.log('[SPUCreate] Loaded categories:', validCategories.length);
+        return validCategories;
+      }
+      return [];
+    } catch (error) {
+      console.error('Load categories error:', error);
+      return [];
+    }
   };
 
   // 处理表单提交
