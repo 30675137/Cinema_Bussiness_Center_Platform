@@ -1,1 +1,1 @@
-specs/T003-flyway-migration
+N001-purchase-inbound

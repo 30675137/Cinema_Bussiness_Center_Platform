@@ -528,6 +528,7 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 - Mock data (MSW handlers + localStorage)，后端使用 Supabase (PostgreSQL) (O008-channel-product-category-migration)
 - MSW mock data (in-memory state + MSW handlers + localStorage) 进行开发模拟 (feat/B001-fix-brand-creation)
 - Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543) (T003-flyway-migration)
+- Supabase PostgreSQL 作为主要后端数据源，使用 JPA 直接访问数据库 (feat/N001-purchase-inbound)
 
 ## Supabase REST API (PostgREST) 使用规则
 
@@ -571,6 +572,6 @@ docker compose -f docker-compose.test.yml --env-file .env.test up -d backend
 ---
 
 ## Recent Changes
+- feat/N001-purchase-inbound: Added Supabase PostgreSQL 作为主要后端数据源，使用 JPA 直接访问数据库
 - T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)
 - T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)
-- feat/B001-fix-brand-creation: Added MSW mock data (in-memory state + MSW handlers + localStorage) 进行开发模拟
