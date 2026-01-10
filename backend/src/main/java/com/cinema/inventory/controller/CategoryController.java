@@ -64,13 +64,19 @@ public class CategoryController {
 
         logger.info("GET /api/categories/tree - lazy={}", lazy);
 
-        // 目前返回所有分类，前端自行组织树形结构
-        // TODO: 后续可以在Service层实现真正的树形结构返回
+        // 获取所有分类并过滤掉无效数据
         List<Category> categories = categoryService.listCategories();
+        
+        // 过滤掉 id 或 name 为空的分类
+        List<Category> validCategories = categories.stream()
+            .filter(category -> category.getId() != null && category.getName() != null && !category.getName().trim().isEmpty())
+            .toList();
+        
+        logger.info("返回有效分类数量: {} / {}", validCategories.size(), categories.size());
 
         return ResponseEntity.ok(Map.of(
                 "success", true,
-                "data", categories,
+                "data", validCategories,
                 "message", "获取成功",
                 "code", 200
         ));
