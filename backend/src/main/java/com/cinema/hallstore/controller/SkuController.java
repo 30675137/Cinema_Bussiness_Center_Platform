@@ -148,6 +148,7 @@ public class SkuController {
             Sku updatedSku = skuService.update(
                     id,
                     request.getName(),
+                    request.getSpuId(),
                     request.getMainUnit(),
                     request.getStoreScope(),
                     request.getStandardCost(),

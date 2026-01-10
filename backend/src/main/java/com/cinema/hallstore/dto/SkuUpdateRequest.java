@@ -26,6 +26,7 @@ public class SkuUpdateRequest {
     private BigDecimal price;
 
     private SkuStatus status;
+    private java.util.UUID spuId;
 
     // Getters and Setters
     public String getName() {
@@ -82,5 +83,13 @@ public class SkuUpdateRequest {
 
     public void setStatus(SkuStatus status) {
         this.status = status;
+    }
+
+    public java.util.UUID getSpuId() {
+        return spuId;
+    }
+
+    public void setSpuId(java.util.UUID spuId) {
+        this.spuId = spuId;
     }
 }
