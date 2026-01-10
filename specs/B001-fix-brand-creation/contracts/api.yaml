@@ -1,0 +1,449 @@
+openapi: 3.0.3
+info:
+  title: 品牌管理 API
+  description: |
+    品牌管理模块 API 契约定义。
+
+    **Spec**: B001-fix-brand-creation
+
+    **注意**: 本次修复不涉及 API 变更，此文档仅记录现有 API 供参考。
+  version: 1.0.0
+  contact:
+    name: 影院商品管理中台
+
+servers:
+  - url: http://localhost:3000/api
+    description: 开发环境（MSW Mock）
+  - url: http://localhost:8080/api
+    description: 后端开发服务器
+
+tags:
+  - name: brands
+    description: 品牌管理接口
+
+paths:
+  /brands:
+    get:
+      summary: 获取品牌列表
+      description: 分页获取品牌列表，支持筛选和搜索
+      operationId: getBrands
+      tags:
+        - brands
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从 1 开始）
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: keyword
+          in: query
+          description: 搜索关键词（品牌名称）
+          schema:
+            type: string
+        - name: brandType
+          in: query
+          description: 品牌类型筛选
+          schema:
+            type: string
+            enum: [domestic, imported, joint]
+        - name: status
+          in: query
+          description: 状态筛选
+          schema:
+            type: string
+            enum: [draft, active, inactive]
+      responses:
+        '200':
+          description: 成功返回品牌列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandListResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: 创建品牌
+      description: 创建新品牌
+      operationId: createBrand
+      tags:
+        - brands
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '201':
+          description: 品牌创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 品牌名称已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /brands/{id}:
+    get:
+      summary: 获取品牌详情
+      description: 根据 ID 获取品牌详情
+      operationId: getBrandById
+      tags:
+        - brands
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 品牌 ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功返回品牌详情
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '404':
+          description: 品牌不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: 更新品牌
+      description: 更新品牌信息
+      operationId: updateBrand
+      tags:
+        - brands
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 品牌 ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBrandRequest'
+      responses:
+        '200':
+          description: 品牌更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 品牌不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: 删除品牌
+      description: 删除指定品牌
+      operationId: deleteBrand
+      tags:
+        - brands
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 品牌 ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 品牌删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: 品牌不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Brand:
+      type: object
+      required:
+        - id
+        - name
+        - brandType
+        - primaryCategories
+        - status
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: 品牌唯一标识符
+          example: "brand-1704873600000"
+        name:
+          type: string
+          description: 品牌名称
+          maxLength: 100
+          example: "可口可乐"
+        englishName:
+          type: string
+          description: 英文名称
+          maxLength: 200
+          example: "Coca-Cola"
+        brandType:
+          type: string
+          enum: [domestic, imported, joint]
+          description: 品牌类型
+          example: "imported"
+        primaryCategories:
+          type: array
+          items:
+            type: string
+          description: 主营类目
+          example: ["饮料"]
+        company:
+          type: string
+          description: 所属公司
+          maxLength: 200
+          example: "可口可乐公司"
+        brandLevel:
+          type: string
+          description: 品牌等级
+          enum: [A, B, C]
+          example: "A"
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+          description: 品牌标签
+          example: ["知名品牌", "全球品牌"]
+        description:
+          type: string
+          description: 品牌描述
+          maxLength: 1000
+        status:
+          type: string
+          enum: [draft, active, inactive]
+          description: 品牌状态
+          example: "active"
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+
+    CreateBrandRequest:
+      type: object
+      required:
+        - name
+        - brandType
+        - primaryCategories
+      properties:
+        name:
+          type: string
+          description: 品牌名称
+          maxLength: 100
+          pattern: '^[\u4e00-\u9fa5a-zA-Z0-9\s\-_&]+$'
+        englishName:
+          type: string
+          maxLength: 200
+          pattern: '^[a-zA-Z0-9\s\-_&]+$'
+        brandType:
+          type: string
+          enum: [domestic, imported, joint]
+        primaryCategories:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        company:
+          type: string
+          maxLength: 200
+        brandLevel:
+          type: string
+          enum: [A, B, C]
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+        description:
+          type: string
+          maxLength: 1000
+        status:
+          type: string
+          enum: [draft, active, inactive]
+          default: draft
+
+    UpdateBrandRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        englishName:
+          type: string
+          maxLength: 200
+        brandType:
+          type: string
+          enum: [domestic, imported, joint]
+        primaryCategories:
+          type: array
+          items:
+            type: string
+        company:
+          type: string
+          maxLength: 200
+        brandLevel:
+          type: string
+          enum: [A, B, C]
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 10
+        description:
+          type: string
+          maxLength: 1000
+        status:
+          type: string
+          enum: [draft, active, inactive]
+
+    BrandResponse:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Brand'
+        message:
+          type: string
+          example: "品牌创建成功"
+        timestamp:
+          type: string
+          format: date-time
+
+    BrandListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - page
+        - pageSize
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Brand'
+        total:
+          type: integer
+          description: 总记录数
+          example: 100
+        page:
+          type: integer
+          description: 当前页码
+          example: 1
+        pageSize:
+          type: integer
+          description: 每页数量
+          example: 10
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "操作成功"
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误代码
+          example: "BRD_NTF_001"
+        message:
+          type: string
+          description: 错误消息
+          example: "品牌不存在"
+        details:
+          type: object
+          description: 错误详情
+        timestamp:
+          type: string
+          format: date-time

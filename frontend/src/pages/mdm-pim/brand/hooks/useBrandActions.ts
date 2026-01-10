@@ -1,178 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { message } from 'antd';
-import type {
-  Brand,
-  CreateBrandRequest,
-  UpdateBrandRequest,
-  UpdateBrandStatusRequest,
-} from '../types/brand.types';
+import type { Brand, CreateBrandRequest, UpdateBrandRequest } from '../types/brand.types';
 import { brandQueryKeys } from '../types/brand.types';
 import { brandService } from '../services/brandService';
 
-// 临时定义ApiResponse类型以避免循环导入问题
-interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-  };
-  message: string;
-  timestamp: string;
-}
-
-// Mock API 服务 - 在实际应用中应该替换为真实的API调用
-const brandApi = {
-  createBrand: async (data: CreateBrandRequest): Promise<ApiResponse<Brand>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // 模拟创建品牌响应
-    const newBrand: Brand = {
-      id: `brand-${Date.now()}`,
-      brandCode: `BRAND${Date.now()}`,
-      name: data.name,
-      englishName: data.englishName,
-      brandType: data.brandType,
-      primaryCategories: data.primaryCategories,
-      company: data.company,
-      brandLevel: data.brandLevel,
-      tags: data.tags || [],
-      description: data.description,
-      logoUrl: null,
-      status: data.status || 'draft',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: 'admin',
-      updatedBy: 'admin',
-    };
-
-    return {
-      success: true,
-      data: newBrand,
-      message: '品牌创建成功',
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  updateBrand: async (id: string, data: UpdateBrandRequest): Promise<ApiResponse<Brand>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // 模拟更新品牌响应
-    const updatedBrand: Brand = {
-      id,
-      brandCode: 'BRAND001',
-      name: data.name || '默认品牌名',
-      englishName: data.englishName,
-      brandType: data.brandType || 'own',
-      primaryCategories: data.primaryCategories || [],
-      company: data.company,
-      brandLevel: data.brandLevel,
-      tags: data.tags || [],
-      description: data.description,
-      logoUrl: null,
-      status: 'enabled',
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: new Date().toISOString(),
-      createdBy: 'admin',
-      updatedBy: 'admin',
-    };
-
-    return {
-      success: true,
-      data: updatedBrand,
-      message: '品牌更新成功',
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  deleteBrand: async (id: string): Promise<ApiResponse<void>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // 模拟删除品牌响应
-    return {
-      success: true,
-      message: '品牌删除成功',
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  updateBrandStatus: async (
-    id: string,
-    data: UpdateBrandStatusRequest
-  ): Promise<ApiResponse<Brand>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // 模拟状态更新响应
-    const updatedBrand: Brand = {
-      id,
-      brandCode: 'BRAND001',
-      name: '测试品牌',
-      englishName: 'Test Brand',
-      brandType: 'own',
-      primaryCategories: [],
-      company: '测试公司',
-      brandLevel: 'A',
-      tags: [],
-      description: '测试描述',
-      logoUrl: null,
-      status: data.status,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: new Date().toISOString(),
-      createdBy: 'admin',
-      updatedBy: 'admin',
-    };
-
-    return {
-      success: true,
-      data: updatedBrand,
-      message: '品牌状态更新成功',
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  uploadLogo: async (
-    id: string,
-    file: File
-  ): Promise<ApiResponse<{ logoUrl: string; updatedAt: string }>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // 模拟Logo上传响应
-    return {
-      success: true,
-      data: {
-        logoUrl: `https://example.com/brand-logos/${id}-${file.name}`,
-        updatedAt: new Date().toISOString(),
-      },
-      message: 'Logo上传成功',
-      timestamp: new Date().toISOString(),
-    };
-  },
-
-  checkNameDuplication: async (params: {
-    name: string;
-    brandType: string;
-    excludeId?: string;
-  }): Promise<ApiResponse<{ isDuplicate: boolean }>> => {
-    // Mock API 延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // 模拟重复检查逻辑
-    const existingBrands = ['可口可乐', '百事可乐', '农夫山泉'];
-    const isDuplicate = existingBrands.includes(params.name) && !params.excludeId;
-
-    return {
-      success: true,
-      data: { isDuplicate },
-      message: '检查完成',
-      timestamp: new Date().toISOString(),
-    };
-  },
-};
+// @spec B001-fix-brand-creation
+// 注意：已移除内部 brandApi mock，现在所有 mutation 都使用 brandService
+// 调用真实 API（在开发环境中被 MSW 拦截）
 
 /**
  * 品牌操作Hook
@@ -181,39 +15,41 @@ const brandApi = {
 export const useBrandActions = () => {
   const queryClient = useQueryClient();
 
-  // 创建品牌
+  // 创建品牌 - 使用 brandService 调用真实 API (被 MSW 拦截)
+  // @spec B001-fix-brand-creation
   const createBrandMutation = useMutation({
-    mutationFn: (data: CreateBrandRequest) => brandApi.createBrand(data),
-    onSuccess: (response) => {
+    mutationFn: (data: CreateBrandRequest) => brandService.createBrand(data),
+    onSuccess: (brand) => {
       message.success('品牌创建成功');
 
-      // 刷新品牌列表
-      queryClient.invalidateQueries({ queryKey: brandQueryKeys.lists });
+      // 刷新品牌列表 - 使用宽泛的 key 匹配所有 'brands' 开头的查询
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
 
-      return response.data;
+      return brand;
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error?.message || '品牌创建失败';
+      const errorMessage = error.message || '品牌创建失败';
       message.error(errorMessage);
 
       throw error;
     },
   });
 
-  // 更新品牌
+  // 更新品牌 - 使用 brandService 调用真实 API
+  // @spec B001-fix-brand-creation
   const updateBrandMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateBrandRequest }) =>
-      brandApi.updateBrand(id, data),
-    onSuccess: (response, variables) => {
+      brandService.updateBrand(id, data),
+    onSuccess: (updatedBrand, variables) => {
       message.success('品牌更新成功');
 
       // 更新列表缓存中的特定品牌
-      queryClient.setQueriesData({ queryKey: brandQueryKeys.all }, (oldData: any) => {
+      queryClient.setQueriesData({ queryKey: ['brands'] }, (oldData: any) => {
         if (!oldData) return oldData;
 
         // 处理列表数据
         if (Array.isArray(oldData)) {
-          return oldData.map((brand: Brand) => (brand.id === variables.id ? response.data : brand));
+          return oldData.map((brand: Brand) => (brand.id === variables.id ? updatedBrand : brand));
         }
 
         // 处理分页数据
@@ -221,7 +57,7 @@ export const useBrandActions = () => {
           return {
             ...oldData,
             data: oldData.data.map((brand: Brand) =>
-              brand.id === variables.id ? response.data : brand
+              brand.id === variables.id ? updatedBrand : brand
             ),
           };
         }
@@ -232,27 +68,28 @@ export const useBrandActions = () => {
       // 刷新详情缓存
       queryClient.invalidateQueries({ queryKey: brandQueryKeys.detail(variables.id) });
 
-      return response.data;
+      return updatedBrand;
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error?.message || '品牌更新失败';
+      const errorMessage = error.message || '品牌更新失败';
       message.error(errorMessage);
 
       throw error;
     },
   });
 
-  // 删除品牌
+  // 删除品牌 - 使用 brandService 调用真实 API
+  // @spec B001-fix-brand-creation
   const deleteBrandMutation = useMutation({
-    mutationFn: (id: string) => brandApi.deleteBrand(id),
+    mutationFn: (id: string) => brandService.deleteBrand(id),
     onSuccess: () => {
       message.success('品牌删除成功');
 
       // 刷新品牌列表
-      queryClient.invalidateQueries({ queryKey: brandQueryKeys.lists });
+      queryClient.invalidateQueries({ queryKey: ['brands'] });
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error?.message || '品牌删除失败';
+      const errorMessage = error.message || '品牌删除失败';
       message.error(errorMessage);
 
       throw error;
@@ -309,21 +146,22 @@ export const useBrandActions = () => {
     },
   });
 
-  // 上传Logo
+  // 上传Logo - 使用 brandService 调用真实 API
+  // @spec B001-fix-brand-creation
   const uploadLogoMutation = useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) => brandApi.uploadLogo(id, file),
-    onSuccess: (response, variables) => {
+    mutationFn: ({ id, file }: { id: string; file: File }) => brandService.uploadLogo(id, file),
+    onSuccess: (result, variables) => {
       message.success('Logo上传成功');
 
       // 更新列表和详情缓存中的Logo URL
-      queryClient.setQueriesData({ queryKey: brandQueryKeys.all }, (oldData: any) => {
+      queryClient.setQueriesData({ queryKey: ['brands'] }, (oldData: any) => {
         if (!oldData) return oldData;
 
         // 处理列表数据
         if (Array.isArray(oldData)) {
           return oldData.map((brand: Brand) =>
             brand.id === variables.id
-              ? { ...brand, logoUrl: response.data.logoUrl, updatedAt: response.data.updatedAt }
+              ? { ...brand, logoUrl: result.logoUrl, updatedAt: new Date().toISOString() }
               : brand
           );
         }
@@ -334,7 +172,7 @@ export const useBrandActions = () => {
             ...oldData,
             data: oldData.data.map((brand: Brand) =>
               brand.id === variables.id
-                ? { ...brand, logoUrl: response.data.logoUrl, updatedAt: response.data.updatedAt }
+                ? { ...brand, logoUrl: result.logoUrl, updatedAt: new Date().toISOString() }
                 : brand
             ),
           };
@@ -346,20 +184,21 @@ export const useBrandActions = () => {
       // 刷新详情缓存
       queryClient.invalidateQueries({ queryKey: brandQueryKeys.detail(variables.id) });
 
-      return response.data;
+      return result;
     },
     onError: (error: any) => {
-      const errorMessage = error.response?.data?.error?.message || 'Logo上传失败';
+      const errorMessage = error.message || 'Logo上传失败';
       message.error(errorMessage);
 
       throw error;
     },
   });
 
-  // 检查品牌名称重复
+  // 检查品牌名称重复 - 使用 brandService 调用真实 API
+  // @spec B001-fix-brand-creation
   const checkNameDuplicationMutation = useMutation({
     mutationFn: (params: { name: string; brandType: string; excludeId?: string }) =>
-      brandApi.checkNameDuplication(params),
+      brandService.checkNameDuplication(params),
     onError: (error: any) => {
       console.error('品牌名称重复检查失败:', error);
       // 这个错误通常不显示给用户，只用于表单验证

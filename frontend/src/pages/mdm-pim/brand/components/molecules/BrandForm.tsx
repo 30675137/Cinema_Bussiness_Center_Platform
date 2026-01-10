@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from 'react';
-import { Form, Input, Select, Button, Space, Row, Col, Typography, Divider, message } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import type { BrandFormProps, Brand } from '../../types/brand.types';
-import { BrandType, BrandStatus, BRAND_CONSTANTS } from '../../types/brand.types';
+import { Form, Input, Select, Row, Col, Typography, message } from 'antd';
+// @spec B001-fix-brand-creation: 移除 Button, Space, PlusOutlined, Divider（按钮已移至 BrandDrawer footer）
+import type { BrandFormProps } from '../../types/brand.types';
+import { BrandStatus, BRAND_CONSTANTS } from '../../types/brand.types';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -59,7 +59,7 @@ const BrandForm: React.FC<BrandFormProps> = ({
         };
 
         await onSubmit(formData);
-      } catch (error) {
+      } catch {
         message.error('提交失败，请稍后重试');
       }
     },
@@ -321,32 +321,9 @@ const BrandForm: React.FC<BrandFormProps> = ({
           </Form.Item>
         </div>
 
-        {/* 操作按钮 */}
-        <div className="form-actions" data-testid="form-actions">
-          <Space>
-            {mode !== 'view' && (
-              <>
-                <Button onClick={handleCancel} disabled={loading} data-testid="cancel-brand-button">
-                  取消
-                </Button>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  icon={mode === 'create' ? <PlusOutlined /> : undefined}
-                  data-testid="save-brand-button"
-                >
-                  {mode === 'create' ? '新建品牌' : '保存修改'}
-                </Button>
-              </>
-            )}
-            {mode === 'view' && (
-              <Button onClick={handleCancel} data-testid="close-brand-button">
-                关闭
-              </Button>
-            )}
-          </Space>
-        </div>
+        {/* @spec B001-fix-brand-creation
+            操作按钮已移至 BrandDrawer footer，此处不再渲染
+            避免重复的「新建品牌」按钮 */}
       </Form>
     </div>
   );

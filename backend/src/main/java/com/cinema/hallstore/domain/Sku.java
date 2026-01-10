@@ -64,8 +64,8 @@ public class Sku {
 
     /**
      * SKU类型: RAW_MATERIAL(原料), PACKAGING(包材), FINISHED_PRODUCT(成品), COMBO(套餐)
+     * 使用 SkuTypeJpaConverter 自动转换数据库值（如 "finished_product"）到枚举常量
      */
-    @Enumerated(EnumType.STRING)
     @Column(name = "sku_type", nullable = false, length = 20)
     private SkuType skuType;
 
@@ -110,8 +110,8 @@ public class Sku {
 
     /**
      * SKU状态: DRAFT(草稿), ENABLED(启用), DISABLED(停用)
+     * 使用 SkuStatusJpaConverter 自动转换数据库值到枚举常量
      */
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 10)
     @Builder.Default
     private SkuStatus status = SkuStatus.DRAFT;

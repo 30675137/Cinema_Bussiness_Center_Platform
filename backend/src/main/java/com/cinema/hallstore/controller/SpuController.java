@@ -14,9 +14,10 @@ import java.util.UUID;
 /**
  * SPU管理控制器
  * - 提供SPU CRUD接口
+ * - 支持 /api/spu (前端路径) 和 /api/spus (REST规范) 双路径
  */
 @RestController
-@RequestMapping("/api/spus")
+@RequestMapping({"/api/spu", "/api/spus"})
 public class SpuController {
 
     private final SpuRepository spuRepository;
@@ -27,7 +28,7 @@ public class SpuController {
 
     /**
      * 查询SPU列表
-     * GET /api/spus
+     * GET /api/spu/list 或 GET /api/spus
      *
      * @param status    状态筛选
      * @param categoryId 类目ID筛选
@@ -36,7 +37,7 @@ public class SpuController {
      * @param page      页码
      * @param pageSize  每页大小
      */
-    @GetMapping
+    @GetMapping({"", "/list"})
     public ResponseEntity<Map<String, Object>> getSpus(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String categoryId,
@@ -81,11 +82,11 @@ public class SpuController {
 
     /**
      * 创建SPU
-     * POST /api/spus
+     * POST /api/spu/create 或 POST /api/spus
      *
      * @param spu SPU数据
      */
-    @PostMapping
+    @PostMapping({"", "/create"})
     public ResponseEntity<ApiResponse<Spu>> createSpu(@RequestBody Spu spu) {
         try {
             if (spu.getId() == null) {
