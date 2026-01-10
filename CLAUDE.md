@@ -98,6 +98,12 @@ cd backend
 
 # Format & Lint
 ./mvnw spotless:apply               # Format Java code (if configured)
+
+# Database Migrations (Flyway) - @spec T003-flyway-migration
+./mvnw flyway:info                  # View migration status
+./mvnw flyway:migrate               # Execute pending migrations
+./mvnw flyway:validate              # Validate migration scripts
+./mvnw flyway:repair                # Repair schema history table
 ```
 
 ### Frontend B端 Commands (React)
@@ -521,6 +527,7 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 - Supabase (PostgreSQL) 作为主要后端数据源 (O002-miniapp-menu-config)
 - Mock data (MSW handlers + localStorage)，后端使用 Supabase (PostgreSQL) (O008-channel-product-category-migration)
 - MSW mock data (in-memory state + MSW handlers + localStorage) 进行开发模拟 (feat/B001-fix-brand-creation)
+- Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543) (T003-flyway-migration)
 
 ## Supabase REST API (PostgREST) 使用规则
 
@@ -564,5 +571,6 @@ docker compose -f docker-compose.test.yml --env-file .env.test up -d backend
 ---
 
 ## Recent Changes
+- T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)
+- T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)
 - feat/B001-fix-brand-creation: Added MSW mock data (in-memory state + MSW handlers + localStorage) 进行开发模拟
-- O007-miniapp-menu-api: Added Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟

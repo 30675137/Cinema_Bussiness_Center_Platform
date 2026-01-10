@@ -1,0 +1,16 @@
+# @spec T003-flyway-migration
+# 生产环境 Flyway 配置
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration,classpath:db/seed,classpath:db/seed/prod
+    baseline-on-migrate: false  # 生产环境禁止自动 baseline
+    validate-on-migrate: true   # 严格验证
+    clean-disabled: true        # 生产环境禁止 clean
+    out-of-order: false         # 生产环境禁止乱序，确保严格顺序执行
+    table: flyway_schema_history
+
+logging:
+  level:
+    org.flywaydb: WARN

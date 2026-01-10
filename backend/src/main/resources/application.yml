@@ -27,15 +27,16 @@ spring:
           lob:
             non_contextual_creation: true
 
-  # Flyway 配置
+  # Flyway 配置 (@spec T003-flyway-migration)
   flyway:
-    enabled: false
-    locations: classpath:db/migration
+    enabled: true
+    locations: classpath:db/migration,classpath:db/seed
     baseline-on-migrate: true
     baseline-version: 0
-    validate-on-migrate: false
+    validate-on-migrate: true
     clean-disabled: true
     out-of-order: true
+    table: flyway_schema_history
     ignore-migration-patterns: "*:missing,*:future,*:ignored"
 
 server:
