@@ -29,6 +29,10 @@ interface SkuTableProps {
   onView?: (record: SKU) => void;
   onEdit?: (record: SKU) => void;
   onToggleStatus?: (record: SKU, status: SkuStatus) => void;
+  /** 选中的行keys */
+  selectedRowKeys?: React.Key[];
+  /** 选中行变化回调 */
+  onSelectionChange?: (selectedRowKeys: React.Key[], selectedRows: SKU[]) => void;
 }
 
 /**
@@ -43,6 +47,8 @@ export const SkuTable: React.FC<SkuTableProps> = ({
   onView,
   onEdit,
   onToggleStatus,
+  selectedRowKeys,
+  onSelectionChange,
 }) => {
   const { isMobile } = useResponsive();
 
@@ -228,12 +234,21 @@ export const SkuTable: React.FC<SkuTableProps> = ({
     },
   ];
 
+  // 行选择配置
+  const rowSelection = onSelectionChange
+    ? {
+        selectedRowKeys,
+        onChange: onSelectionChange,
+      }
+    : undefined;
+
   return (
     <Table<SKU>
       columns={columns}
       dataSource={data}
       loading={loading}
       rowKey="id"
+      rowSelection={rowSelection}
       data-testid="sku-table"
       pagination={{
         ...pagination,

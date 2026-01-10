@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -227,5 +228,66 @@ public class SkuController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.failure("INVALID_OPERATION", e.getMessage(), null));
         }
+    }
+
+    /**
+     * 批量操作SKU
+     * POST /api/skus/batch
+     *
+     * @spec B001-fix-brand-creation
+     * @param request 批量操作请求 {operation: "delete", ids: [...]}
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<Map<String, Object>> batchOperation(@RequestBody Map<String, Object> request) {
+        String operation = (String) request.get("operation");
+        @SuppressWarnings("unchecked")
+        List<String> ids = (List<String>) request.get("ids");
+
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "未提供要操作的SKU ID"
+            ));
+        }
+
+        if ("delete".equals(operation)) {
+            int successCount = 0;
+            int failedCount = 0;
+            List<String> failedIds = new java.util.ArrayList<>();
+
+            for (String idStr : ids) {
+                try {
+                    UUID id = UUID.fromString(idStr);
+                    skuService.delete(id);
+                    successCount++;
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    failedCount++;
+                    failedIds.add(idStr);
+                } catch (DataAccessException e) {
+                    // 数据库约束异常（如外键约束）
+                    failedCount++;
+                    failedIds.add(idStr);
+                }
+            }
+
+            String message = failedCount > 0
+                    ? String.format("成功删除 %d 个 SKU，失败 %d 个（可能被其他数据引用）", successCount, failedCount)
+                    : String.format("成功删除 %d 个 SKU", successCount);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "data", Map.of(
+                            "processedCount", successCount,
+                            "failedCount", failedCount,
+                            "failedIds", failedIds
+                    ),
+                    "message", message
+            ));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "不支持的操作类型: " + operation
+        ));
     }
 }

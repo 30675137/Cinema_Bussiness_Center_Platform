@@ -25,7 +25,7 @@ import java.util.UUID;
  * @spec B001-fix-brand-creation
  */
 @RestController
-@RequestMapping("/api/v1/brands")
+@RequestMapping("/api/brands")
 public class BrandController {
 
     private static final Logger logger = LoggerFactory.getLogger(BrandController.class);

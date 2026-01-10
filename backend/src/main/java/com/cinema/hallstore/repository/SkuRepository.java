@@ -112,4 +112,12 @@ public class SkuRepository {
     public void delete(UUID id) {
         deleteById(id);
     }
+
+    /**
+     * 删除 SKU 并立即刷新（用于立即触发数据库约束检查）
+     */
+    public void deleteAndFlush(UUID id) {
+        jpaRepository.deleteById(id);
+        jpaRepository.flush();
+    }
 }

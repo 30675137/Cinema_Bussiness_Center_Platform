@@ -4,14 +4,14 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Space, message, Modal, Alert, Empty, Card } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import { showError } from '@/utils/errorHandler';
 import { SkuFilters } from '@/components/sku/SkuFilters';
 import { SkuTable } from '@/components/sku/SkuTable';
 import { SkuSimpleForm } from '@/components/sku/SkuSimpleForm';
 import { SkuDetail } from '@/components/sku/SkuDetail';
 import { useSkuStore } from '@/stores/skuStore';
-import { useSkuListQuery, useToggleSkuStatusMutation } from '@/hooks/useSku';
+import { useSkuListQuery, useToggleSkuStatusMutation, useBatchDeleteSkuMutation } from '@/hooks/useSku';
 import type { SKU, SkuQueryParams } from '@/types/sku';
 import { SkuStatus } from '@/types/sku';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,9 @@ const SkuListPage: React.FC = () => {
   const [simpleFormOpen, setSimpleFormOpen] = useState(false);
   const [simpleFormMode, setSimpleFormMode] = useState<'create' | 'edit'>('create');
   const [simpleFormSkuId, setSimpleFormSkuId] = useState<string | undefined>(undefined);
+
+  // 批量选择状态
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   // 安全地获取 store 值，确保不为 undefined
   const filters = store.filters || { status: 'all' };
@@ -68,6 +71,9 @@ const SkuListPage: React.FC = () => {
 
   // 状态切换Mutation
   const toggleStatusMutation = useToggleSkuStatusMutation();
+
+  // 批量删除Mutation
+  const batchDeleteMutation = useBatchDeleteSkuMutation();
 
   // 处理筛选
   const handleFilter = (values: Partial<SkuQueryParams>) => {
@@ -152,20 +158,63 @@ const SkuListPage: React.FC = () => {
     refetch();
   };
 
+  // 处理行选择变化
+  const handleSelectionChange = (keys: React.Key[], rows: SKU[]) => {
+    setSelectedRowKeys(keys);
+  };
+
+  // 处理批量删除
+  const handleBatchDelete = () => {
+    if (selectedRowKeys.length === 0) {
+      message.warning('请先选择要删除的SKU');
+      return;
+    }
+
+    Modal.confirm({
+      title: '确认批量删除',
+      content: `确定要删除选中的 ${selectedRowKeys.length} 个SKU吗？此操作不可恢复。`,
+      okText: '删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await batchDeleteMutation.mutateAsync(selectedRowKeys.map(String));
+          setSelectedRowKeys([]);
+          refetch();
+        } catch (error: any) {
+          showError(error, '批量删除失败');
+        }
+      },
+    });
+  };
+
   return (
     <div style={{ padding: 24 }} data-testid="sku-list-page">
       <Card
         title={
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span data-testid="sku-list-title">SKU管理</span>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreate}
-              data-testid="sku-create-button"
-            >
-              新建SKU
-            </Button>
+            <Space>
+              {selectedRowKeys.length > 0 && (
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={handleBatchDelete}
+                  loading={batchDeleteMutation.isPending}
+                  data-testid="sku-batch-delete-button"
+                >
+                  批量删除 ({selectedRowKeys.length})
+                </Button>
+              )}
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreate}
+                data-testid="sku-create-button"
+              >
+                新建SKU
+              </Button>
+            </Space>
           </div>
         }
         data-testid="sku-list-card"
@@ -240,6 +289,8 @@ const SkuListPage: React.FC = () => {
             onView={handleView}
             onEdit={handleEdit}
             onToggleStatus={handleToggleStatus}
+            selectedRowKeys={selectedRowKeys}
+            onSelectionChange={handleSelectionChange}
           />
         )}
       </Card>

@@ -1,11 +1,14 @@
 import { http, HttpResponse } from 'msw';
-import { categoryHandlers } from './categoryHandlers';
-import { brandHandlers } from './brandHandlers';
+// 分类使用真实后端 API，已禁用 mock
+// import { categoryHandlers } from './categoryHandlers';
+// 品牌使用真实后端 API，已禁用 mock
+// import { brandHandlers } from './brandHandlers';
 import { attributeHandlers_ } from './attributeHandlers';
 import { scheduleHandlers } from './scheduleHandlers';
 import { reservationSettingsHandlers } from './reservationSettingsHandlers';
 import { scenarioPackageEditorHandlers } from './scenarioPackageEditorHandlers';
-import { skuHandlers } from './sku'; // P001-sku-master-data
+// SKU 使用真实后端 API，已禁用 mock
+// import { skuHandlers } from './sku'; // P001-sku-master-data
 import { conversionHandlers } from './conversion'; // P002-unit-conversion
 import { orderHandlers } from './orderHandlers'; // O001-product-order-list
 import { channelProductHandlers } from './channelProductHandlers'; // O005-channel-product-config
@@ -220,14 +223,17 @@ export const handlers = [
   // SPU相关使用真实后端 API，已禁用 mock
   // @spec B001-fix-brand-creation
   // ...spuHandlers,
-  ...categoryHandlers, // 新的类目API处理器（基于OpenAPI规范）
-  ...legacyCategoryHandlers, // 旧版兼容处理器
-  ...brandHandlers, // 使用新的brandHandlers
+  // 分类使用真实后端 API，已禁用 mock
+  // ...categoryHandlers,
+  // ...legacyCategoryHandlers,
+  // 品牌使用真实后端 API，已禁用 mock
+  // ...brandHandlers,
   ...attributeHandlers_, // 属性字典管理处理器
   ...scheduleHandlers, // 排期管理处理器
   ...reservationSettingsHandlers, // 门店预约设置处理器
   ...scenarioPackageEditorHandlers, // 场景包编辑器处理器
-  ...skuHandlers, // SKU主数据管理处理器 (P001-sku-master-data)
+  // SKU 使用真实后端 API，已禁用 mock
+  // ...skuHandlers, // SKU主数据管理处理器 (P001-sku-master-data)
   ...conversionHandlers, // 单位换算管理处理器 (P002-unit-conversion)
   ...orderHandlers, // 订单管理处理器 (O001-product-order-list)
   ...channelProductHandlers, // 渠道商品配置处理器 (O005-channel-product-config)
