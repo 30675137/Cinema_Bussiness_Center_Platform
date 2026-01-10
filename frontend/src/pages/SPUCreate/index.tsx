@@ -7,6 +7,7 @@ import { SPUNotificationService } from '@/components/common/Notification';
 import type { Brand, Category } from '@/types/spu';
 import type { CreateSPURequest } from '@/services/spuService';
 import { spuService } from '@/services/spuService';
+import { brandService } from '@/pages/mdm-pim/brand/services/brandService';
 import { validateSPUForm } from '@/utils/validation';
 import { Breadcrumb as CustomBreadcrumb } from '@/components/common';
 
@@ -39,51 +40,26 @@ const SPUCreatePage: React.FC = () => {
     }
   };
 
-  // Mock加载品牌数据
+  // 加载品牌数据 - 从后端 API 获取
   const loadBrands = async (): Promise<Brand[]> => {
-    // 模拟API延迟
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    return [
-      {
-        id: 'brand_001',
-        name: '可口可乐',
-        code: 'COKE',
-        description: '全球知名碳酸饮料品牌',
-        status: 'active',
-        logo: '/images/brands/coke.png',
-      },
-      {
-        id: 'brand_002',
-        name: '百事可乐',
-        code: 'PEPSI',
-        description: '全球知名碳酸饮料品牌',
-        status: 'active',
-        logo: '/images/brands/pepsi.png',
-      },
-      {
-        id: 'brand_003',
-        name: '农夫山泉',
-        code: 'NONGFU',
-        description: '中国知名饮用水品牌',
-        status: 'active',
-        logo: '/images/brands/nongfu.png',
-      },
-      {
-        id: 'brand_004',
-        name: '康师傅',
-        code: 'KSF',
-        description: '知名食品饮料品牌',
-        status: 'active',
-      },
-      {
-        id: 'brand_005',
-        name: '统一',
-        code: 'UNI',
-        description: '知名食品饮料品牌',
-        status: 'active',
-      },
-    ];
+    try {
+      const response = await brandService.getBrands({ pageSize: 100, status: 'enabled' });
+      if (response.data) {
+        // 转换为 SPU 表单所需的 Brand 格式
+        return response.data.map((brand) => ({
+          id: brand.id,
+          name: brand.name,
+          code: brand.brandCode,
+          description: brand.description,
+          status: brand.status === 'enabled' ? 'active' : 'inactive',
+          logo: brand.logoUrl,
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Load brands error:', error);
+      return [];
+    }
   };
 
   // Mock加载分类数据
