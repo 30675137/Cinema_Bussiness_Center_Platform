@@ -72,12 +72,13 @@ check_feature_branch() {
         return 0
     fi
 
-    # Support both formats:
+    # Support multiple formats:
     # - Legacy: 001-feature-name (numeric prefix)
     # - New: X001-feature-name (module letter + numeric prefix)
-    if [[ ! "$branch" =~ ^[0-9]{3}- ]] && [[ ! "$branch" =~ ^[A-Z][0-9]{3}- ]]; then
+    # - With prefix: feat/X001-feature-name (feat/ prefix + module letter + numeric prefix)
+    if [[ ! "$branch" =~ ^[0-9]{3}- ]] && [[ ! "$branch" =~ ^[A-Z][0-9]{3}- ]] && [[ ! "$branch" =~ ^feat/[A-Z][0-9]{3}- ]] && [[ ! "$branch" =~ ^feat/[0-9]{3}- ]]; then
         echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
-        echo "Feature branches should be named like: 001-feature-name or X001-feature-name" >&2
+        echo "Feature branches should be named like: 001-feature-name, X001-feature-name, or feat/X001-feature-name" >&2
         return 1
     fi
 
@@ -88,25 +89,29 @@ get_feature_dir() { echo "$1/specs/$2"; }
 
 # Find feature directory by prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
-# Supports both formats:
+# Supports multiple formats:
 # - Legacy: 001-feature-name (numeric prefix)
 # - New: X001-feature-name (module letter + numeric prefix)
+# - With prefix: feat/X001-feature-name (feat/ prefix + module letter + numeric prefix)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
     local prefix=""
 
+    # Strip feat/ prefix if present
+    local clean_branch="${branch_name#feat/}"
+
     # Extract prefix from branch
     # New format: X001-feature-name (module letter + numeric prefix)
-    if [[ "$branch_name" =~ ^([A-Z][0-9]{3})- ]]; then
+    if [[ "$clean_branch" =~ ^([A-Z][0-9]{3})- ]]; then
         prefix="${BASH_REMATCH[1]}"
     # Legacy format: 001-feature-name (numeric prefix only)
-    elif [[ "$branch_name" =~ ^([0-9]{3})- ]]; then
+    elif [[ "$clean_branch" =~ ^([0-9]{3})- ]]; then
         prefix="${BASH_REMATCH[1]}"
     else
         # If branch doesn't have valid prefix, fall back to exact match
-        echo "$specs_dir/$branch_name"
+        echo "$specs_dir/$clean_branch"
         return
     fi
 
