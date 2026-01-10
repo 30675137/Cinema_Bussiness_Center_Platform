@@ -81,4 +81,41 @@ public class CategoryController {
                 "code", 200
         ));
     }
+
+    /**
+     * 数据健康检查端点
+     * 检查数据库中是否存在无效的分类记录
+     * 
+     * GET /api/categories/health-check
+     */
+    @GetMapping("/health-check")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        logger.info("GET /api/categories/health-check");
+
+        List<Category> allCategories = categoryService.listCategories();
+        
+        // 统计无效记录
+        long invalidCount = allCategories.stream()
+            .filter(category -> category.getId() == null || 
+                               category.getName() == null || 
+                               category.getName().trim().isEmpty())
+            .count();
+        
+        long validCount = allCategories.size() - invalidCount;
+        
+        logger.info("数据健康检查: 总数={}, 有效={}, 无效={}", 
+                   allCategories.size(), validCount, invalidCount);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "data", Map.of(
+                    "total", allCategories.size(),
+                    "valid", validCount,
+                    "invalid", invalidCount,
+                    "healthy", invalidCount == 0
+                ),
+                "message", invalidCount == 0 ? "数据健康" : "发现无效数据",
+                "code", 200
+        ));
+    }
 }
