@@ -34,7 +34,6 @@ import type { MenuProps } from 'antd';
 import type { SPUStatus } from '@/types/spu';
 import { statusColors } from '@/theme';
 import { spuService } from '@/services/spuService';
-import { SPUNotificationService } from '@/components/common/Notification';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -133,7 +132,6 @@ const StatusManager: React.FC<StatusManagerProps> = ({
 
       if (response.success) {
         message.success('状态更新成功');
-        SPUNotificationService.statusChanged(targetStatus!, values.reason);
         onStatusChange?.(targetStatus!, values.reason);
         setStatusModalVisible(false);
         statusForm.resetFields();

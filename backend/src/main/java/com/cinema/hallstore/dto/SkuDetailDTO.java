@@ -32,6 +32,12 @@ public class SkuDetailDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // 品牌和分类信息(从SPU获取)
+    private String brandId;
+    private String brandName;
+    private String categoryId;
+    private String categoryName;
+
     // BOM组件(仅成品类型)
     private List<BomComponent> bom;
 
@@ -176,5 +182,37 @@ public class SkuDetailDTO {
 
     public void setComboItems(List<ComboItem> comboItems) {
         this.comboItems = comboItems;
+    }
+
+    public String getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

@@ -142,8 +142,14 @@ public class SpuController {
                     if (updateData.getCategoryId() != null) {
                         existingSpu.setCategoryId(updateData.getCategoryId());
                     }
+                    if (updateData.getCategoryName() != null) {
+                        existingSpu.setCategoryName(updateData.getCategoryName());
+                    }
                     if (updateData.getBrandId() != null) {
                         existingSpu.setBrandId(updateData.getBrandId());
+                    }
+                    if (updateData.getBrandName() != null) {
+                        existingSpu.setBrandName(updateData.getBrandName());
                     }
                     if (updateData.getStatus() != null) {
                         existingSpu.setStatus(updateData.getStatus());

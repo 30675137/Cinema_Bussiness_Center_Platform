@@ -1,12 +1,14 @@
 package com.cinema.hallstore.controller;
 
 import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.domain.Spu;
 import com.cinema.hallstore.domain.enums.SkuStatus;
 import com.cinema.hallstore.domain.enums.SkuType;
 import com.cinema.hallstore.dto.ApiResponse;
 import com.cinema.hallstore.dto.SkuCreateRequest;
 import com.cinema.hallstore.dto.SkuDetailDTO;
 import com.cinema.hallstore.dto.SkuUpdateRequest;
+import com.cinema.hallstore.repository.SpuJpaRepository;
 import com.cinema.hallstore.service.SkuService;
 import com.cinema.hallstore.service.StoreScopeValidationService;
 import jakarta.validation.Valid;
@@ -31,9 +33,11 @@ import java.util.UUID;
 public class SkuController {
 
     private final SkuService skuService;
+    private final SpuJpaRepository spuRepository;
 
-    public SkuController(SkuService skuService) {
+    public SkuController(SkuService skuService, SpuJpaRepository spuRepository) {
         this.skuService = skuService;
+        this.spuRepository = spuRepository;
     }
 
     /**
@@ -82,6 +86,16 @@ public class SkuController {
         try {
             Sku sku = skuService.findById(id);
             SkuDetailDTO detail = SkuDetailDTO.from(sku);
+
+            // 从SPU获取品牌和分类信息
+            if (sku.getSpuId() != null) {
+                spuRepository.findById(sku.getSpuId()).ifPresent(spu -> {
+                    detail.setBrandId(spu.getBrandId());
+                    detail.setBrandName(spu.getBrandName());
+                    detail.setCategoryId(spu.getCategoryId());
+                    detail.setCategoryName(spu.getCategoryName());
+                });
+            }
 
             // 根据类型加载BOM或套餐子项
             if (sku.getSkuType() == SkuType.FINISHED_PRODUCT) {

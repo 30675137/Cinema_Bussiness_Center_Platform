@@ -2,6 +2,14 @@ import type { SPUItem, SPUQueryParams, SPUStatus, Brand, Category, ProductType }
 import { generateSPUCode } from '@/utils/spuHelpers';
 import { apiService } from './api';
 
+// 状态颜色和文本映射
+const statusColors: Record<string, { text: string; color: string }> = {
+  active: { text: '启用', color: 'green' },
+  inactive: { text: '停用', color: 'red' },
+  draft: { text: '草稿', color: 'gray' },
+  archived: { text: '已归档', color: 'orange' },
+};
+
 /**
  * 后端SPU数据结构（API返回格式 - snake_case）
  */
@@ -549,6 +557,7 @@ class SPUService {
 
   /**
    * 批量更新SPU状态
+   * @spec B001-fix-brand-creation
    * @param ids SPU ID列表
    * @param status 新状态
    * @returns 更新结果
@@ -558,16 +567,45 @@ class SPUService {
     status: SPUStatus
   ): Promise<ApiResponse<{ success: number; failed: number }>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      let successCount = 0;
+      let failedCount = 0;
 
-      const statusText = statusColors[status as keyof typeof statusColors]?.text;
+      // 逐个更新每个SPU的状态
+      for (const id of ids) {
+        try {
+          const response = await fetch(`/api/spu/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              status: status.toUpperCase(),
+            }),
+          });
 
-      // Mock批量状态更新结果
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+              successCount++;
+            } else {
+              failedCount++;
+            }
+          } else {
+            failedCount++;
+          }
+        } catch {
+          failedCount++;
+        }
+      }
+
+      const statusText = statusColors[status as keyof typeof statusColors]?.text || status;
+
       return {
         success: true,
-        data: { success: ids.length, failed: 0 },
-        message: `成功将${ids.length}个SPU状态更新为"${statusText}"`,
+        data: { success: successCount, failed: failedCount },
+        message: failedCount > 0
+          ? `成功更新${successCount}个SPU状态，失败${failedCount}个`
+          : `成功将${successCount}个SPU状态更新为"${statusText}"`,
         code: 200,
         timestamp: Date.now(),
       };
@@ -683,6 +721,7 @@ class SPUService {
 
   /**
    * 更新SPU状态
+   * @spec B001-fix-brand-creation
    * @param id SPU ID
    * @param status 新状态
    * @param reason 变更原因
@@ -694,22 +733,40 @@ class SPUService {
     reason?: string
   ): Promise<ApiResponse<SPUItem>> {
     try {
-      // 模拟API请求延迟
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      // 调用后端API更新状态
+      const response = await fetch(`/api/spu/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: status.toUpperCase(),
+        }),
+      });
 
-      // Mock状态更新
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || '状态更新失败');
+      }
+
+      // 转换后端返回的数据为前端格式
+      const updatedSPU = transformBackendSpu(result.data);
+
       return {
         success: true,
-        data: {
-          id,
-          status,
-          updatedAt: new Date().toISOString(),
-        } as SPUItem,
+        data: updatedSPU,
         message: '状态更新成功',
         code: 200,
         timestamp: Date.now(),
       };
     } catch (error) {
+      console.error('Update SPU status error:', error);
       return {
         success: false,
         data: null as any,
