@@ -1,5 +1,6 @@
 /**
  * @spec O004-beverage-sku-reuse
+ * @spec N004-procurement-material-selector
  * BOM Configuration Page
  *
  * BOM 配方配置页面,用于配置成品 SKU 的 BOM 组件
@@ -9,7 +10,7 @@
  *
  * 功能特性:
  * - 选择成品 SKU (使用 SKUSelectorModal,仅显示 finished_product 类型)
- * - 添加/编辑/删除 BOM 组件
+ * - 添加/编辑/删除 BOM 组件 (N004: 支持选择物料和 SKU 两种类型)
  * - 计算 BOM 总成本
  * - 配置损耗率
  * - 保存 BOM 配方
@@ -31,29 +32,37 @@ import {
   Row,
   Col,
   Statistic,
+  Tag,
 } from 'antd';
-import { PlusOutlined, DeleteOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, SaveOutlined, ReloadOutlined, DatabaseOutlined, ShoppingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { SKUSelectorModal } from '@/components/molecules/SKUSelectorModal';
+import MaterialSkuSelectorModal, { type SelectedProcurementItem } from '@/features/procurement/components/MaterialSkuSelectorModal';
 import { useSKUDetail, useUpdateBom, useUnits } from '@/hooks/useSKUs';
 import type { SKU } from '@/types/sku';
+import { SkuType } from '@/types/sku';
+import { PurchaseOrderItemType } from '@/types/purchase';
 
 const { Title, Text } = Typography;
 
 /**
  * BOM 组件数据结构
+ * N004: 支持物料（Material）和 SKU 两种类型
  */
 interface BomComponent {
   /** 临时 ID (用于前端列表 key) */
   tempId: string;
 
-  /** 组件 SKU ID */
+  /** N004: 组件类型 - MATERIAL 或 SKU */
+  componentType: PurchaseOrderItemType;
+
+  /** 组件 ID（SKU ID 或 Material ID） */
   componentId: string;
 
-  /** 组件 SKU 名称 */
+  /** 组件名称 */
   componentName: string;
 
-  /** 组件 SKU 编码 */
+  /** 组件编码 */
   componentCode: string;
 
   /** 用量 */
@@ -85,6 +94,8 @@ export const BOMConfigurationPage: React.FC = () => {
   const [wasteRate, setWasteRate] = useState<number>(0); // 损耗率 (0-1)
   const [isSelectorVisible, setIsSelectorVisible] = useState(false);
   const [isAddingComponent, setIsAddingComponent] = useState(false); // 是否正在添加组件
+  // N004: 物料/SKU 选择器模态框状态
+  const [isMaterialSkuSelectorOpen, setIsMaterialSkuSelectorOpen] = useState(false);
 
   // ===== Hooks =====
   const { data: finishedProductDetail, isLoading: isLoadingDetail } = useSKUDetail(
@@ -104,12 +115,15 @@ export const BOMConfigurationPage: React.FC = () => {
     setIsSelectorVisible(false);
 
     // 如果 SKU 已有 BOM 数据,加载现有配方
-    if (sku.bomComponents && sku.bomComponents.length > 0) {
-      const existingBom: BomComponent[] = sku.bomComponents.map((bom, index) => ({
+    const skuWithBom = sku as any;
+    if (skuWithBom.bomComponents && skuWithBom.bomComponents.length > 0) {
+      const existingBom: BomComponent[] = skuWithBom.bomComponents.map((bom: any, index: number) => ({
         tempId: `existing-${bom.id || index}`,
+        // N004: 默认为 SKU 类型（兼容旧数据）
+        componentType: bom.componentType || PurchaseOrderItemType.SKU,
         componentId: bom.componentId,
         componentName: bom.componentName || '',
-        componentCode: '', // TODO: 从组件 SKU 获取
+        componentCode: '', // TODO: 从组件 SKU/Material 获取
         quantity: bom.quantity,
         unit: bom.unit,
         unitCost: bom.unitCost || 0,
@@ -118,7 +132,7 @@ export const BOMConfigurationPage: React.FC = () => {
         sortOrder: bom.sortOrder || index + 1,
       }));
       setBomComponents(existingBom);
-      setWasteRate(sku.wasteRate || 0);
+      setWasteRate(skuWithBom.wasteRate || 0);
     } else {
       // 新 SKU,清空 BOM 列表
       setBomComponents([]);
@@ -127,15 +141,16 @@ export const BOMConfigurationPage: React.FC = () => {
   };
 
   /**
-   * 处理添加组件 (打开选择器)
+   * 处理添加组件 (N004: 打开物料/SKU 双选择器)
    */
   const handleAddComponent = () => {
     setIsAddingComponent(true);
-    setIsSelectorVisible(true);
+    // N004: 使用 MaterialSkuSelectorModal 支持物料和 SKU 双选择
+    setIsMaterialSkuSelectorOpen(true);
   };
 
   /**
-   * 处理选择组件 SKU
+   * 处理选择组件 SKU（保留兼容旧的 SKU 选择器）
    */
   const handleSelectComponent = (sku: SKU) => {
     // 检查是否已添加过该组件
@@ -148,6 +163,7 @@ export const BOMConfigurationPage: React.FC = () => {
     // 添加新组件
     const newComponent: BomComponent = {
       tempId: `new-${Date.now()}-${Math.random()}`,
+      componentType: PurchaseOrderItemType.SKU,
       componentId: sku.id,
       componentName: sku.name,
       componentCode: sku.code,
@@ -163,6 +179,59 @@ export const BOMConfigurationPage: React.FC = () => {
     setIsSelectorVisible(false);
     setIsAddingComponent(false);
     message.success(`已添加组件: ${sku.name}`);
+  };
+
+  /**
+   * N004: 处理物料/SKU 双选择器选择
+   */
+  const handleMaterialSkuSelect = (items: SelectedProcurementItem[]) => {
+    const newComponents: BomComponent[] = [];
+
+    for (const item of items) {
+      // 检查是否已添加（根据类型+ID 唯一识别）
+      const componentId = item.itemType === PurchaseOrderItemType.MATERIAL
+        ? item.materialId!
+        : item.skuId!;
+      const exists = bomComponents.some(
+        (c) => c.componentId === componentId && c.componentType === item.itemType
+      );
+      if (exists) {
+        const name = item.itemType === PurchaseOrderItemType.MATERIAL
+          ? item.materialName
+          : item.skuName;
+        message.warning(`组件 "${name}" 已添加,请勿重复添加`);
+        continue;
+      }
+
+      const newComponent: BomComponent = {
+        tempId: `new-${Date.now()}-${Math.random()}`,
+        componentType: item.itemType,
+        componentId: componentId,
+        componentName: item.itemType === PurchaseOrderItemType.MATERIAL
+          ? item.materialName || ''
+          : item.skuName || '',
+        componentCode: item.itemType === PurchaseOrderItemType.MATERIAL
+          ? item.materialCode || ''
+          : item.skuCode || '',
+        quantity: 1, // 默认用量 1
+        unit: item.itemType === PurchaseOrderItemType.MATERIAL
+          ? item.inventoryUnit || 'g' // 物料使用库存单位
+          : item.mainUnit || 'ml',
+        unitCost: item.unitPrice || 0,
+        totalCost: item.unitPrice || 0,
+        isOptional: false,
+        sortOrder: bomComponents.length + newComponents.length + 1,
+      };
+      newComponents.push(newComponent);
+    }
+
+    if (newComponents.length > 0) {
+      setBomComponents([...bomComponents, ...newComponents]);
+      message.success(`已添加 ${newComponents.length} 个组件`);
+    }
+
+    setIsMaterialSkuSelectorOpen(false);
+    setIsAddingComponent(false);
   };
 
   /**
@@ -256,7 +325,8 @@ export const BOMConfigurationPage: React.FC = () => {
    * 处理重置
    */
   const handleReset = () => {
-    if (selectedFinishedProduct && finishedProductDetail?.bomComponents) {
+    const detailWithBom = finishedProductDetail as any;
+    if (selectedFinishedProduct && detailWithBom?.bomComponents) {
       // 重置到原始数据
       handleSelectFinishedProduct(finishedProductDetail as SKU);
       message.success('已重置到原始数据');
@@ -277,6 +347,21 @@ export const BOMConfigurationPage: React.FC = () => {
       key: 'sortOrder',
       width: 60,
       render: (_, __, index) => index + 1,
+    },
+    {
+      // N004: 显示组件类型（物料/SKU）
+      title: '类型',
+      dataIndex: 'componentType',
+      key: 'componentType',
+      width: 80,
+      render: (type: PurchaseOrderItemType) => (
+        <Tag
+          color={type === PurchaseOrderItemType.MATERIAL ? 'blue' : 'green'}
+          icon={type === PurchaseOrderItemType.MATERIAL ? <DatabaseOutlined /> : <ShoppingOutlined />}
+        >
+          {type === PurchaseOrderItemType.MATERIAL ? '物料' : 'SKU'}
+        </Tag>
+      ),
     },
     {
       title: '组件编码',
@@ -492,14 +577,26 @@ export const BOMConfigurationPage: React.FC = () => {
         </>
       )}
 
-      {/* SKU 选择器模态框 */}
+      {/* 成品 SKU 选择器模态框（选择成品时使用） */}
       <SKUSelectorModal
         visible={isSelectorVisible}
         onCancel={() => setIsSelectorVisible(false)}
-        onSelect={isAddingComponent ? handleSelectComponent : handleSelectFinishedProduct}
-        skuType={isAddingComponent ? 'raw_material' : 'finished_product'}
-        title={isAddingComponent ? '选择 BOM 组件 (原料/包材)' : '选择成品 SKU'}
-        excludeSkuIds={isAddingComponent ? bomComponents.map((c) => c.componentId) : []}
+        onSelect={handleSelectFinishedProduct}
+        skuType={SkuType.FINISHED_PRODUCT}
+        title="选择成品 SKU"
+        excludeSkuIds={[]}
+      />
+
+      {/* N004: 物料/SKU 双选择器（添加 BOM 组件时使用） */}
+      <MaterialSkuSelectorModal
+        open={isMaterialSkuSelectorOpen}
+        onClose={() => {
+          setIsMaterialSkuSelectorOpen(false);
+          setIsAddingComponent(false);
+        }}
+        onSelect={handleMaterialSkuSelect}
+        excludeIds={bomComponents.map((c) => c.componentId)}
+        defaultType={PurchaseOrderItemType.MATERIAL}
       />
     </div>
   );

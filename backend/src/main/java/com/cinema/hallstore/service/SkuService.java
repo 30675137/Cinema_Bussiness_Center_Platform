@@ -10,6 +10,8 @@ import com.cinema.hallstore.repository.BomComponentJpaRepository;
 import com.cinema.hallstore.repository.ComboItemRepository;
 import com.cinema.hallstore.repository.SkuJpaRepository;
 import com.cinema.hallstore.repository.SkuRepository;
+import com.cinema.material.entity.Material;
+import com.cinema.material.repository.MaterialRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,17 +32,20 @@ public class SkuService {
     private final ComboItemRepository comboItemRepository;
     private final CostCalculationService costCalculationService;
     private final StoreScopeValidationService storeScopeValidationService;
+    private final MaterialRepository materialRepository;
 
     public SkuService(SkuRepository skuRepository,
                       BomComponentJpaRepository bomComponentJpaRepository,
                       ComboItemRepository comboItemRepository,
                       CostCalculationService costCalculationService,
-                      StoreScopeValidationService storeScopeValidationService) {
+                      StoreScopeValidationService storeScopeValidationService,
+                      MaterialRepository materialRepository) {
         this.skuRepository = skuRepository;
         this.bomComponentJpaRepository = bomComponentJpaRepository;
         this.comboItemRepository = comboItemRepository;
         this.costCalculationService = costCalculationService;
         this.storeScopeValidationService = storeScopeValidationService;
+        this.materialRepository = materialRepository;
     }
 
     /**
@@ -110,20 +115,32 @@ public class SkuService {
         // 处理BOM组件
         if (request.getSkuType() == SkuType.FINISHED_PRODUCT && request.getBomComponents() != null) {
             for (SkuCreateRequest.BomComponentInput input : request.getBomComponents()) {
-                // 获取组件SKU以验证类型和获取成本
-                Sku component = skuRepository.findById(input.getComponentId())
-                        .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
-
-                if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
-                    throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
+                BigDecimal unitCost;
+                
+                // N004: 根据组件类型分别查询物料表或SKU表
+                if ("MATERIAL".equals(input.getComponentType())) {
+                    // 物料类型
+                    Material material = materialRepository.findById(input.getComponentId())
+                            .orElseThrow(() -> new IllegalArgumentException("组件物料不存在: " + input.getComponentId()));
+                    unitCost = material.getStandardCost() != null ? material.getStandardCost() : BigDecimal.ZERO;
+                } else {
+                    // SKU类型（默认）
+                    Sku component = skuRepository.findById(input.getComponentId())
+                            .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
+                    if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
+                        throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
+                    }
+                    unitCost = component.getStandardCost();
                 }
 
                 BomComponent bomComponent = BomComponent.builder()
                         .finishedProductId(createdSku.getId())
-                        .componentId(input.getComponentId())
+                        .componentId("MATERIAL".equals(input.getComponentType()) ? null : input.getComponentId())
+                        .materialId("MATERIAL".equals(input.getComponentType()) ? input.getComponentId() : null)
+                        .componentType(input.getComponentType() != null ? input.getComponentType() : "SKU")
                         .quantity(input.getQuantity())
                         .unit(input.getUnit())
-                        .unitCost(component.getStandardCost())
+                        .unitCost(unitCost)
                         .isOptional(input.getIsOptional() != null ? input.getIsOptional() : false)
                         .sortOrder(input.getSortOrder() != null ? input.getSortOrder() : 0)
                         .build();
@@ -309,20 +326,32 @@ public class SkuService {
 
         // 创建新的BOM配置
         for (SkuCreateRequest.BomComponentInput input : componentInputs) {
-            // 获取组件SKU以验证类型和获取成本
-            Sku component = skuRepository.findById(input.getComponentId())
-                    .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
-
-            if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
-                throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
+            BigDecimal unitCost;
+            
+            // N004: 根据组件类型分别查询物料表或SKU表
+            if ("MATERIAL".equals(input.getComponentType())) {
+                // 物料类型
+                Material material = materialRepository.findById(input.getComponentId())
+                        .orElseThrow(() -> new IllegalArgumentException("组件物料不存在: " + input.getComponentId()));
+                unitCost = material.getStandardCost() != null ? material.getStandardCost() : BigDecimal.ZERO;
+            } else {
+                // SKU类型（默认）
+                Sku component = skuRepository.findById(input.getComponentId())
+                        .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
+                if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
+                    throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
+                }
+                unitCost = component.getStandardCost();
             }
 
             BomComponent bomComponent = BomComponent.builder()
                     .finishedProductId(finishedProductId)
-                    .componentId(input.getComponentId())
+                    .componentId("MATERIAL".equals(input.getComponentType()) ? null : input.getComponentId())
+                    .materialId("MATERIAL".equals(input.getComponentType()) ? input.getComponentId() : null)
+                    .componentType(input.getComponentType() != null ? input.getComponentType() : "SKU")
                     .quantity(input.getQuantity())
                     .unit(input.getUnit())
-                    .unitCost(component.getStandardCost())
+                    .unitCost(unitCost)
                     .isOptional(input.getIsOptional() != null ? input.getIsOptional() : false)
                     .sortOrder(input.getSortOrder() != null ? input.getSortOrder() : 0)
                     .build();

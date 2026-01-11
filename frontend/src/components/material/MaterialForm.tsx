@@ -30,8 +30,9 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         purchaseUnitId: values.purchaseUnitId,
         conversionRate: values.conversionRate,
         useGlobalConversion: values.useGlobalConversion,
+        standardCost: values.standardCost,
         description: values.description,
-        specifications: values.specifications,
+        specification: values.specification,
       }
       onSubmit(updateData)
     } else {
@@ -43,8 +44,9 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         purchaseUnitId: values.purchaseUnitId,
         conversionRate: values.conversionRate,
         useGlobalConversion: values.useGlobalConversion ?? true,
+        standardCost: values.standardCost,
         description: values.description,
-        specifications: values.specifications,
+        specification: values.specification,
       }
       onSubmit(createData)
     }
@@ -139,8 +141,22 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         }
       </Form.Item>
 
-      <Form.Item name="specifications" label="规格">
+      <Form.Item name="specification" label="规格">
         <Input.TextArea rows={2} placeholder="例：500ml/瓶, 12瓶/箱" />
+      </Form.Item>
+
+      <Form.Item
+        name="standardCost"
+        label="标准成本"
+        extra="物料标准成本（元/库存单位），用于 BOM 成本计算"
+      >
+        <InputNumber
+          min={0}
+          precision={2}
+          style={{ width: '100%' }}
+          placeholder="0.00"
+          addonAfter="元"
+        />
       </Form.Item>
 
       <Form.Item name="description" label="描述">

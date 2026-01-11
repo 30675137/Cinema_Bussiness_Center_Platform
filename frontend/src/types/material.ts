@@ -23,6 +23,8 @@ export interface Material {
   purchaseUnit: Unit
   conversionRate?: number
   useGlobalConversion: boolean
+  /** 标准成本（元/库存单位），用于 BOM 成本计算 */
+  standardCost?: number
   specification?: string
   description?: string
   status: MaterialStatus
@@ -50,8 +52,10 @@ export interface MaterialCreateRequest {
   purchaseUnitId: string
   conversionRate?: number
   useGlobalConversion?: boolean
+  /** 标准成本（元/库存单位） */
+  standardCost?: number
   description?: string
-  specifications?: string
+  specification?: string
 }
 
 export interface MaterialUpdateRequest {
@@ -60,6 +64,8 @@ export interface MaterialUpdateRequest {
   purchaseUnitId?: string
   conversionRate?: number
   useGlobalConversion?: boolean
+  /** 标准成本（元/库存单位） */
+  standardCost?: number
   description?: string
-  specifications?: string
+  specification?: string
 }

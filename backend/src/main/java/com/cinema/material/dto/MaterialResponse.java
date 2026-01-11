@@ -22,6 +22,8 @@ public class MaterialResponse {
     private UnitResponse purchaseUnit;
     private BigDecimal conversionRate;
     private Boolean useGlobalConversion;
+    /** 标准成本（元/库存单位），用于 BOM 成本计算 */
+    private BigDecimal standardCost;
     private String description;
     private String specification;
     private LocalDateTime createdAt;
@@ -41,6 +43,7 @@ public class MaterialResponse {
                         : null)
                 .conversionRate(material.getConversionRate())
                 .useGlobalConversion(material.getUseGlobalConversion())
+                .standardCost(material.getStandardCost())
                 .description(material.getDescription())
                 .specification(material.getSpecification())
                 .createdAt(material.getCreatedAt())

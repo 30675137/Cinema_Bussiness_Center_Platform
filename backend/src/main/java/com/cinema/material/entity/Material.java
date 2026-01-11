@@ -110,6 +110,14 @@ public class Material {
     private Boolean useGlobalConversion = true;
 
     /**
+     * 标准成本（元/库存单位）
+     *
+     * <p>用于 BOM 成本计算。采购时可参考此值，但实际采购单价可不同。
+     */
+    @Column(name = "standard_cost", precision = 12, scale = 2)
+    private BigDecimal standardCost;
+
+    /**
      * 规格说明
      *
      * <p>Examples: 750ml/瓶, 500g/袋

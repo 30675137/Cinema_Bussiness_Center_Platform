@@ -53,7 +53,15 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ materials, loading
       render: (rate: number, record: Material) =>
         record.useGlobalConversion ? '使用全局' : rate?.toFixed(2) || '-',
     },
-    { title: '规格', dataIndex: 'specifications', key: 'specifications', ellipsis: true },
+    {
+      title: '标准成本',
+      dataIndex: 'standardCost',
+      key: 'standardCost',
+      width: 100,
+      render: (cost: number | undefined) =>
+        cost !== undefined && cost > 0 ? `¥${cost.toFixed(2)}` : '-',
+    },
+    { title: '规格', dataIndex: 'specification', key: 'specification', ellipsis: true },
     {
       title: '操作',
       key: 'action',
@@ -72,5 +80,5 @@ export const MaterialTable: React.FC<MaterialTableProps> = ({ materials, loading
     },
   ]
 
-  return <Table columns={columns} dataSource={materials} rowKey="id" loading={loading} scroll={{ x: 1200 }} />
+  return <Table columns={columns} dataSource={materials} rowKey="id" loading={loading} scroll={{ x: 1300 }} />
 }

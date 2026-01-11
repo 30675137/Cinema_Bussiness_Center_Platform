@@ -51,6 +51,7 @@ public class MaterialController {
                 .purchaseUnit(Unit.builder().id(request.getPurchaseUnitId()).build())
                 .conversionRate(request.getConversionRate())
                 .useGlobalConversion(request.getUseGlobalConversion())
+                .standardCost(request.getStandardCost())
                 .description(request.getDescription())
                 .specification(request.getSpecification())
                 .status("ACTIVE")
@@ -152,6 +153,7 @@ public class MaterialController {
                         : null)
                 .conversionRate(request.getConversionRate())
                 .useGlobalConversion(request.getUseGlobalConversion())
+                .standardCost(request.getStandardCost())
                 .description(request.getDescription())
                 .specification(request.getSpecification())
                 .build();

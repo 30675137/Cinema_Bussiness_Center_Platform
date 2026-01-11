@@ -161,8 +161,8 @@ const MaterialSkuSelectorModal: React.FC<MaterialSkuSelectorModalProps> = ({
           purchaseUnit: material.purchaseUnit?.code || material.purchaseUnit?.name,
           inventoryUnit: material.inventoryUnit?.code || material.inventoryUnit?.name,
           quantity: 1,
-          unitPrice: 0,
-          lineAmount: 0,
+          unitPrice: material.standardCost || 0, // 使用物料的标准成本
+          lineAmount: material.standardCost || 0,
         };
       } else {
         const sku = item as SKU;
@@ -242,6 +242,14 @@ const MaterialSkuSelectorModal: React.FC<MaterialSkuSelectorModalProps> = ({
           <Tag color="green">{record.inventoryUnit?.name || '-'}</Tag>
         </Tooltip>
       ),
+    },
+    {
+      title: '标准成本',
+      dataIndex: 'standardCost',
+      key: 'standardCost',
+      width: 100,
+      render: (cost: number | undefined) =>
+        cost !== undefined && cost > 0 ? `¥${cost.toFixed(2)}` : '-',
     },
   ];
 

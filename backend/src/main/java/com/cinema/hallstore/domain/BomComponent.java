@@ -23,9 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "bom_components", uniqueConstraints = {
-    @UniqueConstraint(name = "uk_bom_component", columnNames = {"finished_product_id", "component_id"})
-})
+@Table(name = "bom_components")
 @EntityListeners(AuditingEntityListener.class)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class BomComponent {
@@ -45,10 +43,24 @@ public class BomComponent {
     private UUID finishedProductId;
 
     /**
-     * 组件SKU ID (必须是原料或包材类型)
+     * 组件SKU ID (当 component_type = 'SKU' 时使用)
      */
-    @Column(name = "component_id", nullable = false)
+    @Column(name = "component_id")
     private UUID componentId;
+
+    /**
+     * 物料 ID (当 component_type = 'MATERIAL' 时使用)
+     * N004: 支持物料类型组件
+     */
+    @Column(name = "material_id")
+    private UUID materialId;
+
+    /**
+     * 组件类型: MATERIAL(物料) 或 SKU
+     * N004: 支持物料和SKU两种类型
+     */
+    @Column(name = "component_type", length = 20)
+    private String componentType;
 
     /**
      * 组件数量

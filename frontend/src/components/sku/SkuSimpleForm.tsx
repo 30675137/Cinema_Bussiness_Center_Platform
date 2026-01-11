@@ -2,6 +2,7 @@
  * SKU简化表单组件
  * 左右布局：左侧基础属性 + 右侧BOM配方管理
  * 参考设计原型: ProductBOM.tsx
+ * @spec N004-procurement-material-selector - 支持物料和 SKU 双选择
  */
 import React, { useEffect, useState, useMemo } from 'react';
 import {
@@ -30,6 +31,8 @@ import {
   SearchOutlined,
   CloseOutlined,
   CheckCircleOutlined,
+  DatabaseOutlined,
+  ShoppingOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,6 +47,7 @@ import {
   useComboItemsQuery,
 } from '@/hooks/useSku';
 import { useStoresQuery } from '@/pages/stores/hooks/useStoresQuery';
+import { useMaterials } from '@/hooks/useMaterials';
 import { useQueryClient } from '@tanstack/react-query';
 import { skuKeys } from '@/services';
 import { skuService } from '@/services/skuService';
@@ -54,12 +58,14 @@ import type { SPU } from '@/types/sku';
 const { Option } = Select;
 const { Text } = Typography;
 
-// 原料接口 (基于真实 SKU 数据)
+// 原料接口 (基于真实 SKU 和物料数据)
 interface Ingredient {
   id: string;
   name: string;
   unit: string;
   unitPrice: number;
+  // N004: 区分类型
+  type: 'MATERIAL' | 'SKU';
 }
 
 // BOM配方项接口
@@ -69,6 +75,8 @@ interface BOMItem {
   quantity: number;
   unit: string;
   cost: number;
+  // N004: 组件类型
+  type?: 'MATERIAL' | 'SKU';
 }
 
 // @spec P008-sku-type-refactor: 简化版表单Schema，添加 skuType 字段
@@ -107,6 +115,9 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   const { data: rawIngredients = [] } = useIngredientsQuery();
   const { data: rawComboItems = [] } = useComboItemsQuery(); // 套餐子项包含成品
   const { data: stores = [] } = useStoresQuery(); // 获取门店列表
+  // N004: 获取物料列表
+  const { data: materialsData } = useMaterials();
+  const materials = materialsData || [];
   const createMutation = useCreateSkuMutation();
   const updateMutation = useUpdateSkuMutation();
   const queryClient = useQueryClient();
@@ -168,16 +179,41 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
   // 是否为套餐类型
   const isComboType = currentSkuType === SkuType.COMBO;
 
-  // 根据产品类型选择数据源：套餐可选成品，成品只能选原料/包材
+  // N004: 根据产品类型选择数据源：套餐可选成品，成品可选原料/包材/物料
   const ingredients: Ingredient[] = useMemo(() => {
-    const sourceData = isComboType ? rawComboItems : rawIngredients;
-    return sourceData.map((sku: any) => ({
+    if (isComboType) {
+      // 套餐类型：只能选择成品 SKU
+      return rawComboItems.map((sku: any) => ({
+        id: sku.id,
+        name: `[SKU] ${sku.name}`,
+        unit: sku.mainUnit || 'g',
+        unitPrice: sku.standardCost || 0,
+        type: 'SKU' as const,
+      }));
+    }
+
+    // 成品类型：可选择物料和原料/包材 SKU
+    // 物料组件
+    const materialIngredients: Ingredient[] = materials.map((material: any) => ({
+      id: material.id,
+      name: `[物料] ${material.name}`,
+      unit: material.inventoryUnit?.name || 'g',
+      unitPrice: material.standardCost || 0, // 使用物料的标准成本
+      type: 'MATERIAL' as const,
+    }));
+
+    // SKU 组件（原料和包材类型）
+    const skuIngredients: Ingredient[] = rawIngredients.map((sku: any) => ({
       id: sku.id,
-      name: sku.name,
+      name: `[SKU] ${sku.name}`,
       unit: sku.mainUnit || 'g',
       unitPrice: sku.standardCost || 0,
+      type: 'SKU' as const,
     }));
-  }, [isComboType, rawComboItems, rawIngredients]);
+
+    // 物料优先显示
+    return [...materialIngredients, ...skuIngredients];
+  }, [isComboType, rawComboItems, rawIngredients, materials]);
 
   // 过滤后的原料列表
   const filteredIngredients = useMemo(() => {
@@ -206,6 +242,8 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
       quantity: 1,
       unit: ing.unit,
       cost: ing.unitPrice,
+      // N004: 保存组件类型
+      type: ing.type,
     };
     setBomItems([...bomItems, newItem]);
   };
@@ -370,6 +408,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
               // 成品类型：更新BOM配方
               const bomComponents = bomItems.map((item, index) => ({
                 componentId: item.ingredientId,
+                componentType: item.type || 'SKU', // N004: 传递组件类型
                 quantity: item.quantity,
                 unit: item.unit,
                 isOptional: false,
@@ -404,6 +443,7 @@ export const SkuSimpleForm: React.FC<SkuSimpleFormProps> = ({
           !isComboTypeCreate && bomItems.length > 0
             ? bomItems.map((item, index) => ({
                 componentId: item.ingredientId,
+                componentType: item.type || 'SKU', // N004: 传递组件类型
                 quantity: item.quantity,
                 unit: item.unit,
                 isOptional: false,

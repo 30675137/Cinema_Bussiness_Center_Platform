@@ -136,9 +136,12 @@ public class SkuCreateRequest {
 
     /**
      * BOM组件输入
+     * N004: 支持物料和SKU两种类型
      */
     public static class BomComponentInput {
         private UUID componentId;
+        /** 组件类型: MATERIAL 或 SKU */
+        private String componentType;
         private BigDecimal quantity;
         private String unit;
         private Boolean isOptional;
@@ -151,6 +154,14 @@ public class SkuCreateRequest {
 
         public void setComponentId(UUID componentId) {
             this.componentId = componentId;
+        }
+
+        public String getComponentType() {
+            return componentType;
+        }
+
+        public void setComponentType(String componentType) {
+            this.componentType = componentType;
         }
 
         public BigDecimal getQuantity() {

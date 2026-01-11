@@ -2,9 +2,11 @@
  * SKU表单 - BOM配置步骤
  * 仅成品类型SKU可配置BOM
  * @since P001-sku-master-data T024
+ * @spec N004-procurement-material-selector - 支持物料和 SKU 双选择
  */
 import React, { useMemo } from 'react';
-import { Alert, Divider, Typography } from 'antd';
+import { Alert, Divider, Typography, Tag } from 'antd';
+import { DatabaseOutlined, ShoppingOutlined } from '@ant-design/icons';
 import type {
   Control,
   FieldErrors,
@@ -16,9 +18,15 @@ import { BomConfiguration, type AvailableComponent } from '@/components/shared/B
 import { SkuType, SkuStatus } from '@/types/sku';
 import type { SkuFormValues } from './schema';
 import { useSkuListQuery } from '@/hooks/useSku';
+import { useMaterials } from '@/hooks/useMaterials';
 import { CostBreakdownTable } from '../CostBreakdownTable';
 
 const { Title } = Typography;
+
+/** N004: 扩展组件接口以支持类型区分 */
+interface ExtendedAvailableComponent extends AvailableComponent {
+  type: 'MATERIAL' | 'SKU';
+}
 
 interface BomConfigTabProps {
   control: Control<SkuFormValues>;
@@ -50,17 +58,35 @@ export const BomConfigTab: React.FC<BomConfigTabProps> = ({
   });
   const allSkus = skuListResponse?.items || [];
 
-  // 筛选出原料和包材类型的SKU作为可选组件
-  const availableComponents: AvailableComponent[] = useMemo(() => {
-    return allSkus
+  // N004: 获取物料列表
+  const { data: materialsData } = useMaterials();
+  const materials = materialsData || [];
+
+  // N004: 合并物料和 SKU 作为可选组件
+  const availableComponents: ExtendedAvailableComponent[] = useMemo(() => {
+    // 物料组件
+    const materialComponents: ExtendedAvailableComponent[] = materials.map((material) => ({
+      id: material.id,
+      name: `[物料] ${material.name}`,
+      unit: material.inventoryUnit?.name || 'g',
+      cost: material.standardCost || 0, // 使用物料的标准成本
+      type: 'MATERIAL' as const,
+    }));
+
+    // SKU组件（原料和包材类型）
+    const skuComponents: ExtendedAvailableComponent[] = allSkus
       .filter((sku) => sku.skuType === SkuType.RAW_MATERIAL || sku.skuType === SkuType.PACKAGING)
       .map((sku) => ({
         id: sku.id,
-        name: sku.name,
+        name: `[SKU] ${sku.name}`,
         unit: sku.mainUnit || '个',
         cost: sku.standardCost || 0,
+        type: 'SKU' as const,
       }));
-  }, [allSkus]);
+
+    // 物料优先显示
+    return [...materialComponents, ...skuComponents];
+  }, [allSkus, materials]);
 
   // 如果不是成品类型，显示提示信息
   if (skuType !== SkuType.FINISHED_PRODUCT) {
@@ -70,7 +96,7 @@ export const BomConfigTab: React.FC<BomConfigTabProps> = ({
           message="BOM配置仅适用于成品类型SKU"
           description={
             skuType
-              ? `当前SKU类型为"${SkuType === SkuType.RAW_MATERIAL ? '原料' : SkuType === SkuType.PACKAGING ? '包材' : '套餐'}"，无需配置BOM。如需配置BOM，请在基础信息步骤中将SKU类型更改为"成品"。`
+              ? `当前SKU类型为"${skuType === SkuType.RAW_MATERIAL ? '原料' : skuType === SkuType.PACKAGING ? '包材' : '套餐'}"，无需配置BOM。如需配置BOM，请在基础信息步骤中将SKU类型更改为"成品"。`
               : '请先在基础信息步骤中选择SKU类型为"成品"，然后再配置BOM。'
           }
           type="info"
@@ -81,13 +107,13 @@ export const BomConfigTab: React.FC<BomConfigTabProps> = ({
     );
   }
 
-  // 如果没有可用的原料/包材，显示提示
+  // 如果没有可用的原料/包材/物料，显示提示
   if (availableComponents.length === 0) {
     return (
       <div className="bom-config-tab">
         <Alert
-          message="暂无可用的原料或包材"
-          description="请先创建原料或包材类型的SKU，然后再配置BOM。"
+          message="暂无可用的物料或原料"
+          description="请先创建物料或原料/包材类型的SKU，然后再配置BOM。"
           type="warning"
           showIcon
           style={{ marginTop: 16 }}
@@ -111,8 +137,8 @@ export const BomConfigTab: React.FC<BomConfigTabProps> = ({
         showWasteRate={true}
         wasteRateFieldPath="wasteRate"
         labels={{
-          componentLabel: '组件SKU',
-          title: 'BOM配置',
+          componentLabel: '组件 (物料/SKU)',
+          title: 'BOM配置 - N004: 支持物料和 SKU 双选择',
         }}
         readOnly={false}
         onCostChange={(totalCost) => {

@@ -177,6 +177,10 @@ public class MaterialService {
         if (materialUpdate.getUseGlobalConversion() != null) {
             existing.setUseGlobalConversion(materialUpdate.getUseGlobalConversion());
         }
+        // 更新标准成本
+        if (materialUpdate.getStandardCost() != null) {
+            existing.setStandardCost(materialUpdate.getStandardCost());
+        }
 
         log.info("Updating material: {}", id);
         return materialRepository.save(existing);

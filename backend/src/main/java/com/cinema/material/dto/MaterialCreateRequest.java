@@ -37,6 +37,11 @@ public class MaterialCreateRequest {
     @NotNull(message = "Use global conversion flag is required")
     private Boolean useGlobalConversion = true;
 
+    /** 标准成本（元/库存单位），可选，默认0 */
+    @DecimalMin(value = "0.00", message = "Standard cost must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Standard cost must have at most 10 integer digits and 2 decimal places")
+    private BigDecimal standardCost;
+
     @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
 

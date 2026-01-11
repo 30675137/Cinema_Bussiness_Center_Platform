@@ -25,6 +25,11 @@ public class MaterialUpdateRequest {
 
     private Boolean useGlobalConversion;
 
+    /** 标准成本（元/库存单位） */
+    @DecimalMin(value = "0.00", message = "Standard cost must be non-negative")
+    @Digits(integer = 10, fraction = 2, message = "Standard cost must have at most 10 integer digits and 2 decimal places")
+    private BigDecimal standardCost;
+
     @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
 
