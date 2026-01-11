@@ -38,10 +38,25 @@ export type PurchaseOrderStatus =
   | 'FULLY_RECEIVED'
   | 'CLOSED';
 
+// N004: 物料信息
+export interface MaterialInfo {
+  id: string;
+  code: string;
+  name: string;
+  specification?: string;
+  purchaseUnit?: string;
+  inventoryUnit?: string;
+}
+
 // 采购订单明细
+// N004: 支持 MATERIAL 和 SKU 两种类型
 export interface PurchaseOrderItem {
   id: string;
-  sku: SkuInfo;
+  itemType?: 'MATERIAL' | 'SKU';
+  material?: MaterialInfo;
+  materialName?: string;
+  sku?: SkuInfo;
+  unit?: string;
   quantity: number;
   unitPrice: number;
   lineAmount: number;
@@ -69,7 +84,12 @@ export interface PurchaseOrder {
   items?: PurchaseOrderItem[];
 }
 
-// 创建采购订单请求
+/**
+ * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
+ * 创建采购订单请求
+ * N004: 支持 Material 和 SKU 两种类型
+ */
 export interface CreatePurchaseOrderRequest {
   supplierId: string;
   storeId: string;
@@ -78,8 +98,16 @@ export interface CreatePurchaseOrderRequest {
   items: CreatePurchaseOrderItemRequest[];
 }
 
+/**
+ * N004: 采购订单明细请求
+ * - itemType: MATERIAL 或 SKU
+ * - materialId: 物料采购时必填
+ * - skuId: SKU 采购时必填
+ */
 export interface CreatePurchaseOrderItemRequest {
-  skuId: string;
+  itemType?: 'MATERIAL' | 'SKU';
+  materialId?: string;
+  skuId?: string;
   quantity: number;
   unitPrice: number;
 }
@@ -161,8 +189,11 @@ export interface CreateGoodsReceiptRequest {
   items: CreateGoodsReceiptItemRequest[];
 }
 
+// N004: 支持 MATERIAL 和 SKU 两种类型
 export interface CreateGoodsReceiptItemRequest {
-  skuId: string;
+  itemType: 'MATERIAL' | 'SKU';
+  materialId?: string;
+  skuId?: string;
   receivedQty: number;
   qualityStatus?: string;
   rejectionReason?: string;

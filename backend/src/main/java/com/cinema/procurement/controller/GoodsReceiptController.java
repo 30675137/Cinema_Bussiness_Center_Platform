@@ -1,5 +1,6 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 收货入库控制器
  */
 package com.cinema.procurement.controller;
@@ -97,6 +98,10 @@ public class GoodsReceiptController {
     /**
      * 确认收货（更新库存）
      * POST /api/goods-receipts/{id}/confirm
+     * 
+     * N004: 支持 Material 和 SKU 两种类型
+     * - Material 入库: 自动将采购单位换算为库存单位
+     * - SKU 入库: 使用原有逻辑
      */
     @PostMapping("/{id}/confirm")
     public ResponseEntity<Map<String, Object>> confirm(@PathVariable UUID id) {

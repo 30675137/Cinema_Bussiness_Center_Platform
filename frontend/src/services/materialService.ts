@@ -9,10 +9,19 @@ interface ApiResponse<T> {
   timestamp?: string
 }
 
+/** N004: 后端返回的分页格式 */
+interface MaterialPageResponse {
+  data: Material[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 export const materialService = {
   getAll: async (category?: MaterialCategory): Promise<Material[]> => {
-    const response = await apiClient.get<ApiResponse<Material[]>>('/materials', { params: { category } })
-    return response.data.data || []
+    const response = await apiClient.get<ApiResponse<MaterialPageResponse>>('/materials', { params: { category, size: 1000 } })
+    // N004: 后端返回分页格式 { data: { data: [...], total, page, pageSize } }
+    return response.data.data?.data || []
   },
 
   getById: async (id: string): Promise<Material> => {

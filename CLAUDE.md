@@ -518,9 +518,9 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 
 ---
 
-**Last Updated**: 2025-12-30
+**Last Updated**: 2026-01-11
 **Main Branch**: `001-ui-implementation`
-**Active Branch**: `T001-e2e-scenario-author`
+**Active Branch**: `feat/N004-procurement-material-selector`
 
 ## Active Technologies
 - Supabase (PostgreSQL, Auth, Storage) 作为主要后端数据源，必要时前端使用 Mock data（in-memory state + MSW handlers + localStorage for B端 / Taro.setStorage for C端）进行开发模拟 (O007-miniapp-menu-api)
@@ -529,6 +529,7 @@ Invoke with: `/skill-name` (e.g., `/doc-writer`)
 - MSW mock data (in-memory state + MSW handlers + localStorage) 进行开发模拟 (feat/B001-fix-brand-creation)
 - Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543) (T003-flyway-migration)
 - Supabase PostgreSQL 作为主要后端数据源，使用 JPA 直接访问数据库 (feat/N001-purchase-inbound)
+- Supabase PostgreSQL (direct JPA access), no PostgREST API usage (per rule 11) (N004-procurement-material-selector)
 
 ## Supabase REST API (PostgREST) 使用规则
 
@@ -572,6 +573,10 @@ docker compose -f docker-compose.test.yml --env-file .env.test up -d backend
 ---
 
 ## Recent Changes
+- N004-procurement-material-selector: COMPLETE - 采购订单支持 Material（物料，卓95%业务）和 SKU（成品，協5%业务）双选择器
+  - Phase 1-4 (MVP): 完成
+  - Phase 5-7 (P2): 完成
+  - 后端: PurchaseOrderService 支持 itemType, GoodsReceiptService 支持 Material 入库换算
+  - 前端: MaterialSkuSelectorModal 组件, PurchaseOrders 页面集成
 - feat/N001-purchase-inbound: Added Supabase PostgreSQL 作为主要后端数据源，使用 JPA 直接访问数据库
-- T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)
 - T003-flyway-migration: Added Supabase PostgreSQL (aws-1-us-east-2.pooler.supabase.com:6543)

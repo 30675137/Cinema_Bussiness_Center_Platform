@@ -1,4 +1,7 @@
-/** @spec M001-material-unit-system */
+/**
+ * @spec M001-material-unit-system
+ * @spec N004-procurement-material-selector
+ */
 package com.cinema.material.controller;
 
 import com.cinema.common.dto.ApiResponse;
@@ -11,11 +14,16 @@ import com.cinema.unit.entity.Unit;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,22 +62,53 @@ public class MaterialController {
     }
 
     /**
-     * 获取所有物料（可选按分类筛选）
+     * 获取所有物料（支持分类筛选、搜索和分页）
+     * N004: Enhanced for MaterialSkuSelector component
+     *
+     * @param category 物料分类 (RAW_MATERIAL, PACKAGING)
+     * @param search 搜索关键词 (名称、编码、规格)
+     * @param page 页码 (0-indexed)
+     * @param size 页大小 (默认20，最大100)
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getAllMaterials(
-            @RequestParam(required = false) Material.MaterialCategory category) {
-        log.info("Getting all materials, category: {}", category);
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAllMaterials(
+            @RequestParam(required = false) Material.MaterialCategory category,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        log.info("Getting materials: category={}, search={}, page={}, size={}", category, search, page, size);
 
-        List<Material> materials = category != null
-                ? materialService.findByCategory(category)
-                : materialService.findAll();
+        // Limit page size to 100
+        size = Math.min(size, 100);
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<MaterialResponse> response = materials.stream()
+        Page<Material> materialsPage;
+        if (category != null && search != null && !search.isBlank()) {
+            // Filter by category AND search term
+            materialsPage = materialService.findByCategoryAndSearchTerm(category, search, pageable);
+        } else if (category != null) {
+            // Filter by category only
+            materialsPage = materialService.findByCategoryPaged(category, pageable);
+        } else if (search != null && !search.isBlank()) {
+            // Filter by search term only
+            materialsPage = materialService.findBySearchTerm(search, pageable);
+        } else {
+            // No filter - return all active materials
+            materialsPage = materialService.findAllActivePaged(pageable);
+        }
+
+        List<MaterialResponse> data = materialsPage.getContent().stream()
                 .map(MaterialResponse::fromEntity)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(ApiResponse.success(response));
+        // N004: Return paginated response per api.yaml contract
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", data);
+        result.put("total", materialsPage.getTotalElements());
+        result.put("page", page);
+        result.put("pageSize", size);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     /**

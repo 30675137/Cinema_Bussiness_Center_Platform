@@ -1,4 +1,7 @@
-/** @spec M001-material-unit-system */
+/**
+ * @spec M001-material-unit-system
+ * @spec N004-procurement-material-selector
+ */
 package com.cinema.material.service;
 
 import com.cinema.material.entity.Material;
@@ -7,6 +10,8 @@ import com.cinema.unit.entity.Unit;
 import com.cinema.unit.repository.UnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +95,45 @@ public class MaterialService {
     @Transactional(readOnly = true)
     public List<Material> findAll() {
         return materialRepository.findAll();
+    }
+
+    // ========== N004: Search and pagination methods for Material selector ==========
+
+    /**
+     * 按搜索词查询物料（分页）
+     * N004: 用于 MaterialSkuSelector 组件
+     */
+    @Transactional(readOnly = true)
+    public Page<Material> findBySearchTerm(String searchTerm, Pageable pageable) {
+        return materialRepository.findBySearchTerm(searchTerm, pageable);
+    }
+
+    /**
+     * 按分类查询物料（分页）
+     * N004: 用于 MaterialSkuSelector 组件
+     */
+    @Transactional(readOnly = true)
+    public Page<Material> findByCategoryPaged(Material.MaterialCategory category, Pageable pageable) {
+        return materialRepository.findByCategoryPaged(category, pageable);
+    }
+
+    /**
+     * 按分类和搜索词查询物料（分页）
+     * N004: 用于 MaterialSkuSelector 组件
+     */
+    @Transactional(readOnly = true)
+    public Page<Material> findByCategoryAndSearchTerm(
+            Material.MaterialCategory category, String searchTerm, Pageable pageable) {
+        return materialRepository.findByCategoryAndSearchTerm(category, searchTerm, pageable);
+    }
+
+    /**
+     * 查询所有活跃物料（分页）
+     * N004: 用于 MaterialSkuSelector 组件
+     */
+    @Transactional(readOnly = true)
+    public Page<Material> findAllActivePaged(Pageable pageable) {
+        return materialRepository.findAllActivePaged(pageable);
     }
 
     /**

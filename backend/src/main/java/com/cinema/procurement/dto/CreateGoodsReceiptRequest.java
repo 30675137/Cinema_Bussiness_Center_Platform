@@ -1,9 +1,11 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 创建收货入库单请求DTO
  */
 package com.cinema.procurement.dto;
 
+import com.cinema.procurement.entity.ItemType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -55,9 +57,25 @@ public class CreateGoodsReceiptRequest {
     }
 
     // Inner class for item request
+    // N004: 支持 MATERIAL 和 SKU 两种类型
     public static class ItemRequest {
 
-        @NotNull(message = "SKU ID不能为空")
+        /**
+         * N004: Item type - MATERIAL or SKU
+         * Required to determine which ID field to use
+         */
+        @NotNull(message = "明细类型不能为空")
+        private ItemType itemType;
+
+        /**
+         * N004: Material ID (required when itemType = MATERIAL)
+         */
+        private UUID materialId;
+
+        /**
+         * SKU ID (required when itemType = SKU)
+         * Changed from @NotNull to optional for N004 Material support
+         */
         private UUID skuId;
 
         @NotNull(message = "收货数量不能为空")
@@ -70,12 +88,35 @@ public class CreateGoodsReceiptRequest {
 
         public ItemRequest() {}
 
+        public ItemType getItemType() {
+            return itemType;
+        }
+
+        public void setItemType(ItemType itemType) {
+            this.itemType = itemType;
+        }
+
+        public UUID getMaterialId() {
+            return materialId;
+        }
+
+        public void setMaterialId(UUID materialId) {
+            this.materialId = materialId;
+        }
+
         public UUID getSkuId() {
             return skuId;
         }
 
         public void setSkuId(UUID skuId) {
             this.skuId = skuId;
+        }
+
+        /**
+         * N004: Get the item reference ID based on itemType
+         */
+        public UUID getItemReferenceId() {
+            return itemType == ItemType.MATERIAL ? materialId : skuId;
         }
 
         public BigDecimal getReceivedQty() {

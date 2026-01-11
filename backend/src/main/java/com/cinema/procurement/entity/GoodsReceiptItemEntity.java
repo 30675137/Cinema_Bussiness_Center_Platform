@@ -1,10 +1,12 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 收货入库明细实体
  */
 package com.cinema.procurement.entity;
 
 import com.cinema.hallstore.domain.Sku;
+import com.cinema.material.entity.Material;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -23,8 +25,29 @@ public class GoodsReceiptItemEntity {
     @JoinColumn(name = "goods_receipt_id", nullable = false)
     private GoodsReceiptEntity goodsReceipt;
 
+    /**
+     * N004: Item type discriminator - MATERIAL or SKU
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "item_type", nullable = false, length = 20)
+    private ItemType itemType;
+
+    /**
+     * N004: Material reference (populated when itemType = MATERIAL)
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sku_id", nullable = false)
+    @JoinColumn(name = "material_id")
+    private Material material;
+
+    @Column(name = "material_id", insertable = false, updatable = false)
+    private UUID materialId;
+
+    /**
+     * SKU reference (populated when itemType = SKU)
+     * N004: Changed from NOT NULL to nullable
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sku_id")
     private Sku sku;
 
     @Column(name = "sku_id", insertable = false, updatable = false)
@@ -76,6 +99,32 @@ public class GoodsReceiptItemEntity {
 
     public void setGoodsReceipt(GoodsReceiptEntity goodsReceipt) {
         this.goodsReceipt = goodsReceipt;
+    }
+
+    // N004: itemType getters/setters
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
+    }
+
+    // N004: Material getters/setters
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
+
+    public UUID getMaterialId() {
+        return materialId;
+    }
+
+    public void setMaterialId(UUID materialId) {
+        this.materialId = materialId;
     }
 
     public Sku getSku() {

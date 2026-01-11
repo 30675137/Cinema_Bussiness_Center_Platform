@@ -1,15 +1,19 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 采购订单服务层
  */
 package com.cinema.procurement.service;
 
 import com.cinema.inventory.entity.StoreEntity;
 import com.cinema.inventory.repository.StoreJpaRepository;
+import com.cinema.material.entity.Material;
+import com.cinema.material.repository.MaterialRepository;
 import com.cinema.procurement.dto.CreatePurchaseOrderRequest;
 import com.cinema.procurement.dto.PurchaseOrderDTO;
 import com.cinema.procurement.dto.PurchaseOrderMapper;
 import com.cinema.procurement.dto.PurchaseOrderStatusHistoryDTO;
+import com.cinema.procurement.entity.ItemType;
 import com.cinema.procurement.entity.PurchaseOrderEntity;
 import com.cinema.procurement.entity.PurchaseOrderItemEntity;
 import com.cinema.procurement.entity.PurchaseOrderStatus;
@@ -39,6 +43,7 @@ public class PurchaseOrderService {
     private final SupplierRepository supplierRepository;
     private final StoreJpaRepository storeRepository;
     private final SkuJpaRepository skuRepository;
+    private final MaterialRepository materialRepository;
     private final PurchaseOrderMapper mapper;
 
     public PurchaseOrderService(
@@ -47,17 +52,20 @@ public class PurchaseOrderService {
             SupplierRepository supplierRepository,
             StoreJpaRepository storeRepository,
             SkuJpaRepository skuRepository,
+            MaterialRepository materialRepository,
             PurchaseOrderMapper mapper) {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.statusHistoryRepository = statusHistoryRepository;
         this.supplierRepository = supplierRepository;
         this.storeRepository = storeRepository;
         this.skuRepository = skuRepository;
+        this.materialRepository = materialRepository;
         this.mapper = mapper;
     }
 
     /**
      * 创建采购订单
+     * N004: 支持 Material 和 SKU 两种类型
      */
     @Transactional
     public PurchaseOrderDTO create(CreatePurchaseOrderRequest request) {
@@ -78,21 +86,59 @@ public class PurchaseOrderService {
         order.setPlannedArrivalDate(request.getPlannedArrivalDate());
         order.setRemarks(request.getRemarks());
 
-        // 4. 添加订单明细
+        // 4. 添加订单明细 (N004: 支持 Material 和 SKU)
         for (CreatePurchaseOrderRequest.ItemRequest itemRequest : request.getItems()) {
-            Sku sku = skuRepository.findById(itemRequest.getSkuId())
-                .orElseThrow(() -> new IllegalArgumentException("SKU不存在: " + itemRequest.getSkuId()));
-
-            PurchaseOrderItemEntity item = new PurchaseOrderItemEntity();
-            item.setSku(sku);
-            item.setQuantity(itemRequest.getQuantity());
-            item.setUnitPrice(itemRequest.getUnitPrice());
+            PurchaseOrderItemEntity item = createOrderItem(itemRequest);
             order.addItem(item);
         }
 
         // 5. 保存并返回
         PurchaseOrderEntity saved = purchaseOrderRepository.save(order);
         return mapper.toDTOWithItems(saved);
+    }
+
+    /**
+     * N004: 根据 itemType 创建订单明细
+     * 支持 MATERIAL（物料）和 SKU（成品）两种类型
+     */
+    private PurchaseOrderItemEntity createOrderItem(CreatePurchaseOrderRequest.ItemRequest itemRequest) {
+        PurchaseOrderItemEntity item = new PurchaseOrderItemEntity();
+        item.setQuantity(itemRequest.getQuantity());
+        item.setUnitPrice(itemRequest.getUnitPrice());
+
+        ItemType itemType = itemRequest.getItemType();
+        item.setItemType(itemType);
+
+        if (itemType == ItemType.MATERIAL) {
+            // 物料采购 (N004 新增)
+            Material material = materialRepository.findById(itemRequest.getMaterialId())
+                .orElseThrow(() -> new IllegalArgumentException("物料不存在: " + itemRequest.getMaterialId()));
+
+            // 验证物料状态
+            if (!"ACTIVE".equals(material.getStatus())) {
+                throw new IllegalArgumentException("物料已停用: " + material.getName());
+            }
+
+            // 验证物料单位配置
+            if (material.getPurchaseUnit() == null) {
+                throw new IllegalStateException("物料缺少采购单位配置: " + material.getName());
+            }
+
+            item.setMaterial(material);
+            item.setMaterialName(material.getName());
+            // SKU 保持为空
+        } else if (itemType == ItemType.SKU) {
+            // SKU采购 (原有逻辑)
+            Sku sku = skuRepository.findById(itemRequest.getSkuId())
+                .orElseThrow(() -> new IllegalArgumentException("SKU不存在: " + itemRequest.getSkuId()));
+
+            item.setSku(sku);
+            // Material 保持为空
+        } else {
+            throw new IllegalArgumentException("无效的物品类型: " + itemType);
+        }
+
+        return item;
     }
 
     /**

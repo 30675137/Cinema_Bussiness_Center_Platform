@@ -1,10 +1,18 @@
-/** @spec M001-material-unit-system */
+/**
+ * @spec M001-material-unit-system
+ * @spec N004-procurement-material-selector
+ */
 import type { Unit } from './unit'
 
 export enum MaterialCategory {
   RAW_MATERIAL = 'RAW_MATERIAL',
   PACKAGING = 'PACKAGING',
 }
+
+/**
+ * N004: Material status
+ */
+export type MaterialStatus = 'ACTIVE' | 'INACTIVE'
 
 export interface Material {
   id: string
@@ -15,10 +23,23 @@ export interface Material {
   purchaseUnit: Unit
   conversionRate?: number
   useGlobalConversion: boolean
+  specification?: string
   description?: string
-  specifications?: string
+  status: MaterialStatus
   createdAt: string
   updatedAt: string
+}
+
+/**
+ * N004: Material DTO for procurement order item
+ */
+export interface MaterialDTO {
+  id: string
+  code: string
+  name: string
+  specification?: string
+  purchaseUnitName?: string
+  inventoryUnitName?: string
 }
 
 export interface MaterialCreateRequest {

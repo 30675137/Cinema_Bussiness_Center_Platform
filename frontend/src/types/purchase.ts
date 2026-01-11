@@ -1,7 +1,10 @@
 /**
  * 采购管理相关类型定义
+ * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  */
 import { User, ContactInfo, Address, ApprovalRecord, Attachment } from './common';
+import { MaterialDTO, MaterialCategory } from './material';
 
 // 采购订单状态枚举
 export enum PurchaseOrderStatus {
@@ -29,6 +32,16 @@ export enum PurchaseOrderItemStatus {
   PARTIAL_RECEIVED = 'partial_received', // 部分收货
   COMPLETED = 'completed', // 已完成
   CANCELLED = 'cancelled', // 已取消
+}
+
+/**
+ * N004: 采购订单明细类型枚举
+ * MATERIAL - 物料采购（原料/包材）
+ * SKU - 成品采购
+ */
+export enum PurchaseOrderItemType {
+  MATERIAL = 'MATERIAL',
+  SKU = 'SKU',
 }
 
 // 收货单状态枚举
@@ -100,21 +113,40 @@ export interface Product {
 // 采购订单项接口
 export interface PurchaseOrderItem {
   id: string;
-  productId: string;
-  product: Product;
+  /**
+   * N004: 物品类型 (MATERIAL 或 SKU)
+   */
+  itemType?: PurchaseOrderItemType;
+  /**
+   * N004: 物料信息 (itemType=MATERIAL 时填充)
+   */
+  material?: MaterialDTO;
+  /**
+   * N004: 物料名称冗余 (soft-delete 场景)
+   */
+  materialName?: string;
+  productId?: string;
+  product?: Product;
   quantity: number;
   unitPrice: number;
-  taxRate: number;
-  taxAmount: number;
-  subtotal: number;
-  discountRate: number;
-  discountAmount: number;
-  totalAmount: number;
-  receivedQuantity: number;
-  remainingQuantity: number;
-  expectedDeliveryDate: string;
+  /**
+   * N004: 单位 (Material.purchaseUnit 或 SKU.mainUnit)
+   */
+  unit?: string;
+  taxRate?: number;
+  taxAmount?: number;
+  subtotal?: number;
+  discountRate?: number;
+  discountAmount?: number;
+  totalAmount?: number;
+  lineAmount?: number;
+  receivedQuantity?: number;
+  receivedQty?: number;
+  remainingQuantity?: number;
+  pendingQty?: number;
+  expectedDeliveryDate?: string;
   actualDeliveryDate?: string;
-  status: PurchaseOrderItemStatus;
+  status?: PurchaseOrderItemStatus;
   remarks?: string;
   warehouseLocation?: string;
   qualityRequirements?: string;
@@ -332,15 +364,43 @@ export interface PurchaseOrderFormData {
 
 // 采购订单项表单数据接口
 export interface PurchaseOrderItemFormData {
-  productId: string;
+  /**
+   * N004: 物品类型 (MATERIAL 或 SKU)
+   */
+  itemType: PurchaseOrderItemType;
+  /**
+   * N004: 物料ID (itemType=MATERIAL 时必填)
+   */
+  materialId?: string;
+  /**
+   * SKU ID (itemType=SKU 时必填)
+   */
+  skuId?: string;
+  productId?: string;
   quantity: number;
   unitPrice: number;
-  taxRate: number;
-  discountRate: number;
-  expectedDeliveryDate: string;
+  taxRate?: number;
+  discountRate?: number;
+  expectedDeliveryDate?: string;
   warehouseLocation?: string;
   qualityRequirements?: string;
   remarks?: string;
+}
+
+/**
+ * N004: 创建采购订单明细请求 DTO
+ */
+export interface CreatePurchaseOrderItemRequest {
+  /** 物品类型 (MATERIAL 或 SKU) */
+  itemType: PurchaseOrderItemType;
+  /** 物料ID (itemType=MATERIAL 时必填) */
+  materialId?: string;
+  /** SKU ID (itemType=SKU 时必填) */
+  skuId?: string;
+  /** 采购数量 */
+  quantity: number;
+  /** 单价 */
+  unitPrice: number;
 }
 
 // 供应商表单数据接口

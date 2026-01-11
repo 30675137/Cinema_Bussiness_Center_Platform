@@ -1,11 +1,15 @@
 /**
  * @spec M001-material-unit-system
+ * @spec N004-procurement-material-selector
  */
 package com.cinema.material.repository;
 
 import com.cinema.material.entity.Material;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -54,6 +58,64 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
      * @return list of active materials in the category
      */
     List<Material> findByCategoryAndStatus(Material.MaterialCategory category, String status);
+
+    // ========== N004: Search and pagination methods for Material selector ==========
+
+    /**
+     * Find materials by fuzzy search (name, code, or specification)
+     * N004: Used by MaterialSkuSelector component
+     *
+     * @param searchTerm search term (case-insensitive)
+     * @param pageable pagination parameters
+     * @return paginated materials matching the search term
+     */
+    @Query("SELECT m FROM Material m " +
+           "WHERE m.status = 'ACTIVE' " +
+           "AND (LOWER(m.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(m.code) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(m.specification) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    Page<Material> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);
+
+    /**
+     * Find materials by category with pagination
+     * N004: Used by MaterialSkuSelector component
+     *
+     * @param category material category
+     * @param pageable pagination parameters
+     * @return paginated materials in the category
+     */
+    @Query("SELECT m FROM Material m WHERE m.category = :category AND m.status = 'ACTIVE'")
+    Page<Material> findByCategoryPaged(@Param("category") Material.MaterialCategory category, Pageable pageable);
+
+    /**
+     * Find materials by category and search term with pagination
+     * N004: Used by MaterialSkuSelector component
+     *
+     * @param category material category
+     * @param searchTerm search term (case-insensitive)
+     * @param pageable pagination parameters
+     * @return paginated materials matching category and search term
+     */
+    @Query("SELECT m FROM Material m " +
+           "WHERE m.category = :category " +
+           "AND m.status = 'ACTIVE' " +
+           "AND (LOWER(m.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(m.code) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(m.specification) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    Page<Material> findByCategoryAndSearchTerm(
+            @Param("category") Material.MaterialCategory category,
+            @Param("searchTerm") String searchTerm,
+            Pageable pageable);
+
+    /**
+     * Find all active materials with pagination
+     * N004: Used by MaterialSkuSelector component
+     *
+     * @param pageable pagination parameters
+     * @return paginated active materials
+     */
+    @Query("SELECT m FROM Material m WHERE m.status = 'ACTIVE'")
+    Page<Material> findAllActivePaged(Pageable pageable);
 
     /**
      * Check if a material code exists

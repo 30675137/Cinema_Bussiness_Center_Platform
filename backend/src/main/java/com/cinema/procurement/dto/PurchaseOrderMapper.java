@@ -1,9 +1,11 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 采购订单实体与DTO映射器
  */
 package com.cinema.procurement.dto;
 
+import com.cinema.procurement.entity.ItemType;
 import com.cinema.procurement.entity.PurchaseOrderEntity;
 import com.cinema.procurement.entity.PurchaseOrderItemEntity;
 import org.springframework.stereotype.Component;
@@ -81,8 +83,28 @@ public class PurchaseOrderMapper {
         dto.setReceivedQty(item.getReceivedQty());
         dto.setPendingQty(item.getPendingQty());
 
-        // Map SKU
-        if (item.getSku() != null) {
+        // N004: Map itemType
+        dto.setItemType(item.getItemType());
+
+        // N004: Map Material or SKU based on itemType
+        if (item.getItemType() == ItemType.MATERIAL && item.getMaterial() != null) {
+            // Map Material (N004 新增)
+            PurchaseOrderItemDTO.MaterialDTO materialDTO = new PurchaseOrderItemDTO.MaterialDTO(
+                item.getMaterial().getId(),
+                item.getMaterial().getCode(),
+                item.getMaterial().getName(),
+                item.getMaterial().getSpecification(),
+                item.getMaterial().getPurchaseUnit() != null ? item.getMaterial().getPurchaseUnit().getName() : null,
+                item.getMaterial().getInventoryUnit() != null ? item.getMaterial().getInventoryUnit().getName() : null
+            );
+            dto.setMaterial(materialDTO);
+            dto.setMaterialName(item.getMaterialName());
+            // Unit from Material's purchaseUnit
+            dto.setUnit(item.getMaterial().getPurchaseUnit() != null 
+                ? item.getMaterial().getPurchaseUnit().getName() 
+                : null);
+        } else if (item.getItemType() == ItemType.SKU && item.getSku() != null) {
+            // Map SKU (原有逻辑)
             PurchaseOrderItemDTO.SkuDTO skuDTO = new PurchaseOrderItemDTO.SkuDTO(
                 item.getSku().getId(),
                 item.getSku().getCode(),
@@ -90,6 +112,20 @@ public class PurchaseOrderMapper {
                 item.getSku().getMainUnit()
             );
             dto.setSku(skuDTO);
+            // Unit from SKU's mainUnit
+            dto.setUnit(item.getSku().getMainUnit());
+        } else {
+            // Fallback for legacy data (itemType might be null)
+            if (item.getSku() != null) {
+                PurchaseOrderItemDTO.SkuDTO skuDTO = new PurchaseOrderItemDTO.SkuDTO(
+                    item.getSku().getId(),
+                    item.getSku().getCode(),
+                    item.getSku().getName(),
+                    item.getSku().getMainUnit()
+                );
+                dto.setSku(skuDTO);
+                dto.setUnit(item.getSku().getMainUnit());
+            }
         }
 
         return dto;

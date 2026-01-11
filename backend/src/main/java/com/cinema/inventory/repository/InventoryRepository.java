@@ -1,5 +1,6 @@
 /**
  * @spec P005-bom-inventory-deduction
+ * @spec N004-procurement-material-selector
  * Inventory Repository
  *
  * Purpose: Data access layer for inventory with row-level locking support
@@ -97,5 +98,42 @@ public interface InventoryRepository extends JpaRepository<Inventory, UUID> {
     Optional<Inventory> findByStoreIdAndSkuIdForUpdate(
         @Param("storeId") UUID storeId,
         @Param("skuId") UUID skuId
+    );
+
+    // N004: Material inventory query methods
+
+    /**
+     * Find inventory by store and material ID without locking
+     * N004: Used for material inventory lookup
+     *
+     * @param storeId Store ID
+     * @param materialId Material ID
+     * @return Optional inventory record
+     */
+    Optional<Inventory> findByStoreIdAndMaterialId(UUID storeId, UUID materialId);
+
+    /**
+     * Find inventory by material and store without locking
+     * N004: Alternative parameter order
+     *
+     * @param materialId Material ID
+     * @param storeId Store ID
+     * @return Optional inventory record
+     */
+    Optional<Inventory> findByMaterialIdAndStoreId(UUID materialId, UUID storeId);
+
+    /**
+     * Find material inventory with pessimistic lock (SELECT FOR UPDATE)
+     * N004: Used for concurrent material inventory updates
+     *
+     * @param storeId Store ID
+     * @param materialId Material ID
+     * @return Optional inventory record with lock
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT i FROM Inventory i WHERE i.storeId = :storeId AND i.materialId = :materialId")
+    Optional<Inventory> findByStoreIdAndMaterialIdForUpdate(
+        @Param("storeId") UUID storeId,
+        @Param("materialId") UUID materialId
     );
 }

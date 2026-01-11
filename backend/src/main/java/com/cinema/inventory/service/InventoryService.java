@@ -72,7 +72,9 @@ public class InventoryService {
         }
 
         // 转换为领域模型，然后过滤状态，最后转换为 DTO
+        // N004: 过滤掉 Material 类型的库存记录（skuId 为 null），因为当前列表仅支持 SKU 类型
         List<StoreInventoryItemDto> dtoList = inventories.stream()
+                .filter(inv -> inv.getSkuId() != null)  // N004: 排除 Material 类型
                 .map(this::toDomain)
                 .filter(inv -> {
                     // 状态过滤（在内存中进行，因为状态是计算字段）
@@ -150,7 +152,8 @@ public class InventoryService {
         dto.setId(inventory.getId().toString());
         dto.setStoreId(inventory.getStoreId().toString());
         dto.setStoreName(inventory.getStoreName());
-        dto.setSkuId(inventory.getSkuId().toString());
+        // N004: 安全处理 skuId 可能为 null 的情况（Material 类型）
+        dto.setSkuId(inventory.getSkuId() != null ? inventory.getSkuId().toString() : null);
         dto.setSkuCode(inventory.getSkuCode());
         dto.setSkuName(inventory.getSkuName());
         dto.setOnHandQty(inventory.getOnHandQty());
@@ -173,7 +176,8 @@ public class InventoryService {
         dto.setStoreId(inventory.getStoreId().toString());
         dto.setStoreName(inventory.getStoreName());
         dto.setStoreCode(inventory.getStoreCode());
-        dto.setSkuId(inventory.getSkuId().toString());
+        // N004: 安全处理 skuId 可能为 null 的情况（Material 类型）
+        dto.setSkuId(inventory.getSkuId() != null ? inventory.getSkuId().toString() : null);
         dto.setSkuCode(inventory.getSkuCode());
         dto.setSkuName(inventory.getSkuName());
         dto.setOnHandQty(inventory.getOnHandQty());

@@ -1,5 +1,6 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 采购订单控制器
  */
 package com.cinema.procurement.controller;
@@ -84,6 +85,10 @@ public class PurchaseOrderController {
     /**
      * 创建采购订单
      * POST /api/purchase-orders
+     * 
+     * N004: 支持 Material（物料）和 SKU（成品）两种类型
+     * - itemType=MATERIAL: 物料采购（原料/包材）
+     * - itemType=SKU: 成品采购
      */
     @PostMapping
     public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody CreatePurchaseOrderRequest request) {

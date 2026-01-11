@@ -1,7 +1,10 @@
 /**
  * @spec N001-purchase-inbound
+ * @spec N004-procurement-material-selector
  * 采购订单 (PO) 创建页面
  * 路由: /purchase-management/orders
+ * 
+ * N004: 支持 Material（物料，卓95%业务）和 SKU（成品，協5%业务）双选择器
  */
 import React, { useState, useMemo, useCallback } from 'react';
 import {
@@ -20,6 +23,7 @@ import {
   Popconfirm,
   message,
   Spin,
+  Tag,
 } from 'antd';
 import {
   PlusOutlined,
@@ -30,9 +34,10 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
-import SkuSelectorModal, {
-  type SelectedSkuItem,
-} from '@/features/procurement/components/SkuSelectorModal';
+import MaterialSkuSelectorModal, {
+  type SelectedProcurementItem,
+} from '@/features/procurement/components/MaterialSkuSelectorModal';
+import { PurchaseOrderItemType } from '@/types/purchase';
 import {
   useSuppliers,
   useCreatePurchaseOrder,
@@ -42,8 +47,8 @@ import {
 const { Title } = Typography;
 const { TextArea } = Input;
 
-// 订单项类型
-interface OrderItem extends SelectedSkuItem {
+// 订单项类型 (N004: 支持 Material 和 SKU)
+interface OrderItem extends SelectedProcurementItem {
   key: string;
 }
 
@@ -65,9 +70,9 @@ const PurchaseOrders: React.FC = () => {
   // 创建采购订单
   const createMutation = useCreatePurchaseOrder();
 
-  // 已添加的 SKU ID 列表（用于排除重复选择）
-  const excludeSkuIds = useMemo(
-    () => orderItems.map((item) => item.skuId),
+  // 已添加的 ID 列表（用于排除重复选择）
+  const excludeIds = useMemo(
+    () => orderItems.map((item) => item.materialId || item.skuId || ''),
     [orderItems]
   );
 
@@ -78,26 +83,26 @@ const PurchaseOrders: React.FC = () => {
     return { totalQuantity, totalAmount };
   }, [orderItems]);
 
-  // 添加商品
-  const handleAddItems = useCallback((items: SelectedSkuItem[]) => {
+  // 添加商品 (N004: 支持 Material 和 SKU)
+  const handleAddItems = useCallback((items: SelectedProcurementItem[]) => {
     const newItems: OrderItem[] = items.map((item) => ({
       ...item,
-      key: item.skuId,
+      key: item.materialId || item.skuId || `item_${Date.now()}`,
     }));
     setOrderItems((prev) => [...prev, ...newItems]);
     message.success(`已添加 ${items.length} 个商品`);
   }, []);
 
   // 删除商品
-  const handleRemoveItem = useCallback((skuId: string) => {
-    setOrderItems((prev) => prev.filter((item) => item.skuId !== skuId));
+  const handleRemoveItem = useCallback((itemKey: string) => {
+    setOrderItems((prev) => prev.filter((item) => item.key !== itemKey));
   }, []);
 
   // 更新商品数量
-  const handleQuantityChange = useCallback((skuId: string, quantity: number) => {
+  const handleQuantityChange = useCallback((itemKey: string, quantity: number) => {
     setOrderItems((prev) =>
       prev.map((item) => {
-        if (item.skuId === skuId) {
+        if (item.key === itemKey) {
           const newQuantity = quantity || 0;
           return {
             ...item,
@@ -111,10 +116,10 @@ const PurchaseOrders: React.FC = () => {
   }, []);
 
   // 更新商品单价
-  const handleUnitPriceChange = useCallback((skuId: string, unitPrice: number) => {
+  const handleUnitPriceChange = useCallback((itemKey: string, unitPrice: number) => {
     setOrderItems((prev) =>
       prev.map((item) => {
-        if (item.skuId === skuId) {
+        if (item.key === itemKey) {
           const newPrice = unitPrice || 0;
           return {
             ...item,
@@ -143,12 +148,15 @@ const PurchaseOrders: React.FC = () => {
         return;
       }
 
+      // N004: 支持 Material 和 SKU 两种类型
       const requestData = {
         supplierId: values.supplierId,
         storeId: values.storeId,
         plannedArrivalDate: values.plannedArrivalDate?.format('YYYY-MM-DD'),
         remarks: values.remarks,
         items: orderItems.map((item) => ({
+          itemType: item.itemType,
+          materialId: item.materialId,
           skuId: item.skuId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -201,7 +209,7 @@ const PurchaseOrders: React.FC = () => {
           value={quantity}
           min={1}
           precision={0}
-          onChange={(value) => handleQuantityChange(record.skuId, value || 1)}
+          onChange={(value) => handleQuantityChange(record.key, value || 1)}
           style={{ width: '100%' }}
         />
       ),
@@ -216,7 +224,7 @@ const PurchaseOrders: React.FC = () => {
           value={price}
           min={0}
           precision={2}
-          onChange={(value) => handleUnitPriceChange(record.skuId, value || 0)}
+          onChange={(value) => handleUnitPriceChange(record.key, value || 0)}
           style={{ width: '100%' }}
         />
       ),
@@ -237,7 +245,7 @@ const PurchaseOrders: React.FC = () => {
       render: (_, record) => (
         <Popconfirm
           title="确定删除该商品？"
-          onConfirm={() => handleRemoveItem(record.skuId)}
+          onConfirm={() => handleRemoveItem(record.key)}
           okText="确定"
           cancelText="取消"
         >
@@ -433,12 +441,12 @@ const PurchaseOrders: React.FC = () => {
         </Spin>
       </Card>
 
-      {/* SKU 选择器模态框 */}
-      <SkuSelectorModal
+      {/* 物料/SKU 选择器模态框 (N004) */}
+      <MaterialSkuSelectorModal
         open={skuSelectorOpen}
         onClose={() => setSkuSelectorOpen(false)}
         onSelect={handleAddItems}
-        excludeSkuIds={excludeSkuIds}
+        excludeIds={excludeIds}
       />
     </div>
   );

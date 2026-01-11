@@ -38,7 +38,10 @@ const { TextArea } = Input;
 
 interface ReceivingItem {
   key: string;
-  skuId: string;
+  // N004: 支持 MATERIAL 和 SKU
+  itemType: 'MATERIAL' | 'SKU';
+  materialId?: string;
+  skuId?: string;
   productName: string;
   productCode: string;
   specification: string;
@@ -83,20 +86,27 @@ const ReceivingForm: React.FC = () => {
         warehouse: undefined,
       });
 
-      // 转换订单明细为收货明细
-      const items: ReceivingItem[] = (order.items || []).map((item, index) => ({
-        key: item.id || String(index + 1),
-        skuId: item.sku?.id || '',
-        productName: item.sku?.name || '未知商品',
-        productCode: item.sku?.code || '',
-        specification: '-', // 规格字段暂无数据源
-        unit: item.sku?.mainUnit || '个',
-        orderedQuantity: Number(item.quantity) || 0,
-        receivingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
-        pendingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
-        qualityStatus: 'pending',
-        remark: '',
-      }));
+      // N004: 转换订单明细为收货明细（支持 MATERIAL 和 SKU）
+      const items: ReceivingItem[] = (order.items || []).map((item, index) => {
+        const itemType = item.itemType || 'SKU';
+        const isMaterial = itemType === 'MATERIAL';
+        
+        return {
+          key: item.id || String(index + 1),
+          itemType: itemType as 'MATERIAL' | 'SKU',
+          materialId: isMaterial ? item.material?.id : undefined,
+          skuId: !isMaterial ? item.sku?.id : undefined,
+          productName: isMaterial ? (item.material?.name || '未知物料') : (item.sku?.name || '未知商品'),
+          productCode: isMaterial ? (item.material?.code || '') : (item.sku?.code || ''),
+          specification: isMaterial ? (item.material?.specification || '-') : '-',
+          unit: isMaterial ? (item.material?.purchaseUnit || '个') : (item.sku?.mainUnit || '个'),
+          orderedQuantity: Number(item.quantity) || 0,
+          receivingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
+          pendingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
+          qualityStatus: 'pending',
+          remark: '',
+        };
+      });
 
       setReceivingItems(items);
     }
@@ -243,12 +253,14 @@ const ReceivingForm: React.FC = () => {
       failed: 'UNQUALIFIED',
     };
 
-    // 构建请求数据
+    // N004: 构建请求数据（支持 MATERIAL 和 SKU）
     const requestData: CreateGoodsReceiptRequest = {
       purchaseOrderId: orderId,
       remarks: values.remark || '',
       items: receivingItems.map((item) => ({
-        skuId: item.skuId,
+        itemType: item.itemType,
+        materialId: item.itemType === 'MATERIAL' ? item.materialId : undefined,
+        skuId: item.itemType === 'SKU' ? item.skuId : undefined,
         receivedQty: item.receivingQuantity,
         qualityStatus: qualityStatusMap[item.qualityStatus] || 'PENDING_CHECK',
         rejectionReason: item.qualityStatus === 'failed' ? item.remark : undefined,
