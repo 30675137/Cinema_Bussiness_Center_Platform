@@ -25,6 +25,8 @@ import {
   useSubmitPurchaseOrder,
   useApprovePurchaseOrder,
   useRejectPurchaseOrder,
+  useSuppliers,
+  useProcurementStores,
 } from '@/features/procurement/hooks/usePurchaseOrders';
 import type { PurchaseOrder, PurchaseOrderItem, PurchaseOrderQueryParams } from '@/features/procurement/types';
 
@@ -56,6 +58,13 @@ const PurchaseOrderList: React.FC = () => {
   const approveMutation = useApprovePurchaseOrder();
   // 审批拒绝
   const rejectMutation = useRejectPurchaseOrder();
+
+  // 获取供应商列表（用于筛选）
+  const { data: suppliersData } = useSuppliers('ACTIVE');
+  const suppliers = suppliersData?.data || [];
+
+  // 获取门店列表（用于筛选）
+  const stores = useProcurementStores();
 
   // 状态映射
   const statusMap: Record<string, { label: string; color: string }> = {
@@ -270,6 +279,16 @@ const PurchaseOrderList: React.FC = () => {
     setQueryParams((prev) => ({ ...prev, status, page: 1 }));
   };
 
+  // 供应商筛选
+  const handleSupplierChange = (supplierId: string | undefined) => {
+    setQueryParams((prev) => ({ ...prev, supplierId, page: 1 }));
+  };
+
+  // 门店筛选
+  const handleStoreChange = (storeId: string | undefined) => {
+    setQueryParams((prev) => ({ ...prev, storeId, page: 1 }));
+  };
+
   // 分页变化
   const handleTableChange = (pagination: { current?: number; pageSize?: number }) => {
     setQueryParams((prev) => ({
@@ -404,9 +423,39 @@ const PurchaseOrderList: React.FC = () => {
         }
       >
         {/* 筛选区域 */}
-        <Row gutter={16} style={{ marginBottom: 16 }}>
-          <Col span={8}>
+        <Row gutter={[16, 12]} style={{ marginBottom: 16 }}>
+          <Col span={6}>
             <Search placeholder="搜索订单编号" onSearch={handleSearch} allowClear />
+          </Col>
+          <Col span={5}>
+            <Select
+              placeholder="供应商"
+              style={{ width: '100%' }}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+              onChange={handleSupplierChange}
+              value={queryParams.supplierId}
+            >
+              {suppliers.map((s) => (
+                <Select.Option key={s.id} value={s.id}>{s.name}</Select.Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={5}>
+            <Select
+              placeholder="目标门店"
+              style={{ width: '100%' }}
+              allowClear
+              showSearch
+              optionFilterProp="children"
+              onChange={handleStoreChange}
+              value={queryParams.storeId}
+            >
+              {(stores.data || []).map((store) => (
+                <Select.Option key={store.id} value={store.id}>{store.name}</Select.Option>
+              ))}
+            </Select>
           </Col>
           <Col span={4}>
             <Select
@@ -414,6 +463,7 @@ const PurchaseOrderList: React.FC = () => {
               style={{ width: '100%' }}
               allowClear
               onChange={handleStatusChange}
+              value={queryParams.status}
             >
               <Select.Option value="DRAFT">草稿</Select.Option>
               <Select.Option value="PENDING_APPROVAL">待审核</Select.Option>
@@ -424,7 +474,7 @@ const PurchaseOrderList: React.FC = () => {
               <Select.Option value="CANCELLED">已取消</Select.Option>
             </Select>
           </Col>
-          <Col span={8}>
+          <Col span={4}>
             <RangePicker style={{ width: '100%' }} placeholder={['开始日期', '结束日期']} />
           </Col>
         </Row>

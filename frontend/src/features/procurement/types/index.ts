@@ -87,6 +87,7 @@ export interface CreatePurchaseOrderItemRequest {
 // 采购订单查询参数
 export interface PurchaseOrderQueryParams {
   storeId?: string;
+  supplierId?: string;
   status?: PurchaseOrderStatus;
   page?: number;
   pageSize?: number;

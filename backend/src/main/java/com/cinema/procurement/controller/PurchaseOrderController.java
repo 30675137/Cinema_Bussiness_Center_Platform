@@ -33,11 +33,12 @@ public class PurchaseOrderController {
 
     /**
      * 获取采购订单列表
-     * GET /api/purchase-orders?storeId=xxx&status=DRAFT&page=1&pageSize=20
+     * GET /api/purchase-orders?storeId=xxx&supplierId=xxx&status=DRAFT&page=1&pageSize=20
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> list(
             @RequestParam(required = false) UUID storeId,
+            @RequestParam(required = false) UUID supplierId,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize) {
@@ -51,7 +52,7 @@ public class PurchaseOrderController {
             }
         }
 
-        Page<PurchaseOrderDTO> result = purchaseOrderService.findByFilters(storeId, orderStatus, page, pageSize);
+        Page<PurchaseOrderDTO> result = purchaseOrderService.findByFilters(storeId, supplierId, orderStatus, page, pageSize);
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

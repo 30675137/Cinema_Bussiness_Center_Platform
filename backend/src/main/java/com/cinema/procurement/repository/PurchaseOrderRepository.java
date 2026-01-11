@@ -39,11 +39,13 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrderEnti
 
     @EntityGraph(attributePaths = {"supplier", "store"})
     @Query("SELECT po FROM PurchaseOrderEntity po " +
-           "WHERE (:storeId IS NULL OR po.storeId = :storeId) " +
+           "WHERE (:storeId IS NULL OR po.store.id = :storeId) " +
+           "AND (:supplierId IS NULL OR po.supplier.id = :supplierId) " +
            "AND (:status IS NULL OR po.status = :status) " +
            "ORDER BY po.createdAt DESC")
     Page<PurchaseOrderEntity> findByFilters(
         @Param("storeId") UUID storeId,
+        @Param("supplierId") UUID supplierId,
         @Param("status") PurchaseOrderStatus status,
         Pageable pageable
     );

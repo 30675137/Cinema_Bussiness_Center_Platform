@@ -107,9 +107,9 @@ public class PurchaseOrderService {
     /**
      * 分页查询采购订单列表
      */
-    public Page<PurchaseOrderDTO> findByFilters(UUID storeId, PurchaseOrderStatus status, int page, int pageSize) {
+    public Page<PurchaseOrderDTO> findByFilters(UUID storeId, UUID supplierId, PurchaseOrderStatus status, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        Page<PurchaseOrderEntity> entities = purchaseOrderRepository.findByFilters(storeId, status, pageable);
+        Page<PurchaseOrderEntity> entities = purchaseOrderRepository.findByFilters(storeId, supplierId, status, pageable);
         return entities.map(mapper::toDTO);
     }
 
@@ -209,7 +209,7 @@ public class PurchaseOrderService {
     public Page<PurchaseOrderDTO> findPendingApproval(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         Page<PurchaseOrderEntity> entities = purchaseOrderRepository.findByFilters(
-            null, PurchaseOrderStatus.PENDING_APPROVAL, pageable);
+            null, null, PurchaseOrderStatus.PENDING_APPROVAL, pageable);
         return entities.map(mapper::toDTO);
     }
 

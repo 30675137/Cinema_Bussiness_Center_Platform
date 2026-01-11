@@ -40,6 +40,7 @@ export const purchaseOrderApi = {
   async list(params?: PurchaseOrderQueryParams): Promise<PaginatedResponse<PurchaseOrder>> {
     const searchParams = new URLSearchParams();
     if (params?.storeId) searchParams.append('storeId', params.storeId);
+    if (params?.supplierId) searchParams.append('supplierId', params.supplierId);
     if (params?.status) searchParams.append('status', params.status);
     if (params?.page) searchParams.append('page', String(params.page));
     if (params?.pageSize) searchParams.append('pageSize', String(params.pageSize));
