@@ -5,7 +5,7 @@
 package com.cinema.procurement.service;
 
 import com.cinema.inventory.entity.Inventory;
-import com.cinema.inventory.repository.InventoryJpaRepository;
+import com.cinema.inventory.repository.InventoryRepository;
 import com.cinema.procurement.dto.CreateGoodsReceiptRequest;
 import com.cinema.procurement.dto.GoodsReceiptDTO;
 import com.cinema.procurement.dto.GoodsReceiptMapper;
@@ -13,8 +13,8 @@ import com.cinema.procurement.entity.*;
 import com.cinema.procurement.repository.GoodsReceiptRepository;
 import com.cinema.procurement.repository.PurchaseOrderItemRepository;
 import com.cinema.procurement.repository.PurchaseOrderRepository;
-import com.cinema.product.entity.Sku;
-import com.cinema.product.repository.SkuJpaRepository;
+import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.repository.SkuJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +37,7 @@ public class GoodsReceiptService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final SkuJpaRepository skuRepository;
-    private final InventoryJpaRepository inventoryRepository;
+    private final InventoryRepository inventoryRepository;
     private final GoodsReceiptMapper mapper;
     private final PurchaseOrderService purchaseOrderService;
 
@@ -46,7 +46,7 @@ public class GoodsReceiptService {
             PurchaseOrderRepository purchaseOrderRepository,
             PurchaseOrderItemRepository purchaseOrderItemRepository,
             SkuJpaRepository skuRepository,
-            InventoryJpaRepository inventoryRepository,
+            InventoryRepository inventoryRepository,
             GoodsReceiptMapper mapper,
             PurchaseOrderService purchaseOrderService) {
         this.goodsReceiptRepository = goodsReceiptRepository;

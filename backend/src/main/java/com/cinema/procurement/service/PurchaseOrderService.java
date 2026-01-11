@@ -4,8 +4,8 @@
  */
 package com.cinema.procurement.service;
 
-import com.cinema.hallstore.entity.StoreEntity;
-import com.cinema.hallstore.repository.StoreJpaRepository;
+import com.cinema.inventory.entity.StoreEntity;
+import com.cinema.inventory.repository.StoreJpaRepository;
 import com.cinema.procurement.dto.CreatePurchaseOrderRequest;
 import com.cinema.procurement.dto.PurchaseOrderDTO;
 import com.cinema.procurement.dto.PurchaseOrderMapper;
@@ -18,8 +18,8 @@ import com.cinema.procurement.entity.SupplierEntity;
 import com.cinema.procurement.repository.PurchaseOrderRepository;
 import com.cinema.procurement.repository.PurchaseOrderStatusHistoryRepository;
 import com.cinema.procurement.repository.SupplierRepository;
-import com.cinema.product.entity.Sku;
-import com.cinema.product.repository.SkuJpaRepository;
+import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.repository.SkuJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

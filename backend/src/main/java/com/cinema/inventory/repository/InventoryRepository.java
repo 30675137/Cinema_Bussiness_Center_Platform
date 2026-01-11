@@ -47,6 +47,16 @@ public interface InventoryRepository extends JpaRepository<Inventory, UUID> {
     Optional<Inventory> findByStoreIdAndSkuId(UUID storeId, UUID skuId);
 
     /**
+     * Find inventory by SKU and store without locking
+     * Use for read-only queries (alternative parameter order)
+     *
+     * @param skuId SKU ID
+     * @param storeId Store ID
+     * @return Optional inventory record
+     */
+    Optional<Inventory> findBySkuIdAndStoreId(UUID skuId, UUID storeId);
+
+    /**
      * Find inventory by store and SKU with pessimistic lock (SELECT FOR UPDATE)
      * Acquires row-level lock until transaction commits/rollbacks
      *

@@ -4,7 +4,7 @@
  */
 package com.cinema.procurement.entity;
 
-import com.cinema.product.entity.Sku;
+import com.cinema.hallstore.domain.Sku;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
