@@ -378,9 +378,161 @@ flowchart TD
 
 ---
 
-## 5. 数据关系模型
+## 5. 采购与库存的关系
 
-### 5.1 ER 关系图
+采购入库是库存管理的重要数据来源，理解两者的关系对于正确使用系统至关重要。
+
+### 5.1 核心关系概述
+
+**采购是库存的主要来源**：采购入库流程是库存增加的主要途径之一。当收货确认后，系统自动触发库存更新，为新 SKU 创建库存记录或为已有 SKU 累加库存数量。
+
+```mermaid
+flowchart LR
+    subgraph 采购模块
+        PO[采购订单<br/>PurchaseOrder]
+        GR[收货入库单<br/>GoodsReceipt]
+    end
+
+    subgraph 库存模块
+        SI[门店库存<br/>StoreInventory]
+    end
+
+    PO -->|创建收货单| GR
+    GR -->|确认收货| SI
+
+    style PO fill:#e6f7ff,stroke:#1890ff
+    style GR fill:#fff7e6,stroke:#fa8c16
+    style SI fill:#f6ffed,stroke:#52c41a
+```
+
+### 5.2 数据流向关系
+
+采购到库存的完整数据链路：
+
+```mermaid
+sequenceDiagram
+    participant PO as 采购订单
+    participant POI as 订单明细
+    participant GR as 收货入库单
+    participant GRI as 收货明细
+    participant SI as 门店库存
+
+    PO->>POI: 包含多个SKU明细
+    Note over POI: quantity(订购数量)<br/>unitPrice(单价)
+
+    PO->>GR: 创建收货单
+    GR->>GRI: 填写实收明细
+    Note over GRI: receivedQty(实收数量)<br/>qualityStatus(质检状态)
+
+    GRI->>SI: 确认收货后更新库存
+    Note over SI: on_hand_qty += receivedQty<br/>available_qty += receivedQty
+
+    SI-->>POI: 更新收货进度
+    Note over POI: receivedQty(已收数量)<br/>pendingQty(待收数量)
+```
+
+### 5.3 收货如何影响库存
+
+收货确认后，系统根据 SKU 在目标门店的库存状态执行不同逻辑：
+
+#### 场景一：新 SKU 入库（首次采购）
+
+当 SKU+门店 组合在 `store_inventory` 表中不存在记录时：
+
+```
+系统自动创建新的库存记录：
+├── store_id = 收货单的目标门店
+├── sku_id = 收货明细的 SKU
+├── on_hand_qty = 本次实收数量
+├── available_qty = 本次实收数量
+├── reserved_qty = 0
+└── created_at = 当前时间
+```
+
+**这解决了"新 SKU 无法入库"的核心问题** —— 无需预先创建库存记录，采购入库会自动初始化。
+
+#### 场景二：已有 SKU 入库（补货采购）
+
+当 SKU+门店 组合在 `store_inventory` 表中已存在记录时：
+
+```
+系统累加现有库存数量：
+├── on_hand_qty = on_hand_qty + 本次实收数量
+├── available_qty = available_qty + 本次实收数量
+└── updated_at = 当前时间
+```
+
+#### 质检状态对库存的影响
+
+| 质检状态 | 枚举值 | 是否入库 | 说明 |
+|---------|--------|---------|------|
+| 合格 | `QUALIFIED` | ✅ 是 | 正常入库，增加可用库存 |
+| 不合格 | `UNQUALIFIED` | ❌ 否 | 不入库，需登记异常处理 |
+| 待检验 | `PENDING_CHECK` | ⏳ 暂不 | 暂不入库，待质检完成后处理 |
+
+**重要**：只有质检状态为 `QUALIFIED`（合格）的商品才会计入库存。
+
+### 5.4 关键字段映射
+
+| 来源表/字段 | 目标表/字段 | 数据关系 | 说明 |
+|------------|------------|---------|------|
+| `PurchaseOrderItem.quantity` | - | 订购数量 | 采购订单中计划采购的数量 |
+| `PurchaseOrderItem.receivedQty` | - | 已收数量 | 累计已完成收货的数量 |
+| `PurchaseOrderItem.pendingQty` | - | 待收数量 | = quantity - receivedQty |
+| `GoodsReceiptItem.receivedQty` | `StoreInventory.on_hand_qty` | 累加 | 本次实收数量加到在库数量 |
+| `GoodsReceiptItem.receivedQty` | `StoreInventory.available_qty` | 累加 | 本次实收数量加到可用数量 |
+| `GoodsReceipt.storeId` | `StoreInventory.store_id` | 关联 | 确定库存记录所属门店 |
+| `GoodsReceiptItem.skuId` | `StoreInventory.sku_id` | 关联 | 确定库存记录对应商品 |
+
+### 5.5 状态联动表
+
+收货操作触发采购订单状态和库存的联动变化：
+
+| 收货情况 | 采购订单状态变化 | 库存变化 | 触发条件 |
+|---------|-----------------|---------|---------|
+| 首次部分收货 | `APPROVED` → `PARTIAL_RECEIVED` | 实收数量入库 | 0 < 累计收货 < 订单总量 |
+| 继续部分收货 | 保持 `PARTIAL_RECEIVED` | 实收数量累加入库 | 累计收货仍未达到订单总量 |
+| 完成全部收货 | → `FULLY_RECEIVED` | 最后一批数量入库 | 累计收货 = 订单总量 |
+| 超量收货 | → `FULLY_RECEIVED` | 实际收货数量入库 | 累计收货 > 订单总量（允许但有警告） |
+| 关闭订单 | → `CLOSED` | 无新增入库 | 管理员手动关闭未完成订单 |
+
+### 5.6 实际操作示例
+
+**场景**：门店A首次采购可乐和薯片
+
+```
+采购订单 PO202601110001：
+├── SKU-001 可乐 × 100瓶 @ ¥3.00
+└── SKU-002 薯片 × 50袋 @ ¥5.00
+
+收货入库单 GR202601110001：
+├── SKU-001 可乐：实收 80瓶（合格）
+└── SKU-002 薯片：实收 50袋（合格）
+
+库存变化（门店A）：
+├── SKU-001 可乐：新建记录，on_hand_qty = 80
+└── SKU-002 薯片：新建记录，on_hand_qty = 50
+
+采购订单状态：APPROVED → PARTIAL_RECEIVED
+（可乐还有20瓶待收货）
+```
+
+```
+后续收货入库单 GR202601120001：
+└── SKU-001 可乐：实收 20瓶（合格）
+
+库存变化（门店A）：
+└── SKU-001 可乐：on_hand_qty = 80 + 20 = 100
+
+采购订单状态：PARTIAL_RECEIVED → FULLY_RECEIVED
+（全部收货完成）
+```
+
+---
+
+## 6. 数据关系模型
+
+### 6.1 ER 关系图
 
 ```mermaid
 erDiagram
@@ -475,7 +627,7 @@ erDiagram
     }
 ```
 
-### 5.2 核心数据表说明
+### 6.2 核心数据表说明
 
 | 表名 | 中文名 | 核心职责 | 关联关系 |
 |------|--------|---------|---------|
@@ -487,7 +639,7 @@ erDiagram
 | `purchase_order_status_history` | 状态历史表 | 订单状态变更记录 | 属于 purchase_orders |
 | `store_inventory` | 门店库存表 | 库存实时数据 | 关联 store, sku |
 
-### 5.3 数据流向图
+### 6.3 数据流向图
 
 ```
 ┌──────────────┐
@@ -532,9 +684,9 @@ erDiagram
 
 ---
 
-## 6. 状态流转机制
+## 7. 状态流转机制
 
-### 6.1 采购订单状态
+### 7.1 采购订单状态
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -573,7 +725,7 @@ erDiagram
 | `FULLY_RECEIVED` | 全部收货 | 关闭订单 |
 | `CLOSED` | 已关闭 | 仅查看 |
 
-### 6.2 收货入库单状态
+### 7.2 收货入库单状态
 
 ```
 PENDING ──(确认收货)──▶ CONFIRMED
@@ -587,7 +739,7 @@ PENDING ──(确认收货)──▶ CONFIRMED
 | `CONFIRMED` | 已确认 | 收货完成，库存已更新 |
 | `CANCELLED` | 已取消 | 收货单被取消 |
 
-### 6.3 状态变更记录
+### 7.3 状态变更记录
 
 每次采购订单状态变更都会记录到 `purchase_order_status_history` 表：
 
@@ -602,9 +754,9 @@ PENDING ──(确认收货)──▶ CONFIRMED
 
 ---
 
-## 7. 业务规则约束
+## 8. 业务规则约束
 
-### 7.1 采购订单规则
+### 8.1 采购订单规则
 
 | 规则编号 | 规则描述 | 校验时机 |
 |---------|---------|---------|
@@ -616,7 +768,7 @@ PENDING ──(确认收货)──▶ CONFIRMED
 | PO-006 | 仅 DRAFT 状态可删除 | 删除操作 |
 | PO-007 | 仅 PENDING_APPROVAL 可审批 | 审批操作 |
 
-### 7.2 收货入库规则
+### 8.2 收货入库规则
 
 | 规则编号 | 规则描述 | 校验时机 |
 |---------|---------|---------|
@@ -626,7 +778,7 @@ PENDING ──(确认收货)──▶ CONFIRMED
 | GR-004 | 不合格品必须填写原因 | 质量检验 |
 | GR-005 | 已确认的收货单不可修改 | 编辑收货单 |
 
-### 7.3 库存更新规则
+### 8.3 库存更新规则
 
 | 规则编号 | 规则描述 |
 |---------|---------|
@@ -637,9 +789,9 @@ PENDING ──(确认收货)──▶ CONFIRMED
 
 ---
 
-## 8. 异常处理场景
+## 9. 异常处理场景
 
-### 8.1 场景：短缺收货
+### 9.1 场景：短缺收货
 
 **场景描述**：订单 100 件，实际到货 80 件
 
@@ -658,7 +810,7 @@ purchase_orders.status = PARTIAL_RECEIVED
 store_inventory.on_hand_qty += 80
 ```
 
-### 8.2 场景：超量收货
+### 9.2 场景：超量收货
 
 **场景描述**：订单 100 件，实际到货 120 件
 
@@ -677,7 +829,7 @@ purchase_orders.status = FULLY_RECEIVED
 store_inventory.on_hand_qty += 120
 ```
 
-### 8.3 场景：部分拒收
+### 9.3 场景：部分拒收
 
 **场景描述**：到货 100 件，其中 10 件质量不合格
 

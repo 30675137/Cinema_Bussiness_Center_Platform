@@ -201,7 +201,7 @@
 | 收货入库列表 | ReceivingList.tsx | ✅ 已完成 | 已集成 useGoodsReceipts Hook (2026-01-11) |
 | 收货入库详情 | ReceivingDetail.tsx | ✅ 已完成 | 已集成 useGoodsReceipt Hook |
 | 调拨管理 | TransferManagePage.tsx | ⏳ 后续迭代 | UI 存在，后续集成 API |
-| 异常/短缺/拒收登记 | - | ⏳ 后续迭代 | 通过 qualityStatus 字段在收货流程中处理 |
+| 异常/短缺/拒收登记 | - | ⏳ 后续迭代 | 菜单已禁用并标记"开发中"，通过 qualityStatus 字段在收货流程中处理 |
 | 入库单历史/查询 | ReceivingList.tsx | ✅ 已完成 | 同收货入库列表 |
 
 ### 详细分析

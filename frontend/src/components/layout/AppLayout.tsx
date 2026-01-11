@@ -242,11 +242,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         },
         {
           key: '/procurement/exceptions',
-          label: '异常/短缺/拒收/报损登记',
-        },
-        {
-          key: '/procurement/history',
-          label: '入库单历史/查询',
+          label: '异常/短缺/拒收/报损登记 (开发中)',
+          disabled: true,
+          title: '功能开发中，敬请期待',
         },
         {
           key: '/procurement/transfer',
