@@ -5,7 +5,9 @@
 package com.cinema.procurement.service;
 
 import com.cinema.inventory.entity.Inventory;
+import com.cinema.inventory.entity.StoreEntity;
 import com.cinema.inventory.repository.InventoryRepository;
+import com.cinema.inventory.repository.StoreJpaRepository;
 import com.cinema.procurement.dto.CreateGoodsReceiptRequest;
 import com.cinema.procurement.dto.GoodsReceiptDTO;
 import com.cinema.procurement.dto.GoodsReceiptMapper;
@@ -37,6 +39,7 @@ public class GoodsReceiptService {
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
     private final SkuJpaRepository skuRepository;
+    private final StoreJpaRepository storeRepository;
     private final InventoryRepository inventoryRepository;
     private final GoodsReceiptMapper mapper;
     private final PurchaseOrderService purchaseOrderService;
@@ -46,6 +49,7 @@ public class GoodsReceiptService {
             PurchaseOrderRepository purchaseOrderRepository,
             PurchaseOrderItemRepository purchaseOrderItemRepository,
             SkuJpaRepository skuRepository,
+            StoreJpaRepository storeRepository,
             InventoryRepository inventoryRepository,
             GoodsReceiptMapper mapper,
             PurchaseOrderService purchaseOrderService) {
@@ -53,6 +57,7 @@ public class GoodsReceiptService {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.purchaseOrderItemRepository = purchaseOrderItemRepository;
         this.skuRepository = skuRepository;
+        this.storeRepository = storeRepository;
         this.inventoryRepository = inventoryRepository;
         this.mapper = mapper;
         this.purchaseOrderService = purchaseOrderService;
@@ -164,6 +169,8 @@ public class GoodsReceiptService {
 
     /**
      * 更新库存
+     * Note: Must use entity relationships (setSku/setStore) instead of setSkuId/setStoreId
+     * because Inventory entity has storeId/skuId columns marked as insertable=false, updatable=false
      */
     private void updateInventory(UUID storeId, UUID skuId, BigDecimal qty) {
         Optional<Inventory> existingOpt = inventoryRepository.findBySkuIdAndStoreId(skuId, storeId);
@@ -174,10 +181,15 @@ public class GoodsReceiptService {
             inv.setAvailableQty(inv.getAvailableQty().add(qty));
             inventoryRepository.save(inv);
         } else {
-            // 创建新库存记录
+            // 创建新库存记录 - 必须使用实体关系而非直接设置ID
+            Sku sku = skuRepository.findById(skuId)
+                .orElseThrow(() -> new IllegalArgumentException("SKU不存在: " + skuId));
+            StoreEntity store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new IllegalArgumentException("门店不存在: " + storeId));
+
             Inventory inv = new Inventory();
-            inv.setStoreId(storeId);
-            inv.setSkuId(skuId);
+            inv.setSku(sku);      // Use entity relationship
+            inv.setStore(store);  // Use entity relationship
             inv.setOnHandQty(qty);
             inv.setAvailableQty(qty);
             inv.setReservedQty(BigDecimal.ZERO);

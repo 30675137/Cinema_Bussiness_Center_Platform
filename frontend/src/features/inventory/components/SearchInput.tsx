@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Input } from 'antd';
+import { Input, Button, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import type { InputProps } from 'antd';
 
@@ -17,13 +17,15 @@ export interface SearchInputProps extends Omit<InputProps, 'onChange'> {
   placeholder?: string;
   /** 是否允许清除 */
   allowClear?: boolean;
+  /** 是否显示搜索按钮，默认 true */
+  showSearchButton?: boolean;
   /** data-testid 用于测试 */
   'data-testid'?: string;
 }
 
 /**
  * 搜索输入框组件
- * 支持 300ms 防抖，回车立即触发搜索
+ * 支持 300ms 防抖，回车或点击搜索按钮立即触发搜索
  *
  * @example
  * ```tsx
@@ -31,6 +33,7 @@ export interface SearchInputProps extends Omit<InputProps, 'onChange'> {
  *   value={keyword}
  *   onChange={setKeyword}
  *   placeholder="搜索SKU编码/名称"
+ *   showSearchButton={true}
  * />
  * ```
  *
@@ -42,6 +45,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   debounceMs = 300,
   placeholder = '搜索SKU编码/名称',
   allowClear = true,
+  showSearchButton = true,
   'data-testid': testId = 'search-input',
   ...restProps
 }) => {
@@ -80,18 +84,36 @@ export const SearchInput: React.FC<SearchInputProps> = ({
     onChange?.('');
   }, [onChange]);
 
+  // 处理搜索按钮点击
+  const handleSearch = useCallback(() => {
+    onChange?.(inputValue);
+  }, [inputValue, onChange]);
+
   return (
-    <Input
-      value={inputValue}
-      onChange={handleChange}
-      onPressEnter={handlePressEnter}
-      placeholder={placeholder}
-      allowClear={allowClear}
-      prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-      data-testid={testId}
-      onClear={handleClear}
-      {...restProps}
-    />
+    <Space.Compact>
+      <Input
+        value={inputValue}
+        onChange={handleChange}
+        onPressEnter={handlePressEnter}
+        placeholder={placeholder}
+        allowClear={allowClear}
+        prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+        data-testid={testId}
+        onClear={handleClear}
+        style={{ width: showSearchButton ? 220 : 200 }}
+        {...restProps}
+      />
+      {showSearchButton && (
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          onClick={handleSearch}
+          data-testid={`${testId}-button`}
+        >
+          搜索
+        </Button>
+      )}
+    </Space.Compact>
   );
 };
 

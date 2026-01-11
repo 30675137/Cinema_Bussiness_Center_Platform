@@ -114,17 +114,21 @@ export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({ onFilter
 
   return (
     <Space wrap className="inventory-filter-bar" style={{ marginBottom: 16 }}>
-      {/* 门店筛选 */}
+      {/* 门店筛选 - 支持输入筛选 */}
       <Select
         placeholder="选择门店"
         value={storeId}
         onChange={handleStoreChange}
         allowClear
         loading={storesLoading}
-        style={{ width: 160 }}
+        style={{ width: 180 }}
         options={storeOptions}
         data-testid="filter-store"
         className="store-filter"
+        showSearch
+        filterOption={(input, option) =>
+          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        }
       />
 
       {/* 库存状态筛选 (多选) */}
@@ -141,17 +145,21 @@ export const InventoryFilterBar: React.FC<InventoryFilterBarProps> = ({ onFilter
         maxTagCount="responsive"
       />
 
-      {/* 商品分类筛选 */}
+      {/* 商品分类筛选 - 支持输入筛选 */}
       <Select
         placeholder="商品分类"
         value={categoryId}
         onChange={handleCategoryChange}
         allowClear
         loading={categoriesLoading}
-        style={{ width: 160 }}
+        style={{ width: 180 }}
         options={categoryOptions}
         data-testid="filter-category"
         className="category-filter"
+        showSearch
+        filterOption={(input, option) =>
+          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+        }
       />
 
       {/* 重置按钮 */}

@@ -1,142 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Descriptions, Table, Button, Space, Tag, Timeline, Divider } from 'antd';
+/**
+ * @spec N001-purchase-inbound
+ * 收货入库详情页面
+ * 路由: /purchase-management/receipts/:id
+ */
+import React from 'react';
+import { Card, Descriptions, Table, Button, Space, Tag, Timeline, Divider, Spin, Result } from 'antd';
 import { ArrowLeftOutlined, PrinterOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
-
-interface ReceivingDetailData {
-  id: string;
-  receivingNumber: string;
-  purchaseOrderNumber: string;
-  supplier: string;
-  receivingDate: string;
-  warehouse: string;
-  receiver: string;
-  phone: string;
-  status: string;
-  qualityStatus: string;
-  remark: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-}
-
-interface ReceivingItemDetail {
-  key: string;
-  productName: string;
-  productCode: string;
-  specification: string;
-  unit: string;
-  orderedQuantity: number;
-  receivingQuantity: number;
-  qualityStatus: string;
-  remark: string;
-}
-
-interface TimelineItem {
-  time: string;
-  operator: string;
-  action: string;
-  status: string;
-}
+import { useGoodsReceipt } from '@/features/procurement/hooks/useGoodsReceipts';
+import type { GoodsReceipt, GoodsReceiptItem, QualityStatus } from '@/features/procurement/types';
 
 /**
  * 收货入库详情页面
- * 路由: /purchase-management/receipts/:id
  */
 const ReceivingDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const [loading, setLoading] = useState(false);
-  const [receivingData, setReceivingData] = useState<ReceivingDetailData | null>(null);
-  const [receivingItems, setReceivingItems] = useState<ReceivingItemDetail[]>([]);
-  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
 
-  useEffect(() => {
-    if (id) {
-      loadReceivingDetail(id);
-    }
-  }, [id]);
-
-  const loadReceivingDetail = async (receivingId: string) => {
-    setLoading(true);
-    try {
-      // TODO: 调用API获取收货单详情
-      // Mock数据
-      const mockData: ReceivingDetailData = {
-        id: receivingId,
-        receivingNumber: 'RCV202512110001',
-        purchaseOrderNumber: 'PO202512110001',
-        supplier: '供应商A',
-        receivingDate: '2025-12-11 14:30:00',
-        warehouse: '中心仓库',
-        receiver: '王五',
-        phone: '13800138000',
-        status: 'completed',
-        qualityStatus: 'passed',
-        remark: '收货正常，质检通过',
-        createdBy: '张三',
-        createdAt: '2025-12-11 14:00:00',
-        updatedBy: '王五',
-        updatedAt: '2025-12-11 14:30:00',
-      };
-
-      const mockItems: ReceivingItemDetail[] = [
-        {
-          key: '1',
-          productName: '可乐',
-          productCode: 'PROD001',
-          specification: '330ml/瓶',
-          unit: '箱',
-          orderedQuantity: 100,
-          receivingQuantity: 100,
-          qualityStatus: 'passed',
-          remark: '包装完好',
-        },
-        {
-          key: '2',
-          productName: '爆米花',
-          productCode: 'PROD002',
-          specification: '大桶',
-          unit: '包',
-          orderedQuantity: 200,
-          receivingQuantity: 200,
-          qualityStatus: 'passed',
-          remark: '质量良好',
-        },
-      ];
-
-      const mockTimeline: TimelineItem[] = [
-        {
-          time: '2025-12-11 14:30:00',
-          operator: '王五',
-          action: '确认收货',
-          status: 'completed',
-        },
-        {
-          time: '2025-12-11 14:15:00',
-          operator: '李四',
-          action: '质检通过',
-          status: 'passed',
-        },
-        {
-          time: '2025-12-11 14:00:00',
-          operator: '张三',
-          action: '创建收货单',
-          status: 'created',
-        },
-      ];
-
-      setReceivingData(mockData);
-      setReceivingItems(mockItems);
-      setTimeline(mockTimeline);
-    } catch (error) {
-      console.error('加载收货单详情失败:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 使用 TanStack Query 获取收货单详情
+  const { data: receipt, isLoading, error } = useGoodsReceipt(id);
 
   const handleBack = () => {
     navigate('/purchase-management/receipts');
@@ -150,61 +33,55 @@ const ReceivingDetail: React.FC = () => {
     window.print();
   };
 
-  // 状态映射
+  // 收货单状态映射（匹配后端枚举）
   const statusMap: Record<string, { label: string; color: string }> = {
-    pending: { label: '待收货', color: 'default' },
-    partial: { label: '部分收货', color: 'processing' },
-    completed: { label: '已完成', color: 'success' },
-    rejected: { label: '已拒收', color: 'error' },
+    PENDING: { label: '待确认', color: 'processing' },
+    CONFIRMED: { label: '已确认', color: 'success' },
+    CANCELLED: { label: '已取消', color: 'default' },
   };
 
-  // 质检状态映射
+  // 质检状态映射（匹配后端枚举：QUALIFIED, UNQUALIFIED, PENDING_CHECK）
   const qualityStatusMap: Record<string, { label: string; color: string }> = {
-    waiting: { label: '待质检', color: 'default' },
-    checking: { label: '质检中', color: 'processing' },
-    passed: { label: '质检通过', color: 'success' },
-    failed: { label: '质检不合格', color: 'error' },
+    PENDING_CHECK: { label: '待质检', color: 'default' },
+    QUALIFIED: { label: '质检通过', color: 'success' },
+    UNQUALIFIED: { label: '质检不合格', color: 'error' },
   };
 
-  const itemColumns: ColumnsType<ReceivingItemDetail> = [
+  // 收货明细表格列定义
+  const itemColumns: ColumnsType<GoodsReceiptItem> = [
+    {
+      title: 'SKU编码',
+      dataIndex: ['sku', 'code'],
+      key: 'skuCode',
+      width: 120,
+    },
     {
       title: '商品名称',
-      dataIndex: 'productName',
-      key: 'productName',
-      width: 150,
-    },
-    {
-      title: '商品编码',
-      dataIndex: 'productCode',
-      key: 'productCode',
-      width: 120,
-    },
-    {
-      title: '规格',
-      dataIndex: 'specification',
-      key: 'specification',
-      width: 120,
+      dataIndex: ['sku', 'name'],
+      key: 'skuName',
+      width: 180,
     },
     {
       title: '单位',
-      dataIndex: 'unit',
+      dataIndex: ['sku', 'mainUnit'],
       key: 'unit',
       width: 80,
+      render: (unit: string) => unit || '-',
     },
     {
       title: '订购数量',
-      dataIndex: 'orderedQuantity',
-      key: 'orderedQuantity',
+      dataIndex: 'orderedQty',
+      key: 'orderedQty',
       width: 100,
     },
     {
       title: '实收数量',
-      dataIndex: 'receivingQuantity',
-      key: 'receivingQuantity',
+      dataIndex: 'receivedQty',
+      key: 'receivedQty',
       width: 100,
-      render: (quantity: number, record) => (
-        <span style={{ color: quantity === record.orderedQuantity ? '#52c41a' : '#faad14' }}>
-          {quantity}
+      render: (qty: number, record) => (
+        <span style={{ color: qty === record.orderedQty ? '#52c41a' : '#faad14' }}>
+          {qty}
         </span>
       ),
     },
@@ -213,38 +90,83 @@ const ReceivingDetail: React.FC = () => {
       dataIndex: 'qualityStatus',
       key: 'qualityStatus',
       width: 110,
-      render: (status: string) => {
+      render: (status: QualityStatus) => {
         const statusInfo = qualityStatusMap[status] || { label: status, color: 'default' };
         return <Tag color={statusInfo.color}>{statusInfo.label}</Tag>;
       },
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
+      title: '拒收原因',
+      dataIndex: 'rejectionReason',
+      key: 'rejectionReason',
+      render: (reason: string) => reason || '-',
     },
   ];
 
-  if (!receivingData) {
+  // 加载状态
+  if (isLoading) {
     return (
-      <div style={{ padding: 24, textAlign: 'center' }}>
-        <div>加载中...</div>
+      <div style={{ padding: 24, textAlign: 'center', minHeight: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Spin size="large" tip="加载中..." />
       </div>
     );
   }
 
-  const statusInfo = statusMap[receivingData.status] || {
-    label: receivingData.status,
-    color: 'default',
-  };
-  const qualityInfo = qualityStatusMap[receivingData.qualityStatus] || {
-    label: receivingData.qualityStatus,
-    color: 'default',
-  };
+  // 错误状态
+  if (error) {
+    return (
+      <div style={{ padding: 24 }}>
+        <Result
+          status="error"
+          title="加载失败"
+          subTitle={error.message || '无法获取收货单详情'}
+          extra={[
+            <Button key="back" onClick={handleBack}>返回列表</Button>,
+          ]}
+        />
+      </div>
+    );
+  }
 
-  // 计算汇总
-  const totalOrdered = receivingItems.reduce((sum, item) => sum + item.orderedQuantity, 0);
-  const totalReceived = receivingItems.reduce((sum, item) => sum + item.receivingQuantity, 0);
+  // 无数据
+  if (!receipt) {
+    return (
+      <div style={{ padding: 24 }}>
+        <Result
+          status="404"
+          title="收货单不存在"
+          subTitle="您访问的收货单可能已被删除或不存在"
+          extra={[
+            <Button key="back" type="primary" onClick={handleBack}>返回列表</Button>,
+          ]}
+        />
+      </div>
+    );
+  }
+
+  const statusInfo = statusMap[receipt.status] || { label: receipt.status, color: 'default' };
+  const items = receipt.items || [];
+  const totalOrdered = items.reduce((sum, item) => sum + item.orderedQty, 0);
+  const totalReceived = items.reduce((sum, item) => sum + item.receivedQty, 0);
+
+  // 生成操作时间线
+  const timelineItems = [
+    {
+      time: receipt.createdAt,
+      action: '创建收货单',
+      color: 'blue',
+    },
+    ...(receipt.status === 'CONFIRMED' && receipt.receivedAt ? [{
+      time: receipt.receivedAt,
+      action: '确认收货',
+      color: 'green' as const,
+    }] : []),
+    ...(receipt.status === 'CANCELLED' ? [{
+      time: receipt.updatedAt,
+      action: '取消收货单',
+      color: 'gray' as const,
+    }] : []),
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
@@ -260,47 +182,51 @@ const ReceivingDetail: React.FC = () => {
             <Button icon={<PrinterOutlined />} onClick={handlePrint}>
               打印
             </Button>
-            {receivingData.status === 'pending' && (
+            {receipt.status === 'PENDING' && (
               <Button icon={<EditOutlined />} onClick={handleEdit}>
                 编辑
               </Button>
             )}
           </Space>
         }
-        loading={loading}
       >
         {/* 基本信息 */}
         <Card type="inner" title="基本信息" style={{ marginBottom: 16 }}>
           <Descriptions column={3} bordered>
             <Descriptions.Item label="收货单号" span={1}>
-              <strong>{receivingData.receivingNumber}</strong>
+              <strong>{receipt.receiptNumber}</strong>
             </Descriptions.Item>
             <Descriptions.Item label="采购单号" span={1}>
-              <a style={{ color: '#1890ff' }}>{receivingData.purchaseOrderNumber}</a>
+              <a
+                style={{ color: '#1890ff' }}
+                onClick={() => navigate(`/purchase-management/orders/${receipt.purchaseOrder?.id}`)}
+              >
+                {receipt.purchaseOrder?.orderNumber}
+              </a>
             </Descriptions.Item>
             <Descriptions.Item label="供应商" span={1}>
-              {receivingData.supplier}
+              {receipt.purchaseOrder?.supplier?.name || '-'}
             </Descriptions.Item>
-            <Descriptions.Item label="收货日期" span={1}>
-              {receivingData.receivingDate}
+            <Descriptions.Item label="收货时间" span={1}>
+              {receipt.receivedAt ? new Date(receipt.receivedAt).toLocaleString('zh-CN') : '-'}
             </Descriptions.Item>
-            <Descriptions.Item label="收货仓库" span={1}>
-              {receivingData.warehouse}
+            <Descriptions.Item label="收货门店" span={1}>
+              {receipt.store?.name || '-'}
             </Descriptions.Item>
             <Descriptions.Item label="收货人" span={1}>
-              {receivingData.receiver}
-            </Descriptions.Item>
-            <Descriptions.Item label="联系电话" span={1}>
-              {receivingData.phone}
+              {receipt.receivedByName || '-'}
             </Descriptions.Item>
             <Descriptions.Item label="收货状态" span={1}>
               <Tag color={statusInfo.color}>{statusInfo.label}</Tag>
             </Descriptions.Item>
-            <Descriptions.Item label="质检状态" span={1}>
-              <Tag color={qualityInfo.color}>{qualityInfo.label}</Tag>
+            <Descriptions.Item label="创建时间" span={1}>
+              {new Date(receipt.createdAt).toLocaleString('zh-CN')}
+            </Descriptions.Item>
+            <Descriptions.Item label="更新时间" span={1}>
+              {new Date(receipt.updatedAt).toLocaleString('zh-CN')}
             </Descriptions.Item>
             <Descriptions.Item label="备注说明" span={3}>
-              {receivingData.remark || '-'}
+              {receipt.remarks || '-'}
             </Descriptions.Item>
           </Descriptions>
         </Card>
@@ -309,13 +235,14 @@ const ReceivingDetail: React.FC = () => {
         <Card type="inner" title="收货明细" style={{ marginBottom: 16 }}>
           <Table
             columns={itemColumns}
-            dataSource={receivingItems}
+            dataSource={items}
+            rowKey="id"
             pagination={false}
-            scroll={{ x: 1000 }}
+            scroll={{ x: 900 }}
             summary={() => (
               <Table.Summary fixed>
                 <Table.Summary.Row>
-                  <Table.Summary.Cell index={0} colSpan={4}>
+                  <Table.Summary.Cell index={0} colSpan={3}>
                     <strong>合计</strong>
                   </Table.Summary.Cell>
                   <Table.Summary.Cell index={1}>
@@ -346,18 +273,18 @@ const ReceivingDetail: React.FC = () => {
         {/* 操作历史 */}
         <Card type="inner" title="操作历史">
           <Timeline
-            items={timeline.map((item) => ({
+            items={timelineItems.map((item) => ({
               children: (
                 <div>
                   <div style={{ marginBottom: 4 }}>
                     <strong>{item.action}</strong>
                   </div>
                   <div style={{ color: '#666', fontSize: 12 }}>
-                    操作人: {item.operator} | 时间: {item.time}
+                    时间: {new Date(item.time).toLocaleString('zh-CN')}
                   </div>
                 </div>
               ),
-              color: item.status === 'completed' ? 'green' : 'blue',
+              color: item.color,
             }))}
           />
         </Card>
@@ -366,10 +293,8 @@ const ReceivingDetail: React.FC = () => {
 
         {/* 系统信息 */}
         <Descriptions column={2} size="small">
-          <Descriptions.Item label="创建人">{receivingData.createdBy}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">{receivingData.createdAt}</Descriptions.Item>
-          <Descriptions.Item label="最后修改人">{receivingData.updatedBy}</Descriptions.Item>
-          <Descriptions.Item label="最后修改时间">{receivingData.updatedAt}</Descriptions.Item>
+          <Descriptions.Item label="版本号">{receipt.version}</Descriptions.Item>
+          <Descriptions.Item label="记录ID">{receipt.id}</Descriptions.Item>
         </Descriptions>
       </Card>
     </div>
