@@ -1,5 +1,6 @@
 /**
  * @spec N002-unify-supplier-data
+ * @spec N003-supplier-edit
  * 供应商列表页面 - 统一使用后端真实 API 数据
  * 路由: /purchase-management/suppliers
  */
@@ -33,6 +34,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useSupplierStore } from '@/stores/supplierStore';
 import { SupplierStatus } from '@/types/supplier';
 import type { Supplier } from '@/types/supplier';
+import { createSupplier, updateSupplier } from '@/services/supplierApi';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -56,6 +58,7 @@ const SupplierList: React.FC = () => {
   const [editingSupplier, setEditingSupplier] = useState<SupplierListItem | null>(null);
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
 
   // 使用供应商 store
   const items = useSupplierStore((state) => state.items);
@@ -252,18 +255,51 @@ const SupplierList: React.FC = () => {
 
   const handleModalOk = async () => {
     try {
-      await form.validateFields();
-      message.info('保存功能开发中');
+      const values = await form.validateFields();
+      setSaving(true);
+
+      if (editingSupplier) {
+        // 编辑模式 - 调用 updateSupplier API
+        await updateSupplier(editingSupplier.id, {
+          name: values.name,
+          contactName: values.contactPerson || undefined,
+          contactPhone: values.contactPhone || undefined,
+          status: values.status,
+        });
+        message.success('供应商更新成功');
+      } else {
+        // 新建模式 - 调用 createSupplier API
+        await createSupplier({
+          code: values.code,
+          name: values.name,
+          contactName: values.contactPerson || undefined,
+          contactPhone: values.contactPhone || undefined,
+          status: values.status,
+        });
+        message.success('供应商创建成功');
+      }
+
       setIsModalVisible(false);
       form.resetFields();
+      setEditingSupplier(null);
+      // 刷新列表
+      fetchSuppliers();
     } catch (error) {
-      console.error('表单验证失败:', error);
+      if (error instanceof Error) {
+        // 显示错误消息，保持弹窗打开
+        message.error(error.message);
+      } else {
+        console.error('表单验证失败:', error);
+      }
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleModalCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setEditingSupplier(null);
   };
 
   // 错误状态
@@ -383,6 +419,9 @@ const SupplierList: React.FC = () => {
         width={600}
         okText="确定"
         cancelText="取消"
+        confirmLoading={saving}
+        okButtonProps={{ disabled: saving }}
+        cancelButtonProps={{ disabled: saving }}
       >
         <Form
           form={form}
@@ -398,7 +437,10 @@ const SupplierList: React.FC = () => {
                 name="code"
                 rules={[{ required: true, message: '请输入供应商编码' }]}
               >
-                <Input placeholder="请输入供应商编码" />
+                <Input
+                  placeholder="请输入供应商编码"
+                  disabled={!!editingSupplier}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -421,7 +463,7 @@ const SupplierList: React.FC = () => {
               <Form.Item
                 label="联系电话"
                 name="contactPhone"
-                rules={[{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}
+                rules={[{ pattern: /^$|^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}
               >
                 <Input placeholder="请输入联系电话" />
               </Form.Item>

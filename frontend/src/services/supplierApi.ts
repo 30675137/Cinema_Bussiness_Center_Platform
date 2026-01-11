@@ -1,6 +1,14 @@
 /**
  * @spec N002-unify-supplier-data
+ * @spec N003-supplier-edit
  * 供应商 API 服务 - 统一供应商数据源
+ *
+ * 提供以下功能：
+ * - fetchSuppliers: 获取供应商列表
+ * - fetchSuppliersAsFull: 获取完整供应商信息列表
+ * - fetchSupplierById: 获取单个供应商详情
+ * - createSupplier: 创建新供应商 (N003)
+ * - updateSupplier: 更新供应商信息 (N003)
  */
 
 import { SupplierStatus, SupplierType, SupplierLevel } from '@/types/supplier';
@@ -171,4 +179,102 @@ export const fetchSupplierById = async (id: string): Promise<Supplier> => {
   }
 
   return mapDTOToSupplier(result.data);
+};
+
+/**
+ * 创建供应商请求体
+ */
+export interface CreateSupplierRequest {
+  code: string;
+  name: string;
+  contactName?: string;
+  contactPhone?: string;
+  status: string;
+}
+
+/**
+ * 更新供应商请求体
+ */
+export interface UpdateSupplierRequest {
+  name: string;
+  contactName?: string;
+  contactPhone?: string;
+  status: string;
+}
+
+/**
+ * API 错误响应
+ */
+interface ApiErrorResponse {
+  success: false;
+  error: string;
+  message: string;
+  timestamp: string;
+}
+
+/**
+ * 创建供应商
+ * @param data 创建请求
+ * @returns 创建的供应商
+ * @throws Error 当创建失败时（如编码重复返回 409）
+ */
+export const createSupplier = async (data: CreateSupplierRequest): Promise<SupplierListItem> => {
+  const response = await fetch(`${API_BASE}/suppliers`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    const errorResult = result as ApiErrorResponse;
+    if (response.status === 409) {
+      throw new Error('供应商编码已存在');
+    }
+    throw new Error(errorResult.message || `创建供应商失败: ${response.status}`);
+  }
+
+  const successResult = result as ApiResponse<SupplierDTO>;
+  if (!successResult.success) {
+    throw new Error('API 返回错误');
+  }
+
+  return mapDTOToListItem(successResult.data);
+};
+
+/**
+ * 更新供应商
+ * @param id 供应商 ID
+ * @param data 更新请求
+ * @returns 更新后的供应商
+ * @throws Error 当更新失败时
+ */
+export const updateSupplier = async (id: string, data: UpdateSupplierRequest): Promise<SupplierListItem> => {
+  const response = await fetch(`${API_BASE}/suppliers/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    const errorResult = result as ApiErrorResponse;
+    if (response.status === 404) {
+      throw new Error('供应商不存在');
+    }
+    throw new Error(errorResult.message || `更新供应商失败: ${response.status}`);
+  }
+
+  const successResult = result as ApiResponse<SupplierDTO>;
+  if (!successResult.success) {
+    throw new Error('API 返回错误');
+  }
+
+  return mapDTOToListItem(successResult.data);
 };
