@@ -30,6 +30,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { usePurchaseOrder } from '@/features/procurement/hooks/usePurchaseOrders';
+import { useCreateGoodsReceipt } from '@/features/procurement/hooks/useGoodsReceipts';
+import type { CreateGoodsReceiptRequest } from '@/features/procurement/types';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -64,6 +66,9 @@ const ReceivingForm: React.FC = () => {
 
   // 获取采购订单详情
   const { data: orderData, isLoading: orderLoading } = usePurchaseOrder(orderId || '');
+
+  // 创建收货单 mutation
+  const createGoodsReceiptMutation = useCreateGoodsReceipt();
 
   // 当采购订单数据加载完成后，填充表单
   useEffect(() => {
@@ -211,6 +216,11 @@ const ReceivingForm: React.FC = () => {
   ];
 
   const handleSubmit = async (values: any) => {
+    if (!orderId) {
+      message.error('缺少采购订单ID');
+      return;
+    }
+
     if (receivingItems.length === 0) {
       message.warning('请至少添加一条收货明细');
       return;
@@ -225,16 +235,32 @@ const ReceivingForm: React.FC = () => {
       return;
     }
 
-    setLoading(true);
+    // 映射前端质检状态到后端枚举
+    // 后端枚举: QUALIFIED, UNQUALIFIED, PENDING_CHECK
+    const qualityStatusMap: Record<string, string> = {
+      pending: 'PENDING_CHECK',
+      passed: 'QUALIFIED',
+      failed: 'UNQUALIFIED',
+    };
+
+    // 构建请求数据
+    const requestData: CreateGoodsReceiptRequest = {
+      purchaseOrderId: orderId,
+      remarks: values.remark || '',
+      items: receivingItems.map((item) => ({
+        skuId: item.skuId,
+        receivedQty: item.receivingQuantity,
+        qualityStatus: qualityStatusMap[item.qualityStatus] || 'PENDING_CHECK',
+        rejectionReason: item.qualityStatus === 'failed' ? item.remark : undefined,
+      })),
+    };
+
     try {
-      // TODO: 调用API保存收货单
-      console.log('提交收货单:', { ...values, items: receivingItems });
+      await createGoodsReceiptMutation.mutateAsync(requestData);
       message.success('收货单创建成功');
       navigate('/purchase-management/receipts');
-    } catch (error) {
-      message.error('创建失败，请重试');
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      message.error(error.message || '创建失败，请重试');
     }
   };
 
@@ -288,7 +314,7 @@ const ReceivingForm: React.FC = () => {
               type="primary"
               icon={<CheckOutlined />}
               onClick={() => form.submit()}
-              loading={loading}
+              loading={createGoodsReceiptMutation.isPending}
             >
               确认收货
             </Button>

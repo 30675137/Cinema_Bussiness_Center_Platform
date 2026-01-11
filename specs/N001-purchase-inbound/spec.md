@@ -2,7 +2,8 @@
 
 **Feature Branch**: `N001-purchase-inbound`
 **Created**: 2026-01-11
-**Status**: Draft
+**Updated**: 2026-01-11
+**Status**: ✅ Completed
 **Input**: User description: "完整实现采购入库模块 - 采购订单创建、到货验收、收货入库功能，支持新SKU入库和库存初始化"
 
 ## 功能概述
@@ -191,17 +192,17 @@
 
 ### 复用总结
 
-| 菜单功能 | 现有组件 | 复用状态 | 说明 |
+| 菜单功能 | 现有组件 | 实现状态 | 说明 |
 |---------|---------|---------|------|
-| 供应商管理 | SupplierList.tsx, SupplierDetail.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据为 JPA API |
-| 采购订单列表 | PurchaseOrderList.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据 |
-| 新建采购订单 | PurchaseOrders.tsx | ⚠️ 需完善 | 基础表单存在，但"采购明细"功能未开发 |
-| 新建收货入库 | ReceivingForm.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据 |
-| 收货入库列表 | ReceivingList.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据 |
-| 收货入库详情 | ReceivingDetail.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据 |
-| 调拨管理 | TransferManagePage.tsx | ✅ 可复用 | UI 完整，需替换 Mock 数据 |
-| 异常/短缺/拒收登记 | - | ❌ 不存在 | 需新建或在收货入库流程中集成 |
-| 入库单历史/查询 | ReceivingList.tsx | ✅ 复用 | 同收货入库列表 |
+| 供应商管理 | SupplierList.tsx, SupplierDetail.tsx | ✅ 已完成 | 已集成 JPA API (SupplierController) |
+| 采购订单列表 | PurchaseOrderList.tsx | ✅ 已完成 | 已集成 usePurchaseOrders Hook |
+| 新建采购订单 | PurchaseOrders.tsx | ✅ 已完成 | 已实现 SKU 选择器和 useCreatePurchaseOrder |
+| 新建收货入库 | ReceivingForm.tsx | ✅ 已完成 | 已集成 useCreateGoodsReceipt Hook (2026-01-11) |
+| 收货入库列表 | ReceivingList.tsx | ✅ 已完成 | 已集成 useGoodsReceipts Hook (2026-01-11) |
+| 收货入库详情 | ReceivingDetail.tsx | ✅ 已完成 | 已集成 useGoodsReceipt Hook |
+| 调拨管理 | TransferManagePage.tsx | ⏳ 后续迭代 | UI 存在，后续集成 API |
+| 异常/短缺/拒收登记 | - | ⏳ 后续迭代 | 通过 qualityStatus 字段在收货流程中处理 |
+| 入库单历史/查询 | ReceivingList.tsx | ✅ 已完成 | 同收货入库列表 |
 
 ### 详细分析
 
@@ -296,10 +297,28 @@
 
 ### 前端改造工作
 
-| 组件 | 改造内容 | 工作量 |
-|------|---------|-------|
-| PurchaseOrders.tsx | 完成采购明细 SKU 选择器 | 中 |
-| PurchaseOrderList.tsx | 替换 Mock → API | 小 |
-| ReceivingForm.tsx | 替换 Mock → API | 小 |
-| ReceivingList.tsx | 替换 Mock → API | 小 |
-| ReceivingDetail.tsx | 替换 Mock → API | 小 |
+| 组件 | 改造内容 | 状态 | 完成日期 |
+|------|---------|------|---------|
+| PurchaseOrders.tsx | 完成采购明细 SKU 选择器 | ✅ 已完成 | 2026-01-11 |
+| PurchaseOrderList.tsx | 替换 Mock → API | ✅ 已完成 | 2026-01-11 |
+| ReceivingForm.tsx | 替换 Mock → API，集成 useCreateGoodsReceipt | ✅ 已完成 | 2026-01-11 |
+| ReceivingList.tsx | 替换 Mock → API，集成 useGoodsReceipts | ✅ 已完成 | 2026-01-11 |
+| ReceivingDetail.tsx | 替换 Mock → API | ✅ 已完成 | 2026-01-11 |
+
+### 关键实现细节
+
+#### 质检状态映射 (ReceivingForm.tsx)
+
+前端表单值与后端枚举映射：
+- `pending` → `PENDING_CHECK` (待检验)
+- `passed` → `QUALIFIED` (合格)
+- `failed` → `UNQUALIFIED` (不合格)
+
+#### 供应商筛选修复 (PurchaseOrderRepository)
+
+JPQL 查询从 `po.supplierId` 修改为 `po.supplier.id` 以支持 JPA 关联查询。
+
+---
+
+**文档维护人**: Claude Code
+**最后更新**: 2026-01-11

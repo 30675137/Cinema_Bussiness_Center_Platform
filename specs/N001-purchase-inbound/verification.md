@@ -1,9 +1,10 @@
 # N001-purchase-inbound 功能验证文档
 
 **@spec N001-purchase-inbound**
-**版本**: 1.0.0
+**版本**: 1.1.0
 **创建日期**: 2026-01-11
-**状态**: 待验证
+**最后更新**: 2026-01-11
+**状态**: 功能验证完成
 
 ---
 
@@ -588,35 +589,39 @@ curl -X GET http://localhost:8080/api/purchase-orders/00000000-0000-0000-0000-00
 
 ### 4.1 TanStack Query Hooks
 
-| Hook | 功能 | 验证方法 |
-|------|------|---------|
-| `usePurchaseOrders` | 获取采购订单列表 | 页面加载后数据正确显示 |
-| `usePurchaseOrder` | 获取单个订单详情 | 点击订单后详情正确加载 |
-| `useCreatePurchaseOrder` | 创建采购订单 | 提交表单后订单创建成功 |
-| `useDeletePurchaseOrder` | 删除采购订单 | 删除后列表自动刷新 |
-| `useSubmitPurchaseOrder` | 提交审核 | 状态变更后 UI 更新 |
-| `useApprovePurchaseOrder` | 审批通过 | 审批后状态变更 |
-| `useRejectPurchaseOrder` | 审批拒绝 | 需填写原因，拒绝后状态变更 |
-| `useGoodsReceipts` | 获取收货入库单列表 | 列表数据正确 |
-| `useGoodsReceipt` | 获取收货单详情 | 详情数据正确 |
-| `useCreateGoodsReceipt` | 创建收货单 | 基于订单创建成功 |
-| `useConfirmGoodsReceipt` | 确认收货 | 库存更新提示显示 |
-| `usePurchaseOrderHistory` | 获取状态历史 | 时间线正确显示 |
-| `usePurchaseOrderSummary` | 获取统计摘要 | 数字卡片正确显示 |
-| `usePendingApprovalOrders` | 获取待审批列表 | 审批列表正确 |
+| Hook | 功能 | 验证方法 | 状态 |
+|------|------|---------|------|
+| `usePurchaseOrders` | 获取采购订单列表 | 页面加载后数据正确显示 | ✅ 已验证 |
+| `usePurchaseOrder` | 获取单个订单详情 | 点击订单后详情正确加载 | ✅ 已验证 |
+| `useCreatePurchaseOrder` | 创建采购订单 | 提交表单后订单创建成功 | ✅ 已验证 |
+| `useDeletePurchaseOrder` | 删除采购订单 | 删除后列表自动刷新 | ✅ 已验证 |
+| `useSubmitPurchaseOrder` | 提交审核 | 状态变更后 UI 更新 | ✅ 已验证 |
+| `useApprovePurchaseOrder` | 审批通过 | 审批后状态变更 | ✅ 已验证 |
+| `useRejectPurchaseOrder` | 审批拒绝 | 需填写原因，拒绝后状态变更 | ✅ 已验证 |
+| `useGoodsReceipts` | 获取收货入库单列表 | 列表数据正确 | ✅ 已验证 |
+| `useGoodsReceipt` | 获取收货单详情 | 详情数据正确 | ✅ 已验证 |
+| `useCreateGoodsReceipt` | 创建收货单 | 基于订单创建成功 | ✅ 已验证 (2026-01-11) |
+| `useConfirmGoodsReceipt` | 确认收货 | 库存更新提示显示 | ✅ 已验证 |
+| `useCancelGoodsReceipt` | 取消收货单 | 状态变更后 UI 更新 | ✅ 已验证 |
+| `usePurchaseOrderHistory` | 获取状态历史 | 时间线正确显示 | ✅ 已验证 |
+| `usePurchaseOrderSummary` | 获取统计摘要 | 数字卡片正确显示 | ✅ 已验证 |
+| `usePendingApprovalOrders` | 获取待审批列表 | 审批列表正确 | ✅ 已验证 |
 
 ### 4.2 UI 交互验证
 
-- [ ] 采购订单列表支持分页
-- [ ] 采购订单列表支持按状态筛选
-- [ ] 采购订单列表支持按门店筛选
-- [ ] 新建订单表单验证（必填字段）
-- [ ] 订单明细支持添加多个 SKU
-- [ ] 订单金额实时计算
-- [ ] 状态变更后 UI 自动刷新
-- [ ] 收货入库支持部分收货
-- [ ] 质检状态可选择（合格/不合格/待检验）
-- [ ] 拒绝原因弹窗必填验证
+- [x] 采购订单列表支持分页
+- [x] 采购订单列表支持按状态筛选
+- [x] 采购订单列表支持按门店筛选
+- [x] 采购订单列表支持按供应商筛选 (2026-01-11 修复 JPQL 查询)
+- [x] 新建订单表单验证（必填字段）
+- [x] 订单明细支持添加多个 SKU
+- [x] 订单金额实时计算
+- [x] 状态变更后 UI 自动刷新
+- [x] 收货入库支持部分收货
+- [x] 质检状态可选择（合格/不合格/待检验）
+- [x] 拒绝原因弹窗必填验证
+- [x] 收货入库单创建成功后跳转列表页 (2026-01-11 修复)
+- [x] 收货入库列表显示真实 API 数据 (2026-01-11 修复)
 
 ---
 
@@ -709,20 +714,20 @@ WHERE gri.goods_receipt_id = '<receipt-id>';
 
 | 测试用例 | 执行日期 | 执行人 | 结果 | 备注 |
 |---------|---------|--------|------|------|
-| TC-001 | | | | |
-| TC-002 | | | | |
-| TC-003 | | | | |
-| TC-004 | | | | |
-| TC-005 | | | | |
-| TC-006 | | | | |
-| TC-007 | | | | |
-| TC-008 | | | | |
-| TC-009 | | | | |
-| TC-010 | | | | |
-| TC-011 | | | | |
-| TC-012 | | | | |
-| TC-013 | | | | |
-| TC-014 | | | | |
+| TC-001 | 2026-01-11 | Claude | ✅ Pass | 创建订单成功 |
+| TC-002 | 2026-01-11 | Claude | ✅ Pass | 验证缺少必填字段返回400 |
+| TC-003 | 2026-01-11 | Claude | ✅ Pass | 提交审核状态变更正常 |
+| TC-004 | 2026-01-11 | Claude | ✅ Pass | 非草稿状态提交被拒绝 |
+| TC-005 | 2026-01-11 | Claude | ✅ Pass | 收货入库单创建成功 |
+| TC-006 | 2026-01-11 | Claude | ✅ Pass | 确认收货后库存更新 |
+| TC-007 | 2026-01-11 | Claude | ✅ Pass | 部分收货订单状态更新 |
+| TC-008 | 2026-01-11 | Claude | ✅ Pass | 状态历史记录完整 |
+| TC-009 | 2026-01-11 | Claude | ✅ Pass | 统计摘要数据正确 |
+| TC-010 | 2026-01-11 | Claude | ✅ Pass | 审批通过流程正常 |
+| TC-011 | 2026-01-11 | Claude | ✅ Pass | 审批拒绝流程正常 |
+| TC-012 | 2026-01-11 | Claude | ✅ Pass | 拒绝必填原因验证 |
+| TC-013 | - | - | ⏳ Pending | 待进行压力测试 |
+| TC-014 | 2026-01-11 | Claude | ✅ Pass | 404资源不存在验证 |
 
 ---
 

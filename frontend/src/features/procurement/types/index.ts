@@ -117,8 +117,8 @@ export interface PaginatedResponse<T> {
 // 收货入库单状态
 export type GoodsReceiptStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 
-// 质检状态
-export type QualityStatus = 'QUALIFIED' | 'UNQUALIFIED' | 'PENDING_INSPECTION';
+// 质检状态 (匹配后端枚举: QUALIFIED, UNQUALIFIED, PENDING_CHECK)
+export type QualityStatus = 'QUALIFIED' | 'UNQUALIFIED' | 'PENDING_CHECK';
 
 // 采购订单摘要（用于收货单）
 export interface PurchaseOrderSummary {
