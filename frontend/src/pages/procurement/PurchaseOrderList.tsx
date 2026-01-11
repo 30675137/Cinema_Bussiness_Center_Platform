@@ -1,79 +1,68 @@
-import React from 'react';
-import { Card, Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col } from 'antd';
+/**
+ * @spec N001-purchase-inbound
+ * 采购订单列表页面
+ * 路由: /purchase-management/orders/list
+ */
+import React, { useState } from 'react';
+import { Card, Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col, Spin, message, Popconfirm } from 'antd';
 import {
   PlusOutlined,
   ExportOutlined,
   ReloadOutlined,
   EyeOutlined,
   EditOutlined,
+  DeleteOutlined,
+  SendOutlined,
+  CheckOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { useNavigate } from 'react-router-dom';
+import {
+  usePurchaseOrders,
+  useDeletePurchaseOrder,
+  useSubmitPurchaseOrder,
+  useApprovePurchaseOrder,
+  useRejectPurchaseOrder,
+} from '@/features/procurement/hooks/usePurchaseOrders';
+import type { PurchaseOrder, PurchaseOrderQueryParams } from '@/features/procurement/types';
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
-const { Option } = Select;
-
-interface PurchaseOrder {
-  id: string;
-  orderNumber: string;
-  title: string;
-  supplier: string;
-  totalAmount: number;
-  status: string;
-  priority: string;
-  orderDate: string;
-  expectedDeliveryDate: string;
-  creator: string;
-}
 
 /**
  * 采购订单列表页面
- * 路由: /purchase-management/orders/list
  */
 const PurchaseOrderList: React.FC = () => {
-  // Mock数据
-  const mockData: PurchaseOrder[] = [
-    {
-      id: '1',
-      orderNumber: 'PO202512110001',
-      title: '12月爆米花原料采购',
-      supplier: '供应商A',
-      totalAmount: 15800,
-      status: 'pending',
-      priority: 'high',
-      orderDate: '2025-12-11',
-      expectedDeliveryDate: '2025-12-15',
-      creator: '张三',
-    },
-    {
-      id: '2',
-      orderNumber: 'PO202512110002',
-      title: '饮料杯采购',
-      supplier: '供应商B',
-      totalAmount: 8500,
-      status: 'approved',
-      priority: 'normal',
-      orderDate: '2025-12-10',
-      expectedDeliveryDate: '2025-12-14',
-      creator: '李四',
-    },
-  ];
+  const navigate = useNavigate();
+  const [queryParams, setQueryParams] = useState<PurchaseOrderQueryParams>({
+    page: 1,
+    pageSize: 10,
+  });
+
+  // 获取采购订单列表
+  const { data: ordersData, isLoading, refetch } = usePurchaseOrders(queryParams);
+  const orders = ordersData?.data || [];
+  const total = ordersData?.total || 0;
+
+  // 删除采购订单
+  const deleteMutation = useDeletePurchaseOrder();
+  // 提交审核
+  const submitMutation = useSubmitPurchaseOrder();
+  // 审批通过
+  const approveMutation = useApprovePurchaseOrder();
+  // 审批拒绝
+  const rejectMutation = useRejectPurchaseOrder();
 
   // 状态映射
   const statusMap: Record<string, { label: string; color: string }> = {
-    draft: { label: '草稿', color: 'default' },
-    pending: { label: '待审核', color: 'processing' },
-    approved: { label: '已审核', color: 'success' },
-    rejected: { label: '已拒绝', color: 'error' },
-    completed: { label: '已完成', color: 'success' },
-  };
-
-  // 优先级映射
-  const priorityMap: Record<string, { label: string; color: string }> = {
-    low: { label: '低', color: 'default' },
-    normal: { label: '普通', color: 'blue' },
-    high: { label: '高', color: 'orange' },
-    urgent: { label: '紧急', color: 'red' },
+    DRAFT: { label: '草稿', color: 'default' },
+    PENDING_APPROVAL: { label: '待审核', color: 'processing' },
+    APPROVED: { label: '已审核', color: 'success' },
+    REJECTED: { label: '已拒绝', color: 'error' },
+    RECEIVING: { label: '收货中', color: 'blue' },
+    COMPLETED: { label: '已完成', color: 'green' },
+    CANCELLED: { label: '已取消', color: 'default' },
   };
 
   // 表格列定义
@@ -86,15 +75,15 @@ const PurchaseOrderList: React.FC = () => {
       fixed: 'left',
     },
     {
-      title: '订单标题',
-      dataIndex: 'title',
-      key: 'title',
-      width: 200,
+      title: '供应商',
+      dataIndex: 'supplierName',
+      key: 'supplierName',
+      width: 150,
     },
     {
-      title: '供应商',
-      dataIndex: 'supplier',
-      key: 'supplier',
+      title: '目标门店',
+      dataIndex: 'storeName',
+      key: 'storeName',
       width: 120,
     },
     {
@@ -102,8 +91,8 @@ const PurchaseOrderList: React.FC = () => {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       width: 120,
-      render: (amount: number) => `¥${amount.toLocaleString()}`,
-      sorter: (a, b) => a.totalAmount - b.totalAmount,
+      render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
+      sorter: (a, b) => (a.totalAmount || 0) - (b.totalAmount || 0),
     },
     {
       title: '状态',
@@ -116,66 +105,175 @@ const PurchaseOrderList: React.FC = () => {
       },
     },
     {
-      title: '优先级',
-      dataIndex: 'priority',
-      key: 'priority',
-      width: 100,
-      render: (priority: string) => {
-        const priorityInfo = priorityMap[priority] || { label: priority, color: 'default' };
-        return <Tag color={priorityInfo.color}>{priorityInfo.label}</Tag>;
-      },
-    },
-    {
-      title: '下单日期',
-      dataIndex: 'orderDate',
-      key: 'orderDate',
+      title: '计划到货日期',
+      dataIndex: 'plannedArrivalDate',
+      key: 'plannedArrivalDate',
       width: 120,
-      sorter: (a, b) => new Date(a.orderDate).getTime() - new Date(b.orderDate).getTime(),
+      render: (date: string) => date || '-',
     },
     {
-      title: '预计交付',
-      dataIndex: 'expectedDeliveryDate',
-      key: 'expectedDeliveryDate',
-      width: 120,
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 180,
+      render: (date: string) => date ? new Date(date).toLocaleString('zh-CN') : '-',
+      sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
-      title: '创建人',
-      dataIndex: 'creator',
-      key: 'creator',
-      width: 100,
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      width: 150,
+      ellipsis: true,
+      render: (remarks: string) => remarks || '-',
     },
     {
       title: '操作',
       key: 'actions',
-      width: 150,
+      width: 250,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
-          <Button type="link" size="small" icon={<EyeOutlined />}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/purchase-management/orders/${record.id}`)}
+          >
             查看
           </Button>
-          <Button type="link" size="small" icon={<EditOutlined />}>
-            编辑
-          </Button>
+          {record.status === 'DRAFT' && (
+            <>
+              <Button
+                type="link"
+                size="small"
+                icon={<SendOutlined />}
+                onClick={() => handleSubmit(record.id)}
+                loading={submitMutation.isPending}
+              >
+                提交
+              </Button>
+              <Popconfirm
+                title="确定删除该订单？"
+                onConfirm={() => handleDelete(record.id)}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  loading={deleteMutation.isPending}
+                >
+                  删除
+                </Button>
+              </Popconfirm>
+            </>
+          )}
+          {record.status === 'PENDING_APPROVAL' && (
+            <>
+              <Button
+                type="link"
+                size="small"
+                icon={<CheckOutlined />}
+                style={{ color: '#52c41a' }}
+                onClick={() => handleApprove(record.id)}
+                loading={approveMutation.isPending}
+              >
+                通过
+              </Button>
+              <Button
+                type="link"
+                size="small"
+                danger
+                icon={<CloseOutlined />}
+                onClick={() => handleReject(record.id)}
+                loading={rejectMutation.isPending}
+              >
+                拒绝
+              </Button>
+            </>
+          )}
         </Space>
       ),
     },
   ];
 
+  // 搜索
   const handleSearch = (value: string) => {
     console.log('搜索:', value);
+    // TODO: 实现搜索功能
   };
 
+  // 刷新
   const handleRefresh = () => {
-    console.log('刷新列表');
+    refetch();
+    message.success('列表已刷新');
   };
 
+  // 导出
   const handleExport = () => {
-    console.log('导出数据');
+    message.info('导出功能开发中');
   };
 
+  // 创建订单
   const handleCreate = () => {
-    console.log('创建订单');
+    navigate('/purchase-management/orders');
+  };
+
+  // 删除订单
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      message.success('订单删除成功');
+    } catch (error) {
+      message.error('删除失败');
+    }
+  };
+
+  // 提交审核
+  const handleSubmit = async (id: string) => {
+    try {
+      await submitMutation.mutateAsync(id);
+      message.success('提交审核成功');
+    } catch (error) {
+      message.error('提交失败');
+    }
+  };
+
+  // 审批通过
+  const handleApprove = async (id: string) => {
+    try {
+      await approveMutation.mutateAsync(id);
+      message.success('审批通过');
+    } catch (error) {
+      message.error('审批失败');
+    }
+  };
+
+  // 审批拒绝
+  const handleReject = async (id: string) => {
+    try {
+      await rejectMutation.mutateAsync({ id, reason: '审批拒绝' });
+      message.success('已拒绝');
+    } catch (error) {
+      message.error('操作失败');
+    }
+  };
+
+  // 状态筛选
+  const handleStatusChange = (status: string | undefined) => {
+    setQueryParams((prev) => ({ ...prev, status, page: 1 }));
+  };
+
+  // 分页变化
+  const handleTableChange = (pagination: { current?: number; pageSize?: number }) => {
+    setQueryParams((prev) => ({
+      ...prev,
+      page: pagination.current || 1,
+      pageSize: pagination.pageSize || 10,
+    }));
   };
 
   return (
@@ -184,7 +282,7 @@ const PurchaseOrderList: React.FC = () => {
         title="采购订单列表"
         extra={
           <Space>
-            <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
+            <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={isLoading}>
               刷新
             </Button>
             <Button icon={<ExportOutlined />} onClick={handleExport}>
@@ -199,23 +297,22 @@ const PurchaseOrderList: React.FC = () => {
         {/* 筛选区域 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Search placeholder="搜索订单编号、标题或供应商" onSearch={handleSearch} allowClear />
+            <Search placeholder="搜索订单编号" onSearch={handleSearch} allowClear />
           </Col>
           <Col span={4}>
-            <Select placeholder="订单状态" style={{ width: '100%' }} allowClear>
-              <Option value="draft">草稿</Option>
-              <Option value="pending">待审核</Option>
-              <Option value="approved">已审核</Option>
-              <Option value="rejected">已拒绝</Option>
-              <Option value="completed">已完成</Option>
-            </Select>
-          </Col>
-          <Col span={4}>
-            <Select placeholder="优先级" style={{ width: '100%' }} allowClear>
-              <Option value="low">低</Option>
-              <Option value="normal">普通</Option>
-              <Option value="high">高</Option>
-              <Option value="urgent">紧急</Option>
+            <Select
+              placeholder="订单状态"
+              style={{ width: '100%' }}
+              allowClear
+              onChange={handleStatusChange}
+            >
+              <Select.Option value="DRAFT">草稿</Select.Option>
+              <Select.Option value="PENDING_APPROVAL">待审核</Select.Option>
+              <Select.Option value="APPROVED">已审核</Select.Option>
+              <Select.Option value="REJECTED">已拒绝</Select.Option>
+              <Select.Option value="RECEIVING">收货中</Select.Option>
+              <Select.Option value="COMPLETED">已完成</Select.Option>
+              <Select.Option value="CANCELLED">已取消</Select.Option>
             </Select>
           </Col>
           <Col span={8}>
@@ -224,19 +321,23 @@ const PurchaseOrderList: React.FC = () => {
         </Row>
 
         {/* 表格 */}
-        <Table
-          columns={columns}
-          dataSource={mockData}
-          rowKey="id"
-          scroll={{ x: 1300 }}
-          pagination={{
-            total: mockData.length,
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条`,
-          }}
-        />
+        <Spin spinning={isLoading}>
+          <Table
+            columns={columns}
+            dataSource={orders}
+            rowKey="id"
+            scroll={{ x: 1400 }}
+            pagination={{
+              current: queryParams.page,
+              pageSize: queryParams.pageSize,
+              total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 条`,
+            }}
+            onChange={(pagination) => handleTableChange(pagination)}
+          />
+        </Spin>
       </Card>
     </div>
   );

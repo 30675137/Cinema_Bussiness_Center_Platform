@@ -36,8 +36,8 @@ import SkuSelectorModal, {
 import {
   useSuppliers,
   useCreatePurchaseOrder,
+  useProcurementStores,
 } from '@/features/procurement/hooks/usePurchaseOrders';
-import { useStores } from '@/features/scenario-package-management/hooks/useStores';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -59,9 +59,8 @@ const PurchaseOrders: React.FC = () => {
   const { data: suppliersData, isLoading: suppliersLoading } = useSuppliers();
   const suppliers = suppliersData?.data || [];
 
-  // 获取门店列表
-  const { data: storesData, isLoading: storesLoading } = useStores();
-  const stores = storesData || [];
+  // 获取门店列表（使用采购模块专用的 JPA 数据源）
+  const { data: stores = [], isLoading: storesLoading } = useProcurementStores();
 
   // 创建采购订单
   const createMutation = useCreatePurchaseOrder();
@@ -158,7 +157,7 @@ const PurchaseOrders: React.FC = () => {
 
       await createMutation.mutateAsync(requestData);
       message.success('采购订单创建成功');
-      navigate('/purchase-management');
+      navigate('/purchase-management/orders/list');
     } catch (error) {
       if (error instanceof Error) {
         message.error(error.message);

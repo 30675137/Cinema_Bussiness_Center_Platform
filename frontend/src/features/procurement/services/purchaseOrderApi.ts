@@ -144,3 +144,23 @@ export const supplierApi = {
     return fetchJson<ApiResponse<Supplier[]>>(url);
   },
 };
+
+// 采购模块门店 DTO 类型
+export interface ProcurementStore {
+  id: string;
+  code: string;
+  name: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 采购模块门店 API（使用 JPA 数据源）
+export const procurementStoreApi = {
+  /**
+   * 获取采购模块门店列表（来自 JPA 数据库）
+   */
+  async list(): Promise<ApiResponse<ProcurementStore[]>> {
+    return fetchJson<ApiResponse<ProcurementStore[]>>(`${API_BASE}/procurement/stores`);
+  },
+};

@@ -3,7 +3,7 @@
  * 采购订单 TanStack Query Hooks
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { purchaseOrderApi, supplierApi } from '../services/purchaseOrderApi';
+import { purchaseOrderApi, supplierApi, procurementStoreApi } from '../services/purchaseOrderApi';
 import type {
   PurchaseOrder,
   CreatePurchaseOrderRequest,
@@ -22,6 +22,11 @@ export const purchaseOrderKeys = {
 export const supplierKeys = {
   all: ['suppliers'] as const,
   list: (status?: string) => [...supplierKeys.all, 'list', status] as const,
+};
+
+export const procurementStoreKeys = {
+  all: ['procurementStores'] as const,
+  list: () => [...procurementStoreKeys.all, 'list'] as const,
 };
 
 /**
@@ -128,6 +133,19 @@ export function useSuppliers(status?: string) {
     queryKey: supplierKeys.list(status),
     queryFn: () => supplierApi.list(status),
     staleTime: 5 * 60 * 1000, // 5分钟
+  });
+}
+
+/**
+ * 获取采购模块门店列表（使用 JPA 数据源）
+ * 注意：这里使用的是 /api/procurement/stores 端点，与门店管理 /api/stores 不同
+ */
+export function useProcurementStores() {
+  return useQuery({
+    queryKey: procurementStoreKeys.list(),
+    queryFn: () => procurementStoreApi.list(),
+    staleTime: 5 * 60 * 1000, // 5分钟
+    select: (response) => response.data, // 直接返回门店数组
   });
 }
 
