@@ -1,7 +1,8 @@
 /**
- * 供应商Store
+ * @spec N002-unify-supplier-data
+ * 供应商Store - 统一供应商数据源
  */
-import { createStore, createModalStore, createAsyncAction } from './baseStore';
+import { createStore, createAsyncAction } from './baseStore';
 import {
   Supplier,
   SupplierStatus,
@@ -11,8 +12,8 @@ import {
   CreateSupplierParams,
   UpdateSupplierParams,
   SupplierStatistics,
-  SupplierBatchOperationParams,
 } from '../types/supplier';
+import { fetchSuppliersAsFull } from '@/services/supplierApi';
 
 // 供应商状态类型
 export type SupplierStoreState = {
@@ -291,13 +292,11 @@ const actions: SupplierStoreActions = {
 
     return createAsyncAction(
       async () => {
-        // TODO: 调用API服务
-        // const response = await supplierService.getSuppliers(params);
-        // setItems(response.data.items);
-
-        // Mock数据 - 暂时返回空数组
-        setItems([]);
-        return [];
+        // @spec N002-unify-supplier-data - 调用真实后端 API
+        const statusParam = params?.status;
+        const suppliers = await fetchSuppliersAsFull(statusParam);
+        setItems(suppliers);
+        return suppliers;
       },
       setLoading,
       setError

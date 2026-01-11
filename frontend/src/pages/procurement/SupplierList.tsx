@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+/**
+ * @spec N002-unify-supplier-data
+ * 供应商列表页面 - 统一使用后端真实 API 数据
+ * 路由: /purchase-management/suppliers
+ */
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   Table,
@@ -12,6 +17,8 @@ import {
   Modal,
   Form,
   message,
+  Spin,
+  Empty,
 } from 'antd';
 import {
   PlusOutlined,
@@ -23,215 +30,137 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
+import { useSupplierStore } from '@/stores/supplierStore';
+import { SupplierStatus } from '@/types/supplier';
+import type { Supplier } from '@/types/supplier';
 
 const { Search } = Input;
 const { Option } = Select;
 
-interface Supplier {
+/**
+ * 供应商列表视图项（用于表格展示）
+ */
+interface SupplierListItem {
   id: string;
-  supplierCode: string;
-  supplierName: string;
+  code: string;
+  name: string;
   contactPerson: string;
   contactPhone: string;
-  email: string;
-  address: string;
-  category: string;
-  status: string;
-  creditRating: string;
-  totalOrders: number;
-  totalAmount: number;
-  createdAt: string;
+  status: SupplierStatus;
 }
 
-/**
- * 供应商列表页面
- * 路由: /purchase-management/suppliers
- */
 const SupplierList: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [editingSupplier, setEditingSupplier] = useState<SupplierListItem | null>(null);
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 
-  // Mock数据
-  const mockData: Supplier[] = [
-    {
-      id: '1',
-      supplierCode: 'SUP001',
-      supplierName: '供应商A',
-      contactPerson: '张三',
-      contactPhone: '13800138001',
-      email: 'supplier-a@example.com',
-      address: '北京市朝阳区xxx街道xxx号',
-      category: 'food',
-      status: 'active',
-      creditRating: 'A',
-      totalOrders: 156,
-      totalAmount: 1580000,
-      createdAt: '2024-01-15',
-    },
-    {
-      id: '2',
-      supplierCode: 'SUP002',
-      supplierName: '供应商B',
-      contactPerson: '李四',
-      contactPhone: '13800138002',
-      email: 'supplier-b@example.com',
-      address: '上海市浦东新区xxx路xxx号',
-      category: 'beverage',
-      status: 'active',
-      creditRating: 'A+',
-      totalOrders: 203,
-      totalAmount: 2350000,
-      createdAt: '2024-02-20',
-    },
-    {
-      id: '3',
-      supplierCode: 'SUP003',
-      supplierName: '供应商C',
-      contactPerson: '王五',
-      contactPhone: '13800138003',
-      email: 'supplier-c@example.com',
-      address: '广州市天河区xxx大道xxx号',
-      category: 'equipment',
-      status: 'inactive',
-      creditRating: 'B',
-      totalOrders: 45,
-      totalAmount: 680000,
-      createdAt: '2024-03-10',
-    },
-    {
-      id: '4',
-      supplierCode: 'SUP004',
-      supplierName: '供应商D',
-      contactPerson: '赵六',
-      contactPhone: '13800138004',
-      email: 'supplier-d@example.com',
-      address: '深圳市南山区xxx街xxx栋',
-      category: 'packaging',
-      status: 'active',
-      creditRating: 'A',
-      totalOrders: 89,
-      totalAmount: 950000,
-      createdAt: '2024-04-05',
-    },
-  ];
+  // 使用供应商 store
+  const items = useSupplierStore((state) => state.items);
+  const loading = useSupplierStore((state) => state.loading);
+  const error = useSupplierStore((state) => state.error);
+  const fetchSuppliers = useSupplierStore((state) => state.fetchSuppliers);
+
+  // 加载供应商数据
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
+
+  // 将 Supplier 转换为列表视图项
+  const suppliers: SupplierListItem[] = useMemo(() => {
+    if (!items || !Array.isArray(items)) return [];
+
+    return items.map((supplier: Supplier) => ({
+      id: supplier.id,
+      code: supplier.code,
+      name: supplier.name,
+      contactPerson: supplier.contacts?.[0]?.name || '',
+      contactPhone: supplier.phone || supplier.contacts?.[0]?.phone || '',
+      status: supplier.status,
+    }));
+  }, [items]);
+
+  // 应用搜索和筛选
+  const filteredSuppliers = useMemo(() => {
+    let result = suppliers;
+
+    // 搜索过滤
+    if (searchText) {
+      const lowerSearch = searchText.toLowerCase();
+      result = result.filter(
+        (s) =>
+          s.code.toLowerCase().includes(lowerSearch) ||
+          s.name.toLowerCase().includes(lowerSearch) ||
+          s.contactPerson.toLowerCase().includes(lowerSearch)
+      );
+    }
+
+    // 状态过滤
+    if (statusFilter) {
+      result = result.filter((s) => s.status === statusFilter);
+    }
+
+    return result;
+  }, [suppliers, searchText, statusFilter]);
+
+  // 统计数据
+  const statistics = useMemo(() => {
+    const total = suppliers.length;
+    const active = suppliers.filter((s) => s.status === SupplierStatus.ACTIVE).length;
+    return { total, active };
+  }, [suppliers]);
 
   // 状态映射
   const statusMap: Record<string, { label: string; color: string }> = {
-    active: { label: '启用', color: 'success' },
-    inactive: { label: '停用', color: 'default' },
-    suspended: { label: '暂停合作', color: 'warning' },
-  };
-
-  // 供应商类别映射
-  const categoryMap: Record<string, string> = {
-    food: '食品类',
-    beverage: '饮料类',
-    equipment: '设备类',
-    packaging: '包装类',
-    other: '其他',
-  };
-
-  // 信用评级映射
-  const creditRatingMap: Record<string, { label: string; color: string }> = {
-    'A+': { label: 'A+', color: 'gold' },
-    A: { label: 'A', color: 'green' },
-    B: { label: 'B', color: 'blue' },
-    C: { label: 'C', color: 'orange' },
-    D: { label: 'D', color: 'red' },
+    [SupplierStatus.ACTIVE]: { label: '启用', color: 'success' },
+    [SupplierStatus.SUSPENDED]: { label: '暂停', color: 'warning' },
+    [SupplierStatus.TERMINATED]: { label: '终止', color: 'error' },
+    [SupplierStatus.PENDING_APPROVAL]: { label: '待审批', color: 'processing' },
+    [SupplierStatus.UNDER_REVIEW]: { label: '复核中', color: 'default' },
   };
 
   // 表格列定义
-  const columns: ColumnsType<Supplier> = [
+  const columns: ColumnsType<SupplierListItem> = [
     {
       title: '供应商编码',
-      dataIndex: 'supplierCode',
-      key: 'supplierCode',
-      width: 120,
+      dataIndex: 'code',
+      key: 'code',
+      width: 140,
       fixed: 'left',
     },
     {
       title: '供应商名称',
-      dataIndex: 'supplierName',
-      key: 'supplierName',
-      width: 180,
+      dataIndex: 'name',
+      key: 'name',
+      width: 200,
       fixed: 'left',
       render: (text: string) => <strong>{text}</strong>,
-    },
-    {
-      title: '类别',
-      dataIndex: 'category',
-      key: 'category',
-      width: 100,
-      render: (category: string) => categoryMap[category] || category,
     },
     {
       title: '联系人',
       dataIndex: 'contactPerson',
       key: 'contactPerson',
-      width: 100,
+      width: 120,
+      render: (text: string) => text || '-',
     },
     {
       title: '联系电话',
       dataIndex: 'contactPhone',
       key: 'contactPhone',
-      width: 130,
-    },
-    {
-      title: '邮箱',
-      dataIndex: 'email',
-      key: 'email',
-      width: 180,
-    },
-    {
-      title: '地址',
-      dataIndex: 'address',
-      key: 'address',
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: '信用评级',
-      dataIndex: 'creditRating',
-      key: 'creditRating',
-      width: 100,
-      render: (rating: string) => {
-        const ratingInfo = creditRatingMap[rating] || { label: rating, color: 'default' };
-        return <Tag color={ratingInfo.color}>{ratingInfo.label}</Tag>;
-      },
-    },
-    {
-      title: '累计订单',
-      dataIndex: 'totalOrders',
-      key: 'totalOrders',
-      width: 100,
-      sorter: (a, b) => a.totalOrders - b.totalOrders,
-    },
-    {
-      title: '累计金额',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
-      width: 120,
-      render: (amount: number) => `¥${amount.toLocaleString()}`,
-      sorter: (a, b) => a.totalAmount - b.totalAmount,
+      width: 140,
+      render: (text: string) => text || '-',
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: string) => {
+      render: (status: SupplierStatus) => {
         const statusInfo = statusMap[status] || { label: status, color: 'default' };
         return <Tag color={statusInfo.color}>{statusInfo.label}</Tag>;
       },
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: 120,
-      sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
     {
       title: '操作',
@@ -271,17 +200,20 @@ const SupplierList: React.FC = () => {
   ];
 
   const handleSearch = (value: string) => {
-    console.log('搜索:', value);
+    setSearchText(value);
+  };
+
+  const handleStatusChange = (value: string | undefined) => {
+    setStatusFilter(value);
   };
 
   const handleRefresh = () => {
-    console.log('刷新列表');
+    fetchSuppliers();
     message.success('刷新成功');
   };
 
   const handleExport = () => {
-    console.log('导出数据');
-    message.success('导出成功');
+    message.info('导出功能开发中');
   };
 
   const handleCreate = () => {
@@ -290,40 +222,38 @@ const SupplierList: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleView = (supplier: Supplier) => {
+  const handleView = (supplier: SupplierListItem) => {
     navigate(`/purchase-management/suppliers/${supplier.id}`);
   };
 
-  const handleEdit = (supplier: Supplier) => {
+  const handleEdit = (supplier: SupplierListItem) => {
     setEditingSupplier(supplier);
-    form.setFieldsValue(supplier);
+    form.setFieldsValue({
+      code: supplier.code,
+      name: supplier.name,
+      contactPerson: supplier.contactPerson,
+      contactPhone: supplier.contactPhone,
+      status: supplier.status,
+    });
     setIsModalVisible(true);
   };
 
-  const handleDelete = (supplier: Supplier) => {
+  const handleDelete = (supplier: SupplierListItem) => {
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除供应商"${supplier.supplierName}"吗？`,
+      content: `确定要删除供应商"${supplier.name}"吗？`,
       okText: '确定',
       cancelText: '取消',
       onOk: () => {
-        console.log('删除供应商:', supplier.id);
-        message.success('删除成功');
+        message.info('删除功能开发中');
       },
     });
   };
 
   const handleModalOk = async () => {
     try {
-      const values = await form.validateFields();
-      console.log('提交表单:', values);
-
-      if (editingSupplier) {
-        message.success('更新成功');
-      } else {
-        message.success('创建成功');
-      }
-
+      await form.validateFields();
+      message.info('保存功能开发中');
       setIsModalVisible(false);
       form.resetFields();
     } catch (error) {
@@ -336,13 +266,33 @@ const SupplierList: React.FC = () => {
     form.resetFields();
   };
 
+  // 错误状态
+  if (error) {
+    return (
+      <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
+        <Card title="供应商列表">
+          <Empty
+            description={
+              <span>
+                加载失败: {error}
+                <Button type="link" onClick={handleRefresh}>
+                  重试
+                </Button>
+              </span>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
       <Card
         title="供应商列表"
         extra={
           <Space>
-            <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
+            <Button icon={<ReloadOutlined />} onClick={handleRefresh} loading={loading}>
               刷新
             </Button>
             <Button icon={<ExportOutlined />} onClick={handleExport}>
@@ -357,31 +307,23 @@ const SupplierList: React.FC = () => {
         {/* 筛选区域 */}
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col span={8}>
-            <Search placeholder="搜索供应商编码、名称或联系人" onSearch={handleSearch} allowClear />
+            <Search
+              placeholder="搜索供应商编码、名称或联系人"
+              onSearch={handleSearch}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+            />
           </Col>
           <Col span={4}>
-            <Select placeholder="供应商类别" style={{ width: '100%' }} allowClear>
-              <Option value="food">食品类</Option>
-              <Option value="beverage">饮料类</Option>
-              <Option value="equipment">设备类</Option>
-              <Option value="packaging">包装类</Option>
-              <Option value="other">其他</Option>
-            </Select>
-          </Col>
-          <Col span={4}>
-            <Select placeholder="状态" style={{ width: '100%' }} allowClear>
-              <Option value="active">启用</Option>
-              <Option value="inactive">停用</Option>
-              <Option value="suspended">暂停合作</Option>
-            </Select>
-          </Col>
-          <Col span={4}>
-            <Select placeholder="信用评级" style={{ width: '100%' }} allowClear>
-              <Option value="A+">A+</Option>
-              <Option value="A">A</Option>
-              <Option value="B">B</Option>
-              <Option value="C">C</Option>
-              <Option value="D">D</Option>
+            <Select
+              placeholder="状态"
+              style={{ width: '100%' }}
+              allowClear
+              onChange={handleStatusChange}
+            >
+              <Option value={SupplierStatus.ACTIVE}>启用</Option>
+              <Option value={SupplierStatus.SUSPENDED}>暂停</Option>
+              <Option value={SupplierStatus.TERMINATED}>终止</Option>
             </Select>
           </Col>
         </Row>
@@ -391,7 +333,9 @@ const SupplierList: React.FC = () => {
           <Col span={6}>
             <Card size="small">
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1890ff' }}>4</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1890ff' }}>
+                  {statistics.total}
+                </div>
                 <div style={{ color: '#666' }}>供应商总数</div>
               </div>
             </Card>
@@ -399,43 +343,35 @@ const SupplierList: React.FC = () => {
           <Col span={6}>
             <Card size="small">
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#52c41a' }}>3</div>
+                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#52c41a' }}>
+                  {statistics.active}
+                </div>
                 <div style={{ color: '#666' }}>启用中</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card size="small">
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#faad14' }}>493</div>
-                <div style={{ color: '#666' }}>累计订单</div>
-              </div>
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card size="small">
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f5222d' }}>¥556万</div>
-                <div style={{ color: '#666' }}>累计金额</div>
               </div>
             </Card>
           </Col>
         </Row>
 
         {/* 表格 */}
-        <Table
-          columns={columns}
-          dataSource={mockData}
-          rowKey="id"
-          scroll={{ x: 1800 }}
-          pagination={{
-            total: mockData.length,
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条`,
-          }}
-        />
+        <Spin spinning={loading}>
+          {filteredSuppliers.length === 0 && !loading ? (
+            <Empty description="暂无供应商数据" />
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={filteredSuppliers}
+              rowKey="id"
+              scroll={{ x: 1000 }}
+              pagination={{
+                total: filteredSuppliers.length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total) => `共 ${total} 条`,
+              }}
+            />
+          )}
+        </Spin>
       </Card>
 
       {/* 新建/编辑供应商弹窗 */}
@@ -444,7 +380,7 @@ const SupplierList: React.FC = () => {
         open={isModalVisible}
         onOk={handleModalOk}
         onCancel={handleModalCancel}
-        width={800}
+        width={600}
         okText="确定"
         cancelText="取消"
       >
@@ -452,15 +388,14 @@ const SupplierList: React.FC = () => {
           form={form}
           layout="vertical"
           initialValues={{
-            status: 'active',
-            creditRating: 'A',
+            status: SupplierStatus.ACTIVE,
           }}
         >
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 label="供应商编码"
-                name="supplierCode"
+                name="code"
                 rules={[{ required: true, message: '请输入供应商编码' }]}
               >
                 <Input placeholder="请输入供应商编码" />
@@ -469,7 +404,7 @@ const SupplierList: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 label="供应商名称"
-                name="supplierName"
+                name="name"
                 rules={[{ required: true, message: '请输入供应商名称' }]}
               >
                 <Input placeholder="请输入供应商名称" />
@@ -478,43 +413,7 @@ const SupplierList: React.FC = () => {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label="供应商类别"
-                name="category"
-                rules={[{ required: true, message: '请选择供应商类别' }]}
-              >
-                <Select placeholder="请选择供应商类别">
-                  <Option value="food">食品类</Option>
-                  <Option value="beverage">饮料类</Option>
-                  <Option value="equipment">设备类</Option>
-                  <Option value="packaging">包装类</Option>
-                  <Option value="other">其他</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="信用评级"
-                name="creditRating"
-                rules={[{ required: true, message: '请选择信用评级' }]}
-              >
-                <Select placeholder="请选择信用评级">
-                  <Option value="A+">A+</Option>
-                  <Option value="A">A</Option>
-                  <Option value="B">B</Option>
-                  <Option value="C">C</Option>
-                  <Option value="D">D</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="联系人"
-                name="contactPerson"
-                rules={[{ required: true, message: '请输入联系人' }]}
-              >
+              <Form.Item label="联系人" name="contactPerson">
                 <Input placeholder="请输入联系人" />
               </Form.Item>
             </Col>
@@ -522,10 +421,7 @@ const SupplierList: React.FC = () => {
               <Form.Item
                 label="联系电话"
                 name="contactPhone"
-                rules={[
-                  { required: true, message: '请输入联系电话' },
-                  { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' },
-                ]}
+                rules={[{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }]}
               >
                 <Input placeholder="请输入联系电话" />
               </Form.Item>
@@ -534,38 +430,15 @@ const SupplierList: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="邮箱"
-                name="email"
-                rules={[
-                  { required: true, message: '请输入邮箱' },
-                  { type: 'email', message: '请输入正确的邮箱格式' },
-                ]}
-              >
-                <Input placeholder="请输入邮箱" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
                 label="状态"
                 name="status"
                 rules={[{ required: true, message: '请选择状态' }]}
               >
                 <Select placeholder="请选择状态">
-                  <Option value="active">启用</Option>
-                  <Option value="inactive">停用</Option>
-                  <Option value="suspended">暂停合作</Option>
+                  <Option value={SupplierStatus.ACTIVE}>启用</Option>
+                  <Option value={SupplierStatus.SUSPENDED}>暂停</Option>
+                  <Option value={SupplierStatus.TERMINATED}>终止</Option>
                 </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="地址"
-                name="address"
-                rules={[{ required: true, message: '请输入地址' }]}
-              >
-                <Input placeholder="请输入详细地址" />
               </Form.Item>
             </Col>
           </Row>
