@@ -90,6 +90,7 @@ const ReceivingForm = lazy(() => import('@/pages/procurement/ReceivingForm'));
 const ReceivingDetail = lazy(() => import('@/pages/procurement/ReceivingDetail'));
 const SupplierList = lazy(() => import('@/pages/procurement/SupplierList'));
 const SupplierDetail = lazy(() => import('@/pages/procurement/SupplierDetail'));
+const PurchaseOrderDetail = lazy(() => import('@/pages/procurement/PurchaseOrderDetail'));
 
 // MDM/PIM 模块 - 类目管理
 
@@ -882,6 +883,21 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <PurchaseOrderList />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // 采购订单详情路由
+  {
+    path: '/purchase-management/orders/:id',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <PurchaseOrderDetail />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

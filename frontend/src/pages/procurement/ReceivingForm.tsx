@@ -1,3 +1,7 @@
+/**
+ * @spec N001-purchase-inbound
+ * 收货入库创建页面
+ */
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -13,6 +17,7 @@ import {
   Space,
   message,
   Divider,
+  Spin,
 } from 'antd';
 import {
   SaveOutlined,
@@ -24,23 +29,27 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+import { usePurchaseOrder } from '@/features/procurement/hooks/usePurchaseOrders';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 interface ReceivingItem {
   key: string;
+  skuId: string;
   productName: string;
   productCode: string;
   specification: string;
   unit: string;
   orderedQuantity: number;
   receivingQuantity: number;
+  pendingQuantity: number;
   qualityStatus: string;
   remark: string;
 }
 
 /**
+ * @spec N001-purchase-inbound
  * 收货入库创建/编辑页面
  * 路由: /purchase-management/receipts/create?orderId=xxx
  */
@@ -53,54 +62,40 @@ const ReceivingForm: React.FC = () => {
   const [receivingItems, setReceivingItems] = useState<ReceivingItem[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // 获取采购订单详情
+  const { data: orderData, isLoading: orderLoading } = usePurchaseOrder(orderId || '');
+
+  // 当采购订单数据加载完成后，填充表单
   useEffect(() => {
-    if (orderId) {
-      // 基于采购订单创建收货单，加载采购订单数据
-      loadPurchaseOrderData(orderId);
+    if (orderData?.data && orderId) {
+      const order = orderData.data;
+
+      // 填充表单基本信息
+      form.setFieldsValue({
+        purchaseOrderNumber: order.orderNumber,
+        supplier: order.supplier?.name || '未知供应商',
+        receivingDate: dayjs(),
+        warehouse: undefined,
+      });
+
+      // 转换订单明细为收货明细
+      const items: ReceivingItem[] = (order.items || []).map((item, index) => ({
+        key: item.id || String(index + 1),
+        skuId: item.sku?.id || '',
+        productName: item.sku?.name || '未知商品',
+        productCode: item.sku?.code || '',
+        specification: '-', // 规格字段暂无数据源
+        unit: item.sku?.mainUnit || '个',
+        orderedQuantity: Number(item.quantity) || 0,
+        receivingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
+        pendingQuantity: Number(item.pendingQty) || Number(item.quantity) || 0,
+        qualityStatus: 'pending',
+        remark: '',
+      }));
+
+      setReceivingItems(items);
     }
-  }, [orderId]);
-
-  const loadPurchaseOrderData = (id: string) => {
-    // Mock数据：模拟从采购订单加载数据
-    const mockOrderData = {
-      orderNumber: 'PO202512110001',
-      supplier: '供应商A',
-      expectedDeliveryDate: '2025-12-15',
-      items: [
-        {
-          key: '1',
-          productName: '可乐',
-          productCode: 'PROD001',
-          specification: '330ml/瓶',
-          unit: '箱',
-          orderedQuantity: 100,
-          receivingQuantity: 100,
-          qualityStatus: 'pending',
-          remark: '',
-        },
-        {
-          key: '2',
-          productName: '爆米花',
-          productCode: 'PROD002',
-          specification: '大桶',
-          unit: '包',
-          orderedQuantity: 200,
-          receivingQuantity: 200,
-          qualityStatus: 'pending',
-          remark: '',
-        },
-      ],
-    };
-
-    form.setFieldsValue({
-      purchaseOrderNumber: mockOrderData.orderNumber,
-      supplier: mockOrderData.supplier,
-      receivingDate: dayjs(),
-      warehouse: undefined,
-    });
-
-    setReceivingItems(mockOrderData.items);
-  };
+  }, [orderData, orderId, form]);
 
   const handleQuantityChange = (key: string, value: number | null) => {
     setReceivingItems((items) =>
@@ -276,6 +271,7 @@ const ReceivingForm: React.FC = () => {
 
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
+      <Spin spinning={orderLoading} tip="加载采购订单数据...">
       <Card
         title={
           <Space>
@@ -315,7 +311,8 @@ const ReceivingForm: React.FC = () => {
                 <Form.Item
                   label="采购单号"
                   name="purchaseOrderNumber"
-                  rules={[{ required: true, message: '请输入或选择采购单号' }]}
+                  tooltip={orderId ? '采购单号继承自采购订单' : undefined}
+                  rules={orderId ? [] : [{ required: true, message: '请输入或选择采购单号' }]}
                 >
                   <Input placeholder="请输入采购单号" disabled={!!orderId} />
                 </Form.Item>
@@ -324,7 +321,7 @@ const ReceivingForm: React.FC = () => {
                 <Form.Item
                   label="供应商"
                   name="supplier"
-                  rules={[{ required: true, message: '请选择供应商' }]}
+                  tooltip={orderId ? '供应商信息继承自采购订单，不可修改' : undefined}
                 >
                   <Input placeholder="供应商名称" disabled />
                 </Form.Item>
@@ -410,6 +407,7 @@ const ReceivingForm: React.FC = () => {
           </Card>
         </Form>
       </Card>
+      </Spin>
     </div>
   );
 };

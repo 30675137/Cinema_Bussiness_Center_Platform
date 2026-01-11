@@ -10,22 +10,23 @@ import {
   ExportOutlined,
   ReloadOutlined,
   EyeOutlined,
-  EditOutlined,
   DeleteOutlined,
   SendOutlined,
   CheckOutlined,
   CloseOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
+import type { ColumnsType, ExpandableConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
   usePurchaseOrders,
+  usePurchaseOrder,
   useDeletePurchaseOrder,
   useSubmitPurchaseOrder,
   useApprovePurchaseOrder,
   useRejectPurchaseOrder,
 } from '@/features/procurement/hooks/usePurchaseOrders';
-import type { PurchaseOrder, PurchaseOrderQueryParams } from '@/features/procurement/types';
+import type { PurchaseOrder, PurchaseOrderItem, PurchaseOrderQueryParams } from '@/features/procurement/types';
 
 const { Search } = Input;
 const { RangePicker } = DatePicker;
@@ -39,6 +40,8 @@ const PurchaseOrderList: React.FC = () => {
     page: 1,
     pageSize: 10,
   });
+  // 展开行状态
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
   // 获取采购订单列表
   const { data: ordersData, isLoading, refetch } = usePurchaseOrders(queryParams);
@@ -76,13 +79,13 @@ const PurchaseOrderList: React.FC = () => {
     },
     {
       title: '供应商',
-      dataIndex: 'supplierName',
+      dataIndex: ['supplier', 'name'],
       key: 'supplierName',
       width: 150,
     },
     {
       title: '目标门店',
-      dataIndex: 'storeName',
+      dataIndex: ['store', 'name'],
       key: 'storeName',
       width: 120,
     },
@@ -276,6 +279,112 @@ const PurchaseOrderList: React.FC = () => {
     }));
   };
 
+  // 展开行内容组件
+  const ExpandedRowContent: React.FC<{ orderId: string }> = ({ orderId }) => {
+    const { data: orderDetail, isLoading: detailLoading } = usePurchaseOrder(orderId);
+    const items = orderDetail?.data?.items || [];
+
+    if (detailLoading) {
+      return (
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+          <LoadingOutlined style={{ marginRight: 8 }} />
+          加载中...
+        </div>
+      );
+    }
+
+    if (items.length === 0) {
+      return (
+        <div style={{ padding: '16px', color: '#999', textAlign: 'center' }}>
+          暂无商品明细
+        </div>
+      );
+    }
+
+    // 明细表格列
+    const itemColumns: ColumnsType<PurchaseOrderItem> = [
+      {
+        title: '商品编码',
+        dataIndex: ['sku', 'code'],
+        key: 'skuCode',
+        width: 120,
+      },
+      {
+        title: '商品名称',
+        dataIndex: ['sku', 'name'],
+        key: 'skuName',
+        width: 200,
+      },
+      {
+        title: '单位',
+        dataIndex: ['sku', 'mainUnit'],
+        key: 'unit',
+        width: 80,
+        render: (unit: string) => unit || '个',
+      },
+      {
+        title: '采购数量',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        width: 100,
+        align: 'right',
+      },
+      {
+        title: '单价',
+        dataIndex: 'unitPrice',
+        key: 'unitPrice',
+        width: 100,
+        align: 'right',
+        render: (price: number) => `¥${(price || 0).toFixed(2)}`,
+      },
+      {
+        title: '小计',
+        dataIndex: 'lineAmount',
+        key: 'lineAmount',
+        width: 120,
+        align: 'right',
+        render: (amount: number) => `¥${(amount || 0).toFixed(2)}`,
+      },
+      {
+        title: '已收货',
+        dataIndex: 'receivedQty',
+        key: 'receivedQty',
+        width: 80,
+        align: 'right',
+        render: (qty: number) => qty || 0,
+      },
+      {
+        title: '待收货',
+        dataIndex: 'pendingQty',
+        key: 'pendingQty',
+        width: 80,
+        align: 'right',
+        render: (qty: number) => qty || 0,
+      },
+    ];
+
+    return (
+      <div style={{ padding: '8px 48px', background: '#fafafa' }}>
+        <Table
+          columns={itemColumns}
+          dataSource={items}
+          rowKey="id"
+          pagination={false}
+          size="small"
+          bordered
+        />
+      </div>
+    );
+  };
+
+  // 展开配置
+  const expandableConfig: ExpandableConfig<PurchaseOrder> = {
+    expandedRowKeys,
+    onExpandedRowsChange: (keys) => setExpandedRowKeys(keys as string[]),
+    expandedRowRender: (record) => <ExpandedRowContent orderId={record.id} />,
+    rowExpandable: () => true,
+  };
+
   return (
     <div style={{ padding: 24, background: '#f0f2f5', minHeight: 'calc(100vh - 64px)' }}>
       <Card
@@ -327,6 +436,7 @@ const PurchaseOrderList: React.FC = () => {
             dataSource={orders}
             rowKey="id"
             scroll={{ x: 1400 }}
+            expandable={expandableConfig}
             pagination={{
               current: queryParams.page,
               pageSize: queryParams.pageSize,

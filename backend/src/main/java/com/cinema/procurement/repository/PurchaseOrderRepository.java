@@ -9,6 +9,7 @@ import com.cinema.procurement.entity.PurchaseOrderStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -36,9 +37,8 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrderEnti
            "WHERE po.id = :id")
     Optional<PurchaseOrderEntity> findByIdWithItems(@Param("id") UUID id);
 
+    @EntityGraph(attributePaths = {"supplier", "store"})
     @Query("SELECT po FROM PurchaseOrderEntity po " +
-           "LEFT JOIN FETCH po.supplier " +
-           "LEFT JOIN FETCH po.store " +
            "WHERE (:storeId IS NULL OR po.storeId = :storeId) " +
            "AND (:status IS NULL OR po.status = :status) " +
            "ORDER BY po.createdAt DESC")

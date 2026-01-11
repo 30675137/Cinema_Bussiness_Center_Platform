@@ -237,10 +237,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           label: '采购订单列表',
         },
         {
-          key: '/purchase-management/receipts/create',
-          label: '新建收货入库',
-        },
-        {
           key: '/purchase-management/receipts',
           label: '到货验收 & 收货入库',
         },
