@@ -1,1 +1,1 @@
-N001-purchase-inbound
+specs/N003-supplier-edit
