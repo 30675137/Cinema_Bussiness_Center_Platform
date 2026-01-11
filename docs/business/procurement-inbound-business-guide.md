@@ -847,7 +847,7 @@ goods_receipt_items (不合格): received_qty=10, quality_status=UNQUALIFIED
 store_inventory.on_hand_qty += 90 (仅合格品)
 ```
 
-### 8.4 场景：新 SKU 首次入库
+### 9.4 场景：新 SKU 首次入库
 
 **场景描述**：采购新商品，门店库存表中不存在该 SKU 记录
 
