@@ -278,7 +278,7 @@ generate_branch_name() {
 validate_module() {
     local module="$1"
     case "$module" in
-        S|P|B|A|U|O|T|F)
+        S|P|B|A|U|O|T|F|I|M|N|R|C|D|E|Y)
             return 0
             ;;
         *)
@@ -310,7 +310,7 @@ fi
 
 # Validate module prefix
 if ! validate_module "$MODULE_PREFIX"; then
-    echo "Error: Invalid module prefix '$MODULE_PREFIX'. Must be one of: S, P, B, A, U, O, T, F" >&2
+    echo "Error: Invalid module prefix '$MODULE_PREFIX'. Must be one of: S, P, B, A, U, O, T, F, I, M, N, R, C, D, E, Y" >&2
     exit 1
 fi
 
