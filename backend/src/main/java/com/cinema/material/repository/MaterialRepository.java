@@ -70,9 +70,10 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
      * @return true if referenced, false otherwise
      */
     @Query(
-            "SELECT CASE WHEN COUNT(bc) > 0 THEN true ELSE false END "
-                    + "FROM BomComponent bc "
-                    + "WHERE bc.materialId = :materialId")
+            value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END "
+                    + "FROM bom_components "
+                    + "WHERE material_id = :materialId",
+            nativeQuery = true)
     boolean isReferencedByBomComponents(UUID materialId);
 
     /**
@@ -82,9 +83,10 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
      * @return true if referenced, false otherwise
      */
     @Query(
-            "SELECT CASE WHEN COUNT(si) > 0 THEN true ELSE false END "
-                    + "FROM StoreInventory si "
-                    + "WHERE si.materialId = :materialId")
+            value = "SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END "
+                    + "FROM store_inventory "
+                    + "WHERE material_id = :materialId",
+            nativeQuery = true)
     boolean isReferencedByInventory(UUID materialId);
 
     /**

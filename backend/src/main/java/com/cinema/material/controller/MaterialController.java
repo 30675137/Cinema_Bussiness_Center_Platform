@@ -45,6 +45,7 @@ public class MaterialController {
                 .useGlobalConversion(request.getUseGlobalConversion())
                 .description(request.getDescription())
                 .specification(request.getSpecification())
+                .status("ACTIVE")
                 .build();
 
         Material created = materialService.createMaterial(material);

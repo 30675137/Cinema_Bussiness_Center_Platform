@@ -1,23 +1,41 @@
 /** @spec M001-material-unit-system */
-import { apiClient } from './apiClient'
+import { apiClient } from './api'
 import type { Unit, UnitCreateRequest, UnitUpdateRequest, UnitCategory } from '@/types/unit'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  message?: string
+  timestamp?: string
+}
+
 export const unitService = {
-  getAll: (category?: UnitCategory) =>
-    apiClient.get<Unit[]>('/api/units', { params: { category } }),
+  getAll: async (category?: UnitCategory): Promise<Unit[]> => {
+    const response = await apiClient.get<ApiResponse<Unit[]>>('/units', { params: { category } })
+    return response.data.data || []
+  },
 
-  getById: (id: string) =>
-    apiClient.get<Unit>(`/api/units/${id}`),
+  getById: async (id: string): Promise<Unit> => {
+    const response = await apiClient.get<ApiResponse<Unit>>(`/units/${id}`)
+    return response.data.data
+  },
 
-  getByCode: (code: string) =>
-    apiClient.get<Unit>(`/api/units/code/${code}`),
+  getByCode: async (code: string): Promise<Unit> => {
+    const response = await apiClient.get<ApiResponse<Unit>>(`/units/code/${code}`)
+    return response.data.data
+  },
 
-  create: (data: UnitCreateRequest) =>
-    apiClient.post<Unit>('/api/units', data),
+  create: async (data: UnitCreateRequest): Promise<Unit> => {
+    const response = await apiClient.post<ApiResponse<Unit>>('/units', data)
+    return response.data.data
+  },
 
-  update: (id: string, data: UnitUpdateRequest) =>
-    apiClient.put<Unit>(`/api/units/${id}`, data),
+  update: async (id: string, data: UnitUpdateRequest): Promise<Unit> => {
+    const response = await apiClient.put<ApiResponse<Unit>>(`/units/${id}`, data)
+    return response.data.data
+  },
 
-  delete: (id: string) =>
-    apiClient.delete(`/api/units/${id}`),
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/units/${id}`)
+  },
 }

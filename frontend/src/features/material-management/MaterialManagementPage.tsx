@@ -78,7 +78,7 @@ export const MaterialManagementPage: React.FC = () => {
       }
     >
       <MaterialTable
-        materials={materials?.data || []}
+        materials={materials || []}
         loading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}

@@ -70,6 +70,11 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // 服务器响应错误
       handleServerError(error.response);
+      // 提取服务器返回的错误消息
+      const errorData = error.response.data as ErrorResponse;
+      const serverMessage = errorData?.message || error.message;
+      const enhancedError = new Error(serverMessage);
+      return Promise.reject(enhancedError);
     } else if (error.request) {
       // 网络错误
       handleNetworkError(error);

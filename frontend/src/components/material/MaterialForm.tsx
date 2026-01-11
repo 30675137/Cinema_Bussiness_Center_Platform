@@ -89,7 +89,7 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         rules={[{ required: !isEdit, message: '请选择库存单位' }]}
       >
         <Select placeholder="选择库存单位">
-          {units?.data?.map((unit) => (
+          {units?.map((unit) => (
             <Select.Option key={unit.id} value={unit.id}>
               {unit.name} ({unit.code})
             </Select.Option>
@@ -103,7 +103,7 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         rules={[{ required: !isEdit, message: '请选择采购单位' }]}
       >
         <Select placeholder="选择采购单位">
-          {units?.data?.map((unit) => (
+          {units?.map((unit) => (
             <Select.Option key={unit.id} value={unit.id}>
               {unit.name} ({unit.code})
             </Select.Option>
@@ -111,7 +111,7 @@ export const MaterialForm: React.FC<MaterialFormProps> = ({
         </Select>
       </Form.Item>
 
-      <Form.Item name="useGlobalConversion" label="使用全局换算" valuePropName="checked" initialValue={true}>
+      <Form.Item name="useGlobalConversion" label="使用全局换算" valuePropName="checked">
         <Switch checkedChildren="是" unCheckedChildren="否" />
       </Form.Item>
 

@@ -27,27 +27,32 @@ public class ConversionPathService {
     /**
      * 计算从源单位到目标单位的最短换算路径 (BFS)
      * 支持双向换算 (FR-008)
+     * 支持大小写不敏感匹配
      */
     public ConversionPathResponse calculatePath(String fromUnit, String toUnit) {
-        if (fromUnit.equals(toUnit)) {
+        // 统一转换为小写进行匹配
+        String fromUnitLower = fromUnit.toLowerCase();
+        String toUnitLower = toUnit.toLowerCase();
+        
+        if (fromUnitLower.equals(toUnitLower)) {
             return ConversionPathResponse.found(fromUnit, toUnit, List.of(fromUnit), BigDecimal.ONE);
         }
 
         List<UnitConversion> conversions = repository.findAll();
 
-        // 构建双向图
+        // 构建双向图（单位统一转小写）
         Map<String, List<Edge>> graph = buildBidirectionalGraph(conversions);
 
         // BFS 查找最短路径
         Queue<PathNode> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>();
 
-        queue.offer(new PathNode(fromUnit, new ArrayList<>(List.of(fromUnit)), BigDecimal.ONE));
+        queue.offer(new PathNode(fromUnitLower, new ArrayList<>(List.of(fromUnit)), BigDecimal.ONE));
 
         while (!queue.isEmpty()) {
             PathNode current = queue.poll();
 
-            if (current.unit.equals(toUnit)) {
+            if (current.unit.equals(toUnitLower)) {
                 log.info("找到换算路径: {} → {}, 路径: {}, 换算率: {}",
                         fromUnit, toUnit, current.path, current.rate);
                 return ConversionPathResponse.found(fromUnit, toUnit, current.path, current.rate);
@@ -145,19 +150,23 @@ public class ConversionPathService {
 
     /**
      * 构建双向图（支持反向换算）
+     * 单位名称统一转换为小写
      */
     private Map<String, List<Edge>> buildBidirectionalGraph(List<UnitConversion> conversions) {
         Map<String, List<Edge>> graph = new HashMap<>();
 
         for (UnitConversion c : conversions) {
+            String fromLower = c.getFromUnit().toLowerCase();
+            String toLower = c.getToUnit().toLowerCase();
+            
             // 正向边
-            graph.computeIfAbsent(c.getFromUnit(), k -> new ArrayList<>())
-                    .add(new Edge(c.getToUnit(), c.getConversionRate()));
+            graph.computeIfAbsent(fromLower, k -> new ArrayList<>())
+                    .add(new Edge(toLower, c.getConversionRate()));
 
             // 反向边 (1/rate)
             BigDecimal reverseRate = BigDecimal.ONE.divide(c.getConversionRate(), 10, RoundingMode.HALF_UP);
-            graph.computeIfAbsent(c.getToUnit(), k -> new ArrayList<>())
-                    .add(new Edge(c.getFromUnit(), reverseRate));
+            graph.computeIfAbsent(toLower, k -> new ArrayList<>())
+                    .add(new Edge(fromLower, reverseRate));
         }
 
         return graph;

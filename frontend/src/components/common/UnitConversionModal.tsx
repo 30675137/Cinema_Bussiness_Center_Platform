@@ -46,13 +46,13 @@ export const UnitConversionModal: React.FC<UnitConversionModalProps> = ({ open, 
         </Form.Item>
 
         <Form.Item name="fromUnitCode" label="源单位" rules={[{ required: true, message: '请选择源单位' }]}>
-          <UnitSelector category={category} placeholder="选择源单位" />
+          <UnitSelector category={category} placeholder="选择源单位" valueType="code" />
         </Form.Item>
 
         <SwapOutlined style={{ display: 'block', textAlign: 'center', fontSize: 20, margin: '16px 0' }} />
 
         <Form.Item name="toUnitCode" label="目标单位" rules={[{ required: true, message: '请选择目标单位' }]}>
-          <UnitSelector category={category} placeholder="选择目标单位" />
+          <UnitSelector category={category} placeholder="选择目标单位" valueType="code" />
         </Form.Item>
 
         {showResult && result && (

@@ -51,6 +51,17 @@ const OrderListPage = lazy(() => import('@/pages/orders/OrderListPage'));
 const OrderDetailPage = lazy(() => import('@/pages/orders/OrderDetailPage'));
 // 单位换算管理页面 (P002-unit-conversion)
 const ConversionPage = lazy(() => import('@/pages/bom/ConversionPage'));
+// M001-material-unit-system: 物料管理和单位管理页面
+const MaterialManagementPage = lazy(() =>
+  import('@/features/material-management/MaterialManagementPage').then((module) => ({
+    default: module.MaterialManagementPage,
+  }))
+);
+const UnitManagementPage = lazy(() =>
+  import('@/features/unit-management/UnitManagementPage').then((module) => ({
+    default: module.UnitManagementPage,
+  }))
+);
 // 饮品配置管理页面 (O003-beverage-order) - 已移除，替换为 O005
 // O005-channel-product-config
 const ChannelProductListPage = lazy(
@@ -1018,6 +1029,51 @@ export const router = createBrowserRouter([
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <ConversionPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // M001-material-unit-system: 物料管理路由
+  {
+    path: '/bom/materials',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <MaterialManagementPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // M001-material-unit-system: 单位管理路由
+  {
+    path: '/bom/units',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <UnitManagementPage />
+            </Suspense>
+          </ErrorBoundary>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+  // M001-material-unit-system: 单位管理路由（基础设置入口）
+  {
+    path: '/basic-settings/units',
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <UnitManagementPage />
             </Suspense>
           </ErrorBoundary>
         </AppLayout>

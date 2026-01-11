@@ -79,7 +79,7 @@ export const UnitManagementPage: React.FC = () => {
       }
     >
       <UnitTable
-        units={units?.data || []}
+        units={units || []}
         loading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}

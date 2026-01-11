@@ -1,5 +1,5 @@
 /** @spec M001-material-unit-system */
-import { apiClient } from '@/services/apiClient'
+import { apiClient } from '@/services/api'
 
 export interface ConversionRequest {
   fromUnitCode: string
@@ -17,12 +17,19 @@ export interface ConversionResponse {
   conversionPath: string
 }
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  message?: string
+  timestamp?: string
+}
+
 /**
  * 调用后端换算服务
  */
 export const convertUnit = async (request: ConversionRequest): Promise<ConversionResponse> => {
-  const response = await apiClient.post<ConversionResponse>('/api/conversions/convert', request)
-  return response.data
+  const response = await apiClient.post<ApiResponse<ConversionResponse>>('/conversions/convert', request)
+  return response.data.data
 }
 
 /**
@@ -33,10 +40,10 @@ export const canConvert = async (
   toUnitCode: string,
   materialId?: string
 ): Promise<boolean> => {
-  const response = await apiClient.get<boolean>('/api/conversions/can-convert', {
+  const response = await apiClient.get<ApiResponse<boolean>>('/conversions/can-convert', {
     params: { fromUnitCode, toUnitCode, materialId },
   })
-  return response.data
+  return response.data.data
 }
 
 /**

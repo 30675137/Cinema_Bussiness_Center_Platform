@@ -28,6 +28,11 @@ public interface UnitConversionRepository extends JpaRepository<UnitConversion, 
     Optional<UnitConversion> findByFromUnitAndToUnit(String fromUnit, String toUnit);
 
     /**
+     * 按源单位和目标单位查找换算规则（大小写不敏感）
+     */
+    Optional<UnitConversion> findByFromUnitIgnoreCaseAndToUnitIgnoreCase(String fromUnit, String toUnit);
+
+    /**
      * 检查是否存在指定的换算规则（排除某个ID）
      */
     @Query("SELECT COUNT(c) > 0 FROM UnitConversion c WHERE c.fromUnit = :fromUnit AND c.toUnit = :toUnit AND c.id <> :excludeId")

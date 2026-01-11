@@ -14,8 +14,9 @@ export const useUnitConversion = () => {
       setResult(response)
       return response
     } catch (error) {
-      message.error('换算失败')
-      return null
+      setResult(null)
+      // 重新抛出错误让调用方处理
+      throw error
     } finally {
       setLoading(false)
     }

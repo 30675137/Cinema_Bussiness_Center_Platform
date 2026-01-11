@@ -15,6 +15,7 @@ import ConversionStats from '@/features/unit-conversion/components/ConversionSta
 import ConversionList from '@/features/unit-conversion/components/ConversionList';
 import ConversionForm from '@/features/unit-conversion/components/ConversionForm';
 import ConversionChainGraph from '@/features/unit-conversion/components/ConversionChainGraph';
+import ConversionCalculator from '@/features/unit-conversion/components/ConversionCalculator';
 import ConversionErrorBoundary from '@/features/unit-conversion/components/ConversionErrorBoundary';
 import { useConversionUIStore } from '@/features/unit-conversion/stores/conversionUIStore';
 
@@ -86,6 +87,9 @@ const ConversionPage: React.FC = () => {
 
         {/* 换算路径计算 */}
         <ConversionChainGraph title="换算路径计算" />
+
+        {/* 单位换算计算器 */}
+        <ConversionCalculator title="单位换算计算器" />
 
         {/* 创建/编辑表单模态框 */}
         <ConversionForm />

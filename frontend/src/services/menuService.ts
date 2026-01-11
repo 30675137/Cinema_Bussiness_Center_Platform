@@ -4,7 +4,7 @@
  */
 
 import { MenuItem, FunctionalArea, MenuLevel, MenuFilterResult } from '@/types/navigation';
-import apiClient from './apiClient';
+import { apiClient } from './api';
 import { mockApi } from './mockApi';
 
 /**

@@ -2,7 +2,7 @@
  * @spec O003-beverage-order
  * B端饮品订单管理服务
  */
-import { apiClient } from './apiClient';
+import { apiClient } from './api';
 import type { BeverageOrderDTO, BeverageOrderStatus, PageResponse } from '../types/beverageOrder';
 
 /**

@@ -3,7 +3,7 @@
 
 spring:
   flyway:
-    enabled: flase
+    enabled: false
     locations: classpath:db/migration,classpath:db/seed
     baseline-on-migrate: true
     baseline-version: 0

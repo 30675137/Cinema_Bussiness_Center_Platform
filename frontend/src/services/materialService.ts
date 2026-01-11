@@ -1,23 +1,41 @@
 /** @spec M001-material-unit-system */
-import { apiClient } from './apiClient'
+import { apiClient } from './api'
 import type { Material, MaterialCreateRequest, MaterialUpdateRequest, MaterialCategory } from '@/types/material'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  message?: string
+  timestamp?: string
+}
+
 export const materialService = {
-  getAll: (category?: MaterialCategory) =>
-    apiClient.get<Material[]>('/api/materials', { params: { category } }),
+  getAll: async (category?: MaterialCategory): Promise<Material[]> => {
+    const response = await apiClient.get<ApiResponse<Material[]>>('/materials', { params: { category } })
+    return response.data.data || []
+  },
 
-  getById: (id: string) =>
-    apiClient.get<Material>(`/api/materials/${id}`),
+  getById: async (id: string): Promise<Material> => {
+    const response = await apiClient.get<ApiResponse<Material>>(`/materials/${id}`)
+    return response.data.data
+  },
 
-  getByCode: (code: string) =>
-    apiClient.get<Material>(`/api/materials/code/${code}`),
+  getByCode: async (code: string): Promise<Material> => {
+    const response = await apiClient.get<ApiResponse<Material>>(`/materials/code/${code}`)
+    return response.data.data
+  },
 
-  create: (data: MaterialCreateRequest) =>
-    apiClient.post<Material>('/api/materials', data),
+  create: async (data: MaterialCreateRequest): Promise<Material> => {
+    const response = await apiClient.post<ApiResponse<Material>>('/materials', data)
+    return response.data.data
+  },
 
-  update: (id: string, data: MaterialUpdateRequest) =>
-    apiClient.put<Material>(`/api/materials/${id}`, data),
+  update: async (id: string, data: MaterialUpdateRequest): Promise<Material> => {
+    const response = await apiClient.put<ApiResponse<Material>>(`/materials/${id}`, data)
+    return response.data.data
+  },
 
-  delete: (id: string) =>
-    apiClient.delete(`/api/materials/${id}`),
+  delete: async (id: string): Promise<void> => {
+    await apiClient.delete(`/materials/${id}`)
+  },
 }

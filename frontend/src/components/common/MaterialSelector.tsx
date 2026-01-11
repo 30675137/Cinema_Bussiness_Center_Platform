@@ -1,35 +1,26 @@
 /** @spec M001-material-unit-system */
 import React from 'react'
 import { Select } from 'antd'
-import type { UnitCategory } from '@/types/unit'
-import { useUnits } from '@/hooks/useUnits'
+import { useMaterials } from '@/hooks/useMaterials'
 
-interface UnitSelectorProps {
+interface MaterialSelectorProps {
   value?: string
   onChange?: (value: string) => void
-  category?: UnitCategory
   placeholder?: string
   disabled?: boolean
   style?: React.CSSProperties
-  /**
-   * 返回值类型：'id' 返回单位ID，'code' 返回单位代码
-   * @default 'id'
-   */
-  valueType?: 'id' | 'code'
   allowClear?: boolean
 }
 
-export const UnitSelector: React.FC<UnitSelectorProps> = ({
+export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   value,
   onChange,
-  category,
-  placeholder = '选择单位',
+  placeholder = '选择物料',
   disabled = false,
   style,
-  valueType = 'id',
   allowClear = false,
 }) => {
-  const { data: units, isLoading } = useUnits(category)
+  const { data: materials, isLoading } = useMaterials()
 
   return (
     <Select
@@ -45,13 +36,13 @@ export const UnitSelector: React.FC<UnitSelectorProps> = ({
         (option?.label?.toString().toLowerCase() ?? '').includes(input.toLowerCase())
       }
     >
-      {units?.map((unit) => (
+      {materials?.map((material) => (
         <Select.Option
-          key={unit.id}
-          value={valueType === 'code' ? unit.code : unit.id}
-          label={`${unit.name} (${unit.code})`}
+          key={material.id}
+          value={material.id}
+          label={`${material.name} (${material.code})`}
         >
-          {unit.name} ({unit.code})
+          {material.name} ({material.code})
         </Select.Option>
       ))}
     </Select>

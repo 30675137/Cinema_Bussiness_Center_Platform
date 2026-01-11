@@ -13,9 +13,9 @@ import java.util.UUID;
 @Builder
 public class MaterialCreateRequest {
 
-    @Pattern(regexp = "^MAT-(RAW|PKG)-\\d{3}$",
-            message = "Material code must follow format MAT-{RAW|PKG}-{001-999}")
-    private String code; // Optional, auto-generated if null
+    @Pattern(regexp = "^$|^MAT-(RAW|PKG)-\\d{3}$",
+            message = "Material code must follow format MAT-{RAW|PKG}-{001-999} or be empty for auto-generation")
+    private String code; // Optional, auto-generated if null or empty
 
     @NotBlank(message = "Material name is required")
     @Size(max = 100, message = "Material name must not exceed 100 characters")
