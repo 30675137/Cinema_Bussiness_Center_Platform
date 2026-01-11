@@ -20,7 +20,7 @@ public class MaterialUpdateRequest {
     private UUID purchaseUnitId;
 
     @DecimalMin(value = "0.000001", message = "Conversion rate must be greater than 0")
-    @Digits(integer = 4, fraction = 6, message = "Conversion rate must have at most 4 integer digits and 6 decimal places")
+    @Digits(integer = 6, fraction = 6, message = "Conversion rate must have at most 6 integer digits and 6 decimal places")
     private BigDecimal conversionRate;
 
     private Boolean useGlobalConversion;

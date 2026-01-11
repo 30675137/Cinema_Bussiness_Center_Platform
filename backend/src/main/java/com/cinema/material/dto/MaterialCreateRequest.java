@@ -13,8 +13,8 @@ import java.util.UUID;
 @Builder
 public class MaterialCreateRequest {
 
-    @Pattern(regexp = "^$|^MAT-(RAW|PKG)-\\d{3}$",
-            message = "Material code must follow format MAT-{RAW|PKG}-{001-999} or be empty for auto-generation")
+    @Pattern(regexp = "^$|^MAT-(RAW|PKG)-\\d{3,4}$",
+            message = "Material code must follow format MAT-{RAW|PKG}-{001-9999} or be empty for auto-generation")
     private String code; // Optional, auto-generated if null or empty
 
     @NotBlank(message = "Material name is required")
@@ -31,7 +31,7 @@ public class MaterialCreateRequest {
     private UUID purchaseUnitId;
 
     @DecimalMin(value = "0.000001", message = "Conversion rate must be greater than 0")
-    @Digits(integer = 4, fraction = 6, message = "Conversion rate must have at most 4 integer digits and 6 decimal places")
+    @Digits(integer = 6, fraction = 6, message = "Conversion rate must have at most 6 integer digits and 6 decimal places")
     private BigDecimal conversionRate;
 
     @NotNull(message = "Use global conversion flag is required")
