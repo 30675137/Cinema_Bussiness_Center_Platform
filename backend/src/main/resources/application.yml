@@ -11,7 +11,7 @@ spring:
   datasource:
     url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require
     username: postgres.fxhgyxceqrmnpezluaht
-    #password: {}
+    password: ppkZ8sGUEHB0qjFs
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -34,7 +34,7 @@ spring:
 
   # Flyway 配置 (@spec T003-flyway-migration)
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration,classpath:db/seed
     baseline-on-migrate: true
     baseline-version: 0

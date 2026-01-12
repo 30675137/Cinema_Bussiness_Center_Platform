@@ -1,228 +1,492 @@
--- ============================================================================
--- Cinema Hall & Store 数据库表结构
--- 数据库：Supabase PostgreSQL
--- ============================================================================
+-- ============================================================
+-- Cinema Business Center Platform - 建表脚本 (DDL)
+-- 生成时间: 2026-01-12
+-- 说明: 此脚本包含所有表结构定义，需按顺序执行
+-- ============================================================
 
--- 1. 创建 stores 表（门店）
+-- 注意: 使用 PostgreSQL 内置的 gen_random_uuid() 函数，无需额外扩展
+
+-- ============================================================
+-- 1. 基础主数据表
+-- ============================================================
+
+-- 单位主数据表
+CREATE TABLE IF NOT EXISTS units (
+                                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                     code VARCHAR(20) NOT NULL UNIQUE,
+                                     name VARCHAR(50) NOT NULL,
+                                     category VARCHAR(20) NOT NULL,
+                                     decimal_places SMALLINT NOT NULL DEFAULT 2 CHECK (decimal_places >= 0 AND decimal_places <= 6),
+                                     is_base_unit BOOLEAN NOT NULL DEFAULT false,
+                                     description TEXT,
+                                     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE units IS '单位主数据表 - Unit master data';
+
+-- 单位换算表
+CREATE TABLE IF NOT EXISTS unit_conversions (
+                                                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                from_unit VARCHAR(20) NOT NULL,
+                                                to_unit VARCHAR(20) NOT NULL,
+                                                conversion_rate NUMERIC(12,6) NOT NULL,
+                                                category VARCHAR(20) NOT NULL CHECK (category IN ('volume', 'weight', 'quantity'))
+);
+COMMENT ON TABLE unit_conversions IS '单位换算表:支持体积、重量、数量单位转换';
+
+-- 分类表
+CREATE TABLE IF NOT EXISTS categories (
+                                          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                          code VARCHAR(50) NOT NULL UNIQUE,
+                                          name VARCHAR(100) NOT NULL CHECK (TRIM(name) <> ''),
+                                          parent_id UUID REFERENCES categories(id),
+                                          level INTEGER NOT NULL DEFAULT 1 CHECK (level >= 1 AND level <= 3),
+                                          sort_order INTEGER NOT NULL DEFAULT 0,
+                                          status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'ARCHIVED')),
+                                          created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 品牌管理表
+CREATE TABLE IF NOT EXISTS brands (
+                                      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                      brand_code VARCHAR(50) NOT NULL UNIQUE,
+                                      name VARCHAR(100) NOT NULL,
+                                      english_name VARCHAR(100),
+                                      brand_type VARCHAR(20) NOT NULL DEFAULT 'own' CHECK (brand_type IN ('own', 'agency', 'joint', 'other')),
+                                      primary_categories TEXT[] DEFAULT '{}',
+                                      company VARCHAR(200),
+                                      brand_level VARCHAR(10),
+                                      tags TEXT[] DEFAULT '{}',
+                                      description TEXT,
+                                      logo_url TEXT,
+                                      status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'enabled', 'disabled')),
+                                      created_at TIMESTAMPTZ DEFAULT now(),
+                                      updated_at TIMESTAMPTZ DEFAULT now(),
+                                      created_by VARCHAR(100),
+                                      updated_by VARCHAR(100)
+);
+COMMENT ON TABLE brands IS '品牌管理表';
+
+-- 门店信息表
 CREATE TABLE IF NOT EXISTS stores (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code VARCHAR(50) UNIQUE NOT NULL,
-    name VARCHAR(200) NOT NULL,
-    region VARCHAR(100),
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                                      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                      code VARCHAR(50) NOT NULL UNIQUE,
+                                      name VARCHAR(200) NOT NULL,
+                                      address TEXT,
+                                      phone VARCHAR(50) CHECK (phone IS NULL OR phone ~ '^(1[3-9]\d{9})|(0\d{2,3}-?\d{7,8})|(400-?\d{3}-?\d{4})$'),
+                                      business_hours JSONB,
+                                      status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+                                      created_at TIMESTAMPTZ DEFAULT now(),
+                                      updated_at TIMESTAMPTZ DEFAULT now(),
+                                      province VARCHAR(50),
+                                      city VARCHAR(50),
+                                      district VARCHAR(50),
+                                      version BIGINT NOT NULL DEFAULT 0,
+                                      opening_date DATE,
+                                      area INTEGER CHECK (area IS NULL OR area > 0),
+                                      hall_count INTEGER CHECK (hall_count IS NULL OR hall_count > 0),
+                                      seat_count INTEGER CHECK (seat_count IS NULL OR seat_count > 0)
 );
+COMMENT ON TABLE stores IS '门店信息表';
 
--- 2. 创建 halls 表（影厅）
+-- 影厅信息表
 CREATE TABLE IF NOT EXISTS halls (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
-    code VARCHAR(50),
-    name VARCHAR(200) NOT NULL,
-    type VARCHAR(20) NOT NULL CHECK (type IN ('VIP', 'PUBLIC', 'CP', 'PARTY')),
-    capacity INTEGER NOT NULL CHECK (capacity > 0 AND capacity <= 1000),
-    tags TEXT[],
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'maintenance')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(store_id, code)
+                                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                     store_id UUID NOT NULL REFERENCES stores(id),
+                                     code VARCHAR(50),
+                                     name VARCHAR(200) NOT NULL,
+                                     type VARCHAR(20) NOT NULL CHECK (type IN ('VIP', 'PUBLIC', 'CP', 'PARTY')),
+                                     capacity INTEGER NOT NULL CHECK (capacity > 0 AND capacity <= 1000),
+                                     tags TEXT[],
+                                     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'maintenance')),
+                                     created_at TIMESTAMPTZ DEFAULT now(),
+                                     updated_at TIMESTAMPTZ DEFAULT now()
+);
+COMMENT ON TABLE halls IS '影厅信息表';
+
+-- 供应商表
+CREATE TABLE IF NOT EXISTS suppliers (
+                                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                         code VARCHAR(50) NOT NULL UNIQUE,
+                                         name VARCHAR(200) NOT NULL,
+                                         contact_name VARCHAR(100),
+                                         contact_phone VARCHAR(50),
+                                         status VARCHAR(20) DEFAULT 'ACTIVE',
+                                         created_at TIMESTAMPTZ DEFAULT now(),
+                                         updated_at TIMESTAMPTZ DEFAULT now()
+);
+COMMENT ON TABLE suppliers IS '供应商表';
+
+-- 用户表
+CREATE TABLE IF NOT EXISTS users (
+                                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                     username VARCHAR(100) NOT NULL,
+                                     phone VARCHAR(50),
+                                     province VARCHAR(100),
+                                     city VARCHAR(100),
+                                     district VARCHAR(100),
+                                     address VARCHAR(500),
+                                     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+                                     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()
 );
 
--- 3. 创建索引
+-- 物料主数据表
+CREATE TYPE material_category AS ENUM ('RAW_MATERIAL', 'PACKAGING');
+CREATE TABLE IF NOT EXISTS materials (
+                                         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                         code VARCHAR(30) NOT NULL UNIQUE,
+                                         name VARCHAR(100) NOT NULL,
+                                         category material_category NOT NULL,
+                                         inventory_unit_id UUID NOT NULL REFERENCES units(id),
+                                         purchase_unit_id UUID NOT NULL REFERENCES units(id),
+                                         conversion_rate NUMERIC(12,6) CHECK (conversion_rate > 0),
+                                         use_global_conversion BOOLEAN NOT NULL DEFAULT true,
+                                         specification TEXT,
+                                         description TEXT,
+                                         status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+                                         created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                         updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                         created_by VARCHAR(100),
+                                         updated_by VARCHAR(100),
+                                         standard_cost NUMERIC(12,2) DEFAULT 0.00
+);
+COMMENT ON TABLE materials IS '物料主数据表 - Material master data for raw materials and packaging';
+
+-- ============================================================
+-- 2. SPU/SKU 商品表
+-- ============================================================
+
+-- SPU主数据表
+CREATE TABLE IF NOT EXISTS spus (
+                                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                    code VARCHAR(50) NOT NULL UNIQUE,
+                                    name VARCHAR(200) NOT NULL,
+                                    short_name VARCHAR(100),
+                                    description TEXT,
+                                    category_id VARCHAR(50),
+                                    category_name VARCHAR(100),
+                                    brand_id VARCHAR(50),
+                                    brand_name VARCHAR(100),
+                                    status VARCHAR(20) NOT NULL DEFAULT 'draft',
+                                    unit VARCHAR(20),
+                                    tags TEXT[],
+                                    images JSONB DEFAULT '[]',
+                                    specifications JSONB DEFAULT '[]',
+                                    attributes JSONB DEFAULT '[]',
+                                    created_at TIMESTAMPTZ DEFAULT now(),
+                                    updated_at TIMESTAMPTZ DEFAULT now(),
+                                    created_by VARCHAR(100),
+                                    updated_by VARCHAR(100),
+                                    product_type VARCHAR(20) CHECK (product_type IS NULL OR product_type IN ('raw_material', 'packaging', 'finished_product', 'combo'))
+);
+COMMENT ON TABLE spus IS 'SPU主数据表 - 标准产品单元';
+
+-- SKU主数据表
+CREATE TABLE IF NOT EXISTS skus (
+                                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                    code VARCHAR(50) NOT NULL UNIQUE,
+                                    name VARCHAR(200) NOT NULL,
+                                    spu_id UUID NOT NULL,
+                                    sku_type VARCHAR(20) NOT NULL CHECK (sku_type IN ('raw_material', 'packaging', 'finished_product', 'combo')),
+                                    main_unit VARCHAR(20) NOT NULL,
+                                    store_scope TEXT[] DEFAULT '{}',
+                                    standard_cost NUMERIC(10,2),
+                                    waste_rate NUMERIC(5,2) DEFAULT 0 CHECK (waste_rate >= 0 AND waste_rate <= 100),
+                                    status VARCHAR(10) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'enabled', 'disabled')),
+                                    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+                                    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+                                    price NUMERIC(10,2) DEFAULT 0,
+                                    category_id UUID REFERENCES categories(id),
+                                    version BIGINT NOT NULL DEFAULT 0
+);
+COMMENT ON TABLE skus IS 'SKU主数据表,支持四种类型:原料(raw_material)、包材(packaging)、成品(finished_product)、套餐(combo)';
+
+-- BOM组件表
+CREATE TABLE IF NOT EXISTS bom_components (
+                                              id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                              finished_product_id UUID NOT NULL REFERENCES skus(id),
+                                              component_id UUID REFERENCES skus(id),
+                                              quantity NUMERIC NOT NULL CHECK (quantity > 0),
+                                              unit VARCHAR(20) NOT NULL,
+                                              unit_cost NUMERIC,
+                                              is_optional BOOLEAN DEFAULT false,
+                                              sort_order INTEGER DEFAULT 0,
+                                              created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+                                              material_id UUID REFERENCES materials(id),
+                                              component_type VARCHAR(20) NOT NULL DEFAULT 'SKU' CHECK (component_type IN ('SKU', 'MATERIAL'))
+);
+COMMENT ON TABLE bom_components IS 'BOM 组件表，记录成品 SKU 的物料清单（支持引用 SKU 或 Material）';
+
+-- 套餐子项表
+CREATE TABLE IF NOT EXISTS combo_items (
+                                           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                           combo_id UUID NOT NULL REFERENCES skus(id),
+                                           sub_item_id UUID NOT NULL REFERENCES skus(id),
+                                           quantity NUMERIC NOT NULL CHECK (quantity > 0),
+                                           unit VARCHAR(20) NOT NULL,
+                                           unit_cost NUMERIC,
+                                           sort_order INTEGER DEFAULT 0,
+                                           created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now()
+);
+COMMENT ON TABLE combo_items IS '套餐子项表:套餐SKU的子项配置';
+
+-- ============================================================
+-- 3. 库存管理表
+-- ============================================================
+
+-- 门店库存表
+CREATE TABLE IF NOT EXISTS store_inventory (
+                                               id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                               store_id UUID NOT NULL REFERENCES stores(id),
+                                               sku_id UUID REFERENCES skus(id),
+                                               on_hand_qty NUMERIC NOT NULL DEFAULT 0,
+                                               available_qty NUMERIC NOT NULL DEFAULT 0,
+                                               reserved_qty NUMERIC NOT NULL DEFAULT 0,
+                                               safety_stock NUMERIC DEFAULT 0,
+                                               created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                               updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                               version INTEGER NOT NULL DEFAULT 1,
+                                               inventory_item_type VARCHAR(20) NOT NULL DEFAULT 'SKU',
+                                               material_id UUID REFERENCES materials(id)
+);
+COMMENT ON TABLE store_inventory IS '门店库存表（支持 SKU 和 Material 两种库存类型）';
+
+-- 库存调整原因字典表
+CREATE TABLE IF NOT EXISTS adjustment_reasons (
+                                                  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                  code VARCHAR(50) NOT NULL UNIQUE,
+                                                  name VARCHAR(100) NOT NULL,
+                                                  category VARCHAR(20) NOT NULL CHECK (category IN ('surplus', 'shortage', 'damage')),
+                                                  is_active BOOLEAN DEFAULT true,
+                                                  sort_order INTEGER DEFAULT 0,
+                                                  created_at TIMESTAMPTZ DEFAULT now(),
+                                                  updated_at TIMESTAMPTZ DEFAULT now()
+);
+COMMENT ON TABLE adjustment_reasons IS '库存调整原因字典表';
+
+-- 库存调整单表
+CREATE TABLE IF NOT EXISTS inventory_adjustments (
+                                                     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                     adjustment_number VARCHAR(50) NOT NULL UNIQUE,
+                                                     sku_id UUID NOT NULL,
+                                                     store_id UUID NOT NULL,
+                                                     adjustment_type VARCHAR(20) NOT NULL CHECK (adjustment_type IN ('surplus', 'shortage', 'damage')),
+                                                     quantity INTEGER NOT NULL CHECK (quantity > 0),
+                                                     unit_price NUMERIC NOT NULL DEFAULT 0,
+                                                     adjustment_amount NUMERIC GENERATED ALWAYS AS (quantity::numeric * unit_price) STORED,
+                                                     reason_code VARCHAR(50) NOT NULL REFERENCES adjustment_reasons(code),
+                                                     reason_text VARCHAR(500),
+                                                     remarks VARCHAR(500),
+                                                     status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending_approval', 'approved', 'rejected', 'withdrawn')),
+                                                     stock_before INTEGER NOT NULL DEFAULT 0,
+                                                     stock_after INTEGER NOT NULL DEFAULT 0,
+                                                     available_before INTEGER NOT NULL DEFAULT 0,
+                                                     available_after INTEGER NOT NULL DEFAULT 0,
+                                                     requires_approval BOOLEAN DEFAULT false,
+                                                     operator_id UUID NOT NULL,
+                                                     operator_name VARCHAR(100) NOT NULL,
+                                                     approved_at TIMESTAMPTZ,
+                                                     approved_by UUID,
+                                                     transaction_id UUID,
+                                                     created_at TIMESTAMPTZ DEFAULT now(),
+                                                     updated_at TIMESTAMPTZ DEFAULT now(),
+                                                     version INTEGER DEFAULT 1
+);
+COMMENT ON TABLE inventory_adjustments IS '库存调整单表';
+
+-- 库存流水表
+CREATE TABLE IF NOT EXISTS inventory_transactions (
+                                                      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                      store_id UUID NOT NULL REFERENCES stores(id),
+                                                      sku_id UUID NOT NULL REFERENCES skus(id),
+                                                      transaction_type VARCHAR(30) NOT NULL CHECK (transaction_type IN ('purchase_in', 'sale_out', 'adjustment_in', 'adjustment_out', 'damage_out', 'transfer_in', 'transfer_out', 'return_in', 'return_out', 'safety_stock_update')),
+                                                      quantity INTEGER NOT NULL,
+                                                      stock_before INTEGER NOT NULL DEFAULT 0,
+                                                      stock_after INTEGER NOT NULL DEFAULT 0,
+                                                      available_before INTEGER NOT NULL DEFAULT 0,
+                                                      available_after INTEGER NOT NULL DEFAULT 0,
+                                                      source_type VARCHAR(50),
+                                                      source_document VARCHAR(100),
+                                                      operator_id UUID,
+                                                      operator_name VARCHAR(100),
+                                                      remarks TEXT,
+                                                      transaction_time TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                                      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                                      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                                      bom_snapshot_id UUID,
+                                                      reference_id UUID,
+                                                      related_order_id UUID
+);
+COMMENT ON TABLE inventory_transactions IS '库存流水表，记录所有库存变动';
+
+-- 库存预占表
+CREATE TABLE IF NOT EXISTS inventory_reservations (
+                                                      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                      order_id UUID NOT NULL,
+                                                      store_id UUID NOT NULL REFERENCES stores(id),
+                                                      sku_id UUID NOT NULL REFERENCES skus(id),
+                                                      quantity NUMERIC NOT NULL,
+                                                      status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+                                                      created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                      released_at TIMESTAMP WITHOUT TIME ZONE,
+                                                      reserved_quantity NUMERIC NOT NULL CHECK (reserved_quantity > 0),
+                                                      expires_at TIMESTAMPTZ,
+                                                      fulfilled_at TIMESTAMPTZ,
+                                                      cancelled_at TIMESTAMPTZ,
+                                                      notes TEXT
+);
+COMMENT ON TABLE inventory_reservations IS 'Inventory reservation records for pending orders (库存预占记录)';
+
+-- ============================================================
+-- 4. 菜单分类与渠道商品表
+-- ============================================================
+
+-- 菜单分类表
+CREATE TABLE IF NOT EXISTS menu_category (
+                                             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                             code VARCHAR(50) NOT NULL CHECK (code ~ '^[A-Z][A-Z0-9_]*$'),
+                                             display_name VARCHAR(50) NOT NULL CHECK (char_length(display_name) >= 1 AND char_length(display_name) <= 50),
+                                             sort_order INTEGER NOT NULL DEFAULT 0,
+                                             is_visible BOOLEAN NOT NULL DEFAULT true,
+                                             is_default BOOLEAN NOT NULL DEFAULT false,
+                                             icon_url TEXT,
+                                             description TEXT,
+                                             created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                             updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                             created_by UUID,
+                                             updated_by UUID,
+                                             deleted_at TIMESTAMPTZ,
+                                             version BIGINT NOT NULL DEFAULT 0
+);
+COMMENT ON TABLE menu_category IS '菜单分类表 - 小程序商品分类配置';
+
+-- 渠道商品配置表
+CREATE TABLE IF NOT EXISTS channel_product_config (
+                                                      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                      sku_id UUID NOT NULL REFERENCES skus(id),
+                                                      channel_type VARCHAR(20) NOT NULL DEFAULT 'MINI_PROGRAM' CHECK (channel_type IN ('MINI_PROGRAM', 'POS', 'DELIVERY', 'ECOMMERCE')),
+                                                      display_name VARCHAR(200),
+                                                      channel_category VARCHAR(20) NOT NULL CHECK (channel_category IN ('ALCOHOL', 'COFFEE', 'BEVERAGE', 'SNACK', 'MEAL', 'OTHER')),
+                                                      channel_price BIGINT CHECK (channel_price IS NULL OR channel_price > 0),
+                                                      main_image TEXT,
+                                                      detail_images JSONB DEFAULT '[]',
+                                                      description TEXT,
+                                                      specs JSONB DEFAULT '[]',
+                                                      is_recommended BOOLEAN DEFAULT false,
+                                                      status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK')),
+                                                      sort_order INTEGER DEFAULT 0 CHECK (sort_order >= 0),
+                                                      created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+                                                      updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now(),
+                                                      deleted_at TIMESTAMP WITHOUT TIME ZONE,
+                                                      category_id UUID REFERENCES menu_category(id)
+);
+COMMENT ON TABLE channel_product_config IS '渠道商品配置表，记录 SKU 成品在特定销售渠道的展示配置';
+
+-- ============================================================
+-- 5. 采购管理表
+-- ============================================================
+
+-- 采购订单表
+CREATE TABLE IF NOT EXISTS purchase_orders (
+                                               id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                               order_number VARCHAR(50) NOT NULL UNIQUE,
+                                               supplier_id UUID NOT NULL REFERENCES suppliers(id),
+                                               store_id UUID NOT NULL REFERENCES stores(id),
+                                               status VARCHAR(30) NOT NULL DEFAULT 'DRAFT' CHECK (status IN ('DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'PARTIAL_RECEIVED', 'FULLY_RECEIVED', 'CLOSED')),
+                                               total_amount NUMERIC DEFAULT 0,
+                                               planned_arrival_date DATE,
+                                               remarks VARCHAR(500),
+                                               created_by UUID,
+                                               approved_by UUID,
+                                               approved_at TIMESTAMPTZ,
+                                               rejection_reason VARCHAR(500),
+                                               version INTEGER DEFAULT 1,
+                                               created_at TIMESTAMPTZ DEFAULT now(),
+                                               updated_at TIMESTAMPTZ DEFAULT now()
+);
+COMMENT ON TABLE purchase_orders IS '采购订单表';
+
+-- 采购订单明细表
+CREATE TABLE IF NOT EXISTS purchase_order_items (
+                                                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                    purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id),
+                                                    sku_id UUID REFERENCES skus(id),
+                                                    quantity NUMERIC NOT NULL,
+                                                    unit_price NUMERIC NOT NULL,
+                                                    line_amount NUMERIC,
+                                                    received_qty NUMERIC DEFAULT 0,
+                                                    pending_qty NUMERIC,
+                                                    created_at TIMESTAMPTZ DEFAULT now(),
+                                                    updated_at TIMESTAMPTZ DEFAULT now(),
+                                                    material_id UUID REFERENCES materials(id),
+                                                    item_type VARCHAR(20) NOT NULL,
+                                                    material_name VARCHAR(200)
+);
+COMMENT ON TABLE purchase_order_items IS '采购订单明细表';
+
+-- 收货入库单表
+CREATE TABLE IF NOT EXISTS goods_receipts (
+                                              id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                              receipt_number VARCHAR(50) NOT NULL UNIQUE,
+                                              purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id),
+                                              store_id UUID NOT NULL REFERENCES stores(id),
+                                              status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED')),
+                                              received_by UUID,
+                                              received_by_name VARCHAR(100),
+                                              received_at TIMESTAMPTZ,
+                                              remarks VARCHAR(500),
+                                              version INTEGER DEFAULT 1,
+                                              created_at TIMESTAMPTZ DEFAULT now(),
+                                              updated_at TIMESTAMPTZ DEFAULT now()
+);
+COMMENT ON TABLE goods_receipts IS '收货入库单表';
+
+-- 收货入库明细表
+CREATE TABLE IF NOT EXISTS goods_receipt_items (
+                                                   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                                   goods_receipt_id UUID NOT NULL REFERENCES goods_receipts(id),
+                                                   sku_id UUID REFERENCES skus(id),
+                                                   ordered_qty NUMERIC NOT NULL,
+                                                   received_qty NUMERIC NOT NULL,
+                                                   quality_status VARCHAR(20) DEFAULT 'QUALIFIED' CHECK (quality_status IN ('QUALIFIED', 'UNQUALIFIED', 'PENDING_CHECK')),
+                                                   rejection_reason VARCHAR(500),
+                                                   created_at TIMESTAMPTZ DEFAULT now(),
+                                                   updated_at TIMESTAMPTZ DEFAULT now(),
+                                                   item_type VARCHAR(20) NOT NULL DEFAULT 'SKU',
+                                                   material_id UUID REFERENCES materials(id)
+);
+COMMENT ON TABLE goods_receipt_items IS '收货入库明细表';
+
+-- ============================================================
+-- 6. 活动类型表
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS activity_types (
+                                              id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                              name VARCHAR(100) NOT NULL,
+                                              description VARCHAR(500),
+                                              status VARCHAR(20) NOT NULL DEFAULT 'ENABLED' CHECK (status IN ('ENABLED', 'DISABLED', 'DELETED')),
+                                              sort INTEGER NOT NULL DEFAULT 0,
+                                              created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                              updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                              deleted_at TIMESTAMPTZ,
+                                              created_by VARCHAR(255),
+                                              updated_by VARCHAR(255)
+);
+COMMENT ON TABLE activity_types IS '活动类型表，存储预约活动类型配置（如企业团建、订婚、生日Party等）';
+
+-- ============================================================
+-- 7. 索引创建
+-- ============================================================
+
 CREATE INDEX IF NOT EXISTS idx_stores_code ON stores(code);
 CREATE INDEX IF NOT EXISTS idx_stores_status ON stores(status);
 CREATE INDEX IF NOT EXISTS idx_halls_store_id ON halls(store_id);
-CREATE INDEX IF NOT EXISTS idx_halls_status ON halls(status);
-CREATE INDEX IF NOT EXISTS idx_halls_type ON halls(type);
-
--- 4. 创建 updated_at 自动更新触发器函数
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- 5. 为 stores 表添加触发器
-DROP TRIGGER IF EXISTS update_stores_updated_at ON stores;
-CREATE TRIGGER update_stores_updated_at
-    BEFORE UPDATE ON stores
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- 6. 为 halls 表添加触发器
-DROP TRIGGER IF EXISTS update_halls_updated_at ON halls;
-CREATE TRIGGER update_halls_updated_at
-    BEFORE UPDATE ON halls
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- 7. 启用 Row Level Security (RLS)
-ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
-ALTER TABLE halls ENABLE ROW LEVEL SECURITY;
-
--- 8. 创建 RLS 策略（允许所有操作 - 可根据实际需求调整）
-CREATE POLICY "Enable all access for stores" ON stores FOR ALL USING (true);
-CREATE POLICY "Enable all access for halls" ON halls FOR ALL USING (true);
-
--- 9. 创建 store_reservation_settings 表（门店预约设置）
-CREATE TABLE IF NOT EXISTS store_reservation_settings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id UUID NOT NULL UNIQUE REFERENCES stores(id) ON DELETE CASCADE,
-  is_reservation_enabled BOOLEAN NOT NULL DEFAULT false,
-  max_reservation_days INTEGER NOT NULL DEFAULT 0 CHECK (max_reservation_days >= 0 AND max_reservation_days <= 365),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_by VARCHAR(255) -- 如果支持用户追踪，记录最后更新人
-);
-
--- 10. 为 store_reservation_settings 表创建索引
-CREATE INDEX IF NOT EXISTS idx_store_reservation_settings_store_id ON store_reservation_settings(store_id);
-CREATE INDEX IF NOT EXISTS idx_store_reservation_settings_enabled ON store_reservation_settings(is_reservation_enabled);
-
--- 11. 为 store_reservation_settings 表添加触发器
-DROP TRIGGER IF EXISTS trigger_update_store_reservation_settings_updated_at ON store_reservation_settings;
-CREATE TRIGGER trigger_update_store_reservation_settings_updated_at
-  BEFORE UPDATE ON store_reservation_settings
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
--- 12. 为 store_reservation_settings 表启用 RLS
-ALTER TABLE store_reservation_settings ENABLE ROW LEVEL SECURITY;
-
--- 13. 创建 store_reservation_settings 表的 RLS 策略
-CREATE POLICY "Enable all access for store_reservation_settings" ON store_reservation_settings FOR ALL USING (true);
-
--- 14. 创建 activity_types 表（活动类型）
-CREATE TABLE IF NOT EXISTS activity_types (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(100) NOT NULL,
-  description VARCHAR(500),
-  status VARCHAR(20) NOT NULL DEFAULT 'ENABLED' CHECK (status IN ('ENABLED', 'DISABLED', 'DELETED')),
-  sort INTEGER NOT NULL DEFAULT 0,
-  business_category VARCHAR(100),
-  background_image_url TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  deleted_at TIMESTAMPTZ,
-  created_by VARCHAR(255),
-  updated_by VARCHAR(255)
-);
-
--- 15. 为 activity_types 表创建索引
-CREATE INDEX IF NOT EXISTS idx_activity_types_status ON activity_types(status);
-CREATE INDEX IF NOT EXISTS idx_activity_types_sort ON activity_types(sort);
-CREATE INDEX IF NOT EXISTS idx_activity_types_name ON activity_types(name);
-
--- 16. 创建 activity_types 表的唯一约束（名称，排除已删除状态）
-CREATE UNIQUE INDEX IF NOT EXISTS idx_activity_types_name_unique ON activity_types(name) WHERE status != 'DELETED';
-
--- 17. 为 activity_types 表添加触发器
-DROP TRIGGER IF EXISTS trigger_update_activity_types_updated_at ON activity_types;
-CREATE TRIGGER trigger_update_activity_types_updated_at
-  BEFORE UPDATE ON activity_types
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
--- 18. 为 activity_types 表启用 RLS
-ALTER TABLE activity_types ENABLE ROW LEVEL SECURITY;
-
--- 19. 创建 activity_types 表的 RLS 策略
-CREATE POLICY "Enable all access for activity_types" ON activity_types FOR ALL USING (true);
-
--- ============================================================================
--- 注释
--- ============================================================================
-COMMENT ON TABLE stores IS '门店信息表';
-COMMENT ON COLUMN stores.code IS '门店编码，唯一标识';
-COMMENT ON COLUMN stores.name IS '门店名称';
-COMMENT ON COLUMN stores.region IS '门店所属区域';
-COMMENT ON COLUMN stores.status IS '门店状态：active=营业中, inactive=已停业';
-
-COMMENT ON TABLE halls IS '影厅信息表';
-COMMENT ON COLUMN halls.store_id IS '所属门店ID';
-COMMENT ON COLUMN halls.code IS '影厅编码，在门店内唯一';
-COMMENT ON COLUMN halls.name IS '影厅名称';
-COMMENT ON COLUMN halls.type IS '影厅类型：VIP=VIP厅, PUBLIC=普通厅, CP=情侣厅, PARTY=派对厅';
-COMMENT ON COLUMN halls.capacity IS '可容纳人数（1-1000）';
-COMMENT ON COLUMN halls.tags IS '影厅特性标签数组';
-COMMENT ON COLUMN halls.status IS '影厅状态：active=可用, inactive=停用, maintenance=维护中';
-
-COMMENT ON TABLE store_reservation_settings IS '门店预约设置表，存储每个门店的预约配置（是否开放预约、可预约天数）';
-COMMENT ON COLUMN store_reservation_settings.store_id IS '门店ID，与stores表一对一关系';
-COMMENT ON COLUMN store_reservation_settings.is_reservation_enabled IS '是否开放预约';
-COMMENT ON COLUMN store_reservation_settings.max_reservation_days IS '可预约天数（未来N天），范围0-365';
-COMMENT ON COLUMN store_reservation_settings.updated_by IS '最后更新人（如果支持用户追踪）';
-
-COMMENT ON TABLE activity_types IS '活动类型表，存储预约活动类型配置（如企业团建、订婚、生日Party等）';
-COMMENT ON COLUMN activity_types.name IS '活动类型名称，必填，唯一（在非已删除状态下）';
-COMMENT ON COLUMN activity_types.description IS '活动类型描述，可选';
-COMMENT ON COLUMN activity_types.status IS '状态：ENABLED=启用, DISABLED=停用, DELETED=已删除（软删除）';
-COMMENT ON COLUMN activity_types.sort IS '排序号，用于控制显示顺序';
-COMMENT ON COLUMN activity_types.business_category IS '业务分类（如：私人订制、商务团建、派对策划），用于分组和筛选';
-COMMENT ON COLUMN activity_types.background_image_url IS '场景背景图 URL，用于后台与小程序端场景卡片展示';
-COMMENT ON COLUMN activity_types.deleted_at IS '删除时间（软删除时记录）';
-COMMENT ON COLUMN activity_types.created_by IS '创建人（如果支持用户追踪）';
-COMMENT ON COLUMN activity_types.updated_by IS '更新人（如果支持用户追踪）';
-
--- activity_type_packages 表：活动类型下的套餐配置
-CREATE TABLE IF NOT EXISTS activity_type_packages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  activity_type_id UUID NOT NULL REFERENCES activity_types(id) ON DELETE CASCADE,
-  name VARCHAR(200) NOT NULL,
-  current_price NUMERIC(10, 2) NOT NULL,
-  original_price NUMERIC(10, 2),
-  sort INTEGER NOT NULL DEFAULT 0,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_activity_type_packages_activity_type_id ON activity_type_packages(activity_type_id);
-CREATE INDEX IF NOT EXISTS idx_activity_type_packages_sort ON activity_type_packages(sort);
-
-DROP TRIGGER IF EXISTS trigger_update_activity_type_packages_updated_at ON activity_type_packages;
-CREATE TRIGGER trigger_update_activity_type_packages_updated_at
-  BEFORE UPDATE ON activity_type_packages
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
-ALTER TABLE activity_type_packages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Enable all access for activity_type_packages" ON activity_type_packages FOR ALL USING (true);
-
-COMMENT ON TABLE activity_type_packages IS '活动类型套餐表，用于配置每种活动类型下的具体套餐及价格信息';
-COMMENT ON COLUMN activity_type_packages.activity_type_id IS '所属活动类型ID';
-COMMENT ON COLUMN activity_type_packages.name IS '套餐名称，如基础套餐、豪华套餐';
-COMMENT ON COLUMN activity_type_packages.current_price IS '当前售价，单位与业务约定一致';
-COMMENT ON COLUMN activity_type_packages.original_price IS '原价（如有优惠时用于展示对比）';
-COMMENT ON COLUMN activity_type_packages.sort IS '排序号，用于控制同一活动类型下套餐显示顺序';
-
--- activity_type_halls 表：活动类型与门店/影厅的资源关联
-CREATE TABLE IF NOT EXISTS activity_type_halls (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  activity_type_id UUID NOT NULL REFERENCES activity_types(id) ON DELETE CASCADE,
-  store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
-  hall_id UUID NOT NULL REFERENCES halls(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (activity_type_id, hall_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_activity_type_halls_activity_type_id ON activity_type_halls(activity_type_id);
-CREATE INDEX IF NOT EXISTS idx_activity_type_halls_store_id ON activity_type_halls(store_id);
-CREATE INDEX IF NOT EXISTS idx_activity_type_halls_hall_id ON activity_type_halls(hall_id);
-
-DROP TRIGGER IF EXISTS trigger_update_activity_type_halls_updated_at ON activity_type_halls;
-CREATE TRIGGER trigger_update_activity_type_halls_updated_at
-  BEFORE UPDATE ON activity_type_halls
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
-ALTER TABLE activity_type_halls ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Enable all access for activity_type_halls" ON activity_type_halls FOR ALL USING (true);
-
-COMMENT ON TABLE activity_type_halls IS '活动类型与门店/影厅资源关联表，用于限定某活动类型适用的物理场地';
-COMMENT ON COLUMN activity_type_halls.activity_type_id IS '活动类型ID';
-COMMENT ON COLUMN activity_type_halls.store_id IS '门店ID';
-COMMENT ON COLUMN activity_type_halls.hall_id IS '影厅ID';
+CREATE INDEX IF NOT EXISTS idx_skus_code ON skus(code);
+CREATE INDEX IF NOT EXISTS idx_skus_spu_id ON skus(spu_id);
+CREATE INDEX IF NOT EXISTS idx_skus_status ON skus(status);
+CREATE INDEX IF NOT EXISTS idx_store_inventory_store_sku ON store_inventory(store_id, sku_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_transactions_store_sku ON inventory_transactions(store_id, sku_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_store_id ON purchase_orders(store_id);
+CREATE INDEX IF NOT EXISTS idx_purchase_orders_supplier_id ON purchase_orders(supplier_id);
