@@ -1,153 +1,152 @@
-# Flyway 数据库迁移指南
-
-**@spec T003-flyway-migration**
+# Flyway 数据库迁移规范
 
 ## 目录结构
 
 ```
-db/
-├── migration/              # 版本化迁移脚本
-│   ├── V1__create_skus_table.sql
-│   ├── V2__create_bom_combo_tables.sql
-│   └── V2026.01.04.001__add_menu_category.sql
-│
-├── seed/                   # 可重复迁移（种子数据）
-│   ├── R__01_seed_brands.sql
-│   ├── R__02_seed_categories.sql
-│   └── R__03_seed_unit_conversions.sql
-│
-└── README.md               # 本文档
+db/migration/
+├── baseline/           # 基础表结构（V0001）
+├── archive/            # 废弃/历史文件
+├── V001__*.sql         # 版本迁移脚本
+├── V002__*.sql
+└── ...
 ```
 
-## 迁移脚本命名规范
+## 版本命名规范
 
-### 版本化迁移（Versioned Migration）
+### 标准格式
 
-**格式**: `V{version}__{description}.sql`
-
-| 组成部分 | 说明 | 示例 |
-|---------|------|------|
-| `V` | 版本化迁移前缀（固定） | V |
-| `{version}` | 版本号（支持多种格式） | `65`, `065`, `2026.01.11.001` |
-| `__` | 双下划线分隔符（固定） | __ |
-| `{description}` | 描述（下划线分隔单词） | `add_column_to_skus` |
-| `.sql` | 文件扩展名（固定） | .sql |
-
-**版本号格式推荐**：
-- 简单序号：`V65__xxx.sql`（适合小型项目）
-- 日期格式：`V2026.01.11.001__xxx.sql`（推荐，避免多人冲突）
-
-**示例**：
 ```
-V065__add_status_column_to_orders.sql      # 简单序号
-V2026.01.11.001__create_audit_log_table.sql # 日期格式（推荐）
+V{版本号}__{描述}.sql
 ```
 
-### 可重复迁移（Repeatable Migration）
+### 推荐命名方式
 
-**格式**: `R__{description}.sql`
+| 格式 | 示例 | 说明 |
+|------|------|------|
+| 日期序列 | `V2026_01_11_001__xxx.sql` | 推荐用于新迁移 |
+| 简单序号 | `V065__xxx.sql` | 历史遗留格式 |
 
-| 组成部分 | 说明 | 示例 |
-|---------|------|------|
-| `R` | 可重复迁移前缀（固定） | R |
-| `__` | 双下划线分隔符（固定） | __ |
-| `{description}` | 描述（带序号便于排序） | `01_seed_brands` |
-| `.sql` | 文件扩展名（固定） | .sql |
+### 命名规则
 
-**特点**：
-- 每次内容变化时自动重新执行
-- 适用于初始化数据、视图、存储过程
-- 按字母顺序执行，建议用数字前缀排序
+1. **版本号**：使用 `YYYY_MM_DD_XXX` 格式（推荐）或递增序号
+2. **双下划线**：版本号与描述之间必须是 `__`
+3. **描述**：使用小写字母和下划线，如 `create_users_table`
+4. **后缀**：`.sql`
 
-**示例**：
+### 示例
+
 ```
-R__01_seed_brands.sql
-R__02_seed_categories.sql
-R__03_seed_unit_conversions.sql
+V2026_01_11_001__create_procurement_tables.sql
+V2026_01_11_002__add_material_support.sql
 ```
 
-## 编写迁移脚本注意事项
+## 迁移类型
 
-### 1. 幂等性
+| 类型 | 前缀 | 说明 |
+|------|------|------|
+| 版本迁移 | `V` | 按版本顺序执行一次 |
+| 可重复迁移 | `R` | 每次内容变更都会重新执行 |
 
-版本化迁移**只执行一次**，无需 IF NOT EXISTS。
+## 脚本编写规范
 
-可重复迁移**多次执行**，必须保证幂等性：
+### 1. 必须包含的元素
+
 ```sql
--- 使用 ON CONFLICT DO NOTHING
-INSERT INTO brands (brand_code, name) VALUES ('BRAND001', '耀莱影院')
-ON CONFLICT (brand_code) DO NOTHING;
+-- 文件头注释
+-- Description: 简要描述
+-- Author: 作者
+-- Date: 日期
 
--- 或使用 IF NOT EXISTS
-CREATE INDEX IF NOT EXISTS idx_skus_name ON skus(name);
+-- DDL 操作
+CREATE TABLE IF NOT EXISTS ...;
+ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...;
+
+-- 使用 IF EXISTS / IF NOT EXISTS 保证幂等性
 ```
 
-### 2. 事务安全
+### 2. 禁止的操作
 
-默认每个脚本在单独事务中执行。DDL 操作自动回滚失败的语句。
+- ❌ 不要 `DROP TABLE` 生产数据表
+- ❌ 不要修改历史迁移脚本
+- ❌ 不要在一个脚本中混合多个不相关的变更
 
-### 3. @spec 标识
+### 3. 最佳实践
 
-每个迁移脚本必须在开头添加规格标识：
-```sql
--- @spec T003-flyway-migration
--- 脚本描述...
-```
+- ✅ 每个脚本专注于一个功能
+- ✅ 使用 `IF EXISTS` / `IF NOT EXISTS` 保证可重复执行
+- ✅ 大表变更先在测试环境验证
+- ✅ 添加适当的注释
 
-## 常用 Maven 命令
+## 执行迁移
+
+### 使用 Flyway CLI
 
 ```bash
-# 查看迁移状态
-mvn flyway:info
-
 # 执行迁移
-mvn flyway:migrate
+./scripts/db/migrate.sh localhost 15432 postgres
 
-# 修复历史表（删除失败记录）
-mvn flyway:repair
-
-# 验证迁移
-mvn flyway:validate
+# 查看状态
+flyway -url="jdbc:postgresql://localhost:15432/postgres" info
 ```
 
-## 多环境配置
+### 使用 Spring Boot
 
-| 环境 | Profile | 配置文件 | 特点 |
-|-----|---------|---------|------|
-| 开发 | dev | application-dev.yml | out-of-order=true |
-| 测试 | test | application-test.yml | clean-disabled=false |
-| 生产 | prod | application-prod.yml | out-of-order=false |
+应用启动时自动执行（配置 `spring.flyway.enabled=true`）
 
-## 版本冲突处理
+## 初始化新数据库
 
-项目启用 `out-of-order: true`，支持并行开发场景：
-- 开发者 A 创建 V100，开发者 B 创建 V101
-- 即使 V101 先合入主分支并执行，后续执行 V100 也不会报错
-
-**生产环境**建议关闭 out-of-order，确保严格顺序执行。
-
-## 故障排除
-
-### 迁移失败后重试
+对于全新数据库，推荐流程：
 
 ```bash
-# 1. 修复历史表
-mvn flyway:repair
+# 1. 执行 baseline schema
+psql -f db_backup/schema.sql
 
-# 2. 修复脚本错误
+# 2. 导入 Flyway 历史记录
+psql -f db_backup/flyway_schema_history.sql
 
-# 3. 重新执行
-mvn flyway:migrate
+# 3. 导入种子数据
+psql -f db_backup/seed-data.sql
+
+# 4. 或使用一键脚本
+./db_backup/init-db.sh localhost 15432 postgres
 ```
 
-### 跳过问题迁移
+## archive 目录
 
-将问题脚本重命名为 `.disabled`：
+存放废弃或历史版本的迁移文件：
+
+- `.bak` - 备份文件
+- `.deprecated` - 已废弃
+- `.disabled` - 已禁用
+- `.v1` / `.v2` - 历史版本
+
+**注意**：archive 目录下的文件不会被 Flyway 执行。
+
+## 故障排查
+
+### 迁移失败
+
 ```bash
-mv V1.3__add_constraints.sql V1.3__add_constraints.sql.disabled
+# 查看失败记录
+SELECT * FROM flyway_schema_history WHERE success = false;
+
+# 修复后重置状态
+flyway repair
 ```
 
----
+### 版本冲突
 
-**创建日期**: 2026-01-11
-**维护者**: Claude Code (@spec T003-flyway-migration)
+使用 `outOfOrder=true` 参数允许乱序执行：
+
+```bash
+flyway -outOfOrder=true migrate
+```
+
+## 相关脚本
+
+| 脚本 | 位置 | 用途 |
+|------|------|------|
+| `migrate.sh` | `scripts/db/` | 执行 Flyway 迁移 |
+| `backup-db.sh` | `scripts/db/` | 备份数据库 |
+| `export-schema.sh` | `scripts/db/` | 导出 schema |
+| `init-db.sh` | `scripts/db/` | 初始化新数据库 |
