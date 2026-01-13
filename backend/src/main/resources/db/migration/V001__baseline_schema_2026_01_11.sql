@@ -10,6 +10,13 @@
 -- 启用必要的扩展
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- 创建物料类别枚举（在表创建之前）
+DO $$ BEGIN
+    CREATE TYPE material_category AS ENUM ('RAW_MATERIAL', 'PACKAGING');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 -- ============================================
 -- 第 1 部分: 基础配置表（无外键依赖）
 -- ============================================
@@ -64,6 +71,7 @@ CREATE TABLE IF NOT EXISTS units (
     name VARCHAR(50) NOT NULL,
     name_en VARCHAR(50),
     category VARCHAR(30),
+    decimal_places INTEGER DEFAULT 2,
     is_base_unit BOOLEAN DEFAULT false,
     status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     description TEXT,
@@ -83,6 +91,7 @@ CREATE TABLE IF NOT EXISTS unit_conversions (
     from_unit VARCHAR(20) NOT NULL,
     to_unit VARCHAR(20) NOT NULL,
     conversion_rate NUMERIC(15,6) NOT NULL,
+    category VARCHAR(30),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uk_conversion_from_to UNIQUE (from_unit, to_unit)
