@@ -1,27 +1,43 @@
 -- ============================================
--- Cinema Business Center Platform - 完整数据库结构
--- 从 Supabase 生产数据库导出
--- 表数量: 62 个表 (包含 flyway_schema_history 和 unified_orders 视图)
--- 更新时间: 2026-01-13
+-- V001__baseline_schema_2026_01_13.sql
+-- Cinema Business Center Platform - 完整基础表结构
+-- 用途: 初始化新数据库的完整表结构（从 Supabase 生产环境导出）
+-- 表数量: 62 个表 (包含 unified_orders 视图)
+-- 注意: 此脚本包含所有表结构，需要在空数据库上执行
+-- 创建时间: 2026-01-13
 -- ============================================
 
 -- 启用必要的扩展
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
--- 枚举类型
+-- 枚举类型（幂等性处理）
 -- ============================================
 
-CREATE TYPE inventory_item_type AS ENUM ('SKU', 'MATERIAL');
-CREATE TYPE material_category AS ENUM ('RAW_MATERIAL', 'PACKAGING');
-CREATE TYPE unit_category AS ENUM ('VOLUME', 'WEIGHT', 'COUNT');
+DO $$ BEGIN
+    CREATE TYPE inventory_item_type AS ENUM ('SKU', 'MATERIAL');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE material_category AS ENUM ('RAW_MATERIAL', 'PACKAGING');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    CREATE TYPE unit_category AS ENUM ('VOLUME', 'WEIGHT', 'COUNT');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- ============================================
 -- 第 1 部分: 基础配置表（无外键依赖）
 -- ============================================
 
 -- 1.1 门店信息表
-CREATE TABLE stores (
+CREATE TABLE IF NOT EXISTS stores (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(200) NOT NULL,
@@ -43,7 +59,7 @@ CREATE TABLE stores (
 );
 
 -- 1.2 供应商表
-CREATE TABLE suppliers (
+CREATE TABLE IF NOT EXISTS suppliers (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(200) NOT NULL,
@@ -56,7 +72,7 @@ CREATE TABLE suppliers (
 );
 
 -- 1.3 品牌表
-CREATE TABLE brands (
+CREATE TABLE IF NOT EXISTS brands (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     brand_code VARCHAR(50) NOT NULL,
     name VARCHAR(200) NOT NULL,
@@ -77,7 +93,7 @@ CREATE TABLE brands (
 );
 
 -- 1.4 分类表
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -92,7 +108,7 @@ CREATE TABLE categories (
 );
 
 -- 1.5 计量单位表
-CREATE TABLE units (
+CREATE TABLE IF NOT EXISTS units (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(20) NOT NULL,
     name VARCHAR(50) NOT NULL,
@@ -106,7 +122,7 @@ CREATE TABLE units (
 );
 
 -- 1.6 单位换算表
-CREATE TABLE unit_conversions (
+CREATE TABLE IF NOT EXISTS unit_conversions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     from_unit VARCHAR(20) NOT NULL,
     to_unit VARCHAR(20) NOT NULL,
@@ -116,7 +132,7 @@ CREATE TABLE unit_conversions (
 );
 
 -- 1.7 活动类型表
-CREATE TABLE activity_types (
+CREATE TABLE IF NOT EXISTS activity_types (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     description VARCHAR(500),
@@ -130,7 +146,7 @@ CREATE TABLE activity_types (
 );
 
 -- 1.8 调整原因表
-CREATE TABLE adjustment_reasons (
+CREATE TABLE IF NOT EXISTS adjustment_reasons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -143,7 +159,7 @@ CREATE TABLE adjustment_reasons (
 );
 
 -- 1.9 用户表
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
@@ -156,7 +172,7 @@ CREATE TABLE users (
 );
 
 -- 1.10 菜单分类表
-CREATE TABLE menu_category (
+CREATE TABLE IF NOT EXISTS menu_category (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) NOT NULL,
     display_name VARCHAR(50) NOT NULL,
@@ -173,8 +189,12 @@ CREATE TABLE menu_category (
     version BIGINT NOT NULL DEFAULT 0
 );
 
+-- 菜单分类 code 唯一索引（支持软删除，用于 ON CONFLICT）
+CREATE UNIQUE INDEX IF NOT EXISTS idx_menu_category_code_active 
+    ON menu_category(code) WHERE deleted_at IS NULL;
+
 -- 1.11 加购项表
-CREATE TABLE addon_items (
+CREATE TABLE IF NOT EXISTS addon_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     price NUMERIC(10,2) NOT NULL,
@@ -187,7 +207,7 @@ CREATE TABLE addon_items (
 );
 
 -- 1.12 饮品表
-CREATE TABLE beverages (
+CREATE TABLE IF NOT EXISTS beverages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -210,7 +230,7 @@ CREATE TABLE beverages (
 -- ============================================
 
 -- 2.1 物料表
-CREATE TABLE materials (
+CREATE TABLE IF NOT EXISTS materials (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(30) NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -231,7 +251,7 @@ CREATE TABLE materials (
 );
 
 -- 2.2 影厅表
-CREATE TABLE halls (
+CREATE TABLE IF NOT EXISTS halls (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
     code VARCHAR(50),
@@ -246,7 +266,7 @@ CREATE TABLE halls (
 );
 
 -- 2.3 门店预约设置表
-CREATE TABLE store_reservation_settings (
+CREATE TABLE IF NOT EXISTS store_reservation_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
     is_reservation_enabled BOOLEAN NOT NULL DEFAULT false,
@@ -265,7 +285,7 @@ CREATE TABLE store_reservation_settings (
 );
 
 -- 2.4 门店操作日志表
-CREATE TABLE store_operation_logs (
+CREATE TABLE IF NOT EXISTS store_operation_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
     operation_type VARCHAR(20) NOT NULL,
@@ -279,7 +299,7 @@ CREATE TABLE store_operation_logs (
 );
 
 -- 2.5 SPU表（标准产品单元）
-CREATE TABLE spus (
+CREATE TABLE IF NOT EXISTS spus (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(200) NOT NULL,
@@ -304,7 +324,7 @@ CREATE TABLE spus (
 );
 
 -- 2.6 SKU表（库存单位）
-CREATE TABLE skus (
+CREATE TABLE IF NOT EXISTS skus (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) NOT NULL,
     name VARCHAR(200) NOT NULL,
@@ -324,7 +344,7 @@ CREATE TABLE skus (
 );
 
 -- 2.7 饮品规格表
-CREATE TABLE beverage_specs (
+CREATE TABLE IF NOT EXISTS beverage_specs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
     spec_type VARCHAR(50) NOT NULL,
@@ -338,7 +358,7 @@ CREATE TABLE beverage_specs (
 );
 
 -- 2.8 饮品配方表
-CREATE TABLE beverage_recipes (
+CREATE TABLE IF NOT EXISTS beverage_recipes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
@@ -349,7 +369,7 @@ CREATE TABLE beverage_recipes (
 );
 
 -- 2.9 饮品订单表
-CREATE TABLE beverage_orders (
+CREATE TABLE IF NOT EXISTS beverage_orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(50) NOT NULL,
     user_id UUID NOT NULL,
@@ -371,7 +391,7 @@ CREATE TABLE beverage_orders (
 );
 
 -- 2.10 场景套餐表
-CREATE TABLE scenario_packages (
+CREATE TABLE IF NOT EXISTS scenario_packages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     base_package_id UUID,
     version INTEGER NOT NULL DEFAULT 1,
@@ -391,11 +411,15 @@ CREATE TABLE scenario_packages (
 );
 
 -- 自引用外键（场景套餐版本）
-ALTER TABLE scenario_packages ADD CONSTRAINT fk_base_package 
-    FOREIGN KEY (base_package_id) REFERENCES scenario_packages(id) ON DELETE RESTRICT;
+DO $$ BEGIN
+    ALTER TABLE scenario_packages ADD CONSTRAINT fk_base_package 
+        FOREIGN KEY (base_package_id) REFERENCES scenario_packages(id) ON DELETE RESTRICT;
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- 2.11 采购订单表
-CREATE TABLE purchase_orders (
+CREATE TABLE IF NOT EXISTS purchase_orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_number VARCHAR(30) NOT NULL,
     supplier_id UUID NOT NULL REFERENCES suppliers(id),
@@ -415,7 +439,7 @@ CREATE TABLE purchase_orders (
 );
 
 -- 2.12 商品订单表
-CREATE TABLE product_orders (
+CREATE TABLE IF NOT EXISTS product_orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_number VARCHAR(20) NOT NULL,
     user_id UUID NOT NULL,
@@ -443,7 +467,7 @@ CREATE TABLE product_orders (
 -- ============================================
 
 -- 3.1 渠道商品配置表
-CREATE TABLE channel_product_config (
+CREATE TABLE IF NOT EXISTS channel_product_config (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sku_id UUID NOT NULL REFERENCES skus(id) ON DELETE CASCADE,
     channel_type VARCHAR(50) NOT NULL DEFAULT 'MINI_PROGRAM',
@@ -464,7 +488,7 @@ CREATE TABLE channel_product_config (
 );
 
 -- 3.2 组合商品明细表
-CREATE TABLE combo_items (
+CREATE TABLE IF NOT EXISTS combo_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     combo_id UUID NOT NULL REFERENCES skus(id) ON DELETE CASCADE,
     sub_item_id UUID NOT NULL REFERENCES skus(id) ON DELETE RESTRICT,
@@ -477,7 +501,7 @@ CREATE TABLE combo_items (
 );
 
 -- 3.3 BOM组件表
-CREATE TABLE bom_components (
+CREATE TABLE IF NOT EXISTS bom_components (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     finished_product_id UUID NOT NULL REFERENCES skus(id) ON DELETE CASCADE,
     component_id UUID REFERENCES skus(id) ON DELETE RESTRICT,
@@ -492,7 +516,7 @@ CREATE TABLE bom_components (
 );
 
 -- 3.4 门店库存表
-CREATE TABLE store_inventory (
+CREATE TABLE IF NOT EXISTS store_inventory (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
     sku_id UUID REFERENCES skus(id) ON DELETE CASCADE,
@@ -508,7 +532,7 @@ CREATE TABLE store_inventory (
 );
 
 -- 3.5 库存调整表
-CREATE TABLE inventory_adjustments (
+CREATE TABLE IF NOT EXISTS inventory_adjustments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     adjustment_number VARCHAR(30) NOT NULL,
     sku_id UUID NOT NULL,
@@ -538,7 +562,7 @@ CREATE TABLE inventory_adjustments (
 );
 
 -- 3.6 库存事务表
-CREATE TABLE inventory_transactions (
+CREATE TABLE IF NOT EXISTS inventory_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     store_id UUID NOT NULL REFERENCES stores(id),
     sku_id UUID NOT NULL REFERENCES skus(id),
@@ -562,7 +586,7 @@ CREATE TABLE inventory_transactions (
 );
 
 -- 3.7 库存预留表
-CREATE TABLE inventory_reservations (
+CREATE TABLE IF NOT EXISTS inventory_reservations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL,
     store_id UUID NOT NULL REFERENCES stores(id),
@@ -579,7 +603,7 @@ CREATE TABLE inventory_reservations (
 );
 
 -- 3.8 饮品订单项表
-CREATE TABLE beverage_order_items (
+CREATE TABLE IF NOT EXISTS beverage_order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
     beverage_id UUID NOT NULL REFERENCES beverages(id) ON DELETE RESTRICT,
@@ -594,7 +618,7 @@ CREATE TABLE beverage_order_items (
 );
 
 -- 3.9 饮品订单状态日志表
-CREATE TABLE beverage_order_status_logs (
+CREATE TABLE IF NOT EXISTS beverage_order_status_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
     from_status VARCHAR(20),
@@ -605,7 +629,7 @@ CREATE TABLE beverage_order_status_logs (
 );
 
 -- 3.10 取餐号表
-CREATE TABLE queue_numbers (
+CREATE TABLE IF NOT EXISTS queue_numbers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     queue_number VARCHAR(10) NOT NULL,
     order_id UUID NOT NULL REFERENCES beverage_orders(id) ON DELETE CASCADE,
@@ -621,7 +645,7 @@ CREATE TABLE queue_numbers (
 );
 
 -- 3.11 配方原料表
-CREATE TABLE recipe_ingredients (
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     recipe_id UUID NOT NULL REFERENCES beverage_recipes(id) ON DELETE CASCADE,
     sku_id UUID NOT NULL REFERENCES skus(id) ON DELETE RESTRICT,
@@ -634,7 +658,7 @@ CREATE TABLE recipe_ingredients (
 );
 
 -- 3.12 饮品-SKU映射表
-CREATE TABLE beverage_sku_mapping (
+CREATE TABLE IF NOT EXISTS beverage_sku_mapping (
     old_beverage_id UUID NOT NULL,
     new_sku_id UUID NOT NULL REFERENCES skus(id) ON DELETE RESTRICT,
     migrated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -643,7 +667,7 @@ CREATE TABLE beverage_sku_mapping (
 );
 
 -- 3.13 套餐层级表
-CREATE TABLE package_tiers (
+CREATE TABLE IF NOT EXISTS package_tiers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
@@ -657,7 +681,7 @@ CREATE TABLE package_tiers (
 );
 
 -- 3.14 时间段模板表
-CREATE TABLE time_slot_templates (
+CREATE TABLE IF NOT EXISTS time_slot_templates (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     day_of_week INTEGER NOT NULL,
@@ -671,7 +695,7 @@ CREATE TABLE time_slot_templates (
 );
 
 -- 3.15 时间段覆盖表
-CREATE TABLE time_slot_overrides (
+CREATE TABLE IF NOT EXISTS time_slot_overrides (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     override_date DATE NOT NULL,
@@ -685,7 +709,7 @@ CREATE TABLE time_slot_overrides (
 );
 
 -- 3.16 套餐定价表
-CREATE TABLE package_pricing (
+CREATE TABLE IF NOT EXISTS package_pricing (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     package_price NUMERIC(10,2) NOT NULL,
@@ -698,7 +722,7 @@ CREATE TABLE package_pricing (
 );
 
 -- 3.17 套餐规则表
-CREATE TABLE package_rules (
+CREATE TABLE IF NOT EXISTS package_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     duration_hours NUMERIC(5,2) NOT NULL,
@@ -709,7 +733,7 @@ CREATE TABLE package_rules (
 );
 
 -- 3.18 套餐商品表
-CREATE TABLE package_items (
+CREATE TABLE IF NOT EXISTS package_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     item_id UUID NOT NULL,
@@ -721,7 +745,7 @@ CREATE TABLE package_items (
 );
 
 -- 3.19 套餐服务表
-CREATE TABLE package_services (
+CREATE TABLE IF NOT EXISTS package_services (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     service_id UUID NOT NULL,
@@ -732,7 +756,7 @@ CREATE TABLE package_services (
 );
 
 -- 3.20 套餐权益表
-CREATE TABLE package_benefits (
+CREATE TABLE IF NOT EXISTS package_benefits (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     benefit_type VARCHAR(50) NOT NULL,
@@ -744,7 +768,7 @@ CREATE TABLE package_benefits (
 );
 
 -- 3.21 套餐加购表
-CREATE TABLE package_addons (
+CREATE TABLE IF NOT EXISTS package_addons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     addon_item_id UUID NOT NULL REFERENCES addon_items(id) ON DELETE CASCADE,
@@ -755,7 +779,7 @@ CREATE TABLE package_addons (
 );
 
 -- 3.22 套餐影厅关联表
-CREATE TABLE package_hall_associations (
+CREATE TABLE IF NOT EXISTS package_hall_associations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     hall_type_id UUID NOT NULL,
@@ -764,7 +788,7 @@ CREATE TABLE package_hall_associations (
 );
 
 -- 3.23 套餐门店关联表
-CREATE TABLE scenario_package_store_associations (
+CREATE TABLE IF NOT EXISTS scenario_package_store_associations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     package_id UUID NOT NULL REFERENCES scenario_packages(id) ON DELETE CASCADE,
     store_id UUID NOT NULL REFERENCES stores(id) ON DELETE RESTRICT,
@@ -774,7 +798,7 @@ CREATE TABLE scenario_package_store_associations (
 );
 
 -- 3.24 采购订单明细表
-CREATE TABLE purchase_order_items (
+CREATE TABLE IF NOT EXISTS purchase_order_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
     sku_id UUID REFERENCES skus(id),
@@ -791,7 +815,7 @@ CREATE TABLE purchase_order_items (
 );
 
 -- 3.25 采购订单状态历史表
-CREATE TABLE purchase_order_status_history (
+CREATE TABLE IF NOT EXISTS purchase_order_status_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
     from_status VARCHAR(30),
@@ -803,7 +827,7 @@ CREATE TABLE purchase_order_status_history (
 );
 
 -- 3.26 收货单表
-CREATE TABLE goods_receipts (
+CREATE TABLE IF NOT EXISTS goods_receipts (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     receipt_number VARCHAR(30) NOT NULL,
     purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id),
@@ -820,7 +844,7 @@ CREATE TABLE goods_receipts (
 );
 
 -- 3.27 订单项表
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_id UUID NOT NULL REFERENCES product_orders(id) ON DELETE CASCADE,
     product_id UUID NOT NULL,
@@ -834,7 +858,7 @@ CREATE TABLE order_items (
 );
 
 -- 3.28 订单日志表
-CREATE TABLE order_logs (
+CREATE TABLE IF NOT EXISTS order_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_id UUID NOT NULL REFERENCES product_orders(id) ON DELETE CASCADE,
     action VARCHAR(50) NOT NULL,
@@ -851,7 +875,7 @@ CREATE TABLE order_logs (
 -- ============================================
 
 -- 4.1 审批记录表
-CREATE TABLE approval_records (
+CREATE TABLE IF NOT EXISTS approval_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     adjustment_id UUID NOT NULL REFERENCES inventory_adjustments(id) ON DELETE CASCADE,
     approver_id UUID NOT NULL,
@@ -865,7 +889,7 @@ CREATE TABLE approval_records (
 );
 
 -- 4.2 收货单明细表
-CREATE TABLE goods_receipt_items (
+CREATE TABLE IF NOT EXISTS goods_receipt_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     goods_receipt_id UUID NOT NULL REFERENCES goods_receipts(id) ON DELETE CASCADE,
     sku_id UUID REFERENCES skus(id),
@@ -880,7 +904,7 @@ CREATE TABLE goods_receipt_items (
 );
 
 -- 4.3 预约订单表
-CREATE TABLE reservation_orders (
+CREATE TABLE IF NOT EXISTS reservation_orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(20) NOT NULL,
     user_id UUID NOT NULL,
@@ -905,7 +929,7 @@ CREATE TABLE reservation_orders (
 );
 
 -- 4.4 BOM快照表
-CREATE TABLE bom_snapshots (
+CREATE TABLE IF NOT EXISTS bom_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL,
     finished_sku_id UUID NOT NULL REFERENCES skus(id),
@@ -918,7 +942,7 @@ CREATE TABLE bom_snapshots (
 );
 
 -- 4.5 分类审计日志表
-CREATE TABLE category_audit_log (
+CREATE TABLE IF NOT EXISTS category_audit_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category_id UUID NOT NULL,
     action VARCHAR(20) NOT NULL,
@@ -937,7 +961,7 @@ CREATE TABLE category_audit_log (
 -- ============================================
 
 -- 5.1 预约项目表
-CREATE TABLE reservation_items (
+CREATE TABLE IF NOT EXISTS reservation_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reservation_order_id UUID NOT NULL REFERENCES reservation_orders(id) ON DELETE CASCADE,
     addon_item_id UUID NOT NULL REFERENCES addon_items(id) ON DELETE RESTRICT,
@@ -949,7 +973,7 @@ CREATE TABLE reservation_items (
 );
 
 -- 5.2 预约操作日志表
-CREATE TABLE reservation_operation_logs (
+CREATE TABLE IF NOT EXISTS reservation_operation_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reservation_order_id UUID NOT NULL REFERENCES reservation_orders(id) ON DELETE CASCADE,
     operation_type VARCHAR(20) NOT NULL,
@@ -963,7 +987,7 @@ CREATE TABLE reservation_operation_logs (
 );
 
 -- 5.3 时间段库存快照表
-CREATE TABLE slot_inventory_snapshots (
+CREATE TABLE IF NOT EXISTS slot_inventory_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reservation_order_id UUID NOT NULL REFERENCES reservation_orders(id) ON DELETE CASCADE,
     time_slot_template_id UUID NOT NULL REFERENCES time_slot_templates(id) ON DELETE RESTRICT,
