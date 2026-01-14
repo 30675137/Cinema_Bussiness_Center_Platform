@@ -80,15 +80,8 @@ public class SkuService {
                 .status(request.getStatus() != null ? request.getStatus() : SkuStatus.DRAFT)
                 .build();
 
-        // 根据类型处理
+        // 根据类型处理 (M001: 原料和包材已迁移到 Material 表)
         switch (request.getSkuType()) {
-            case RAW_MATERIAL, PACKAGING -> {
-                // 原料和包材需要手动设置成本
-                if (request.getStandardCost() == null) {
-                    throw new IllegalArgumentException("原料和包材必须指定标准成本");
-                }
-                sku.setStandardCost(request.getStandardCost());
-            }
             case FINISHED_PRODUCT -> {
                 // 成品需要BOM配置
                 if (request.getBomComponents() == null || request.getBomComponents().isEmpty()) {
@@ -111,12 +104,10 @@ public class SkuService {
         if (request.getSkuType() == SkuType.FINISHED_PRODUCT && request.getBomComponents() != null) {
             for (SkuCreateRequest.BomComponentInput input : request.getBomComponents()) {
                 // 获取组件SKU以验证类型和获取成本
+                // M001: BOM 组件现在应该引用 Material 表,暂时移除类型检查
+                // TODO: 迁移 BOM 组件到 Material 引用
                 Sku component = skuRepository.findById(input.getComponentId())
                         .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
-
-                if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
-                    throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
-                }
 
                 BomComponent bomComponent = BomComponent.builder()
                         .finishedProductId(createdSku.getId())
@@ -192,9 +183,9 @@ public class SkuService {
         if (storeScope != null) {
             sku.setStoreScope(storeScope);
         }
-        if (standardCost != null && (sku.getSkuType() == SkuType.RAW_MATERIAL || sku.getSkuType() == SkuType.PACKAGING)) {
-            sku.setStandardCost(standardCost);
-        }
+        // M001: 原料和包材已迁移到 Material 表
+        // 成品和套餐的标准成本通过 BOM/Combo 计算,不允许手动修改
+        // if (standardCost != null) { sku.setStandardCost(standardCost); }
         if (wasteRate != null && sku.getSkuType() == SkuType.FINISHED_PRODUCT) {
             sku.setWasteRate(wasteRate);
             // 重新计算成本
@@ -310,12 +301,10 @@ public class SkuService {
         // 创建新的BOM配置
         for (SkuCreateRequest.BomComponentInput input : componentInputs) {
             // 获取组件SKU以验证类型和获取成本
+            // M001: BOM 组件现在应该引用 Material 表,暂时移除类型检查
+            // TODO: 迁移 BOM 组件到 Material 引用
             Sku component = skuRepository.findById(input.getComponentId())
                     .orElseThrow(() -> new IllegalArgumentException("组件SKU不存在: " + input.getComponentId()));
-
-            if (component.getSkuType() != SkuType.RAW_MATERIAL && component.getSkuType() != SkuType.PACKAGING) {
-                throw new IllegalArgumentException("BOM组件必须是原料或包材类型");
-            }
 
             BomComponent bomComponent = BomComponent.builder()
                     .finishedProductId(finishedProductId)

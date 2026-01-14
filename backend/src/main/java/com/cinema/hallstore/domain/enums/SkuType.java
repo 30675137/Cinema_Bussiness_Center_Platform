@@ -5,25 +5,23 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * SKU类型枚举
+ * 
+ * M001 架构调整后,SKU 仅保留成品和套餐类型:
+ * - 原料 (RAW_MATERIAL) → 迁移到 Material 表
+ * - 包材 (PACKAGING) → 迁移到 Material 表
+ * - 成品 (FINISHED_PRODUCT) → 保留在 SKU 表
+ * - 套餐 (COMBO) → 保留在 SKU 表
+ * 
+ * @spec M001-material-unit-system Phase 9
  */
 public enum SkuType {
     /**
-     * 原料
-     */
-    RAW_MATERIAL("raw_material", "原料"),
-
-    /**
-     * 包材
-     */
-    PACKAGING("packaging", "包材"),
-
-    /**
-     * 成品
+     * 成品 - 带 BOM 配方的可售商品
      */
     FINISHED_PRODUCT("finished_product", "成品"),
 
     /**
-     * 套餐/组合
+     * 套餐/组合 - 成品的捆绑
      */
     COMBO("combo", "套餐");
 

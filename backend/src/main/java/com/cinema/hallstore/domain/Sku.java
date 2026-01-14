@@ -140,13 +140,13 @@ public class Sku {
     private Long version = 0L;
 
     /**
-     * 业务规则验证: 原料和包材必须有标准成本
+     * 业务规则验证: 成品和套餐的标准成本验证
+     * 
+     * M001 调整: 原料和包材已迁移到 Material 表,不再需要验证
      */
     @JsonIgnore
     public boolean validateStandardCostRequired() {
-        if (skuType == SkuType.RAW_MATERIAL || skuType == SkuType.PACKAGING) {
-            return standardCost != null && standardCost.compareTo(BigDecimal.ZERO) > 0;
-        }
+        // 成品和套餐不强制要求 standardCost（可以通过 BOM 计算）
         return true;
     }
 
