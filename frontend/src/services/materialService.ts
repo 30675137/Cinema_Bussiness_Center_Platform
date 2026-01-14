@@ -79,4 +79,39 @@ export const materialService = {
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/materials/${id}`)
   },
+
+  /**
+   * M002: 导出物料数据为 Excel
+   * User Story: US2 - 批量导出物料数据
+   */
+  exportMaterials: async (filter: MaterialFilter): Promise<void> => {
+    const params: Record<string, any> = {}
+
+    if (filter.category) params.category = filter.category
+    if (filter.status) params.status = filter.status
+    if (filter.minCost !== undefined) params.minCost = filter.minCost
+    if (filter.maxCost !== undefined) params.maxCost = filter.maxCost
+    if (filter.keyword) params.keyword = filter.keyword
+
+    const response = await apiClient.get('/materials/export', {
+      params,
+      responseType: 'blob',
+    })
+
+    // 下载文件
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+
+    // 生成文件名
+    const timestamp = new Date().toISOString().replace(/[:\-T]/g, '').slice(0, 14)
+    const fileName = `物料数据_${timestamp}.xlsx`
+
+    // 触发下载
+    const link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = fileName
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  },
 }

@@ -9,6 +9,7 @@ import { useSearchParams } from 'react-router-dom'
 import { MaterialTable } from '@/components/material/MaterialTable'
 import { MaterialForm } from '@/components/material/MaterialForm'
 import { MaterialFilterComponent } from '@/components/material/MaterialFilter'
+import { MaterialExportButton } from '@/components/material/MaterialExportButton'
 import {
   useMaterials,
   useFilterMaterials,
@@ -119,9 +120,12 @@ export const MaterialManagementPage: React.FC = () => {
       <Card
         title="物料主数据管理"
         extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            新建物料
-          </Button>
+          <Space>
+            <MaterialExportButton filter={filter} />
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+              新建物料
+            </Button>
+          </Space>
         }
       >
         <MaterialTable

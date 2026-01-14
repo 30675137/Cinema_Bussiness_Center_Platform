@@ -12,6 +12,7 @@ import com.cinema.material.dto.MaterialResponse;
 import com.cinema.material.dto.MaterialUpdateRequest;
 import com.cinema.material.entity.Material;
 import com.cinema.material.entity.MaterialStatus;
+import com.cinema.material.service.MaterialExportService;
 import com.cinema.material.service.MaterialService;
 import com.cinema.unit.entity.Unit;
 import jakarta.validation.Valid;
@@ -20,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final MaterialExportService materialExportService;
 
     /**
      * 创建物料
@@ -196,5 +200,63 @@ public class MaterialController {
 
         materialService.deleteMaterial(id);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // ========== M002-material-filter: US2 - 批量导出 ==========
+
+    /**
+     * 导出物料数据为 Excel
+     * User Story: US2 - 批量导出物料数据
+     *
+     * @param category 物料分类
+     * @param status 物料状态
+     * @param minCost 最小成本
+     * @param maxCost 最大成本
+     * @param keyword 关键词
+     * @return Excel 文件二进制流
+     */
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportMaterials(
+            @RequestParam(required = false) Material.MaterialCategory category,
+            @RequestParam(required = false) MaterialStatus status,
+            @RequestParam(required = false) BigDecimal minCost,
+            @RequestParam(required = false) BigDecimal maxCost,
+            @RequestParam(required = false) String keyword) {
+
+        log.info("Exporting materials: category={}, status={}, minCost={}, maxCost={}, keyword={}",
+                category, status, minCost, maxCost, keyword);
+
+        try {
+            // 构建筛选条件
+            MaterialFilterDTO filter = new MaterialFilterDTO();
+            filter.setCategory(category);
+            filter.setStatus(status);
+            filter.setMinCost(minCost);
+            filter.setMaxCost(maxCost);
+            filter.setKeyword(keyword);
+
+            // 导出 Excel
+            byte[] excelData = materialExportService.exportMaterials(filter);
+            String fileName = materialExportService.generateFileName();
+
+            // 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", 
+                new String(fileName.getBytes("UTF-8"), "ISO-8859-1")); // 中文文件名编码
+            headers.setContentLength(excelData.length);
+
+            log.info("Material export completed, file size: {} bytes", excelData.length);
+            return new ResponseEntity<>(excelData, headers, HttpStatus.OK);
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Export failed: {}", e.getMessage());
+            // 返回错误信息（注：这里应该返回 JSON 错误，但为了简化直接抛出）
+            throw e;
+        } catch (Exception e) {
+            log.error("Export failed with unexpected error", e);
+            throw new RuntimeException("导出失败：" + e.getMessage());
+        }
     }
 }
