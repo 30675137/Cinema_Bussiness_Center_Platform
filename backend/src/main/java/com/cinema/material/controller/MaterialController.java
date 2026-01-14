@@ -1,14 +1,17 @@
 /**
  * @spec M001-material-unit-system
  * @spec N004-procurement-material-selector
+ * @spec M002-material-filter
  */
 package com.cinema.material.controller;
 
 import com.cinema.common.dto.ApiResponse;
 import com.cinema.material.dto.MaterialCreateRequest;
+import com.cinema.material.dto.MaterialFilterDTO;
 import com.cinema.material.dto.MaterialResponse;
 import com.cinema.material.dto.MaterialUpdateRequest;
 import com.cinema.material.entity.Material;
+import com.cinema.material.entity.MaterialStatus;
 import com.cinema.material.service.MaterialService;
 import com.cinema.unit.entity.Unit;
 import jakarta.validation.Valid;
@@ -19,8 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/materials")
 @RequiredArgsConstructor
+@Validated
 public class MaterialController {
 
     private final MaterialService materialService;
@@ -63,38 +69,57 @@ public class MaterialController {
     }
 
     /**
-     * 获取所有物料（支持分类筛选、搜索和分页）
-     * N004: Enhanced for MaterialSkuSelector component
+     * 获取所有物料（支持筛选、搜索和分页）
+     * M002: Enhanced with comprehensive filter support
+     * N004: Compatible with MaterialSkuSelector component
      *
-     * @param category 物料分类 (RAW_MATERIAL, PACKAGING)
-     * @param search 搜索关键词 (名称、编码、规格)
+     * @param category 物料分类 (RAW_MATERIAL, PACKAGING) - M002
+     * @param status 物料状态 (ACTIVE, INACTIVE) - M002
+     * @param minCost 最小标准成本 - M002
+     * @param maxCost 最大标准成本 - M002
+     * @param keyword 搜索关键词 (编码、名称) - M002
+     * @param search 搜索关键词 (名称、编码、规格) - N004 (deprecated, use keyword instead)
      * @param page 页码 (0-indexed)
      * @param size 页大小 (默认20，最大100)
      */
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getAllMaterials(
             @RequestParam(required = false) Material.MaterialCategory category,
-            @RequestParam(required = false) String search,
+            @RequestParam(required = false) MaterialStatus status,
+            @RequestParam(required = false) BigDecimal minCost,
+            @RequestParam(required = false) BigDecimal maxCost,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String search, // N004 compatibility
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        log.info("Getting materials: category={}, search={}, page={}, size={}", category, search, page, size);
+        
+        // M002: Use keyword if provided, otherwise fall back to search (N004 compatibility)
+        String searchTerm = keyword != null ? keyword : search;
+        
+        log.info("Getting materials: category={}, status={}, minCost={}, maxCost={}, keyword={}, page={}, size={}",
+                category, status, minCost, maxCost, searchTerm, page, size);
 
         // Limit page size to 100
         size = Math.min(size, 100);
         Pageable pageable = PageRequest.of(page, size);
 
         Page<Material> materialsPage;
-        if (category != null && search != null && !search.isBlank()) {
-            // Filter by category AND search term
-            materialsPage = materialService.findByCategoryAndSearchTerm(category, search, pageable);
-        } else if (category != null) {
-            // Filter by category only
-            materialsPage = materialService.findByCategoryPaged(category, pageable);
-        } else if (search != null && !search.isBlank()) {
-            // Filter by search term only
-            materialsPage = materialService.findBySearchTerm(search, pageable);
+        
+        // M002: Check if any filter is applied
+        boolean hasFilter = category != null || status != null || minCost != null || maxCost != null || searchTerm != null;
+        
+        if (hasFilter) {
+            // M002: Use comprehensive filter
+            MaterialFilterDTO filter = new MaterialFilterDTO();
+            filter.setCategory(category);
+            filter.setStatus(status);
+            filter.setMinCost(minCost);
+            filter.setMaxCost(maxCost);
+            filter.setKeyword(searchTerm);
+            
+            materialsPage = materialService.filterMaterials(filter, pageable);
         } else {
-            // No filter - return all active materials
+            // N004: No filter - return all active materials
             materialsPage = materialService.findAllActivePaged(pageable);
         }
 

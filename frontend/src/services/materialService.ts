@@ -1,6 +1,15 @@
-/** @spec M001-material-unit-system */
+/**
+ * @spec M001-material-unit-system
+ * @spec M002-material-filter
+ */
 import { apiClient } from './api'
-import type { Material, MaterialCreateRequest, MaterialUpdateRequest, MaterialCategory } from '@/types/material'
+import type {
+  Material,
+  MaterialCreateRequest,
+  MaterialUpdateRequest,
+  MaterialCategory,
+  MaterialFilter,
+} from '@/types/material'
 
 interface ApiResponse<T> {
   success: boolean
@@ -19,9 +28,32 @@ interface MaterialPageResponse {
 
 export const materialService = {
   getAll: async (category?: MaterialCategory): Promise<Material[]> => {
-    const response = await apiClient.get<ApiResponse<MaterialPageResponse>>('/materials', { params: { category, size: 1000 } })
+    const response = await apiClient.get<ApiResponse<MaterialPageResponse>>('/materials', {
+      params: { category, size: 1000 },
+    })
     // N004: 后端返回分页格式 { data: { data: [...], total, page, pageSize } }
     return response.data.data?.data || []
+  },
+
+  /**
+   * M002: 筛选查询物料列表（支持分页）
+   * User Story: US1 - 快速筛选物料
+   */
+  filterMaterials: async (
+    filter: MaterialFilter,
+    page: number = 0,
+    size: number = 20
+  ): Promise<MaterialPageResponse> => {
+    const params: Record<string, any> = { page, size }
+
+    if (filter.category) params.category = filter.category
+    if (filter.status) params.status = filter.status
+    if (filter.minCost !== undefined) params.minCost = filter.minCost
+    if (filter.maxCost !== undefined) params.maxCost = filter.maxCost
+    if (filter.keyword) params.keyword = filter.keyword
+
+    const response = await apiClient.get<ApiResponse<MaterialPageResponse>>('/materials', { params })
+    return response.data.data
   },
 
   getById: async (id: string): Promise<Material> => {

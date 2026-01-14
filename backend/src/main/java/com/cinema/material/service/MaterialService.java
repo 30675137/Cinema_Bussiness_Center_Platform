@@ -1,20 +1,26 @@
 /**
  * @spec M001-material-unit-system
  * @spec N004-procurement-material-selector
+ * @spec M002-material-filter
  */
 package com.cinema.material.service;
 
+import com.cinema.material.dto.MaterialFilterDTO;
 import com.cinema.material.entity.Material;
+import com.cinema.material.entity.MaterialStatus;
 import com.cinema.material.repository.MaterialRepository;
 import com.cinema.unit.entity.Unit;
 import com.cinema.unit.repository.UnitRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -202,5 +208,65 @@ public class MaterialService {
 
         log.info("Deleting material: {}", material.getCode());
         materialRepository.delete(material);
+    }
+
+    // ========== M002-material-filter: 筛选功能 ==========
+
+    /**
+     * 根据筛选条件查询物料（分页）
+     * User Story: US1 - 快速筛选物料
+     *
+     * @param filter 筛选条件
+     * @param pageable 分页参数
+     * @return 分页的物料列表
+     */
+    @Transactional(readOnly = true)
+    public Page<Material> filterMaterials(MaterialFilterDTO filter, Pageable pageable) {
+        Specification<Material> spec = buildMaterialSpecification(filter);
+        log.info("Filtering materials with criteria: category={}, status={}, minCost={}, maxCost={}, keyword={}",
+                filter.getCategory(), filter.getStatus(), filter.getMinCost(), filter.getMaxCost(), filter.getKeyword());
+        return materialRepository.findAll(spec, pageable);
+    }
+
+    /**
+     * 构建动态查询条件
+     *
+     * @param filter 筛选条件
+     * @return JPA Specification
+     */
+    private Specification<Material> buildMaterialSpecification(MaterialFilterDTO filter) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 按分类筛选
+            if (filter.getCategory() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), filter.getCategory()));
+            }
+
+            // 按状态筛选
+            if (filter.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), filter.getStatus().name()));
+            }
+
+            // 按成本范围筛选
+            if (filter.getMinCost() != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("standardCost"), filter.getMinCost()));
+            }
+            if (filter.getMaxCost() != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("standardCost"), filter.getMaxCost()));
+            }
+
+            // 按关键词搜索（物料编码或名称）
+            if (filter.getKeyword() != null && !filter.getKeyword().trim().isEmpty()) {
+                String keyword = "%" + filter.getKeyword().trim().toLowerCase() + "%";
+                Predicate codeMatch = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("code")), keyword);
+                Predicate nameMatch = criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("name")), keyword);
+                predicates.add(criteriaBuilder.or(codeMatch, nameMatch));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }
