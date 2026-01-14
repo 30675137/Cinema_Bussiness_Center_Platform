@@ -1,6 +1,7 @@
 /**
  * @spec O003-beverage-order
- * 饮品订单项实体类
+ * @spec O013-order-channel-migration
+ * 消费订单项实体类
  */
 package com.cinema.beverage.entity;
 
@@ -21,12 +22,20 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 /**
- * 饮品订单项实体
+ * 消费订单项实体
  *
  * 映射数据库表: beverage_order_items
- * 对应 spec: O003-beverage-order
+ * 对应 spec: O003-beverage-order, O013-order-channel-migration
  *
- * 说明: 订单项保存饮品快照，避免饮品信息变更后影响历史订单
+ * 说明: 订单项保存商品快照，避免商品信息变更后影响历史订单
+ * 
+ * @spec O013-order-channel-migration 迁移说明:
+ * - 新增 channelProductId 字段，关联 channel_product_config 表
+ * - 新增 skuId 字段，用于库存扣减
+ * - 新增 productSnapshot 字段，存储完整商品快照
+ * - beverageName 重命名为 productName
+ * - beverageImageUrl 重命名为 productImageUrl
+ * - beverageId 字段已废弃，保留用于过渡期兼容
  */
 @Entity
 @Table(name = "beverage_order_items")
@@ -52,30 +61,57 @@ public class BeverageOrderItem {
     private BeverageOrder order;
 
     /**
-     * 饮品ID（来自 beverages 表或 skus 表）
-     * 2026-01-14: 暂不重构，使用现有的beverage_id字段
+     * @spec O013-order-channel-migration 渠道商品配置 ID
+     * 关联 channel_product_config 表，用于获取商品展示信息
      */
-    @NotNull(message = "饮品ID不能为空")
-    @Column(name = "beverage_id", nullable = false, columnDefinition = "uuid")
+    @Column(name = "channel_product_id", columnDefinition = "uuid")
+    private UUID channelProductId;
+
+    /**
+     * @spec O013-order-channel-migration SKU ID
+     * 用于库存扣减，从 channel_product_config.sku_id 获取
+     */
+    @Column(name = "sku_id", columnDefinition = "uuid")
+    private UUID skuId;
+
+    /**
+     * @deprecated @spec O013-order-channel-migration
+     * 已废弃字段，保留用于过渡期兼容
+     * 新订单请使用 channelProductId
+     */
+    @Deprecated
+    @Column(name = "beverage_id", columnDefinition = "uuid")
     private UUID beverageId;
 
     /**
-     * 饮品名称快照
+     * @spec O013-order-channel-migration 商品名称快照
+     * 数据库列名: product_name (原 beverage_name)
      */
-    @NotBlank(message = "饮品名称不能为空")
-    @Size(max = 100, message = "饮品名称长度不能超过100")
-    @Column(name = "beverage_name", nullable = false, length = 100)
-    private String beverageName;
+    @NotBlank(message = "商品名称不能为空")
+    @Size(max = 100, message = "商品名称长度不能超过100")
+    @Column(name = "product_name", nullable = false, length = 100)
+    private String productName;
 
     /**
-     * 饮品图片URL快照
+     * @spec O013-order-channel-migration 商品图片URL快照
+     * 数据库列名: product_image_url (原 beverage_image_url)
      */
-    @Column(name = "beverage_image_url", columnDefinition = "TEXT")
-    private String beverageImageUrl;
+    @Column(name = "product_image_url", columnDefinition = "TEXT")
+    private String productImageUrl;
 
     /**
-     * 选中的规格 (JSON对象)
-     * 格式: {"size": "大杯", "temperature": "热", "sweetness": "五分糖", "topping": "珍珠"}
+     * @spec O013-order-channel-migration 商品快照
+     * JSONB 格式，包含下单时的完整商品信息
+     * @see com.cinema.beverage.util.ProductSnapshotBuilder
+     */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_snapshot", columnDefinition = "jsonb")
+    private String productSnapshot;
+
+    /**
+     * @spec O013-order-channel-migration 选中的规格 (JSON对象)
+     * 新格式: {"SIZE": {"optionId": "xxx", "optionName": "大杯", "priceAdjust": 300}}
+     * 旧格式 (兼容): {"size": "大杯", "temperature": "热"}
      */
     @NotNull(message = "选中规格不能为空")
     @JdbcTypeCode(SqlTypes.JSON)

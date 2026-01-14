@@ -129,7 +129,7 @@ public class OrderStatisticsService {
                     if (existing == null) {
                         return new BeverageItemAggregate(
                                 beverageId,
-                                item.getBeverageName(),
+                                item.getProductName(),
                                 item.getQuantity(),
                                 item.getSubtotal()
                         );
@@ -320,7 +320,7 @@ public class OrderStatisticsService {
         Map<String, Long> beverageQuantityMap = new HashMap<>();
         for (BeverageOrder order : validOrders) {
             for (BeverageOrderItem item : order.getItems()) {
-                beverageQuantityMap.merge(item.getBeverageName(), (long) item.getQuantity(), Long::sum);
+                beverageQuantityMap.merge(item.getProductName(), (long) item.getQuantity(), Long::sum);
             }
         }
 
@@ -409,7 +409,7 @@ public class OrderStatisticsService {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(order.getOrderNumber());
                 row.createCell(1).setCellValue(order.getCreatedAt().toString());
-                row.createCell(2).setCellValue(item.getBeverageName());
+                row.createCell(2).setCellValue(item.getProductName());
                 row.createCell(3).setCellValue(item.getSelectedSpecs() != null ? item.getSelectedSpecs() : "-");
                 row.createCell(4).setCellValue(item.getQuantity());
                 row.createCell(5).setCellValue(item.getUnitPrice().doubleValue());

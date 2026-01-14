@@ -1,7 +1,6 @@
 /**
- * @spec O003-beverage-order
- * @deprecated @spec O013-order-channel-migration
- * 饮品订单控制器 - 已废弃，请使用 ConsumerOrderController
+ * @spec O013-order-channel-migration
+ * 消费订单控制器 - 新 API 路径
  */
 package com.cinema.beverage.controller;
 
@@ -27,23 +26,24 @@ import com.cinema.order.service.OrderCancellationService;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 饮品订单控制器 - C端 API
+ * 消费订单控制器 - C端 API
  *
- * 对应 spec: O003-beverage-order
- * 提供 C端订单创建、支付、查询接口
+ * @spec O013-order-channel-migration
+ * 新的 API 路径: /api/client/orders
  * 
- * @deprecated @spec O013-order-channel-migration
- * 此控制器已废弃，请使用 {@link ConsumerOrderController} (/api/client/orders) 替代。
- * 保留用于向后兼容。
+ * 替代 BeverageOrderController (/api/client/beverage-orders)
+ * - 支持通过 channelProductId 下单
+ * - 保持与旧 API 相同的接口语义
+ * 
+ * 注意: BeverageOrderController 保留用于向后兼容，标记为 @Deprecated
  */
-@Deprecated
 @RestController
-@RequestMapping("/api/client/beverage-orders")
+@RequestMapping("/api/client/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-public class BeverageOrderController {
+public class ConsumerOrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BeverageOrderController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerOrderController.class);
 
     private final BeverageOrderService orderService;
     private final OrderCancellationService cancellationService;
@@ -51,7 +51,12 @@ public class BeverageOrderController {
     /**
      * 创建订单
      *
-     * POST /api/client/beverage-orders
+     * POST /api/client/orders
+     * 
+     * @spec O013-order-channel-migration
+     * 请求体变更:
+     * - 使用 channelProductId 替代 skuId
+     * - selectedSpecs 格式: {"SIZE": {"optionId": "xxx", "optionName": "大杯", "priceAdjust": 300}}
      *
      * @param request 创建订单请求
      * @param userId 用户ID（从认证上下文获取，暂时mock）
@@ -62,12 +67,16 @@ public class BeverageOrderController {
             @Valid @RequestBody CreateBeverageOrderRequest request,
             @RequestHeader(value = "X-User-Id", required = false) String userId
     ) {
-        logger.info("创建订单: userId={}, storeId={}", userId, request.getStoreId());
+        logger.info("ConsumerOrder - CREATE: userId={}, storeId={}, itemCount={}",
+                userId, request.getStoreId(), request.getItems().size());
 
         // TODO: 从认证上下文获取userId，暂时使用mock值
         UUID userIdParsed = userId != null ? UUID.fromString(userId) : UUID.randomUUID();
 
         BeverageOrderDTO order = orderService.createOrder(request, userIdParsed);
+        
+        logger.info("ConsumerOrder - CREATED: orderId={}, orderNumber={}", 
+                order.getId(), order.getOrderNumber());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(order));
     }
@@ -75,14 +84,14 @@ public class BeverageOrderController {
     /**
      * 支付订单 (Mock)
      *
-     * POST /api/client/beverage-orders/{id}/pay
+     * POST /api/client/orders/{id}/pay
      *
      * @param id 订单ID
      * @return 订单详情（包含取餐号）
      */
     @PostMapping("/{id}/pay")
     public ResponseEntity<ApiResponse<BeverageOrderDTO>> payOrder(@PathVariable String id) {
-        logger.info("支付订单: orderId={}", id);
+        logger.info("ConsumerOrder - PAY: orderId={}", id);
 
         UUID orderId = UUID.fromString(id);
         BeverageOrderDTO order = orderService.mockPay(orderId);
@@ -93,14 +102,14 @@ public class BeverageOrderController {
     /**
      * 获取订单详情
      *
-     * GET /api/client/beverage-orders/{id}
+     * GET /api/client/orders/{id}
      *
      * @param id 订单ID
      * @return 订单详情
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<BeverageOrderDTO>> getOrderById(@PathVariable String id) {
-        logger.info("查询订单详情: orderId={}", id);
+        logger.debug("ConsumerOrder - GET: orderId={}", id);
 
         UUID orderId = UUID.fromString(id);
         BeverageOrderDTO order = orderService.findById(orderId);
@@ -111,14 +120,14 @@ public class BeverageOrderController {
     /**
      * 获取订单详情（通过订单号）
      *
-     * GET /api/client/beverage-orders/by-number/{orderNumber}
+     * GET /api/client/orders/by-number/{orderNumber}
      *
      * @param orderNumber 订单号
      * @return 订单详情
      */
     @GetMapping("/by-number/{orderNumber}")
     public ResponseEntity<ApiResponse<BeverageOrderDTO>> getOrderByNumber(@PathVariable String orderNumber) {
-        logger.info("查询订单详情: orderNumber={}", orderNumber);
+        logger.debug("ConsumerOrder - GET BY NUMBER: orderNumber={}", orderNumber);
 
         BeverageOrderDTO order = orderService.findByOrderNumber(orderNumber);
 
@@ -128,7 +137,7 @@ public class BeverageOrderController {
     /**
      * 获取我的订单列表
      *
-     * GET /api/client/beverage-orders/my
+     * GET /api/client/orders/my
      *
      * @param userId 用户ID（从认证上下文获取，暂时mock）
      * @param page 页码（从0开始）
@@ -141,7 +150,7 @@ public class BeverageOrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int pageSize
     ) {
-        logger.info("查询我的订单列表: userId={}, page={}, pageSize={}", userId, page, pageSize);
+        logger.debug("ConsumerOrder - GET MY ORDERS: userId={}, page={}, pageSize={}", userId, page, pageSize);
 
         // TODO: 从认证上下文获取userId，暂时使用mock值
         UUID userIdParsed = userId != null ? UUID.fromString(userId) : UUID.randomUUID();
@@ -155,8 +164,7 @@ public class BeverageOrderController {
     /**
      * 取消订单
      * 
-     * @spec O012-order-inventory-reservation
-     * POST /api/client/beverage-orders/{id}/cancel
+     * POST /api/client/orders/{id}/cancel
      *
      * @param id 订单ID
      * @param cancelReason 取消原因（可选）
@@ -167,7 +175,7 @@ public class BeverageOrderController {
             @PathVariable String id,
             @RequestParam(value = "reason", required = false, defaultValue = "用户取消") String cancelReason
     ) {
-        logger.info("取消订单: orderId={}, reason={}", id, cancelReason);
+        logger.info("ConsumerOrder - CANCEL: orderId={}, reason={}", id, cancelReason);
 
         UUID orderId = UUID.fromString(id);
         cancellationService.cancelOrder(orderId, cancelReason);

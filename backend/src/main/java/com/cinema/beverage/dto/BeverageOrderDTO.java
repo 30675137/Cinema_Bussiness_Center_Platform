@@ -1,6 +1,7 @@
 /**
  * @spec O003-beverage-order
- * 饮品订单数据传输对象
+ * @spec O013-order-channel-migration
+ * 订单数据传输对象
  */
 package com.cinema.beverage.dto;
 
@@ -18,10 +19,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 饮品订单DTO
+ * 订单DTO
  *
- * 对应 spec: O003-beverage-order
+ * 对应 spec: O003-beverage-order, O013-order-channel-migration
  * 使用场景: C端订单列表、B端订单管理
+ * 
+ * @spec O013-order-channel-migration 变更说明:
+ * - OrderItemDTO 新增 channelProductId, productName, productImageUrl, productSnapshot 字段
+ * - 保留 beverageId, beverageName, beverageImageUrl 用于向后兼容
  */
 @Data
 @Builder
@@ -187,6 +192,10 @@ public class BeverageOrderDTO {
 
     /**
      * 订单项DTO
+     * 
+     * @spec O013-order-channel-migration 迁移说明:
+     * - 新增 channelProductId, productName, productImageUrl, productSnapshot 字段
+     * - 保留 beverageId, beverageName, beverageImageUrl 用于向后兼容
      */
     @Data
     @Builder
@@ -199,24 +208,52 @@ public class BeverageOrderDTO {
         private UUID id;
 
         /**
-         * 饮品ID
-         * 2026-01-14: 使用beverage_id字段（实际存储SKU ID）
+         * @spec O013-order-channel-migration 渠道商品配置 ID
+         * 关联 channel_product_config 表
          */
-        private UUID beverageId;
+        private UUID channelProductId;
 
         /**
-         * SKU ID（2026-01-14重构后的主字段）
+         * @spec O013-order-channel-migration SKU ID
+         * 用于库存扣减
          */
         private UUID skuId;
 
         /**
-         * 饮品名称
+         * @deprecated @spec O013-order-channel-migration
+         * 已废弃字段，保留用于向后兼容
          */
+        @Deprecated
+        private UUID beverageId;
+
+        /**
+         * @spec O013-order-channel-migration 商品名称快照
+         */
+        private String productName;
+
+        /**
+         * @spec O013-order-channel-migration 商品图片URL快照
+         */
+        private String productImageUrl;
+
+        /**
+         * @spec O013-order-channel-migration 商品快照 (JSON字符串)
+         * 包含下单时的完整商品信息
+         */
+        private String productSnapshot;
+
+        /**
+         * @deprecated @spec O013-order-channel-migration
+         * 已废弃，使用 productName 替代
+         */
+        @Deprecated
         private String beverageName;
 
         /**
-         * 饮品图片URL
+         * @deprecated @spec O013-order-channel-migration
+         * 已废弃，使用 productImageUrl 替代
          */
+        @Deprecated
         private String beverageImageUrl;
 
         /**
@@ -246,22 +283,38 @@ public class BeverageOrderDTO {
 
         /**
          * 从实体转换为DTO
-         * 2026-01-14：支持新旧字段兼容
+         * @spec O013-order-channel-migration 支持新旧字段兼容
          */
         public static OrderItemDTO fromEntity(BeverageOrderItem item) {
             if (item == null) {
                 return null;
             }
 
-            // 2026-01-14: 使用beverage_id字段（实际存储的是SKU ID）
-            UUID beverageId = item.getBeverageId();
+            // @spec O013-order-channel-migration 字段映射:
+            // - 新字段: channelProductId, skuId, productName, productImageUrl, productSnapshot
+            // - 旧字段 (兼容): beverageId, beverageName, beverageImageUrl
+            UUID channelProductId = item.getChannelProductId();
+            UUID skuId = item.getSkuId();
+            String productName = item.getProductName();
+            String productImageUrl = item.getProductImageUrl();
+            String productSnapshot = item.getProductSnapshot();
+            
+            // 向后兼容: 旧字段使用新字段的值填充
+            UUID beverageId = item.getBeverageId() != null ? item.getBeverageId() : skuId;
 
             return OrderItemDTO.builder()
                     .id(item.getId())
-                    .beverageId(beverageId) // 实际存储SKU ID
-                    .skuId(beverageId) // skuId字段使用相同值
-                    .beverageName(item.getBeverageName())
-                    .beverageImageUrl(item.getBeverageImageUrl())
+                    // 新字段
+                    .channelProductId(channelProductId)
+                    .skuId(skuId)
+                    .productName(productName)
+                    .productImageUrl(productImageUrl)
+                    .productSnapshot(productSnapshot)
+                    // 旧字段 (向后兼容)
+                    .beverageId(beverageId)
+                    .beverageName(productName) // 使用新字段值
+                    .beverageImageUrl(productImageUrl) // 使用新字段值
+                    // 其他字段
                     .selectedSpecs(item.getSelectedSpecs())
                     .quantity(item.getQuantity())
                     .unitPrice(item.getUnitPrice())
