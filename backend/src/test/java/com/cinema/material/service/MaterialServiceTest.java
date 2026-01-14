@@ -278,7 +278,7 @@ class MaterialServiceTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Material is referenced by BOM components");
 
-        verify(materialRepository, never()).delete(any());
+        verify(materialRepository, never()).delete((Material) any());
     }
 
     @Test
@@ -290,6 +290,6 @@ class MaterialServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Material not found");
 
-        verify(materialRepository, never()).delete(any());
+        verify(materialRepository, never()).delete((Material) any());
     }
 }

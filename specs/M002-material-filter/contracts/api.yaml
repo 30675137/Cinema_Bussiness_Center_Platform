@@ -1,0 +1,778 @@
+openapi: 3.0.3
+info:
+  title: Material Management Filter & Actions API
+  description: |
+    物料主数据管理的筛选、导出、导入、批量操作 API 契约
+    
+    **Spec**: M002-material-filter  
+    **Date**: 2026-01-14
+    
+    本 API 遵循 RESTful 风格，所有响应使用统一的 `ApiResponse<T>` 格式。
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: http://localhost:54321/api
+    description: Supabase 本地环境
+
+tags:
+  - name: Material Filter
+    description: 物料筛选相关接口
+  - name: Material Export
+    description: 物料导出相关接口
+  - name: Material Import
+    description: 物料导入相关接口
+  - name: Material Batch
+    description: 物料批量操作相关接口
+
+paths:
+  /materials:
+    get:
+      tags:
+        - Material Filter
+      summary: 筛选查询物料列表
+      description: |
+        根据筛选条件查询物料列表，支持分类、状态、成本范围和关键词搜索。
+        
+        **功能需求**: FR-001, FR-002, FR-003, FR-004, FR-005
+        
+        **性能目标**: < 5秒（1000+条数据）
+      operationId: filterMaterials
+      parameters:
+        - name: category
+          in: query
+          description: 物料分类
+          required: false
+          schema:
+            type: string
+            enum:
+              - RAW_MATERIAL
+              - PACKAGING
+        - name: status
+          in: query
+          description: 物料状态
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - INACTIVE
+        - name: minCost
+          in: query
+          description: 最小标准成本
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+        - name: maxCost
+          in: query
+          description: 最大标准成本
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+        - name: keyword
+          in: query
+          description: 关键词（搜索物料编码或名称）
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+        - name: page
+          in: query
+          description: 页码（从0开始）
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: size
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: sort
+          in: query
+          description: 排序字段（格式：field,direction）
+          required: false
+          schema:
+            type: string
+            example: createdAt,desc
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaterialPageResponse'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidCostRange:
+                  summary: 成本范围无效
+                  value:
+                    success: false
+                    error: MAT_VAL_001
+                    message: 筛选条件不合法：最小成本不能大于最大成本
+                    details:
+                      minCost: 100
+                      maxCost: 50
+                    timestamp: '2026-01-14T10:30:00Z'
+
+  /materials/export:
+    get:
+      tags:
+        - Material Export
+      summary: 导出物料数据为 Excel
+      description: |
+        导出符合筛选条件的物料数据为 Excel 文件（.xlsx 格式）。
+        
+        **功能需求**: FR-011, FR-012, FR-013, FR-014, FR-015
+        
+        **性能目标**: < 10秒（1000条以内）
+        
+        **限制**: 单次导出最多 10000 条数据
+      operationId: exportMaterials
+      parameters:
+        - name: category
+          in: query
+          description: 物料分类（可选）
+          required: false
+          schema:
+            type: string
+            enum:
+              - RAW_MATERIAL
+              - PACKAGING
+        - name: status
+          in: query
+          description: 物料状态（可选）
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - INACTIVE
+        - name: minCost
+          in: query
+          description: 最小标准成本（可选）
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+        - name: maxCost
+          in: query
+          description: 最大标准成本（可选）
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+        - name: keyword
+          in: query
+          description: 关键词（可选）
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        '200':
+          description: 导出成功
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: 文件名（格式：物料数据_YYYYMMDD_HHmmss.xlsx）
+              schema:
+                type: string
+                example: 'attachment; filename="物料数据_20260114_103000.xlsx"'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '413':
+          description: 数据量过大
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRecords:
+                  summary: 数据量超过限制
+                  value:
+                    success: false
+                    error: MAT_VAL_004
+                    message: 导出数据量过大（12000 条），请使用筛选条件缩小范围（最多支持 10000 条）
+                    timestamp: '2026-01-14T10:30:00Z'
+        '500':
+          description: 导出失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                exportError:
+                  summary: Excel 生成失败
+                  value:
+                    success: false
+                    error: MAT_SYS_001
+                    message: 导出失败：Excel 文件生成异常
+                    timestamp: '2026-01-14T10:30:00Z'
+
+  /materials/import/preview:
+    post:
+      tags:
+        - Material Import
+      summary: 预览导入数据（不保存）
+      description: |
+        解析 Excel 文件并校验数据，返回校验结果但不保存到数据库。
+        
+        **功能需求**: FR-017, FR-018, FR-019, FR-020, FR-021
+        
+        **性能目标**: < 5秒（100条数据）
+        
+        **限制**: 单次导入最多 1000 条数据
+      operationId: previewImport
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Excel 文件（.xlsx 或 .xls 格式，最大 10MB）
+      responses:
+        '200':
+          description: 预览成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportPreviewResponse'
+        '400':
+          description: 文件格式或数据验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidFileFormat:
+                  summary: 文件格式错误
+                  value:
+                    success: false
+                    error: MAT_VAL_002
+                    message: 文件格式错误：仅支持 .xlsx 和 .xls 格式
+                    timestamp: '2026-01-14T10:30:00Z'
+                fileTooLarge:
+                  summary: 文件过大
+                  value:
+                    success: false
+                    error: MAT_VAL_002
+                    message: 文件大小超过限制（最大 10MB）
+                    timestamp: '2026-01-14T10:30:00Z'
+        '413':
+          description: 数据量过大
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /materials/import/confirm:
+    post:
+      tags:
+        - Material Import
+      summary: 确认导入数据（保存到数据库）
+      description: |
+        确认导入预览通过的数据到数据库。
+        
+        **功能需求**: FR-022, FR-023
+        
+        **限制**: 单次导入最多 1000 条数据
+      operationId: confirmImport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - records
+              properties:
+                records:
+                  type: array
+                  maxItems: 1000
+                  items:
+                    $ref: '#/components/schemas/MaterialImportData'
+      responses:
+        '200':
+          description: 导入成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResultResponse'
+        '400':
+          description: 数据验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 数据冲突（如物料编码重复）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateCode:
+                  summary: 物料编码重复
+                  value:
+                    success: false
+                    error: MAT_DUP_001
+                    message: 物料编码重复：MAT-2024-0001 已存在
+                    timestamp: '2026-01-14T10:30:00Z'
+        '500':
+          description: 导入失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /materials/batch:
+    post:
+      tags:
+        - Material Batch
+      summary: 批量操作物料
+      description: |
+        对多个物料执行批量操作（删除或修改状态）。
+        
+        **功能需求**: FR-024, FR-025, FR-026, FR-027, FR-028, FR-029
+        
+        **限制**: 单次操作最多 100 项
+      operationId: batchOperateMaterials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchOperationRequest'
+      responses:
+        '200':
+          description: 批量操作完成（部分成功或全部成功）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchOperationResponse'
+        '400':
+          description: 请求参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyIdList:
+                  summary: 物料ID列表为空
+                  value:
+                    success: false
+                    error: MAT_VAL_003
+                    message: 物料ID列表不能为空
+                    timestamp: '2026-01-14T10:30:00Z'
+                tooManyItems:
+                  summary: 操作项过多
+                  value:
+                    success: false
+                    error: MAT_VAL_003
+                    message: 单次批量操作不能超过 100 项
+                    timestamp: '2026-01-14T10:30:00Z'
+
+components:
+  schemas:
+    # ========== 基础类型 ==========
+    MaterialCategory:
+      type: string
+      enum:
+        - RAW_MATERIAL
+        - PACKAGING
+      description: 物料分类
+
+    MaterialStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+      description: 物料状态
+
+    BatchOperationType:
+      type: string
+      enum:
+        - DELETE
+        - UPDATE_STATUS
+      description: 批量操作类型
+
+    # ========== 响应基础类型 ==========
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - error
+            - message
+          properties:
+            error:
+              type: string
+              description: 错误编码（格式：MAT_XXX_###）
+              example: MAT_VAL_001
+            message:
+              type: string
+              description: 错误消息
+              example: 筛选条件不合法：最小成本不能大于最大成本
+            details:
+              type: object
+              description: 错误详情（可选）
+
+    # ========== Material 相关 ==========
+    Material:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - category
+        - status
+        - inventoryUnit
+        - purchaseUnit
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: MAT-2024-0001
+        name:
+          type: string
+          example: 可口可乐
+        category:
+          $ref: '#/components/schemas/MaterialCategory'
+        status:
+          $ref: '#/components/schemas/MaterialStatus'
+        inventoryUnit:
+          $ref: '#/components/schemas/Unit'
+        purchaseUnit:
+          $ref: '#/components/schemas/Unit'
+        conversionRate:
+          type: number
+          format: double
+          nullable: true
+          example: 12
+        useGlobalConversion:
+          type: boolean
+          default: false
+        standardCost:
+          type: number
+          format: double
+          nullable: true
+          example: 3.5
+        specification:
+          type: string
+          nullable: true
+          example: 500ml瓶装
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Unit:
+      type: object
+      required:
+        - id
+        - name
+        - symbol
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: 箱
+        symbol:
+          type: string
+          example: 箱
+
+    # ========== 筛选响应 ==========
+    MaterialPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              required:
+                - content
+                - page
+                - size
+                - totalElements
+                - totalPages
+              properties:
+                content:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Material'
+                page:
+                  type: integer
+                  description: 当前页码（从0开始）
+                  example: 0
+                size:
+                  type: integer
+                  description: 每页大小
+                  example: 20
+                totalElements:
+                  type: integer
+                  description: 总记录数
+                  example: 156
+                totalPages:
+                  type: integer
+                  description: 总页数
+                  example: 8
+
+    # ========== 导入相关 ==========
+    MaterialImportData:
+      type: object
+      required:
+        - name
+        - category
+        - inventoryUnitId
+        - purchaseUnitId
+      properties:
+        code:
+          type: string
+          nullable: true
+          description: 物料编码（留空自动生成）
+        name:
+          type: string
+          maxLength: 100
+          example: 可口可乐
+        category:
+          $ref: '#/components/schemas/MaterialCategory'
+        inventoryUnitId:
+          type: string
+          format: uuid
+        purchaseUnitId:
+          type: string
+          format: uuid
+        conversionRate:
+          type: number
+          format: double
+          nullable: true
+          minimum: 0
+          exclusiveMinimum: true
+        useGlobalConversion:
+          type: boolean
+          nullable: true
+          default: false
+        standardCost:
+          type: number
+          format: double
+          nullable: true
+          minimum: 0
+        specification:
+          type: string
+          nullable: true
+          maxLength: 500
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+
+    MaterialImportRecord:
+      type: object
+      required:
+        - rowIndex
+        - data
+        - valid
+      properties:
+        rowIndex:
+          type: integer
+          description: Excel 行号（从1开始）
+          example: 2
+        data:
+          $ref: '#/components/schemas/MaterialImportData'
+        valid:
+          type: boolean
+          description: 是否校验通过
+        errors:
+          type: array
+          nullable: true
+          items:
+            type: string
+          example:
+            - 物料名称不能为空
+            - 库存单位ID不存在
+
+    ImportPreviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              required:
+                - totalCount
+                - validCount
+                - invalidCount
+                - records
+              properties:
+                totalCount:
+                  type: integer
+                  description: 总行数
+                  example: 100
+                validCount:
+                  type: integer
+                  description: 校验通过行数
+                  example: 95
+                invalidCount:
+                  type: integer
+                  description: 校验失败行数
+                  example: 5
+                records:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MaterialImportRecord'
+
+    ImportResultResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              required:
+                - successCount
+                - failureCount
+              properties:
+                successCount:
+                  type: integer
+                  description: 成功导入行数
+                  example: 95
+                failureCount:
+                  type: integer
+                  description: 导入失败行数
+                  example: 5
+                failedRecords:
+                  type: array
+                  nullable: true
+                  items:
+                    $ref: '#/components/schemas/MaterialImportRecord'
+
+    # ========== 批量操作相关 ==========
+    BatchOperationRequest:
+      type: object
+      required:
+        - materialIds
+        - operation
+      properties:
+        materialIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+        operation:
+          $ref: '#/components/schemas/BatchOperationType'
+        targetStatus:
+          $ref: '#/components/schemas/MaterialStatus'
+          nullable: true
+          description: 目标状态（UPDATE_STATUS 时必填）
+
+    BatchOperationItem:
+      type: object
+      required:
+        - materialId
+        - materialCode
+        - success
+      properties:
+        materialId:
+          type: string
+          format: uuid
+        materialCode:
+          type: string
+          example: MAT-2024-0001
+        success:
+          type: boolean
+        error:
+          type: string
+          nullable: true
+          example: 物料已被 BOM 引用，无法删除
+
+    BatchOperationResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              required:
+                - successCount
+                - failureCount
+                - items
+              properties:
+                successCount:
+                  type: integer
+                  description: 成功数量
+                  example: 8
+                failureCount:
+                  type: integer
+                  description: 失败数量
+                  example: 2
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BatchOperationItem'
