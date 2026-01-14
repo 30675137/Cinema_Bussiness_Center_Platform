@@ -87,13 +87,14 @@ export const BUSINESS_MODULES: ModuleCard[] = [
   {
     id: 'bom',
     name: 'BOM/配方&成本管理',
-    description: '物料清单、配方、成本核算',
+    description: '物料清单、配方、成本核算、原料库',
     icon: ReconciliationOutlined,
-    defaultPath: '/bom/list',
+    defaultPath: '/bom/material',
     order: 4,
     status: 'normal',
     swimlane: 'master-data',
     functionLinks: [
+      { name: '原料库/物料主数据', path: '/bom/material', enabled: true },
       { name: 'BOM 列表', path: '/bom/list', enabled: true },
       { name: '配方管理', path: '/bom/formula', enabled: true },
       { name: '成本核算', path: '/bom/cost', enabled: true },
