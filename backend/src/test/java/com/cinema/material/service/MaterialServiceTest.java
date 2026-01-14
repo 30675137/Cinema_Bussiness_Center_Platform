@@ -1,6 +1,7 @@
 /** @spec M001-material-unit-system */
 package com.cinema.material.service;
 
+import com.cinema.material.domain.MaterialCategory;
 import com.cinema.material.entity.Material;
 import com.cinema.material.repository.MaterialRepository;
 import com.cinema.unit.domain.Unit;
@@ -70,7 +71,7 @@ class MaterialServiceTest {
                 .id(materialId)
                 .code("MAT-RAW-001")
                 .name("糖浆")
-                .category(Material.MaterialCategory.RAW_MATERIAL)
+                .category(MaterialCategory.RAW_MATERIAL)
                 .inventoryUnit(mlUnit)
                 .purchaseUnit(lUnit)
                 .conversionRate(new BigDecimal("1000.00"))
@@ -91,7 +92,7 @@ class MaterialServiceTest {
 
         assertThat(created).isNotNull();
         assertThat(created.getCode()).isEqualTo("MAT-RAW-001");
-        assertThat(created.getCategory()).isEqualTo(Material.MaterialCategory.RAW_MATERIAL);
+        assertThat(created.getCategory()).isEqualTo(MaterialCategory.RAW_MATERIAL);
         verify(materialRepository).save(rawMaterial);
     }
 
@@ -190,22 +191,22 @@ class MaterialServiceTest {
     void testFindByCategory() {
         Material packagingMaterial = Material.builder()
                 .code("MAT-PKG-001")
-                .category(Material.MaterialCategory.PACKAGING)
+                .category(MaterialCategory.PACKAGING)
                 .build();
 
-        when(materialRepository.findByCategory(Material.MaterialCategory.RAW_MATERIAL))
+        when(materialRepository.findByCategory(MaterialCategory.RAW_MATERIAL))
                 .thenReturn(Arrays.asList(rawMaterial));
-        when(materialRepository.findByCategory(Material.MaterialCategory.PACKAGING))
+        when(materialRepository.findByCategory(MaterialCategory.PACKAGING))
                 .thenReturn(Arrays.asList(packagingMaterial));
 
-        List<Material> rawMaterials = materialService.findByCategory(Material.MaterialCategory.RAW_MATERIAL);
-        List<Material> packagingMaterials = materialService.findByCategory(Material.MaterialCategory.PACKAGING);
+        List<Material> rawMaterials = materialService.findByCategory(MaterialCategory.RAW_MATERIAL);
+        List<Material> packagingMaterials = materialService.findByCategory(MaterialCategory.PACKAGING);
 
         assertThat(rawMaterials).hasSize(1);
-        assertThat(rawMaterials.get(0).getCategory()).isEqualTo(Material.MaterialCategory.RAW_MATERIAL);
+        assertThat(rawMaterials.get(0).getCategory()).isEqualTo(MaterialCategory.RAW_MATERIAL);
 
         assertThat(packagingMaterials).hasSize(1);
-        assertThat(packagingMaterials.get(0).getCategory()).isEqualTo(Material.MaterialCategory.PACKAGING);
+        assertThat(packagingMaterials.get(0).getCategory()).isEqualTo(MaterialCategory.PACKAGING);
     }
 
     @Test
@@ -226,7 +227,7 @@ class MaterialServiceTest {
                 .id(materialId)
                 .code("MAT-RAW-001")
                 .name("糖浆（更新）")
-                .category(Material.MaterialCategory.RAW_MATERIAL)
+                .category(MaterialCategory.RAW_MATERIAL)
                 .inventoryUnit(mlUnit)
                 .purchaseUnit(lUnit)
                 .conversionRate(new BigDecimal("1200.00"))

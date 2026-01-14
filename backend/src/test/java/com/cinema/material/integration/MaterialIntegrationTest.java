@@ -5,6 +5,7 @@ import com.cinema.integration.BaseIntegrationTest;
 import com.cinema.material.dto.MaterialCreateRequest;
 import com.cinema.material.dto.MaterialResponse;
 import com.cinema.material.dto.MaterialUpdateRequest;
+import com.cinema.material.domain.MaterialCategory;
 import com.cinema.material.entity.Material;
 import com.cinema.common.dto.ApiResponse;
 
@@ -37,7 +38,7 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
         // Prepare request
         MaterialCreateRequest request = MaterialCreateRequest.builder()
                 .name("可乐糖浆")
-                .category(Material.MaterialCategory.RAW_MATERIAL)
+                .category(MaterialCategory.RAW_MATERIAL)
                 .specification("5L装")
                 .inventoryUnitId(UUID.randomUUID())
                 .purchaseUnitId(UUID.randomUUID())
@@ -62,7 +63,7 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
         assertThat(material.getId()).isNotNull();
         assertThat(material.getCode()).matches("MAT-RAW-\\d{3}");
         assertThat(material.getName()).isEqualTo("可乐糖浆");
-        assertThat(material.getCategory()).isEqualTo(Material.MaterialCategory.RAW_MATERIAL);
+        assertThat(material.getCategory()).isEqualTo(MaterialCategory.RAW_MATERIAL);
         assertThat(material.getConversionRate()).isEqualByComparingTo(new BigDecimal("1000.00"));
     }
 
@@ -70,9 +71,9 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
     @DisplayName("查询物料列表 - 按分类筛选")
     void testListMaterials_FilterByCategory() {
         // Create test materials
-        createMaterial("原料A", Material.MaterialCategory.RAW_MATERIAL);
-        createMaterial("原料B", Material.MaterialCategory.RAW_MATERIAL);
-        createMaterial("包装A", Material.MaterialCategory.PACKAGING);
+        createMaterial("原料A", MaterialCategory.RAW_MATERIAL);
+        createMaterial("原料B", MaterialCategory.RAW_MATERIAL);
+        createMaterial("包装A", MaterialCategory.PACKAGING);
 
         // Query by category
         ResponseEntity<ApiResponse<List<MaterialResponse>>> response = restTemplate.exchange(
@@ -89,14 +90,14 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
 
         List<MaterialResponse> materials = response.getBody().getData();
         assertThat(materials).hasSize(2);
-        assertThat(materials).allMatch(m -> m.getCategory() == Material.MaterialCategory.RAW_MATERIAL);
+        assertThat(materials).allMatch(m -> m.getCategory() == MaterialCategory.RAW_MATERIAL);
     }
 
     @Test
     @DisplayName("更新物料 - 换算率修改")
     void testUpdateMaterial_ConversionRate() {
         // Create material
-        MaterialResponse created = createMaterial("可乐糖浆", Material.MaterialCategory.RAW_MATERIAL);
+        MaterialResponse created = createMaterial("可乐糖浆", MaterialCategory.RAW_MATERIAL);
 
         // Update request
         MaterialUpdateRequest updateRequest = MaterialUpdateRequest.builder()
@@ -127,7 +128,7 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
     @DisplayName("删除物料 - 成功删除")
     void testDeleteMaterial_Success() {
         // Create material
-        MaterialResponse created = createMaterial("测试物料", Material.MaterialCategory.RAW_MATERIAL);
+        MaterialResponse created = createMaterial("测试物料", MaterialCategory.RAW_MATERIAL);
 
         // Send DELETE request
         ResponseEntity<Void> response = restTemplate.exchange(
@@ -156,7 +157,7 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
         // Invalid request (empty name)
         MaterialCreateRequest request = MaterialCreateRequest.builder()
                 .name("")  // Invalid
-                .category(Material.MaterialCategory.RAW_MATERIAL)
+                .category(MaterialCategory.RAW_MATERIAL)
                 .build();
 
         // Send POST request
@@ -189,7 +190,7 @@ class MaterialIntegrationTest extends BaseIntegrationTest {
     }
 
     // Helper method
-    private MaterialResponse createMaterial(String name, Material.MaterialCategory category) {
+    private MaterialResponse createMaterial(String name, MaterialCategory category) {
         MaterialCreateRequest request = MaterialCreateRequest.builder()
                 .name(name)
                 .category(category)
