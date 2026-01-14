@@ -6,11 +6,14 @@ import React, { useState, useEffect } from 'react'
 import { Button, Card, Modal, message, Pagination, Space } from 'antd'
 import { PlusOutlined, ImportOutlined } from '@ant-design/icons'
 import { useSearchParams } from 'react-router-dom'
+import type { Key } from 'react'
 import { MaterialTable } from '@/components/material/MaterialTable'
 import { MaterialForm } from '@/components/material/MaterialForm'
 import { MaterialFilterComponent } from '@/components/material/MaterialFilter'
 import { MaterialExportButton } from '@/components/material/MaterialExportButton'
 import { MaterialImportModal } from '@/components/material/MaterialImportModal'
+import { MaterialBatchActions } from '@/components/material/MaterialBatchActions'
+import { MaterialErrorBoundary } from '@/components/material/MaterialErrorBoundary'
 import {
   useMaterials,
   useFilterMaterials,
@@ -19,13 +22,17 @@ import {
   useDeleteMaterial,
 } from '@/hooks/useMaterials'
 import { usePreviewImport, useConfirmImport } from '@/hooks/useImportMaterials'
-import type { Material, MaterialFilter } from '@/types/material'
+import { useBatchOperateMaterials } from '@/hooks/useBatchMaterials'
+import type { Material, MaterialFilter, BatchOperationType } from '@/types/material'
 
 export const MaterialManagementPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [modalVisible, setModalVisible] = useState(false)
   const [importModalVisible, setImportModalVisible] = useState(false)
   const [editingMaterial, setEditingMaterial] = useState<Material | undefined>()
+  
+  // M002: 批量选择状态
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([])
 
   // M002: 从 URL 读取筛选条件
   const [filter, setFilter] = useState<MaterialFilter>(() => ({
@@ -55,6 +62,9 @@ export const MaterialManagementPage: React.FC = () => {
   // M002: 导入相关 hooks
   const previewImportMutation = usePreviewImport()
   const confirmImportMutation = useConfirmImport()
+  
+  // M002: 批量操作 hooks
+  const batchOperateMutation = useBatchOperateMaterials()
 
   // M002: 同步筛选条件到 URL
   useEffect(() => {
@@ -99,6 +109,11 @@ export const MaterialManagementPage: React.FC = () => {
       }
       setModalVisible(false)
     } catch (error) {
+      console.error('物料操作失败:', {
+        operation: editingMaterial ? 'update' : 'create',
+        materialId: editingMaterial?.id,
+        error,
+      })
       message.error('操作失败')
     }
   }
@@ -112,6 +127,7 @@ export const MaterialManagementPage: React.FC = () => {
           await deleteMutation.mutateAsync(id)
           message.success('删除成功')
         } catch (error) {
+          console.error('物料删除失败:', { materialId: id, error })
           message.error('删除失败，该物料可能已被BOM引用')
         }
       },
@@ -128,8 +144,39 @@ export const MaterialManagementPage: React.FC = () => {
     // 列表会自动刷新（因为 confirmImport 成功后会 invalidate queries）
   }
 
+  // M002: 批量操作相关处理函数
+  const handleBatchDelete = async (materialIds: string[]) => {
+    try {
+      await batchOperateMutation.mutateAsync({
+        materialIds,
+        operation: 'DELETE' as BatchOperationType,
+      })
+    } catch (error) {
+      console.error('批量删除失败:', { materialIds, error })
+      throw error
+    }
+  }
+
+  const handleBatchUpdateStatus = async (materialIds: string[], targetStatus: 'ACTIVE' | 'INACTIVE') => {
+    try {
+      await batchOperateMutation.mutateAsync({
+        materialIds,
+        operation: 'UPDATE_STATUS' as BatchOperationType,
+        targetStatus,
+      })
+    } catch (error) {
+      console.error('批量修改状态失败:', { materialIds, targetStatus, error })
+      throw error
+    }
+  }
+
+  const handleClearSelection = () => {
+    setSelectedRowKeys([])
+  }
+
   return (
-    <div>
+    <MaterialErrorBoundary>
+      <div>
       <Card style={{ marginBottom: 16 }}>
         <MaterialFilterComponent onFilter={handleFilter} loading={isLoading} />
       </Card>
@@ -148,11 +195,26 @@ export const MaterialManagementPage: React.FC = () => {
           </Space>
         }
       >
+        {/* M002: 批量操作区域 */}
+        {selectedRowKeys.length > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <MaterialBatchActions
+              selectedCount={selectedRowKeys.length}
+              selectedRowKeys={selectedRowKeys}
+              onBatchDelete={handleBatchDelete}
+              onBatchUpdateStatus={handleBatchUpdateStatus}
+              onClearSelection={handleClearSelection}
+            />
+          </div>
+        )}
+
         <MaterialTable
           materials={materials}
           loading={isLoading}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          selectedRowKeys={selectedRowKeys}
+          onSelectChange={setSelectedRowKeys}
         />
 
         {/* M002: 分页组件 */}
@@ -200,5 +262,6 @@ export const MaterialManagementPage: React.FC = () => {
         />
       </Card>
     </div>
+    </MaterialErrorBoundary>
   )
 }

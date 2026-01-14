@@ -10,6 +10,8 @@ import type {
   MaterialCategory,
   MaterialFilter,
   MaterialImportResult,
+  MaterialBatchOperationRequest,
+  MaterialBatchOperationResult,
 } from '@/types/material'
 
 interface ApiResponse<T> {
@@ -158,6 +160,21 @@ export const materialService = {
           'Content-Type': 'multipart/form-data',
         },
       }
+    )
+    return response.data.data
+  },
+
+  /**
+   * M002: 批量操作物料（删除或修改状态）
+   * User Story: US4 - 批量操作物料
+   * 
+   * @param request 批量操作请求
+   * @returns 批量操作结果（包含成功/失败统计和详情）
+   */
+  batchOperateMaterials: async (request: MaterialBatchOperationRequest): Promise<MaterialBatchOperationResult> => {
+    const response = await apiClient.post<ApiResponse<MaterialBatchOperationResult>>(
+      '/materials/batch',
+      request
     )
     return response.data.data
   },

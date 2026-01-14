@@ -3,6 +3,7 @@
  * Material Filter Component - 物料筛选组件
  * User Story: US1 - 快速筛选物料
  */
+import { useCallback, useMemo } from 'react'
 import { Form, Select, InputNumber, Input, Button, Space, Row, Col } from 'antd'
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
 import type { MaterialFilter, MaterialCategory } from '@/types/material'
@@ -15,22 +16,26 @@ interface MaterialFilterProps {
 export function MaterialFilterComponent({ onFilter, loading = false }: MaterialFilterProps) {
   const [form] = Form.useForm()
 
-  const handleSubmit = (values: MaterialFilter) => {
-    // 过滤掉空值
-    const filteredValues = Object.entries(values).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        acc[key as keyof MaterialFilter] = value
-      }
-      return acc
-    }, {} as MaterialFilter)
+  // 性能优化：使用 useCallback 缓存处理函数
+  const handleSubmit = useCallback(
+    (values: MaterialFilter) => {
+      // 过滤掉空值
+      const filteredValues = Object.entries(values).reduce((acc, [key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          acc[key as keyof MaterialFilter] = value
+        }
+        return acc
+      }, {} as MaterialFilter)
 
-    onFilter(filteredValues)
-  }
+      onFilter(filteredValues)
+    },
+    [onFilter]
+  )
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     form.resetFields()
     onFilter({})
-  }
+  }, [form, onFilter])
 
   return (
     <Form

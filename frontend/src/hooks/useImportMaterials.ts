@@ -13,6 +13,9 @@ import type { MaterialImportResult } from '@/types/material'
 export function usePreviewImport() {
   return useMutation<MaterialImportResult, Error, File>({
     mutationFn: (file: File) => materialService.previewImport(file),
+    onError: (error, file) => {
+      console.error('导入预览失败:', { fileName: file.name, fileSize: file.size, error })
+    },
   })
 }
 
@@ -24,9 +27,17 @@ export function useConfirmImport() {
 
   return useMutation<MaterialImportResult, Error, File>({
     mutationFn: (file: File) => materialService.confirmImport(file),
-    onSuccess: () => {
+    onSuccess: (result, file) => {
       // 导入成功后，使物料列表缓存失效，触发重新查询
       queryClient.invalidateQueries({ queryKey: ['materials'] })
+      console.log('导入确认成功:', {
+        fileName: file.name,
+        successCount: result.successCount,
+        failureCount: result.failureCount,
+      })
+    },
+    onError: (error, file) => {
+      console.error('导入确认失败:', { fileName: file.name, fileSize: file.size, error })
     },
   })
 }

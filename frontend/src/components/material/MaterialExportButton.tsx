@@ -20,10 +20,12 @@ export function MaterialExportButton({ filter, disabled = false }: MaterialExpor
   const handleExport = async () => {
     try {
       setLoading(true)
+      console.log('开始导出物料:', filter)
       await materialService.exportMaterials(filter)
+      console.log('导出成功')
       message.success('导出成功')
     } catch (error: any) {
-      console.error('Export failed:', error)
+      console.error('导出失败:', { filter, error })
       message.error(error.message || '导出失败，请稍后重试')
     } finally {
       setLoading(false)
