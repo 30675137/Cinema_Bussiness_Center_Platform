@@ -1,6 +1,6 @@
 # Feature Specification: Material Management Filter & Actions
 
-**Feature Branch**: `001-material-filter`  
+**Feature Branch**: `M002-material-filter`  
 **Created**: 2026-01-14  
 **Status**: Draft  
 **Input**: User description: "增加物料主数据管理的筛选器区域（分类筛选、状态筛选、成本范围、关键词搜索）和操作按钮组（新建物料、批量导入、批量导出、批量操作）"
