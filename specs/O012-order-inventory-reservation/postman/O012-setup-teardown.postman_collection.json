@@ -695,6 +695,11 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
                   "console.log('========================================');",
                   "console.log('   测试数据清理完成 (Teardown Complete)   ');",
                   "console.log('========================================');",
@@ -718,11 +723,11 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/stores/00000000-0000-0000-0000-000000000099",
+              "raw": "{{base_url}}/api/skus/{{test_sku_id_1}}",
               "host": ["{{base_url}}"],
-              "path": ["api", "stores", "00000000-0000-0000-0000-000000000099"]
+              "path": ["api", "skus", "{{test_sku_id_1}}"]
             },
-            "description": "获取门店信息，验证清理完成"
+            "description": "获取测试SKU信息，验证清理完成"
           },
           "response": []
         }
