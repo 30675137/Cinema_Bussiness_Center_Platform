@@ -34,7 +34,7 @@ spring:
 
   # Flyway 配置 (@spec T003-flyway-migration)
   flyway:
-    enabled: false
+    enabled: true
     locations: classpath:db/migration,classpath:db/seed
     baseline-on-migrate: true
     baseline-version: 0

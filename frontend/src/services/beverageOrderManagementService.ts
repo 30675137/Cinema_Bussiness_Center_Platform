@@ -1,9 +1,17 @@
 /**
  * @spec O003-beverage-order
+ * @spec O012-order-inventory-reservation
  * B端饮品订单管理服务
  */
 import { apiClient } from './api';
-import type { BeverageOrderDTO, BeverageOrderStatus, PageResponse } from '../types/beverageOrder';
+import type {
+  BeverageOrderDTO,
+  BeverageOrderStatus,
+  PageResponse,
+  CreateBeverageOrderRequest,
+  OrderCreationResponse,
+  OrderCancellationResponse,
+} from '../types/beverageOrder';
 
 /**
  * 订单查询参数
@@ -102,11 +110,39 @@ export const beverageOrderManagementService = {
   },
 
   /**
-   * 取消订单
+   * 取消订单 (O012: 自动释放库存预占)
+   * 
+   * @param orderId 订单ID
+   * @param cancelReason 取消原因
+   * @returns 订单取消响应，包含释放的库存清单
    */
-  async cancelOrder(orderId: string): Promise<BeverageOrderDTO> {
-    const response = await apiClient.post<BeverageOrderDTO>(
-      `/api/admin/beverage-orders/${orderId}/cancel`
+  async cancelOrder(
+    orderId: string,
+    cancelReason?: string
+  ): Promise<OrderCancellationResponse> {
+    const response = await apiClient.post<OrderCancellationResponse>(
+      `/api/client/beverage-orders/${orderId}/cancel`,
+      null,
+      {
+        params: { reason: cancelReason || '用户取消' },
+      }
+    );
+    return response.data;
+  },
+
+  /**
+   * 创建订单 (O012: 自动库存预占)
+   * 
+   * @param request 创建订单请求
+   * @returns 订单创建响应，包含预占状态和过期时间
+   * @throws InsufficientInventoryError 库存不足时抛出
+   */
+  async createOrderWithReservation(
+    request: CreateBeverageOrderRequest
+  ): Promise<OrderCreationResponse> {
+    const response = await apiClient.post<OrderCreationResponse>(
+      '/api/client/beverage-orders',
+      request
     );
     return response.data;
   },

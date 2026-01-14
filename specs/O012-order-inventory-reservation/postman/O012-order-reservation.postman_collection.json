@@ -1,0 +1,441 @@
+{
+  "info": {
+    "name": "O012 - 订单创建时库存预占",
+    "_postman_id": "o012-order-reservation-api",
+    "description": "订单创建时库存预占机制的Postman测试集合。\n\n**核心功能**:\n- 下单时自动预占库存\n- 订单取消时自动释放预占\n- 预占记录审计查询\n\n**测试场景**:\n- 正常下单流程（库存充足）\n- 库存不足场景（预占失败）\n- 订单取消流程（预占释放）\n- 并发下单场景（防止超卖）\n- 预占记录查询\n\n**前置条件**:\n1. 数据库已包含测试门店数据\n2. 数据库已包含测试商品（SKU）和BOM配方\n3. 数据库已配置库存数据\n\n**使用说明**:\n1. 导入本集合到Postman\n2. 导入环境配置文件 `O012-local.postman_environment.json`\n3. 按照文件夹顺序执行测试\n4. 查看Test Results验证结果",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Order Creation (预占成功)",
+      "item": [
+        {
+          "name": "创建饮品订单 - 库存充足",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "// 验证响应结构",
+                  "pm.test(\"Response has correct structure\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('code');",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "});",
+                  "",
+                  "// 验证业务响应码",
+                  "pm.test(\"Business code is 0000\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"0000\");",
+                  "});",
+                  "",
+                  "// 验证订单数据",
+                  "pm.test(\"Order data is complete\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('orderId');",
+                  "    pm.expect(jsonData.data).to.have.property('orderNo');",
+                  "    pm.expect(jsonData.data).to.have.property('status');",
+                  "    pm.expect(jsonData.data.status).to.eql(\"PENDING_PAYMENT\");",
+                  "});",
+                  "",
+                  "// 验证预占状态",
+                  "pm.test(\"Reservation status is RESERVED\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('reservationStatus');",
+                  "    pm.expect(jsonData.data.reservationStatus).to.eql(\"RESERVED\");",
+                  "});",
+                  "",
+                  "// 验证预占商品清单",
+                  "pm.test(\"Reserved items list is not empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('reservedItems');",
+                  "    pm.expect(jsonData.data.reservedItems).to.be.an('array');",
+                  "    pm.expect(jsonData.data.reservedItems.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "// 验证预占过期时间",
+                  "pm.test(\"Reservation expiry is set\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('reservationExpiry');",
+                  "});",
+                  "",
+                  "// 保存订单ID供后续测试使用",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"test_order_id\", jsonData.data.orderId);",
+                  "    console.log(\"Saved orderId: \" + jsonData.data.orderId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"beverageId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 2,\n      \"selectedSpecs\": {}\n    },\n    {\n      \"beverageId\": \"{{test_sku_id_2}}\",\n      \"quantity\": 1,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Postman automated test order\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/beverage-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "beverage-orders"]
+            },
+            "description": "测试场景：库存充足时创建订单，验证库存预占成功。\n\n**预期结果**:\n- HTTP状态码 201\n- 业务响应码 0000\n- 订单状态 PENDING_PAYMENT\n- 预占状态 RESERVED\n- 返回预占商品清单和过期时间"
+          },
+          "response": []
+        }
+      ],
+      "description": "测试订单创建流程中的库存预占逻辑（正常场景）"
+    },
+    {
+      "name": "2. Order Creation (预占失败)",
+      "item": [
+        {
+          "name": "创建饮品订单 - 库存不足",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "// 验证错误码",
+                  "pm.test(\"Error code is ORD_BIZ_002\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"ORD_BIZ_002\");",
+                  "});",
+                  "",
+                  "// 验证错误消息",
+                  "pm.test(\"Error message mentions insufficient stock\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message).to.include(\"库存不足\");",
+                  "});",
+                  "",
+                  "// 验证缺货清单",
+                  "pm.test(\"Shortage items list is provided\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.details).to.have.property('shortageItems');",
+                  "    pm.expect(jsonData.details.shortageItems).to.be.an('array');",
+                  "    pm.expect(jsonData.details.shortageItems.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "// 验证缺货清单字段",
+                  "pm.test(\"Shortage item has required fields\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var firstItem = jsonData.details.shortageItems[0];",
+                  "    pm.expect(firstItem).to.have.property('skuId');",
+                  "    pm.expect(firstItem).to.have.property('skuName');",
+                  "    pm.expect(firstItem).to.have.property('requiredQty');",
+                  "    pm.expect(firstItem).to.have.property('availableQty');",
+                  "    pm.expect(firstItem).to.have.property('unit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"beverageId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 9999,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Insufficient inventory test\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/client/beverage-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "client", "beverage-orders"]
+            },
+            "description": "测试场景：库存不足时创建订单，验证预占失败并返回缺货清单。\n\n**预期结果**:\n- HTTP状态码 409\n- 业务响应码 ORD_BIZ_002\n- 错误消息提示库存不足\n- 返回详细缺货清单（SKU ID、名称、需求数量、可用数量）"
+          },
+          "response": []
+        }
+      ],
+      "description": "测试订单创建流程中的库存不足场景"
+    },
+    {
+      "name": "3. Order Cancellation",
+      "item": [
+        {
+          "name": "取消订单 - 释放预占库存",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 验证业务响应码",
+                  "pm.test(\"Business code is 0000\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"0000\");",
+                  "});",
+                  "",
+                  "// 验证订单状态",
+                  "pm.test(\"Order status is CANCELLED\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.status).to.eql(\"CANCELLED\");",
+                  "});",
+                  "",
+                  "// 验证取消时间",
+                  "pm.test(\"Cancellation time is set\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('cancelledAt');",
+                  "});",
+                  "",
+                  "// 验证释放商品清单",
+                  "pm.test(\"Released items list is not empty\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('releasedItems');",
+                  "    pm.expect(jsonData.data.releasedItems).to.be.an('array');",
+                  "    pm.expect(jsonData.data.releasedItems.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/beverage-orders/{{test_order_id}}/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "beverage-orders", "{{test_order_id}}", "cancel"]
+            },
+            "description": "测试场景：取消订单并自动释放已预占的库存。\n\n**前置条件**:\n- 已创建测试订单（通过第1步获取orderId）\n\n**预期结果**:\n- HTTP状态码 200\n- 业务响应码 0000\n- 订单状态更新为 CANCELLED\n- 返回释放商品清单\n- 库存预占记录状态更新为 CANCELLED"
+          },
+          "response": []
+        }
+      ],
+      "description": "测试订单取消流程中的库存释放逻辑"
+    },
+    {
+      "name": "4. Reservation Query",
+      "item": [
+        {
+          "name": "查询预占记录 - 按订单ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 验证业务响应码",
+                  "pm.test(\"Business code is 0000\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"0000\");",
+                  "});",
+                  "",
+                  "// 验证分页数据",
+                  "pm.test(\"Pagination data is present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('total');",
+                  "    pm.expect(jsonData.data).to.have.property('page');",
+                  "    pm.expect(jsonData.data).to.have.property('pageSize');",
+                  "    pm.expect(jsonData.data).to.have.property('items');",
+                  "});",
+                  "",
+                  "// 验证预占记录字段",
+                  "if (pm.response.json().data.items.length > 0) {",
+                  "    pm.test(\"Reservation record has required fields\", function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        var firstRecord = jsonData.data.items[0];",
+                  "        pm.expect(firstRecord).to.have.property('id');",
+                  "        pm.expect(firstRecord).to.have.property('orderId');",
+                  "        pm.expect(firstRecord).to.have.property('storeId');",
+                  "        pm.expect(firstRecord).to.have.property('skuId');",
+                  "        pm.expect(firstRecord).to.have.property('reservedQty');",
+                  "        pm.expect(firstRecord).to.have.property('status');",
+                  "        pm.expect(firstRecord).to.have.property('createdAt');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/inventory/reservations/by-order/{{test_order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "inventory", "reservations", "by-order", "{{test_order_id}}"]
+            },
+            "description": "测试场景：按订单ID查询库存预占记录。\n\n**预期结果**:\n- HTTP状态码 200\n- 业务响应码 0000\n- 返回分页数据（total、page、pageSize、items）\n- 预占记录包含完整字段（ID、订单ID、门店ID、SKU ID、预占数量、状态、创建时间）"
+          },
+          "response": []
+        },
+        {
+          "name": "查询预占记录 - 按门店ID和状态",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 验证业务响应码",
+                  "pm.test(\"Business code is 0000\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"0000\");",
+                  "});",
+                  "",
+                  "// 验证状态过滤",
+                  "if (pm.response.json().data.items.length > 0) {",
+                  "    pm.test(\"All records match status filter\", function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        var items = jsonData.data.items;",
+                  "        items.forEach(function(item) {",
+                  "            pm.expect(item.status).to.eql(\"ACTIVE\");",
+                  "        });",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/inventory/reservations/by-store-status?storeId={{test_store_id}}&status=ACTIVE&page=0&pageSize=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "inventory", "reservations", "by-store-status"],
+              "query": [
+                {
+                  "key": "storeId",
+                  "value": "{{test_store_id}}"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "测试场景：按门店ID和状态查询预占记录，支持分页。\n\n**预期结果**:\n- HTTP状态码 200\n- 所有返回记录的status字段均为 ACTIVE\n- 支持分页参数（page、pageSize）"
+          },
+          "response": []
+        },
+        {
+          "name": "查询预占记录 - 按时间范围",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// 验证业务响应码",
+                  "pm.test(\"Business code is 0000\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.code).to.eql(\"0000\");",
+                  "});",
+                  "",
+                  "// 验证时间范围过滤",
+                  "if (pm.response.json().data.items.length > 0) {",
+                  "    pm.test(\"All records are within time range\", function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        var items = jsonData.data.items;",
+                  "        var createdAfter = new Date(pm.environment.get(\"test_created_after\"));",
+                  "        var createdBefore = new Date(pm.environment.get(\"test_created_before\"));",
+                  "        ",
+                  "        items.forEach(function(item) {",
+                  "            var createdAt = new Date(item.createdAt);",
+                  "            pm.expect(createdAt.getTime()).to.be.at.least(createdAfter.getTime());",
+                  "            pm.expect(createdAt.getTime()).to.be.at.most(createdBefore.getTime());",
+                  "        });",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/inventory/reservations/by-time?startTime={{test_created_after}}&endTime={{test_created_before}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "inventory", "reservations", "by-time"],
+              "query": [
+                {
+                  "key": "startTime",
+                  "value": "{{test_created_after}}"
+                },
+                {
+                  "key": "endTime",
+                  "value": "{{test_created_before}}"
+                }
+              ]
+            },
+            "description": "测试场景：按创建时间范围查询预占记录。\n\n**预期结果**:\n- HTTP状态码 200\n- 所有返回记录的createdAt字段在指定时间范围内"
+          },
+          "response": []
+        }
+      ],
+      "description": "测试预占记录审计查询接口"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}
