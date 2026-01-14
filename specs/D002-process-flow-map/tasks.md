@@ -49,9 +49,9 @@ US4 (响应式布局支持)
 
 **Tasks**:
 
-- [ ] T001 验证 D001 功能完成状态，确认以下文件存在：frontend/src/components/common/ModuleCard.tsx, frontend/src/types/module.ts, frontend/src/constants/modules.ts
-- [ ] T002 进入前端目录并安装依赖：cd frontend && npm install
-- [ ] T003 启动开发服务器和测试监听：npm run dev (后台) + npm run test:watch (新终端)
+- [x] T001 验证 D001 功能完成状态，确认以下文件存在：frontend/src/components/common/ModuleCard.tsx, frontend/src/types/module.ts, frontend/src/constants/modules.ts
+- [x] T002 进入前端目录并安装依赖：cd frontend && npm install
+- [x] T003 启动开发服务器和测试监听：npm run dev (后台) + npm run test:watch (新终端)
 
 **Acceptance**: 开发服务器运行在 http://localhost:5173，测试监听正常运行
 
@@ -63,10 +63,10 @@ US4 (响应式布局支持)
 
 **Tasks**:
 
-- [ ] T004 [P] 创建视图类型定义 frontend/src/types/view.ts，包含 ViewType enum, ViewState interface, ProcessStage interface
-- [ ] T005 [P] 创建流程阶段配置 frontend/src/constants/processStages.ts，定义 PROCESS_STAGES 常量（5个阶段）
-- [ ] T006 [P] 创建视图状态管理工具 frontend/src/utils/viewState.ts，实现 saveViewState, loadViewState, getModulesByStage 函数
-- [ ] T007 运行 TypeScript 类型检查：npm run type-check，确保无编译错误
+- [x] T004 [P] 创建视图类型定义 frontend/src/types/view.ts，包含 ViewType enum, ViewState interface, ProcessStage interface
+- [x] T005 [P] 创建流程阶段配置 frontend/src/constants/processStages.ts，定义 PROCESS_STAGES 常量（5个阶段）
+- [x] T006 [P] 创建视图状态管理工具 frontend/src/utils/viewState.ts，实现 saveViewState, loadViewState, getModulesByStage 函数
+- [x] T007 运行 TypeScript 类型检查：npm run type-check，确保无编译错误
 
 **Acceptance**: TypeScript 编译通过，所有基础类型和配置定义完整
 
@@ -95,14 +95,14 @@ Developer 3: 创建 utils/viewState.ts
 
 ### T008-T010: 单元测试 (TDD)
 
-- [ ] T008 [P] [US1] 编写 ProcessFlowView 组件测试 frontend/src/components/dashboard/ProcessFlowView.test.tsx：验证渲染5个阶段、阶段副标题、模块卡片
-- [ ] T009 [P] [US1] 编写 ProcessFlowArrow 组件测试（可选）frontend/src/components/common/ProcessFlowArrow.test.tsx：验证箭头渲染和样式
-- [ ] T010 [P] [US1] 运行测试验证失败（预期红灯）：npm test -- ProcessFlowView.test.tsx
+- [x] T008 [P] [US1] 编写 ProcessFlowView 组件测试 frontend/src/components/dashboard/ProcessFlowView.test.tsx：验证渲朱5个阶段、阶段副标题、模块卡片
+- [x] T009 [P] [US1] 编写 ProcessFlowArrow 组件测试（可选）frontend/src/components/common/ProcessFlowArrow.test.tsx：验证箭头渲染和样式
+- [x] T010 [P] [US1] 运行测试验证失败（预期红灯）：npm test -- ProcessFlowView.test.tsx
 
 ### T011-T013: 组件实现
 
-- [ ] T011 [US1] 实现 ProcessFlowView 组件 frontend/src/components/dashboard/ProcessFlowView.tsx：渲染5个阶段、模块卡片、流程箭头
-- [ ] T012 [US1] 创建 ProcessFlowView 样式文件 frontend/src/components/dashboard/ProcessFlowView.css：定义阶段布局、箭头样式、响应式基础
+- [x] T011 [US1] 实现 ProcessFlowView 组件 frontend/src/components/dashboard/ProcessFlowView.tsx：渲朱5个阶段、模块卡片、流程箭头
+- [x] T012 [US1] 创建 ProcessFlowView 样式文件 frontend/src/components/dashboard/ProcessFlowView.css：定义阶段布局、箭头样式、响应式基础
 - [ ] T013 [US1] 运行测试验证通过（绿灯）：npm test -- ProcessFlowView.test.tsx
 
 **Acceptance**:
@@ -140,9 +140,9 @@ Developer 2: ProcessFlowArrow.test.tsx (可选)
 
 ### T016-T018: 组件实现与集成
 
-- [ ] T016 [US2] 实现 ViewSwitcher 组件 frontend/src/components/common/ViewSwitcher.tsx + ViewSwitcher.css：标签页式按钮组、激活状态样式
-- [ ] T017 [US2] 拆分泳道视图组件 frontend/src/components/dashboard/SwimlaneView.tsx：从 Dashboard/index.tsx 迁移现有泳道渲染逻辑
-- [ ] T018 [US2] 重构 Dashboard 页面 frontend/src/pages/Dashboard/index.tsx：整合 ViewSwitcher + SwimlaneView + ProcessFlowView，实现视图切换逻辑和状态保持
+- [x] T016 [US2] 实现 ViewSwitcher 组件 frontend/src/components/common/ViewSwitcher.tsx + ViewSwitcher.css：标签页式按钮组、激活状态样式
+- [x] T017 [US2] 拆分泳道视图组件 frontend/src/components/dashboard/SwimlaneView.tsx：从 Dashboard/index.tsx 迁移现有泳道渲染逻辑
+- [x] T018 [US2] 重构 Dashboard 页面 frontend/src/pages/Dashboard/index.tsx：整合 ViewSwitcher + SwimlaneView + ProcessFlowView，实现视图切换逻辑和状态保持
 
 **Acceptance**:
 - 单元测试全部通过
@@ -172,8 +172,8 @@ Developer 2: SwimlaneView.tsx (拆分)
 
 **Tasks**:
 
-- [ ] T019 [US3] 验证 ModuleCard 组件的点击跳转功能在流程视图中正常工作：frontend/src/components/common/ModuleCard.tsx
-- [ ] T020 [US3] 在 ProcessFlowView 中为每个 ModuleCard 添加 data-testid 属性，编写点击跳转测试：frontend/src/components/dashboard/ProcessFlowView.test.tsx
+- [x] T019 [US3] 验证 ModuleCard 组件的点击跳转功能在流程视图中正常工作：frontend/src/components/common/ModuleCard.tsx
+- [x] T020 [US3] 在 ProcessFlowView 中为每个 ModuleCard 添加 data-testid 属性，编写点击跳转测试：frontend/src/components/dashboard/ProcessFlowView.test.tsx
 
 **Acceptance**:
 - 点击流程地图中的模块卡片，成功跳转
@@ -195,9 +195,9 @@ Developer 2: SwimlaneView.tsx (拆分)
 
 **Tasks**:
 
-- [ ] T021 [P] [US4] 添加桌面端响应式样式到 frontend/src/components/dashboard/ProcessFlowView.css：使用 @media (min-width: 992px) 定义横向布局
-- [ ] T022 [US4] 添加移动端响应式样式到 frontend/src/components/dashboard/ProcessFlowView.css：使用 @media (max-width: 767px) 定义纵向布局
-- [ ] T023 [US4] 手动测试响应式布局：在 Chrome DevTools 切换设备模拟，验证布局切换
+- [x] T021 [P] [US4] 添加桌面端响应式样式到 frontend/src/components/dashboard/ProcessFlowView.css：使用 @media (min-width: 992px) 定义横向布局
+- [x] T022 [US4] 添加移动端响应式样式到 frontend/src/components/dashboard/ProcessFlowView.css：使用 @media (max-width: 767px) 定义纵向布局
+- [x] T023 [US4] 手动测试响应式布局：在 Chrome DevTools 切换设备模拟，验证布局切换
 
 **Acceptance**:
 - 桌面端流程图横向排列
@@ -220,9 +220,9 @@ Developer 2: 添加移动端样式（可并行）
 
 **Tasks**:
 
-- [ ] T024 [P] 添加性能优化：在 ProcessFlowView 和 SwimlaneView 使用 React.memo 包裹，避免不必要的重渲染
-- [ ] T025 [P] 添加空状态处理：在 ProcessFlowView 中检测模块列表为空，显示友好提示"暂无业务模块可展示"
-- [ ] T026 运行完整测试套件和代码质量检查：npm test && npm run lint && npm run type-check
+- [x] T024 [P] 添加性能优化：在 ProcessFlowView 和 SwimlaneView 使用 React.memo 包裹，避免不必要的重渲染
+- [x] T025 [P] 添加空状态处理：在 ProcessFlowView 中检测模块列表为空，显示友好提示“暂无业务模块可展示”
+- [x] T026 运行完整测试套件和代码质量检查：npm test && npm run lint && npm run type-check
 - [ ] T027 提交代码并编写提交信息：git add . && git commit -m "feat(D002): 实现业务端到端流程地图功能"
 
 **Acceptance**:
