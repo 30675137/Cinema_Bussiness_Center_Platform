@@ -223,7 +223,7 @@ Developer 2: 添加移动端样式（可并行）
 - [x] T024 [P] 添加性能优化：在 ProcessFlowView 和 SwimlaneView 使用 React.memo 包裹，避免不必要的重渲染
 - [x] T025 [P] 添加空状态处理：在 ProcessFlowView 中检测模块列表为空，显示友好提示“暂无业务模块可展示”
 - [x] T026 运行完整测试套件和代码质量检查：npm test && npm run lint && npm run type-check
-- [ ] T027 提交代码并编写提交信息：git add . && git commit -m "feat(D002): 实现业务端到端流程地图功能"
+- [x] T027 提交代码并编写提交信息：git add . && git commit -m "feat(D002): 实现业务端到端流程地图功能"
 
 **Acceptance**:
 - 所有测试通过
