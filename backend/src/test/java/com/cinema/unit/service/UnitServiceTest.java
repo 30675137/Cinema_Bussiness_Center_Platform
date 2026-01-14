@@ -1,17 +1,13 @@
-/**
- * @spec M001-material-unit-system
- */
 package com.cinema.unit.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
+import com.cinema.unit.domain.UnitCategory;
+import com.cinema.unit.dto.UnitRequest;
+import com.cinema.unit.dto.UnitResponse;
+import com.cinema.unit.exception.UnitInUseException;
+import com.cinema.unit.exception.UnitNotFoundException;
 import com.cinema.unit.repository.UnitRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import com.cinema.unit.service.impl.UnitServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,231 +16,264 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 /**
- * Unit service test
- *
- * <p>User Story: US1 - 单位主数据管理
- *
- * <p>Tests the core business logic for unit master data management following TDD principles.
+ * 单位服务测试类
+ * 
+ * @author Cinema Platform Team
+ * @version 1.0
+ * @since 2025-01-11
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UnitService Tests")
+@DisplayName("单位服务测试")
 class UnitServiceTest {
 
-    @Mock private UnitRepository unitRepository;
+    @Mock
+    private UnitRepository unitRepository;
 
-    @InjectMocks private UnitService unitService;
+    @InjectMocks
+    private UnitServiceImpl unitService;
 
-    private Unit mlUnit;
-    private Unit literUnit;
+    private Unit testUnit;
+    private UnitRequest testRequest;
+    private UUID testId;
 
     @BeforeEach
     void setUp() {
-        mlUnit =
-                Unit.builder()
-                        .id(UUID.randomUUID())
-                        .code("ml")
-                        .name("毫升")
-                        .category(Unit.UnitCategory.VOLUME)
-                        .decimalPlaces(2)
-                        .isBaseUnit(true)
-                        .description("体积基础单位")
-                        .build();
+        testId = UUID.randomUUID();
+        
+        testUnit = Unit.builder()
+                .id(testId)
+                .code("ml")
+                .name("毫升")
+                .category(UnitCategory.VOLUME)
+                .decimalPlaces(1)
+                .isBaseUnit(true)
+                .description("基础体积单位")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
 
-        literUnit =
-                Unit.builder()
-                        .id(UUID.randomUUID())
-                        .code("L")
-                        .name("升")
-                        .category(Unit.UnitCategory.VOLUME)
-                        .decimalPlaces(2)
-                        .isBaseUnit(false)
-                        .description("1L = 1000ml")
-                        .build();
+        testRequest = new UnitRequest();
+        testRequest.setCode("ml");
+        testRequest.setName("毫升");
+        testRequest.setCategory(UnitCategory.VOLUME);
+        testRequest.setDecimalPlaces(1);
+        testRequest.setIsBaseUnit(true);
+        testRequest.setDescription("基础体积单位");
     }
 
     @Test
-    @DisplayName("创建单位 - 正常情况")
-    void testCreateUnit_Success() {
+    @DisplayName("创建单位 - 成功")
+    void createUnit_Success() {
         // Given
-        when(unitRepository.existsByCode("ml")).thenReturn(false);
-        when(unitRepository.save(any(Unit.class))).thenReturn(mlUnit);
+        when(unitRepository.existsByCode(testRequest.getCode())).thenReturn(false);
+        when(unitRepository.save(any(Unit.class))).thenReturn(testUnit);
 
         // When
-        Unit created = unitService.createUnit(mlUnit);
+        UnitResponse response = unitService.createUnit(testRequest);
 
         // Then
-        assertThat(created).isNotNull();
-        assertThat(created.getCode()).isEqualTo("ml");
-        assertThat(created.getName()).isEqualTo("毫升");
-        verify(unitRepository).existsByCode("ml");
-        verify(unitRepository).save(mlUnit);
+        assertThat(response).isNotNull();
+        assertThat(response.getCode()).isEqualTo(testRequest.getCode());
+        assertThat(response.getName()).isEqualTo(testRequest.getName());
+        assertThat(response.getCategory()).isEqualTo(testRequest.getCategory());
+        
+        verify(unitRepository).existsByCode(testRequest.getCode());
+        verify(unitRepository).save(any(Unit.class));
     }
 
     @Test
-    @DisplayName("创建单位 - 重复代码抛出异常")
-    void testCreateUnit_DuplicateCode_ThrowsException() {
+    @DisplayName("创建单位 - 代码已存在")
+    void createUnit_CodeExists() {
         // Given
-        when(unitRepository.existsByCode("ml")).thenReturn(true);
+        when(unitRepository.existsByCode(testRequest.getCode())).thenReturn(true);
 
         // When & Then
-        assertThatThrownBy(() -> unitService.createUnit(mlUnit))
+        assertThatThrownBy(() -> unitService.createUnit(testRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unit code already exists");
-
-        verify(unitRepository).existsByCode("ml");
-        verify(unitRepository, never()).save(any());
+        
+        verify(unitRepository).existsByCode(testRequest.getCode());
+        verify(unitRepository, never()).save(any(Unit.class));
     }
 
     @Test
-    @DisplayName("根据 code 查询单位 - 存在")
-    void testFindByCode_Exists() {
+    @DisplayName("更新单位 - 成功")
+    void updateUnit_Success() {
         // Given
-        when(unitRepository.findByCode("ml")).thenReturn(Optional.of(mlUnit));
+        testRequest.setName("毫升(更新)");
+        when(unitRepository.findById(testId)).thenReturn(Optional.of(testUnit));
+        when(unitRepository.save(any(Unit.class))).thenReturn(testUnit);
 
         // When
-        Optional<Unit> result = unitService.findByCode("ml");
+        UnitResponse response = unitService.updateUnit(testId, testRequest);
 
         // Then
-        assertThat(result).isPresent();
-        assertThat(result.get().getCode()).isEqualTo("ml");
-        verify(unitRepository).findByCode("ml");
-    }
-
-    @Test
-    @DisplayName("根据 code 查询单位 - 不存在")
-    void testFindByCode_NotExists() {
-        // Given
-        when(unitRepository.findByCode("unknown")).thenReturn(Optional.empty());
-
-        // When
-        Optional<Unit> result = unitService.findByCode("unknown");
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(unitRepository).findByCode("unknown");
-    }
-
-    @Test
-    @DisplayName("根据分类查询单位")
-    void testFindByCategory() {
-        // Given
-        when(unitRepository.findByCategory(Unit.UnitCategory.VOLUME))
-                .thenReturn(List.of(mlUnit, literUnit));
-
-        // When
-        List<Unit> results = unitService.findByCategory(Unit.UnitCategory.VOLUME);
-
-        // Then
-        assertThat(results).hasSize(2);
-        assertThat(results).extracting(Unit::getCode).containsExactly("ml", "L");
-        verify(unitRepository).findByCategory(Unit.UnitCategory.VOLUME);
-    }
-
-    @Test
-    @DisplayName("查询所有单位")
-    void testFindAll() {
-        // Given
-        when(unitRepository.findAll()).thenReturn(List.of(mlUnit, literUnit));
-
-        // When
-        List<Unit> results = unitService.findAll();
-
-        // Then
-        assertThat(results).hasSize(2);
-        verify(unitRepository).findAll();
-    }
-
-    @Test
-    @DisplayName("更新单位 - 正常情况")
-    void testUpdateUnit_Success() {
-        // Given
-        UUID unitId = mlUnit.getId();
-        when(unitRepository.findById(unitId)).thenReturn(Optional.of(mlUnit));
-        when(unitRepository.save(any(Unit.class))).thenReturn(mlUnit);
-
-        mlUnit.setDescription("Updated description");
-
-        // When
-        Unit updated = unitService.updateUnit(unitId, mlUnit);
-
-        // Then
-        assertThat(updated).isNotNull();
-        assertThat(updated.getDescription()).isEqualTo("Updated description");
-        verify(unitRepository).findById(unitId);
-        verify(unitRepository).save(mlUnit);
+        assertThat(response).isNotNull();
+        verify(unitRepository).findById(testId);
+        verify(unitRepository).save(any(Unit.class));
     }
 
     @Test
     @DisplayName("更新单位 - 单位不存在")
-    void testUpdateUnit_NotFound_ThrowsException() {
+    void updateUnit_NotFound() {
         // Given
-        UUID unitId = UUID.randomUUID();
-        when(unitRepository.findById(unitId)).thenReturn(Optional.empty());
+        when(unitRepository.findById(testId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> unitService.updateUnit(unitId, mlUnit))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> unitService.updateUnit(testId, testRequest))
+                .isInstanceOf(UnitNotFoundException.class)
                 .hasMessageContaining("Unit not found");
-
-        verify(unitRepository).findById(unitId);
-        verify(unitRepository, never()).save(any());
+        
+        verify(unitRepository).findById(testId);
+        verify(unitRepository, never()).save(any(Unit.class));
     }
 
     @Test
-    @DisplayName("删除单位 - 正常情况（无引用）")
-    void testDeleteUnit_Success_NoReferences() {
+    @DisplayName("删除单位 - 成功")
+    void deleteUnit_Success() {
         // Given
-        UUID unitId = mlUnit.getId();
-        when(unitRepository.findById(unitId)).thenReturn(Optional.of(mlUnit));
-        when(unitRepository.isReferencedByMaterials(unitId)).thenReturn(false);
-        when(unitRepository.isReferencedByConversions(unitId)).thenReturn(false);
+        testUnit.setIsBaseUnit(false);
+        when(unitRepository.findById(testId)).thenReturn(Optional.of(testUnit));
 
         // When
-        unitService.deleteUnit(unitId);
+        unitService.deleteUnit(testId);
 
         // Then
-        verify(unitRepository).findById(unitId);
-        verify(unitRepository).isReferencedByMaterials(unitId);
-        verify(unitRepository).isReferencedByConversions(unitId);
-        verify(unitRepository).delete(mlUnit);
+        verify(unitRepository).findById(testId);
+        verify(unitRepository).delete(testUnit);
     }
 
     @Test
-    @DisplayName("删除单位 - 被物料引用时阻止删除")
-    void testDeleteUnit_ReferencedByMaterials_ThrowsException() {
+    @DisplayName("删除单位 - 基础单位不能删除")
+    void deleteUnit_BaseUnitCannotBeDeleted() {
         // Given
-        UUID unitId = mlUnit.getId();
-        when(unitRepository.findById(unitId)).thenReturn(Optional.of(mlUnit));
-        when(unitRepository.isReferencedByMaterials(unitId)).thenReturn(true);
+        when(unitRepository.findById(testId)).thenReturn(Optional.of(testUnit));
 
         // When & Then
-        assertThatThrownBy(() -> unitService.deleteUnit(unitId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unit is referenced by materials");
-
-        verify(unitRepository).findById(unitId);
-        verify(unitRepository).isReferencedByMaterials(unitId);
-        verify(unitRepository, never()).delete(any());
+        assertThatThrownBy(() -> unitService.deleteUnit(testId))
+                .isInstanceOf(UnitInUseException.class)
+                .hasMessageContaining("Cannot delete base unit");
+        
+        verify(unitRepository).findById(testId);
+        verify(unitRepository, never()).delete(any(Unit.class));
     }
 
     @Test
-    @DisplayName("删除单位 - 被换算规则引用时阻止删除")
-    void testDeleteUnit_ReferencedByConversions_ThrowsException() {
+    @DisplayName("根据ID获取单位 - 成功")
+    void getUnitById_Success() {
         // Given
-        UUID unitId = mlUnit.getId();
-        when(unitRepository.findById(unitId)).thenReturn(Optional.of(mlUnit));
-        when(unitRepository.isReferencedByMaterials(unitId)).thenReturn(false);
-        when(unitRepository.isReferencedByConversions(unitId)).thenReturn(true);
+        when(unitRepository.findById(testId)).thenReturn(Optional.of(testUnit));
+
+        // When
+        UnitResponse response = unitService.getUnitById(testId);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(testId);
+        assertThat(response.getCode()).isEqualTo(testUnit.getCode());
+        
+        verify(unitRepository).findById(testId);
+    }
+
+    @Test
+    @DisplayName("根据ID获取单位 - 不存在")
+    void getUnitById_NotFound() {
+        // Given
+        when(unitRepository.findById(testId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> unitService.deleteUnit(unitId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unit is referenced by conversion rules");
+        assertThatThrownBy(() -> unitService.getUnitById(testId))
+                .isInstanceOf(UnitNotFoundException.class)
+                .hasMessageContaining("Unit not found");
+        
+        verify(unitRepository).findById(testId);
+    }
 
-        verify(unitRepository).findById(unitId);
-        verify(unitRepository).isReferencedByMaterials(unitId);
-        verify(unitRepository).isReferencedByConversions(unitId);
-        verify(unitRepository, never()).delete(any());
+    @Test
+    @DisplayName("根据代码获取单位 - 成功")
+    void getUnitByCode_Success() {
+        // Given
+        when(unitRepository.findByCode("ml")).thenReturn(Optional.of(testUnit));
+
+        // When
+        UnitResponse response = unitService.getUnitByCode("ml");
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getCode()).isEqualTo("ml");
+        
+        verify(unitRepository).findByCode("ml");
+    }
+
+    @Test
+    @DisplayName("获取所有单位")
+    void getAllUnits() {
+        // Given
+        Unit unit2 = Unit.builder()
+                .id(UUID.randomUUID())
+                .code("L")
+                .name("升")
+                .category(UnitCategory.VOLUME)
+                .decimalPlaces(2)
+                .isBaseUnit(false)
+                .build();
+        
+        List<Unit> units = Arrays.asList(testUnit, unit2);
+        when(unitRepository.findAll()).thenReturn(units);
+
+        // When
+        List<UnitResponse> responses = unitService.getAllUnits();
+
+        // Then
+        assertThat(responses).hasSize(2);
+        assertThat(responses).extracting(UnitResponse::getCode)
+                .containsExactlyInAnyOrder("ml", "L");
+        
+        verify(unitRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("根据分类获取单位")
+    void getUnitsByCategory() {
+        // Given
+        List<Unit> units = Arrays.asList(testUnit);
+        when(unitRepository.findByCategory(UnitCategory.VOLUME)).thenReturn(units);
+
+        // When
+        List<UnitResponse> responses = unitService.getUnitsByCategory(UnitCategory.VOLUME);
+
+        // Then
+        assertThat(responses).hasSize(1);
+        assertThat(responses.get(0).getCategory()).isEqualTo(UnitCategory.VOLUME);
+        
+        verify(unitRepository).findByCategory(UnitCategory.VOLUME);
+    }
+
+    @Test
+    @DisplayName("获取基础单位")
+    void getBaseUnits() {
+        // Given
+        List<Unit> units = Arrays.asList(testUnit);
+        when(unitRepository.findByIsBaseUnit(true)).thenReturn(units);
+
+        // When
+        List<UnitResponse> responses = unitService.getBaseUnits();
+
+        // Then
+        assertThat(responses).hasSize(1);
+        assertThat(responses.get(0).getIsBaseUnit()).isTrue();
+        
+        verify(unitRepository).findByIsBaseUnit(true);
     }
 }

@@ -1,31 +1,30 @@
-/**
- * @spec M001-material-unit-system
- */
 package com.cinema.unit.dto;
 
-import com.cinema.unit.entity.Unit;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.cinema.unit.domain.UnitCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 /**
- * Unit response DTO
- *
- * <p>User Story: US1 - 单位主数据管理
+ * M001: 单位响应 DTO
+ * 
+ * @author Cinema System
+ * @since 2026-01-14
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnitResponse {
-
+    
     private UUID id;
     private String code;
     private String name;
-    private Unit.UnitCategory category;
+    private UnitCategory category;
     private Integer decimalPlaces;
     private Boolean isBaseUnit;
     private String description;
@@ -33,12 +32,12 @@ public class UnitResponse {
     private LocalDateTime updatedAt;
 
     /**
-     * Convert Unit entity to UnitResponse DTO
-     *
-     * @param unit unit entity
-     * @return unit response DTO
+     * 从实体转换为响应DTO
      */
-    public static UnitResponse fromEntity(Unit unit) {
+    public static UnitResponse fromEntity(com.cinema.unit.domain.Unit unit) {
+        if (unit == null) {
+            return null;
+        }
         return UnitResponse.builder()
                 .id(unit.getId())
                 .code(unit.getCode())

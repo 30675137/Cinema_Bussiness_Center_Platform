@@ -3,7 +3,8 @@ package com.cinema.material.service;
 
 import com.cinema.material.entity.Material;
 import com.cinema.material.repository.MaterialRepository;
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
+import com.cinema.unit.domain.UnitCategory;
 import com.cinema.unit.repository.UnitRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ class MaterialServiceTest {
                 .id(unitId)
                 .code("ml")
                 .name("毫升")
-                .category(Unit.UnitCategory.VOLUME)
+                .category(UnitCategory.VOLUME)
                 .decimalPlaces(2)
                 .isBaseUnit(true)
                 .build();
@@ -60,7 +61,7 @@ class MaterialServiceTest {
                 .id(UUID.randomUUID())
                 .code("L")
                 .name("升")
-                .category(Unit.UnitCategory.VOLUME)
+                .category(UnitCategory.VOLUME)
                 .decimalPlaces(2)
                 .isBaseUnit(false)
                 .build();

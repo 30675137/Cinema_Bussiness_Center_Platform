@@ -3,7 +3,7 @@
  */
 package com.cinema.material.entity;
 
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

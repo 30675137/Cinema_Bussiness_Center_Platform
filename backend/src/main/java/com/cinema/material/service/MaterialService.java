@@ -3,7 +3,7 @@ package com.cinema.material.service;
 
 import com.cinema.material.entity.Material;
 import com.cinema.material.repository.MaterialRepository;
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
 import com.cinema.unit.repository.UnitRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -7,7 +7,7 @@ import com.cinema.material.dto.MaterialResponse;
 import com.cinema.material.dto.MaterialUpdateRequest;
 import com.cinema.material.entity.Material;
 import com.cinema.material.service.MaterialService;
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

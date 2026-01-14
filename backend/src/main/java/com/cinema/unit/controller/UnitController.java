@@ -1,30 +1,25 @@
-/**
- * @spec M001-material-unit-system
- */
 package com.cinema.unit.controller;
 
-import com.cinema.common.dto.ApiResponse;
-import com.cinema.unit.dto.UnitCreateRequest;
+import com.cinema.unit.domain.UnitCategory;
+import com.cinema.unit.dto.UnitRequest;
 import com.cinema.unit.dto.UnitResponse;
-import com.cinema.unit.dto.UnitUpdateRequest;
-import com.cinema.unit.entity.Unit;
 import com.cinema.unit.service.UnitService;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 /**
- * Unit REST controller
- *
- * <p>User Story: US1 - 单位主数据管理
- *
- * <p>Provides REST API endpoints for unit master data management.
+ * 单位管理控制器
+ * 
+ * @author Cinema Platform Team
+ * @version 1.0
+ * @since 2025-01-11
  */
 @Slf4j
 @RestController
@@ -35,147 +30,84 @@ public class UnitController {
     private final UnitService unitService;
 
     /**
-     * Create a new unit
-     *
-     * <p>POST /api/units
-     *
-     * @param request unit creation request
-     * @return created unit response
+     * 创建单位
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<UnitResponse>> createUnit(
-            @Valid @RequestBody UnitCreateRequest request) {
-        log.info("Received request to create unit: code={}", request.getCode());
-
-        Unit unit =
-                Unit.builder()
-                        .code(request.getCode())
-                        .name(request.getName())
-                        .category(request.getCategory())
-                        .decimalPlaces(request.getDecimalPlaces())
-                        .isBaseUnit(request.getIsBaseUnit())
-                        .description(request.getDescription())
-                        .build();
-
-        Unit created = unitService.createUnit(unit);
-        UnitResponse response = UnitResponse.fromEntity(created);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+    public ResponseEntity<UnitResponse> createUnit(@Valid @RequestBody UnitRequest request) {
+        log.info("Received request to create unit: {}", request.getCode());
+        UnitResponse response = unitService.createUnit(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
-     * Get all units
-     *
-     * <p>GET /api/units
-     *
-     * @param category optional category filter
-     * @return list of units
-     */
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<UnitResponse>>> getAllUnits(
-            @RequestParam(required = false) Unit.UnitCategory category) {
-        log.info("Received request to get all units, category={}", category);
-
-        List<Unit> units =
-                category != null
-                        ? unitService.findByCategory(category)
-                        : unitService.findAll();
-
-        List<UnitResponse> responses =
-                units.stream().map(UnitResponse::fromEntity).collect(Collectors.toList());
-
-        return ResponseEntity.ok(ApiResponse.success(responses));
-    }
-
-    /**
-     * Get unit by ID
-     *
-     * <p>GET /api/units/{id}
-     *
-     * @param id unit ID
-     * @return unit response
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UnitResponse>> getUnitById(@PathVariable UUID id) {
-        log.info("Received request to get unit by id: {}", id);
-
-        Unit unit =
-                unitService
-                        .findById(id)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Unit not found: " + id));
-
-        return ResponseEntity.ok(ApiResponse.success(UnitResponse.fromEntity(unit)));
-    }
-
-    /**
-     * Get unit by code
-     *
-     * <p>GET /api/units/code/{code}
-     *
-     * @param code unit code
-     * @return unit response
-     */
-    @GetMapping("/code/{code}")
-    public ResponseEntity<ApiResponse<UnitResponse>> getUnitByCode(@PathVariable String code) {
-        log.info("Received request to get unit by code: {}", code);
-
-        Unit unit =
-                unitService
-                        .findByCode(code)
-                        .orElseThrow(
-                                () ->
-                                        new IllegalArgumentException(
-                                                "Unit not found: " + code));
-
-        return ResponseEntity.ok(ApiResponse.success(UnitResponse.fromEntity(unit)));
-    }
-
-    /**
-     * Update a unit
-     *
-     * <p>PUT /api/units/{id}
-     *
-     * @param id unit ID
-     * @param request unit update request
-     * @return updated unit response
+     * 更新单位
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UnitResponse>> updateUnit(
-            @PathVariable UUID id, @Valid @RequestBody UnitUpdateRequest request) {
-        log.info("Received request to update unit: id={}", id);
-
-        Unit unit =
-                Unit.builder()
-                        .name(request.getName())
-                        .decimalPlaces(request.getDecimalPlaces())
-                        .isBaseUnit(request.getIsBaseUnit())
-                        .description(request.getDescription())
-                        .build();
-
-        Unit updated = unitService.updateUnit(id, unit);
-        UnitResponse response = UnitResponse.fromEntity(updated);
-
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<UnitResponse> updateUnit(
+            @PathVariable UUID id,
+            @Valid @RequestBody UnitRequest request) {
+        log.info("Received request to update unit: {}", id);
+        UnitResponse response = unitService.updateUnit(id, request);
+        return ResponseEntity.ok(response);
     }
 
     /**
-     * Delete a unit
-     *
-     * <p>DELETE /api/units/{id}
-     *
-     * @param id unit ID
-     * @return no content
+     * 删除单位
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUnit(@PathVariable UUID id) {
-        log.info("Received request to delete unit: id={}", id);
-
+    public ResponseEntity<Void> deleteUnit(@PathVariable UUID id) {
+        log.info("Received request to delete unit: {}", id);
         unitService.deleteUnit(id);
+        return ResponseEntity.noContent().build();
+    }
 
-        return ResponseEntity.ok(ApiResponse.success(null));
+    /**
+     * 根据ID获取单位
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<UnitResponse> getUnitById(@PathVariable UUID id) {
+        log.info("Received request to get unit by id: {}", id);
+        UnitResponse response = unitService.getUnitById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 根据代码获取单位
+     */
+    @GetMapping("/code/{code}")
+    public ResponseEntity<UnitResponse> getUnitByCode(@PathVariable String code) {
+        log.info("Received request to get unit by code: {}", code);
+        UnitResponse response = unitService.getUnitByCode(code);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 获取所有单位
+     */
+    @GetMapping
+    public ResponseEntity<List<UnitResponse>> getAllUnits() {
+        log.info("Received request to get all units");
+        List<UnitResponse> responses = unitService.getAllUnits();
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 根据分类获取单位
+     */
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<UnitResponse>> getUnitsByCategory(@PathVariable UnitCategory category) {
+        log.info("Received request to get units by category: {}", category);
+        List<UnitResponse> responses = unitService.getUnitsByCategory(category);
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * 获取基础单位
+     */
+    @GetMapping("/base")
+    public ResponseEntity<List<UnitResponse>> getBaseUnits() {
+        log.info("Received request to get base units");
+        List<UnitResponse> responses = unitService.getBaseUnits();
+        return ResponseEntity.ok(responses);
     }
 }

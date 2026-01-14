@@ -3,7 +3,8 @@
  */
 package com.cinema.unit.dto;
 
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
+import com.cinema.unit.domain.UnitCategory;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class UnitCreateRequest {
     private String name;
 
     @NotNull(message = "Unit category is required")
-    private Unit.UnitCategory category;
+    private UnitCategory category;
 
     @Min(value = 0, message = "Decimal places must be between 0 and 6")
     @Max(value = 6, message = "Decimal places must be between 0 and 6")

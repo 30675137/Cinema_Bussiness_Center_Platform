@@ -5,7 +5,8 @@ import com.cinema.common.conversion.CommonConversionService.ConversionResult;
 import com.cinema.common.conversion.CommonConversionService.ConversionSource;
 import com.cinema.material.entity.Material;
 import com.cinema.material.repository.MaterialRepository;
-import com.cinema.unit.entity.Unit;
+import com.cinema.unit.domain.Unit;
+import com.cinema.unit.domain.UnitCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,14 +48,14 @@ class CommonConversionServiceTest {
                 .id(UUID.randomUUID())
                 .code("ml")
                 .name("毫升")
-                .category(Unit.UnitCategory.VOLUME)
+                .category(UnitCategory.VOLUME)
                 .build();
 
         lUnit = Unit.builder()
                 .id(UUID.randomUUID())
                 .code("L")
                 .name("升")
-                .category(Unit.UnitCategory.VOLUME)
+                .category(UnitCategory.VOLUME)
                 .build();
 
         material = Material.builder()
