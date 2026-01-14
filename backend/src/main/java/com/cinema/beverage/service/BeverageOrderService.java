@@ -1,12 +1,15 @@
 /**
  * @spec O003-beverage-order
+ * @spec O012-order-inventory-reservation
  * 饮品订单业务逻辑层
  */
 package com.cinema.beverage.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -29,6 +32,9 @@ import com.cinema.beverage.exception.OrderNotFoundException;
 import com.cinema.beverage.repository.BeverageOrderRepository;
 import com.cinema.beverage.repository.BeverageRepository;
 import com.cinema.beverage.repository.BeverageSpecRepository;
+import com.cinema.inventory.entity.InventoryReservation;
+import com.cinema.inventory.exception.InsufficientInventoryException;
+import com.cinema.inventory.service.InventoryReservationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,8 +43,13 @@ import lombok.RequiredArgsConstructor;
 /**
  * 饮品订单服务类
  *
- * 对应 spec: O003-beverage-order
+ * 对应 spec: O003-beverage-order, O012-order-inventory-reservation
  * 提供订单创建、支付、查询等业务逻辑
+ * 
+ * O012 集成:
+ * - 订单创建时自动调用库存预占服务
+ * - 处理库存不足异常
+ * - 预占失败时回滚订单创建
  */
 @Service
 @RequiredArgsConstructor
@@ -53,9 +64,10 @@ public class BeverageOrderService {
     private final OrderNumberGenerator orderNumberGenerator;
     private final QueueNumberGenerator queueNumberGenerator;
     private final ObjectMapper objectMapper;
+    private final InventoryReservationService inventoryReservationService; // O012 integration
 
     /**
-     * Mock支付延迟（毫秒）
+     * Mock支付延迟(毫秒)
      */
     @Value("${beverage.payment.mock-delay-ms:500}")
     private long mockPaymentDelayMs;
@@ -63,11 +75,18 @@ public class BeverageOrderService {
     /**
      * 创建订单
      *
+     * O012 集成:
+     * 1. 计算订单总价
+     * 2. 调用库存预占服务(BOM展开 + 库存检查 + 预占)
+     * 3. 创建订单记录
+     * 4. 更新预占记录的order_id
+     *
      * @param request 创建订单请求
      * @param userId 用户ID
      * @return 订单DTO
+     * @throws InsufficientInventoryException 库存不足时抛出
      */
-    @Transactional
+    @Transactional(timeout = 30) // O012: 预占需要更长超时时间
     public BeverageOrderDTO createOrder(CreateBeverageOrderRequest request, UUID userId) {
         // Structured logging for order creation (FR-027)
         logger.info("OrderCreation - START: userId={}, storeId={}, itemCount={}, operation=CREATE_ORDER",
@@ -79,7 +98,29 @@ public class BeverageOrderService {
         // 2. 计算订单总价
         BigDecimal totalPrice = calculateOrderTotal(request);
 
-        // 3. 创建订单
+        // 3. O012: 调用库存预占服务
+        Map<UUID, BigDecimal> skuQuantities = extractSkuQuantities(request);
+        List<InventoryReservation> reservations;
+        
+        try {
+            // 注意: orderId 此时为null，稍后更新
+            reservations = inventoryReservationService.reserveInventory(
+                null, 
+                request.getStoreId(), 
+                skuQuantities
+            );
+            
+            logger.info("OrderCreation - INVENTORY_RESERVED: orderNumber={}, reservationCount={}",
+                    orderNumber, reservations.size());
+                    
+        } catch (InsufficientInventoryException e) {
+            // 库存不足,记录日志并抛出异常(事务会自动回滚)
+            logger.warn("OrderCreation - FAILED: orderNumber={}, reason=INSUFFICIENT_INVENTORY, shortageCount={}",
+                    orderNumber, e.getShortages().size());
+            throw e; // 传递给Controller层处理
+        }
+
+        // 4. 创建订单
         BeverageOrder order = BeverageOrder.builder()
                 .orderNumber(orderNumber)
                 .userId(userId)
@@ -89,18 +130,23 @@ public class BeverageOrderService {
                 .customerNote(request.getCustomerNote())
                 .build();
 
-        // 4. 创建订单项
+        // 5. 创建订单项
         for (CreateBeverageOrderRequest.OrderItemRequest itemRequest : request.getItems()) {
             BeverageOrderItem orderItem = createOrderItem(order, itemRequest);
             order.addItem(orderItem);
         }
 
-        // 5. 保存订单
+        // 6. 保存订单
         BeverageOrder savedOrder = orderRepository.save(order);
+        
+        // 7. O012: 更新预占记录的order_id
+        for (InventoryReservation reservation : reservations) {
+            reservation.setOrderId(savedOrder.getId());
+        }
 
         // Structured logging for order creation success (FR-027)
-        logger.info("OrderCreation - SUCCESS: orderNumber={}, totalPrice={}, orderId={}, itemCount={}, operation=CREATE_ORDER, status=PENDING_PAYMENT",
-                orderNumber, totalPrice, savedOrder.getId(), savedOrder.getItems().size());
+        logger.info("OrderCreation - SUCCESS: orderNumber={}, totalPrice={}, orderId={}, itemCount={}, reservationCount={}, operation=CREATE_ORDER, status=PENDING_PAYMENT",
+                orderNumber, totalPrice, savedOrder.getId(), savedOrder.getItems().size(), reservations.size());
 
         return BeverageOrderDTO.fromEntity(savedOrder);
     }
@@ -343,5 +389,32 @@ public class BeverageOrderService {
         }
 
         return orders.map(BeverageOrderDTO::fromEntity);
+    }
+
+    /**
+     * O012: 提取SKU数量映射表
+     * 从订单请求中提取饮品ID和数量,用于库存预占
+     *
+     * @param request 订单创建请求
+     * @return SKU ID到数量的映射
+     */
+    private Map<UUID, BigDecimal> extractSkuQuantities(CreateBeverageOrderRequest request) {
+        Map<UUID, BigDecimal> skuQuantities = new HashMap<>();
+        
+        for (CreateBeverageOrderRequest.OrderItemRequest item : request.getItems()) {
+            // 查询饮品获取SKU ID
+            Beverage beverage = beverageRepository.findById(item.getBeverageId())
+                    .orElseThrow(() -> new BeverageNotFoundException(item.getBeverageId().toString()));
+            
+            // 注意: 这里假设 beverage 本身就是 SKU
+            // 如果需要通过规格查找不同的SKU,需要进一步查询
+            UUID skuId = beverage.getId();
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            
+            // 如果同SKU多次出现,累加数量
+            skuQuantities.merge(skuId, quantity, BigDecimal::add);
+        }
+        
+        return skuQuantities;
     }
 }

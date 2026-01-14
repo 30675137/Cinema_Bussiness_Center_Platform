@@ -20,6 +20,7 @@ import com.cinema.beverage.dto.BeverageOrderDTO;
 import com.cinema.beverage.dto.CreateBeverageOrderRequest;
 import com.cinema.beverage.service.BeverageOrderService;
 import com.cinema.common.dto.ApiResponse;
+import com.cinema.order.service.OrderCancellationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,7 @@ public class BeverageOrderController {
     private static final Logger logger = LoggerFactory.getLogger(BeverageOrderController.class);
 
     private final BeverageOrderService orderService;
+    private final OrderCancellationService cancellationService;
 
     /**
      * 创建订单
@@ -141,5 +143,31 @@ public class BeverageOrderController {
         Page<BeverageOrderDTO> orders = orderService.findByUserId(userIdParsed, pageable);
 
         return ResponseEntity.ok(ApiResponse.success(orders));
+    }
+
+    /**
+     * 取消订单
+     * 
+     * @spec O012-order-inventory-reservation
+     * POST /api/client/beverage-orders/{id}/cancel
+     *
+     * @param id 订单ID
+     * @param cancelReason 取消原因（可选）
+     * @return 订单详情
+     */
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<BeverageOrderDTO>> cancelOrder(
+            @PathVariable String id,
+            @RequestParam(value = "reason", required = false, defaultValue = "用户取消") String cancelReason
+    ) {
+        logger.info("取消订单: orderId={}, reason={}", id, cancelReason);
+
+        UUID orderId = UUID.fromString(id);
+        cancellationService.cancelOrder(orderId, cancelReason);
+
+        // 重新查询订单详情返回
+        BeverageOrderDTO order = orderService.findById(orderId);
+
+        return ResponseEntity.ok(ApiResponse.success(order));
     }
 }

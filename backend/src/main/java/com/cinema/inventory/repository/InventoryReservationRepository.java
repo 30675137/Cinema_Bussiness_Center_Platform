@@ -11,6 +11,8 @@ package com.cinema.inventory.repository;
 
 import com.cinema.inventory.entity.InventoryReservation;
 import com.cinema.inventory.entity.InventoryReservation.ReservationStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -66,6 +68,19 @@ public interface InventoryReservationRepository extends JpaRepository<InventoryR
     );
 
     /**
+     * Find reservations by status and created before a certain time
+     * Used by O012 cleanup job to release reservations older than 30 minutes
+     *
+     * @param status Reservation status
+     * @param createdBefore Threshold timestamp
+     * @return List of matching reservations
+     */
+    List<InventoryReservation> findByStatusAndCreatedAtBefore(
+        ReservationStatus status,
+        Instant createdBefore
+    );
+
+    /**
      * Update reservation status by order ID
      * Used for bulk status updates (e.g., fulfill all reservations for an order)
      *
@@ -91,4 +106,64 @@ public interface InventoryReservationRepository extends JpaRepository<InventoryR
      * @return true if active reservations exist
      */
     boolean existsByOrderIdAndStatus(UUID orderId, ReservationStatus status);
+
+    // ========================================
+    // O012: 审计追踪查询方法 (Paginated Queries)
+    // ========================================
+
+    /**
+     * 按订单ID分页查询预占记录
+     *
+     * @param orderId 订单ID
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findByOrderId(UUID orderId, Pageable pageable);
+
+    /**
+     * 按门店ID分页查询预占记录
+     *
+     * @param storeId 门店ID
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findByStoreId(UUID storeId, Pageable pageable);
+
+    /**
+     * 按SKU ID分页查询预占记录
+     *
+     * @param skuId SKU ID
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findBySkuId(UUID skuId, Pageable pageable);
+
+    /**
+     * 按状态分页查询预占记录
+     *
+     * @param status 预占状态
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findByStatus(ReservationStatus status, Pageable pageable);
+
+    /**
+     * 按时间范围分页查询预占记录
+     *
+     * @param startTime 开始时间 (包含)
+     * @param endTime 结束时间 (包含)
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findByCreatedAtBetween(Instant startTime, Instant endTime, Pageable pageable);
+
+    /**
+     * 组合查询: 按门店ID和状态分页查询
+     *
+     * @param storeId 门店ID
+     * @param status 预占状态
+     * @param pageable 分页参数
+     * @return 预占记录分页结果
+     */
+    Page<InventoryReservation> findByStoreIdAndStatus(UUID storeId, ReservationStatus status, Pageable pageable);
 }
