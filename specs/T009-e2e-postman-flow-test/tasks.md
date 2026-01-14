@@ -122,11 +122,11 @@
 
 ### Tasks
 
-- [ ] T026 创建 postman/README.md 在 `specs/T009-e2e-postman-flow-test/postman/README.md`，包含使用说明、前置条件、执行步骤
-- [ ] T027 为每个 Request 添加 Description 说明（在 Postman UI 中可见）
-- [ ] T028 验证所有 Test Scripts 的错误信息清晰易懂
-- [ ] T029 [P] 创建可选的测试环境 Environment 文件 `specs/T009-e2e-postman-flow-test/postman/T009-test.postman_environment.json`
-- [ ] T030 提交代码并合并到 dev 分支
+- [x] T026 创建 postman/README.md 在 `specs/T009-e2e-postman-flow-test/postman/README.md`，包含使用说明、前置条件、执行步骤
+- [x] T027 为每个 Request 添加 Description 说明（在 Postman UI 中可见）
+- [x] T028 验证所有 Test Scripts 的错误信息清晰易懂
+- [x] T029 [P] 创建可选的测试环境 Environment 文件 `specs/T009-e2e-postman-flow-test/postman/T009-test.postman_environment.json`
+- [x] T030 提交代码并合并到 dev 分支
 
 ---
 
