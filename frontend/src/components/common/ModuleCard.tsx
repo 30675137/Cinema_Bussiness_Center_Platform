@@ -89,18 +89,26 @@ export const ModuleCard: React.FC<ModuleCardProps> = React.memo(({ module }) => 
                 key={link.path}
                 style={{
                   fontSize: 13,
-                  color: link.enabled === false ? '#ccc' : '#595959',
+                  color: link.enabled === false ? '#d9d9d9' : '#262626',
+                  fontWeight: link.enabled === false ? 'normal' : 500,
                   cursor: link.enabled === false ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  textDecoration: link.enabled === false ? 'line-through' : 'none',
+                  opacity: link.enabled === false ? 0.5 : 1,
                 }}
                 onClick={(e) => link.enabled !== false && handleLinkClick(link.path, e)}
-                className="function-link"
+                className={link.enabled === false ? 'function-link-disabled' : 'function-link'}
               >
-                <span>•</span>
+                <span>{link.enabled === false ? '○' : '•'}</span>
                 <span style={{ flex: 1 }}>{link.name}</span>
-                {link.badge && (
+                {link.enabled === false && (
+                  <Tag color="default" style={{ margin: 0, fontSize: 11, color: '#999' }}>
+                    未开发
+                  </Tag>
+                )}
+                {link.enabled !== false && link.badge && (
                   <Tag color="red" style={{ margin: 0, fontSize: 11 }}>
                     {link.badge}
                   </Tag>
@@ -120,6 +128,11 @@ export const ModuleCard: React.FC<ModuleCardProps> = React.memo(({ module }) => 
           }
           .function-link:hover {
             color: #1890ff !important;
+            font-weight: 600;
+          }
+          .function-link-disabled:hover {
+            color: #d9d9d9 !important;
+            cursor: not-allowed !important;
           }
         `}
       </style>

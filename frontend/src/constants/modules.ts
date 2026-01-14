@@ -43,12 +43,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: ControlOutlined,
     defaultPath: '/basic-settings/organization',
     order: 1,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: StoreQueryController, UnitController, UnitConversionController
     swimlane: 'foundation',
     functionLinks: [
-      { name: '组织/门店/仓库管理', path: '/basic-settings/organization', enabled: true },
-      { name: '单位 & 换算规则', path: '/basic-settings/units', enabled: true },
-      { name: '字典与规则配置', path: '/basic-settings/dictionary', enabled: true },
+      { name: '组织/门店/仓库管理', path: '/basic-settings/organization', enabled: true }, // ✅ StoreQueryController
+      { name: '单位 & 换算规则', path: '/basic-settings/units', enabled: true }, // ✅ UnitController, UnitConversionController
+      { name: '字典与规则配置', path: '/basic-settings/dictionary', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -58,12 +58,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: SettingOutlined,
     defaultPath: '/system/users',
     order: 2,
-    status: 'normal',
+    status: 'developing', // ❌ API未完成: 无UserController, 无RoleController
     swimlane: 'foundation',
     functionLinks: [
-      { name: '用户管理', path: '/system/users', enabled: true },
-      { name: '角色权限', path: '/system/roles', enabled: true },
-      { name: '系统设置', path: '/system/settings', enabled: true },
+      { name: '用户管理', path: '/system/users', enabled: false }, // ❌ 未开发
+      { name: '角色权限', path: '/system/roles', enabled: false }, // ❌ 未开发
+      { name: '系统设置', path: '/system/settings', enabled: false }, // ❌ 未开发
     ],
   },
 
@@ -75,13 +75,13 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: ShoppingOutlined,
     defaultPath: '/products/spu',
     order: 3,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: SpuController, SkuController, BrandController, CategoryController
     swimlane: 'master-data',
     functionLinks: [
-      { name: 'SPU 管理', path: '/products/spu', enabled: true },
-      { name: 'SKU 管理', path: '/products/sku', enabled: true },
-      { name: '商品分类', path: '/products/category', enabled: true },
-      { name: '品牌管理', path: '/products/brand', enabled: true },
+      { name: 'SPU 管理', path: '/products/spu', enabled: true }, // ✅ SpuController
+      { name: 'SKU 管理', path: '/products/sku', enabled: true }, // ✅ SkuController
+      { name: '商品分类', path: '/products/category', enabled: true }, // ✅ CategoryController
+      { name: '品牌管理', path: '/products/brand', enabled: true }, // ✅ BrandController
     ],
   },
   {
@@ -91,13 +91,13 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: ReconciliationOutlined,
     defaultPath: '/bom/material',
     order: 4,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: BomController, MaterialController
     swimlane: 'master-data',
     functionLinks: [
-      { name: '原料库/物料主数据', path: '/bom/material', enabled: true },
-      { name: 'BOM 列表', path: '/bom/list', enabled: true },
-      { name: '配方管理', path: '/bom/formula', enabled: true },
-      { name: '成本核算', path: '/bom/cost', enabled: true },
+      { name: '原料库/物料主数据', path: '/bom/material', enabled: true }, // ✅ MaterialController
+      { name: 'BOM 列表', path: '/bom/list', enabled: true }, // ✅ BomController
+      { name: '配方管理', path: '/bom/formula', enabled: true }, // ✅ BomController
+      { name: '成本核算', path: '/bom/cost', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -107,12 +107,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: CalendarOutlined,
     defaultPath: '/scheduling/calendar',
     order: 5,
-    status: 'normal',
+    status: 'developing', // ❌ API未完成: 无SchedulingController
     swimlane: 'master-data',
     functionLinks: [
-      { name: '档期日历', path: '/scheduling/calendar', enabled: true },
-      { name: '资源预约', path: '/scheduling/reservation', enabled: true },
-      { name: '排期管理', path: '/scheduling/schedule', enabled: true },
+      { name: '档期日历', path: '/scheduling/calendar', enabled: false }, // ❌ 未开发
+      { name: '资源预约', path: '/scheduling/reservation', enabled: true }, // ✅ ReservationController
+      { name: '排期管理', path: '/scheduling/schedule', enabled: false }, // ❌ 未开发
     ],
   },
 
@@ -124,12 +124,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: FileTextOutlined,
     defaultPath: '/orders/list',
     order: 6,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: OrderController, BeverageOrderController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '订单列表', path: '/orders/list', enabled: true },
-      { name: '履约管理', path: '/orders/fulfillment', enabled: true },
-      { name: '退款管理', path: '/orders/refund', enabled: true },
+      { name: '订单列表', path: '/orders/list', enabled: true }, // ✅ OrderController
+      { name: '履约管理', path: '/orders/fulfillment', enabled: true }, // ✅ OrderController
+      { name: '退款管理', path: '/orders/refund', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -139,13 +139,13 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: DatabaseOutlined,
     defaultPath: '/inventory/query',
     order: 7,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: InventoryController, InventoryAdjustmentController, StoreQueryController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '库存查询', path: '/inventory/query', enabled: true },
-      { name: '库存调整', path: '/inventory/adjustment', enabled: true },
-      { name: '库存盘点', path: '/inventory/stocktaking', enabled: true },
-      { name: '仓店管理', path: '/inventory/stores', enabled: true },
+      { name: '库存查询', path: '/inventory/query', enabled: true }, // ✅ InventoryController
+      { name: '库存调整', path: '/inventory/adjustment', enabled: true }, // ✅ InventoryAdjustmentController
+      { name: '库存盘点', path: '/inventory/stocktaking', enabled: false }, // ❌ 未开发
+      { name: '仓店管理', path: '/inventory/stores', enabled: true }, // ✅ StoreQueryController
     ],
   },
   {
@@ -155,12 +155,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: ShoppingCartOutlined,
     defaultPath: '/procurement/orders',
     order: 8,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: PurchaseOrderController, GoodsReceiptController, SupplierController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '采购订单', path: '/procurement/orders', enabled: true },
-      { name: '收货入库', path: '/procurement/receiving', enabled: true },
-      { name: '供应商管理', path: '/procurement/suppliers', enabled: true },
+      { name: '采购订单', path: '/procurement/orders', enabled: true }, // ✅ PurchaseOrderController
+      { name: '收货入库', path: '/procurement/receiving', enabled: true }, // ✅ GoodsReceiptController
+      { name: '供应商管理', path: '/procurement/suppliers', enabled: true }, // ✅ SupplierController
     ],
   },
 
@@ -172,12 +172,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: CoffeeOutlined,
     defaultPath: '/channels/products',
     order: 9,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: ChannelProductController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '渠道商品', path: '/channels/products', enabled: true },
-      { name: '渠道配置', path: '/channels/config', enabled: true },
-      { name: '渠道授权', path: '/channels/auth', enabled: true },
+      { name: '渠道商品', path: '/channels/products', enabled: true }, // ✅ ChannelProductController
+      { name: '渠道配置', path: '/channels/config', enabled: false }, // ❌ 未开发
+      { name: '渠道授权', path: '/channels/auth', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -187,12 +187,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: GoldOutlined,
     defaultPath: '/packages/list',
     order: 10,
-    status: 'normal',
+    status: 'normal', // ✅ API已完成: ScenarioPackageController, ComboController, ActivityTypeController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '场景包列表', path: '/packages/list', enabled: true },
-      { name: '套餐配置', path: '/packages/combo', enabled: true },
-      { name: '活动管理', path: '/packages/activity', enabled: true },
+      { name: '场景包列表', path: '/packages/list', enabled: true }, // ✅ ScenarioPackageController
+      { name: '套餐配置', path: '/packages/combo', enabled: true }, // ✅ ComboController
+      { name: '活动管理', path: '/packages/activity', enabled: true }, // ✅ ActivityTypeController
     ],
   },
   {
@@ -202,12 +202,12 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: DollarOutlined,
     defaultPath: '/pricing/list',
     order: 11,
-    status: 'normal',
+    status: 'developing', // ❌ API未完成: 无PricingController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '价目表管理', path: '/pricing/list', enabled: true },
-      { name: '价格规则', path: '/pricing/rules', enabled: true },
-      { name: '定价策略', path: '/pricing/strategy', enabled: true },
+      { name: '价目表管理', path: '/pricing/list', enabled: false }, // ❌ 未开发
+      { name: '价格规则', path: '/pricing/rules', enabled: false }, // ❌ 未开发
+      { name: '定价策略', path: '/pricing/strategy', enabled: false }, // ❌ 未开发
     ],
   },
 
@@ -219,13 +219,13 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     icon: BarChartOutlined,
     defaultPath: '/reports/overview',
     order: 12,
-    status: 'normal',
+    status: 'developing', // ❌ API未完成: 无ReportController
     swimlane: 'support',
     functionLinks: [
-      { name: '数据概览', path: '/reports/overview', enabled: true },
-      { name: '销售报表', path: '/reports/sales', enabled: true },
-      { name: '库存报表', path: '/reports/inventory', enabled: true },
-      { name: '指标看板', path: '/reports/dashboard', enabled: true },
+      { name: '数据概览', path: '/reports/overview', enabled: false }, // ❌ 未开发
+      { name: '销售报表', path: '/reports/sales', enabled: false }, // ❌ 未开发
+      { name: '库存报表', path: '/reports/inventory', enabled: false }, // ❌ 未开发
+      { name: '指标看板', path: '/reports/dashboard', enabled: false }, // ❌ 未开发
     ],
   },
 ];
