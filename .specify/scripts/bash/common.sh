@@ -37,8 +37,11 @@ get_current_branch() {
         for dir in "$specs_dir"/*; do
             if [[ -d "$dir" ]]; then
                 local dirname=$(basename "$dir")
-                if [[ "$dirname" =~ ^([0-9]{3})- ]]; then
-                    local number=${BASH_REMATCH[1]}
+                # Support both formats:
+                # - Legacy: ###-feature (e.g., 001-feature)
+                # - New: X###-feature (e.g., M002-material-filter)
+                if [[ "$dirname" =~ ^([A-Z])?([0-9]{3})- ]]; then
+                    local number=${BASH_REMATCH[2]}
                     number=$((10#$number))
                     if [[ "$number" -gt "$highest" ]]; then
                         highest=$number
@@ -72,9 +75,12 @@ check_feature_branch() {
         return 0
     fi
 
-    if [[ ! "$branch" =~ ^[0-9]{3}- ]]; then
+    # Support both formats:
+    # - Legacy: 001-feature-name (pure numeric)
+    # - New: X###-feature-name (module prefix + numeric)
+    if [[ ! "$branch" =~ ^([A-Z][0-9]{3}|[0-9]{3})- ]]; then
         echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
-        echo "Feature branches should be named like: 001-feature-name" >&2
+        echo "Feature branches should be named like: 001-feature-name or M002-feature-name" >&2
         return 1
     fi
 
@@ -85,19 +91,27 @@ get_feature_dir() { echo "$1/specs/$2"; }
 
 # Find feature directory by numeric prefix instead of exact branch match
 # This allows multiple branches to work on the same spec (e.g., 004-fix-bug, 004-add-feature)
+# Also supports new format: X###-feature-name (e.g., M002-material-filter)
 find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
 
-    # Extract numeric prefix from branch (e.g., "004" from "004-whatever")
-    if [[ ! "$branch_name" =~ ^([0-9]{3})- ]]; then
-        # If branch doesn't have numeric prefix, fall back to exact match
+    # Extract prefix from branch:
+    # - New format: X### (e.g., "M002" from "M002-material-filter")
+    # - Legacy format: ### (e.g., "004" from "004-whatever")
+    local prefix=""
+    if [[ "$branch_name" =~ ^([A-Z][0-9]{3})- ]]; then
+        # New format: X###-
+        prefix="${BASH_REMATCH[1]}"
+    elif [[ "$branch_name" =~ ^([0-9]{3})- ]]; then
+        # Legacy format: ###-
+        prefix="${BASH_REMATCH[1]}"
+    else
+        # If branch doesn't match either format, fall back to exact match
         echo "$specs_dir/$branch_name"
         return
     fi
-
-    local prefix="${BASH_REMATCH[1]}"
 
     # Search for directories in specs/ that start with this prefix
     local matches=()
