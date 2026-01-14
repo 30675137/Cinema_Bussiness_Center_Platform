@@ -1,6 +1,7 @@
 /**
  * @spec O011-order-checkout
  * @spec O012-order-inventory-reservation
+ * @spec O013-order-channel-migration
  * 订单确认页组件
  */
 import { View, Text, Image, ScrollView, Textarea } from '@tarojs/components'
@@ -76,11 +77,12 @@ const OrderConfirm = () => {
     setIsPaymentLoading(true)
 
     try {
-      // O012: 调用后端API创建订单并预占库存
+      // O012 & O013: 调用后端API创建订单并预占库存
       const response = await createOrderWithReservation({
         storeId: 'mock-store-001', // TODO: 从用户上下文获取门店ID
         items: cart.items.map((item) => ({
-          beverageId: item.product.id,
+          // @spec O013: 使用 channelProductId 替代 beverageId
+          channelProductId: item.product.id,
           quantity: item.quantity,
           selectedSpecs: item.selectedOptions,
         })),

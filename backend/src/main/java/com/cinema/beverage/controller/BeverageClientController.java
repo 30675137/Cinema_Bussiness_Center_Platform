@@ -1,6 +1,11 @@
 /**
  * @spec O003-beverage-order
+ * @spec O013-order-channel-migration
  * C端饮品查询控制器 (T142)
+ * 
+ * @deprecated 从 O013 开始，该控制器已废弃。
+ *             请使用渠道商品 API: /api/client/channel-products
+ *             参考: O006-miniapp-channel-order
  */
 package com.cinema.beverage.controller;
 
@@ -34,7 +39,14 @@ import java.util.Map;
  * - 此控制器仅提供只读查询接口
  * - 不需要认证即可访问
  * - 仅返回状态为 ACTIVE 的饮品
+ * 
+ * @deprecated 从 O013-order-channel-migration 开始，该控制器已废弃。
+ *             新的商品查询请使用渠道商品 API：
+ *             - GET /api/client/channel-products - 获取渠道商品列表
+ *             - GET /api/client/channel-products/{id} - 获取渠道商品详情
+ *             参考 O006-miniapp-channel-order 规格
  */
+@Deprecated(since = "O013", forRemoval = true)
 @RestController
 @RequestMapping("/api/client/beverages")
 @RequiredArgsConstructor

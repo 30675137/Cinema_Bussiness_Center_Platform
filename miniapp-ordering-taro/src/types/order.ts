@@ -1,5 +1,6 @@
 /**
  * @spec O011-order-checkout
+ * @spec O013-order-channel-migration
  * 订单相关类型定义
  *
  * 数据模型复用策略：
@@ -21,10 +22,17 @@ export type PaymentMethod = 'WECHAT_PAY' | 'ALIPAY' | 'APPLE_PAY'
 export interface OrderItem {
   id: string
   orderId: string
+  /** @spec O013: 新增渠道商品ID */
+  channelProductId?: string
+  /** @spec O013: 新增 SKU ID */
+  skuId?: string
+  /** @deprecated 使用 channelProductId 替代 */
   productId: string
   productName: string
   productSpec: string | null
   productImage: string | null
+  /** @spec O013: 商品快照 JSON */
+  productSnapshot?: string
   quantity: number
   unitPrice: number
   subtotal: number

@@ -1,6 +1,7 @@
 /**
  * @spec O011-order-checkout
  * @spec O012-order-inventory-reservation
+ * @spec O013-order-channel-migration
  * 订单服务 - 核心函数
  */
 import Taro from '@tarojs/taro'
@@ -23,6 +24,27 @@ export interface InsufficientInventoryError {
       unit: string
     }>
   }
+}
+
+/**
+ * O013: 商品快照接口
+ * 下单时保存的商品信息快照
+ */
+export interface ProductSnapshot {
+  snapshotAt: string
+  channelProduct: {
+    id: string
+    displayName: string
+    channelPrice: number
+    imageUrl?: string
+  }
+  sku: {
+    id: string
+    name: string
+    basePrice: number
+  }
+  selectedSpecs?: Record<string, string>
+  effectivePrice: number
 }
 
 /**
@@ -186,7 +208,8 @@ export const getOrders = (): CinemaOrder[] => {
 }
 
 /**
- * O012: 创建订单并预占库存（调用后端API）
+ * O012 & O013: 创建订单并预占库存（调用后端API）
+ * API Path: POST /api/client/orders (O013 新路径)
  * 
  * @param request 订单创建请求
  * @returns 订单创建响应
@@ -196,16 +219,18 @@ export const createOrderWithReservation = async (
   request: {
     storeId: string
     items: Array<{
-      beverageId: string
+      /** @spec O013 使用 channelProductId 替代 beverageId */
+      channelProductId: string
       quantity: number
-      selectedSpecs: Record<string, string>
+      selectedSpecs?: Record<string, string>
     }>
     customerNote?: string
   }
 ): Promise<OrderCreationResponse> => {
   try {
+    // @spec O013: API 路径变更 /api/client/beverage-orders -> /api/client/orders
     const response = await Taro.request({
-      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/beverage-orders`,
+      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/orders`,
       method: 'POST',
       data: request,
       header: {
@@ -228,7 +253,8 @@ export const createOrderWithReservation = async (
 }
 
 /**
- * O012: 取消订单并释放预占（调用后端API）
+ * O012 & O013: 取消订单并释放预占（调用后端API）
+ * API Path: POST /api/client/orders/{orderId}/cancel (O013 新路径)
  * 
  * @param orderId 订单ID
  * @param cancelReason 取消原因
@@ -238,8 +264,9 @@ export const cancelOrderWithRelease = async (
   cancelReason?: string
 ): Promise<void> => {
   try {
+    // @spec O013: API 路径变更
     const response = await Taro.request({
-      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/beverage-orders/${orderId}/cancel`,
+      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/orders/${orderId}/cancel`,
       method: 'POST',
       data: {
         reason: cancelReason || '用户取消',

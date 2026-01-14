@@ -2,7 +2,7 @@
   "info": {
     "name": "O012 - 订单创建时库存预占",
     "_postman_id": "o012-order-reservation-api",
-    "description": "订单创建时库存预占机制的Postman测试集合。\n\n**核心功能**:\n- 下单时自动预占库存\n- 订单取消时自动释放预占\n- 预占记录审计查询\n\n**测试场景**:\n- 正常下单流程（库存充足）\n- 库存不足场景（预占失败）\n- 订单取消流程（预占释放）\n- 并发下单场景（防止超卖）\n- 预占记录查询\n\n**前置条件**:\n1. 数据库已包含测试门店数据\n2. 数据库已包含测试商品（SKU）和BOM配方\n3. 数据库已配置库存数据\n\n**使用说明**:\n1. 导入本集合到Postman\n2. 导入环境配置文件 `O012-local.postman_environment.json`\n3. 按照文件夹顺序执行测试\n4. 查看Test Results验证结果",
+    "description": "订单创建时库存预占机制的Postman测试集合。\n\n**核心功能**:\n- 下单时自动预占库存\n- 订单取消时自动释放预占\n- 预占记录审计查询\n\n**测试场景**:\n- 正常下单流程（库存充足）\n- 库存不足场景（预占失败）\n- 订单取消流程（预占释放）\n- 并发下单场景（防止超卖）\n- 预占记录查询\n\n**前置条件**:\n1. 数据库已包含测试门店数据\n2. 数据库已包含测试渠道商品(channelProductId)和BOM配方\n3. 数据库已配置库存数据\n\n**使用说明**:\n1. 导入本集合到Postman\n2. 导入环境配置文件 `O012-local.postman_environment.json`\n3. 按照文件夹顺序执行测试\n4. 查看Test Results验证结果\n\n**O013更新**: API路径变更为 /api/client/orders，使用channelProductId替代skuId",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -86,12 +86,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"skuId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 2,\n      \"selectedSpecs\": {}\n    },\n    {\n      \"skuId\": \"{{test_sku_id_2}}\",\n      \"quantity\": 1,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Postman automated test order\"\n}"
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"channelProductId\": \"{{test_channel_product_id_1}}\",\n      \"quantity\": 2,\n      \"selectedSpecs\": {}\n    },\n    {\n      \"channelProductId\": \"{{test_channel_product_id_2}}\",\n      \"quantity\": 1,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Postman automated test order\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/client/beverage-orders",
+              "raw": "{{base_url}}/api/client/orders",
               "host": ["{{base_url}}"],
-              "path": ["api", "client", "beverage-orders"]
+              "path": ["api", "client", "orders"]
             },
             "description": "测试场景：库存充足时创建订单，验证库存预占成功。\n\n**预期结果**:\n- HTTP状态码 201\n- 业务响应码 0000\n- 订单状态 PENDING_PAYMENT\n- 预占状态 RESERVED\n- 返回预占商品清单和过期时间"
           },
@@ -160,12 +160,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"skuId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 9999,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Insufficient inventory test\"\n}"
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"channelProductId\": \"{{test_channel_product_id_1}}\",\n      \"quantity\": 9999,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Insufficient inventory test\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/client/beverage-orders",
+              "raw": "{{base_url}}/api/client/orders",
               "host": ["{{base_url}}"],
-              "path": ["api", "client", "beverage-orders"]
+              "path": ["api", "client", "orders"]
             },
             "description": "测试场景：库存不足时创建订单，验证预占失败并返回缺货清单。\n\n**预期结果**:\n- HTTP状态码 409\n- 业务响应码 ORD_BIZ_002\n- 错误消息提示库存不足\n- 返回详细缺货清单（SKU ID、名称、需求数量、可用数量）"
           },

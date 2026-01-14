@@ -1,13 +1,15 @@
 /**
  * @spec O010-shopping-cart
+ * @spec O013-order-channel-migration
  * 购物车数据类型定义
  */
 
 /**
  * 购物车商品数据
+ * @spec O013: id 对应 channelProductId
  */
 export interface CartProduct {
-  /** 商品ID */
+  /** 渠道商品ID (channelProductId) */
   id: string
   /** 商品名称 */
   name: string
@@ -15,6 +17,8 @@ export interface CartProduct {
   price: number
   /** 商品图片 */
   image: string
+  /** SKU ID (可选，用于向后兼容) */
+  skuId?: string
 }
 
 /**
