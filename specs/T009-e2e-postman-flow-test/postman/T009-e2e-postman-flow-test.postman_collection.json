@@ -777,7 +777,7 @@
           "response": []
         },
         {
-          "name": "03-Delete-SKU",
+          "name": "03-Delete-SKU-Product",
           "event": [
             {
               "listen": "test",
@@ -787,28 +787,11 @@
                   "pm.test(\"Status code is 200, 204 or 500 (FK constraint)\", function () {",
                   "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 500]);",
                   "    if (pm.response.code === 500) {",
-                  "        console.log('SKU deletion failed (may have order references)');",
+                  "        console.log('Product SKU deletion failed (may have order references)');",
                   "    }",
                   "});",
                   "",
-                  "console.log('SKU deletion attempted');"
-                ],
-                "type": "text/javascript"
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "// Delete all test SKUs one by one",
-                  "var skuIds = [",
-                  "    pm.environment.get('test_material_rum_id'),",
-                  "    pm.environment.get('test_material_mint_id'),",
-                  "    pm.environment.get('test_material_soda_id'),",
-                  "    pm.environment.get('test_sku_id_1')",
-                  "];",
-                  "",
-                  "console.log('SKUs to delete:', skuIds);"
+                  "console.log('Product SKU deletion attempted');"
                 ],
                 "type": "text/javascript"
               }
@@ -828,12 +811,114 @@
                 "{{test_sku_id_1}}"
               ]
             },
-            "description": "删除成品 SKU"
+            "description": "删除成品 SKU（莫吉托）"
           },
           "response": []
         },
         {
-          "name": "04-Delete-SPU",
+          "name": "04-Delete-SKU-Rum",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200, 204 or 500\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 500]);",
+                  "});",
+                  "console.log('Rum SKU deletion attempted');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/api/skus/{{test_material_rum_id}}",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "api",
+                "skus",
+                "{{test_material_rum_id}}"
+              ]
+            },
+            "description": "删除朗姆酒原料 SKU"
+          },
+          "response": []
+        },
+        {
+          "name": "05-Delete-SKU-Mint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200, 204 or 500\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 500]);",
+                  "});",
+                  "console.log('Mint SKU deletion attempted');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/api/skus/{{test_material_mint_id}}",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "api",
+                "skus",
+                "{{test_material_mint_id}}"
+              ]
+            },
+            "description": "删除薄荷叶原料 SKU"
+          },
+          "response": []
+        },
+        {
+          "name": "06-Delete-SKU-Soda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200, 204 or 500\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 500]);",
+                  "});",
+                  "console.log('Soda SKU deletion attempted');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/api/skus/{{test_material_soda_id}}",
+              "host": [
+                "{{api_base_url}}"
+              ],
+              "path": [
+                "api",
+                "skus",
+                "{{test_material_soda_id}}"
+              ]
+            },
+            "description": "删除苏打水原料 SKU"
+          },
+          "response": []
+        },
+        {
+          "name": "07-Delete-SPU",
           "event": [
             {
               "listen": "test",
