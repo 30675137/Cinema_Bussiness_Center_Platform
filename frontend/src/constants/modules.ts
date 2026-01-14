@@ -47,8 +47,9 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     swimlane: 'foundation',
     functionLinks: [
       { name: '组织/门店/仓库管理', path: '/basic-settings/organization', enabled: true }, // ✅ StoreQueryController
-      { name: '单位 & 换算规则', path: '/basic-settings/units', enabled: true }, // ✅ UnitController, UnitConversionController
+      { name: '单位 & 换算规则管理', path: '/basic-settings/units', enabled: true }, // ✅ UnitController, UnitConversionController
       { name: '字典与规则配置', path: '/basic-settings/dictionary', enabled: false }, // ❌ 未开发
+      { name: '角色与权限管理', path: '/basic-settings/roles', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -78,10 +79,10 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     status: 'normal', // ✅ API已完成: SpuController, SkuController, BrandController, CategoryController
     swimlane: 'master-data',
     functionLinks: [
-      { name: 'SPU 管理', path: '/products/spu', enabled: true }, // ✅ SpuController
-      { name: 'SKU 管理', path: '/products/sku', enabled: true }, // ✅ SkuController
-      { name: '商品分类', path: '/products/category', enabled: true }, // ✅ CategoryController
-      { name: '品牌管理', path: '/products/brand', enabled: true }, // ✅ BrandController
+      { name: 'P001-SPU 管理', path: '/products/spu', enabled: true }, // ✅ SpuController
+      { name: 'P001-SKU 管理', path: '/products/sku', enabled: true }, // ✅ SkuController
+      { name: '类目管理', path: '/mdm-pim/category', enabled: true }, // ✅ CategoryController
+      { name: 'B001-品牌管理', path: '/mdm-pim/brands', enabled: true }, // ✅ BrandController
     ],
   },
   {
@@ -89,15 +90,15 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: 'BOM/配方&成本管理',
     description: '物料清单、配方、成本核算、原料库',
     icon: ReconciliationOutlined,
-    defaultPath: '/bom/material',
+    defaultPath: '/bom/materials',
     order: 4,
     status: 'normal', // ✅ API已完成: BomController, MaterialController
     swimlane: 'master-data',
     functionLinks: [
-      { name: '原料库/物料主数据', path: '/bom/material', enabled: true }, // ✅ MaterialController
-      { name: 'BOM 列表', path: '/bom/list', enabled: true }, // ✅ BomController
-      { name: '配方管理', path: '/bom/formula', enabled: true }, // ✅ BomController
-      { name: '成本核算', path: '/bom/cost', enabled: false }, // ❌ 未开发
+      { name: '原料库/物料主数据', path: '/bom/materials', enabled: true }, // ✅ MaterialController
+      { name: 'BOM/配方配置', path: '/bom/formula', enabled: true }, // ✅ BomController
+      { name: '单位换算/损耗率配置', path: '/bom/conversion', enabled: true }, // ✅ UnitConversionController
+      { name: '成本/毛利预估与校验', path: '/bom/cost', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -105,14 +106,15 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '档期/排期/资源预约',
     description: '影厅档期、资源预约、排期管理',
     icon: CalendarOutlined,
-    defaultPath: '/scheduling/calendar',
+    defaultPath: '/stores',
     order: 5,
-    status: 'developing', // ❌ API未完成: 无SchedulingController
+    status: 'normal', // ✅ API部分完成: StoreController, ReservationController, ActivityTypeController
     swimlane: 'master-data',
     functionLinks: [
-      { name: '档期日历', path: '/scheduling/calendar', enabled: false }, // ❌ 未开发
-      { name: '资源预约', path: '/scheduling/reservation', enabled: true }, // ✅ ReservationController
-      { name: '排期管理', path: '/scheduling/schedule', enabled: false }, // ❌ 未开发
+      { name: '14-门店管理', path: '/stores', enabled: true }, // ✅ StoreController
+      { name: '活动类型管理', path: '/activity-types', enabled: true }, // ✅ ActivityTypeController
+      { name: '14-影厅资源管理', path: '/schedule/hall-resources', enabled: true }, // ✅ HallController
+      { name: '排期管理', path: '/schedule/gantt', enabled: false }, // ❌ 未开发
     ],
   },
 
@@ -127,9 +129,10 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     status: 'normal', // ✅ API已完成: OrderController, BeverageOrderController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '订单列表', path: '/orders/list', enabled: true }, // ✅ OrderController
-      { name: '履约管理', path: '/orders/fulfillment', enabled: true }, // ✅ OrderController
-      { name: '退款管理', path: '/orders/refund', enabled: false }, // ❌ 未开发
+      { name: 'U004-订单列表/状态查看', path: '/orders/list', enabled: true }, // ✅ OrderController
+      { name: 'U001-预约单管理', path: '/reservation-orders', enabled: true }, // ✅ ReservationController
+      { name: '二次确认队列', path: '/orders/confirmation', enabled: false }, // ❌ 未开发
+      { name: '退款/改期/取消/回滚', path: '/orders/refund', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -142,10 +145,10 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     status: 'normal', // ✅ API已完成: InventoryController, InventoryAdjustmentController, StoreQueryController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '库存查询', path: '/inventory/query', enabled: true }, // ✅ InventoryController
-      { name: '库存调整', path: '/inventory/adjustment', enabled: true }, // ✅ InventoryAdjustmentController
-      { name: '库存盘点', path: '/inventory/stocktaking', enabled: false }, // ❌ 未开发
-      { name: '仓店管理', path: '/inventory/stores', enabled: true }, // ✅ StoreQueryController
+      { name: 'I003-库存查询', path: '/inventory/query', enabled: true }, // ✅ InventoryController
+      { name: 'I004-库存台账查看', path: '/inventory/ledger', enabled: true }, // ✅ InventoryTransactionController
+      { name: 'I005-库存调整审批', path: '/inventory/approvals', enabled: true }, // ✅ ApprovalController
+      { name: '库存预占/释放管理', path: '/inventory/reservation', enabled: true }, // ✅ InventoryReservationController
     ],
   },
   {
@@ -153,14 +156,15 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '采购与入库管理',
     description: '采购订单、收货入库、供应商管理',
     icon: ShoppingCartOutlined,
-    defaultPath: '/procurement/orders',
+    defaultPath: '/purchase-management/orders',
     order: 8,
     status: 'normal', // ✅ API已完成: PurchaseOrderController, GoodsReceiptController, SupplierController
     swimlane: 'transaction',
     functionLinks: [
-      { name: '采购订单', path: '/procurement/orders', enabled: true }, // ✅ PurchaseOrderController
-      { name: '收货入库', path: '/procurement/receiving', enabled: true }, // ✅ GoodsReceiptController
-      { name: '供应商管理', path: '/procurement/suppliers', enabled: true }, // ✅ SupplierController
+      { name: '供应商管理', path: '/purchase-management/suppliers', enabled: true }, // ✅ SupplierController
+      { name: '采购订单 (PO)', path: '/purchase-management/orders', enabled: true }, // ✅ PurchaseOrderController
+      { name: '采购订单列表', path: '/purchase-management/orders/list', enabled: true }, // ✅ PurchaseOrderController
+      { name: '到货验收 & 收货入库', path: '/purchase-management/receipts', enabled: true }, // ✅ GoodsReceiptController
     ],
   },
 
@@ -170,12 +174,13 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '渠道商品配置',
     description: '渠道商品、配置管理',
     icon: CoffeeOutlined,
-    defaultPath: '/channels/products',
+    defaultPath: '/channel-products/mini-program',
     order: 9,
-    status: 'normal', // ✅ API已完成: ChannelProductController
+    status: 'normal', // ✅ API已完成: ChannelProductController, MenuCategoryController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '渠道商品', path: '/channels/products', enabled: true }, // ✅ ChannelProductController
+      { name: '小程序商品', path: '/channel-products/mini-program', enabled: true }, // ✅ ChannelProductController
+      { name: 'O002-菜单分类', path: '/menu-category', enabled: true }, // ✅ MenuCategoryController
       { name: '渠道配置', path: '/channels/config', enabled: false }, // ❌ 未开发
       { name: '渠道授权', path: '/channels/auth', enabled: false }, // ❌ 未开发
     ],
@@ -185,14 +190,15 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '场景包/套餐管理',
     description: '活动场景包、套餐配置',
     icon: GoldOutlined,
-    defaultPath: '/packages/list',
+    defaultPath: '/scenario-packages',
     order: 10,
     status: 'normal', // ✅ API已完成: ScenarioPackageController, ComboController, ActivityTypeController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '场景包列表', path: '/packages/list', enabled: true }, // ✅ ScenarioPackageController
-      { name: '套餐配置', path: '/packages/combo', enabled: true }, // ✅ ComboController
-      { name: '活动管理', path: '/packages/activity', enabled: true }, // ✅ ActivityTypeController
+      { name: '17-场景包模板管理', path: '/scenario-packages', enabled: true }, // ✅ ScenarioPackageController
+      { name: '场景包模板管理', path: '/scenario-package/template', enabled: true }, // ✅ ScenarioPackageController
+      { name: '内容组合配置', path: '/scenario-package/content', enabled: false }, // ❌ 未开发
+      { name: '定价策略配置', path: '/scenario-package/pricing', enabled: false }, // ❌ 未开发
     ],
   },
   {
@@ -200,14 +206,14 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '价格体系管理',
     description: '价目表、价格规则、定价策略',
     icon: DollarOutlined,
-    defaultPath: '/pricing/list',
+    defaultPath: '/pricing/price-list',
     order: 11,
     status: 'developing', // ❌ API未完成: 无PricingController
     swimlane: 'channel-marketing',
     functionLinks: [
-      { name: '价目表管理', path: '/pricing/list', enabled: false }, // ❌ 未开发
-      { name: '价格规则', path: '/pricing/rules', enabled: false }, // ❌ 未开发
-      { name: '定价策略', path: '/pricing/strategy', enabled: false }, // ❌ 未开发
+      { name: '价目表管理', path: '/pricing/price-list', enabled: false }, // ❌ 未开发
+      { name: '价格审核与生效', path: '/pricing/audit', enabled: false }, // ❌ 未开发
+      { name: '价格规则配置', path: '/pricing/rules', enabled: false }, // ❌ 未开发
     ],
   },
 
@@ -217,15 +223,15 @@ export const BUSINESS_MODULES: ModuleCard[] = [
     name: '运营&报表/指标看板',
     description: '数据分析、运营报表、指标监控',
     icon: BarChartOutlined,
-    defaultPath: '/reports/overview',
+    defaultPath: '/operations/launch-report',
     order: 12,
     status: 'developing', // ❌ API未完成: 无ReportController
     swimlane: 'support',
     functionLinks: [
-      { name: '数据概览', path: '/reports/overview', enabled: false }, // ❌ 未开发
-      { name: '销售报表', path: '/reports/sales', enabled: false }, // ❌ 未开发
-      { name: '库存报表', path: '/reports/inventory', enabled: false }, // ❌ 未开发
-      { name: '指标看板', path: '/reports/dashboard', enabled: false }, // ❌ 未开发
+      { name: '上新/发布时效报表', path: '/operations/launch-report', enabled: false }, // ❌ 未开发
+      { name: '商品数据质量报表', path: '/operations/quality-report', enabled: false }, // ❌ 未开发
+      { name: '销售/场景包表现分析', path: '/operations/sales-analysis', enabled: false }, // ❌ 未开发
+      { name: '库存&订单&收入&成本汇总', path: '/operations/summary', enabled: false }, // ❌ 未开发
     ],
   },
 ];
