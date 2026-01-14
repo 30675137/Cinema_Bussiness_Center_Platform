@@ -1,6 +1,7 @@
 /**
  * @spec M001-material-unit-system
  * @spec N004-procurement-material-selector
+ * @spec M002-material-filter
  */
 package com.cinema.material.repository;
 
@@ -8,6 +9,7 @@ import com.cinema.material.entity.Material;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,7 +26,7 @@ import java.util.UUID;
  * <p>Provides data access methods for material master data.
  */
 @Repository
-public interface MaterialRepository extends JpaRepository<Material, UUID> {
+public interface MaterialRepository extends JpaRepository<Material, UUID>, JpaSpecificationExecutor<Material> {
 
     /**
      * Find material by code (unique identifier)
