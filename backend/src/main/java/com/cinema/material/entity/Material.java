@@ -3,6 +3,7 @@
  */
 package com.cinema.material.entity;
 
+import com.cinema.material.domain.MaterialCategory;
 import com.cinema.unit.domain.Unit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -124,6 +125,14 @@ public class Material {
     private String description;
 
     /**
+     * 标准成本 (以库存单位计价)
+     *
+     * <p>Examples: 50元/ml, 0.5元/g, 2元/个
+     */
+    @Column(name = "standard_cost", precision = 10, scale = 2)
+    private BigDecimal standardCost;
+
+    /**
      * 状态
      *
      * <p>ACTIVE: 启用<br>
@@ -157,15 +166,4 @@ public class Material {
      */
     @Column(name = "updated_by", length = 100)
     private String updatedBy;
-
-    /**
-     * Material category enumeration
-     */
-    public enum MaterialCategory {
-        /** 原料 (Raw Material) */
-        RAW_MATERIAL,
-
-        /** 包材 (Packaging) */
-        PACKAGING
-    }
 }
