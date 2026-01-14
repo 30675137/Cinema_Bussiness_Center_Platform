@@ -6,6 +6,8 @@
 package com.cinema.material.controller;
 
 import com.cinema.common.dto.ApiResponse;
+import com.cinema.material.dto.MaterialBatchOperationRequestDTO;
+import com.cinema.material.dto.MaterialBatchOperationResultDTO;
 import com.cinema.material.dto.MaterialCreateRequest;
 import com.cinema.material.dto.MaterialFilterDTO;
 import com.cinema.material.dto.MaterialImportResultDTO;
@@ -351,6 +353,77 @@ public class MaterialController {
             log.error("Import failed with unexpected error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.failure("导入失败：" + e.getMessage()));
+        }
+    }
+
+    // ========== M002-material-filter: US4 - 批量操作 ==========
+
+    /**
+     * 批量操作物料（删除或修改状态）
+     * User Story: US4 - 批量操作物料
+     * 
+     * <p>功能说明：
+     * <ul>
+     *   <li>支持批量删除：检查BOM引用，防止误删</li>
+     *   <li>支持批量修改状态：ACTIVE/INACTIVE</li>
+     *   <li>返回每个物料的操作结果</li>
+     * </ul>
+     * 
+     * <p>注意事项：
+     * <ul>
+     *   <li>部分成功也会返回200响应</li>
+     *   <li>前端需要检查 failureCount 判断是否有失败记录</li>
+     * </ul>
+     * 
+     * @param request 批量操作请求（包含ID列表、操作类型、目标状态）
+     * @return 批量操作结果（包含成功/失败统计和详情）
+     */
+    @PostMapping("/batch")
+    public ResponseEntity<ApiResponse<MaterialBatchOperationResultDTO>> batchOperateMaterials(
+            @Valid @RequestBody MaterialBatchOperationRequestDTO request) {
+        
+        log.info("Batch operating materials: operation={}, count={}", 
+                request.getOperation(), request.getMaterialIds().size());
+
+        try {
+            // 将 String ID 转换为 UUID
+            List<UUID> materialIds = request.getMaterialIds().stream()
+                    .map(UUID::fromString)
+                    .collect(Collectors.toList());
+            
+            MaterialBatchOperationResultDTO result;
+            
+            switch (request.getOperation()) {
+                case DELETE:
+                    result = materialService.batchDelete(materialIds);
+                    break;
+                    
+                case UPDATE_STATUS:
+                    if (request.getTargetStatus() == null) {
+                        return ResponseEntity.badRequest()
+                                .body(ApiResponse.failure("修改状态操作必须指定目标状态"));
+                    }
+                    result = materialService.batchUpdateStatus(materialIds, request.getTargetStatus());
+                    break;
+                    
+                default:
+                    return ResponseEntity.badRequest()
+                            .body(ApiResponse.failure("不支持的操作类型：" + request.getOperation()));
+            }
+            
+            log.info("Batch operation completed: successCount={}, failureCount={}",
+                    result.getSuccessCount(), result.getFailureCount());
+            
+            return ResponseEntity.ok(ApiResponse.success(result));
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Batch operation validation failed: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.failure(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Batch operation failed with unexpected error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("批量操作失败：" + e.getMessage()));
         }
     }
 }

@@ -5,6 +5,8 @@
  */
 package com.cinema.material.service;
 
+import com.cinema.material.dto.MaterialBatchOperationItemDTO;
+import com.cinema.material.dto.MaterialBatchOperationResultDTO;
 import com.cinema.material.dto.MaterialFilterDTO;
 import com.cinema.material.entity.Material;
 import com.cinema.material.entity.MaterialStatus;
@@ -268,5 +270,123 @@ public class MaterialService {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    // ========== M002-material-filter: 批量操作 ==========
+
+    /**
+     * 批量删除物料
+     * User Story: US4 - 批量操作物料
+     * 
+     * @param materialIds 物料ID列表
+     * @return 批量操作结果
+     */
+    @Transactional
+    public MaterialBatchOperationResultDTO batchDelete(List<UUID> materialIds) {
+        log.info("Batch deleting {} materials", materialIds.size());
+        
+        List<MaterialBatchOperationItemDTO> items = new ArrayList<>();
+        int successCount = 0;
+        int failureCount = 0;
+
+        for (UUID materialId : materialIds) {
+            try {
+                Material material = materialRepository.findById(materialId)
+                        .orElseThrow(() -> new IllegalArgumentException("Material not found: " + materialId));
+                
+                String materialCode = material.getCode();
+                
+                // 检查是否被BOM引用
+                if (materialRepository.isReferencedByBomComponents(materialId)) {
+                    items.add(MaterialBatchOperationItemDTO.builder()
+                            .materialId(materialId.toString())
+                            .materialCode(materialCode)
+                            .success(false)
+                            .error("物料已被BOM引用，无法删除")
+                            .build());
+                    failureCount++;
+                    continue;
+                }
+                
+                materialRepository.delete(material);
+                items.add(MaterialBatchOperationItemDTO.builder()
+                        .materialId(materialId.toString())
+                        .materialCode(materialCode)
+                        .success(true)
+                        .build());
+                successCount++;
+                
+            } catch (Exception e) {
+                log.error("Failed to delete material: {}", materialId, e);
+                items.add(MaterialBatchOperationItemDTO.builder()
+                        .materialId(materialId.toString())
+                        .materialCode("UNKNOWN")
+                        .success(false)
+                        .error("删除失败：" + e.getMessage())
+                        .build());
+                failureCount++;
+            }
+        }
+
+        log.info("Batch delete completed: success={}, failure={}", successCount, failureCount);
+        return MaterialBatchOperationResultDTO.builder()
+                .successCount(successCount)
+                .failureCount(failureCount)
+                .items(items)
+                .build();
+    }
+
+    /**
+     * 批量修改物料状态
+     * User Story: US4 - 批量操作物料
+     * 
+     * @param materialIds 物料ID列表
+     * @param targetStatus 目标状态
+     * @return 批量操作结果
+     */
+    @Transactional
+    public MaterialBatchOperationResultDTO batchUpdateStatus(List<UUID> materialIds, MaterialStatus targetStatus) {
+        log.info("Batch updating status for {} materials to {}", materialIds.size(), targetStatus);
+        
+        List<MaterialBatchOperationItemDTO> items = new ArrayList<>();
+        int successCount = 0;
+        int failureCount = 0;
+
+        for (UUID materialId : materialIds) {
+            try {
+                Material material = materialRepository.findById(materialId)
+                        .orElseThrow(() -> new IllegalArgumentException("Material not found: " + materialId));
+                
+                String materialCode = material.getCode();
+                
+                // 更新状态
+                material.setStatus(targetStatus.name());
+                materialRepository.save(material);
+                
+                items.add(MaterialBatchOperationItemDTO.builder()
+                        .materialId(materialId.toString())
+                        .materialCode(materialCode)
+                        .success(true)
+                        .build());
+                successCount++;
+                
+            } catch (Exception e) {
+                log.error("Failed to update status for material: {}", materialId, e);
+                items.add(MaterialBatchOperationItemDTO.builder()
+                        .materialId(materialId.toString())
+                        .materialCode("UNKNOWN")
+                        .success(false)
+                        .error("修改状态失败：" + e.getMessage())
+                        .build());
+                failureCount++;
+            }
+        }
+
+        log.info("Batch status update completed: success={}, failure={}", successCount, failureCount);
+        return MaterialBatchOperationResultDTO.builder()
+                .successCount(successCount)
+                .failureCount(failureCount)
+                .items(items)
+                .build();
     }
 }
