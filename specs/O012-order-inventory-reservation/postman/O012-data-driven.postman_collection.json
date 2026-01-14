@@ -1,0 +1,155 @@
+{
+  "info": {
+    "name": "O012 - 订单创建时库存预占 (Data-Driven)",
+    "_postman_id": "o012-order-reservation-data-driven",
+    "description": "数据驱动测试版本，配合 CSV 文件使用。\n\n**使用说明**:\n1. 导入本集合到 Postman\n2. 在 Runner 中选择 CSV 数据文件: O012-test-data.csv\n3. 运行测试\n\n**CSV 列说明**:\n- scenario: 测试场景名称\n- store_id: 门店ID\n- sku_id_1: 商品1 SKU ID\n- quantity_1: 商品1数量\n- sku_id_2: 商品2 SKU ID（可选）\n- quantity_2: 商品2数量（可选）\n- expected_status: 预期HTTP状态码\n- expected_reservation_status: 预期预占状态\n- description: 场景描述",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "创建饮品订单 (Data-Driven)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// Build order items array based on CSV data",
+              "var items = [];",
+              "",
+              "// Add first item (always required)",
+              "items.push({",
+              "    skuId: pm.iterationData.get('sku_id_1'),",
+              "    quantity: parseInt(pm.iterationData.get('quantity_1')),",
+              "    selectedSpecs: {}",
+              "});",
+              "",
+              "// Add second item if present",
+              "var skuId2 = pm.iterationData.get('sku_id_2');",
+              "var qty2 = pm.iterationData.get('quantity_2');",
+              "if (skuId2 && skuId2.trim() !== '' && qty2) {",
+              "    items.push({",
+              "        skuId: skuId2,",
+              "        quantity: parseInt(qty2),",
+              "        selectedSpecs: {}",
+              "    });",
+              "}",
+              "",
+              "// Build request body",
+              "var requestBody = {",
+              "    storeId: pm.iterationData.get('store_id'),",
+              "    items: items,",
+              "    customerNote: 'Data-driven test: ' + pm.iterationData.get('scenario')",
+              "};",
+              "",
+              "// Store for use in request body",
+              "pm.environment.set('request_body', JSON.stringify(requestBody));",
+              "console.log('Request Body:', JSON.stringify(requestBody, null, 2));"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Get expected values from CSV",
+              "var expectedStatus = parseInt(pm.iterationData.get('expected_status'));",
+              "var expectedReservationStatus = pm.iterationData.get('expected_reservation_status');",
+              "var scenario = pm.iterationData.get('scenario');",
+              "var description = pm.iterationData.get('description');",
+              "",
+              "// Log test info",
+              "console.log('Testing scenario:', scenario, '-', description);",
+              "",
+              "// Test 1: Verify HTTP status code",
+              "pm.test('Scenario ' + scenario + ': Status code is ' + expectedStatus, function() {",
+              "    pm.response.to.have.status(expectedStatus);",
+              "});",
+              "",
+              "var jsonData = pm.response.json();",
+              "",
+              "if (expectedStatus === 201) {",
+              "    // Success case tests",
+              "    pm.test('Scenario ' + scenario + ': Response has correct structure', function() {",
+              "        pm.expect(jsonData).to.have.property('code');",
+              "        pm.expect(jsonData).to.have.property('data');",
+              "    });",
+              "",
+              "    pm.test('Scenario ' + scenario + ': Business code is 0000', function() {",
+              "        pm.expect(jsonData.code).to.eql('0000');",
+              "    });",
+              "",
+              "    pm.test('Scenario ' + scenario + ': Order created with ID', function() {",
+              "        pm.expect(jsonData.data).to.have.property('id');",
+              "        pm.expect(jsonData.data).to.have.property('orderNumber');",
+              "    });",
+              "",
+              "    pm.test('Scenario ' + scenario + ': Order status is PENDING_PAYMENT', function() {",
+              "        pm.expect(jsonData.data.status).to.eql('PENDING_PAYMENT');",
+              "    });",
+              "",
+              "    if (expectedReservationStatus === 'RESERVED') {",
+              "        pm.test('Scenario ' + scenario + ': Reservation status is RESERVED', function() {",
+              "            pm.expect(jsonData.data.reservationStatus).to.eql('RESERVED');",
+              "        });",
+              "    }",
+              "",
+              "    // Save order ID for subsequent tests",
+              "    pm.environment.set('test_order_id', jsonData.data.id);",
+              "",
+              "} else if (expectedStatus === 409) {",
+              "    // Insufficient inventory case",
+              "    pm.test('Scenario ' + scenario + ': Error code is ORD_BIZ_002', function() {",
+              "        pm.expect(jsonData.code).to.eql('ORD_BIZ_002');",
+              "    });",
+              "",
+              "    pm.test('Scenario ' + scenario + ': Error message contains insufficient info', function() {",
+              "        pm.expect(jsonData.message).to.include('库存不足');",
+              "    });",
+              "",
+              "    pm.test('Scenario ' + scenario + ': Shortage items list provided', function() {",
+              "        pm.expect(jsonData.details).to.have.property('shortageItems');",
+              "        pm.expect(jsonData.details.shortageItems).to.be.an('array');",
+              "    });",
+              "",
+              "} else if (expectedStatus === 400) {",
+              "    // Validation error case",
+              "    pm.test('Scenario ' + scenario + ': Validation error returned', function() {",
+              "        pm.expect(jsonData).to.have.property('message');",
+              "    });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{{request_body}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/client/beverage-orders",
+          "host": ["{{base_url}}"],
+          "path": ["api", "client", "beverage-orders"]
+        },
+        "description": "数据驱动测试请求。\n\n请求体由 Pre-request Script 根据 CSV 数据动态构建。"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

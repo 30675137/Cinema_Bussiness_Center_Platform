@@ -47,7 +47,7 @@ const OrderConfirm: React.FC = () => {
       const orderRequest: CreateBeverageOrderRequest = {
         storeId,
         items: items.map((item) => ({
-          beverageId: item.beverageId,
+          skuId: item.beverageId,
           selectedSpecs: item.selectedSpecs,
           quantity: item.quantity,
           customerNote: item.customerNote,

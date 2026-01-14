@@ -86,7 +86,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"beverageId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 2,\n      \"selectedSpecs\": {}\n    },\n    {\n      \"beverageId\": \"{{test_sku_id_2}}\",\n      \"quantity\": 1,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Postman automated test order\"\n}"
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"skuId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 2,\n      \"selectedSpecs\": {}\n    },\n    {\n      \"skuId\": \"{{test_sku_id_2}}\",\n      \"quantity\": 1,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Postman automated test order\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/client/beverage-orders",
@@ -160,7 +160,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"beverageId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 9999,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Insufficient inventory test\"\n}"
+              "raw": "{\n  \"storeId\": \"{{test_store_id}}\",\n  \"items\": [\n    {\n      \"skuId\": \"{{test_sku_id_1}}\",\n      \"quantity\": 9999,\n      \"selectedSpecs\": {}\n    }\n  ],\n  \"customerNote\": \"Insufficient inventory test\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/client/beverage-orders",

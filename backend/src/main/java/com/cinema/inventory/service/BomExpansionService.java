@@ -135,14 +135,41 @@ public class BomExpansionService {
             for (BomComponent component : components) {
                 BigDecimal componentQuantity = component.getQuantity().multiply(quantity);
 
-                // Recursively expand this component
-                expandRecursive(
-                        component.getComponentId(),
-                        componentQuantity,
-                        depth + 1,
-                        visitedSkus,
-                        aggregatedMaterials
-                );
+                // Determine component type and ID
+                String componentType = component.getComponentType();
+                UUID actualComponentId;
+                
+                if ("MATERIAL".equals(componentType)) {
+                    // Component is a Material, treat as leaf node (raw material)
+                    actualComponentId = component.getMaterialId();
+                    if (actualComponentId != null) {
+                        logger.debug("Component is MATERIAL type, treating as raw material: {}", actualComponentId);
+                        addToAggregatedMaterials(
+                                actualComponentId,
+                                "Material",
+                                componentQuantity,
+                                component.getUnit(),
+                                aggregatedMaterials
+                        );
+                    } else {
+                        logger.warn("MATERIAL type component has null materialId for finished product {}", skuId);
+                    }
+                } else {
+                    // Component is SKU type, recursively expand
+                    actualComponentId = component.getComponentId();
+                    if (actualComponentId != null) {
+                        logger.debug("Component is SKU type, expanding recursively: {}", actualComponentId);
+                        expandRecursive(
+                                actualComponentId,
+                                componentQuantity,
+                                depth + 1,
+                                visitedSkus,
+                                aggregatedMaterials
+                        );
+                    } else {
+                        logger.warn("SKU type component has null componentId for finished product {}", skuId);
+                    }
+                }
             }
         }
 

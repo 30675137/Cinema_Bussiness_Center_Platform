@@ -42,7 +42,7 @@ export type SpecType = 'SIZE' | 'TEMPERATURE' | 'SWEETNESS' | 'TOPPING'
  */
 export interface BeverageSpecDTO {
   id: string
-  beverageId: string
+  skuId: string // SKU ID
   specType: SpecType
   specName: string
   specCode: string
@@ -71,7 +71,7 @@ export interface SelectedSpec {
  * 订单项
  */
 export interface OrderItemDTO {
-  beverageId: string
+  skuId: string // SKU ID
   beverageName: string
   beverageImageUrl: string
   quantity: number
@@ -86,7 +86,7 @@ export interface OrderItemDTO {
 export interface CreateOrderRequest {
   storeId: string
   items: {
-    beverageId: string
+    skuId: string // SKU ID
     quantity: number
     selectedSpecs: Record<string, SelectedSpec>
   }[]

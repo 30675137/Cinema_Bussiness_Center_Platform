@@ -84,7 +84,7 @@ class BeverageOrderServiceTest {
 
         // Setup test request
         CreateBeverageOrderRequest.OrderItemRequest item = new CreateBeverageOrderRequest.OrderItemRequest();
-        item.setBeverageId(testBeverageId);
+        item.setSkuId(testBeverageId);
         item.setQuantity(2);
         item.setSelectedSpecs(new HashMap<>());
 

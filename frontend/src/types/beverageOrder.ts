@@ -28,10 +28,11 @@ export type OrderReservationStatus =
 
 /**
  * 订单商品项
+ * @clarification 2026-01-14: beverageId 实际存储的是 SKU ID
  */
 export interface BeverageOrderItem {
   id: string;
-  beverageId: string;
+  beverageId: string; // 实际为 SKU ID，字段名保持向后兼容
   beverageName: string;
   quantity: number;
   unitPrice: number;
@@ -106,11 +107,12 @@ export interface PageResponse<T> {
 
 /**
  * 创建订单请求 (C端)
+ * @clarification 2026-01-14: 使用 skuId 而非 beverageId
  */
 export interface CreateBeverageOrderRequest {
   storeId: string;
   items: {
-    beverageId: string;
+    skuId: string; // 使用 SKU ID
     quantity: number;
     selectedSpecs: Record<string, string>;
   }[];

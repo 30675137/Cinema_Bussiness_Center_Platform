@@ -59,10 +59,11 @@ public class CreateBeverageOrderRequest {
     public static class OrderItemRequest {
 
         /**
-         * 饮品ID
+         * SKU ID (商品规格ID)
+         * @clarification 2026-01-14: 使用SKU ID而非Beverage ID作为订单项商品标识
          */
-        @NotNull(message = "饮品ID不能为空")
-        private UUID beverageId;
+        @NotNull(message = "SKU ID不能为空")
+        private UUID skuId;
 
         /**
          * 选中的规格

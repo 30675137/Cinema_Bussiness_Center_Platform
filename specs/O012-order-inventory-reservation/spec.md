@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: "订单创建时预占：下单时自动调用预占服务，展开BOM计算物料需求，检查库存可用性，使用事务+行锁保证原子性扣减库存"
 
+## Clarifications
+
+### Session 2026-01-14
+
+- Q: 订单创建API中的商品标识符应使用什么ID类型？ → A: 使用 SKU ID，不使用 Beverage ID（饮品SPU ID）。API路径 `/api/client/beverage-orders` 中的 items[].beverageId 字段实际应接收 SKU ID 值，字段名保持 beverageId 但语义上传入的是 SKU ID。
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - 顾客下单时自动库存预占 (Priority: P1)
@@ -144,6 +150,8 @@
 - **FR-014**: 系统必须在预占库存时，同时记录操作人信息（操作员ID或顾客ID）、操作来源（POS/小程序/管理后台），便于审计追踪
 
 - **FR-015**: 系统当前版本不支持订单修改（数量或商品），顾客如需修改需先取消原订单（释放预占），再创建新订单（重新预占）
+
+- **FR-016**: 订单创建API (`/api/client/beverage-orders`) 的订单项 (`items[]`) 中使用 SKU ID 作为商品标识符，字段名为 `beverageId` 但实际传入 SKU 的 UUID。系统根据 SKU ID 查找对应的 BOM 配方进行库存预占。
 
 ### Key Entities
 
