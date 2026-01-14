@@ -1,5 +1,6 @@
 /**
  * @spec O011-order-checkout
+ * @spec O012-order-inventory-reservation
  * 订单确认页组件
  */
 import { View, Text, Image, ScrollView, Textarea } from '@tarojs/components'
@@ -8,7 +9,12 @@ import Taro from '@tarojs/taro'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/formatPrice'
 import { PaymentSheet } from '../../components/PaymentSheet'
-import { createOrder, saveOrder } from '../../services/orderService'
+import {
+  createOrder,
+  saveOrder,
+  createOrderWithReservation,
+  type InsufficientInventoryError,
+} from '../../services/orderService'
 import type { PaymentMethod } from '../../types/order'
 import './index.less'
 
@@ -63,18 +69,28 @@ const OrderConfirm = () => {
   }
 
   /**
-   * 处理支付方式选择
+   * 处理支付方式选择 (O012: 集成库存预占)
    */
-  const handlePaymentSelect = (method: PaymentMethod) => {
+  const handlePaymentSelect = async (method: PaymentMethod) => {
     setShowPaymentSheet(false)
     setIsPaymentLoading(true)
 
-    // Mock 支付延迟 1.5 秒
-    setTimeout(() => {
-      // 创建订单
-      const order = createOrder(cart.items, totalAmount, method, remark)
+    try {
+      // O012: 调用后端API创建订单并预占库存
+      const response = await createOrderWithReservation({
+        storeId: 'mock-store-001', // TODO: 从用户上下文获取门店ID
+        items: cart.items.map((item) => ({
+          beverageId: item.product.id,
+          quantity: item.quantity,
+          selectedSpecs: item.selectedOptions,
+        })),
+        customerNote: remark,
+      })
 
-      // 保存订单
+      // 预占成功，保存订单到本地
+      const order = createOrder(cart.items, totalAmount, method, remark)
+      order.id = response.data.orderId
+      order.orderNumber = response.data.orderNumber
       saveOrder(order)
 
       // 清空购物车
@@ -84,9 +100,36 @@ const OrderConfirm = () => {
 
       // 跳转到支付成功页
       Taro.redirectTo({
-        url: `/pages/order-success/index?orderNumber=${order.orderNumber}&pickupNumber=${order.pickupNumber}&totalAmount=${order.totalAmount}`
+        url: `/pages/order-success/index?orderNumber=${order.orderNumber}&pickupNumber=${order.pickupNumber}&totalAmount=${order.totalAmount}`,
       })
-    }, 1500)
+    } catch (error: any) {
+      setIsPaymentLoading(false)
+
+      // O012: 处理库存不足错误
+      if (error.code === 'ORD_BIZ_002') {
+        const inventoryError = error as InsufficientInventoryError
+        const shortageList = inventoryError.details.shortageItems
+          .map(
+            (item) =>
+              `${item.skuName}: 需要 ${item.requiredQty}${item.unit}，只剩 ${item.availableQty}${item.unit}`
+          )
+          .join('\n')
+
+        Taro.showModal({
+          title: '库存不足',
+          content: `以下商品库存不足，无法下单：\n\n${shortageList}`,
+          showCancel: false,
+          confirmText: '知道了',
+        })
+      } else {
+        // 其他错误
+        Taro.showToast({
+          title: error.message || '创建订单失败，请稍后重试',
+          icon: 'none',
+          duration: 3000,
+        })
+      }
+    }
   }
 
   /**

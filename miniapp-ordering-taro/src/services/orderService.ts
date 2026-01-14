@@ -1,11 +1,51 @@
 /**
  * @spec O011-order-checkout
+ * @spec O012-order-inventory-reservation
  * 订单服务 - 核心函数
  */
 import Taro from '@tarojs/taro'
 import type { CinemaOrder, OrderItem, PaymentMethod, PickupNumberCounter } from '../types/order'
 import { OrderStatus } from '../types/order'
 import type { CartItem } from '../types/cart'
+
+/**
+ * O012: 库存不足错误响应
+ */
+export interface InsufficientInventoryError {
+  code: 'ORD_BIZ_002'
+  message: string
+  details: {
+    shortageItems: Array<{
+      skuId: string
+      skuName: string
+      requiredQty: number
+      availableQty: number
+      unit: string
+    }>
+  }
+}
+
+/**
+ * O012: 订单创建响应
+ */
+export interface OrderCreationResponse {
+  code: string
+  message: string
+  data: {
+    orderId: string
+    orderNumber: string
+    status: string
+    totalAmount: number
+    reservationStatus?: 'RESERVED' | 'PARTIAL_RESERVED' | 'FAILED'
+    reservedItems?: Array<{
+      skuId: string
+      skuName: string
+      reservedQty: number
+      unit: string
+    }>
+    reservationExpiry?: string
+  }
+}
 
 /**
  * 生成 UUID v4
@@ -143,4 +183,77 @@ export const saveOrder = (order: CinemaOrder): void => {
  */
 export const getOrders = (): CinemaOrder[] => {
   return Taro.getStorageSync('orders') || []
+}
+
+/**
+ * O012: 创建订单并预占库存（调用后端API）
+ * 
+ * @param request 订单创建请求
+ * @returns 订单创建响应
+ * @throws InsufficientInventoryError 库存不足时抛出
+ */
+export const createOrderWithReservation = async (
+  request: {
+    storeId: string
+    items: Array<{
+      beverageId: string
+      quantity: number
+      selectedSpecs: Record<string, string>
+    }>
+    customerNote?: string
+  }
+): Promise<OrderCreationResponse> => {
+  try {
+    const response = await Taro.request({
+      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/beverage-orders`,
+      method: 'POST',
+      data: request,
+      header: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (response.statusCode === 201) {
+      return response.data as OrderCreationResponse
+    } else if (response.statusCode === 409) {
+      // 库存不足
+      throw response.data as InsufficientInventoryError
+    } else {
+      throw new Error(response.data.message || '创建订单失败')
+    }
+  } catch (error: any) {
+    console.error('createOrderWithReservation error:', error)
+    throw error
+  }
+}
+
+/**
+ * O012: 取消订单并释放预占（调用后端API）
+ * 
+ * @param orderId 订单ID
+ * @param cancelReason 取消原因
+ */
+export const cancelOrderWithRelease = async (
+  orderId: string,
+  cancelReason?: string
+): Promise<void> => {
+  try {
+    const response = await Taro.request({
+      url: `${process.env.TARO_APP_API_BASE_URL || 'http://localhost:8080'}/api/client/beverage-orders/${orderId}/cancel`,
+      method: 'POST',
+      data: {
+        reason: cancelReason || '用户取消',
+      },
+      header: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (response.statusCode !== 200) {
+      throw new Error(response.data.message || '取消订单失败')
+    }
+  } catch (error: any) {
+    console.error('cancelOrderWithRelease error:', error)
+    throw error
+  }
 }
