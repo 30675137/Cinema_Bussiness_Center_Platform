@@ -422,9 +422,9 @@
               "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_rum_id}}\",\n  \"on_hand_qty\": 5000,\n  \"available_qty\": 5000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 500\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
-              "host": ["{{supabase_url}}"],
-              "path": ["rest", "v1", "store_inventory"]
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
             },
             "description": "直接通过Supabase REST API初始化朗姆酒库存：5000ml（使用service_role_key绕过RLS策略）"
           },
@@ -478,9 +478,9 @@
               "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_mint_id}}\",\n  \"on_hand_qty\": 500,\n  \"available_qty\": 500,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 50\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
-              "host": ["{{supabase_url}}"],
-              "path": ["rest", "v1", "store_inventory"]
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
             },
             "description": "直接通过Supabase REST API初始化薄荷叶库存：500g（使用service_role_key绕过RLS策略）"
           },
@@ -534,9 +534,9 @@
               "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_soda_id}}\",\n  \"on_hand_qty\": 20000,\n  \"available_qty\": 20000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 2000\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
-              "host": ["{{supabase_url}}"],
-              "path": ["rest", "v1", "store_inventory"]
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
             },
             "description": "直接通过Supabase REST API初始化苏打水库存：20000ml（使用service_role_key绕过RLS策略）"
           },
@@ -630,9 +630,9 @@
               }
             ],
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/inventory_reservations?sku_id=in.({{test_sku_id_1}},{{test_sku_id_2}})",
-              "host": ["{{supabase_url}}"],
-              "path": ["rest", "v1", "inventory_reservations"],
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/inventory_reservations?sku_id=in.({{test_sku_id_1}},{{test_sku_id_2}})",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["inventory_reservations"],
               "query": [
                 {
                   "key": "sku_id",
@@ -674,9 +674,9 @@
               }
             ],
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/beverage_orders?store_id=eq.00000000-0000-0000-0000-000000000099",
-              "host": ["{{supabase_url}}"],
-              "path": ["rest", "v1", "beverage_orders"],
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/beverage_orders?store_id=eq.00000000-0000-0000-0000-000000000099",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["beverage_orders"],
               "query": [
                 {
                   "key": "store_id",
@@ -739,6 +739,11 @@
     {
       "key": "supabase_url",
       "value": "https://fxhgyxceqrmnpezluaht.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "supabase_rest_path",
+      "value": "/rest/v1",
       "type": "string"
     },
     {
