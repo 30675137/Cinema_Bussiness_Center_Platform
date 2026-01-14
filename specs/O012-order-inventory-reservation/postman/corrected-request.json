@@ -2,12 +2,12 @@
   "storeId": "00000000-0000-0000-0000-000000000099",
   "items": [
     {
-      "beverageId": "80430c51-3fb0-4de6-be29-23bc24ac748b",
+      "skuId": "80430c51-3fb0-4de6-be29-23bc24ac748b",
       "quantity": 2,
       "selectedSpecs": {}
     },
     {
-      "beverageId": "550e8400-e29b-41d4-a716-446655440026",
+      "skuId": "550e8400-e29b-41d4-a716-446655440026",
       "quantity": 1,
       "selectedSpecs": {}
     }

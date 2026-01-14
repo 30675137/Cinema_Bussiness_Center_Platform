@@ -139,7 +139,7 @@ export interface Beverage {
  */
 export interface BeverageSpec {
   id: string
-  beverageId: string
+  skuId: string // SKU ID
   specType: 'SIZE' | 'TEMPERATURE' | 'SWEETNESS' | 'TOPPING'
   specName: string
   priceAdjustment: number
@@ -176,7 +176,7 @@ export interface BeverageOrder {
 export interface BeverageOrderItem {
   id: string
   orderId: string
-  beverageId: string
+  skuId: string // SKU ID
   beverageName: string
   beverageImageUrl: string
   selectedSpecs: Record<string, string>
@@ -188,11 +188,12 @@ export interface BeverageOrderItem {
 
 /**
  * 创建订单请求
+ * @clarification 2026-01-14: 使用 skuId 而非 beverageId
  */
 export interface CreateOrderRequest {
   storeId: string
   items: Array<{
-    beverageId: string
+    skuId: string // 使用 SKU ID
     selectedSpecs: Record<string, string>
     quantity: number
     customerNote?: string

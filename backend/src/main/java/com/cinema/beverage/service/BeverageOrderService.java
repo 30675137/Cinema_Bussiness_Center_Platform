@@ -22,19 +22,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cinema.beverage.dto.BeverageOrderDTO;
 import com.cinema.beverage.dto.CreateBeverageOrderRequest;
-import com.cinema.beverage.entity.Beverage;
 import com.cinema.beverage.entity.BeverageOrder;
 import com.cinema.beverage.entity.BeverageOrderItem;
-import com.cinema.beverage.entity.BeverageSpec;
 import com.cinema.beverage.entity.QueueNumber;
-import com.cinema.beverage.exception.BeverageNotFoundException;
 import com.cinema.beverage.exception.OrderNotFoundException;
 import com.cinema.beverage.repository.BeverageOrderRepository;
-import com.cinema.beverage.repository.BeverageRepository;
-import com.cinema.beverage.repository.BeverageSpecRepository;
+import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.domain.enums.SkuType;
+import com.cinema.hallstore.repository.SkuJpaRepository;
 import com.cinema.inventory.entity.InventoryReservation;
 import com.cinema.inventory.exception.InsufficientInventoryException;
 import com.cinema.inventory.service.InventoryReservationService;
+import com.cinema.product.exception.SkuNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -59,8 +58,7 @@ public class BeverageOrderService {
     private static final Logger logger = LoggerFactory.getLogger(BeverageOrderService.class);
 
     private final BeverageOrderRepository orderRepository;
-    private final BeverageRepository beverageRepository;
-    private final BeverageSpecRepository beverageSpecRepository;
+    private final SkuJpaRepository skuRepository; // @clarification 2026-01-14: 使用SKU表替代Beverage表
     private final OrderNumberGenerator orderNumberGenerator;
     private final QueueNumberGenerator queueNumberGenerator;
     private final ObjectMapper objectMapper;
@@ -153,6 +151,8 @@ public class BeverageOrderService {
 
     /**
      * 计算订单总价
+     * @clarification 2026-01-14: 使用SKU ID查询SKU表获取价格
+     * @clarification 2026-01-14: 验证SKU类型，仅成品和套餐可下单
      *
      * @param request 创建订单请求
      * @return 订单总价
@@ -161,24 +161,24 @@ public class BeverageOrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (CreateBeverageOrderRequest.OrderItemRequest item : request.getItems()) {
-            // 查询饮品
-            Beverage beverage = beverageRepository.findById(item.getBeverageId())
-                    .orElseThrow(() -> new BeverageNotFoundException(item.getBeverageId().toString()));
+            // 查询SKU
+            Sku sku = skuRepository.findById(item.getSkuId())
+                    .orElseThrow(() -> new SkuNotFoundException(item.getSkuId()));
 
-            // 基础价格
-            BigDecimal itemPrice = beverage.getBasePrice();
-
-            // 累加规格调整价格
-            List<BeverageSpec> specs = beverageSpecRepository.findByBeverageIdOrderBySpecTypeAscSortOrderAsc(
-                    item.getBeverageId()
-            );
-
-            for (BeverageSpec spec : specs) {
-                String selectedValue = item.getSelectedSpecs().get(spec.getSpecType().name().toLowerCase());
-                if (selectedValue != null && selectedValue.equals(spec.getSpecName())) {
-                    itemPrice = itemPrice.add(spec.getPriceAdjustment());
-                }
+            // 验证SKU类型：只有成品(FINISHED_PRODUCT)和套餐(COMBO)可以下单
+            if (sku.getSkuType() != SkuType.FINISHED_PRODUCT && sku.getSkuType() != SkuType.COMBO) {
+                String errorMsg = String.format(
+                    "SKU [%s] 类型为 [%s]，不能用于创建订单。只有成品(FINISHED_PRODUCT)和套餐(COMBO)可以下单",
+                    sku.getName(),
+                    sku.getSkuType()
+                );
+                logger.error("OrderCreation - VALIDATION_FAILED: skuId={}, skuType={}, reason=INVALID_SKU_TYPE",
+                        sku.getId(), sku.getSkuType());
+                throw new IllegalArgumentException(errorMsg);
             }
+
+            // SKU价格 (SKU已包含规格价格，无需额外计算)
+            BigDecimal itemPrice = sku.getPrice();
 
             // 乘以数量
             BigDecimal itemTotal = itemPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
@@ -190,14 +190,15 @@ public class BeverageOrderService {
 
     /**
      * 创建订单项
+     * @clarification 2026-01-14: 使用SKU ID查询SKU表
      */
     private BeverageOrderItem createOrderItem(BeverageOrder order, CreateBeverageOrderRequest.OrderItemRequest itemRequest) {
-        // 查询饮品
-        Beverage beverage = beverageRepository.findById(itemRequest.getBeverageId())
-                .orElseThrow(() -> new BeverageNotFoundException(itemRequest.getBeverageId().toString()));
+        // 查询SKU
+        Sku sku = skuRepository.findById(itemRequest.getSkuId())
+                .orElseThrow(() -> new SkuNotFoundException(itemRequest.getSkuId()));
 
-        // 计算单价（基础价格 + 规格调整）
-        BigDecimal unitPrice = calculateUnitPrice(beverage, itemRequest.getSelectedSpecs());
+        // SKU价格
+        BigDecimal unitPrice = sku.getPrice();
 
         // 计算小计
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
@@ -212,35 +213,15 @@ public class BeverageOrderService {
         }
 
         return BeverageOrderItem.builder()
-                .beverageId(beverage.getId())
-                .beverageName(beverage.getName())
-                .beverageImageUrl(beverage.getImageUrl())
+                .beverageId(sku.getId()) // @clarification: 存储SKU ID
+                .beverageName(sku.getName())
+                .beverageImageUrl(null) // SKU无图片字段，后续可从关联表获取
                 .selectedSpecs(selectedSpecsJson)
                 .quantity(itemRequest.getQuantity())
                 .unitPrice(unitPrice)
                 .subtotal(subtotal)
                 .customerNote(itemRequest.getCustomerNote())
                 .build();
-    }
-
-    /**
-     * 计算单价（基础价格 + 规格调整）
-     */
-    private BigDecimal calculateUnitPrice(Beverage beverage, java.util.Map<String, String> selectedSpecs) {
-        BigDecimal price = beverage.getBasePrice();
-
-        List<BeverageSpec> specs = beverageSpecRepository.findByBeverageIdOrderBySpecTypeAscSortOrderAsc(
-                beverage.getId()
-        );
-
-        for (BeverageSpec spec : specs) {
-            String selectedValue = selectedSpecs.get(spec.getSpecType().name().toLowerCase());
-            if (selectedValue != null && selectedValue.equals(spec.getSpecName())) {
-                price = price.add(spec.getPriceAdjustment());
-            }
-        }
-
-        return price;
     }
 
     /**
@@ -393,7 +374,7 @@ public class BeverageOrderService {
 
     /**
      * O012: 提取SKU数量映射表
-     * 从订单请求中提取饮品ID和数量,用于库存预占
+     * @clarification 2026-01-14: 前端直接传入SKU ID，无需再查询转换
      *
      * @param request 订单创建请求
      * @return SKU ID到数量的映射
@@ -402,13 +383,8 @@ public class BeverageOrderService {
         Map<UUID, BigDecimal> skuQuantities = new HashMap<>();
         
         for (CreateBeverageOrderRequest.OrderItemRequest item : request.getItems()) {
-            // 查询饮品获取SKU ID
-            Beverage beverage = beverageRepository.findById(item.getBeverageId())
-                    .orElseThrow(() -> new BeverageNotFoundException(item.getBeverageId().toString()));
-            
-            // 注意: 这里假设 beverage 本身就是 SKU
-            // 如果需要通过规格查找不同的SKU,需要进一步查询
-            UUID skuId = beverage.getId();
+            // 直接使用传入的SKU ID
+            UUID skuId = item.getSkuId();
             BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
             
             // 如果同SKU多次出现,累加数量
