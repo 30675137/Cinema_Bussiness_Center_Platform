@@ -3,6 +3,7 @@
  */
 package com.cinema.material.repository;
 
+import com.cinema.material.domain.MaterialCategory;
 import com.cinema.material.entity.Material;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,7 +37,7 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
      * @param category material category (RAW_MATERIAL, PACKAGING)
      * @return list of materials in the category
      */
-    List<Material> findByCategory(Material.MaterialCategory category);
+    List<Material> findByCategory(MaterialCategory category);
 
     /**
      * Find all materials by status
@@ -53,7 +54,7 @@ public interface MaterialRepository extends JpaRepository<Material, UUID> {
      * @param status material status
      * @return list of active materials in the category
      */
-    List<Material> findByCategoryAndStatus(Material.MaterialCategory category, String status);
+    List<Material> findByCategoryAndStatus(MaterialCategory category, String status);
 
     /**
      * Check if a material code exists

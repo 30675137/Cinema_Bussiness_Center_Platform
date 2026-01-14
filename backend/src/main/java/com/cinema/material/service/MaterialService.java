@@ -1,6 +1,7 @@
 /** @spec M001-material-unit-system */
 package com.cinema.material.service;
 
+import com.cinema.material.domain.MaterialCategory;
 import com.cinema.material.entity.Material;
 import com.cinema.material.repository.MaterialRepository;
 import com.cinema.unit.domain.Unit;
@@ -39,7 +40,7 @@ public class MaterialService {
 
         // 自动生成物料编码（如果未提供）
         if (material.getCode() == null || material.getCode().isEmpty()) {
-            String prefix = material.getCategory() == Material.MaterialCategory.RAW_MATERIAL
+            String prefix = material.getCategory() == MaterialCategory.RAW_MATERIAL
                     ? "MAT-RAW-"
                     : "MAT-PKG-";
             Long sequence = materialRepository.getNextCodeSequence();
@@ -80,7 +81,7 @@ public class MaterialService {
      * 按分类查询物料列表
      */
     @Transactional(readOnly = true)
-    public List<Material> findByCategory(Material.MaterialCategory category) {
+    public List<Material> findByCategory(MaterialCategory category) {
         return materialRepository.findByCategory(category);
     }
 

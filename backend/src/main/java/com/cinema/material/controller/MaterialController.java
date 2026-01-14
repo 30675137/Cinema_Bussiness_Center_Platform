@@ -1,13 +1,9 @@
-/** @spec M001-material-unit-system */
 package com.cinema.material.controller;
 
-import com.cinema.common.dto.ApiResponse;
-import com.cinema.material.dto.MaterialCreateRequest;
+import com.cinema.material.domain.MaterialCategory;
+import com.cinema.material.dto.MaterialRequest;
 import com.cinema.material.dto.MaterialResponse;
-import com.cinema.material.dto.MaterialUpdateRequest;
-import com.cinema.material.entity.Material;
-import com.cinema.material.service.MaterialService;
-import com.cinema.unit.domain.Unit;
+import com.cinema.material.service.IMaterialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,118 +13,91 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+/**
+ * M001: 物料管理控制器
+ * 
+ * @author Cinema System
+ * @since 2026-01-14
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/materials")
 @RequiredArgsConstructor
 public class MaterialController {
 
-    private final MaterialService materialService;
+    private final IMaterialService materialService;
 
     /**
      * 创建物料
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<MaterialResponse>> createMaterial(
-            @Valid @RequestBody MaterialCreateRequest request) {
-        log.info("Creating material: {}", request.getName());
-
-        Material material = Material.builder()
-                .code(request.getCode())
-                .name(request.getName())
-                .category(request.getCategory())
-                .inventoryUnit(Unit.builder().id(request.getInventoryUnitId()).build())
-                .purchaseUnit(Unit.builder().id(request.getPurchaseUnitId()).build())
-                .conversionRate(request.getConversionRate())
-                .useGlobalConversion(request.getUseGlobalConversion())
-                .description(request.getDescription())
-                .specification(request.getSpecification())
-                .status("ACTIVE")
-                .build();
-
-        Material created = materialService.createMaterial(material);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(MaterialResponse.fromEntity(created)));
-    }
-
-    /**
-     * 获取所有物料（可选按分类筛选）
-     */
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<MaterialResponse>>> getAllMaterials(
-            @RequestParam(required = false) Material.MaterialCategory category) {
-        log.info("Getting all materials, category: {}", category);
-
-        List<Material> materials = category != null
-                ? materialService.findByCategory(category)
-                : materialService.findAll();
-
-        List<MaterialResponse> response = materials.stream()
-                .map(MaterialResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(ApiResponse.success(response));
-    }
-
-    /**
-     * 按ID获取物料
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MaterialResponse>> getMaterialById(@PathVariable UUID id) {
-        log.info("Getting material by ID: {}", id);
-
-        Material material = materialService.findById(id);
-        return ResponseEntity.ok(ApiResponse.success(MaterialResponse.fromEntity(material)));
-    }
-
-    /**
-     * 按编码获取物料
-     */
-    @GetMapping("/code/{code}")
-    public ResponseEntity<ApiResponse<MaterialResponse>> getMaterialByCode(@PathVariable String code) {
-        log.info("Getting material by code: {}", code);
-
-        Material material = materialService.findByCode(code);
-        return ResponseEntity.ok(ApiResponse.success(MaterialResponse.fromEntity(material)));
+    public ResponseEntity<MaterialResponse> createMaterial(@Valid @RequestBody MaterialRequest request) {
+        log.info("Received request to create material: {}", request.getName());
+        MaterialResponse response = materialService.createMaterial(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
      * 更新物料
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MaterialResponse>> updateMaterial(
+    public ResponseEntity<MaterialResponse> updateMaterial(
             @PathVariable UUID id,
-            @Valid @RequestBody MaterialUpdateRequest request) {
-        log.info("Updating material: {}", id);
-
-        Material materialUpdate = Material.builder()
-                .name(request.getName())
-                .inventoryUnit(request.getInventoryUnitId() != null
-                        ? Unit.builder().id(request.getInventoryUnitId()).build()
-                        : null)
-                .purchaseUnit(request.getPurchaseUnitId() != null
-                        ? Unit.builder().id(request.getPurchaseUnitId()).build()
-                        : null)
-                .conversionRate(request.getConversionRate())
-                .useGlobalConversion(request.getUseGlobalConversion())
-                .description(request.getDescription())
-                .specification(request.getSpecification())
-                .build();
-
-        Material updated = materialService.updateMaterial(id, materialUpdate);
-        return ResponseEntity.ok(ApiResponse.success(MaterialResponse.fromEntity(updated)));
+            @Valid @RequestBody MaterialRequest request) {
+        log.info("Received request to update material: {}", id);
+        MaterialResponse response = materialService.updateMaterial(id, request);
+        return ResponseEntity.ok(response);
     }
 
     /**
      * 删除物料
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteMaterial(@PathVariable UUID id) {
-        log.info("Deleting material: {}", id);
-
+    public ResponseEntity<Void> deleteMaterial(@PathVariable UUID id) {
+        log.info("Received request to delete material: {}", id);
         materialService.deleteMaterial(id);
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 根据ID获取物料
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<MaterialResponse> getMaterialById(@PathVariable UUID id) {
+        log.info("Received request to get material by id: {}", id);
+        MaterialResponse response = materialService.getMaterialById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 根据编码获取物料
+     */
+    @GetMapping("/code/{code}")
+    public ResponseEntity<MaterialResponse> getMaterialByCode(@PathVariable String code) {
+        log.info("Received request to get material by code: {}", code);
+        MaterialResponse response = materialService.getMaterialByCode(code);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 获取所有物料 (支持按分类和状态筛选)
+     */
+    @GetMapping
+    public ResponseEntity<List<MaterialResponse>> getAllMaterials(
+            @RequestParam(required = false) MaterialCategory category,
+            @RequestParam(required = false) String status) {
+        log.info("Received request to get all materials, category: {}, status: {}", category, status);
+        
+        List<MaterialResponse> responses;
+        if (category != null && status != null) {
+            responses = materialService.getMaterialsByCategoryAndStatus(category, status);
+        } else if (category != null) {
+            responses = materialService.getMaterialsByCategory(category);
+        } else {
+            responses = materialService.getAllMaterials();
+        }
+        
+        return ResponseEntity.ok(responses);
     }
 }

@@ -1,6 +1,8 @@
 /** @spec M001-material-unit-system */
 package com.cinema.material.dto;
 
+import com.cinema.material.domain.MaterialCategory;
+
 import com.cinema.material.entity.Material;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
@@ -22,7 +24,7 @@ public class MaterialCreateRequest {
     private String name;
 
     @NotNull(message = "Material category is required")
-    private Material.MaterialCategory category;
+    private MaterialCategory category;
 
     @NotNull(message = "Inventory unit ID is required")
     private UUID inventoryUnitId;
