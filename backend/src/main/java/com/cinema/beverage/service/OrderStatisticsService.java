@@ -122,10 +122,13 @@ public class OrderStatisticsService {
             }
 
             for (BeverageOrderItem item : order.getItems()) {
-                aggregateMap.compute(item.getBeverageId(), (id, existing) -> {
+                // 2026-01-14: 使用beverage_id字段（实际存储的是SKU ID）
+                UUID beverageId = item.getBeverageId();
+                
+                aggregateMap.compute(beverageId, (id, existing) -> {
                     if (existing == null) {
                         return new BeverageItemAggregate(
-                                item.getBeverageId(),
+                                beverageId,
                                 item.getBeverageName(),
                                 item.getQuantity(),
                                 item.getSubtotal()

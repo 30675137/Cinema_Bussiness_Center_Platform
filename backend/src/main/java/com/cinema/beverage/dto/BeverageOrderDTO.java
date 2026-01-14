@@ -120,6 +120,12 @@ public class BeverageOrderDTO {
     private String queueNumber;
 
     /**
+     * 库存预占状态
+     * 2026-01-14: 新增用于E2E测试
+     */
+    private String reservationStatus;
+
+    /**
      * 从实体转换为DTO
      */
     public static BeverageOrderDTO fromEntity(BeverageOrder order) {
@@ -130,6 +136,14 @@ public class BeverageOrderDTO {
      * 从实体转换为DTO（带取餐号）
      */
     public static BeverageOrderDTO fromEntity(BeverageOrder order, String queueNumber) {
+        return fromEntity(order, queueNumber, null);
+    }
+
+    /**
+     * 从实体转换为DTO（带取餐号和库存预占状态）
+     * 2026-01-14: 新增reservationStatus参数
+     */
+    public static BeverageOrderDTO fromEntity(BeverageOrder order, String queueNumber, String reservationStatus) {
         if (order == null) {
             return null;
         }
@@ -137,6 +151,16 @@ public class BeverageOrderDTO {
         List<OrderItemDTO> itemDTOs = order.getItems() != null
                 ? order.getItems().stream().map(OrderItemDTO::fromEntity).collect(Collectors.toList())
                 : List.of();
+
+        // 计算预占状态（如果未传入）
+        String resStatus = reservationStatus;
+        if (resStatus == null) {
+            resStatus = switch (order.getStatus()) {
+                case CANCELLED -> "CANCELLED";
+                case PENDING_PAYMENT, PENDING_PRODUCTION, PRODUCING, COMPLETED -> "RESERVED";
+                case DELIVERED -> "RELEASED";
+            };
+        }
 
         return BeverageOrderDTO.builder()
                 .id(order.getId())
@@ -157,6 +181,7 @@ public class BeverageOrderDTO {
                 .updatedAt(order.getUpdatedAt())
                 .items(itemDTOs)
                 .queueNumber(queueNumber)
+                .reservationStatus(resStatus)
                 .build();
     }
 
@@ -175,8 +200,14 @@ public class BeverageOrderDTO {
 
         /**
          * 饮品ID
+         * 2026-01-14: 使用beverage_id字段（实际存储SKU ID）
          */
         private UUID beverageId;
+
+        /**
+         * SKU ID（2026-01-14重构后的主字段）
+         */
+        private UUID skuId;
 
         /**
          * 饮品名称
@@ -215,15 +246,20 @@ public class BeverageOrderDTO {
 
         /**
          * 从实体转换为DTO
+         * 2026-01-14：支持新旧字段兼容
          */
         public static OrderItemDTO fromEntity(BeverageOrderItem item) {
             if (item == null) {
                 return null;
             }
 
+            // 2026-01-14: 使用beverage_id字段（实际存储的是SKU ID）
+            UUID beverageId = item.getBeverageId();
+
             return OrderItemDTO.builder()
                     .id(item.getId())
-                    .beverageId(item.getBeverageId())
+                    .beverageId(beverageId) // 实际存储SKU ID
+                    .skuId(beverageId) // skuId字段使用相同值
                     .beverageName(item.getBeverageName())
                     .beverageImageUrl(item.getBeverageImageUrl())
                     .selectedSpecs(item.getSelectedSpecs())

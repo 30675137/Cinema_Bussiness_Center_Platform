@@ -52,7 +52,8 @@ public class BeverageOrderItem {
     private BeverageOrder order;
 
     /**
-     * 饮品ID (引用，非外键)
+     * 饮品ID（来自 beverages 表或 skus 表）
+     * 2026-01-14: 暂不重构，使用现有的beverage_id字段
      */
     @NotNull(message = "饮品ID不能为空")
     @Column(name = "beverage_id", nullable = false, columnDefinition = "uuid")

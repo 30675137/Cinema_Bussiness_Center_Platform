@@ -111,4 +111,27 @@ public class BomController {
                     .body(ApiResponse.failure("VALIDATION_ERROR", e.getMessage(), null));
         }
     }
+
+    /**
+     * 删除成品SKU的BOM配置（清空所有配方）
+     * DELETE /api/skus/{id}/bom
+     * 
+     * @spec T009-e2e-postman-flow-test
+     * @param id 成品SKU ID
+     */
+    @DeleteMapping("/{id}/bom")
+    public ResponseEntity<ApiResponse<Void>> deleteBom(@PathVariable UUID id) {
+        try {
+            // 通过更新空列表来清空BOM
+            skuService.updateBom(id, java.util.List.of(), null);
+            return ResponseEntity.ok(ApiResponse.success(null));
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("不存在")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.failure("SKU_NOT_FOUND", e.getMessage(), null));
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.failure("VALIDATION_ERROR", e.getMessage(), null));
+        }
+    }
 }

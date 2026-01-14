@@ -96,29 +96,7 @@ public class BeverageOrderService {
         // 2. 计算订单总价
         BigDecimal totalPrice = calculateOrderTotal(request);
 
-        // 3. O012: 调用库存预占服务
-        Map<UUID, BigDecimal> skuQuantities = extractSkuQuantities(request);
-        List<InventoryReservation> reservations;
-        
-        try {
-            // 注意: orderId 此时为null，稍后更新
-            reservations = inventoryReservationService.reserveInventory(
-                null, 
-                request.getStoreId(), 
-                skuQuantities
-            );
-            
-            logger.info("OrderCreation - INVENTORY_RESERVED: orderNumber={}, reservationCount={}",
-                    orderNumber, reservations.size());
-                    
-        } catch (InsufficientInventoryException e) {
-            // 库存不足,记录日志并抛出异常(事务会自动回滚)
-            logger.warn("OrderCreation - FAILED: orderNumber={}, reason=INSUFFICIENT_INVENTORY, shortageCount={}",
-                    orderNumber, e.getShortages().size());
-            throw e; // 传递给Controller层处理
-        }
-
-        // 4. 创建订单
+        // 3. 创建订单对象
         BeverageOrder order = BeverageOrder.builder()
                 .orderNumber(orderNumber)
                 .userId(userId)
@@ -128,18 +106,35 @@ public class BeverageOrderService {
                 .customerNote(request.getCustomerNote())
                 .build();
 
-        // 5. 创建订单项
+        // 4. 创建订单项
         for (CreateBeverageOrderRequest.OrderItemRequest itemRequest : request.getItems()) {
             BeverageOrderItem orderItem = createOrderItem(order, itemRequest);
             order.addItem(orderItem);
         }
 
-        // 6. 保存订单
+        // 5. 保存订单（获得orderId）
         BeverageOrder savedOrder = orderRepository.save(order);
         
-        // 7. O012: 更新预占记录的order_id
-        for (InventoryReservation reservation : reservations) {
-            reservation.setOrderId(savedOrder.getId());
+        // 6. O012: 调用库存预占服务（传入真实的orderId）
+        // 2026-01-14: 重构 - 先创建订单再预占库存，确保预占记录始终有正确的order_id
+        Map<UUID, BigDecimal> skuQuantities = extractSkuQuantities(request);
+        List<InventoryReservation> reservations;
+        
+        try {
+            reservations = inventoryReservationService.reserveInventory(
+                savedOrder.getId(),  // 传入真实的orderId
+                request.getStoreId(), 
+                skuQuantities
+            );
+            
+            logger.info("OrderCreation - INVENTORY_RESERVED: orderNumber={}, orderId={}, reservationCount={}",
+                    orderNumber, savedOrder.getId(), reservations.size());
+                    
+        } catch (InsufficientInventoryException e) {
+            // 库存不足,记录日志并抛出异常(事务会自动回滚，包括已保存的订单)
+            logger.warn("OrderCreation - FAILED: orderNumber={}, orderId={}, reason=INSUFFICIENT_INVENTORY, shortageCount={}",
+                    orderNumber, savedOrder.getId(), e.getShortages().size());
+            throw e; // 传递给Controller层处理，事务回滚
         }
 
         // Structured logging for order creation success (FR-027)
@@ -190,7 +185,7 @@ public class BeverageOrderService {
 
     /**
      * 创建订单项
-     * @clarification 2026-01-14: 使用SKU ID查询SKU表
+     * 2026-01-14: 使用现有的beverage_id字段，存储SKU ID
      */
     private BeverageOrderItem createOrderItem(BeverageOrder order, CreateBeverageOrderRequest.OrderItemRequest itemRequest) {
         // 查询SKU
@@ -213,7 +208,7 @@ public class BeverageOrderService {
         }
 
         return BeverageOrderItem.builder()
-                .beverageId(sku.getId()) // @clarification: 存储SKU ID
+                .beverageId(sku.getId()) // 使用beverage_id字段存储SKU ID
                 .beverageName(sku.getName())
                 .beverageImageUrl(null) // SKU无图片字段，后续可从关联表获取
                 .selectedSpecs(selectedSpecsJson)

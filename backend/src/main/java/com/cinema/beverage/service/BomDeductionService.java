@@ -210,7 +210,9 @@ public class BomDeductionService {
 
         for (BeverageOrderItem orderItem : order.getItems()) {
             // 获取饮品配方
-            List<BomItem> bomItems = bomRecipeService.getRecipeByBeverageId(orderItem.getBeverageId());
+            // 2026-01-14: 使用beverage_id字段（实际存储的是SKU ID）
+            UUID beverageId = orderItem.getBeverageId();
+            List<BomItem> bomItems = bomRecipeService.getRecipeByBeverageId(beverageId);
 
             for (BomItem bomItem : bomItems) {
                 int totalQuantity = bomItem.getQuantity() * orderItem.getQuantity();

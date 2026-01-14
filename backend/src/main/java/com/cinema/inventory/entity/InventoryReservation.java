@@ -37,6 +37,10 @@ public class InventoryReservation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    /**
+     * 订单ID
+     * 2026-01-14: 重构后保持NOT NULL约束 - 先创建订单再预占库存，确保预占记录始终有正确的order_id
+     */
     @Column(name = "order_id", nullable = false)
     private UUID orderId;
 

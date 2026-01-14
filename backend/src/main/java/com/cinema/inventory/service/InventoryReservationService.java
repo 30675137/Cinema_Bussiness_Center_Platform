@@ -77,7 +77,7 @@ public class InventoryReservationService {
      * 5. Create reservation records
      * 6. Create BOM snapshots
      *
-     * @param orderId Order ID
+     * @param orderId Order ID (2026-01-14: 必须NOT NULL - 在调用前先创建订单获得ID)
      * @param storeId Store ID
      * @param items Map of SKU ID to quantity
      * @return List of created reservations
