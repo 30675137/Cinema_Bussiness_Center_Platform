@@ -75,12 +75,13 @@ check_feature_branch() {
         return 0
     fi
 
-    # Support both formats:
+    # Support multiple formats:
     # - Legacy: 001-feature-name (pure numeric)
     # - New: X###-feature-name (module prefix + numeric)
-    if [[ ! "$branch" =~ ^([A-Z][0-9]{3}|[0-9]{3})- ]]; then
+    # - Git Flow: feat/X###-feature-name or feat/###-feature-name
+    if [[ ! "$branch" =~ ^(feat/)?([A-Z][0-9]{3}|[0-9]{3})- ]]; then
         echo "ERROR: Not on a feature branch. Current branch: $branch" >&2
-        echo "Feature branches should be named like: 001-feature-name or M002-feature-name" >&2
+        echo "Feature branches should be named like: feat/O012-feature-name, O012-feature-name, or 001-feature-name" >&2
         return 1
     fi
 
@@ -96,6 +97,9 @@ find_feature_dir_by_prefix() {
     local repo_root="$1"
     local branch_name="$2"
     local specs_dir="$repo_root/specs"
+
+    # Strip feat/ prefix if present
+    branch_name="${branch_name#feat/}"
 
     # Extract prefix from branch:
     # - New format: X### (e.g., "M002" from "M002-material-filter")

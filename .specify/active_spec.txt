@@ -1,1 +1,1 @@
-specs/M001-material-unit-system
+O012-order-inventory-reservation
