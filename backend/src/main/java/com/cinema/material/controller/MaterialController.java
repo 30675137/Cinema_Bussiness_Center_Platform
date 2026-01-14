@@ -8,11 +8,13 @@ package com.cinema.material.controller;
 import com.cinema.common.dto.ApiResponse;
 import com.cinema.material.dto.MaterialCreateRequest;
 import com.cinema.material.dto.MaterialFilterDTO;
+import com.cinema.material.dto.MaterialImportResultDTO;
 import com.cinema.material.dto.MaterialResponse;
 import com.cinema.material.dto.MaterialUpdateRequest;
 import com.cinema.material.entity.Material;
 import com.cinema.material.entity.MaterialStatus;
 import com.cinema.material.service.MaterialExportService;
+import com.cinema.material.service.MaterialImportService;
 import com.cinema.material.service.MaterialService;
 import com.cinema.unit.entity.Unit;
 import jakarta.validation.Valid;
@@ -44,6 +46,7 @@ public class MaterialController {
 
     private final MaterialService materialService;
     private final MaterialExportService materialExportService;
+    private final MaterialImportService materialImportService;
 
     /**
      * 创建物料
@@ -257,6 +260,97 @@ public class MaterialController {
         } catch (Exception e) {
             log.error("Export failed with unexpected error", e);
             throw new RuntimeException("导出失败：" + e.getMessage());
+        }
+    }
+
+    // ========== M002-material-filter: US3 - 批量导入 ==========
+
+    /**
+     * 预览导入数据（不保存到数据库）
+     * User Story: US3 - 批量导入物料数据
+     * 
+     * <p>功能说明：
+     * <ul>
+     *   <li>上传 Excel 文件</li>
+     *   <li>解析并校验数据</li>
+     *   <li>返回校验结果（包含成功和失败的记录）</li>
+     *   <li>不保存到数据库</li>
+     * </ul>
+     * 
+     * @param file Excel 文件 (.xlsx 或 .xls)
+     * @return 导入结果（包含校验详情）
+     */
+    @PostMapping("/import/preview")
+    public ResponseEntity<ApiResponse<MaterialImportResultDTO>> previewImport(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        
+        log.info("Previewing import: fileName={}, size={} bytes", 
+                file.getOriginalFilename(), file.getSize());
+
+        try {
+            MaterialImportResultDTO result = materialImportService.previewImport(file);
+            
+            log.info("Preview completed: totalCount={}, successCount={}, failureCount={}",
+                    result.getTotalCount(), result.getSuccessCount(), result.getFailureCount());
+            
+            return ResponseEntity.ok(ApiResponse.success(result));
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Preview validation failed: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.failure(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Preview failed with unexpected error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("预览失败：" + e.getMessage()));
+        }
+    }
+
+    /**
+     * 确认导入数据（保存到数据库）
+     * User Story: US3 - 批量导入物料数据
+     * 
+     * <p>功能说明：
+     * <ul>
+     *   <li>上传 Excel 文件</li>
+     *   <li>解析并校验数据</li>
+     *   <li>只保存通过校验的记录</li>
+     *   <li>返回导入结果（包含成功和失败的记录）</li>
+     * </ul>
+     * 
+     * <p>注意事项：
+     * <ul>
+     *   <li>如果记录校验失败，将跳过该记录</li>
+     *   <li>部分成功也会返回成功响应</li>
+     *   <li>前端需要检查 failureCount 判断是否有失败记录</li>
+     * </ul>
+     * 
+     * @param file Excel 文件 (.xlsx 或 .xls)
+     * @return 导入结果（包含保存详情）
+     */
+    @PostMapping("/import/confirm")
+    public ResponseEntity<ApiResponse<MaterialImportResultDTO>> confirmImport(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        
+        log.info("Confirming import: fileName={}, size={} bytes", 
+                file.getOriginalFilename(), file.getSize());
+
+        try {
+            MaterialImportResultDTO result = materialImportService.confirmImport(file);
+            
+            log.info("Import completed: totalCount={}, successCount={}, failureCount={}",
+                    result.getTotalCount(), result.getSuccessCount(), result.getFailureCount());
+            
+            return ResponseEntity.ok(ApiResponse.success(result));
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("Import validation failed: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.failure(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Import failed with unexpected error", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("导入失败：" + e.getMessage()));
         }
     }
 }

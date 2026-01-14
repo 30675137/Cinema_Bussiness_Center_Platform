@@ -9,6 +9,7 @@ import type {
   MaterialUpdateRequest,
   MaterialCategory,
   MaterialFilter,
+  MaterialImportResult,
 } from '@/types/material'
 
 interface ApiResponse<T> {
@@ -113,5 +114,51 @@ export const materialService = {
     link.download = fileName
     link.click()
     window.URL.revokeObjectURL(link.href)
+  },
+
+  /**
+   * M002: 预览导入物料数据（不保存到数据库）
+   * User Story: US3 - 批量导入物料数据
+   * 
+   * @param file Excel 文件
+   * @returns 导入结果（包含校验详情）
+   */
+  previewImport: async (file: File): Promise<MaterialImportResult> => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await apiClient.post<ApiResponse<MaterialImportResult>>(
+      '/materials/import/preview',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
+  },
+
+  /**
+   * M002: 确认导入物料数据（保存到数据库）
+   * User Story: US3 - 批量导入物料数据
+   * 
+   * @param file Excel 文件
+   * @returns 导入结果（包含保存详情）
+   */
+  confirmImport: async (file: File): Promise<MaterialImportResult> => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await apiClient.post<ApiResponse<MaterialImportResult>>(
+      '/materials/import/confirm',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+    return response.data.data
   },
 }

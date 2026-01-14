@@ -4,12 +4,13 @@
  */
 import React, { useState, useEffect } from 'react'
 import { Button, Card, Modal, message, Pagination, Space } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, ImportOutlined } from '@ant-design/icons'
 import { useSearchParams } from 'react-router-dom'
 import { MaterialTable } from '@/components/material/MaterialTable'
 import { MaterialForm } from '@/components/material/MaterialForm'
 import { MaterialFilterComponent } from '@/components/material/MaterialFilter'
 import { MaterialExportButton } from '@/components/material/MaterialExportButton'
+import { MaterialImportModal } from '@/components/material/MaterialImportModal'
 import {
   useMaterials,
   useFilterMaterials,
@@ -17,11 +18,13 @@ import {
   useUpdateMaterial,
   useDeleteMaterial,
 } from '@/hooks/useMaterials'
+import { usePreviewImport, useConfirmImport } from '@/hooks/useImportMaterials'
 import type { Material, MaterialFilter } from '@/types/material'
 
 export const MaterialManagementPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [modalVisible, setModalVisible] = useState(false)
+  const [importModalVisible, setImportModalVisible] = useState(false)
   const [editingMaterial, setEditingMaterial] = useState<Material | undefined>()
 
   // M002: 从 URL 读取筛选条件
@@ -48,6 +51,10 @@ export const MaterialManagementPage: React.FC = () => {
   const createMutation = useCreateMaterial()
   const updateMutation = useUpdateMaterial()
   const deleteMutation = useDeleteMaterial()
+
+  // M002: 导入相关 hooks
+  const previewImportMutation = usePreviewImport()
+  const confirmImportMutation = useConfirmImport()
 
   // M002: 同步筛选条件到 URL
   useEffect(() => {
@@ -111,6 +118,16 @@ export const MaterialManagementPage: React.FC = () => {
     })
   }
 
+  // M002: 导入相关处理函数
+  const handleImport = () => {
+    setImportModalVisible(true)
+  }
+
+  const handleImportSuccess = () => {
+    setImportModalVisible(false)
+    // 列表会自动刷新（因为 confirmImport 成功后会 invalidate queries）
+  }
+
   return (
     <div>
       <Card style={{ marginBottom: 16 }}>
@@ -122,6 +139,9 @@ export const MaterialManagementPage: React.FC = () => {
         extra={
           <Space>
             <MaterialExportButton filter={filter} />
+            <Button icon={<ImportOutlined />} onClick={handleImport}>
+              批量导入
+            </Button>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新建物料
             </Button>
@@ -165,6 +185,19 @@ export const MaterialManagementPage: React.FC = () => {
             isEdit={!!editingMaterial}
           />
         </Modal>
+
+        {/* M002: 导入弹窗 */}
+        <MaterialImportModal
+          open={importModalVisible}
+          onCancel={() => setImportModalVisible(false)}
+          onSuccess={handleImportSuccess}
+          onPreview={async (file) => {
+            return await previewImportMutation.mutateAsync(file)
+          }}
+          onConfirm={async (file) => {
+            return await confirmImportMutation.mutateAsync(file)
+          }}
+        />
       </Card>
     </div>
   )
