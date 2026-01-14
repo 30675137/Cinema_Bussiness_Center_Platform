@@ -124,8 +124,26 @@ export function MaterialImportModal({
 
   // 下载导入模板
   const handleDownloadTemplate = () => {
-    // TODO: 实现模板下载逻辑
-    message.info('模板下载功能开发中...')
+    // 创建模板数据（示例行）
+    const templateData = [
+      ['物料编码', '物料名称*', '分类*', '库存单位名称*', '采购单位名称*', '换算率', '使用全局换算', '标准成本', '规格', '描述'],
+      ['MAT001', '示例原料', 'RAW_MATERIAL', '千克', '吨', '1000', 'false', '50.00', '食品级', '这是一个示例原料'],
+      ['', '示例包材', 'PACKAGING', '个', '箱', '100', 'false', '5.00', '标准包装', '这是一个示例包材'],
+    ]
+
+    // 创建 CSV 内容（使用 BOM 使 Excel 正确识别 UTF-8 编码）
+    const BOM = '\uFEFF'
+    const csvContent = BOM + templateData.map(row => row.join(',')).join('\n')
+
+    // 创建 Blob 并下载
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = '物料导入模板.csv'
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+
+    message.success('模板下载成功')
   }
 
   // 关闭弹窗
