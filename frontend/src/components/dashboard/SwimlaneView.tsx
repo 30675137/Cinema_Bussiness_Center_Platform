@@ -209,48 +209,75 @@ const SwimlaneView: React.FC = React.memo(() => {
 
                       {/* Module Items */}
                       <div style={{ padding: 12 }}>
-                        {module.functionLinks.slice(0, 4).map((link, idx) => (
-                          <div
-                            key={idx}
-                            onClick={() => navigate(link.path)}
-                            style={{
-                              padding: '8px 12px',
-                              fontSize: 11,
-                              color: '#595959',
-                              borderRadius: 8,
-                              marginBottom: 6,
-                              transition: 'all 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              cursor: 'pointer',
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = '#e6f7ff';
-                              e.currentTarget.style.color = '#1890ff';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'transparent';
-                              e.currentTarget.style.color = '#595959';
-                            }}
-                          >
-                            <span style={{ fontWeight: 500, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {link.name}
-                            </span>
-                            {link.badge && (
-                              <Badge 
-                                count={link.badge} 
-                                style={{ 
-                                  background: '#ff4d4f',
-                                  fontSize: 10,
-                                  height: 16,
-                                  lineHeight: '16px',
-                                  minWidth: 16,
-                                }} 
-                              />
-                            )}
-                          </div>
-                        ))}
+                        {module.functionLinks.slice(0, 4).map((link, idx) => {
+                          const isDisabled = link.enabled === false;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => !isDisabled && navigate(link.path)}
+                              style={{
+                                padding: '8px 12px',
+                                fontSize: 11,
+                                color: isDisabled ? '#d9d9d9' : '#595959',
+                                fontWeight: isDisabled ? 'normal' : 500,
+                                borderRadius: 8,
+                                marginBottom: 6,
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                textDecoration: isDisabled ? 'line-through' : 'none',
+                                opacity: isDisabled ? 0.5 : 1,
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isDisabled) {
+                                  e.currentTarget.style.background = '#e6f7ff';
+                                  e.currentTarget.style.color = '#1890ff';
+                                  e.currentTarget.style.fontWeight = '600';
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isDisabled) {
+                                  e.currentTarget.style.background = 'transparent';
+                                  e.currentTarget.style.color = '#595959';
+                                  e.currentTarget.style.fontWeight = '500';
+                                }
+                              }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, overflow: 'hidden' }}>
+                                <span style={{ fontSize: 10 }}>{isDisabled ? '○' : '•'}</span>
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {link.name}
+                                </span>
+                              </span>
+                              {isDisabled && (
+                                <span style={{ 
+                                  fontSize: 9, 
+                                  color: '#999', 
+                                  background: '#f5f5f5',
+                                  padding: '2px 6px',
+                                  borderRadius: 4,
+                                  marginLeft: 4,
+                                }}>
+                                  未开发
+                                </span>
+                              )}
+                              {!isDisabled && link.badge && (
+                                <Badge 
+                                  count={link.badge} 
+                                  style={{ 
+                                    background: '#ff4d4f',
+                                    fontSize: 10,
+                                    height: 16,
+                                    lineHeight: '16px',
+                                    minWidth: 16,
+                                  }} 
+                                />
+                              )}
+                            </div>
+                          );
+                        })}
                         
                         <div style={{
                           paddingTop: 12,
