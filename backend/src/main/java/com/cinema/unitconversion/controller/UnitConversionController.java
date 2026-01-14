@@ -3,6 +3,7 @@ package com.cinema.unitconversion.controller;
 import com.cinema.common.dto.ApiResponse;
 import com.cinema.unitconversion.dto.*;
 import com.cinema.unitconversion.service.ConversionPathService;
+import com.cinema.unitconversion.service.UnifiedConversionService;
 import com.cinema.unitconversion.service.UnitConversionService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -26,6 +27,7 @@ public class UnitConversionController {
 
     private final UnitConversionService service;
     private final ConversionPathService pathService;
+    private final UnifiedConversionService unifiedConversionService;
 
     /**
      * GET /api/unit-conversions - 获取所有换算规则
@@ -134,6 +136,29 @@ public class UnitConversionController {
                 request.getExcludeId()
         );
         return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    /**
+     * POST /api/unit-conversions/convert - 执行单位换算 (M001)
+     * 
+     * 支持物料级换算优先逻辑:
+     * 1. 如果提供 materialId,优先使用物料级换算
+     * 2. 如果物料启用 use_global_conversion,降级到全局换算
+     * 3. 如果未提供 materialId,使用纯全局换算
+     */
+    @PostMapping("/convert")
+    public ResponseEntity<ApiResponse<ConversionResponse>> convert(
+            @Valid @RequestBody ConversionRequest request) {
+        log.debug("执行单位换算: {} {} → {}, materialId={}", 
+                request.getQuantity(), request.getFromUnitCode(), 
+                request.getToUnitCode(), request.getMaterialId());
+        try {
+            ConversionResponse result = unifiedConversionService.convert(request);
+            return ResponseEntity.ok(ApiResponse.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.failure(e.getMessage()));
+        }
     }
 
     /**
