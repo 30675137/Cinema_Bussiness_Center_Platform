@@ -15,6 +15,15 @@
           "    const testRunId = Date.now().toString().slice(-6);",
           "    pm.environment.set('test_run_id', testRunId);",
           "    console.log('Test Run ID generated:', testRunId);",
+          "}",
+          "",
+          "// Setup Supabase auth headers based on environment",
+          "const authType = pm.environment.get('supabase_auth_type') || 'apikey';",
+          "const serviceRoleKey = pm.environment.get('supabase_service_role_key');",
+          "if (authType === 'bearer') {",
+          "    pm.request.headers.upsert({ key: 'Authorization', value: 'Bearer ' + serviceRoleKey });",
+          "} else {",
+          "    pm.request.headers.upsert({ key: 'apikey', value: serviceRoleKey });",
           "}"
         ]
       }
@@ -321,10 +330,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "apikey",
-                "value": "{{supabase_service_role_key}}"
-              },
-              {
                 "key": "Prefer",
                 "value": "return=representation"
               },
@@ -338,13 +343,11 @@
               "raw": "{\n  \"store_id\": \"{{test_store_id}}\",\n  \"sku_id\": \"{{test_material_rum_id}}\",\n  \"on_hand_qty\": 5000,\n  \"available_qty\": 5000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 500\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
               "host": [
-                "{{supabase_url}}"
+                "{{supabase_url}}{{supabase_rest_path}}"
               ],
               "path": [
-                "rest",
-                "v1",
                 "store_inventory"
               ]
             },
@@ -380,10 +383,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "apikey",
-                "value": "{{supabase_service_role_key}}"
-              },
-              {
                 "key": "Prefer",
                 "value": "return=representation"
               },
@@ -397,13 +396,11 @@
               "raw": "{\n  \"store_id\": \"{{test_store_id}}\",\n  \"sku_id\": \"{{test_material_mint_id}}\",\n  \"on_hand_qty\": 500,\n  \"available_qty\": 500,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 50\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
               "host": [
-                "{{supabase_url}}"
+                "{{supabase_url}}{{supabase_rest_path}}"
               ],
               "path": [
-                "rest",
-                "v1",
                 "store_inventory"
               ]
             },
@@ -439,10 +436,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "apikey",
-                "value": "{{supabase_service_role_key}}"
-              },
-              {
                 "key": "Prefer",
                 "value": "return=representation"
               },
@@ -456,13 +449,11 @@
               "raw": "{\n  \"store_id\": \"{{test_store_id}}\",\n  \"sku_id\": \"{{test_material_soda_id}}\",\n  \"on_hand_qty\": 20000,\n  \"available_qty\": 20000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 2000\n}"
             },
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory",
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
               "host": [
-                "{{supabase_url}}"
+                "{{supabase_url}}{{supabase_rest_path}}"
               ],
               "path": [
-                "rest",
-                "v1",
                 "store_inventory"
               ]
             },
@@ -726,22 +717,16 @@
             "method": "DELETE",
             "header": [
               {
-                "key": "apikey",
-                "value": "{{supabase_service_role_key}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{supabase_url}}/rest/v1/store_inventory?store_id=eq.{{test_store_id}}",
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory?store_id=eq.{{test_store_id}}",
               "host": [
-                "{{supabase_url}}"
+                "{{supabase_url}}{{supabase_rest_path}}"
               ],
               "path": [
-                "rest",
-                "v1",
                 "store_inventory"
               ],
               "query": [
