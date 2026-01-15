@@ -1,0 +1,765 @@
+{
+  "info": {
+    "name": "O012 - Setup & Teardown",
+    "_postman_id": "o012-setup-teardown",
+    "description": "O012 测试数据准备与清理。\n\n**Setup部分**：自动创建可售卖的饮品测试数据，包括：\n- 1个测试SPU\n- 3个原料SKU（朗姆酒、薄荷叶、苏打水）\n- 2个成品SKU（莫吉托、草莓莫吉托）\n- BOM配方配置\n- 门店库存初始化\n\n**Teardown部分**：清理测试生成的订单和预占记录。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Setup - 准备测试数据",
+      "item": [
+        {
+          "name": "1. 创建测试SPU",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"SPU created successfully\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "",
+                  "// 保存SPU ID到环境变量",
+                  "pm.environment.set('test_spu_id', jsonData.data.id);",
+                  "console.log('Test SPU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"测试饮品SPU - Mojito\",\n  \"category_id\": \"550e8400-e29b-41d4-a716-446655440003\",\n  \"description\": \"用于O012测试的莫吉托SPU\",\n  \"status\": \"enabled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/spus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "spus"]
+            },
+            "description": "创建测试用的SPU（标准产品单元）"
+          },
+          "response": []
+        },
+        {
+          "name": "2. 创建原料SKU - 朗姆酒",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Rum SKU created\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.environment.set('test_material_rum_id', jsonData.data.id);",
+                  "console.log('Rum SKU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"MAT-RUM-{{$timestamp}}\",\n  \"name\": \"朗姆酒 (Test)\",\n  \"spuId\": \"{{test_spu_id}}\",\n  \"skuType\": \"raw_material\",\n  \"mainUnit\": \"ml\",\n  \"storeScope\": [],\n  \"standardCost\": 0.15,\n  \"status\": \"enabled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/skus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus"]
+            },
+            "description": "创建原料SKU：朗姆酒，45ml用量，0.15元成本/ml"
+          },
+          "response": []
+        },
+        {
+          "name": "3. 创建原料SKU - 薄荷叶",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Mint SKU created\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.environment.set('test_material_mint_id', jsonData.data.id);",
+                  "console.log('Mint SKU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"MAT-MINT-{{$timestamp}}\",\n  \"name\": \"薄荷叶 (Test)\",\n  \"spuId\": \"{{test_spu_id}}\",\n  \"skuType\": \"raw_material\",\n  \"mainUnit\": \"g\",\n  \"storeScope\": [],\n  \"standardCost\": 0.05,\n  \"status\": \"enabled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/skus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus"]
+            },
+            "description": "创建原料SKU：薄荷叶，5g用量，0.05元成本/g"
+          },
+          "response": []
+        },
+        {
+          "name": "4. 创建原料SKU - 苏打水",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Soda SKU created\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.environment.set('test_material_soda_id', jsonData.data.id);",
+                  "console.log('Soda SKU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"MAT-SODA-{{$timestamp}}\",\n  \"name\": \"苏打水 (Test)\",\n  \"spuId\": \"{{test_spu_id}}\",\n  \"skuType\": \"raw_material\",\n  \"mainUnit\": \"ml\",\n  \"storeScope\": [],\n  \"standardCost\": 0.01,\n  \"status\": \"enabled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/skus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus"]
+            },
+            "description": "创建原料SKU：苏打水，200ml用量，0.01元成本/ml"
+          },
+          "response": []
+        },
+        {
+          "name": "5. 创建成品SKU - 莫吉托",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// 构建包含BOM组件的请求体",
+                  "var requestBody = {",
+                  "    code: 'FP-MOJITO-' + Date.now(),",
+                  "    name: '莫吉托 (Test)',",
+                  "    spuId: pm.environment.get('test_spu_id'),",
+                  "    skuType: 'finished_product',",
+                  "    mainUnit: '杯',",
+                  "    storeScope: [],",
+                  "    wasteRate: 5.0,",
+                  "    status: 'enabled',",
+                  "    bomComponents: [",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_rum_id'),",
+                  "            quantity: 45,",
+                  "            unit: 'ml',",
+                  "            sortOrder: 1",
+                  "        },",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_mint_id'),",
+                  "            quantity: 5,",
+                  "            unit: 'g',",
+                  "            sortOrder: 2",
+                  "        },",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_soda_id'),",
+                  "            quantity: 200,",
+                  "            unit: 'ml',",
+                  "            sortOrder: 3",
+                  "        }",
+                  "    ]",
+                  "};",
+                  "",
+                  "pm.environment.set('mojito_request_body', JSON.stringify(requestBody));",
+                  "console.log('Mojito request body prepared with BOM components');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Mojito SKU created\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    // 创建API返回Snake Case格式",
+                  "    pm.expect(jsonData.data.sku_type).to.eql('finished_product');",
+                  "});",
+                  "",
+                  "pm.environment.set('test_sku_id_1', jsonData.data.id);",
+                  "console.log('Mojito SKU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{mojito_request_body}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/skus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus"]
+            },
+            "description": "创建成品SKU：莫吉托，包含BOM配方（45ml朗姆酒 + 5g薄荷叶 + 200ml苏打水）"
+          },
+          "response": []
+        },
+        {
+          "name": "6. 创建成品SKU - 草莓莫吉托",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// 构建包含BOM组件的请求体",
+                  "var requestBody = {",
+                  "    code: 'FP-MOJITO-STRAW-' + Date.now(),",
+                  "    name: '草莓莫吉托 (Test)',",
+                  "    spuId: pm.environment.get('test_spu_id'),",
+                  "    skuType: 'finished_product',",
+                  "    mainUnit: '杯',",
+                  "    storeScope: [],",
+                  "    wasteRate: 5.0,",
+                  "    status: 'enabled',",
+                  "    bomComponents: [",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_rum_id'),",
+                  "            quantity: 40,",
+                  "            unit: 'ml',",
+                  "            sortOrder: 1",
+                  "        },",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_mint_id'),",
+                  "            quantity: 3,",
+                  "            unit: 'g',",
+                  "            sortOrder: 2",
+                  "        },",
+                  "        {",
+                  "            componentType: 'SKU',",
+                  "            componentId: pm.environment.get('test_material_soda_id'),",
+                  "            quantity: 180,",
+                  "            unit: 'ml',",
+                  "            sortOrder: 3",
+                  "        }",
+                  "    ]",
+                  "};",
+                  "",
+                  "pm.environment.set('strawberry_mojito_request_body', JSON.stringify(requestBody));",
+                  "console.log('Strawberry Mojito request body prepared with BOM components');"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Strawberry Mojito SKU created\", function () {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.environment.set('test_sku_id_2', jsonData.data.id);",
+                  "console.log('Strawberry Mojito SKU ID:', jsonData.data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{{strawberry_mojito_request_body}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/skus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus"]
+            },
+            "description": "创建成品SKU：草莓莫吉托，包含BOM配方（40ml朗姆酒 + 3g薄荷叶 + 180ml苏打水）"
+          },
+          "response": []
+        },
+        {
+          "name": "7. 初始化库存 - 朗姆酒",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test(\"Inventory created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "console.log('✅ 初始化朗姆酒库存: 5000ml (约110杯)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "apikey",
+                "value": "{{supabase_service_role_key}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabase_service_role_key}}"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_rum_id}}\",\n  \"on_hand_qty\": 5000,\n  \"available_qty\": 5000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 500\n}"
+            },
+            "url": {
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
+            },
+            "description": "直接通过Supabase REST API初始化朗姆酒库存：5000ml（使用service_role_key绕过RLS策略）"
+          },
+          "response": []
+        },
+        {
+          "name": "8. 初始化库存 - 薄荷叶",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test(\"Inventory created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "console.log('✅ 初始化薄荷叶库存: 500g (约100杯)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "apikey",
+                "value": "{{supabase_service_role_key}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabase_service_role_key}}"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_mint_id}}\",\n  \"on_hand_qty\": 500,\n  \"available_qty\": 500,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 50\n}"
+            },
+            "url": {
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
+            },
+            "description": "直接通过Supabase REST API初始化薄荷叶库存：500g（使用service_role_key绕过RLS策略）"
+          },
+          "response": []
+        },
+        {
+          "name": "9. 初始化库存 - 苏打水",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test(\"Inventory created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "console.log('✅ 初始化苏打水库存: 20000ml (约100杯)');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "apikey",
+                "value": "{{supabase_service_role_key}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabase_service_role_key}}"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"store_id\": \"00000000-0000-0000-0000-000000000099\",\n  \"sku_id\": \"{{test_material_soda_id}}\",\n  \"on_hand_qty\": 20000,\n  \"available_qty\": 20000,\n  \"reserved_qty\": 0,\n  \"safety_stock\": 2000\n}"
+            },
+            "url": {
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/store_inventory",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["store_inventory"]
+            },
+            "description": "直接通过Supabase REST API初始化苏打水库存：20000ml（使用service_role_key绕过RLS策略）"
+          },
+          "response": []
+        },
+        {
+          "name": "10. 查看测试数据摘要",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "console.log('========================================');",
+                  "console.log('   测试数据准备完成 (Setup Complete)   ');",
+                  "console.log('========================================');",
+                  "console.log('');",
+                  "console.log('✅ SPU ID:', pm.environment.get('test_spu_id'));",
+                  "console.log('');",
+                  "console.log('原料SKU:');",
+                  "console.log('  - 朗姆酒:', pm.environment.get('test_material_rum_id'), '(5000ml)');",
+                  "console.log('  - 薄荷叶:', pm.environment.get('test_material_mint_id'), '(500g)');",
+                  "console.log('  - 苏打水:', pm.environment.get('test_material_soda_id'), '(20000ml)');",
+                  "console.log('');",
+                  "console.log('成品SKU:');",
+                  "console.log('  - 莫吉托:', pm.environment.get('test_sku_id_1'));",
+                  "console.log('  - 草莓莫吉托:', pm.environment.get('test_sku_id_2'));",
+                  "console.log('');",
+                  "console.log('BOM配方:');",
+                  "console.log('  莫吉托 = 45ml朗姆酒 + 5g薄荷叶 + 200ml苏打水');",
+                  "console.log('  损耗率: 5%');",
+                  "console.log('');",
+                  "console.log('门店库存 (Store: 00000000-0000-0000-0000-000000000099):');",
+                  "console.log('  - 朗姆酒: 5000ml (可制作约110杯)');",
+                  "console.log('  - 薄荷叶: 500g (可制作约100杯)');",
+                  "console.log('  - 苏打水: 20000ml (可制作约100杯)');",
+                  "console.log('  → 理论最多可制作: 100杯莫吉托 (受薄荷叶限制)');",
+                  "console.log('');",
+                  "console.log('========================================');",
+                  "console.log('   现在可以运行主测试用例了！   ');",
+                  "console.log('========================================');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/skus/{{test_sku_id_1}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus", "{{test_sku_id_1}}"]
+            },
+            "description": "获取莫吉托SKU信息，验证数据创建完整性"
+          },
+          "response": []
+        }
+      ],
+      "description": "自动创建完整的测试数据，包括SPU、原料SKU、成品SKU、BOM配方和门店库存"
+    },
+    {
+      "name": "Teardown - 清理测试数据",
+      "item": [
+        {
+          "name": "1. 清理测试订单的预占记录",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "console.log('Cleaned up test reservation records');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{supabase_service_role_key}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabase_service_role_key}}"
+              }
+            ],
+            "url": {
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/inventory_reservations?sku_id=in.({{test_sku_id_1}},{{test_sku_id_2}})",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["inventory_reservations"],
+              "query": [
+                {
+                  "key": "sku_id",
+                  "value": "in.({{test_sku_id_1}},{{test_sku_id_2}})"
+                }
+              ]
+            },
+            "description": "删除测试SKU相关的所有预占记录"
+          },
+          "response": []
+        },
+        {
+          "name": "2. 清理测试订单",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {",
+                  "    pm.expect([200, 204]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "console.log('Cleaned up test orders');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{supabase_service_role_key}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabase_service_role_key}}"
+              }
+            ],
+            "url": {
+              "raw": "{{supabase_url}}{{supabase_rest_path}}/beverage_orders?store_id=eq.00000000-0000-0000-0000-000000000099",
+              "host": ["{{supabase_url}}{{supabase_rest_path}}"],
+              "path": ["beverage_orders"],
+              "query": [
+                {
+                  "key": "store_id",
+                  "value": "eq.00000000-0000-0000-0000-000000000099"
+                }
+              ]
+            },
+            "description": "删除测试门店的所有订单（注意：仅清理测试数据，生产环境请谨慎使用）"
+          },
+          "response": []
+        },
+        {
+          "name": "3. 显示清理完成信息",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// 验证响应状态码",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "console.log('========================================');",
+                  "console.log('   测试数据清理完成 (Teardown Complete)   ');",
+                  "console.log('========================================');",
+                  "console.log('');",
+                  "console.log('✅ 已清理测试订单');",
+                  "console.log('✅ 已清理库存预占记录');",
+                  "console.log('');",
+                  "console.log('注意: SKU和库存记录仍然保留，可继续使用。');",
+                  "console.log('如需完全清理，请手动删除以下数据:');",
+                  "console.log('  - SPU:', pm.environment.get('test_spu_id'));",
+                  "console.log('  - SKU:', pm.environment.get('test_sku_id_1'), ',', pm.environment.get('test_sku_id_2'));",
+                  "console.log('  - Materials:', pm.environment.get('test_material_rum_id'), ',', pm.environment.get('test_material_mint_id'), ',', pm.environment.get('test_material_soda_id'));",
+                  "console.log('');",
+                  "console.log('========================================');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/skus/{{test_sku_id_1}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "skus", "{{test_sku_id_1}}"]
+            },
+            "description": "获取测试SKU信息，验证清理完成"
+          },
+          "response": []
+        }
+      ],
+      "description": "清理测试过程中产生的订单和预占记录"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "supabase_url",
+      "value": "https://fxhgyxceqrmnpezluaht.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "supabase_rest_path",
+      "value": "/rest/v1",
+      "type": "string"
+    },
+    {
+      "key": "supabase_anon_key",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ4aGd5eGNlcXJtbnBlemx1YWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MjU3OTAsImV4cCI6MjA1MDMwMTc5MH0.X5oJxVHQY2nHfEb9qCkZVW9ZdGMJRJYMYr7Pd6ujDWs",
+      "type": "string"
+    },
+    {
+      "key": "supabase_service_role_key",
+      "value": "sb_secret_FkEDAlCy8cOBZex8J7f34g_YJLufeNC",
+      "type": "string"
+    }
+  ]
+}

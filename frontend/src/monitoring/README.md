@@ -5,6 +5,7 @@
 ## 功能特性
 
 ### 🔍 性能监控
+
 - **页面加载性能**: 监控DOM加载时间、首次内容绘制时间等
 - **API响应性能**: 跟踪API请求时间、重试机制和错误率
 - **组件渲染性能**: 监控组件渲染时间、重渲染频率
@@ -12,12 +13,14 @@
 - **Web Vitals**: 集成Google Web Vitals核心指标
 
 ### ⚡ 性能优化
+
 - **代码分割优化**: 智能懒加载和预加载策略
 - **图片懒加载**: 支持占位符、渐进式加载和现代图片格式
 - **虚拟滚动**: 高性能长列表渲染，支持动态高度
 - **缓存策略**: 多级缓存支持，LRU/LFU/FIFO淘汰策略
 
 ### 📊 性能分析
+
 - **实时性能面板**: 可视化性能指标和警告信息
 - **Bundle分析**: 分析打包大小、重复模块和优化建议
 - **性能报告**: 自动生成详细的性能分析报告
@@ -40,11 +43,7 @@ import React from 'react';
 import { PerformanceProvider } from './monitoring/PerformanceProvider';
 
 function App() {
-  return (
-    <PerformanceProvider>
-      {/* 你的应用组件 */}
-    </PerformanceProvider>
-  );
+  return <PerformanceProvider>{/* 你的应用组件 */}</PerformanceProvider>;
 }
 ```
 
@@ -130,7 +129,7 @@ import { LazyImage } from './optimization/LazyImage';
   alt="描述"
   placeholder="/path/to/placeholder.jpg"
   threshold={0.1}
-/>
+/>;
 ```
 
 #### 3. 虚拟滚动
@@ -143,7 +142,7 @@ import VirtualScroll from './optimization/VirtualScroll';
   itemHeight={50}
   containerHeight={400}
   renderItem={(item, index) => <div>{item.name}</div>}
-/>
+/>;
 ```
 
 #### 4. 缓存管理
@@ -154,7 +153,7 @@ import { apiCache } from './optimization/CacheManager';
 // 缓存API请求
 const data = await apiCache.request(
   'users',
-  () => fetch('/api/users').then(r => r.json()),
+  () => fetch('/api/users').then((r) => r.json()),
   5 * 60 * 1000 // 5分钟TTL
 );
 ```
@@ -218,13 +217,13 @@ const data = await apiCache.request(
 ```typescript
 export const PERFORMANCE_CONFIG = {
   monitoring: {
-    enabled: boolean,        // 是否启用监控
-    samplingRate: number,    // 采样率 (0-1)
+    enabled: boolean, // 是否启用监控
+    samplingRate: number, // 采样率 (0-1)
     reportToConsole: boolean, // 是否输出到控制台
     reportToAnalytics: boolean, // 是否上报到分析平台
   },
   thresholds: {
-    pageLoadTime: number,    // 页面加载时间阈值
+    pageLoadTime: number, // 页面加载时间阈值
     apiResponseTime: number, // API响应时间阈值
     componentRenderTime: number, // 组件渲染时间阈值
     memoryUsageThreshold: number, // 内存使用阈值
@@ -237,10 +236,10 @@ export const PERFORMANCE_CONFIG = {
 
 ```typescript
 const cacheOptions = {
-  maxSize: 200,              // 最大缓存条目数
-  ttl: 5 * 60 * 1000,        // 默认TTL (5分钟)
-  strategy: 'lru',          // 淘汰策略: 'lru' | 'lfu' | 'fifo'
-  compressionEnabled: true,  // 是否启用压缩
+  maxSize: 200, // 最大缓存条目数
+  ttl: 5 * 60 * 1000, // 默认TTL (5分钟)
+  strategy: 'lru', // 淘汰策略: 'lru' | 'lfu' | 'fifo'
+  compressionEnabled: true, // 是否启用压缩
 };
 ```
 
@@ -311,6 +310,7 @@ MIT License
 ## 更新日志
 
 ### v1.0.0
+
 - 初始版本发布
 - 基础性能监控功能
 - Web Vitals集成

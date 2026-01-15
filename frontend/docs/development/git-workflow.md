@@ -136,17 +136,17 @@ git push -u origin hotfix/critical-bug-fix
 
 #### 提交类型（type）
 
-| 类型 | 描述 | 示例 |
-|------|------|------|
-| `feat` | 新功能 | `feat(product): 添加商品搜索功能` |
-| `fix` | 修复bug | `fix(auth): 修复登录页面崩溃问题` |
-| `docs` | 文档更新 | `docs(readme): 更新安装说明` |
-| `style` | 代码格式调整 | `style(product): 格式化商品列表代码` |
-| `refactor` | 重构代码 | `refactor(api): 重构商品服务层` |
-| `perf` | 性能优化 | `perf(list): 优化虚拟滚动性能` |
-| `test` | 测试相关 | `test(product): 添加商品组件单元测试` |
-| `chore` | 构建工具、依赖更新 | `chore(deps): 更新React到18.2.0` |
-| `revert` | 回滚提交 | `revert: 回滚之前的提交` |
+| 类型       | 描述               | 示例                                  |
+| ---------- | ------------------ | ------------------------------------- |
+| `feat`     | 新功能             | `feat(product): 添加商品搜索功能`     |
+| `fix`      | 修复bug            | `fix(auth): 修复登录页面崩溃问题`     |
+| `docs`     | 文档更新           | `docs(readme): 更新安装说明`          |
+| `style`    | 代码格式调整       | `style(product): 格式化商品列表代码`  |
+| `refactor` | 重构代码           | `refactor(api): 重构商品服务层`       |
+| `perf`     | 性能优化           | `perf(list): 优化虚拟滚动性能`        |
+| `test`     | 测试相关           | `test(product): 添加商品组件单元测试` |
+| `chore`    | 构建工具、依赖更新 | `chore(deps): 更新React到18.2.0`      |
+| `revert`   | 回滚提交           | `revert: 回滚之前的提交`              |
 
 #### 范围（scope）
 
@@ -306,6 +306,7 @@ graph LR
 
 ```markdown
 ## 变更类型
+
 - [ ] 新功能 (feature)
 - [ ] 修复 (fix)
 - [ ] 文档 (docs)
@@ -316,21 +317,26 @@ graph LR
 - [ ] 构建 (chore)
 
 ## 变更描述
+
 简要描述本次PR的主要变更内容
 
 ## 相关Issue
+
 Closes #123
 
 ## 测试
+
 - [ ] 单元测试已通过
 - [ ] 集成测试已通过
 - [ ] 手动测试已完成
 - [ ] 浏览器兼容性测试
 
 ## 截图（如适用）
+
 如果是UI相关的变更，请提供截图
 
 ## Checklist
+
 - [ ] 代码已通过lint检查
 - [ ] 已添加或更新了测试
 - [ ] 文档已更新
@@ -421,20 +427,15 @@ const reviewComments: ReviewComment[] = [
     file: 'src/components/ProductCard.tsx',
     line: 45,
     message: '这里缺少错误边界处理，可能导致组件崩溃',
-    suggestions: [
-      '添加try-catch包装',
-      '使用ErrorBoundary组件包裹'
-    ]
+    suggestions: ['添加try-catch包装', '使用ErrorBoundary组件包裹'],
   },
   {
     type: 'suggested',
     file: 'src/hooks/useProductList.ts',
     line: 23,
     message: '建议使用useMemo缓存计算结果以提高性能',
-    suggestions: [
-      '将filter操作包装在useMemo中'
-    ]
-  }
+    suggestions: ['将filter操作包装在useMemo中'],
+  },
 ];
 ```
 
@@ -450,9 +451,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -531,9 +532,9 @@ branch_protection:
     required_status_checks:
       strict: true
       contexts:
-        - "CI Pipeline"
-        - "CodeQL Analysis"
-        - "Security Scan"
+        - 'CI Pipeline'
+        - 'CodeQL Analysis'
+        - 'Security Scan'
     enforce_admins: true
     required_pull_request_reviews:
       required_approving_review_count: 2
@@ -541,7 +542,7 @@ branch_protection:
       require_code_owner_reviews: true
     restrictions:
       users: []
-      teams: ["core-developers"]
+      teams: ['core-developers']
 ```
 
 ## 发布流程

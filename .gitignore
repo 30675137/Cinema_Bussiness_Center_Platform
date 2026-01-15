@@ -1,0 +1,78 @@
+# Build outputs
+target/
+**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Claude skills (auto-generated, keep ops-expert)
+.claude/skills/*
+!.claude/skills/ops-expert/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+test-results/
+**/test-results/
+playwright-report/
+coverage/
+**/.coverage
+
+# E2E Reports
+reports/e2e/artifacts/
+reports/e2e/html/
+reports/e2e/json/
+reports/e2e/junit/
+
+# Process IDs
+backend-new.pid
+backend.pid
+backend/backend.pid
+backend/src/main/resources/db/backend.pid
+
+# Environment (only ignore local overrides, keep .env tracked)
+.env.local
+.env.*.local
+
+# Build artifacts
+dist/
+build/
+out/
+
+# Cache
+.cache/
+*.cache
+.pytest_cache/
+__pycache__/
+
+# Taro specific
+.temp/
+.rn_temp/
+**/.temp/
+**/.rn_temp/
+.taro_cache/
+**/.taro_cache/
+
+# Mini-program specific
+miniapp-ordering/dist/
+miniapp-ordering/.temp/
+project.config.json.bak
+project.alipay.json.bak
+
+# Prototype reference (keep tracked but ignore temp files)
+miniapp-ordering/_prototype/node_modules/
+miniapp-ordering/_prototype/dist/
+miniapp-ordering/_prototype/.temp/
+frontend/logo-upload-fix-verified.png

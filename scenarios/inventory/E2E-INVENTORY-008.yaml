@@ -1,0 +1,81 @@
+# E2E Scenario: 库存导出报表
+# Generated for e2e-admin testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-008
+spec_ref: P005
+title: 库存导出报表
+description: 验证导出库存明细报表功能，支持 Excel 和 CSV 格式
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+  deploy:
+    - saas
+    - private
+  priority: p3
+  smoke: false
+
+preconditions:
+  role: inventory_manager
+
+steps:
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.manager_user
+    description: 库存经理登录系统
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /inventory/reports
+    description: 导航到库存报表页面
+
+  - action: filter_inventory
+    system: b-end
+    params:
+      date_range: inventoryTestData.report_date_range
+      store: inventoryTestData.store_filter
+    description: 设置筛选条件
+
+  - action: export_report
+    system: b-end
+    params:
+      format: excel
+      fields: inventoryTestData.export_fields
+    description: 导出 Excel 格式报表
+
+assertions:
+  - type: ui
+    check: download_started
+    params:
+      filename_pattern: "inventory_report_*.xlsx"
+    timeout: 10000
+
+  - type: api
+    check: file_created
+    params:
+      path: inventoryTestData.export_path
+      mime_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    timeout: 5000
+
+  - type: api
+    check: database_record_exists
+    params:
+      table: export_logs
+      field: status
+      expected: "completed"
+    timeout: 3000
+
+artifacts:
+  trace: off
+  video: off
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T11:15:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

@@ -57,11 +57,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({ childr
     getWebVitals: () => monitorRef.current.getWebVitals(),
   };
 
-  return (
-    <PerformanceContext.Provider value={contextValue}>
-      {children}
-    </PerformanceContext.Provider>
-  );
+  return <PerformanceContext.Provider value={contextValue}>{children}</PerformanceContext.Provider>;
 };
 
 export const usePerformance = (): PerformanceContextType => {

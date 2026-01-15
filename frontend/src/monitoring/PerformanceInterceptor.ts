@@ -91,9 +91,9 @@ export class PerformanceInterceptor {
       },
       (error) => {
         const requestId = error.config?.headers['X-Request-ID'] as string;
-        const startTime = error.config?.headers ?
-          parseFloat(error.config.headers['X-Request-Start-Time'] as string) :
-          performance.now();
+        const startTime = error.config?.headers
+          ? parseFloat(error.config.headers['X-Request-Start-Time'] as string)
+          : performance.now();
         const endTime = performance.now();
         const duration = endTime - startTime;
 
@@ -154,19 +154,16 @@ export class PerformanceInterceptor {
 
       // 在开发环境中输出详细的请求信息
       if (process.env.NODE_ENV === 'development') {
-        const logLevel = metrics.duration > 1000 ? 'warn' :
-                        metrics.duration > 500 ? 'info' : 'debug';
+        const logLevel =
+          metrics.duration > 1000 ? 'warn' : metrics.duration > 500 ? 'info' : 'debug';
 
-        console[logLevel](
-          `[API Request] ${metrics.method} ${metrics.url}`,
-          {
-            duration: `${metrics.duration.toFixed(2)}ms`,
-            status: metrics.status,
-            success: metrics.success,
-            size: `${(metrics.size || 0 / 1024).toFixed(2)}KB`,
-            retryCount: metrics.retryCount || 0,
-          }
-        );
+        console[logLevel](`[API Request] ${metrics.method} ${metrics.url}`, {
+          duration: `${metrics.duration.toFixed(2)}ms`,
+          status: metrics.status,
+          success: metrics.success,
+          size: `${(metrics.size || 0 / 1024).toFixed(2)}KB`,
+          retryCount: metrics.retryCount || 0,
+        });
       }
     } catch (error) {
       console.warn('记录性能指标时出错:', error);
@@ -180,12 +177,12 @@ export class PerformanceInterceptor {
 
   // 获取慢请求
   public getSlowRequests(threshold = 1000): RequestMetrics[] {
-    return this.getAllMetrics().filter(req => req.duration > threshold);
+    return this.getAllMetrics().filter((req) => req.duration > threshold);
   }
 
   // 获取失败的请求
   public getFailedRequests(): RequestMetrics[] {
-    return this.getAllMetrics().filter(req => !req.success);
+    return this.getAllMetrics().filter((req) => !req.success);
   }
 
   // 重试失败的请求
@@ -212,10 +209,7 @@ export class PerformanceInterceptor {
   }
 
   // 设置全局性能阈值
-  public setPerformanceThresholds(thresholds: {
-    warning: number;
-    error: number;
-  }): void {
+  public setPerformanceThresholds(thresholds: { warning: number; error: number }): void {
     // 这里可以实现更复杂的阈值逻辑
   }
 

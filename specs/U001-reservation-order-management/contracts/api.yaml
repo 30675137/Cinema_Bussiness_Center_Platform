@@ -1,0 +1,939 @@
+openapi: 3.0.3
+info:
+  title: Reservation Order Management API
+  version: 1.0.0
+  description: |
+    预约单管理系统API契约,包含C端用户预约创建与查询、B端运营预约管理功能。
+
+    功能分支: U001-reservation-order-management
+    规格文档: specs/U001-reservation-order-management/spec.md
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.cinema.example.com
+    description: Production server
+
+tags:
+  - name: Client Reservations
+    description: C端用户预约单相关接口
+  - name: Admin Reservations
+    description: B端运营预约单管理接口
+
+paths:
+  # ====================
+  # C端用户预约API
+  # ====================
+
+  /api/client/reservations:
+    post:
+      summary: 创建预约单
+      description: |
+        C端用户提交预约单,包含场景包选择、时段选择、套餐和加购项选择、联系人信息。
+        系统将实时校验时段库存,库存不足时返回400错误。
+      tags:
+        - Client Reservations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+            example:
+              scenarioPackageId: "00000000-0003-0000-0000-000000000003"
+              reservationDate: "2025-12-25"
+              timeSlotId: "uuid-time-slot-001"
+              packageTierId: "uuid-package-tier-001"
+              addOnItems:
+                - addonItemId: "uuid-addon-001"
+                  quantity: 2
+                - addonItemId: "uuid-addon-002"
+                  quantity: 1
+              contactName: "张三"
+              contactPhone: "13800138000"
+              remarks: "请提前准备生日蛋糕"
+      responses:
+        '201':
+          description: 预约单创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  scenarioPackageId: "00000000-0003-0000-0000-000000000003"
+                  scenarioPackageName: "浪漫求婚场景包"
+                  reservationDate: "2025-12-25"
+                  timeSlot: "10:00-14:00"
+                  packageTierName: "豪华套餐"
+                  totalAmount: 3500.00
+                  status: "PENDING"
+                  requiresPayment: null
+                  contactName: "张三"
+                  contactPhone: "13800138000"
+                  remarks: "请提前准备生日蛋糕"
+                  createdAt: "2025-12-23T15:00:00Z"
+                  updatedAt: "2025-12-23T15:00:00Z"
+                timestamp: "2025-12-23T15:00:00Z"
+        '400':
+          description: 请求参数错误或库存不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficientInventory:
+                  summary: 库存不足
+                  value:
+                    error: "INSUFFICIENT_INVENTORY"
+                    message: "该时段预约已满,请选择其他时段"
+                    details:
+                      timeSlotId: "uuid-time-slot-001"
+                      requestedDate: "2025-12-25"
+                    timestamp: "2025-12-23T15:00:00Z"
+                validationError:
+                  summary: 参数验证失败
+                  value:
+                    error: "VALIDATION_ERROR"
+                    message: "请求参数验证失败"
+                    details:
+                      fields:
+                        contactPhone: "手机号格式不正确,必须为11位数字"
+                        contactName: "联系人姓名不能为空"
+                    timestamp: "2025-12-23T15:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      summary: 查询当前用户预约单列表
+      description: C端用户查看"我的预约"列表,支持按状态筛选
+      tags:
+        - Client Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: 预约单状态筛选(可选)
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
+        - name: page
+          in: query
+          description: 页码(从1开始)
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页记录数
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationListResponse'
+              example:
+                data:
+                  - id: "uuid-reservation-001"
+                    orderNumber: "R202512230001"
+                    scenarioPackageName: "浪漫求婚场景包"
+                    reservationDate: "2025-12-25"
+                    timeSlot: "10:00-14:00"
+                    status: "PENDING"
+                    totalAmount: 3500.00
+                    createdAt: "2025-12-23T15:00:00Z"
+                total: 10
+                timestamp: "2025-12-23T15:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/client/reservations/{id}:
+    get:
+      summary: 查询预约单详情
+      description: C端用户查看预约单完整信息,包括套餐、加购项明细、状态历史
+      tags:
+        - Client Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 预约单ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  scenarioPackageId: "00000000-0003-0000-0000-000000000003"
+                  scenarioPackageName: "浪漫求婚场景包"
+                  reservationDate: "2025-12-25"
+                  timeSlot: "10:00-14:00"
+                  packageTierId: "uuid-package-tier-001"
+                  packageTierName: "豪华套餐"
+                  packageTierPrice: 3000.00
+                  addOnItems:
+                    - addonItemId: "uuid-addon-001"
+                      addonItemName: "红酒套餐"
+                      quantity: 2
+                      unitPrice: 200.00
+                      subtotal: 400.00
+                    - addonItemId: "uuid-addon-002"
+                      addonItemName: "花束装饰"
+                      quantity: 1
+                      unitPrice: 100.00
+                      subtotal: 100.00
+                  totalAmount: 3500.00
+                  status: "CONFIRMED"
+                  requiresPayment: true
+                  contactName: "张三"
+                  contactPhone: "13800138000"
+                  remarks: "请提前准备生日蛋糕"
+                  createdAt: "2025-12-23T15:00:00Z"
+                  updatedAt: "2025-12-23T15:30:00Z"
+                  operationLogs:
+                    - operationType: "CREATE"
+                      operatorName: "张三"
+                      createdAt: "2025-12-23T15:00:00Z"
+                    - operationType: "CONFIRM"
+                      operatorName: "运营人员李四"
+                      reason: "确认预约,要求支付"
+                      createdAt: "2025-12-23T15:30:00Z"
+                timestamp: "2025-12-23T15:00:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/client/reservations/pending-count:
+    get:
+      summary: 查询待处理订单数量
+      description: 用于profile页面角标显示,待处理订单定义为状态为PENDING或CONFIRMED且requiresPayment=true
+      tags:
+        - Client Reservations
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  pendingCount: 3
+                timestamp: "2025-12-24T00:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ====================
+  # B端运营管理API
+  # ====================
+
+  /api/admin/reservations:
+    get:
+      summary: 查询预约单列表(B端运营)
+      description: |
+        B端运营人员查看所有预约单列表,支持多维度筛选:
+        - 状态筛选(支持多选)
+        - 创建日期范围
+        - 预订日期范围
+        - 场景包筛选
+        - 搜索框(预约单号/客户手机号模糊搜索)
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: 预约单状态(可多选,逗号分隔)
+          required: false
+          schema:
+            type: string
+            example: "PENDING,CONFIRMED"
+        - name: createdStartDate
+          in: query
+          description: 创建日期起始(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: createdEndDate
+          in: query
+          description: 创建日期结束(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: reservationStartDate
+          in: query
+          description: 预订日期起始(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: reservationEndDate
+          in: query
+          description: 预订日期结束(YYYY-MM-DD)
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: scenarioPackageId
+          in: query
+          description: 场景包ID
+          required: false
+          schema:
+            type: string
+        - name: searchKeyword
+          in: query
+          description: 搜索关键词(预约单号/客户手机号)
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: 页码(从1开始)
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页记录数
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationListResponse'
+              example:
+                data:
+                  - id: "uuid-reservation-001"
+                    orderNumber: "R202512230001"
+                    contactName: "张三"
+                    contactPhone: "13800138000"
+                    scenarioPackageName: "浪漫求婚场景包"
+                    reservationDate: "2025-12-25"
+                    timeSlot: "10:00-14:00"
+                    packageTierName: "豪华套餐"
+                    totalAmount: 3500.00
+                    status: "PENDING"
+                    createdAt: "2025-12-23T15:00:00Z"
+                total: 100
+                timestamp: "2025-12-23T15:00:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/reservations/{id}:
+    get:
+      summary: 查询预约单详情(B端运营)
+      description: B端运营人员查看预约单完整信息
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 预约单ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  userId: "uuid-user-001"
+                  scenarioPackageId: "00000000-0003-0000-0000-000000000003"
+                  scenarioPackageName: "浪漫求婚场景包"
+                  reservationDate: "2025-12-25"
+                  timeSlotId: "uuid-time-slot-001"
+                  timeSlot: "10:00-14:00"
+                  packageTierId: "uuid-package-tier-001"
+                  packageTierName: "豪华套餐"
+                  packageTierPrice: 3000.00
+                  addOnItems:
+                    - addonItemId: "uuid-addon-001"
+                      addonItemName: "红酒套餐"
+                      quantity: 2
+                      unitPrice: 200.00
+                      subtotal: 400.00
+                  totalAmount: 3500.00
+                  status: "PENDING"
+                  requiresPayment: null
+                  contactName: "张三"
+                  contactPhone: "13800138000"
+                  remarks: "请提前准备生日蛋糕"
+                  version: 0
+                  createdAt: "2025-12-23T15:00:00Z"
+                  updatedAt: "2025-12-23T15:00:00Z"
+                  operationLogs:
+                    - operationType: "CREATE"
+                      operatorName: "张三(客户)"
+                      createdAt: "2025-12-23T15:00:00Z"
+                timestamp: "2025-12-23T15:00:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/reservations/{id}/confirm:
+    post:
+      summary: 确认预约单
+      description: |
+        运营人员确认预约单,可选择:
+        1. 要求客户支付(状态变更为CONFIRMED)
+        2. 直接完成(状态直接变更为COMPLETED,无需支付)
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 预约单ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requiresPayment:
+                  type: boolean
+                  description: 是否要求客户支付(true=要求支付,false=直接完成)
+                version:
+                  type: integer
+                  description: 乐观锁版本号
+              required:
+                - requiresPayment
+                - version
+            example:
+              requiresPayment: true
+              version: 0
+      responses:
+        '200':
+          description: 确认成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  status: "CONFIRMED"
+                  requiresPayment: true
+                  updatedAt: "2025-12-23T15:30:00Z"
+                timestamp: "2025-12-23T15:30:00Z"
+        '400':
+          description: 非法状态转换
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "INVALID_STATUS_TRANSITION"
+                message: "当前状态不允许确认操作"
+                details:
+                  currentStatus: "COMPLETED"
+                timestamp: "2025-12-23T15:30:00Z"
+        '409':
+          description: 并发更新冲突(乐观锁)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "CONCURRENT_UPDATE_CONFLICT"
+                message: "预约单已被其他人修改,请刷新页面"
+                details:
+                  currentVersion: 1
+                  requestedVersion: 0
+                timestamp: "2025-12-23T15:30:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/reservations/{id}/cancel:
+    post:
+      summary: 取消预约单
+      description: |
+        运营人员取消预约单,需填写取消原因。
+        取消后将释放时段库存。
+        已完成(COMPLETED)的预约单不可取消。
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 预约单ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 取消原因(必填)
+                  maxLength: 200
+                version:
+                  type: integer
+                  description: 乐观锁版本号
+              required:
+                - reason
+                - version
+            example:
+              reason: "客户要求取消,时段冲突"
+              version: 0
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  status: "CANCELLED"
+                  updatedAt: "2025-12-23T16:00:00Z"
+                timestamp: "2025-12-23T16:00:00Z"
+        '400':
+          description: 非法状态转换或参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidStatusTransition:
+                  summary: 非法状态转换
+                  value:
+                    error: "INVALID_STATUS_TRANSITION"
+                    message: "已完成的预约单无法取消,请使用退款功能"
+                    details:
+                      currentStatus: "COMPLETED"
+                    timestamp: "2025-12-23T16:00:00Z"
+                validationError:
+                  summary: 参数验证失败
+                  value:
+                    error: "VALIDATION_ERROR"
+                    message: "取消原因不能为空"
+                    timestamp: "2025-12-23T16:00:00Z"
+        '409':
+          $ref: '#/components/responses/ConcurrentUpdateConflict'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/reservations/{id}/update-contact:
+    patch:
+      summary: 修改预约单联系信息
+      description: |
+        运营人员修改预约单的联系人姓名、手机号、备注。
+        核心字段(场景包/时段/套餐/加购项)不可修改。
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 预约单ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contactName:
+                  type: string
+                  maxLength: 100
+                contactPhone:
+                  type: string
+                  pattern: '^\d{11}$'
+                  description: 11位手机号
+                remarks:
+                  type: string
+                  maxLength: 200
+                version:
+                  type: integer
+                  description: 乐观锁版本号
+              required:
+                - version
+            example:
+              contactName: "张三(已修改)"
+              contactPhone: "13900139000"
+              remarks: "备注已更新"
+              version: 1
+      responses:
+        '200':
+          description: 修改成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  id: "uuid-reservation-001"
+                  orderNumber: "R202512230001"
+                  contactName: "张三(已修改)"
+                  contactPhone: "13900139000"
+                  remarks: "备注已更新"
+                  updatedAt: "2025-12-23T16:30:00Z"
+                timestamp: "2025-12-23T16:30:00Z"
+        '400':
+          description: 参数验证失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "VALIDATION_ERROR"
+                message: "手机号格式不正确"
+                details:
+                  field: "contactPhone"
+                timestamp: "2025-12-23T16:30:00Z"
+        '409':
+          $ref: '#/components/responses/ConcurrentUpdateConflict'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/admin/reservations/export:
+    post:
+      summary: 批量导出预约单
+      description: |
+        导出筛选条件范围内的所有预约单数据,格式为Excel或CSV。
+        导出字段包括:预约单号、客户信息、场景包、时段、套餐、金额、状态、时间等。
+      tags:
+        - Admin Reservations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: 状态筛选(可多选,逗号分隔)
+                createdStartDate:
+                  type: string
+                  format: date
+                createdEndDate:
+                  type: string
+                  format: date
+                reservationStartDate:
+                  type: string
+                  format: date
+                reservationEndDate:
+                  type: string
+                  format: date
+                scenarioPackageId:
+                  type: string
+                format:
+                  type: string
+                  enum: [excel, csv]
+                  default: excel
+            example:
+              status: "PENDING,CONFIRMED"
+              createdStartDate: "2025-12-01"
+              createdEndDate: "2025-12-31"
+              format: "excel"
+      responses:
+        '200':
+          description: 导出成功,返回文件下载URL或直接返回文件流
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ====================
+  # 时段库存查询API(C端使用)
+  # ====================
+
+  /api/time-slots/{id}/availability:
+    get:
+      summary: 查询时段实时库存
+      description: C端用户选择时段时实时查询库存,用于前端校验和提示
+      tags:
+        - Client Reservations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 时段库存ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                data:
+                  timeSlotId: "uuid-time-slot-001"
+                  date: "2025-12-25"
+                  timeSlot: "10:00-14:00"
+                  totalCapacity: 10
+                  bookedCount: 7
+                  availableCount: 3
+                timestamp: "2025-12-24T00:00:00Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Token认证,格式为 "Bearer <token>"
+
+  schemas:
+    CreateReservationRequest:
+      type: object
+      properties:
+        scenarioPackageId:
+          type: string
+          description: 场景包ID
+        reservationDate:
+          type: string
+          format: date
+          description: 预订日期(YYYY-MM-DD)
+        timeSlotId:
+          type: string
+          description: 时段库存ID
+        packageTierId:
+          type: string
+          description: 套餐档位ID
+        addOnItems:
+          type: array
+          description: 加购项列表
+          items:
+            type: object
+            properties:
+              addonItemId:
+                type: string
+                description: 加购项ID
+              quantity:
+                type: integer
+                minimum: 1
+                description: 数量
+        contactName:
+          type: string
+          maxLength: 100
+          description: 联系人姓名
+        contactPhone:
+          type: string
+          pattern: '^\d{11}$'
+          description: 联系人手机号(11位数字)
+        remarks:
+          type: string
+          maxLength: 200
+          description: 备注(可选)
+      required:
+        - scenarioPackageId
+        - reservationDate
+        - timeSlotId
+        - packageTierId
+        - contactName
+        - contactPhone
+
+    ApiResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: 响应数据
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+
+    ReservationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationSummary'
+        total:
+          type: integer
+          description: 总记录数
+        timestamp:
+          type: string
+          format: date-time
+
+    ReservationSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        orderNumber:
+          type: string
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+        scenarioPackageName:
+          type: string
+        reservationDate:
+          type: string
+          format: date
+        timeSlot:
+          type: string
+        packageTierName:
+          type: string
+        totalAmount:
+          type: number
+          format: double
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: 错误码
+        message:
+          type: string
+          description: 错误信息
+        details:
+          type: object
+          description: 错误详情
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误发生时间戳
+
+  responses:
+    Unauthorized:
+      description: 未授权,Token缺失或无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "UNAUTHORIZED"
+            message: "Token缺失或无效,请先登录"
+            timestamp: "2025-12-23T15:00:00Z"
+
+    Forbidden:
+      description: 权限不足,当前用户无操作权限
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "FORBIDDEN"
+            message: "权限不足,需要ADMIN或OPERATOR角色"
+            timestamp: "2025-12-23T15:00:00Z"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "RESERVATION_NOT_FOUND"
+            message: "未找到指定的预约单"
+            details:
+              reservationId: "uuid-reservation-999"
+            timestamp: "2025-12-23T15:00:00Z"
+
+    ConcurrentUpdateConflict:
+      description: 并发更新冲突(乐观锁)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "CONCURRENT_UPDATE_CONFLICT"
+            message: "预约单已被其他人修改,请刷新页面"
+            details:
+              currentVersion: 1
+              requestedVersion: 0
+            timestamp: "2025-12-23T15:30:00Z"

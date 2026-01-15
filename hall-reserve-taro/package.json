@@ -1,0 +1,66 @@
+{
+  "name": "hall-reserve-taro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "影院场景包预订小程序",
+  "templateInfo": {
+    "name": "react-vite",
+    "typescript": true,
+    "css": "less"
+  },
+  "scripts": {
+    "dev:weapp": "npm run build:weapp -- --watch",
+    "dev:h5": "npm run build:h5 -- --watch",
+    "build:weapp": "taro build --type weapp",
+    "build:h5": "taro build --type h5",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.12",
+    "@tarojs/components": "4.1.9",
+    "@tarojs/helper": "4.1.9",
+    "@tarojs/plugin-framework-react": "4.1.9",
+    "@tarojs/plugin-platform-h5": "4.1.9",
+    "@tarojs/plugin-platform-weapp": "4.1.9",
+    "@tarojs/react": "4.1.9",
+    "@tarojs/runtime": "4.1.9",
+    "@tarojs/shared": "4.1.9",
+    "@tarojs/taro": "4.1.9",
+    "@tarojs/vite-runner": "4.1.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.25.76",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@babel/runtime": "^7.24.0",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@tarojs/cli": "4.1.9",
+    "@tarojs/webpack5-runner": "^4.1.9",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/react": "^18.3.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "babel-preset-taro": "^4.1.9",
+    "jsdom": "^27.3.0",
+    "less": "^4.2.0",
+    "puppeteer": "^24.34.0",
+    "react-refresh": "^0.18.0",
+    "typescript": "^5.4.0",
+    "vite": "^4.5.0",
+    "vitest": "^4.0.16",
+    "webpack": "^5.104.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}

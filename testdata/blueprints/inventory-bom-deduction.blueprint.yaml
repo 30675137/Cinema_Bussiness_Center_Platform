@@ -1,0 +1,40 @@
+# @spec T004-e2e-testdata-planner
+# Test Data Blueprint for E2E-INVENTORY-001 (BOM Deduction Test)
+
+id: TD-INVENTORY-BOM-DEDUCTION
+description: "BOM库存扣减测试数据 - 威士忌可乐鸡尾酒订单"
+version: "1.0.0"
+
+strategy:
+  type: seed
+  seedFilePath: testdata/seeds/inventory-bom-deduction.json
+  seedKey: "bom-deduction-scenario"
+
+# Output data structure
+outputSchema:
+  h5BaseUrl: string
+  user_normal:
+    phone: string
+    verifyCode: string
+  product_with_bom:
+    id: string
+    name: string
+    price: number
+  bom_materials:
+    - skuId: string
+      skuName: string
+      initial_stock: number
+      required_quantity: number
+      unit: string
+  order_data:
+    product_id: string
+    quantity: number
+    total_price: number
+  payment_wechat:
+    method: string
+    amount: number
+
+scope: test
+teardown: false
+timeout: 10000
+environments: [local, staging, production]

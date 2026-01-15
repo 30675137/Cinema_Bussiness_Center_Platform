@@ -12,13 +12,13 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 |
-|--------|------|------|------|
-| productId | string | 否 | 商品ID |
-| warehouseId | string | 否 | 仓库ID |
-| lowStock | boolean | 否 | 只显示低库存商品 |
-| page | number | 否 | 页码 |
-| pageSize | number | 否 | 每页数量 |
+| 参数名      | 类型    | 必填 | 说明             |
+| ----------- | ------- | ---- | ---------------- |
+| productId   | string  | 否   | 商品ID           |
+| warehouseId | string  | 否   | 仓库ID           |
+| lowStock    | boolean | 否   | 只显示低库存商品 |
+| page        | number  | 否   | 页码             |
+| pageSize    | number  | 否   | 每页数量         |
 
 **响应示例**:
 

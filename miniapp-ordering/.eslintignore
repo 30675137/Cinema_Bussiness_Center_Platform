@@ -1,0 +1,7 @@
+node_modules/
+dist/
+build/
+_prototype/
+config/
+*.config.js
+*.config.ts

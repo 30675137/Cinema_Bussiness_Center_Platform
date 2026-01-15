@@ -1,0 +1,1458 @@
+openapi: 3.0.3
+info:
+  title: 渠道商品配置 API
+  description: |
+    **@spec O005-channel-product-config**
+
+    渠道商品配置功能的后端 REST API 规范。支持：
+    - B端管理后台：渠道商品配置管理（CRUD）
+    - C端小程序：商品数据查询和订单创建（O006集成）
+
+    ## 核心功能
+    - SKU 成品选择和渠道配置
+    - 多种规格类型配置（SIZE/TEMPERATURE/SWEETNESS/TOPPING等）
+    - 渠道分类管理（酒/咖啡/饮料/小食/餐品）
+    - 商品状态管理（上架/下架/缺货）
+    - 小程序订单创建和查询
+
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+    email: dev@cinema-platform.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api-dev.cinema-platform.com/api
+    description: 开发环境
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: channel-products
+    description: B端渠道商品配置管理
+  - name: client-products
+    description: C端小程序商品查询
+  - name: client-orders
+    description: C端小程序订单管理
+
+paths:
+  # ==================== B端管理接口 ====================
+
+  /channel-products:
+    get:
+      summary: 查询渠道商品列表（B端）
+      description: |
+        管理员查看渠道商品配置列表，支持筛选和分页。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: listChannelProducts
+      parameters:
+        - $ref: '#/components/parameters/ChannelTypeParam'
+        - $ref: '#/components/parameters/ChannelCategoryParam'
+        - $ref: '#/components/parameters/StatusParam'
+        - $ref: '#/components/parameters/KeywordParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: 成功返回商品列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ChannelProductDTO'
+                      total:
+                        type: integer
+                        example: 100
+                      page:
+                        type: integer
+                        example: 1
+                      pageSize:
+                        type: integer
+                        example: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+    post:
+      summary: 创建渠道商品配置（B端）
+      description: |
+        管理员为 SKU 成品创建渠道配置。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: createChannelProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateChannelProductRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelProductDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: 冲突 - SKU 已在此渠道配置
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      success:
+                        example: false
+                      error:
+                        example: 'CPC_DUP_001'
+                      message:
+                        example: '该 SKU 已在此渠道配置，请直接编辑'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+  /channel-products/{id}:
+    get:
+      summary: 查询单个渠道商品详情（B端）
+      description: |
+        管理员查看渠道商品完整配置信息。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: getChannelProduct
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: 成功返回商品详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelProductDetailDTO'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+    put:
+      summary: 更新渠道商品配置（B端）
+      description: |
+        管理员更新渠道商品配置信息。
+        **注意**: SKU 关联不可修改
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: updateChannelProduct
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateChannelProductRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelProductDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+    delete:
+      summary: 删除渠道商品配置（B端）
+      description: |
+        管理员删除渠道商品配置（软删除）。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: deleteChannelProduct
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+  /channel-products/{id}/status:
+    patch:
+      summary: 更新商品状态（B端）
+      description: |
+        管理员更新商品上下架状态。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: updateChannelProductStatus
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: '#/components/schemas/ChannelProductStatus'
+      responses:
+        '200':
+          description: 状态更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+  /skus/finished-products:
+    get:
+      summary: 获取可选 SKU 成品列表（B端）
+      description: |
+        用于 SKU 选择器，仅返回 finished_product 类型的 SKU。
+        **权限要求**: 管理员
+      tags:
+        - channel-products
+      operationId: getFinishedProductSkus
+      parameters:
+        - name: keyword
+          in: query
+          description: 搜索关键词（SKU 名称或编码）
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: 成功返回 SKU 列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SkuDTO'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+  # ==================== C端小程序接口 (O006集成) ====================
+
+  /client/channel-products/mini-program:
+    get:
+      summary: 获取小程序商品列表（C端）
+      description: |
+        小程序端获取商品列表，仅返回已上架商品。
+        **筛选规则**:
+        - 固定筛选 channel_type = 'MINI_PROGRAM'
+        - 固定筛选 status = 'ACTIVE'
+        - 软删除记录不返回
+      tags:
+        - client-products
+      operationId: getMiniProgramProducts
+      parameters:
+        - name: category
+          in: query
+          description: 商品分类筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/ChannelCategory'
+        - $ref: '#/components/parameters/KeywordParam'
+        - $ref: '#/components/parameters/PageParam'
+        - name: size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 50
+      responses:
+        '200':
+          description: 成功返回商品列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ClientProductListItemDTO'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /client/channel-products/mini-program/{id}:
+    get:
+      summary: 获取商品详情（C端）
+      description: |
+        小程序端获取商品详情，包含完整规格配置。
+        **返回数据**: 仅返回 status = 'ACTIVE' 的商品
+      tags:
+        - client-products
+      operationId: getMiniProgramProductDetail
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: 成功返回商品详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ClientProductDetailDTO'
+        '404':
+          description: 商品不存在或已下架
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      success:
+                        example: false
+                      error:
+                        example: 'PRODUCT_NOT_FOUND'
+                      message:
+                        example: '商品不存在或已下架'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /client/channel-product-orders:
+    post:
+      summary: 创建订单（C端）
+      description: |
+        小程序端创建订单。
+        **Mock 支付**: 订单创建后自动标记为 PAID 状态（O006规格要求）
+      tags:
+        - client-orders
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /client/channel-product-orders/my:
+    get:
+      summary: 查询我的订单列表（C端）
+      description: |
+        小程序端查询当前用户的订单列表。
+        **用户识别**: 从 JWT token 获取用户 ID
+      tags:
+        - client-orders
+      operationId: getMyOrders
+      parameters:
+        - name: status
+          in: query
+          description: 订单状态筛选
+          required: false
+          schema:
+            $ref: '#/components/schemas/OrderStatus'
+        - $ref: '#/components/parameters/PageParam'
+        - name: size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 50
+      responses:
+        '200':
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/OrderListItemDTO'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+  /client/channel-product-orders/{orderId}:
+    get:
+      summary: 查询订单详情（C端）
+      description: |
+        小程序端查询订单详情。
+        **权限验证**: 仅可查询自己的订单
+      tags:
+        - client-orders
+      operationId: getOrderDetail
+      parameters:
+        - name: orderId
+          in: path
+          description: 订单 ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回订单详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDetailDTO'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 无权访问此订单
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      success:
+                        example: false
+                      error:
+                        example: 'ACCESS_DENIED'
+                      message:
+                        example: '无权访问此订单'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token
+
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      description: 资源 ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    ChannelTypeParam:
+      name: channelType
+      in: query
+      description: 渠道类型筛选
+      required: false
+      schema:
+        $ref: '#/components/schemas/ChannelType'
+
+    ChannelCategoryParam:
+      name: category
+      in: query
+      description: 渠道分类筛选
+      required: false
+      schema:
+        $ref: '#/components/schemas/ChannelCategory'
+
+    StatusParam:
+      name: status
+      in: query
+      description: 状态筛选
+      required: false
+      schema:
+        $ref: '#/components/schemas/ChannelProductStatus'
+
+    KeywordParam:
+      name: keyword
+      in: query
+      description: 搜索关键词（商品名称或 SKU 编码）
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+
+    PageParam:
+      name: page
+      in: query
+      description: 页码（从 1 开始）
+      required: false
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+
+    SizeParam:
+      name: size
+      in: query
+      description: 每页数量
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+  schemas:
+    # ==================== 通用响应 ====================
+
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          type: object
+          description: 响应数据（具体结构由各接口定义）
+        error:
+          type: string
+          description: 错误码（失败时）
+          example: 'CPC_VAL_001'
+        message:
+          type: string
+          description: 提示消息
+          example: '操作成功'
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳（ISO 8601 格式）
+          example: '2026-01-02T10:00:00Z'
+
+    # ==================== 枚举类型 ====================
+
+    ChannelType:
+      type: string
+      enum:
+        - MINI_PROGRAM
+        - POS
+        - DELIVERY
+        - ECOMMERCE
+      description: |
+        渠道类型:
+        - MINI_PROGRAM: 小程序点餐
+        - POS: 线下 POS（未来）
+        - DELIVERY: 外卖平台（未来）
+        - ECOMMERCE: 电商平台（未来）
+
+    ChannelCategory:
+      type: string
+      enum:
+        - ALCOHOL
+        - COFFEE
+        - BEVERAGE
+        - SNACK
+        - MEAL
+        - OTHER
+      description: |
+        渠道分类:
+        - ALCOHOL: 酒
+        - COFFEE: 咖啡
+        - BEVERAGE: 饮料
+        - SNACK: 小食
+        - MEAL: 餐品
+        - OTHER: 其他
+
+    ChannelProductStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+        - OUT_OF_STOCK
+      description: |
+        商品状态:
+        - ACTIVE: 已上架
+        - INACTIVE: 已下架
+        - OUT_OF_STOCK: 缺货
+
+    SpecType:
+      type: string
+      enum:
+        - SIZE
+        - TEMPERATURE
+        - SWEETNESS
+        - TOPPING
+        - SPICINESS
+        - SIDE
+        - COOKING
+        - CUSTOM
+      description: |
+        规格类型:
+        - SIZE: 大小（小杯/中杯/大杯）
+        - TEMPERATURE: 温度（冷/热/去冰）
+        - SWEETNESS: 甜度（无糖/半糖/标准/多糖）
+        - TOPPING: 配料（珍珠/椰果/布丁）
+        - SPICINESS: 辣度（不辣/微辣/中辣/特辣）
+        - SIDE: 配菜（薯条/沙拉/洋葱圈）
+        - COOKING: 做法（煎/烤/炸）
+        - CUSTOM: 自定义规格
+
+    OrderStatus:
+      type: string
+      enum:
+        - PENDING_PAYMENT
+        - PAID
+        - PREPARING
+        - READY
+        - COMPLETED
+        - CANCELLED
+      description: |
+        订单状态:
+        - PENDING_PAYMENT: 待支付
+        - PAID: 已支付
+        - PREPARING: 备餐中
+        - READY: 待取餐
+        - COMPLETED: 已完成
+        - CANCELLED: 已取消
+
+    DeliveryMethod:
+      type: string
+      enum:
+        - SELF_PICKUP
+        - DELIVERY
+      description: |
+        取货方式:
+        - SELF_PICKUP: 自取
+        - DELIVERY: 配送
+
+    # ==================== 规格相关 ====================
+
+    SpecOption:
+      type: object
+      required:
+        - id
+        - name
+        - priceAdjustment
+        - isDefault
+        - sortOrder
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 选项 ID
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 选项名称（如"大杯"、"热"）
+          example: '大杯'
+        priceAdjustment:
+          type: integer
+          description: 价格调整（分），正数加价，负数减价
+          example: 500
+        isDefault:
+          type: boolean
+          description: 是否默认选中
+          example: false
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 1
+
+    ChannelProductSpec:
+      type: object
+      required:
+        - id
+        - type
+        - name
+        - required
+        - multiSelect
+        - options
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 规格 ID
+        type:
+          $ref: '#/components/schemas/SpecType'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 规格显示名称（如"大小"、"温度"）
+          example: '大小'
+        required:
+          type: boolean
+          description: 是否必选
+          example: true
+        multiSelect:
+          type: boolean
+          description: 是否多选（如配料可多选）
+          example: false
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecOption'
+          minItems: 1
+          description: 选项列表
+
+    SelectedSpec:
+      type: object
+      required:
+        - specId
+        - optionId
+        - optionName
+        - priceAdjustment
+      properties:
+        specId:
+          type: string
+          format: uuid
+          description: 规格 ID
+        optionId:
+          type: string
+          format: uuid
+          description: 选项 ID
+        optionName:
+          type: string
+          description: 选项名称
+          example: '大杯'
+        priceAdjustment:
+          type: integer
+          description: 价格调整（分）
+          example: 500
+
+    # ==================== SKU 相关 ====================
+
+    SkuDTO:
+      type: object
+      required:
+        - id
+        - skuCode
+        - skuName
+        - price
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: SKU ID
+        skuCode:
+          type: string
+          description: SKU 编码
+          example: 'SKU-COFFEE-001'
+        skuName:
+          type: string
+          description: SKU 名称
+          example: '美式咖啡'
+        price:
+          type: integer
+          description: 基础价格（分）
+          example: 2800
+        imageUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: SKU 主图 URL
+          example: 'https://cdn.example.com/coffee.jpg'
+
+    # ==================== B端渠道商品 DTO ====================
+
+    ChannelProductDTO:
+      type: object
+      required:
+        - id
+        - skuId
+        - channelType
+        - channelCategory
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 渠道商品配置 ID
+        skuId:
+          type: string
+          format: uuid
+          description: 关联的 SKU ID
+        channelType:
+          $ref: '#/components/schemas/ChannelType'
+        displayName:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: 渠道展示名称（空则使用 SKU 名称）
+          example: '美式咖啡（小程序限定）'
+        channelCategory:
+          $ref: '#/components/schemas/ChannelCategory'
+        channelPrice:
+          type: integer
+          nullable: true
+          description: 渠道价格（分），空则使用 SKU 价格
+          example: 3000
+        mainImage:
+          type: string
+          format: uri
+          nullable: true
+          description: 主图 URL（空则使用 SKU 主图）
+          example: 'https://cdn.example.com/coffee-miniprogram.jpg'
+        isRecommended:
+          type: boolean
+          description: 是否推荐
+          example: true
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+        sortOrder:
+          type: integer
+          description: 排序序号
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+        sku:
+          $ref: '#/components/schemas/SkuDTO'
+          description: 关联的 SKU 信息（查询时 JOIN）
+
+    ChannelProductDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/ChannelProductDTO'
+        - type: object
+          properties:
+            detailImages:
+              type: array
+              items:
+                type: string
+                format: uri
+              description: 详情图数组
+              example: ['https://cdn.example.com/coffee-1.jpg']
+            description:
+              type: string
+              nullable: true
+              maxLength: 1000
+              description: 商品描述
+              example: '精选阿拉比卡咖啡豆，香气浓郁'
+            specs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChannelProductSpec'
+              description: 规格配置
+
+    # ==================== C端商品 DTO ====================
+
+    ClientProductListItemDTO:
+      type: object
+      required:
+        - id
+        - skuId
+        - displayName
+        - channelCategory
+        - basePrice
+        - mainImage
+        - hasSpecs
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 商品 ID
+        skuId:
+          type: string
+          format: uuid
+          description: SKU ID
+        displayName:
+          type: string
+          description: 展示名称
+          example: '美式咖啡'
+        channelCategory:
+          $ref: '#/components/schemas/ChannelCategory'
+        basePrice:
+          type: integer
+          description: 基础价格（分）
+          example: 2800
+        mainImage:
+          type: string
+          format: uri
+          description: 主图 URL
+          example: 'https://cdn.example.com/coffee.jpg'
+        isRecommended:
+          type: boolean
+          description: 是否推荐
+          example: true
+        hasSpecs:
+          type: boolean
+          description: 是否有规格配置
+          example: true
+
+    ClientProductDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/ClientProductListItemDTO'
+        - type: object
+          properties:
+            detailImages:
+              type: array
+              items:
+                type: string
+                format: uri
+              description: 详情图数组
+            description:
+              type: string
+              nullable: true
+              description: 商品描述
+            specs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChannelProductSpec'
+              description: 规格配置
+
+    # ==================== 请求 DTO ====================
+
+    CreateChannelProductRequest:
+      type: object
+      required:
+        - skuId
+        - channelCategory
+      properties:
+        skuId:
+          type: string
+          format: uuid
+          description: SKU 成品 ID
+        channelType:
+          $ref: '#/components/schemas/ChannelType'
+          default: 'MINI_PROGRAM'
+        displayName:
+          type: string
+          maxLength: 100
+          description: 渠道展示名称（可选）
+        channelCategory:
+          $ref: '#/components/schemas/ChannelCategory'
+        channelPrice:
+          type: integer
+          minimum: 0
+          description: 渠道价格（分），可选
+        mainImage:
+          type: string
+          format: uri
+          description: 主图 URL（可选）
+        detailImages:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: 详情图数组（可选）
+        description:
+          type: string
+          maxLength: 1000
+          description: 商品描述（可选）
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductSpec'
+          description: 规格配置（可选）
+        isRecommended:
+          type: boolean
+          default: false
+          description: 是否推荐
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+          default: 'ACTIVE'
+        sortOrder:
+          type: integer
+          default: 0
+          description: 排序序号
+
+    UpdateChannelProductRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: 渠道展示名称
+        channelCategory:
+          $ref: '#/components/schemas/ChannelCategory'
+        channelPrice:
+          type: integer
+          nullable: true
+          minimum: 0
+          description: 渠道价格（分），null 则使用 SKU 价格
+        mainImage:
+          type: string
+          format: uri
+          nullable: true
+          description: 主图 URL，null 则使用 SKU 主图
+        detailImages:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: 详情图数组
+        description:
+          type: string
+          nullable: true
+          maxLength: 1000
+          description: 商品描述
+        specs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductSpec'
+          description: 规格配置
+        isRecommended:
+          type: boolean
+          description: 是否推荐
+        status:
+          $ref: '#/components/schemas/ChannelProductStatus'
+        sortOrder:
+          type: integer
+          description: 排序序号
+
+    # ==================== 订单相关 ====================
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - storeId
+        - hallId
+        - sessionTime
+        - items
+        - contactName
+        - contactPhone
+        - deliveryMethod
+      properties:
+        storeId:
+          type: string
+          format: uuid
+          description: 门店 ID
+        hallId:
+          type: string
+          format: uuid
+          description: 影厅 ID
+        sessionTime:
+          type: string
+          format: date-time
+          description: 场次时间（ISO 8601 格式）
+          example: '2026-01-02T14:30:00Z'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+          minItems: 1
+          description: 订单项数组
+        contactName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 联系人姓名
+          example: '张三'
+        contactPhone:
+          type: string
+          pattern: '^1[3-9]\d{9}$'
+          description: 联系电话（中国大陆手机号）
+          example: '13800138000'
+        deliveryMethod:
+          $ref: '#/components/schemas/DeliveryMethod'
+        notes:
+          type: string
+          maxLength: 500
+          description: 订单备注
+          example: '少冰'
+
+    OrderItemRequest:
+      type: object
+      required:
+        - channelProductId
+        - quantity
+      properties:
+        channelProductId:
+          type: string
+          format: uuid
+          description: 渠道商品配置 ID
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: 数量
+          example: 2
+        selectedSpecs:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SelectedSpec'
+          description: 选中的规格（键为 SpecType，值为选项详情）
+          example:
+            SIZE:
+              specId: 'spec-001'
+              optionId: 'opt-003'
+              optionName: '大杯'
+              priceAdjustment: 500
+            TEMPERATURE:
+              specId: 'spec-002'
+              optionId: 'opt-004'
+              optionName: '热'
+              priceAdjustment: 0
+
+    OrderDTO:
+      type: object
+      required:
+        - orderId
+        - orderNumber
+        - totalAmount
+        - status
+        - createdAt
+        - items
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: 订单 ID
+        orderNumber:
+          type: string
+          description: 订单号
+          example: 'MP202601020001'
+        totalAmount:
+          type: integer
+          description: 订单总额（分）
+          example: 7000
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: 支付时间
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemDTO'
+          description: 订单项
+
+    OrderItemDTO:
+      type: object
+      required:
+        - id
+        - productName
+        - basePrice
+        - unitPrice
+        - quantity
+        - subtotal
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 订单项 ID
+        productName:
+          type: string
+          description: 商品名称
+          example: '美式咖啡'
+        productImage:
+          type: string
+          format: uri
+          nullable: true
+          description: 商品图片
+        basePrice:
+          type: integer
+          description: 基础价格（分）
+          example: 2800
+        selectedSpecs:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SelectedSpec'
+          description: 选中的规格
+        unitPrice:
+          type: integer
+          description: 单价（分）= basePrice + Σ(priceAdjustment)
+          example: 3500
+        quantity:
+          type: integer
+          description: 数量
+          example: 2
+        subtotal:
+          type: integer
+          description: 小计（分）= unitPrice × quantity
+          example: 7000
+
+    OrderListItemDTO:
+      type: object
+      required:
+        - orderId
+        - orderNumber
+        - totalAmount
+        - status
+        - createdAt
+        - items
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: 订单 ID
+        orderNumber:
+          type: string
+          description: 订单号
+        totalAmount:
+          type: integer
+          description: 订单总额（分）
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productName:
+                type: string
+                description: 商品名称
+              productImage:
+                type: string
+                format: uri
+                nullable: true
+                description: 商品图片
+              unitPrice:
+                type: integer
+                description: 单价（分）
+              quantity:
+                type: integer
+                description: 数量
+              subtotal:
+                type: integer
+                description: 小计（分）
+              specsDescription:
+                type: string
+                description: 规格描述字符串（如"大杯 / 热 / 珍珠"）
+                example: '大杯 / 热 / 珍珠'
+          description: 订单项摘要
+        deliveryMethod:
+          $ref: '#/components/schemas/DeliveryMethod'
+        storeName:
+          type: string
+          description: 门店名称
+          example: '万达影城中关村店'
+
+    OrderDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/OrderDTO'
+        - type: object
+          properties:
+            contactName:
+              type: string
+              description: 联系人姓名
+            contactPhone:
+              type: string
+              description: 联系电话（脱敏）
+              example: '138****8000'
+            deliveryMethod:
+              $ref: '#/components/schemas/DeliveryMethod'
+            notes:
+              type: string
+              nullable: true
+              description: 订单备注
+            storeName:
+              type: string
+              description: 门店名称
+            hallName:
+              type: string
+              description: 影厅名称
+            sessionTime:
+              type: string
+              format: date-time
+              description: 场次时间
+
+  # ==================== 响应模板 ====================
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    example: 'CPC_VAL_001'
+                  message:
+                    example: '请求参数验证失败'
+
+    Unauthorized:
+      description: 未认证
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    example: 'AUTH_001'
+                  message:
+                    example: '认证失败，请重新登录'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    example: 'CPC_NTF_001'
+                  message:
+                    example: '渠道商品配置不存在'
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    example: 'SYS_ERR_001'
+                  message:
+                    example: '服务器内部错误'

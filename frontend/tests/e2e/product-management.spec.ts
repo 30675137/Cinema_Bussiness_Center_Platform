@@ -149,8 +149,8 @@ test.describe('用户故事1: 商品管理主界面', () => {
 
     // 选择前两个商品
     await productPage.selectProducts([
-      await rows.nth(0).locator('[data-testid="cell-sku"]').textContent() || '',
-      await rows.nth(1).locator('[data-testid="cell-sku"]').textContent() || ''
+      (await rows.nth(0).locator('[data-testid="cell-sku"]').textContent()) || '',
+      (await rows.nth(1).locator('[data-testid="cell-sku"]').textContent()) || '',
     ]);
 
     // 验证批量操作按钮出现
@@ -178,7 +178,7 @@ test.describe('用户故事1: 商品管理主界面', () => {
 
     // 验证表格在移动端的显示方式
     const mobileCards = page.locator('[data-testid="mobile-product-card"]');
-    if (await mobileCards.count() > 0) {
+    if ((await mobileCards.count()) > 0) {
       await expect(mobileCards.first()).toBeVisible();
     }
   });
@@ -189,7 +189,7 @@ test.describe('用户故事1: 商品管理主界面', () => {
     // Then 显示适当的加载状态和错误处理
 
     // 监听网络请求
-    page.on('request', request => {
+    page.on('request', (request) => {
       if (request.url().includes('/api/products')) {
         // 模拟网络延迟
         // Note: 在实际测试中，这里可以通过route handler来模拟延迟

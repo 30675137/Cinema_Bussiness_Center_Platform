@@ -1,0 +1,2418 @@
+openapi: 3.0.3
+info:
+  title: Beverage Order & Production Management API
+  description: |
+    饮品订单创建与出品管理 API 规范
+    - C端：顾客下单、支付、查询订单
+    - B端：接收订单、管理出品、BOM扣料、叫号通知
+    - 管理端：饮品管理、规格配置、配方管理
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform
+    email: dev@cinema.com
+
+servers:
+  - url: https://api.cinema.com
+    description: Production server
+  - url: https://api-staging.cinema.com
+    description: Staging server
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Client - Beverages
+    description: C端饮品菜单查询
+  - name: Client - Orders
+    description: C端订单创建与查询
+  - name: Client - Queue
+    description: C端取餐号查询
+  - name: Admin - Orders
+    description: B端订单管理与出品
+  - name: Admin - Beverages
+    description: 后端饮品管理（仅API，无UI）
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ==================== C端 - 饮品菜单 ====================
+  /api/client/beverages:
+    get:
+      tags:
+        - Client - Beverages
+      summary: 获取饮品菜单列表
+      description: |
+        获取所有启用的饮品，按分类分组返回
+        - 支持分类筛选
+        - 支持分页加载
+        - 返回饮品基本信息、价格、库存状态
+      operationId: getBeverages
+      parameters:
+        - name: category
+          in: query
+          description: 饮品分类（不传则返回所有分类）
+          required: false
+          schema:
+            type: string
+            enum: [COFFEE, TEA, JUICE, SMOOTHIE, MILK_TEA, OTHER]
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页条数
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功返回饮品列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        description: 按分类分组的饮品列表
+                        additionalProperties:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/BeverageDTO'
+                      total:
+                        type: integer
+                        description: 总条数
+                      page:
+                        type: integer
+                        description: 当前页码
+                      pageSize:
+                        type: integer
+                        description: 每页条数
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      COFFEE:
+                        - id: "550e8400-e29b-41d4-a716-446655440000"
+                          name: "美式咖啡"
+                          description: "经典美式咖啡，浓郁香醇"
+                          category: "COFFEE"
+                          basePrice: 15.00
+                          imageUrl: "https://storage.supabase.co/.../americano.jpg"
+                          status: "ACTIVE"
+                          isRecommended: true
+                      TEA:
+                        - id: "660e8400-e29b-41d4-a716-446655440001"
+                          name: "珍珠奶茶"
+                          description: "经典珍珠奶茶，Q弹珍珠"
+                          category: "TEA"
+                          basePrice: 18.00
+                          imageUrl: "https://storage.supabase.co/.../milk-tea.jpg"
+                          status: "ACTIVE"
+                          isRecommended: false
+                    total: 25
+                    page: 1
+                    pageSize: 20
+                    timestamp: "2025-12-27T10:30:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/client/beverages/{id}:
+    get:
+      tags:
+        - Client - Beverages
+      summary: 获取饮品详情
+      description: |
+        获取单个饮品的详细信息
+        - 包含饮品基本信息
+        - 包含所有可选规格（大小、温度、甜度、配料）
+        - 包含营养信息
+        - 包含详情图片数组
+      operationId: getBeverageDetail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 饮品ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回饮品详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageDetailDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      name: "美式咖啡"
+                      description: "经典美式咖啡，浓郁香醇，选用优质咖啡豆现磨"
+                      category: "COFFEE"
+                      basePrice: 15.00
+                      imageUrl: "https://storage.supabase.co/.../americano.jpg"
+                      detailImages:
+                        - "https://storage.supabase.co/.../americano-detail-1.jpg"
+                        - "https://storage.supabase.co/.../americano-detail-2.jpg"
+                      nutritionInfo:
+                        calories: 10
+                        sugar: "0g"
+                        caffeine: "150mg"
+                      status: "ACTIVE"
+                      isRecommended: true
+                      specs:
+                        SIZE:
+                          - id: "spec-001"
+                            specType: "SIZE"
+                            specName: "小杯"
+                            specCode: "small"
+                            priceAdjustment: 0
+                            isDefault: true
+                          - id: "spec-002"
+                            specType: "SIZE"
+                            specName: "大杯"
+                            specCode: "large"
+                            priceAdjustment: 5.00
+                            isDefault: false
+                        TEMPERATURE:
+                          - id: "spec-003"
+                            specType: "TEMPERATURE"
+                            specName: "热"
+                            specCode: "hot"
+                            priceAdjustment: 0
+                            isDefault: true
+                          - id: "spec-004"
+                            specType: "TEMPERATURE"
+                            specName: "冰"
+                            specCode: "cold"
+                            priceAdjustment: 0
+                            isDefault: false
+                    timestamp: "2025-12-27T10:30:00Z"
+        '404':
+          $ref: '#/components/responses/BeverageNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/client/beverage-specs:
+    get:
+      tags:
+        - Client - Beverages
+      summary: 获取可选规格列表
+      description: |
+        获取所有可选规格类型及选项（全局）
+        - 用于规格选择器初始化
+        - 返回所有规格类型（大小、温度、甜度、配料）
+      operationId: getBeverageSpecs
+      responses:
+        '200':
+          description: 成功返回规格列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      SIZE: ["小杯", "中杯", "大杯"]
+                      TEMPERATURE: ["热", "冰", "去冰", "少冰"]
+                      SWEETNESS: ["无糖", "半糖", "标准", "多糖"]
+                      TOPPING: ["珍珠", "椰果", "布丁", "奶盖"]
+                    timestamp: "2025-12-27T10:30:00Z"
+
+  # ==================== C端 - 订单管理 ====================
+  /api/client/beverage-orders:
+    post:
+      tags:
+        - Client - Orders
+      summary: 创建饮品订单
+      description: |
+        创建新的饮品订单
+        - 校验饮品ID和规格选择
+        - 计算订单总价（基础价格 + 规格调整）
+        - 生成订单号（BORDT + yyyyMMddHHmmss + 4位随机）
+        - 订单初始状态为 PENDING_PAYMENT
+      operationId: createBeverageOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBeverageOrderRequest'
+            examples:
+              example:
+                value:
+                  storeId: "store-456"
+                  items:
+                    - beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                      quantity: 2
+                      selectedSpecs:
+                        size:
+                          name: "大杯"
+                          code: "large"
+                          priceAdjustment: 5.00
+                        temperature:
+                          name: "冰"
+                          code: "cold"
+                          priceAdjustment: 0
+                    - beverageId: "660e8400-e29b-41d4-a716-446655440001"
+                      quantity: 1
+                      selectedSpecs:
+                        size:
+                          name: "小杯"
+                          code: "small"
+                          priceAdjustment: 0
+                        sweetness:
+                          name: "半糖"
+                          code: "half"
+                          priceAdjustment: 0
+                        topping:
+                          name: "珍珠"
+                          code: "pearl"
+                          priceAdjustment: 3.00
+                  customerNote: "少冰，谢谢"
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageOrderDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: "order-123"
+                      orderNumber: "BORDT202512271430251234"
+                      userId: "user-789"
+                      storeId: "store-456"
+                      totalPrice: 46.00
+                      status: "PENDING_PAYMENT"
+                      items:
+                        - id: "item-001"
+                          beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                          beverageName: "美式咖啡"
+                          beverageImageUrl: "https://.../americano.jpg"
+                          selectedSpecs:
+                            size:
+                              name: "大杯"
+                              code: "large"
+                              priceAdjustment: 5.00
+                            temperature:
+                              name: "冰"
+                              code: "cold"
+                              priceAdjustment: 0
+                          quantity: 2
+                          unitPrice: 20.00
+                          subtotal: 40.00
+                        - id: "item-002"
+                          beverageId: "660e8400-e29b-41d4-a716-446655440001"
+                          beverageName: "珍珠奶茶"
+                          beverageImageUrl: "https://.../milk-tea.jpg"
+                          selectedSpecs:
+                            size:
+                              name: "小杯"
+                              code: "small"
+                              priceAdjustment: 0
+                            sweetness:
+                              name: "半糖"
+                              code: "half"
+                              priceAdjustment: 0
+                            topping:
+                              name: "珍珠"
+                              code: "pearl"
+                              priceAdjustment: 3.00
+                          quantity: 1
+                          unitPrice: 18.00
+                          subtotal: 18.00
+                      customerNote: "少冰，谢谢"
+                      createdAt: "2025-12-27T14:30:25Z"
+                    timestamp: "2025-12-27T14:30:25Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                validation_error:
+                  value:
+                    success: false
+                    error: "ORD_VAL_001"
+                    message: "订单验证失败"
+                    details:
+                      field: "items"
+                      reason: "订单至少包含一个饮品"
+                    timestamp: "2025-12-27T10:30:00Z"
+                invalid_spec:
+                  value:
+                    success: false
+                    error: "ORD_VAL_002"
+                    message: "规格选择无效"
+                    details:
+                      beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                      invalidSpec: "size: 超大杯"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '422':
+          description: 业务规则错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficient_inventory:
+                  value:
+                    success: false
+                    error: "ORD_VAL_003"
+                    message: "库存不足"
+                    details:
+                      beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                      beverageName: "美式咖啡"
+                      availableQuantity: 0
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/client/beverage-orders/{id}/pay:
+    post:
+      tags:
+        - Client - Orders
+      summary: Mock支付订单
+      description: |
+        模拟支付流程（MVP阶段）
+        - 延迟500ms模拟异步支付
+        - 自动标记订单为"已支付"
+        - 生成Mock支付流水号
+        - 生成取餐号
+        - 状态变更: PENDING_PAYMENT → PENDING_PRODUCTION
+      operationId: payBeverageOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentMethod:
+                  type: string
+                  description: 支付方式（MVP阶段固定为MOCK_WECHAT_PAY）
+                  enum: [MOCK_WECHAT_PAY]
+                  example: MOCK_WECHAT_PAY
+              required:
+                - paymentMethod
+      responses:
+        '200':
+          description: 支付成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          orderId:
+                            type: string
+                            format: uuid
+                          orderNumber:
+                            type: string
+                          queueNumber:
+                            type: string
+                            description: 取餐号
+                          status:
+                            type: string
+                            enum: [PENDING_PRODUCTION]
+                          transactionId:
+                            type: string
+                            description: 支付流水号（Mock）
+                          paidAt:
+                            type: string
+                            format: date-time
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      orderId: "order-123"
+                      orderNumber: "BORDT202512271430251234"
+                      queueNumber: "D042"
+                      status: "PENDING_PRODUCTION"
+                      transactionId: "MOCK_1735291830000"
+                      paidAt: "2025-12-27T14:30:30Z"
+                    timestamp: "2025-12-27T14:30:30Z"
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '409':
+          description: 重复支付
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicate_payment:
+                  value:
+                    success: false
+                    error: "ORD_DUP_001"
+                    message: "订单已支付，请勿重复支付"
+                    details:
+                      orderId: "order-123"
+                      currentStatus: "PENDING_PRODUCTION"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/client/beverage-orders/{id}:
+    get:
+      tags:
+        - Client - Orders
+      summary: 查询订单详情
+      description: |
+        获取订单详细信息
+        - 包含订单基本信息
+        - 包含订单项列表（饮品快照）
+        - 包含取餐号
+        - 包含订单状态
+        - 支持轮询查询状态更新（8秒间隔）
+      operationId: getBeverageOrderDetail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回订单详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageOrderDetailDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: "order-123"
+                      orderNumber: "BORDT202512271430251234"
+                      userId: "user-789"
+                      storeId: "store-456"
+                      totalPrice: 46.00
+                      status: "COMPLETED"
+                      queueNumber: "D042"
+                      paymentMethod: "MOCK_WECHAT_PAY"
+                      transactionId: "MOCK_1735291830000"
+                      paidAt: "2025-12-27T14:30:30Z"
+                      productionStartTime: "2025-12-27T14:31:00Z"
+                      completedAt: "2025-12-27T14:35:00Z"
+                      customerNote: "少冰，谢谢"
+                      items:
+                        - id: "item-001"
+                          beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                          beverageName: "美式咖啡"
+                          beverageImageUrl: "https://.../americano.jpg"
+                          selectedSpecs:
+                            size:
+                              name: "大杯"
+                              code: "large"
+                              priceAdjustment: 5.00
+                            temperature:
+                              name: "冰"
+                              code: "cold"
+                              priceAdjustment: 0
+                          quantity: 2
+                          unitPrice: 20.00
+                          subtotal: 40.00
+                      createdAt: "2025-12-27T14:30:25Z"
+                      updatedAt: "2025-12-27T14:35:00Z"
+                    timestamp: "2025-12-27T14:35:10Z"
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/client/beverage-orders/my:
+    get:
+      tags:
+        - Client - Orders
+      summary: 我的订单列表
+      description: |
+        获取当前用户的历史订单列表
+        - 按创建时间倒序排列
+        - 支持分页加载
+        - 支持状态筛选
+      operationId: getMyBeverageOrders
+      parameters:
+        - name: status
+          in: query
+          description: 订单状态筛选（不传则返回所有状态）
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_PAYMENT, PENDING_PRODUCTION, PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页条数
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BeverageOrderDTO'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      - id: "order-123"
+                        orderNumber: "BORDT202512271430251234"
+                        totalPrice: 46.00
+                        status: "DELIVERED"
+                        queueNumber: "D042"
+                        itemCount: 3
+                        createdAt: "2025-12-27T14:30:25Z"
+                      - id: "order-122"
+                        orderNumber: "BORDT202512261200001111"
+                        totalPrice: 23.00
+                        status: "CANCELLED"
+                        queueNumber: "D015"
+                        itemCount: 1
+                        createdAt: "2025-12-26T12:00:00Z"
+                    total: 15
+                    page: 1
+                    pageSize: 20
+                    timestamp: "2025-12-27T15:00:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== C端 - 取餐号查询 ====================
+  /api/client/queue-numbers/{orderId}:
+    get:
+      tags:
+        - Client - Queue
+      summary: 查询取餐号
+      description: |
+        根据订单ID查询取餐号
+        - 返回取餐号码
+        - 返回叫号状态
+        - 支持轮询查询叫号状态
+      operationId: getQueueNumber
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回取餐号
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/QueueNumberDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: "queue-001"
+                      queueNumber: "D042"
+                      orderId: "order-123"
+                      status: "CALLED"
+                      calledAt: "2025-12-27T14:35:10Z"
+                      createdAt: "2025-12-27T14:30:30Z"
+                    timestamp: "2025-12-27T14:35:15Z"
+        '404':
+          description: 取餐号不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                not_found:
+                  value:
+                    success: false
+                    error: "ORD_NTF_002"
+                    message: "取餐号不存在"
+                    details:
+                      orderId: "order-999"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== B端 - 订单管理 ====================
+  /api/admin/beverage-orders:
+    get:
+      tags:
+        - Admin - Orders
+      summary: B端订单列表
+      description: |
+        获取门店的订单列表（管理后台）
+        - 支持状态筛选
+        - 支持时间范围筛选
+        - 支持分页加载
+        - 按创建时间正序排列（先到先处理）
+      operationId: getAdminBeverageOrders
+      parameters:
+        - name: storeId
+          in: query
+          required: true
+          description: 门店ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: 订单状态筛选
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_PRODUCTION, PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+        - name: startTime
+          in: query
+          description: 开始时间（ISO 8601格式）
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          description: 结束时间（ISO 8601格式）
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页条数
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BeverageOrderDTO'
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      pageSize:
+                        type: integer
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/pending:
+    get:
+      tags:
+        - Admin - Orders
+      summary: 待处理订单（轮询端点）
+      description: |
+        获取待处理订单列表（实时轮询）
+        - 仅返回 PENDING_PRODUCTION 和 PRODUCING 状态的订单
+        - 按创建时间正序排列
+        - 前端使用 TanStack Query 8秒间隔轮询
+      operationId: getPendingBeverageOrders
+      parameters:
+        - name: storeId
+          in: query
+          required: true
+          description: 门店ID
+          schema:
+            type: string
+            format: uuid
+        - name: since
+          in: query
+          description: 查询此时间之后的订单（增量查询优化）
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 成功返回待处理订单
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BeverageOrderDTO'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/{id}/status:
+    put:
+      tags:
+        - Admin - Orders
+      summary: 更新订单状态
+      description: |
+        B端工作人员更新订单状态
+        - 支持的状态流转：
+          - PENDING_PRODUCTION → PRODUCING (开始制作 + BOM扣料)
+          - PRODUCING → COMPLETED (完成制作 + 触发叫号)
+          - COMPLETED → DELIVERED (顾客已取餐)
+          - * → CANCELLED (取消订单)
+        - 状态变更记录到审计日志
+      operationId: updateBeverageOrderStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+                reason:
+                  type: string
+                  description: 状态变更原因（取消时必填）
+              required:
+                - status
+            examples:
+              start_production:
+                value:
+                  status: "PRODUCING"
+              complete:
+                value:
+                  status: "COMPLETED"
+              deliver:
+                value:
+                  status: "DELIVERED"
+              cancel:
+                value:
+                  status: "CANCELLED"
+                  reason: "原料库存不足"
+      responses:
+        '200':
+          description: 状态更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageOrderDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      id: "order-123"
+                      orderNumber: "BORDT202512271430251234"
+                      status: "PRODUCING"
+                      productionStartTime: "2025-12-27T14:31:00Z"
+                      updatedAt: "2025-12-27T14:31:00Z"
+                    timestamp: "2025-12-27T14:31:00Z"
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '422':
+          description: 业务规则错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_transition:
+                  value:
+                    success: false
+                    error: "ORD_BIZ_001"
+                    message: "订单状态不允许变更"
+                    details:
+                      currentStatus: "DELIVERED"
+                      targetStatus: "PRODUCING"
+                      reason: "已交付的订单无法返回制作中状态"
+                    timestamp: "2025-12-27T10:30:00Z"
+                bom_deduction_failed:
+                  value:
+                    success: false
+                    error: "ORD_BIZ_002"
+                    message: "BOM扣料失败"
+                    details:
+                      reason: "原料库存不足"
+                      missingIngredients:
+                        - skuId: "sku-coffee-beans"
+                          skuName: "咖啡豆"
+                          required: 40
+                          available: 15
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/{id}/call:
+    post:
+      tags:
+        - Admin - Orders
+      summary: 叫号通知
+      description: |
+        触发叫号通知
+        - B端显示"已叫号"状态（Mock语音播报）
+        - C端小程序推送通知
+        - 更新取餐号状态为 CALLED
+      operationId: callBeverageOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 叫号成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          queueNumber:
+                            type: string
+                          calledAt:
+                            type: string
+                            format: date-time
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      queueNumber: "D042"
+                      calledAt: "2025-12-27T14:35:10Z"
+                    message: "叫号成功，已通知顾客取餐"
+                    timestamp: "2025-12-27T14:35:10Z"
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/{id}:
+    get:
+      tags:
+        - Admin - Orders
+      summary: B端订单详情
+      description: |
+        B端查看订单详细信息
+        - 包含订单基本信息
+        - 包含订单项列表
+        - 包含BOM清单（所需原料）
+        - 包含制作步骤
+      operationId: getAdminBeverageOrderDetail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功返回订单详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminBeverageOrderDetailDTO'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/{id}/deduct-inventory:
+    post:
+      tags:
+        - Admin - Orders
+      summary: BOM扣料（集成P003/P004）
+      description: |
+        执行BOM扣料操作
+        - 查询订单中所有饮品的配方
+        - 计算所需原料总量
+        - 调用P003库存查询API校验库存充足性
+        - 调用P004库存扣减API执行扣料
+        - 使用悲观锁保证库存一致性
+      operationId: deductInventoryForOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 订单ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 扣料成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          deductedIngredients:
+                            type: array
+                            description: 已扣减的原料列表
+                            items:
+                              type: object
+                              properties:
+                                skuId:
+                                  type: string
+                                skuName:
+                                  type: string
+                                quantity:
+                                  type: number
+                                unit:
+                                  type: string
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      deductedIngredients:
+                        - skuId: "sku-coffee-beans"
+                          skuName: "咖啡豆"
+                          quantity: 40
+                          unit: "g"
+                        - skuId: "sku-water"
+                          skuName: "水"
+                          quantity: 600
+                          unit: "ml"
+                    message: "BOM扣料成功"
+                    timestamp: "2025-12-27T14:31:00Z"
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '422':
+          description: 业务规则错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficient_inventory:
+                  value:
+                    success: false
+                    error: "ORD_BIZ_002"
+                    message: "BOM扣料失败：原料库存不足"
+                    details:
+                      missingIngredients:
+                        - skuId: "sku-coffee-beans"
+                          skuName: "咖啡豆"
+                          required: 40
+                          available: 15
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== 后端 - 饮品管理 ====================
+  /api/admin/beverages:
+    post:
+      tags:
+        - Admin - Beverages
+      summary: 创建饮品
+      description: |
+        创建新饮品（仅后端API，无B端UI）
+        - 通过Supabase Studio或API调试工具调用
+        - 创建饮品基本信息
+        - 自动生成UUID
+      operationId: createBeverage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBeverageRequest'
+      responses:
+        '201':
+          description: 饮品创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverages/{id}:
+    put:
+      tags:
+        - Admin - Beverages
+      summary: 更新饮品
+      description: 更新饮品信息
+      operationId: updateBeverage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBeverageRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageDTO'
+        '404':
+          $ref: '#/components/responses/BeverageNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - Admin - Beverages
+      summary: 删除/下架饮品
+      description: |
+        软删除饮品（更新status为INACTIVE）
+        - 不删除数据库记录
+        - 已关联订单不受影响
+      operationId: deleteBeverage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 删除成功
+        '404':
+          $ref: '#/components/responses/BeverageNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-specs:
+    post:
+      tags:
+        - Admin - Beverages
+      summary: 添加饮品规格
+      description: 为饮品添加可选规格（大小、温度、甜度、配料）
+      operationId: addBeverageSpec
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBeverageSpecRequest'
+      responses:
+        '201':
+          description: 规格创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageSpecDTO'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-recipes:
+    post:
+      tags:
+        - Admin - Beverages
+      summary: 配置饮品配方（BOM）
+      description: |
+        配置饮品制作配方
+        - 关联饮品ID
+        - 指定规格组合（可选）
+        - 定义所需原料及用量
+      operationId: createBeverageRecipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBeverageRecipeRequest'
+      responses:
+        '201':
+          description: 配方创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          beverageId:
+                            type: string
+                            format: uuid
+                          specCombination:
+                            type: object
+                            nullable: true
+                          ingredients:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                skuId:
+                                  type: string
+                                skuName:
+                                  type: string
+                                quantity:
+                                  type: number
+                                unit:
+                                  type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== C端 - 订单历史查询 (US3) ====================
+  /api/beverage-orders/history:
+    get:
+      tags:
+        - Client - Orders
+      summary: 订单历史查询
+      description: |
+        查询用户的历史订单列表（US3: FR-019）
+        - 按时间倒序排列
+        - 支持状态筛选
+        - 支持分页加载
+        - 返回订单基本信息和订单项
+      operationId: getOrderHistory
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: 用户ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: 订单状态筛选（可选）
+          required: false
+          schema:
+            type: string
+            enum: [PENDING_PAYMENT, PENDING_PRODUCTION, PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+        - name: page
+          in: query
+          description: 页码（从0开始，Spring Data分页）
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: pageSize
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功返回订单历史
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            type: array
+                            description: 订单列表
+                            items:
+                              $ref: '#/components/schemas/BeverageOrderDetailDTO'
+                          totalElements:
+                            type: integer
+                            description: 总记录数
+                          totalPages:
+                            type: integer
+                            description: 总页数
+                          number:
+                            type: integer
+                            description: 当前页码
+                          size:
+                            type: integer
+                            description: 每页数量
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      content:
+                        - id: "order-123"
+                          orderNumber: "BORDT202512271430251234"
+                          userId: "user-789"
+                          totalPrice: 46.00
+                          status: "DELIVERED"
+                          queueNumber: "D042"
+                          items:
+                            - beverageName: "美式咖啡"
+                              quantity: 2
+                              unitPrice: 20.00
+                          createdAt: "2025-12-27T14:30:25Z"
+                      totalElements: 25
+                      totalPages: 3
+                      number: 0
+                      size: 10
+                    timestamp: "2025-12-27T15:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/beverage-orders/by-number/{orderNumber}:
+    get:
+      tags:
+        - Client - Orders
+      summary: 根据订单号搜索订单
+      description: |
+        根据订单号查询订单详情（US3: T130）
+        - 用于订单搜索功能
+        - 验证订单归属
+      operationId: getOrderByNumber
+      parameters:
+        - name: orderNumber
+          in: path
+          required: true
+          description: 订单号
+          schema:
+            type: string
+            example: "BORDT202512271430251234"
+      responses:
+        '200':
+          description: 成功返回订单详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/BeverageOrderDetailDTO'
+        '404':
+          $ref: '#/components/responses/OrderNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # ==================== B端 - 订单统计与报表 (US3) ====================
+  /api/admin/beverage-orders/statistics:
+    get:
+      tags:
+        - Admin - Orders
+      summary: 订单统计数据
+      description: |
+        获取订单统计数据（US3: FR-022）
+        - 支持今日/本周/本月/自定义时间范围
+        - 显示订单数量、销售额、完成率
+        - 显示热销饮品排行
+      operationId: getOrderStatistics
+      parameters:
+        - name: storeId
+          in: query
+          description: 门店ID（可选，不传则查询所有门店）
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: rangeType
+          in: query
+          description: 时间范围类型
+          required: false
+          schema:
+            type: string
+            enum: [TODAY, WEEK, MONTH, CUSTOM]
+            default: TODAY
+        - name: startDate
+          in: query
+          description: 起始日期（rangeType=CUSTOM时必填）
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-01"
+        - name: endDate
+          in: query
+          description: 截止日期（rangeType=CUSTOM时必填）
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+      responses:
+        '200':
+          description: 成功返回统计数据
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderStatisticsDTO'
+              examples:
+                success:
+                  value:
+                    success: true
+                    data:
+                      dateRange:
+                        startDate: "2025-12-27"
+                        endDate: "2025-12-27"
+                        rangeType: "TODAY"
+                      orderMetrics:
+                        totalOrders: 125
+                        completedOrders: 118
+                        cancelledOrders: 7
+                        completionRate: 94.4
+                        averagePreparationTime: 4.5
+                      salesMetrics:
+                        totalRevenue: 3580.00
+                        averageOrderValue: 28.64
+                        totalQuantity: 342
+                        topSellingBeverage: "美式咖啡"
+                        topSellingQuantity: 85
+                      bestSellingBeverages:
+                        - rank: 1
+                          beverageId: "bev-001"
+                          beverageName: "美式咖啡"
+                          quantity: 85
+                          revenue: 1275.00
+                          percentage: 35.6
+                        - rank: 2
+                          beverageId: "bev-002"
+                          beverageName: "珍珠奶茶"
+                          quantity: 62
+                          revenue: 1116.00
+                          percentage: 31.2
+                    timestamp: "2025-12-27T16:00:00Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_parameters:
+                  value:
+                    success: false
+                    error: "STAT_VAL_001"
+                    message: "无效的统计参数"
+                    details:
+                      reason: "自定义时间范围需要提供起始日期和截止日期"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/admin/beverage-orders/export:
+    get:
+      tags:
+        - Admin - Orders
+      summary: 导出销售报表
+      description: |
+        导出Excel格式销售报表（US3: FR-023）
+        - 包含订单明细、销售汇总、热销商品
+        - 使用Apache POI生成Excel
+        - 返回二进制文件流
+      operationId: exportSalesReport
+      parameters:
+        - name: storeId
+          in: query
+          description: 门店ID（可选）
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          required: true
+          description: 起始日期
+          schema:
+            type: string
+            format: date
+            example: "2025-12-01"
+        - name: endDate
+          in: query
+          required: true
+          description: 截止日期
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+      responses:
+        '200':
+          description: 成功返回Excel文件
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: 文件名
+              schema:
+                type: string
+                example: 'attachment; filename="销售报表_2025-12-01_2025-12-31.xlsx"'
+            Content-Length:
+              description: 文件大小（字节）
+              schema:
+                type: integer
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_dates:
+                  value:
+                    success: false
+                    error: "STAT_VAL_002"
+                    message: "导出报表需要提供起始日期和截止日期"
+                    timestamp: "2025-12-27T10:30:00Z"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                export_failed:
+                  value:
+                    success: false
+                    error: "STAT_SYS_001"
+                    message: "导出报表失败"
+                    details:
+                      reason: "Excel文件生成异常"
+                    timestamp: "2025-12-27T10:30:00Z"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Token (从认证系统获取)
+
+  schemas:
+    # ==================== 通用响应结构 ====================
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+          example: "2025-12-27T10:30:00Z"
+        message:
+          type: string
+          description: 可选的消息提示
+          example: "操作成功"
+      required:
+        - success
+        - timestamp
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: 固定为false
+          example: false
+        error:
+          type: string
+          description: 错误编号（模块_类别_序号）
+          example: "ORD_VAL_001"
+        message:
+          type: string
+          description: 错误消息
+          example: "订单验证失败"
+        details:
+          type: object
+          description: 错误详细信息
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-27T10:30:00Z"
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+
+    # ==================== 饮品相关 ====================
+    BeverageDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 饮品ID
+        name:
+          type: string
+          description: 饮品名称
+          maxLength: 100
+        description:
+          type: string
+          description: 饮品描述
+        category:
+          type: string
+          enum: [COFFEE, TEA, JUICE, SMOOTHIE, MILK_TEA, OTHER]
+          description: 饮品分类
+        basePrice:
+          type: number
+          format: decimal
+          description: 基础价格
+          minimum: 0
+        imageUrl:
+          type: string
+          format: uri
+          description: 主图URL
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, OUT_OF_STOCK]
+          description: 饮品状态
+        isRecommended:
+          type: boolean
+          description: 是否推荐
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - category
+        - basePrice
+        - status
+
+    BeverageDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/BeverageDTO'
+        - type: object
+          properties:
+            detailImages:
+              type: array
+              description: 详情图片数组
+              items:
+                type: string
+                format: uri
+            nutritionInfo:
+              type: object
+              description: 营养信息
+              properties:
+                calories:
+                  type: integer
+                  description: 卡路里
+                sugar:
+                  type: string
+                  description: 含糖量
+                caffeine:
+                  type: string
+                  description: 咖啡因含量
+            specs:
+              type: object
+              description: 按规格类型分组的规格选项
+              additionalProperties:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BeverageSpecDTO'
+
+    BeverageSpecDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        specType:
+          type: string
+          enum: [SIZE, TEMPERATURE, SWEETNESS, TOPPING]
+          description: 规格类型
+        specName:
+          type: string
+          description: 规格名称（如：小杯、大杯）
+        specCode:
+          type: string
+          description: 规格代码（如：small、large）
+        priceAdjustment:
+          type: number
+          format: decimal
+          description: 价格调整（可为负数）
+        isDefault:
+          type: boolean
+          description: 是否默认选中
+      required:
+        - id
+        - specType
+        - specName
+        - priceAdjustment
+
+    CreateBeverageRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        category:
+          type: string
+          enum: [COFFEE, TEA, JUICE, SMOOTHIE, MILK_TEA, OTHER]
+        basePrice:
+          type: number
+          format: decimal
+          minimum: 0
+        imageUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+          default: ACTIVE
+        isRecommended:
+          type: boolean
+          default: false
+      required:
+        - name
+        - category
+        - basePrice
+
+    UpdateBeverageRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        category:
+          type: string
+          enum: [COFFEE, TEA, JUICE, SMOOTHIE, MILK_TEA, OTHER]
+        basePrice:
+          type: number
+          format: decimal
+          minimum: 0
+        imageUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, OUT_OF_STOCK]
+        isRecommended:
+          type: boolean
+
+    CreateBeverageSpecRequest:
+      type: object
+      properties:
+        beverageId:
+          type: string
+          format: uuid
+        specType:
+          type: string
+          enum: [SIZE, TEMPERATURE, SWEETNESS, TOPPING]
+        specName:
+          type: string
+        specCode:
+          type: string
+        priceAdjustment:
+          type: number
+          format: decimal
+          default: 0
+        isDefault:
+          type: boolean
+          default: false
+      required:
+        - beverageId
+        - specType
+        - specName
+
+    CreateBeverageRecipeRequest:
+      type: object
+      properties:
+        beverageId:
+          type: string
+          format: uuid
+        specCombination:
+          type: object
+          description: 规格组合（null表示基础配方）
+          nullable: true
+          example:
+            size: "large"
+            temperature: "hot"
+        instructions:
+          type: string
+          description: 制作步骤
+        preparationTime:
+          type: integer
+          description: 预计制作时间（秒）
+          default: 120
+        ingredients:
+          type: array
+          description: 原料列表
+          items:
+            type: object
+            properties:
+              skuId:
+                type: string
+                format: uuid
+                description: 原料SKU ID
+              quantity:
+                type: number
+                format: decimal
+                description: 用量
+              unit:
+                type: string
+                description: 单位（g/ml/piece）
+            required:
+              - skuId
+              - quantity
+              - unit
+      required:
+        - beverageId
+        - ingredients
+
+    # ==================== 订单相关 ====================
+    BeverageOrderDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderNumber:
+          type: string
+          description: 订单号
+          example: "BORDT202512271430251234"
+        userId:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+          format: uuid
+        totalPrice:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [PENDING_PAYMENT, PENDING_PRODUCTION, PRODUCING, COMPLETED, DELIVERED, CANCELLED]
+        queueNumber:
+          type: string
+          description: 取餐号
+          example: "D042"
+        paymentMethod:
+          type: string
+          nullable: true
+        transactionId:
+          type: string
+          nullable: true
+        paidAt:
+          type: string
+          format: date-time
+          nullable: true
+        productionStartTime:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+        cancelledAt:
+          type: string
+          format: date-time
+          nullable: true
+        customerNote:
+          type: string
+          nullable: true
+        itemCount:
+          type: integer
+          description: 订单项总数
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - orderNumber
+        - userId
+        - storeId
+        - totalPrice
+        - status
+        - createdAt
+
+    BeverageOrderDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/BeverageOrderDTO'
+        - type: object
+          properties:
+            items:
+              type: array
+              description: 订单项列表
+              items:
+                $ref: '#/components/schemas/BeverageOrderItemDTO'
+          required:
+            - items
+
+    AdminBeverageOrderDetailDTO:
+      allOf:
+        - $ref: '#/components/schemas/BeverageOrderDetailDTO'
+        - type: object
+          properties:
+            bomList:
+              type: array
+              description: BOM清单（所需原料）
+              items:
+                type: object
+                properties:
+                  skuId:
+                    type: string
+                  skuName:
+                    type: string
+                  quantity:
+                    type: number
+                  unit:
+                    type: string
+                  availableQuantity:
+                    type: number
+                    description: 当前库存
+
+    BeverageOrderItemDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        beverageId:
+          type: string
+          format: uuid
+        beverageName:
+          type: string
+          description: 饮品名称（快照）
+        beverageImageUrl:
+          type: string
+          format: uri
+          description: 图片URL（快照）
+        selectedSpecs:
+          type: object
+          description: 选中的规格（快照）
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+              code:
+                type: string
+              priceAdjustment:
+                type: number
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          type: number
+          format: decimal
+          description: 单价（快照，含规格调整）
+        subtotal:
+          type: number
+          format: decimal
+          description: 小计
+      required:
+        - id
+        - orderId
+        - beverageId
+        - beverageName
+        - selectedSpecs
+        - quantity
+        - unitPrice
+        - subtotal
+
+    CreateBeverageOrderRequest:
+      type: object
+      properties:
+        storeId:
+          type: string
+          format: uuid
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            properties:
+              beverageId:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+              selectedSpecs:
+                type: object
+                description: 选中的规格
+                additionalProperties:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    code:
+                      type: string
+                    priceAdjustment:
+                      type: number
+                  required:
+                    - name
+                    - code
+                    - priceAdjustment
+            required:
+              - beverageId
+              - quantity
+              - selectedSpecs
+        customerNote:
+          type: string
+          maxLength: 500
+      required:
+        - storeId
+        - items
+
+    # ==================== 取餐号相关 ====================
+    QueueNumberDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        queueNumber:
+          type: string
+          description: 取餐号（D001-D999）
+          example: "D042"
+        orderId:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+          description: 生成日期
+        sequence:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: 当日序号
+        status:
+          type: string
+          enum: [PENDING, CALLED, PICKED]
+          description: 叫号状态
+        calledAt:
+          type: string
+          format: date-time
+          nullable: true
+        pickedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - queueNumber
+        - orderId
+        - storeId
+        - date
+        - sequence
+        - status
+
+    # ==================== 统计分析相关（US3） ====================
+    DateRangeDTO:
+      type: object
+      description: 时间范围
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: 开始日期
+          example: "2025-12-20"
+        endDate:
+          type: string
+          format: date
+          description: 结束日期
+          example: "2025-12-27"
+        rangeType:
+          type: string
+          enum: [TODAY, WEEK, MONTH, CUSTOM]
+          description: 时间范围类型
+          example: "TODAY"
+      required:
+        - startDate
+        - endDate
+        - rangeType
+
+    OrderMetrics:
+      type: object
+      description: 订单指标
+      properties:
+        totalOrders:
+          type: integer
+          description: 订单总数
+          example: 156
+        completedOrders:
+          type: integer
+          description: 已完成订单数
+          example: 142
+        cancelledOrders:
+          type: integer
+          description: 已取消订单数
+          example: 8
+        completionRate:
+          type: number
+          format: double
+          description: 完成率（百分比）
+          example: 91.03
+        averagePreparationTime:
+          type: number
+          format: double
+          description: 平均制作时长（分钟）
+          example: 5.8
+      required:
+        - totalOrders
+        - completedOrders
+        - cancelledOrders
+        - completionRate
+        - averagePreparationTime
+
+    SalesMetrics:
+      type: object
+      description: 销售指标
+      properties:
+        totalRevenue:
+          type: number
+          format: decimal
+          description: 销售总额（元）
+          example: 12850.00
+        averageOrderValue:
+          type: number
+          format: decimal
+          description: 平均客单价（元）
+          example: 82.37
+        totalQuantity:
+          type: integer
+          description: 总销量（杯数）
+          example: 285
+        topSellingBeverage:
+          type: string
+          nullable: true
+          description: 最畅销饮品名称
+          example: "拿铁咖啡"
+        topSellingQuantity:
+          type: integer
+          nullable: true
+          description: 最畅销饮品销量
+          example: 48
+      required:
+        - totalRevenue
+        - averageOrderValue
+        - totalQuantity
+
+    BestSellingItem:
+      type: object
+      description: 热销商品项
+      properties:
+        rank:
+          type: integer
+          description: 排名
+          example: 1
+        beverageId:
+          type: string
+          format: uuid
+          description: 饮品ID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        beverageName:
+          type: string
+          description: 饮品名称
+          example: "拿铁咖啡"
+        quantity:
+          type: integer
+          description: 销售数量
+          example: 48
+        revenue:
+          type: number
+          format: decimal
+          description: 销售额（元）
+          example: 1920.00
+        percentage:
+          type: number
+          format: double
+          description: 占比（百分比）
+          example: 16.84
+      required:
+        - rank
+        - beverageId
+        - beverageName
+        - quantity
+        - revenue
+        - percentage
+
+    OrderStatisticsDTO:
+      type: object
+      description: 订单统计数据
+      properties:
+        dateRange:
+          $ref: '#/components/schemas/DateRangeDTO'
+        orderMetrics:
+          $ref: '#/components/schemas/OrderMetrics'
+        salesMetrics:
+          $ref: '#/components/schemas/SalesMetrics'
+        bestSellingBeverages:
+          type: array
+          description: 热销饮品排行
+          items:
+            $ref: '#/components/schemas/BestSellingItem'
+        storeId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 门店ID（如果按门店筛选）
+          example: "660e8400-e29b-41d4-a716-446655440001"
+      required:
+        - dateRange
+        - orderMetrics
+        - salesMetrics
+        - bestSellingBeverages
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            validation_error:
+              value:
+                success: false
+                error: "CMN_VAL_001"
+                message: "请求参数验证失败"
+                details:
+                  field: "page"
+                  reason: "页码必须大于0"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    OrderNotFound:
+      description: 订单不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not_found:
+              value:
+                success: false
+                error: "ORD_NTF_001"
+                message: "订单不存在"
+                details:
+                  orderId: "order-999"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    BeverageNotFound:
+      description: 饮品不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            not_found:
+              value:
+                success: false
+                error: "BEV_NTF_001"
+                message: "饮品不存在"
+                details:
+                  beverageId: "550e8400-e29b-41d4-a716-446655440000"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    InternalError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internal_error:
+              value:
+                success: false
+                error: "ORD_SYS_001"
+                message: "系统内部错误，请稍后重试"
+                timestamp: "2025-12-27T10:30:00Z"

@@ -23,7 +23,7 @@ import {
   Spin,
   Empty,
   Progress,
-  Timeline
+  Timeline,
 } from 'antd';
 import {
   SearchOutlined,
@@ -37,26 +37,26 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   SyncOutlined,
-  ExportOutlined
+  ExportOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 
-import { useInventoryStore, useInventoryQueries, useInventoryActions } from '@/store/inventoryStore';
-import inventoryService from '@/services/inventoryService';
 import {
-  TransactionType,
-  SourceType,
-  InventoryStatus
-} from '@/types/inventory';
+  useInventoryStore,
+  useInventoryQueries,
+  useInventoryActions,
+} from '@/store/inventoryStore';
+import inventoryService from '@/services/inventoryService';
+import { TransactionType, SourceType, InventoryStatus } from '@/types/inventory';
 
-import { InventorySearchPanel } from './components/InventorySearchPanel';
-import { RealTimeInventoryCard } from './components/RealTimeInventoryCard';
-import { TransactionHistoryTable } from './components/TransactionHistoryTable';
-import { TransactionDetailModal } from './components/TransactionDetailModal';
-import { InventoryStatisticsCard } from './components/InventoryStatisticsCard';
-import { InventoryTrendsChart } from './components/InventoryTrendsChart';
-import { ReplenishmentSuggestions } from './components/ReplenishmentSuggestions';
+import InventorySearchPanel from './components/InventorySearchPanel';
+import RealTimeInventoryCard from './components/RealTimeInventoryCard';
+import TransactionHistoryTable from './components/TransactionHistoryTable';
+import TransactionDetailModal from './components/TransactionDetailModal';
+import InventoryStatisticsCard from './components/InventoryStatisticsCard';
+import InventoryTrendsChart from './components/InventoryTrendsChart';
+import ReplenishmentSuggestions from './components/ReplenishmentSuggestions';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -85,7 +85,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
     isLoading,
     error,
     setError,
-    setLoading
+    setLoading,
   } = useInventoryStore();
 
   // 查询和操作方法
@@ -98,13 +98,10 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
     refreshCurrentInventory,
     refreshTransactions,
     refreshStatistics,
-    exportInventoryData
+    exportInventoryData,
   } = useInventoryQueries();
 
-  const {
-    fetchTransactionDetail,
-    fetchInventoryDetail
-  } = useInventoryActions();
+  const { fetchTransactionDetail, fetchInventoryDetail } = useInventoryActions();
 
   // 组件状态
   const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
@@ -117,11 +114,11 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
   const statisticsQuery = useStatisticsQuery();
   const trendsQuery = useTrendsQuery({
     dateRange: [dayjs().subtract(30, 'day').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')],
-    groupBy: 'day'
+    groupBy: 'day',
   });
   const replenishmentQuery = useReplenishmentQuery({
     includeLowStock: true,
-    maxSuggestions: 20
+    maxSuggestions: 20,
   });
 
   // 模拟数据（用于演示）
@@ -134,20 +131,19 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
     todayTransactionsCount: 156,
     highPriorityAlerts: [
       { alertType: 'low_stock', skuId: 'SKU001', thresholdValue: 50, thresholdUnit: '件' },
-      { alertType: 'out_of_stock', skuId: 'SKU002', thresholdValue: 0, thresholdUnit: '件' }
-    ]
+      { alertType: 'out_of_stock', skuId: 'SKU002', thresholdValue: 0, thresholdUnit: '件' },
+    ],
   };
 
   // 处理搜索
   const handleSearch = (values: any) => {
     const params = {
       ...values,
-      dateRange: values.dateRange ? [
-        values.dateRange[0].format('YYYY-MM-DD'),
-        values.dateRange[1].format('YYYY-MM-DD')
-      ] : undefined,
+      dateRange: values.dateRange
+        ? [values.dateRange[0].format('YYYY-MM-DD'), values.dateRange[1].format('YYYY-MM-DD')]
+        : undefined,
       page: 1,
-      pageSize: 20
+      pageSize: 20,
     };
 
     setSearchParams(params);
@@ -168,11 +164,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
     setLoading(true);
     setError(null);
     try {
-      await Promise.all([
-        refreshTransactions(),
-        refreshCurrentInventory(),
-        refreshStatistics()
-      ]);
+      await Promise.all([refreshTransactions(), refreshCurrentInventory(), refreshStatistics()]);
       message.success('数据刷新成功');
     } catch (error) {
       console.error('数据刷新失败:', error);
@@ -190,7 +182,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
       await exportInventoryData({
         format,
         reportType: 'transaction_history',
-        ...searchParams
+        ...searchParams,
       });
       message.success('导出成功');
     } catch (error) {
@@ -224,7 +216,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
       key: 'transactionTime',
       width: 180,
       sorter: true,
-      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss')
+      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '商品编码',
@@ -238,7 +230,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
             {record.sku?.name}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '门店',
@@ -252,7 +244,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
             {record.store?.code}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '交易类型',
@@ -271,12 +263,12 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           [TransactionType.RETURN_OUT]: { text: '退货出库', color: 'volcano' },
           [TransactionType.DAMAGE_OUT]: { text: '损耗出库', color: 'red' },
           [TransactionType.PRODUCTION_IN]: { text: '生产入库', color: 'cyan' },
-          [TransactionType.EXPIRED_OUT]: { text: '过期出库', color: 'magenta' }
+          [TransactionType.EXPIRED_OUT]: { text: '过期出库', color: 'magenta' },
         };
 
         const config = typeConfig[type] || { text: type, color: 'default' };
         return <Tag color={config.color}>{config.text}</Tag>;
-      }
+      },
     },
     {
       title: '数量变化',
@@ -290,15 +282,16 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           TransactionType.TRANSFER_IN,
           TransactionType.ADJUSTMENT_IN,
           TransactionType.RETURN_IN,
-          TransactionType.PRODUCTION_IN
+          TransactionType.PRODUCTION_IN,
         ].includes(record.transactionType);
 
         return (
           <Text style={{ color: isInbound ? '#52c41a' : '#ff4d4f', fontWeight: 'bold' }}>
-            {isInbound ? '+' : '-'}{quantity}
+            {isInbound ? '+' : '-'}
+            {quantity}
           </Text>
         );
-      }
+      },
     },
     {
       title: '库存前后',
@@ -309,7 +302,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           <Text type="secondary">前: {record.stockBefore}</Text>
           <Text strong>后: {record.stockAfter}</Text>
         </Space>
-      )
+      ),
     },
     {
       title: '来源',
@@ -325,25 +318,25 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           [SourceType.RETURN]: { text: '退货', color: 'volcano' },
           [SourceType.DAMAGE]: { text: '损耗', color: 'red' },
           [SourceType.PRODUCTION]: { text: '生产', color: 'cyan' },
-          [SourceType.EXPIRY]: { text: '过期', color: 'magenta' }
+          [SourceType.EXPIRY]: { text: '过期', color: 'magenta' },
         };
 
         const config = sourceConfig[type] || { text: type, color: 'default' };
         return <Tag color={config.color}>{config.text}</Tag>;
-      }
+      },
     },
     {
       title: '操作人',
       dataIndex: ['operator', 'name'],
       key: 'operator',
-      width: 100
+      width: 100,
     },
     {
       title: '批次号',
       dataIndex: 'batchNumber',
       key: 'batchNumber',
       width: 100,
-      render: (text) => text || '-'
+      render: (text) => text || '-',
     },
     {
       title: '操作',
@@ -359,8 +352,8 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
         >
           详情
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   // 概览统计卡片
@@ -371,43 +364,43 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
       prefix: '¥',
       suffix: '',
       precision: 2,
-      color: '#1890ff'
+      color: '#1890ff',
     },
     {
       title: '总可用数量',
       value: mockData.totalAvailableQuantity,
       suffix: '件',
       precision: 0,
-      color: '#52c41a'
+      color: '#52c41a',
     },
     {
       title: '低库存商品',
       value: mockData.lowStockItemsCount,
       suffix: '个',
       precision: 0,
-      color: '#faad14'
+      color: '#faad14',
     },
     {
       title: '缺货商品',
       value: mockData.outOfStockItemsCount,
       suffix: '个',
       precision: 0,
-      color: '#ff4d4f'
+      color: '#ff4d4f',
     },
     {
       title: '今日交易',
       value: mockData.todayTransactionsCount,
       suffix: '笔',
       precision: 0,
-      color: '#722ed1'
+      color: '#722ed1',
     },
     {
       title: '活跃转移',
       value: mockData.activeTransfersCount,
       suffix: '单',
       precision: 0,
-      color: '#13c2c2'
-    }
+      color: '#13c2c2',
+    },
   ];
 
   return (
@@ -419,17 +412,11 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
             <Title level={2} style={{ margin: 0 }}>
               库存追溯查询
             </Title>
-            <Text type="secondary">
-              实时监控商品库存变动，追溯交易流水历史
-            </Text>
+            <Text type="secondary">实时监控商品库存变动，追溯交易流水历史</Text>
           </Col>
           <Col>
             <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                loading={loading}
-                onClick={handleRefresh}
-              >
+              <Button icon={<ReloadOutlined />} loading={loading} onClick={handleRefresh}>
                 刷新数据
               </Button>
               <Button
@@ -470,11 +457,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
 
       {/* 搜索面板 */}
       <Card title="搜索条件" style={{ marginBottom: '24px' }}>
-        <Form
-          form={searchForm}
-          layout="inline"
-          onFinish={handleSearch}
-        >
+        <Form form={searchForm} layout="inline" onFinish={handleSearch}>
           <Form.Item name="skuCode" label="商品编码">
             <Input placeholder="请输入商品编码" style={{ width: 200 }} />
           </Form.Item>
@@ -494,7 +477,12 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit" icon={<SearchOutlined />} loading={isLoading}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SearchOutlined />}
+                loading={isLoading}
+              >
                 搜索
               </Button>
               <Button onClick={handleReset} icon={<ReloadOutlined />}>
@@ -530,11 +518,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           {/* 图表区域 */}
           <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
             <Col span={12}>
-              <InventoryTrendsChart
-                data={trendsData}
-                loading={trendsLoading}
-                title="库存趋势"
-              />
+              <InventoryTrendsChart data={trendsData} loading={trendsLoading} title="库存趋势" />
             </Col>
             <Col span={12}>
               <InventoryStatisticsCard
@@ -548,10 +532,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
           {/* 补货建议 */}
           <Row style={{ marginTop: '24px' }}>
             <Col span={24}>
-              <ReplenishmentSuggestions
-                data={replenishmentData}
-                loading={replenishmentLoading}
-              />
+              <ReplenishmentSuggestions data={replenishmentData} loading={replenishmentLoading} />
             </Col>
           </Row>
         </TabPane>
@@ -566,11 +547,14 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
         </TabPane>
 
         {/* 交易历史页面 */}
-        <TabPane tab={
-          <Badge count={transactions.length} offset={[10, 0]}>
-            交易历史
-          </Badge>
-        } key="transactions">
+        <TabPane
+          tab={
+            <Badge count={transactions.length} offset={[10, 0]}>
+              交易历史
+            </Badge>
+          }
+          key="transactions"
+        >
           <Table
             columns={transactionColumns}
             dataSource={transactions}
@@ -585,8 +569,8 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
               showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
               onChange: (page, pageSize) => {
                 setInventoryFilters({ page, pageSize });
-                setSearchParams(prev => ({ ...prev, page, pageSize }));
-              }
+                setSearchParams((prev) => ({ ...prev, page, pageSize }));
+              },
             }}
             scroll={{ x: 1200 }}
             size="small"
@@ -594,11 +578,14 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
         </TabPane>
 
         {/* 警报页面 */}
-        <TabPane tab={
-          <Badge count={mockData.highPriorityAlerts.length} offset={[10, 0]}>
-            库存警报
-          </Badge>
-        } key="alerts">
+        <TabPane
+          tab={
+            <Badge count={mockData.highPriorityAlerts.length} offset={[10, 0]}>
+              库存警报
+            </Badge>
+          }
+          key="alerts"
+        >
           <Card title="高优先级警报">
             {mockData.highPriorityAlerts.length > 0 ? (
               <Timeline>
@@ -609,7 +596,9 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
                     dot={<ExclamationCircleOutlined />}
                   >
                     <Space direction="vertical" size="small">
-                      <Text strong>{alert.alertType === 'low_stock' ? '低库存警报' : '缺货警报'}</Text>
+                      <Text strong>
+                        {alert.alertType === 'low_stock' ? '低库存警报' : '缺货警报'}
+                      </Text>
                       <Text>SKU: {alert.skuId}</Text>
                       <Text type="secondary">
                         阈值: {alert.thresholdValue} {alert.thresholdUnit}
@@ -636,7 +625,7 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
         footer={[
           <Button key="close" onClick={() => setDetailModalVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -651,7 +640,9 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
                 </Col>
                 <Col span={8}>
                   <Text>交易时间：</Text>
-                  <Text>{dayjs(selectedTransaction.transactionTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
+                  <Text>
+                    {dayjs(selectedTransaction.transactionTime).format('YYYY-MM-DD HH:mm:ss')}
+                  </Text>
                 </Col>
                 <Col span={8}>
                   <Text>交易类型：</Text>
@@ -684,18 +675,10 @@ const InventoryTrace: React.FC<InventoryTraceProps> = () => {
                   />
                 </Col>
                 <Col span={8}>
-                  <Statistic
-                    title="库存前"
-                    value={selectedTransaction.stockBefore}
-                    suffix="件"
-                  />
+                  <Statistic title="库存前" value={selectedTransaction.stockBefore} suffix="件" />
                 </Col>
                 <Col span={8}>
-                  <Statistic
-                    title="库存后"
-                    value={selectedTransaction.stockAfter}
-                    suffix="件"
-                  />
+                  <Statistic title="库存后" value={selectedTransaction.stockAfter} suffix="件" />
                 </Col>
               </Row>
             </div>

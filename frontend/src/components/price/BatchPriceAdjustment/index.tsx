@@ -20,7 +20,7 @@ import {
   Divider,
   Checkbox,
   Tooltip,
-  Badge
+  Badge,
 } from 'antd';
 import {
   EditOutlined,
@@ -30,17 +30,12 @@ import {
   UploadOutlined,
   SettingOutlined,
   CalculatorOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-  useProductsQuery,
-  useBatchUpdatePriceMutation,
-  useExportPriceTemplateMutation,
-  useImportPriceMutation
-} from '@/stores/priceStore';
+import { usePricesQuery, useBatchUpdatePricesMutation } from '@/stores/priceStore';
 import { PriceConfig, PriceType } from '@/types/price';
 import { z } from 'zod';
 
@@ -56,7 +51,7 @@ const BatchPriceAdjustmentSchema = z.object({
   minMargin: z.number().optional(),
   maxAdjustment: z.number().optional(),
   applyTo: z.enum(['all', 'selected', 'filtered']),
-  priceType: z.enum(['base', 'current', 'all']).optional()
+  priceType: z.enum(['base', 'current', 'all']).optional(),
 });
 
 type BatchPriceAdjustmentData = z.infer<typeof BatchPriceAdjustmentSchema>;
@@ -68,7 +63,7 @@ interface BatchPriceAdjustmentProps {
 
 const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
   selectedProductIds = [],
-  onSelectionChange
+  onSelectionChange,
 }) => {
   const [adjustmentModalVisible, setAdjustmentModalVisible] = useState(false);
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
@@ -81,16 +76,14 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
   const {
     data: productsData,
     isLoading,
-    refetch
-  } = useProductsQuery({
+    refetch,
+  } = usePricesQuery({
     keyword: searchKeyword,
     page: 1,
-    pageSize: 100
+    pageSize: 100,
   });
 
-  const batchUpdateMutation = useBatchUpdatePriceMutation();
-  const exportTemplateMutation = useExportPriceTemplateMutation();
-  const importMutation = useImportPriceMutation();
+  const batchUpdateMutation = useBatchUpdatePricesMutation();
 
   const form = useForm<BatchPriceAdjustmentData>({
     resolver: zodResolver(BatchPriceAdjustmentSchema),
@@ -99,8 +92,8 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
       adjustmentValue: 0,
       roundTo: 'nearest',
       applyTo: 'selected',
-      priceType: 'current'
-    }
+      priceType: 'current',
+    },
   });
 
   const {
@@ -108,7 +101,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isValid }
+    formState: { errors, isValid },
   } = form;
 
   // 监听表单变化
@@ -121,7 +114,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
       dataIndex: 'productCode',
       key: 'productCode',
       width: 120,
-      render: (text: string) => <Text strong>{text}</Text>
+      render: (text: string) => <Text strong>{text}</Text>,
     },
     {
       title: '商品名称',
@@ -137,23 +130,19 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '当前价格',
       key: 'currentPrice',
       width: 120,
-      render: (_, record: any) => (
-        <Text>¥{(record.currentPrice || 0).toFixed(2)}</Text>
-      )
+      render: (_, record: any) => <Text>¥{(record.currentPrice || 0).toFixed(2)}</Text>,
     },
     {
       title: '基础价格',
       key: 'basePrice',
       width: 120,
-      render: (_, record: any) => (
-        <Text>¥{(record.basePrice || 0).toFixed(2)}</Text>
-      )
+      render: (_, record: any) => <Text>¥{(record.basePrice || 0).toFixed(2)}</Text>,
     },
     {
       title: '价格类型',
@@ -167,11 +156,11 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
           promotion: { color: 'red', text: '促销价格' },
           special: { color: 'purple', text: '特殊价格' },
           wholesale: { color: 'orange', text: '批发价格' },
-          channel: { color: 'cyan', text: '渠道价格' }
+          channel: { color: 'cyan', text: '渠道价格' },
         };
         const config = typeConfig[type] || typeConfig.base;
         return <Tag color={config.color}>{config.text}</Tag>;
-      }
+      },
     },
     {
       title: '毛利率',
@@ -181,15 +170,15 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
         const margin = calculateMargin(record.basePrice, record.currentPrice);
         const color = margin >= 30 ? 'green' : margin >= 15 ? 'orange' : 'red';
         return <Text style={{ color }}>{margin.toFixed(1)}%</Text>;
-      }
+      },
     },
     {
       title: '更新时间',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 150,
-      render: (date: string) => date ? new Date(date).toLocaleString() : '-'
-    }
+      render: (date: string) => (date ? new Date(date).toLocaleString() : '-'),
+    },
   ];
 
   // 计算毛利率
@@ -205,16 +194,16 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
 
     // 根据应用范围筛选商品
     if (data.applyTo === 'selected') {
-      targetProducts = products.filter(p => selectedRowKeys.includes(p.id));
+      targetProducts = products.filter((p) => selectedRowKeys.includes(p.id));
     } else if (data.applyTo === 'filtered') {
       // 这里可以基于当前筛选条件
       targetProducts = products;
     }
 
     // 计算调整后的价格
-    const previewResults = targetProducts.map(product => {
+    const previewResults = targetProducts.map((product) => {
       let currentPrice = product.currentPrice || 0;
-      let basePrice = product.basePrice || 0;
+      const basePrice = product.basePrice || 0;
       let newPrice = currentPrice;
 
       if (data.priceType === 'base') {
@@ -257,10 +246,10 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
         oldPrice: currentPrice,
         newPrice: newPrice,
         priceChange: newPrice - currentPrice,
-        priceChangePercent: ((newPrice - currentPrice) / currentPrice * 100),
+        priceChangePercent: ((newPrice - currentPrice) / currentPrice) * 100,
         oldMargin,
         newMargin,
-        marginChange: newMargin - oldMargin
+        marginChange: newMargin - oldMargin,
       };
     });
 
@@ -273,12 +262,12 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     let productIds: string[] = [];
 
     if (data.applyTo === 'all') {
-      productIds = (productsData?.data || []).map(p => p.id);
+      productIds = (productsData?.data || []).map((p) => p.id);
     } else if (data.applyTo === 'selected') {
       productIds = selectedRowKeys;
     } else if (data.applyTo === 'filtered') {
       // 基于当前筛选条件
-      productIds = (productsData?.data || []).map(p => p.id);
+      productIds = (productsData?.data || []).map((p) => p.id);
     }
 
     if (productIds.length === 0) {
@@ -293,8 +282,8 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
           type: data.adjustmentType,
           value: data.adjustmentValue,
           roundTo: data.roundTo,
-          priceType: data.priceType
-        }
+          priceType: data.priceType,
+        },
       });
 
       message.success(`成功更新 ${result.updated} 个商品的价格`);
@@ -315,7 +304,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
       const result = await exportTemplateMutation.mutateAsync({
         format: 'excel',
         includeHeaders: true,
-        productIds: selectedRowKeys.length > 0 ? selectedRowKeys : undefined
+        productIds: selectedRowKeys.length > 0 ? selectedRowKeys : undefined,
       });
 
       // 创建下载链接
@@ -339,7 +328,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     try {
       const result = await importMutation.mutateAsync({
         file,
-        updateMode: 'update' // or 'create'
+        updateMode: 'update', // or 'create'
       });
 
       message.success(`成功导入 ${result.imported} 个商品的价格`);
@@ -359,7 +348,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
     onChange: (keys: React.Key[]) => {
       setSelectedRowKeys(keys as string[]);
       onSelectionChange?.(keys as string[]);
-    }
+    },
   };
 
   // 预览表格列
@@ -368,21 +357,21 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
       title: '商品名称',
       dataIndex: 'productName',
       key: 'productName',
-      width: 200
+      width: 200,
     },
     {
       title: '原价格',
       dataIndex: 'oldPrice',
       key: 'oldPrice',
       width: 100,
-      render: (price: number) => <Text>¥{price.toFixed(2)}</Text>
+      render: (price: number) => <Text>¥{price.toFixed(2)}</Text>,
     },
     {
       title: '新价格',
       dataIndex: 'newPrice',
       key: 'newPrice',
       width: 100,
-      render: (price: number) => <Text strong>¥{price.toFixed(2)}</Text>
+      render: (price: number) => <Text strong>¥{price.toFixed(2)}</Text>,
     },
     {
       title: '价格变动',
@@ -394,10 +383,11 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
             {record.priceChange >= 0 ? '+' : ''}¥{record.priceChange.toFixed(2)}
           </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            {record.priceChangePercent >= 0 ? '+' : ''}{record.priceChangePercent.toFixed(1)}%
+            {record.priceChangePercent >= 0 ? '+' : ''}
+            {record.priceChangePercent.toFixed(1)}%
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '毛利率变化',
@@ -405,16 +395,16 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
       width: 120,
       render: (_: any, record: any) => (
         <Space direction="vertical" size={0}>
-          <Text>{record.oldMargin.toFixed(1)}% → {record.newMargin.toFixed(1)}%</Text>
-          <Text
-            type={record.marginChange >= 0 ? 'success' : 'danger'}
-            style={{ fontSize: 12 }}
-          >
-            {record.marginChange >= 0 ? '+' : ''}{record.marginChange.toFixed(1)}%
+          <Text>
+            {record.oldMargin.toFixed(1)}% → {record.newMargin.toFixed(1)}%
+          </Text>
+          <Text type={record.marginChange >= 0 ? 'success' : 'danger'} style={{ fontSize: 12 }}>
+            {record.marginChange >= 0 ? '+' : ''}
+            {record.marginChange.toFixed(1)}%
           </Text>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -427,18 +417,14 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
               <CalculatorOutlined style={{ marginRight: 8 }} />
               批量价格调整
             </Title>
-            <Text type="secondary">
-              对多个商品进行批量价格调整，支持百分比、固定金额等方式
-            </Text>
+            <Text type="secondary">对多个商品进行批量价格调整，支持百分比、固定金额等方式</Text>
           </Col>
           <Col>
             <Space>
               <Button icon={<DownloadOutlined />} onClick={handleExportTemplate}>
                 导出模板
               </Button>
-              <Button icon={<UploadOutlined />}>
-                导入价格
-              </Button>
+              <Button icon={<UploadOutlined />}>导入价格</Button>
               <Button
                 type="primary"
                 icon={<PlayCircleOutlined />}
@@ -511,13 +497,15 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
                 {/* 平均毛利率 */}
                 {(() => {
                   const products = productsData?.data || [];
-                  const validProducts = products.filter(p => p.basePrice && p.currentPrice);
+                  const validProducts = products.filter((p) => p.basePrice && p.currentPrice);
                   if (validProducts.length === 0) return 0;
-                  const totalMargin = validProducts.reduce((sum, p) =>
-                    sum + calculateMargin(p.basePrice, p.currentPrice), 0
+                  const totalMargin = validProducts.reduce(
+                    (sum, p) => sum + calculateMargin(p.basePrice, p.currentPrice),
+                    0
                   );
                   return (totalMargin / validProducts.length).toFixed(1);
-                })()}%
+                })()}
+                %
               </Title>
               <Text type="secondary">平均毛利率</Text>
             </div>
@@ -527,8 +515,10 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
           <Card>
             <div style={{ textAlign: 'center' }}>
               <Title level={3} style={{ color: '#722ed1', margin: 0 }}>
-                {/* 价格总值 */}
-                ¥{(productsData?.data?.reduce((sum, p) => sum + (p.currentPrice || 0), 0) || 0).toFixed(0)}
+                {/* 价格总值 */}¥
+                {(
+                  productsData?.data?.reduce((sum, p) => sum + (p.currentPrice || 0), 0) || 0
+                ).toFixed(0)}
               </Title>
               <Text type="secondary">价格总值</Text>
             </div>
@@ -556,7 +546,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
           scroll={{ x: 1000 }}
         />
@@ -582,7 +572,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
             loading={batchUpdateMutation.isPending}
           >
             执行调整
-          </Button>
+          </Button>,
         ]}
       >
         <Form layout="vertical">
@@ -624,8 +614,11 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
                       placeholder="0"
                       min={watchedValues.adjustmentType === 'fixed_price' ? 0.01 : undefined}
                       addonAfter={
-                        watchedValues.adjustmentType === 'percentage' ? '%' :
-                        watchedValues.adjustmentType === 'fixed' ? '元' : '元'
+                        watchedValues.adjustmentType === 'percentage'
+                          ? '%'
+                          : watchedValues.adjustmentType === 'fixed'
+                            ? '元'
+                            : '元'
                       }
                     />
                   )}
@@ -720,7 +713,7 @@ const BatchPriceAdjustment: React.FC<BatchPriceAdjustmentProps> = ({
             loading={batchUpdateMutation.isPending}
           >
             确认执行
-          </Button>
+          </Button>,
         ]}
       >
         <Table

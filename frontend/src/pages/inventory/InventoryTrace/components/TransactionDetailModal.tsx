@@ -14,7 +14,7 @@ import {
   Alert,
   Typography,
   Badge,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import {
   EyeOutlined,
@@ -30,7 +30,7 @@ import {
   InfoCircleOutlined,
   DollarOutlined,
   PackageOutlined,
-  FileTextOutlined
+  FileTextOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { TransactionDetail } from '@/types/inventory';
@@ -38,7 +38,7 @@ import {
   TransactionType,
   SourceType,
   TRANSACTION_TYPE_OPTIONS,
-  SOURCE_TYPE_OPTIONS
+  SOURCE_TYPE_OPTIONS,
 } from '@/types/inventory';
 
 const { Title, Text, Paragraph } = Typography;
@@ -52,34 +52,34 @@ interface TransactionDetailModalProps {
 const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
   visible,
   transaction,
-  onClose
+  onClose,
 }) => {
   if (!transaction) return null;
 
   // 获取交易类型信息
   const getTransactionTypeInfo = (type: TransactionType) => {
-    const option = TRANSACTION_TYPE_OPTIONS.find(opt => opt.value === type);
+    const option = TRANSACTION_TYPE_OPTIONS.find((opt) => opt.value === type);
     const isInbound = [
       TransactionType.PURCHASE_IN,
       TransactionType.TRANSFER_IN,
       TransactionType.ADJUSTMENT_IN,
       TransactionType.RETURN_IN,
-      TransactionType.PRODUCTION_IN
+      TransactionType.PRODUCTION_IN,
     ].includes(type);
 
     return {
       label: option?.label,
       color: option?.color,
-      isInbound
+      isInbound,
     };
   };
 
   // 获取来源类型信息
   const getSourceTypeInfo = (type: SourceType) => {
-    const option = SOURCE_TYPE_OPTIONS.find(opt => opt.value === type);
+    const option = SOURCE_TYPE_OPTIONS.find((opt) => opt.value === type);
     return {
       label: option?.label,
-      color: option?.color
+      color: option?.color,
     };
   };
 
@@ -111,7 +111,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
         </Button>,
         <Button key="close" onClick={onClose}>
           关闭
-        </Button>
+        </Button>,
       ]}
     >
       <div className="transaction-detail-modal">
@@ -131,7 +131,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                   )
                 }
                 valueStyle={{
-                  color: transactionType.isInbound ? '#52c41a' : '#ff4d4f'
+                  color: transactionType.isInbound ? '#52c41a' : '#ff4d4f',
                 }}
               />
             </Col>
@@ -148,7 +148,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                   )
                 }
                 valueStyle={{
-                  color: stockChange >= 0 ? '#52c41a' : '#ff4d4f'
+                  color: stockChange >= 0 ? '#52c41a' : '#ff4d4f',
                 }}
               />
             </Col>
@@ -162,12 +162,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
               />
             </Col>
             <Col span={6}>
-              <Statistic
-                title="单价"
-                value={transaction.unitCost || 0}
-                prefix="¥"
-                precision={2}
-              />
+              <Statistic title="单价" value={transaction.unitCost || 0} prefix="¥" precision={2} />
             </Col>
           </Row>
         </Card>
@@ -196,9 +191,7 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
             </Descriptions.Item>
 
             <Descriptions.Item label="交易类型" span={1}>
-              <Tag color={transactionType.color} icon={
-                transactionType.isInbound ? '↑' : '↓'
-              }>
+              <Tag color={transactionType.color} icon={transactionType.isInbound ? '↑' : '↓'}>
                 {transactionType.label}
               </Tag>
             </Descriptions.Item>
@@ -213,7 +206,9 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                   <FileTextOutlined />
                   <Text>{transaction.sourceDocument}</Text>
                 </Space>
-              ) : '-'}
+              ) : (
+                '-'
+              )}
             </Descriptions.Item>
           </Descriptions>
         </Card>
@@ -256,7 +251,8 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 
             {transaction.sku.dimensions && (
               <Descriptions.Item label="尺寸" span={1}>
-                {transaction.sku.dimensions.length} × {transaction.sku.dimensions.width} × {transaction.sku.dimensions.height} cm
+                {transaction.sku.dimensions.length} × {transaction.sku.dimensions.width} ×{' '}
+                {transaction.sku.dimensions.height} cm
               </Descriptions.Item>
             )}
           </Descriptions>
@@ -329,7 +325,8 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Text>变化:</Text>
                   <Text strong style={{ color: stockChange >= 0 ? '#52c41a' : '#ff4d4f' }}>
-                    {stockChange >= 0 ? '+' : ''}{stockChange}
+                    {stockChange >= 0 ? '+' : ''}
+                    {stockChange}
                   </Text>
                 </div>
               </Space>
@@ -352,7 +349,8 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Text>变化:</Text>
                   <Text strong style={{ color: availableChange >= 0 ? '#52c41a' : '#ff4d4f' }}>
-                    {availableChange >= 0 ? '+' : ''}{availableChange}
+                    {availableChange >= 0 ? '+' : ''}
+                    {availableChange}
                   </Text>
                 </div>
               </Space>

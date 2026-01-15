@@ -21,7 +21,7 @@ import {
   Statistic,
   Progress,
   Empty,
-  message
+  message,
 } from 'antd';
 import {
   HistoryOutlined,
@@ -30,20 +30,16 @@ import {
   FilterOutlined,
   UserOutlined,
   ClockCircleOutlined,
-  TrendingUpOutlined,
-  TrendingDownOutlined,
+  RiseOutlined,
+  FallOutlined,
   InfoCircleOutlined,
-  CompareOutlined
+  SwapOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import dayjs from 'dayjs';
 
-import {
-  usePriceHistoryQuery,
-  useExportPriceHistoryMutation,
-  useComparePriceHistoryMutation
-} from '@/stores/priceStore';
-import { PriceHistory, PriceChangeType } from '@/types/price';
+import { usePriceHistoryQuery } from '@/stores/priceStore';
+import { PriceHistory as PriceHistoryType, PriceChangeType } from '@/types/price';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -55,43 +51,25 @@ interface PriceHistoryProps {
   showProductFilter?: boolean;
 }
 
-const PriceHistory: React.FC<PriceHistoryProps> = ({
-  productId,
-  showProductFilter = true
-}) => {
+const PriceHistory: React.FC<PriceHistoryProps> = ({ productId, showProductFilter = true }) => {
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [compareModalVisible, setCompareModalVisible] = useState(false);
-  const [selectedHistory, setSelectedHistory] = useState<PriceHistory | null>(null);
-  const [compareItems, setCompareItems] = useState<PriceHistory[]>([]);
+  const [selectedHistory, setSelectedHistory] = useState<PriceHistoryType | null>(null);
+  const [compareItems, setCompareItems] = useState<PriceHistoryType[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [changeTypeFilter, setChangeTypeFilter] = useState<string>('');
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
 
-  const {
-    data: historyData,
-    isLoading,
-    refetch
-  } = usePriceHistoryQuery({
-    productId,
-    keyword: searchKeyword,
-    changeType: changeTypeFilter,
-    startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
-    endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
-    page: 1,
-    pageSize: 50
-  });
-
-  const exportMutation = useExportPriceHistoryMutation();
-  const compareMutation = useComparePriceHistoryMutation();
+  const { data: historyData, isLoading, refetch } = usePriceHistoryQuery(productId || '');
 
   // 价格变动类型配置
   const changeTypeConfig = {
-    create: { color: 'green', text: '新建价格', icon: <TrendingUpOutlined /> },
-    update: { color: 'blue', text: '价格调整', icon: <TrendingUpOutlined /> },
-    delete: { color: 'red', text: '删除价格', icon: <TrendingDownOutlined /> },
+    create: { color: 'green', text: '新建价格', icon: <RiseOutlined /> },
+    update: { color: 'blue', text: '价格调整', icon: <RiseOutlined /> },
+    delete: { color: 'red', text: '删除价格', icon: <FallOutlined /> },
     batch_update: { color: 'purple', text: '批量调整', icon: <HistoryOutlined /> },
     import: { color: 'orange', text: '导入更新', icon: <DownloadOutlined /> },
-    rule_applied: { color: 'cyan', text: '规则应用', icon: <InfoCircleOutlined /> }
+    rule_applied: { color: 'cyan', text: '规则应用', icon: <InfoCircleOutlined /> },
   };
 
   // 表格列定义
@@ -108,13 +86,13 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             {dayjs(date).format('HH:mm:ss')}
           </Text>
         </Space>
-      )
+      ),
     },
     {
       title: '商品信息',
       key: 'product',
       width: 200,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space direction="vertical" size={0}>
           <Text strong>{record.productName}</Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
@@ -126,7 +104,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '变动类型',
@@ -140,46 +118,46 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             {config.text}
           </Tag>
         );
-      }
+      },
     },
     {
       title: '价格变动',
       key: 'priceChange',
       width: 150,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space direction="vertical" size={0}>
           <div>
             <Text delete style={{ fontSize: 12, color: '#999' }}>
               ¥{(record.oldValue || 0).toFixed(2)}
             </Text>
-            <Text strong style={{ margin: '0 4px' }}>→</Text>
+            <Text strong style={{ margin: '0 4px' }}>
+              →
+            </Text>
             <Text strong>¥{(record.newValue || 0).toFixed(2)}</Text>
           </div>
           {record.changeAmount !== undefined && (
-            <Text
-              type={record.changeAmount >= 0 ? 'success' : 'danger'}
-              style={{ fontSize: 12 }}
-            >
+            <Text type={record.changeAmount >= 0 ? 'success' : 'danger'} style={{ fontSize: 12 }}>
               {record.changeAmount >= 0 ? '+' : ''}¥{record.changeAmount.toFixed(2)}
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '变动幅度',
       key: 'changePercent',
       width: 100,
-      render: (_, record: PriceHistory) => {
+      render: (_, record: PriceHistoryType) => {
         if (record.changePercent === undefined) return '-';
-        const color = record.changePercent > 0 ? '#52c41a' :
-                     record.changePercent < 0 ? '#ff4d4f' : '#999';
+        const color =
+          record.changePercent > 0 ? '#52c41a' : record.changePercent < 0 ? '#ff4d4f' : '#999';
         return (
           <Text style={{ color, fontSize: 12 }}>
-            {record.changePercent > 0 ? '+' : ''}{record.changePercent.toFixed(1)}%
+            {record.changePercent > 0 ? '+' : ''}
+            {record.changePercent.toFixed(1)}%
           </Text>
         );
-      }
+      },
     },
     {
       title: '价格类型',
@@ -193,18 +171,18 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
           promotion: { color: 'red', text: '促销价格' },
           special: { color: 'purple', text: '特殊价格' },
           wholesale: { color: 'orange', text: '批发价格' },
-          channel: { color: 'cyan', text: '渠道价格' }
+          channel: { color: 'cyan', text: '渠道价格' },
         };
         const config = typeConfig[type] || typeConfig.base;
         return <Tag color={config.color}>{config.text}</Tag>;
-      }
+      },
     },
     {
       title: '操作人',
       dataIndex: 'operatorName',
       key: 'operatorName',
       width: 120,
-      render: (name: string, record: PriceHistory) => (
+      render: (name: string, record: PriceHistoryType) => (
         <Space>
           <Avatar size="small" icon={<UserOutlined />} />
           <Space direction="vertical" size={0}>
@@ -216,7 +194,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             )}
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '备注',
@@ -233,13 +211,13 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             {remark || '-'}
           </Text>
         </Tooltip>
-      )
+      ),
     },
     {
       title: '操作',
       key: 'actions',
       width: 100,
-      render: (_, record: PriceHistory) => (
+      render: (_, record: PriceHistoryType) => (
         <Space>
           <Tooltip title="查看详情">
             <Button
@@ -253,29 +231,29 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             <Button
               type="text"
               size="small"
-              icon={<CompareOutlined />}
+              icon={<SwapOutlined />}
               onClick={() => handleAddToCompare(record)}
             />
           </Tooltip>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 查看详情
-  const handleViewDetail = (record: PriceHistory) => {
+  const handleViewDetail = (record: PriceHistoryType) => {
     setSelectedHistory(record);
     setDetailModalVisible(true);
   };
 
   // 加入对比
-  const handleAddToCompare = (record: PriceHistory) => {
+  const handleAddToCompare = (record: PriceHistoryType) => {
     if (compareItems.length >= 5) {
       message.warning('最多只能对比5条记录');
       return;
     }
 
-    const exists = compareItems.some(item => item.id === record.id);
+    const exists = compareItems.some((item) => item.id === record.id);
     if (exists) {
       message.warning('该记录已在对比列表中');
       return;
@@ -287,7 +265,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
 
   // 从对比列表移除
   const handleRemoveFromCompare = (id: string) => {
-    setCompareItems(compareItems.filter(item => item.id !== id));
+    setCompareItems(compareItems.filter((item) => item.id !== id));
   };
 
   // 导出历史记录
@@ -298,7 +276,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
         startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
         changeType: changeTypeFilter,
-        format: 'excel'
+        format: 'excel',
       });
 
       // 创建下载链接
@@ -326,10 +304,10 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
 
     try {
       const result = await compareMutation.mutateAsync({
-        items: compareItems.map(item => ({
+        items: compareItems.map((item) => ({
           id: item.id,
-          timestamp: item.createdAt
-        }))
+          timestamp: item.createdAt,
+        })),
       });
 
       setCompareModalVisible(true);
@@ -343,11 +321,12 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
     const history = historyData?.data || [];
 
     const totalChanges = history.length;
-    const priceIncrease = history.filter(h => h.changeAmount > 0).length;
-    const priceDecrease = history.filter(h => h.changeAmount < 0).length;
-    const avgChangePercent = totalChanges > 0
-      ? history.reduce((sum, h) => sum + (h.changePercent || 0), 0) / totalChanges
-      : 0;
+    const priceIncrease = history.filter((h) => h.changeAmount > 0).length;
+    const priceDecrease = history.filter((h) => h.changeAmount < 0).length;
+    const avgChangePercent =
+      totalChanges > 0
+        ? history.reduce((sum, h) => sum + (h.changePercent || 0), 0) / totalChanges
+        : 0;
 
     return (
       <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -366,7 +345,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             <Statistic
               title="价格上涨"
               value={priceIncrease}
-              prefix={<TrendingUpOutlined />}
+              prefix={<RiseOutlined />}
               valueStyle={{ color: '#ff4d4f' }}
               suffix={`/ ${totalChanges}`}
             />
@@ -377,7 +356,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             <Statistic
               title="价格下跌"
               value={priceDecrease}
-              prefix={<TrendingDownOutlined />}
+              prefix={<FallOutlined />}
               valueStyle={{ color: '#52c41a' }}
               suffix={`/ ${totalChanges}`}
             />
@@ -392,8 +371,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
               suffix="%"
               prefix={<InfoCircleOutlined />}
               valueStyle={{
-                color: avgChangePercent > 0 ? '#ff4d4f' :
-                       avgChangePercent < 0 ? '#52c41a' : '#999'
+                color: avgChangePercent > 0 ? '#ff4d4f' : avgChangePercent < 0 ? '#52c41a' : '#999',
               }}
             />
           </Card>
@@ -412,18 +390,13 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
               <HistoryOutlined style={{ marginRight: 8 }} />
               价格历史记录
             </Title>
-            <Text type="secondary">
-              查看商品价格的变动历史和趋势分析
-            </Text>
+            <Text type="secondary">查看商品价格的变动历史和趋势分析</Text>
           </Col>
           <Col>
             <Space>
               {compareItems.length > 0 && (
                 <Badge count={compareItems.length}>
-                  <Button
-                    icon={<CompareOutlined />}
-                    onClick={handleCompare}
-                  >
+                  <Button icon={<SwapOutlined />} onClick={handleCompare}>
                     价格对比
                   </Button>
                 </Badge>
@@ -497,11 +470,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
           size="small"
           style={{ marginBottom: 16 }}
           extra={
-            <Button
-              type="text"
-              size="small"
-              onClick={() => setCompareItems([])}
-            >
+            <Button type="text" size="small" onClick={() => setCompareItems([])}>
               清空
             </Button>
           }
@@ -541,11 +510,11 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-            defaultPageSize: 20
+            defaultPageSize: 20,
           }}
           scroll={{ x: 1200 }}
           locale={{
-            emptyText: <Empty description="暂无价格历史记录" />
+            emptyText: <Empty description="暂无价格历史记录" />,
           }}
         />
       </Card>
@@ -558,7 +527,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
         footer={[
           <Button key="close" onClick={() => setDetailModalVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={600}
       >
@@ -593,7 +562,9 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
                     <Text delete style={{ color: '#999' }}>
                       ¥{(selectedHistory.oldValue || 0).toFixed(2)}
                     </Text>
-                    <Text strong style={{ margin: '0 8px' }}>→</Text>
+                    <Text strong style={{ margin: '0 8px' }}>
+                      →
+                    </Text>
                     <Text strong style={{ color: '#1890ff' }}>
                       ¥{(selectedHistory.newValue || 0).toFixed(2)}
                     </Text>
@@ -601,12 +572,14 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
                   {selectedHistory.changeAmount !== undefined && (
                     <div>
                       <Text type={selectedHistory.changeAmount >= 0 ? 'success' : 'danger'}>
-                        变动金额: {selectedHistory.changeAmount >= 0 ? '+' : ''}¥{selectedHistory.changeAmount.toFixed(2)}
+                        变动金额: {selectedHistory.changeAmount >= 0 ? '+' : ''}¥
+                        {selectedHistory.changeAmount.toFixed(2)}
                       </Text>
                       <br />
                       {selectedHistory.changePercent !== undefined && (
                         <Text type={selectedHistory.changePercent >= 0 ? 'success' : 'danger'}>
-                          变动幅度: {selectedHistory.changePercent >= 0 ? '+' : ''}{selectedHistory.changePercent.toFixed(1)}%
+                          变动幅度: {selectedHistory.changePercent >= 0 ? '+' : ''}
+                          {selectedHistory.changePercent.toFixed(1)}%
                         </Text>
                       )}
                     </div>
@@ -666,7 +639,7 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
         footer={[
           <Button key="close" onClick={() => setCompareModalVisible(false)}>
             关闭
-          </Button>
+          </Button>,
         ]}
         width={800}
       >
@@ -714,13 +687,16 @@ const PriceHistory: React.FC<PriceHistoryProps> = ({
             <div>
               <div>对比项目: {compareItems.length} 个时间点</div>
               <div>
-                价格区间: ¥{Math.min(...compareItems.map(item => item.newValue || 0)).toFixed(2)} -
-                ¥{Math.max(...compareItems.map(item => item.newValue || 0)).toFixed(2)}
+                价格区间: ¥{Math.min(...compareItems.map((item) => item.newValue || 0)).toFixed(2)}{' '}
+                - ¥{Math.max(...compareItems.map((item) => item.newValue || 0)).toFixed(2)}
               </div>
               <div>
-                总变动: {
-                  ((compareItems[compareItems.length - 1]?.newValue || 0) - (compareItems[0]?.newValue || 0)).toFixed(2)
-                } 元
+                总变动:{' '}
+                {(
+                  (compareItems[compareItems.length - 1]?.newValue || 0) -
+                  (compareItems[0]?.newValue || 0)
+                ).toFixed(2)}{' '}
+                元
               </div>
             </div>
           }

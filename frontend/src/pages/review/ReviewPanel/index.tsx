@@ -27,7 +27,7 @@ import {
   Spin,
   Form,
   DatePicker,
-  Checkbox
+  Checkbox,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -44,7 +44,7 @@ import {
   SettingOutlined,
   ReloadOutlined,
   ExportOutlined,
-  BulkActions
+  BulkActions,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -62,7 +62,7 @@ import {
   AuditStatus,
   AuditType,
   AuditQueryParams,
-  AuditActionRequest
+  AuditActionRequest,
 } from '@/stores/auditStore';
 import { AUDIT_TYPE_OPTIONS, AUDIT_STATUS_OPTIONS, PRIORITY_OPTIONS } from '@/types/audit';
 
@@ -83,43 +83,33 @@ const ReviewPanel: React.FC = () => {
   // Store和Query
   const store = useAuditStore();
   const { filters, selectedAuditIds, setSelectedAuditIds, clearSelection } = useAuditStore();
-  const {
-    filteredAudits,
-    selectedAudits,
-    pendingCount,
-    highPriorityPendingCount,
-    hasSelection
-  } = useAuditSelectors();
+  const { filteredAudits, selectedAudits, pendingCount, highPriorityPendingCount, hasSelection } =
+    useAuditSelectors();
 
   // 数据查询
-  const {
-    data: auditsData,
-    isLoading,
-    refetch
-  } = useAuditsQuery(filters);
+  const { data: auditsData, isLoading, refetch } = useAuditsQuery(filters);
 
-  const {
-    data: myPendingAudits,
-    isLoading: pendingLoading
-  } = useMyPendingAuditsQuery();
+  const { data: myPendingAudits, isLoading: pendingLoading } = useMyPendingAuditsQuery();
 
-  const {
-    data: statistics
-  } = useAuditStatisticsQuery();
+  const { data: statistics } = useAuditStatisticsQuery();
 
   // Mutations
   const actionMutation = useAuditActionMutation();
   const batchActionMutation = useBatchAuditMutation();
 
   // 审核操作
-  const handleAuditAction = async (auditId: string, action: 'approve' | 'reject', comment?: string) => {
+  const handleAuditAction = async (
+    auditId: string,
+    action: 'approve' | 'reject',
+    comment?: string
+  ) => {
     try {
       await actionMutation.mutateAsync({
         auditId,
         action,
         comment,
         rejectionReason: action === 'reject' ? rejectReason : undefined,
-        itemIds: selectedItemIds.length > 0 ? selectedItemIds : undefined
+        itemIds: selectedItemIds.length > 0 ? selectedItemIds : undefined,
       });
 
       message.success(action === 'approve' ? '审核已批准' : '审核已驳回');
@@ -142,7 +132,7 @@ const ReviewPanel: React.FC = () => {
       await batchActionMutation.mutateAsync({
         auditIds: selectedAuditIds,
         action,
-        rejectionReason: action === 'reject' ? rejectReason : undefined
+        rejectionReason: action === 'reject' ? rejectReason : undefined,
       });
 
       message.success(`批量${action === 'approve' ? '批准' : '驳回'}成功`);
@@ -188,12 +178,14 @@ const ReviewPanel: React.FC = () => {
             </Text>
           )}
           <Space size={4}>
-            {record.tags.map(tag => (
-              <Tag key={tag} size="small" color="blue">{tag}</Tag>
+            {record.tags.map((tag) => (
+              <Tag key={tag} size="small" color="blue">
+                {tag}
+              </Tag>
             ))}
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '审核类型',
@@ -201,9 +193,9 @@ const ReviewPanel: React.FC = () => {
       key: 'auditType',
       width: 120,
       render: (type: AuditType) => {
-        const config = AUDIT_TYPE_OPTIONS.find(opt => opt.value === type);
+        const config = AUDIT_TYPE_OPTIONS.find((opt) => opt.value === type);
         return config ? <Tag color={config.color}>{config.label}</Tag> : type;
-      }
+      },
     },
     {
       title: '状态',
@@ -211,9 +203,9 @@ const ReviewPanel: React.FC = () => {
       key: 'status',
       width: 100,
       render: (status: AuditStatus) => {
-        const config = AUDIT_STATUS_OPTIONS.find(opt => opt.value === status);
+        const config = AUDIT_STATUS_OPTIONS.find((opt) => opt.value === status);
         return config ? <Tag color={config.color}>{config.label}</Tag> : status;
-      }
+      },
     },
     {
       title: '优先级',
@@ -221,9 +213,9 @@ const ReviewPanel: React.FC = () => {
       key: 'priority',
       width: 80,
       render: (priority: string) => {
-        const config = PRIORITY_OPTIONS.find(opt => opt.value === priority);
+        const config = PRIORITY_OPTIONS.find((opt) => opt.value === priority);
         return config ? <Tag color={config.color}>{config.label}</Tag> : priority;
-      }
+      },
     },
     {
       title: '提交人',
@@ -240,7 +232,7 @@ const ReviewPanel: React.FC = () => {
             </Text>
           </Space>
         </Space>
-      )
+      ),
     },
     {
       title: '审核项目',
@@ -255,7 +247,7 @@ const ReviewPanel: React.FC = () => {
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '提交时间',
@@ -277,7 +269,7 @@ const ReviewPanel: React.FC = () => {
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '操作',
@@ -319,8 +311,8 @@ const ReviewPanel: React.FC = () => {
             </>
           )}
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 渲染统计信息
@@ -389,24 +381,24 @@ const ReviewPanel: React.FC = () => {
       children: (
         <Table
           columns={columns}
-          dataSource={filteredAudits.filter(audit => audit.status === AuditStatus.PENDING)}
+          dataSource={filteredAudits.filter((audit) => audit.status === AuditStatus.PENDING)}
           rowKey="id"
           loading={isLoading}
           rowSelection={{
             selectedRowKeys: selectedAuditIds,
             onChange: setSelectedAuditIds,
-            getCheckboxProps: (record: AuditRecord) => record.status === AuditStatus.PENDING
+            getCheckboxProps: (record: AuditRecord) => record.status === AuditStatus.PENDING,
           }}
           pagination={{
             current: store.pagination.current,
             pageSize: store.pagination.pageSize,
-            total: filteredAudits.filter(audit => audit.status === AuditStatus.PENDING).length,
+            total: filteredAudits.filter((audit) => audit.status === AuditStatus.PENDING).length,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
         />
-      )
+      ),
     },
     {
       key: 'my-pending',
@@ -431,10 +423,10 @@ const ReviewPanel: React.FC = () => {
             total: myPendingAudits?.pagination?.total || 0,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
         />
-      )
+      ),
     },
     {
       key: 'all',
@@ -448,7 +440,7 @@ const ReviewPanel: React.FC = () => {
           rowSelection={{
             selectedRowKeys: selectedAuditIds,
             onChange: setSelectedAuditIds,
-            getCheckboxProps: (record: AuditRecord) => record.status === AuditStatus.PENDING
+            getCheckboxProps: (record: AuditRecord) => record.status === AuditStatus.PENDING,
           }}
           pagination={{
             current: store.pagination.current,
@@ -456,11 +448,11 @@ const ReviewPanel: React.FC = () => {
             total: filteredAudits.length,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
         />
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -476,21 +468,15 @@ const ReviewPanel: React.FC = () => {
                 <Badge count={highPriorityPendingCount} style={{ marginLeft: 8 }} />
               )}
             </Title>
-            <Text type="secondary">
-              管理和审核待处理的变更请求
-            </Text>
+            <Text type="secondary">管理和审核待处理的变更请求</Text>
           </Col>
           <Col>
             <Space>
               <Button icon={<ReloadOutlined />} onClick={() => refetch()}>
                 刷新
               </Button>
-              <Button icon={<ExportOutlined />}>
-                导出
-              </Button>
-              <Button icon={<SettingOutlined />}>
-                审核设置
-              </Button>
+              <Button icon={<ExportOutlined />}>导出</Button>
+              <Button icon={<SettingOutlined />}>审核设置</Button>
             </Space>
           </Col>
         </Row>
@@ -519,7 +505,7 @@ const ReviewPanel: React.FC = () => {
               value={filters.auditType}
               onChange={(value) => handleFilterChange({ auditType: value ? [value] : undefined })}
             >
-              {AUDIT_TYPE_OPTIONS.map(option => (
+              {AUDIT_TYPE_OPTIONS.map((option) => (
                 <Option key={option.value} value={option.value}>
                   {option.label}
                 </Option>
@@ -532,11 +518,13 @@ const ReviewPanel: React.FC = () => {
               style={{ width: 120 }}
               allowClear
               value={filters.status?.[0]}
-              onChange={(value) => handleFilterChange({
-                status: value ? [value] : undefined
-              })}
+              onChange={(value) =>
+                handleFilterChange({
+                  status: value ? [value] : undefined,
+                })
+              }
             >
-              {AUDIT_STATUS_OPTIONS.map(option => (
+              {AUDIT_STATUS_OPTIONS.map((option) => (
                 <Option key={option.value} value={option.value}>
                   {option.label}
                 </Option>
@@ -549,7 +537,7 @@ const ReviewPanel: React.FC = () => {
               onChange={(dates) => {
                 if (dates && dates[0] && dates[1]) {
                   handleFilterChange({
-                    dateRange: [dates[0].format('YYYY-MM-DD'), dates[1].format('YYYY-MM-DD')]
+                    dateRange: [dates[0].format('YYYY-MM-DD'), dates[1].format('YYYY-MM-DD')],
                   });
                 } else {
                   handleFilterChange({ dateRange: undefined });
@@ -619,10 +607,8 @@ const ReviewPanel: React.FC = () => {
                 <Col span={12}>
                   <Text strong>审核类型：</Text>
                   <div style={{ marginTop: 4 }}>
-                    {
-                      AUDIT_TYPE_OPTIONS.find(opt => opt.value === currentAudit.auditType)
-                        ?.label || currentAudit.auditType
-                    }
+                    {AUDIT_TYPE_OPTIONS.find((opt) => opt.value === currentAudit.auditType)
+                      ?.label || currentAudit.auditType}
                   </div>
                 </Col>
               </Row>
@@ -662,10 +648,8 @@ const ReviewPanel: React.FC = () => {
                 <Col span={8}>
                   <Text strong>优先级：</Text>
                   <div style={{ marginTop: 4 }}>
-                    {
-                      PRIORITY_OPTIONS.find(opt => opt.value === currentAudit.priority)
-                        ?.label || currentAudit.priority
-                    }
+                    {PRIORITY_OPTIONS.find((opt) => opt.value === currentAudit.priority)?.label ||
+                      currentAudit.priority}
                   </div>
                 </Col>
               </Row>
@@ -675,14 +659,12 @@ const ReviewPanel: React.FC = () => {
             <Card size="small" style={{ marginBottom: 16 }}>
               <Text strong>变更项目 ({currentAudit.totalItems})</Text>
               <div style={{ marginTop: 8 }}>
-                {currentAudit.items.map(item => (
+                {currentAudit.items.map((item) => (
                   <Card key={item.id} size="small" style={{ marginBottom: 8 }}>
                     <Row justify="space-between" align="middle">
                       <Col>
                         <Text strong>{item.entityName}</Text>
-                        {item.entityCode && (
-                          <Text type="secondary"> ({item.entityCode})</Text>
-                        )}
+                        {item.entityCode && <Text type="secondary"> ({item.entityCode})</Text>}
                       </Col>
                       <Col>
                         <Space>
@@ -751,11 +733,7 @@ const ReviewPanel: React.FC = () => {
         confirmLoading={actionMutation.isPending || batchActionMutation.isPending}
       >
         <Form layout="vertical">
-          <Form.Item
-            label="驳回原因"
-            required
-            help="请详细说明驳回的原因，以便提交人了解问题所在"
-          >
+          <Form.Item label="驳回原因" required help="请详细说明驳回的原因，以便提交人了解问题所在">
             <Input.TextArea
               rows={4}
               placeholder="请输入驳回原因..."

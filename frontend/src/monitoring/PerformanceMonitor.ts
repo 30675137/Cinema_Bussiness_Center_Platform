@@ -1,4 +1,9 @@
-import type { PerformanceMetrics, PerformanceThresholds, PerformanceAlert, WebVitals } from './types';
+import type {
+  PerformanceMetrics,
+  PerformanceThresholds,
+  PerformanceAlert,
+  WebVitals,
+} from './types';
 
 class PerformanceMonitor {
   private metrics: PerformanceMetrics;
@@ -58,7 +63,8 @@ class PerformanceMonitor {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'navigation') {
           const navEntry = entry as PerformanceNavigationTiming;
-          this.metrics.pageLoad.domContentLoaded = navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart;
+          this.metrics.pageLoad.domContentLoaded =
+            navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart;
           this.metrics.pageLoad.loadComplete = navEntry.loadEventEnd - navEntry.loadEventStart;
 
           this.checkPageLoadThresholds();
@@ -239,7 +245,13 @@ class PerformanceMonitor {
     }
   }
 
-  private createAlert(type: PerformanceAlert['type'], severity: PerformanceAlert['severity'], message: string, value: number, threshold: number): void {
+  private createAlert(
+    type: PerformanceAlert['type'],
+    severity: PerformanceAlert['severity'],
+    message: string,
+    value: number,
+    threshold: number
+  ): void {
     const alert: PerformanceAlert = {
       id: Math.random().toString(36).substr(2, 9),
       type,
@@ -305,7 +317,7 @@ class PerformanceMonitor {
   }
 
   public destroy(): void {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers = [];
   }
 }

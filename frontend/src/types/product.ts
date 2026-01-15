@@ -1,456 +1,310 @@
-import { z } from 'zod';
-import type { BaseEntity } from './index';
-import { MaterialType, ProductStatus } from './index';
+/**
+ * @spec P006-fix-sku-edit-data
+ * Product type definitions for SKU edit page data loading
+ */
 
-// 商品接口定义
-export interface Product extends BaseEntity {
+// ============================================
+// Core Entities
+// ============================================
+
+/**
+ * SKU (Stock Keeping Unit) - 库存量单位
+ * 代表可销售的具体商品规格
+ */
+export interface SKU {
+  /** 主键ID */
   id: string;
-  skuId: string;
-  spuId?: string;
+
+  /** SKU编码，唯一标识（如 FIN-COCKTAIL） */
+  code: string;
+
+  /** SKU名称 */
   name: string;
-  shortName?: string;
-  description?: string;
-  categoryId: string;
-  category: ProductCategory;
-  materialType: MaterialType;
-  status: ProductStatus;
-  basePrice: number;
-  specifications?: ProductSpec[];
-  content?: ProductContent;
-  bom?: BOMRecipe;
-  channels?: ChannelOverride[];
-  images: ProductImage[];
-  barcode?: string;
-  unit?: string;
-  brand?: string;
-}
 
-// 商品内容
-export interface ProductContent {
-  productId: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  images: ProductImage[];
-  videos?: ProductVideo[];
-  attributes?: Record<string, any>;
-}
+  /** 销售价格（单位：分） */
+  price: number;
 
-// 商品图片
-export interface ProductImage {
-  id: string;
-  url: string;
-  alt?: string;
-  sortOrder: number;
-  type: 'main' | 'gallery' | 'detail';
-}
+  /** 库存数量 */
+  stockQuantity: number;
 
-// 商品视频
-export interface ProductVideo {
-  id: string;
-  url: string;
-  title?: string;
-  duration?: number;
-  sortOrder: number;
-}
+  /** 状态（active | inactive | deleted） */
+  status: SKUStatus;
 
-// 商品规格
-export interface ProductSpec {
-  id: string;
-  productId: string;
-  name: string;
-  type: SpecType;
-  values: SpecValue[];
-  required: boolean;
-  sortOrder: number;
-}
+  /** 关联的SPU ID（可为空） */
+  spuId: string | null;
 
-export enum SpecType {
-  TEXT = 'text',
-  NUMBER = 'number',
-  SELECT = 'select',
-  MULTI_SELECT = 'multi_select',
-  BOOLEAN = 'boolean',
-  DATE = 'date'
-}
-
-export interface SpecValue {
-  id: string;
-  value: string;
-  label?: string;
-  price?: number;
-}
-
-// BOM配方
-export interface BOMRecipe {
-  id: string;
-  productId: string;
+  /** 乐观锁版本号（用于并发冲突检测） */
   version: number;
-  components: BOMComponent[];
-  totalCost?: number;
-  yieldRate?: number;
-  isActive: boolean;
+
+  /** 创建时间 */
   createdAt: string;
+
+  /** 更新时间 */
+  updatedAt: string;
+
+  /** 创建人ID */
   createdBy: string;
+
+  /** 更新人ID */
+  updatedBy: string;
 }
 
-export interface BOMComponent {
-  id: string;
-  materialId: string;
-  material: Product;
-  quantity: number;
-  unit: string;
-  unitCost?: number;
-  totalCost?: number;
-  isOptional: boolean;
-  sortOrder: number;
-}
+export type SKUStatus = 'active' | 'inactive' | 'deleted';
 
-// 渠道覆写
-export interface ChannelOverride {
+/**
+ * SPU (Standard Product Unit) - 标准产品单元
+ * 代表产品的抽象概念
+ */
+export interface SPU {
+  /** 主键ID */
   id: string;
-  productId: string;
-  channelId: string;
-  channel: Channel;
-  shortTitle?: string;
-  shortDescription?: string;
-  customImages?: ProductImage[];
-  customAttributes?: Record<string, any>;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
-// 商品类目
-export interface ProductCategory {
-  id: string;
+  /** 产品名称 */
   name: string;
-  code: string;
-  level: number;
-  parentId?: string;
-  path: string;
-  children?: ProductCategory[];
-  sortOrder: number;
-  status: 'active' | 'inactive';
-}
 
-// 渠道
-export interface Channel {
-  id: string;
-  code: string;
-  name: string;
-  type: ChannelType;
-  platform?: string;
-  status: 'active' | 'inactive' | 'testing';
-  config?: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export enum ChannelType {
-  MINI_PROGRAM = 'mini_program',
-  APP = 'app',
-  WEBSITE = 'website',
-  OFFLINE = 'offline'
-}
-
-// 商品筛选条件
-export interface ProductFilters {
-  categoryId?: string;
-  materialType?: MaterialType;
-  status?: ProductStatus[];
-  priceRange?: [number, number];
-  stockRange?: [number, number];
-  brandIds?: string[];
-  keyword?: string;
-}
-
-// 商品查询参数
-export interface ProductQueryParams {
-  page?: number;
-  pageSize?: number;
-  keyword?: string;
-  skuId?: string;
-  categoryId?: string;
-  materialType?: MaterialType;
-  status?: ProductStatus[];
-  priceRange?: [number, number];
-  sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'basePrice';
-  sortOrder?: 'asc' | 'desc';
-}
-
-// 商品表单数据类型
-export interface ProductFormData {
-  // 基础信息
-  name: string;
-  shortTitle?: string;
-  description?: string;
+  /** 产品分类ID */
   categoryId: string;
-  materialType: MaterialType;
-  basePrice: number;
-  barcode?: string;
-  unit?: string;
-  brand?: string;
-  weight?: number;
-  volume?: number;
-  shelfLife?: number;
-  storageCondition?: string;
 
-  // 内容管理
-  content: ProductContent;
+  /** 品牌ID（可选） */
+  brandId: string | null;
 
-  // 规格属性
-  specifications: ProductSpec[];
+  /** 产品描述 */
+  description: string;
 
-  // BOM配方（仅成品）
-  bom?: BOMRecipe;
+  /** 状态（valid | invalid） */
+  status: SPUStatus;
 
-  // 渠道覆写
-  channelOverrides?: ChannelOverride[];
+  /** 创建时间 */
+  createdAt: string;
 
-  // 状态
-  status: ProductStatus;
+  /** 更新时间 */
+  updatedAt: string;
 }
 
-// 表单验证步骤
+export type SPUStatus = 'valid' | 'invalid';
+
+/**
+ * BOM (Bill of Materials) - 物料清单/配方
+ * 定义成品SKU由哪些原料SKU组成
+ */
+export interface BOM {
+  /** 主键ID */
+  id: string;
+
+  /** 关联的成品SKU ID */
+  skuId: string;
+
+  /** 配方名称（可选） */
+  name: string | null;
+
+  /** 损耗率（百分比，如 5 表示 5%） */
+  wasteRate: number;
+
+  /** 状态（active | inactive） */
+  status: BOMStatus;
+
+  /** BOM组成项列表 */
+  components: BOMComponent[];
+
+  /** 创建时间 */
+  createdAt: string;
+
+  /** 更新时间 */
+  updatedAt: string;
+}
+
+export type BOMStatus = 'active' | 'inactive';
+
+/**
+ * BOMComponent - BOM配方组成项
+ * 代表配方中的一条原料记录
+ */
+export interface BOMComponent {
+  /** 主键ID */
+  id: string;
+
+  /** 关联的BOM ID */
+  bomId: string;
+
+  /** 原料SKU ID */
+  ingredientSkuId: string;
+
+  /** 原料SKU编码（冗余字段，用于显示） */
+  ingredientSkuCode: string;
+
+  /** 原料SKU名称（冗余字段，用于显示） */
+  ingredientSkuName: string;
+
+  /** 用量 */
+  quantity: number;
+
+  /** 单位（ml | g | kg | 个 | 瓶 | 升） */
+  unit: string;
+
+  /** 标准成本（单位：分，可选） */
+  standardCost: number | null;
+
+  /** 状态（valid | invalid） */
+  status: BOMComponentStatus;
+
+  /** 排序顺序 */
+  sortOrder: number;
+
+  /** 创建时间 */
+  createdAt: string;
+
+  /** 更新时间 */
+  updatedAt: string;
+}
+
+export type BOMComponentStatus = 'valid' | 'invalid';
+
+// ============================================
+// Response DTOs
+// ============================================
+
+/**
+ * SKU详情聚合响应
+ * SKU编辑页面加载时的聚合响应数据
+ */
+export interface SKUDetailResponse {
+  /** SKU基本信息 */
+  sku: SKU;
+
+  /** 关联的SPU信息（可为null） */
+  spu: SPU | null;
+
+  /** 关联的BOM配方（可为null） */
+  bom: BOM | null;
+
+  /** 加载元数据（标识各部分数据加载状态） */
+  metadata: LoadMetadata;
+}
+
+/**
+ * 数据加载元数据
+ * 标识SPU和BOM数据的加载状态和有效性
+ */
+export interface LoadMetadata {
+  /** SPU加载是否成功 */
+  spuLoadSuccess: boolean;
+
+  /** BOM加载是否成功 */
+  bomLoadSuccess: boolean;
+
+  /** SPU状态（valid=有效，invalid=失效，not_linked=未关联） */
+  spuStatus: 'valid' | 'invalid' | 'not_linked';
+
+  /** BOM状态（active=有效，inactive=禁用，not_configured=未配置） */
+  bomStatus: 'active' | 'inactive' | 'not_configured';
+}
+
+// ============================================
+// Request DTOs
+// ============================================
+
+/**
+ * SKU更新请求
+ * 包含乐观锁版本号用于并发冲突检测
+ */
+export interface SKUUpdateRequest {
+  /** SKU编码（可选，通常不允许修改） */
+  code?: string;
+
+  /** SKU名称 */
+  name?: string;
+
+  /** 销售价格（单位：分） */
+  price?: number;
+
+  /** 库存数量 */
+  stockQuantity?: number;
+
+  /** 状态 */
+  status?: SKUStatus;
+
+  /** 关联的SPU ID */
+  spuId?: string | null;
+
+  /** 乐观锁版本号（用于并发冲突检测，必填） */
+  version: number;
+}
+
+// ============================================
+// Error Types
+// ============================================
+
+/**
+ * API错误响应
+ */
+export interface ApiErrorResponse {
+  success: false;
+  error: string;
+  message: string;
+  details?: Record<string, unknown>;
+  timestamp: string;
+}
+
+/**
+ * SKU模块错误编号
+ * 格式: SKU_<类别>_<序号>
+ */
+export const SKU_ERROR_CODES = {
+  // 未找到错误 (NTF - Not Found)
+  SKU_NTF_001: 'SKU_NTF_001', // SKU不存在
+  SKU_NTF_002: 'SKU_NTF_002', // SPU不存在（已删除）
+  SKU_NTF_003: 'SKU_NTF_003', // BOM不存在
+
+  // 业务规则错误 (BIZ - Business Rule)
+  SKU_BIZ_001: 'SKU_BIZ_001', // 并发冲突（版本号不匹配）
+  SKU_BIZ_002: 'SKU_BIZ_002', // SPU已失效
+  SKU_BIZ_003: 'SKU_BIZ_003', // BOM已禁用
+
+  // 验证错误 (VAL - Validation)
+  SKU_VAL_001: 'SKU_VAL_001', // SKU编码格式无效
+  SKU_VAL_002: 'SKU_VAL_002', // 价格为负数
+  SKU_VAL_003: 'SKU_VAL_003', // 库存数量为负数
+  SKU_VAL_004: 'SKU_VAL_004', // 状态值无效
+  SKU_VAL_005: 'SKU_VAL_005', // 版本号缺失
+
+  // 系统错误 (SYS - System)
+  SKU_SYS_001: 'SKU_SYS_001', // 数据库连接失败
+  SKU_SYS_002: 'SKU_SYS_002', // Supabase调用超时
+} as const;
+
+export type SKUErrorCode = (typeof SKU_ERROR_CODES)[keyof typeof SKU_ERROR_CODES];
+
+/**
+ * Type guard: 检查是否为API错误响应
+ */
+export function isApiErrorResponse(response: unknown): response is ApiErrorResponse {
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'success' in response &&
+    response.success === false &&
+    'error' in response &&
+    'message' in response
+  );
+}
+
+// ============================================
+// Product Form Types
+// ============================================
+
+/**
+ * Product form step enum
+ */
 export enum FormStep {
   BASIC_INFO = 'basic_info',
   CONTENT = 'content',
   SPECS = 'specs',
   BOM = 'bom',
-  CHANNEL_OVERRIDE = 'channel_override'
+  CHANNEL_OVERRIDE = 'channel_override',
 }
 
-// 表单步骤配置
-export interface FormStepConfig {
-  key: FormStep;
-  title: string;
-  description: string;
-  required: boolean;
-  completed: boolean;
-  valid: boolean;
-}
-
-// 表单状态
-export interface ProductFormState {
-  currentStep: FormStep;
-  formData: Partial<ProductFormData>;
-  steps: FormStepConfig[];
-  isDirty: boolean;
-  isValid: boolean;
-  saving: boolean;
-}
-
-// 商品列表状态
-export interface ProductListState {
-  products: Product[];
-  loading: boolean;
-  error?: string;
-  totalCount: number;
-  filters: ProductFilters;
-  searchQuery: string;
-  pagination: {
-    current: number;
-    pageSize: number;
-    total: number;
-  };
-  selectedProductIds: string[];
-  selectionMode: 'single' | 'multiple';
-  viewMode: 'table' | 'grid';
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-}
-
-
-// Zod验证Schema
-export const ProductBasicInfoSchema = z.object({
-  name: z.string()
-    .min(1, '商品名称不能为空')
-    .max(100, '商品名称不能超过100个字符')
-    .regex(/^[a-zA-Z0-9\u4e00-\u9fa5\s\-_()（）]+$/, '商品名称包含非法字符'),
-
-  shortTitle: z.string()
-    .max(50, '短标题不能超过50个字符')
-    .optional(),
-
-  description: z.string()
-    .max(1000, '描述不能超过1000个字符')
-    .optional(),
-
-  categoryId: z.string()
-    .min(1, '请选择商品类目'),
-
-  materialType: z.nativeEnum(MaterialType, {
-    message: '请选择物料类型'
-  }),
-
-  basePrice: z.number()
-    .min(0, '价格必须大于等于0')
-    .max(999999, '价格不能超过999999'),
-
-  barcode: z.string()
-    .max(50, '条形码不能超过50个字符')
-    .regex(/^[0-9]+$/, '条形码只能包含数字')
-    .optional(),
-
-  unit: z.string()
-    .max(20, '单位不能超过20个字符')
-    .optional(),
-
-  brand: z.string()
-    .max(50, '品牌不能超过50个字符')
-    .optional(),
-
-  weight: z.number()
-    .min(0, '重量必须大于等于0')
-    .max(1000000, '重量不能超过1000000')
-    .optional(),
-
-  volume: z.number()
-    .min(0, '体积必须大于等于0')
-    .max(1000000, '体积不能超过1000000')
-    .optional(),
-
-  shelfLife: z.number()
-    .min(0, '保质期必须大于等于0')
-    .max(36500, '保质期不能超过100年')
-    .optional(),
-
-  storageCondition: z.string()
-    .max(200, '储存条件不能超过200个字符')
-    .optional(),
-
-  status: z.nativeEnum(ProductStatus, {
-    message: '请选择商品状态'
-  })
-});
-
-export const ProductContentSchema = z.object({
-  title: z.string()
-    .min(1, '内容标题不能为空')
-    .max(200, '内容标题不能超过200个字符'),
-
-  subtitle: z.string()
-    .max(300, '副标题不能超过300个字符')
-    .optional(),
-
-  description: z.string()
-    .max(2000, '内容描述不能超过2000个字符')
-    .optional(),
-
-  images: z.array(z.object({
-    id: z.string(),
-    url: z.string().url('请输入有效的图片URL'),
-    alt: z.string().optional(),
-    sortOrder: z.number().min(0),
-    type: z.enum(['main', 'gallery', 'detail'])
-  })).min(1, '至少需要一张主图'),
-
-  videos: z.array(z.object({
-    id: z.string(),
-    url: z.string().url('请输入有效的视频URL'),
-    title: z.string().optional(),
-    duration: z.number().optional()
-  })).optional()
-});
-
-export const ProductSpecSchema = z.object({
-  name: z.string().min(1, '规格名称不能为空'),
-  value: z.string().min(1, '规格值不能为空'),
-  type: z.enum(['text', 'number', 'boolean', 'select']),
-  required: z.boolean().default(false),
-  sortOrder: z.number().default(0)
-});
-
-export const ProductSpecsSchema = z.array(ProductSpecSchema).optional();
-
-export const BOMComponentSchema = z.object({
-  materialId: z.string().min(1, '物料ID不能为空'),
-  materialName: z.string().min(1, '物料名称不能为空'),
-  quantity: z.number().min(0, '物料数量必须大于等于0'),
-  unit: z.string().min(1, '物料单位不能为空'),
-  cost: z.number().min(0, '物料成本必须大于等于0')
-});
-
-export const BOMRecipeSchema = z.object({
-  components: z.array(BOMComponentSchema).min(1, 'BOM配方至少需要一个物料'),
-  totalCost: z.number().min(0, '总成本必须大于等于0').optional(),
-  instructions: z.string().max(1000, '制作说明不能超过1000个字符').optional()
-});
-
-export const ChannelOverrideSchema = z.object({
-  channelType: z.enum(['mini_program', 'app', 'website', 'offline']),
-  title: z.string().max(200, '标题不能超过200个字符').optional(),
-  shortTitle: z.string().max(50, '短标题不能超过50个字符').optional(),
-  description: z.string().max(2000, '描述不能超过2000个字符').optional(),
-  images: z.array(z.object({
-    id: z.string(),
-    url: z.string().url('请输入有效的图片URL'),
-    alt: z.string().optional()
-  })).optional()
-});
-
-export const ChannelOverridesSchema = z.array(ChannelOverrideSchema).optional();
-
-// 完整的商品表单验证Schema
-export const ProductFormSchema = z.object({
-  ...ProductBasicInfoSchema.shape,
-  content: ProductContentSchema,
-  specifications: ProductSpecsSchema,
-  bom: BOMRecipeSchema.optional(),
-  channelOverrides: ChannelOverridesSchema
-}).superRefine((data, ctx) => {
-  // 如果是成品且没有BOM配方，添加错误
-  if (data.materialType === 'finished_good' && !data.bom) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: '成品必须配置BOM配方',
-      path: ['bom']
-    });
-  }
-
-  return data;
-});
-
-// 导出类型推导
-export type ProductFormInput = z.infer<typeof ProductFormSchema>;
-export type ProductBasicInfoInput = z.infer<typeof ProductBasicInfoSchema>;
-export type ProductContentInput = z.infer<typeof ProductContentSchema>;
-export type ProductSpecsInput = z.infer<typeof ProductSpecsSchema>;
-export type BOMRecipeInput = z.infer<typeof BOMRecipeSchema>;
-export type ChannelOverridesInput = z.infer<typeof ChannelOverridesSchema>;
-export type ProductBaseFormData = z.infer<typeof ProductBasicInfoSchema>;
-export type ProductFullFormData = z.infer<typeof ProductFormSchema>;
-
-// 工具函数
-export const createEmptyProduct = (): Product => ({
-  id: '',
-  skuId: '',
-  name: '',
-  categoryId: '',
-  category: {} as any, // 临时类型，实际使用时需要正确的category对象
-  materialType: MaterialType.FINISHED_GOOD,
-  status: ProductStatus.DRAFT,
-  basePrice: 0,
-  images: [],
-  specifications: [],
-  version: 1,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  createdBy: '',
-  updatedBy: ''
-});
-
-export const createEmptyProductForm = (): ProductFormData => ({
-  name: '',
-  categoryId: '',
-  materialType: MaterialType.FINISHED_GOOD,
-  basePrice: 0,
-  unit: '个',
-  specifications: [],
-  content: {
-    productId: '',
-    title: '',
-    images: []
-  }
-});
+/**
+ * Product form schema (placeholder for Zod validation)
+ * Note: Actual Zod schema should be defined in a separate validation file
+ */
+export const ProductFormSchema = {} as any; // Placeholder - replace with actual Zod schema

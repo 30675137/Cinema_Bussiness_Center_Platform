@@ -17,7 +17,7 @@ import {
   message,
   Divider,
   Tag,
-  Alert
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -27,7 +27,7 @@ import {
   UploadOutlined,
   EyeOutlined,
   InfoCircleOutlined,
-  CopyOutlined
+  CopyOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -69,11 +69,7 @@ interface ChannelOverrideTabProps {
   touched: Record<string, boolean>;
 }
 
-const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
-  control,
-  errors,
-  touched
-}) => {
+const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({ control, errors, touched }) => {
   const [editingOverride, setEditingOverride] = useState<ChannelOverride | null>(null);
   const [overrideFormVisible, setOverrideFormVisible] = useState(false);
 
@@ -81,34 +77,65 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
     fields: overrideFields,
     append: appendOverride,
     remove: removeOverride,
-    update: updateOverride
+    update: updateOverride,
   } = useFieldArray({
     control,
-    name: 'channelOverrides'
+    name: 'channelOverrides',
   });
 
   // 模拟渠道数据（实际应该从API获取）
   const availableChannels: Channel[] = [
-    { id: 'ch001', code: 'wechat_mini', name: '微信小程序', type: 'mini_program', platform: 'wechat', status: 'active' },
-    { id: 'ch002', code: 'alipay_mini', name: '支付宝小程序', type: 'mini_program', platform: 'alipay', status: 'active' },
-    { id: 'ch003', code: 'cinema_app', name: '影城APP', type: 'app', platform: 'ios', status: 'active' },
-    { id: 'ch004', code: 'h5_website', name: 'H5网站', type: 'website', platform: 'web', status: 'active' },
-    { id: 'ch005', code: 'offline_store', name: '线下门店', type: 'offline', status: 'active' }
+    {
+      id: 'ch001',
+      code: 'wechat_mini',
+      name: '微信小程序',
+      type: 'mini_program',
+      platform: 'wechat',
+      status: 'active',
+    },
+    {
+      id: 'ch002',
+      code: 'alipay_mini',
+      name: '支付宝小程序',
+      type: 'mini_program',
+      platform: 'alipay',
+      status: 'active',
+    },
+    {
+      id: 'ch003',
+      code: 'cinema_app',
+      name: '影城APP',
+      type: 'app',
+      platform: 'ios',
+      status: 'active',
+    },
+    {
+      id: 'ch004',
+      code: 'h5_website',
+      name: 'H5网站',
+      type: 'website',
+      platform: 'web',
+      status: 'active',
+    },
+    { id: 'ch005', code: 'offline_store', name: '线下门店', type: 'offline', status: 'active' },
   ];
 
   // 获取可用渠道（排除已添加的）
   const getAvailableChannels = () => {
-    const usedChannelIds = control.getValues('channelOverrides')?.map((override: ChannelOverride) => override.channelId) || [];
-    return availableChannels.filter(channel => !usedChannelIds.includes(channel.id));
+    const usedChannelIds =
+      control
+        .getValues('channelOverrides')
+        ?.map((override: ChannelOverride) => override.channelId) || [];
+    return availableChannels.filter((channel) => !usedChannelIds.includes(channel.id));
   };
 
   // 渠道类型标签
   const getChannelTypeTag = (type: string) => {
     const typeMap: Record<string, { color: string; text: string }> = {
-      'mini_program': { color: 'green', text: '小程序' },
-      'app': { color: 'blue', text: 'APP' },
-      'website': { color: 'orange', text: '网站' },
-      'offline': { color: 'purple', text: '线下' }
+      mini_program: { color: 'green', text: '小程序' },
+      app: { color: 'blue', text: 'APP' },
+      website: { color: 'orange', text: '网站' },
+      offline: { color: 'purple', text: '线下' },
     };
     const config = typeMap[type] || { color: 'default', text: type };
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -131,7 +158,7 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
       shortDescription: '',
       customImages: [],
       customAttributes: {},
-      isActive: true
+      isActive: true,
     };
     setEditingOverride(newOverride);
     setOverrideFormVisible(true);
@@ -145,16 +172,16 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
 
   // 保存渠道覆写
   const handleSaveOverride = (override: ChannelOverride) => {
-    const channel = availableChannels.find(ch => ch.id === override.channelId);
+    const channel = availableChannels.find((ch) => ch.id === override.channelId);
     if (!channel) {
       message.error('请选择有效的渠道');
       return;
     }
     override.channel = channel;
 
-    if (editingOverride && overrideFields.find(field => field.id === editingOverride.id)) {
+    if (editingOverride && overrideFields.find((field) => field.id === editingOverride.id)) {
       // 更新现有覆写
-      const index = overrideFields.findIndex(field => field.id === override.id);
+      const index = overrideFields.findIndex((field) => field.id === override.id);
       if (index !== -1) {
         updateOverride(index, override);
       }
@@ -187,7 +214,7 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
     if (editingOverride) {
       setEditingOverride({
         ...editingOverride,
-        [field]: baseContent
+        [field]: baseContent,
       });
     }
   };
@@ -209,7 +236,7 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
         return false;
       }
       return false;
-    }
+    },
   };
 
   // 表格列定义
@@ -223,7 +250,7 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
           <span>{record.channel.name || '-'}</span>
           {getChannelTypeTag(record.channel.type)}
         </Space>
-      )
+      ),
     },
     {
       title: '自定义标题',
@@ -232,23 +259,22 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
       render: (title: string, record: ChannelOverride) => (
         <Space>
           <span>{title || record.channel.name}</span>
-          {title && <Tag color="blue" >自定义</Tag>}
+          {title && <Tag color="blue">自定义</Tag>}
         </Space>
-      )
+      ),
     },
     {
       title: '自定义描述',
       dataIndex: 'shortDescription',
       key: 'shortDescription',
-      render: (desc: string) => (
+      render: (desc: string) =>
         desc ? (
           <Text ellipsis style={{ maxWidth: 200 }}>
             {desc}
           </Text>
         ) : (
           <Text type="secondary">-</Text>
-        )
-      )
+        ),
     },
     {
       title: '自定义图片',
@@ -264,18 +290,16 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
                 src={images[0]?.url}
                 style={{ objectFit: 'cover', borderRadius: 4 }}
                 preview={{
-                  mask: <EyeOutlined />
+                  mask: <EyeOutlined />,
                 }}
               />
-              {images.length > 1 && (
-                <Tag >+{images.length - 1}</Tag>
-              )}
+              {images.length > 1 && <Tag>+{images.length - 1}</Tag>}
             </>
           ) : (
             <Text type="secondary">无</Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '状态',
@@ -283,41 +307,27 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
       key: 'isActive',
       width: 80,
       render: (isActive: boolean, record: ChannelOverride, index: number) => (
-        <Switch
-          
-          checked={isActive}
-          onChange={(checked) => handleToggleActive(index, checked)}
-        />
-      )
+        <Switch checked={isActive} onChange={(checked) => handleToggleActive(index, checked)} />
+      ),
     },
     {
       title: '操作',
       key: 'actions',
       width: 100,
       render: (_: any, record: ChannelOverride, index: number) => (
-        <Space >
-          <Button
-            type="text"
-            
-            icon={<EditOutlined />}
-            onClick={() => handleEditOverride(record)}
-          />
+        <Space>
+          <Button type="text" icon={<EditOutlined />} onClick={() => handleEditOverride(record)} />
           <Popconfirm
             title="确定删除此渠道配置吗？"
             onConfirm={() => handleDeleteOverride(index)}
             okText="确定"
             cancelText="取消"
           >
-            <Button
-              type="text"
-              
-              danger
-              icon={<DeleteOutlined />}
-            />
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
@@ -370,7 +380,6 @@ const ChannelOverrideTab: React.FC<ChannelOverrideTabProps> = ({
               columns={columns}
               rowKey="id"
               pagination={false}
-              
               bordered
             />
           )}
@@ -411,7 +420,7 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
   onSave,
   onCancel,
   onCopyFromBase,
-  uploadProps
+  uploadProps,
 }) => {
   const [formOverride, setFormOverride] = useState<ChannelOverride>(override);
 
@@ -423,7 +432,7 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
       title: '', // 重置自定义内容
       shortTitle: '',
       shortDescription: '',
-      customImages: []
+      customImages: [],
     });
   };
 
@@ -436,11 +445,11 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
           id: Date.now().toString(),
           url: e.target?.result as string,
           alt: '',
-          sortOrder: (formOverride.customImages || []).length
+          sortOrder: (formOverride.customImages || []).length,
         };
         setFormOverride({
           ...formOverride,
-          customImages: [...(formOverride.customImages || []), newImage]
+          customImages: [...(formOverride.customImages || []), newImage],
         });
       };
       reader.readAsDataURL(info.file.originFileObj);
@@ -451,7 +460,7 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
   const handleDeleteImage = (imageId: string) => {
     setFormOverride({
       ...formOverride,
-      customImages: (formOverride.customImages || []).filter(img => img.id !== imageId)
+      customImages: (formOverride.customImages || []).filter((img) => img.id !== imageId),
     });
   };
 
@@ -480,7 +489,7 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
               value={formOverride.channelId}
               onChange={handleChannelSelect}
             >
-              {availableChannels.map(channel => (
+              {availableChannels.map((channel) => (
                 <Option key={channel.id} value={channel.id}>
                   {channel.name}
                 </Option>
@@ -492,10 +501,12 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
           <Form.Item label="启用状态">
             <Switch
               checked={formOverride.isActive}
-              onChange={(checked) => setFormOverride({
-                ...formOverride,
-                isActive: checked
-              })}
+              onChange={(checked) =>
+                setFormOverride({
+                  ...formOverride,
+                  isActive: checked,
+                })
+              }
             />
           </Form.Item>
         </Col>
@@ -510,14 +521,15 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
             <Input
               placeholder="留空使用默认标题"
               value={formOverride.title || ''}
-              onChange={(e) => setFormOverride({
-                ...formOverride,
-                title: e.target.value
-              })}
+              onChange={(e) =>
+                setFormOverride({
+                  ...formOverride,
+                  title: e.target.value,
+                })
+              }
               addonAfter={
                 <Button
                   type="text"
-                  
                   icon={<CopyOutlined />}
                   onClick={() => onCopyFromBase('title')}
                   title="复制基础标题"
@@ -531,14 +543,15 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
             <Input
               placeholder="留空使用默认短标题"
               value={formOverride.shortTitle || ''}
-              onChange={(e) => setFormOverride({
-                ...formOverride,
-                shortTitle: e.target.value
-              })}
+              onChange={(e) =>
+                setFormOverride({
+                  ...formOverride,
+                  shortTitle: e.target.value,
+                })
+              }
               addonAfter={
                 <Button
                   type="text"
-                  
                   icon={<CopyOutlined />}
                   onClick={() => onCopyFromBase('subtitle')}
                   title="复制基础短标题"
@@ -555,18 +568,15 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
           rows={3}
           placeholder="留空使用默认描述"
           value={formOverride.shortDescription || ''}
-          onChange={(e) => setFormOverride({
-            ...formOverride,
-            shortDescription: e.target.value
-          })}
+          onChange={(e) =>
+            setFormOverride({
+              ...formOverride,
+              shortDescription: e.target.value,
+            })
+          }
         />
         <div style={{ textAlign: 'right', marginTop: 4 }}>
-          <Button
-            type="text"
-            
-            icon={<CopyOutlined />}
-            onClick={() => onCopyFromBase('description')}
-          >
+          <Button type="text" icon={<CopyOutlined />} onClick={() => onCopyFromBase('description')}>
             复制基础描述
           </Button>
         </div>
@@ -592,7 +602,6 @@ const OverrideForm: React.FC<OverrideFormProps> = ({
                     />
                     <Button
                       type="text"
-                      
                       danger
                       icon={<DeleteOutlined />}
                       style={{ position: 'absolute', top: 4, right: 4 }}

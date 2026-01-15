@@ -1,0 +1,46 @@
+# @spec T004-e2e-testdata-planner
+# Test Data Blueprint for E2E-INVENTORY-004 (Low Stock Alert Test)
+
+id: TD-INVENTORY-LOW-STOCK-ALERT
+description: "库存预警通知测试数据 - 爆米花库存不足场景"
+version: "1.0.0"
+
+strategy:
+  type: seed
+  seedFilePath: testdata/seeds/inventory-low-stock-alert.json
+  seedKey: "low-stock-alert-scenario"
+
+# Output data structure
+outputSchema:
+  adminBaseUrl: string
+  manager_user:
+    username: string
+    password: string
+    email: string
+  safety_stock_config:
+    sku_id: string
+    safety_stock_threshold: number
+    warning_threshold: number
+  product_sku:
+    id: string
+    name: string
+    initial_stock: number
+    current_stock: number
+    unit: string
+  alert_notification:
+    type: string
+    severity: string
+    sku_id: string
+    sku_name: string
+    current_stock: number
+    safety_threshold: number
+    recommended_restock: number
+  manager_email:
+    to: string
+    subject: string
+    body_contains: array
+
+scope: test
+teardown: false
+timeout: 10000
+environments: [local, staging, production]

@@ -1,0 +1,418 @@
+/**
+ * 移动端导航抽屉组件样式
+ */
+
+.mobile-navigation-drawer {
+  /* 抽屉基础样式 */
+}
+
+.mobile-navigation-drawer .ant-drawer-body {
+  padding: 0;
+  background: #ffffff;
+}
+
+.mobile-drawer-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 头部区域 */
+.mobile-drawer-header {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-icon {
+  font-size: 20px;
+  color: #1890ff;
+}
+
+.header-title {
+  margin: 0;
+  color: #262626;
+  font-weight: 600;
+}
+
+.close-btn {
+  font-size: 16px;
+  color: #8c8c8c;
+  padding: 8px;
+}
+
+.close-btn:hover {
+  color: #262626;
+  background: #f5f5f5;
+}
+
+/* 用户信息区域 */
+.mobile-user-section {
+  flex-shrink: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  flex-shrink: 0;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  margin: 0 !important;
+  color: white !important;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 快捷操作区域 */
+.mobile-quick-actions {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.quick-action-btn {
+  flex-shrink: 0;
+  border: 1px solid #d9d9d9;
+  background: white;
+  color: #595959;
+  border-radius: 6px;
+  height: 40px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quick-action-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: #f6ffed;
+}
+
+/* 菜单区域通用样式 */
+.mobile-menu-section,
+.mobile-favorite-section {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.mobile-menu-section {
+  background: white;
+}
+
+.mobile-favorite-section {
+  background: #fafafa;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.section-icon {
+  font-size: 14px;
+  color: #1890ff;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+/* 菜单列表样式 */
+.main-menu-list,
+.favorite-menu-list {
+  background: transparent;
+}
+
+.mobile-menu-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  margin-bottom: 1px;
+}
+
+.mobile-menu-item:hover {
+  background: #f5f5f5;
+}
+
+.mobile-menu-item.active {
+  background: #e6f7ff;
+  border-left-color: #1890ff;
+}
+
+.mobile-menu-item .ant-list-item-content {
+  padding: 0;
+}
+
+.menu-item-content {
+  width: 100%;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menu-icon {
+  font-size: 16px;
+  color: #8c8c8c;
+  flex-shrink: 0;
+}
+
+.menu-title {
+  flex: 1;
+  font-size: 14px;
+  color: #262626;
+  margin-left: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-children-count {
+  font-size: 12px;
+  color: #8c8c8c;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* 收藏菜单项样式 */
+.favorite-menu-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.favorite-menu-item:hover {
+  background: #fff2e8;
+}
+
+.favorite-menu-item .ant-list-item-content {
+  padding: 0;
+}
+
+.favorite-menu-item .menu-item-content {
+  padding: 10px 20px;
+}
+
+.favorite-menu-item .menu-icon {
+  color: #faad14;
+}
+
+.favorite-menu-item .menu-title {
+  color: #262626;
+  font-weight: 500;
+}
+
+/* 底部区域 */
+.mobile-drawer-footer {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* 响应式适配 */
+@media (min-width: 576px) {
+  .mobile-drawer-header {
+    padding: 20px 24px;
+  }
+
+  .mobile-quick-actions {
+    padding: 20px 24px;
+  }
+
+  .section-header {
+    padding: 20px 24px 16px;
+  }
+
+  .menu-item-content {
+    padding: 14px 24px;
+  }
+
+  .favorite-menu-item .menu-item-content {
+    padding: 12px 24px;
+  }
+
+  .mobile-user-section {
+    padding: 24px;
+  }
+
+  .mobile-drawer-footer {
+    padding: 20px 24px;
+  }
+}
+
+@media (max-width: 375px) {
+  .header-title {
+    font-size: 16px;
+  }
+
+  .menu-title {
+    font-size: 13px;
+  }
+
+  .quick-action-btn {
+    font-size: 11px;
+    height: 36px;
+    padding: 0 8px;
+  }
+
+  .menu-icon {
+    font-size: 14px;
+  }
+}
+
+/* 触摸优化 */
+.mobile-menu-item,
+.favorite-menu-item {
+  min-height: 48px;
+  /* 增加触摸目标大小 */
+}
+
+.mobile-menu-item:active,
+.favorite-menu-item:active {
+  background: #e6f7ff;
+  transform: scale(0.98);
+  transition: all 0.1s ease;
+}
+
+/* 滚动条样式 */
+.mobile-menu-section::-webkit-scrollbar,
+.mobile-favorite-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mobile-menu-section::-webkit-scrollbar-track,
+.mobile-favorite-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-menu-section::-webkit-scrollbar-thumb,
+.mobile-favorite-section::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 2px;
+}
+
+.mobile-menu-section::-webkit-scrollbar-thumb:hover,
+.mobile-favorite-section::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+  .mobile-navigation-drawer .ant-drawer-body {
+    background: #141414;
+  }
+
+  .mobile-drawer-header {
+    background: #1f1f1f;
+    border-bottom-color: #303030;
+  }
+
+  .header-title {
+    color: #ffffff;
+  }
+
+  .mobile-quick-actions {
+    background: #1f1f1f;
+    border-bottom-color: #303030;
+  }
+
+  .quick-action-btn {
+    background: #262626;
+    border-color: #434343;
+    color: #ffffff;
+  }
+
+  .quick-action-btn:hover {
+    border-color: #1890ff;
+    background: #111b26;
+  }
+
+  .section-header {
+    background: #1f1f1f;
+    border-bottom-color: #303030;
+  }
+
+  .section-title {
+    color: #ffffff;
+  }
+
+  .mobile-menu-item:hover {
+    background: #262626;
+  }
+
+  .mobile-menu-item.active {
+    background: #111b26;
+  }
+
+  .menu-title {
+    color: #ffffff;
+  }
+
+  .mobile-favorite-section {
+    background: #1a1a1a;
+  }
+
+  .favorite-menu-item:hover {
+    background: #2b2111;
+  }
+
+  .mobile-drawer-footer {
+    background: #1f1f1f;
+    border-top-color: #303030;
+  }
+}

@@ -22,7 +22,7 @@ export enum PriceConfigStatus {
   APPROVED = 'approved',
   ACTIVE = 'active',
   EXPIRED = 'expired',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 export interface PriceRule {
@@ -39,7 +39,7 @@ export enum PriceRuleType {
   TIME_BASED = 'time_based',
   MEMBER_LEVEL = 'member_level',
   QUANTITY_BASED = 'quantity_based',
-  PROMOTIONAL = 'promotional'
+  PROMOTIONAL = 'promotional',
 }
 
 export interface RuleCondition {
@@ -71,7 +71,7 @@ export interface Calculation {
 export enum CalculationMethod {
   FIXED = 'fixed',
   PERCENTAGE = 'percentage',
-  FORMULA = 'formula'
+  FORMULA = 'formula',
 }
 
 export interface PricePreview {

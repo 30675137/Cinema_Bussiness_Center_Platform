@@ -1,0 +1,563 @@
+openapi: 3.0.3
+info:
+  title: 门店预约设置管理 API
+  version: 1.0.0
+  description: |
+    门店预约设置管理功能的REST API接口规范，提供预约设置的查询、创建、更新功能。
+
+    **功能范围**:
+    - 查询指定门店的预约设置
+    - 创建或更新门店的预约设置
+    - 删除门店的预约设置（恢复默认值）
+
+    **认证方式**: Bearer Token (JWT)
+
+  contact:
+    name: Cinema Business Center Platform Team
+    email: dev@cinema-platform.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api-dev.cinema-platform.com/api
+    description: 开发环境
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: reservation-settings
+    description: 门店预约设置管理
+
+security:
+  - BearerAuth: []
+
+paths:
+  /stores/{storeId}/reservation-settings:
+    get:
+      summary: 获取指定门店的预约设置
+      description: 根据门店ID获取该门店的预约设置配置，包括时间段、提前量、时长单位和押金规则。
+      operationId: getReservationSettings
+      tags:
+        - reservation-settings
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          description: 门店唯一标识符（UUID）
+          schema:
+            type: string
+            format: uuid
+          example: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+      responses:
+        '200':
+          description: 成功获取预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ReservationSettings'
+              examples:
+                success:
+                  summary: 成功响应示例
+                  value:
+                    success: true
+                    data:
+                      id: "b1ffc99-8d1c-5fg9-cc7e-7cc0ce491b22"
+                      storeId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+                      timeSlots:
+                        - dayOfWeek: 1
+                          startTime: "10:00"
+                          endTime: "22:00"
+                        - dayOfWeek: 2
+                          startTime: "10:00"
+                          endTime: "22:00"
+                        - dayOfWeek: 3
+                          startTime: "10:00"
+                          endTime: "22:00"
+                        - dayOfWeek: 4
+                          startTime: "10:00"
+                          endTime: "22:00"
+                        - dayOfWeek: 5
+                          startTime: "10:00"
+                          endTime: "22:00"
+                        - dayOfWeek: 6
+                          startTime: "09:00"
+                          endTime: "23:00"
+                        - dayOfWeek: 7
+                          startTime: "09:00"
+                          endTime: "23:00"
+                      minAdvanceHours: 2
+                      maxAdvanceDays: 30
+                      durationUnit: 1
+                      depositRequired: false
+                      depositAmount: null
+                      depositPercentage: null
+                      isActive: true
+                      createdAt: "2025-12-22T10:00:00Z"
+                      updatedAt: "2025-12-22T15:30:00Z"
+                    timestamp: "2025-12-22T16:00:00Z"
+        '404':
+          description: 门店不存在或未配置预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                storeNotFound:
+                  summary: 门店不存在
+                  value:
+                    success: false
+                    error: "STORE_NOT_FOUND"
+                    message: "门店不存在"
+                    details:
+                      storeId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+                    timestamp: "2025-12-22T16:00:00Z"
+                settingsNotFound:
+                  summary: 未配置预约设置
+                  value:
+                    success: false
+                    error: "SETTINGS_NOT_FOUND"
+                    message: "该门店未配置预约设置"
+                    details:
+                      storeId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+                    timestamp: "2025-12-22T16:00:00Z"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: 创建或更新门店的预约设置
+      description: |
+        创建或更新指定门店的预约设置配置。如果门店已有配置则更新，否则创建新配置。
+
+        **业务规则**:
+        - store_id必须引用有效的门店
+        - timeSlots必须包含7条记录（周一至周日）
+        - startTime必须早于endTime
+        - maxAdvanceDays * 24 必须大于 minAdvanceHours
+        - depositRequired为true时，depositAmount和depositPercentage必须至少有一个非null
+      operationId: createOrUpdateReservationSettings
+      tags:
+        - reservation-settings
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          description: 门店唯一标识符（UUID）
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationSettingsDTO'
+            examples:
+              createWithDefaults:
+                summary: 创建默认配置
+                value:
+                  timeSlots:
+                    - dayOfWeek: 1
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 2
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 3
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 4
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 5
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 6
+                      startTime: "09:00"
+                      endTime: "21:00"
+                    - dayOfWeek: 7
+                      startTime: "09:00"
+                      endTime: "21:00"
+                  minAdvanceHours: 1
+                  maxAdvanceDays: 30
+                  durationUnit: 1
+                  depositRequired: false
+              updateWithDeposit:
+                summary: 更新配置并启用押金
+                value:
+                  timeSlots:
+                    - dayOfWeek: 1
+                      startTime: "10:00"
+                      endTime: "22:00"
+                    - dayOfWeek: 2
+                      startTime: "10:00"
+                      endTime: "22:00"
+                    - dayOfWeek: 3
+                      startTime: "10:00"
+                      endTime: "22:00"
+                    - dayOfWeek: 4
+                      startTime: "10:00"
+                      endTime: "22:00"
+                    - dayOfWeek: 5
+                      startTime: "10:00"
+                      endTime: "22:00"
+                    - dayOfWeek: 6
+                      startTime: "09:00"
+                      endTime: "23:00"
+                    - dayOfWeek: 7
+                      startTime: "09:00"
+                      endTime: "23:00"
+                  minAdvanceHours: 2
+                  maxAdvanceDays: 30
+                  durationUnit: 2
+                  depositRequired: true
+                  depositAmount: 200.00
+      responses:
+        '200':
+          description: 成功更新预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ReservationSettings'
+        '201':
+          description: 成功创建预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse_ReservationSettings'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+              examples:
+                invalidTimeRange:
+                  summary: 时间范围无效
+                  value:
+                    success: false
+                    error: "INVALID_TIME_RANGE"
+                    message: "开始时间必须早于结束时间"
+                    details:
+                      field: "timeSlots[0].endTime"
+                      value: "08:00"
+                    timestamp: "2025-12-22T16:00:00Z"
+                invalidAdvanceTime:
+                  summary: 提前量配置无效
+                  value:
+                    success: false
+                    error: "INVALID_ADVANCE_TIME"
+                    message: "最大提前天数必须大于最小提前小时数"
+                    details:
+                      minAdvanceHours: 48
+                      maxAdvanceDays: 1
+                    timestamp: "2025-12-22T16:00:00Z"
+                invalidDepositConfig:
+                  summary: 押金配置无效
+                  value:
+                    success: false
+                    error: "INVALID_DEPOSIT_CONFIG"
+                    message: "启用押金时，必须设置押金金额或押金比例"
+                    details:
+                      depositRequired: true
+                      depositAmount: null
+                      depositPercentage: null
+                    timestamp: "2025-12-22T16:00:00Z"
+        '404':
+          description: 门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: 删除门店的预约设置（恢复默认值）
+      description: |
+        删除指定门店的预约设置配置，恢复为系统默认值。
+
+        **默认值**:
+        - 周一至周日: 09:00-21:00
+        - 最小提前1小时，最大提前30天
+        - 时长单位1小时，无押金
+      operationId: deleteReservationSettings
+      tags:
+        - reservation-settings
+      parameters:
+        - name: storeId
+          in: path
+          required: true
+          description: 门店唯一标识符（UUID）
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 成功删除预约设置
+        '404':
+          description: 门店不存在或未配置预约设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        使用JWT Token进行认证。
+        请求头格式: `Authorization: Bearer <token>`
+
+  schemas:
+    TimeSlot:
+      type: object
+      required:
+        - dayOfWeek
+        - startTime
+        - endTime
+      properties:
+        dayOfWeek:
+          type: integer
+          minimum: 1
+          maximum: 7
+          description: 星期几（1=周一, 7=周日）
+          example: 1
+        startTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+          description: 开始时间（HH:mm格式）
+          example: "10:00"
+        endTime:
+          type: string
+          pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+          description: 结束时间（HH:mm格式）
+          example: "22:00"
+
+    ReservationSettings:
+      type: object
+      required:
+        - id
+        - storeId
+        - timeSlots
+        - minAdvanceHours
+        - maxAdvanceDays
+        - durationUnit
+        - depositRequired
+        - isActive
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 预约设置唯一标识符
+          example: "b1ffc99-8d1c-5fg9-cc7e-7cc0ce491b22"
+        storeId:
+          type: string
+          format: uuid
+          description: 所属门店ID
+          example: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
+        timeSlots:
+          type: array
+          minItems: 7
+          maxItems: 7
+          description: 可预约时间段列表（7天）
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+        minAdvanceHours:
+          type: integer
+          minimum: 1
+          description: 最小提前小时数
+          example: 2
+        maxAdvanceDays:
+          type: integer
+          minimum: 1
+          description: 最大提前天数
+          example: 30
+        durationUnit:
+          type: integer
+          enum: [1, 2, 4]
+          description: 预约单位时长（小时）
+          example: 1
+        depositRequired:
+          type: boolean
+          description: 是否需要押金
+          example: false
+        depositAmount:
+          type: number
+          format: decimal
+          minimum: 0
+          nullable: true
+          description: 押金金额（元）
+          example: 200.00
+        depositPercentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: 押金比例（百分比）
+          example: 10
+        isActive:
+          type: boolean
+          description: 配置是否生效
+          example: true
+        createdBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: 创建人ID
+        updatedBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: 最后修改人ID
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间（ISO 8601格式）
+          example: "2025-12-22T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间（ISO 8601格式）
+          example: "2025-12-22T15:30:00Z"
+
+    ReservationSettingsDTO:
+      type: object
+      required:
+        - timeSlots
+        - minAdvanceHours
+        - maxAdvanceDays
+        - durationUnit
+        - depositRequired
+      properties:
+        timeSlots:
+          type: array
+          minItems: 7
+          maxItems: 7
+          description: 可预约时间段列表（必须包含7天）
+          items:
+            $ref: '#/components/schemas/TimeSlot'
+        minAdvanceHours:
+          type: integer
+          minimum: 1
+          description: 最小提前小时数
+          example: 2
+        maxAdvanceDays:
+          type: integer
+          minimum: 1
+          description: 最大提前天数
+          example: 30
+        durationUnit:
+          type: integer
+          enum: [1, 2, 4]
+          description: 预约单位时长（小时）
+          example: 1
+        depositRequired:
+          type: boolean
+          description: 是否需要押金
+          example: false
+        depositAmount:
+          type: number
+          format: decimal
+          minimum: 0
+          nullable: true
+          description: 押金金额（元），depositRequired为true时必填之一
+          example: 200.00
+        depositPercentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: 押金比例（百分比），depositRequired为true时必填之一
+          example: 10
+
+    ApiResponse_ReservationSettings:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: true
+        data:
+          $ref: '#/components/schemas/ReservationSettings'
+        message:
+          type: string
+          description: 响应消息
+          example: "操作成功"
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+          example: "2025-12-22T16:00:00Z"
+
+    ApiErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+          example: false
+        error:
+          type: string
+          description: 错误码
+          example: "STORE_NOT_FOUND"
+        message:
+          type: string
+          description: 错误描述
+          example: "门店不存在"
+        details:
+          type: object
+          nullable: true
+          description: 错误详细信息
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+          example: "2025-12-22T16:00:00Z"
+
+  responses:
+    UnauthorizedError:
+      description: 未认证或Token无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+          example:
+            success: false
+            error: "UNAUTHORIZED"
+            message: "Token无效或已过期"
+            timestamp: "2025-12-22T16:00:00Z"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+          example:
+            success: false
+            error: "INTERNAL_ERROR"
+            message: "服务器内部错误，请稍后重试"
+            timestamp: "2025-12-22T16:00:00Z"

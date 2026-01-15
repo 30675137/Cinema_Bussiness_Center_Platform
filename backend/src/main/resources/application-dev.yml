@@ -1,0 +1,18 @@
+# @spec T003-flyway-migration
+# 开发环境 Flyway 配置
+
+spring:
+  flyway:
+    enabled: false
+    locations: classpath:db/migration,classpath:db/seed
+    baseline-on-migrate: true
+    baseline-version: 0
+    validate-on-migrate: false
+    clean-disabled: true
+    out-of-order: true  # 开发环境允许乱序，支持并行开发
+    table: flyway_schema_history
+    ignore-migration-patterns: "*:missing,*:future,*:ignored"
+
+logging:
+  level:
+    org.flywaydb: DEBUG

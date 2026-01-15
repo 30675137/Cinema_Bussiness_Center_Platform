@@ -1,0 +1,272 @@
+---
+# @spec O005-channel-product-config
+# E2E Test Scenario: Full CRUD Operations
+# Tests: Create, Read, Update, Delete channel products with cleanup
+
+scenarioId: E2E-CHANNEL-PRODUCT-004
+title: 渠道商品完整 CRUD 操作测试（含数据清理）
+module: channel-product-config
+priority: high
+tags:
+  - channel-product
+  - crud
+  - data-cleanup
+  - dev-environment
+
+description: |
+  在开发环境中执行完整的 CRUD 测试流程，包括创建、查询、更新、删除操作。
+  测试结束后会清理所有创建的测试数据，确保环境干净。
+
+environment: development
+dataCleanup: true
+
+preconditions:
+  - 后端服务运行在 http://localhost:8080
+  - 前端服务运行在 http://localhost:3000
+  - 开发环境数据库（允许删除数据）
+  - 测试用 SKU ID: "test-sku-e2e-001"
+
+testData:
+  testChannelProduct:
+    skuId: "test-sku-e2e-001"
+    channelType: "MINI_PROGRAM"
+    displayName: "E2E测试商品"
+    channelCategory: "BEVERAGE"
+    channelPrice: 2990  # 29.90元 = 2990分
+    mainImage: "https://fxhgyxceqrmnpezluaht.supabase.co/storage/v1/object/public/test/e2e-test.jpg"
+    description: "这是一个E2E测试创建的商品，可以删除"
+    specs:
+      - type: "SIZE"
+        name: "大小"
+        required: true
+        multiSelect: false
+        options:
+          - name: "中杯"
+            priceAdjust: 0
+            isDefault: true
+            sortOrder: 0
+    isRecommended: false
+    status: "INACTIVE"
+    sortOrder: 999
+
+testSteps:
+  # ==================== 创建 ====================
+  - step: 1
+    phase: CREATE
+    action: 创建测试商品
+    method: POST /api/channel-products
+    requestBody: ${testChannelProduct}
+    expectedResponse:
+      status: 201
+      body:
+        success: true
+        data:
+          id: string (保存为 createdId)
+          skuId: "test-sku-e2e-001"
+          displayName: "E2E测试商品"
+    saveVariable:
+      name: createdId
+      path: data.id
+    notes: 保存创建的 ID 用于后续测试
+
+  # ==================== 查询单个 ====================
+  - step: 2
+    phase: READ
+    action: 查询刚创建的商品
+    method: GET /api/channel-products/${createdId}
+    expectedResponse:
+      status: 200
+      body:
+        success: true
+        data:
+          id: ${createdId}
+          displayName: "E2E测试商品"
+          channelPrice: 2990
+          sku:
+            skuCode: string
+            skuName: string
+            price: number
+            imageUrl: string
+    validations:
+      - field: data.sku
+        condition: notNull
+        message: "SKU 信息应该已加载"
+      - field: data.sku.imageUrl
+        condition: equals
+        value: ${testChannelProduct.mainImage}
+        message: "imageUrl 应该来自 mainImage"
+
+  # ==================== 查询列表 ====================
+  - step: 3
+    phase: READ
+    action: 在列表中查找测试商品
+    method: GET /api/channel-products?channelType=MINI_PROGRAM&keyword=E2E测试
+    expectedResponse:
+      status: 200
+      body:
+        success: true
+        data:
+          content:
+            - id: ${createdId}
+              displayName: "E2E测试商品"
+    validations:
+      - field: data.content
+        condition: arrayContains
+        value: { id: ${createdId} }
+
+  # ==================== 更新 ====================
+  - step: 4
+    phase: UPDATE
+    action: 更新商品信息
+    method: PUT /api/channel-products/${createdId}
+    requestBody:
+      displayName: "E2E测试商品(已修改)"
+      channelPrice: 3990
+      status: "ACTIVE"
+      isRecommended: true
+    expectedResponse:
+      status: 200
+      body:
+        success: true
+        data:
+          id: ${createdId}
+          displayName: "E2E测试商品(已修改)"
+          channelPrice: 3990
+          status: "ACTIVE"
+          isRecommended: true
+
+  - step: 5
+    phase: UPDATE
+    action: 验证更新后的数据
+    method: GET /api/channel-products/${createdId}
+    expectedResponse:
+      status: 200
+      body:
+        data:
+          displayName: "E2E测试商品(已修改)"
+          channelPrice: 3990
+          status: "ACTIVE"
+
+  # ==================== 状态变更 ====================
+  - step: 6
+    phase: UPDATE
+    action: 下架商品
+    method: PATCH /api/channel-products/${createdId}/status
+    requestBody:
+      status: "INACTIVE"
+    expectedResponse:
+      status: 200
+
+  - step: 7
+    phase: UPDATE
+    action: 验证状态已更新
+    method: GET /api/channel-products/${createdId}
+    expectedResponse:
+      body:
+        data:
+          status: "INACTIVE"
+
+  # ==================== 前端 UI 测试 ====================
+  - step: 8
+    phase: UI_TEST
+    action: 在前端列表页面查看测试商品
+    page: http://localhost:3000/channel-products/mini-program
+    interactions:
+      - action: wait
+        selector: '.ant-table-tbody'
+        timeout: 5000
+
+      - action: search
+        selector: 'input[placeholder*="搜索"]'
+        value: "E2E测试商品"
+
+      - action: verify
+        selector: '.ant-table-tbody tr'
+        expectedText: "E2E测试商品(已修改)"
+        notes: 验证显示名称
+
+      - action: verify
+        selector: '.ant-avatar[src*="test/e2e-test.jpg"]'
+        notes: 验证图片显示
+
+      - action: verify
+        selector: 'text=/SKU:/'
+        notes: 验证 SKU 编码显示
+
+  # ==================== 软删除 ====================
+  - step: 9
+    phase: DELETE
+    action: 软删除商品
+    method: DELETE /api/channel-products/${createdId}
+    expectedResponse:
+      status: 200
+
+  - step: 10
+    phase: DELETE
+    action: 验证商品已软删除
+    method: GET /api/channel-products/${createdId}
+    expectedResponse:
+      status: 404
+      body:
+        success: false
+        error: "CHANNEL_PRODUCT_NOT_FOUND"
+
+  - step: 11
+    phase: DELETE
+    action: 验证列表中不再显示已删除商品
+    method: GET /api/channel-products?channelType=MINI_PROGRAM&keyword=E2E测试
+    expectedResponse:
+      body:
+        data:
+          content:
+            condition: notContains
+            value: { id: ${createdId} }
+
+  # ==================== 数据清理 ====================
+  - step: 12
+    phase: CLEANUP
+    action: 清理测试数据（数据库层面）
+    sql: |
+      -- 硬删除测试数据（仅开发环境）
+      DELETE FROM channel_product_config
+      WHERE sku_id = 'test-sku-e2e-001'
+      OR description LIKE '%E2E测试%';
+    notes: 确保测试数据完全清除
+
+  - step: 13
+    phase: CLEANUP
+    action: 验证数据已清理
+    method: GET /api/channel-products?keyword=E2E测试
+    expectedResponse:
+      body:
+        data:
+          content: []
+          totalElements: 0
+
+expectedResults:
+  - ✅ 成功创建测试商品并返回 ID
+  - ✅ 单个查询返回完整的 SKU 信息
+  - ✅ 列表查询包含新创建的商品
+  - ✅ 更新操作成功修改数据
+  - ✅ 状态变更正确应用
+  - ✅ 前端 UI 正确显示商品信息和 SKU 数据
+  - ✅ 软删除后商品不可查询
+  - ✅ 测试结束后数据完全清理
+
+dataCleanupStrategy:
+  - 测试结束后自动删除所有包含 "E2E测试" 的记录
+  - 删除 sku_id = 'test-sku-e2e-001' 的所有配置
+  - 验证数据库中无残留测试数据
+
+rollbackPlan:
+  - 如果测试中断，执行 step 12 清理脚本
+  - 手动检查并删除 sortOrder = 999 的记录
+
+regressionRisk: low
+estimatedDuration: 20分钟
+automatable: true
+repeatability: high
+
+notes: |
+  此测试场景专为开发环境设计，包含完整的数据清理步骤。
+  在生产环境中禁止执行此测试！

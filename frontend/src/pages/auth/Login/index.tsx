@@ -54,22 +54,13 @@ const Login: React.FC = () => {
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         }}
       >
-        <Form
-          form={form}
-          name="login"
-          onFinish={handleLogin}
-          layout="vertical"
-          size="large"
-        >
+        <Form form={form} name="login" onFinish={handleLogin} layout="vertical" size="large">
           <Form.Item
             name="username"
             label="用户名"
             rules={[{ required: true, message: '请输入用户名' }]}
           >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="请输入用户名"
-            />
+            <Input prefix={<UserOutlined />} placeholder="请输入用户名" />
           </Form.Item>
 
           <Form.Item
@@ -77,28 +68,17 @@ const Login: React.FC = () => {
             label="密码"
             rules={[{ required: true, message: '请输入密码' }]}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="请输入密码"
-            />
+            <Input.Password prefix={<LockOutlined />} placeholder="请输入密码" />
           </Form.Item>
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-              style={{ height: 40 }}
-            >
+            <Button type="primary" htmlType="submit" loading={loading} block style={{ height: 40 }}>
               登录
             </Button>
           </Form.Item>
 
           <div style={{ textAlign: 'center', marginTop: 16 }}>
-            <Text type="secondary">
-              测试账号：admin / password
-            </Text>
+            <Text type="secondary">测试账号：admin / password</Text>
           </div>
         </Form>
       </Card>

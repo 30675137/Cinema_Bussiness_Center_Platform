@@ -12,14 +12,14 @@ import {
   Image,
   message,
   Divider,
-  Tag
+  Tag,
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
   EyeOutlined,
   UploadOutlined,
-  PictureOutlined
+  PictureOutlined,
 } from '@ant-design/icons';
 import type { Control, FieldErrors, FieldValues } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
@@ -42,21 +42,17 @@ interface ProductImageItem {
   type: 'main' | 'gallery' | 'detail';
 }
 
-const ContentTab: React.FC<ContentTabProps> = ({
-  control,
-  errors,
-  touched
-}) => {
+const ContentTab: React.FC<ContentTabProps> = ({ control, errors, touched }) => {
   const [previewImage, setPreviewImage] = useState<string>('');
   const [previewVisible, setPreviewVisible] = useState(false);
 
   const {
     fields: imageFields,
     append: appendImage,
-    remove: removeImage
+    remove: removeImage,
   } = useFieldArray({
     control,
-    name: 'content.images'
+    name: 'content.images',
   });
 
   // 图片上传配置
@@ -86,13 +82,13 @@ const ContentTab: React.FC<ContentTabProps> = ({
             url: e.target?.result as string,
             alt: '',
             sortOrder: imageFields.length,
-            type: imageFields.length === 0 ? 'main' : 'gallery'
+            type: imageFields.length === 0 ? 'main' : 'gallery',
           };
           appendImage(newImage);
         };
         reader.readAsDataURL(info.file.originFileObj);
       }
-    }
+    },
   };
 
   // 更新图片信息
@@ -143,6 +139,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
                 help={errors['content.title']?.message as string}
               >
                 <Input
+                  id="field-content-title"
                   placeholder="请输入商品展示标题"
                   {...control.register('content.title')}
                 />
@@ -184,11 +181,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
               商品图片
             </Title>
             <Upload {...uploadProps}>
-              <Button
-                type="primary"
-                icon={<UploadOutlined />}
-                
-              >
+              <Button type="primary" icon={<UploadOutlined />}>
                 上传图片
               </Button>
             </Upload>
@@ -213,7 +206,6 @@ const ContentTab: React.FC<ContentTabProps> = ({
               {imageFields.map((field, index) => (
                 <Col span={8} key={field.id}>
                   <Card
-                    
                     title={
                       <Space>
                         <span>图片 {index + 1}</span>
@@ -225,17 +217,12 @@ const ContentTab: React.FC<ContentTabProps> = ({
                     extra={
                       <Space>
                         {index > 0 && (
-                          <Button
-                            type="text"
-                            
-                            onClick={() => setMainImage(index)}
-                          >
+                          <Button type="text" onClick={() => setMainImage(index)}>
                             设为主图
                           </Button>
                         )}
                         <Button
                           type="text"
-                          
                           danger
                           icon={<DeleteOutlined />}
                           onClick={() => handleDeleteImage(index)}
@@ -250,34 +237,28 @@ const ContentTab: React.FC<ContentTabProps> = ({
                         src={field.url}
                         style={{ objectFit: 'cover', borderRadius: 4 }}
                         preview={{
-                          mask: <EyeOutlined />
+                          mask: <EyeOutlined />,
                         }}
                         fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RUG8O+L"
                       />
                     </div>
 
-                    <Form.Item
-                      label="图片说明"
-                      style={{ marginBottom: 8 }}
-                    >
+                    <Form.Item label="图片说明" style={{ marginBottom: 8 }}>
                       <Input
-                        
                         placeholder="请输入图片说明"
                         value={control.getValues(`content.images.${index}.alt`) || ''}
                         onChange={(e) => updateImage(index, 'alt', e.target.value)}
                       />
                     </Form.Item>
 
-                    <Form.Item
-                      label="排序"
-                      style={{ marginBottom: 8 }}
-                    >
+                    <Form.Item label="排序" style={{ marginBottom: 8 }}>
                       <Input
-                        
                         type="number"
                         placeholder="排序值"
                         value={control.getValues(`content.images.${index}.sortOrder`) || 0}
-                        onChange={(e) => updateImage(index, 'sortOrder', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updateImage(index, 'sortOrder', parseInt(e.target.value) || 0)
+                        }
                       />
                     </Form.Item>
                   </Card>
@@ -302,7 +283,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
           <Title level={4} style={{ marginBottom: 16 }}>
             营销标签
           </Title>
-          <Card  style={{ backgroundColor: '#fafafa' }}>
+          <Card style={{ backgroundColor: '#fafafa' }}>
             <Text type="secondary">营销标签功能开发中...</Text>
           </Card>
         </div>
@@ -314,7 +295,7 @@ const ContentTab: React.FC<ContentTabProps> = ({
         preview={{
           visible: previewVisible,
           src: previewImage,
-          onVisibleChange: (visible) => setPreviewVisible(visible)
+          onVisibleChange: (visible) => setPreviewVisible(visible),
         }}
       />
     </div>

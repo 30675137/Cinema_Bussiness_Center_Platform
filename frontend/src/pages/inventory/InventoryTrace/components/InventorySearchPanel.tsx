@@ -11,7 +11,7 @@ import {
   Card,
   Collapse,
   Tag,
-  AutoComplete
+  AutoComplete,
 } from 'antd';
 import {
   SearchOutlined,
@@ -19,7 +19,7 @@ import {
   ClearOutlined,
   FilterOutlined,
   ShoppingCartOutlined,
-  ShopOutlined
+  ShopOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash-es';
@@ -28,7 +28,7 @@ import {
   TransactionType,
   SourceType,
   TRANSACTION_TYPE_OPTIONS,
-  SOURCE_TYPE_OPTIONS
+  SOURCE_TYPE_OPTIONS,
 } from '@/types/inventory';
 
 const { RangePicker } = DatePicker;
@@ -49,7 +49,7 @@ const mockSKUs = [
   { id: 'SKU002', name: '爆米花中份', code: 'SKU002', category: '零食' },
   { id: 'SKU003', name: '电影票-成人', code: 'SKU003', category: '票务' },
   { id: 'SKU004', name: '3D眼镜', code: 'SKU004', category: '设备' },
-  { id: 'SKU005', name: '热狗套餐', code: 'SKU005', category: '套餐' }
+  { id: 'SKU005', name: '热狗套餐', code: 'SKU005', category: '套餐' },
 ];
 
 // 模拟门店数据
@@ -57,7 +57,7 @@ const mockStores = [
   { id: 'STORE001', name: '万达影城CBD店', code: 'WM001', address: '北京市朝阳区CBD' },
   { id: 'STORE002', name: '万达影城三里屯店', code: 'WM002', address: '北京市朝阳区三里屯' },
   { id: 'STORE003', name: '万达影城五道口店', code: 'WM003', address: '北京市海淀区五道口' },
-  { id: 'STORE004', name: '万达影城西单店', code: 'WM004', address: '北京市西城区西单' }
+  { id: 'STORE004', name: '万达影城西单店', code: 'WM004', address: '北京市西城区西单' },
 ];
 
 const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
@@ -66,14 +66,14 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
   onReset,
   onSKUSelect,
   onStoreSelect,
-  loading = false
+  loading = false,
 }) => {
   const [selectedSKUs, setSelectedSKUs] = useState<string[]>([]);
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
 
   // 处理搜索
   const handleSearch = () => {
-    form.validateFields().then(values => {
+    form.validateFields().then((values) => {
       onSearch(values);
     });
   };
@@ -117,7 +117,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
       initialValues={{
         dateRange: [dayjs().subtract(7, 'day'), dayjs()],
         transactionType: [],
-        sourceType: []
+        sourceType: [],
       }}
     >
       <Row gutter={[16, 16]}>
@@ -145,7 +145,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
               allowClear
               style={{ width: '100%' }}
             >
-              {mockSKUs.map(sku => (
+              {mockSKUs.map((sku) => (
                 <Select.Option key={sku.id} value={sku.id}>
                   <Space>
                     <ShoppingCartOutlined />
@@ -175,7 +175,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
               allowClear
               style={{ width: '100%' }}
             >
-              {mockStores.map(store => (
+              {mockStores.map((store) => (
                 <Select.Option key={store.id} value={store.id}>
                   <Space>
                     <ShopOutlined />
@@ -216,11 +216,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
               >
                 搜索
               </Button>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={handleReset}
-                disabled={loading}
-              >
+              <Button icon={<ReloadOutlined />} onClick={handleReset} disabled={loading}>
                 重置
               </Button>
             </Space>
@@ -249,7 +245,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   allowClear
                   style={{ width: '100%' }}
                 >
-                  {TRANSACTION_TYPE_OPTIONS.map(option => (
+                  {TRANSACTION_TYPE_OPTIONS.map((option) => (
                     <Select.Option key={option.value} value={option.value}>
                       <Tag color={option.color}>{option.label}</Tag>
                     </Select.Option>
@@ -267,7 +263,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   allowClear
                   style={{ width: '100%' }}
                 >
-                  {SOURCE_TYPE_OPTIONS.map(option => (
+                  {SOURCE_TYPE_OPTIONS.map((option) => (
                     <Select.Option key={option.value} value={option.value}>
                       <Tag color={option.color}>{option.label}</Tag>
                     </Select.Option>
@@ -293,49 +289,27 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
             {/* 最低数量 */}
             <Col xs={24} sm={12} md={6}>
               <Form.Item label="最低数量" name="minQuantity">
-                <Input
-                  type="number"
-                  placeholder="输入最低数量"
-                  min={0}
-                  allowClear
-                />
+                <Input type="number" placeholder="输入最低数量" min={0} allowClear />
               </Form.Item>
             </Col>
 
             {/* 最高数量 */}
             <Col xs={24} sm={12} md={6}>
               <Form.Item label="最高数量" name="maxQuantity">
-                <Input
-                  type="number"
-                  placeholder="输入最高数量"
-                  min={0}
-                  allowClear
-                />
+                <Input type="number" placeholder="输入最高数量" min={0} allowClear />
               </Form.Item>
             </Col>
 
             {/* 单价范围 */}
             <Col xs={24} sm={12} md={6}>
               <Form.Item label="最低单价" name="minUnitCost">
-                <Input
-                  type="number"
-                  placeholder="输入最低单价"
-                  min={0}
-                  step={0.01}
-                  allowClear
-                />
+                <Input type="number" placeholder="输入最低单价" min={0} step={0.01} allowClear />
               </Form.Item>
             </Col>
 
             <Col xs={24} sm={12} md={6}>
               <Form.Item label="最高单价" name="maxUnitCost">
-                <Input
-                  type="number"
-                  placeholder="输入最高单价"
-                  min={0}
-                  step={0.01}
-                  allowClear
-                />
+                <Input type="number" placeholder="输入最高单价" min={0} step={0.01} allowClear />
               </Form.Item>
             </Col>
           </Row>
@@ -348,14 +322,14 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   {selectedSKUs.length > 0 && (
                     <div>
                       <span style={{ marginRight: '8px', color: '#999' }}>已选商品:</span>
-                      {selectedSKUs.map(skuId => {
-                        const sku = mockSKUs.find(s => s.id === skuId);
+                      {selectedSKUs.map((skuId) => {
+                        const sku = mockSKUs.find((s) => s.id === skuId);
                         return sku ? (
                           <Tag
                             key={skuId}
                             closable
                             onClose={() => {
-                              const newSKUs = selectedSKUs.filter(id => id !== skuId);
+                              const newSKUs = selectedSKUs.filter((id) => id !== skuId);
                               setSelectedSKUs(newSKUs);
                               onSKUSelect(newSKUs);
                             }}
@@ -370,14 +344,14 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   {selectedStores.length > 0 && (
                     <div>
                       <span style={{ marginRight: '8px', color: '#999' }}>已选门店:</span>
-                      {selectedStores.map(storeId => {
-                        const store = mockStores.find(s => s.id === storeId);
+                      {selectedStores.map((storeId) => {
+                        const store = mockStores.find((s) => s.id === storeId);
                         return store ? (
                           <Tag
                             key={storeId}
                             closable
                             onClose={() => {
-                              const newStores = selectedStores.filter(id => id !== storeId);
+                              const newStores = selectedStores.filter((id) => id !== storeId);
                               setSelectedStores(newStores);
                               onStoreSelect(newStores);
                             }}
@@ -405,8 +379,8 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                       transactionType: [
                         TransactionType.PURCHASE_IN,
                         TransactionType.TRANSFER_IN,
-                        TransactionType.PRODUCTION_IN
-                      ]
+                        TransactionType.PRODUCTION_IN,
+                      ],
                     });
                     handleSearch();
                   }}
@@ -420,8 +394,8 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                       transactionType: [
                         TransactionType.SALE_OUT,
                         TransactionType.TRANSFER_OUT,
-                        TransactionType.DAMAGE_OUT
-                      ]
+                        TransactionType.DAMAGE_OUT,
+                      ],
                     });
                     handleSearch();
                   }}
@@ -432,7 +406,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   size="small"
                   onClick={() => {
                     form.setFieldsValue({
-                      dateRange: [dayjs().subtract(1, 'day'), dayjs()]
+                      dateRange: [dayjs().subtract(1, 'day'), dayjs()],
                     });
                     handleSearch();
                   }}
@@ -443,7 +417,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   size="small"
                   onClick={() => {
                     form.setFieldsValue({
-                      dateRange: [dayjs().subtract(7, 'day'), dayjs()]
+                      dateRange: [dayjs().subtract(7, 'day'), dayjs()],
                     });
                     handleSearch();
                   }}
@@ -454,7 +428,7 @@ const InventorySearchPanel: React.FC<InventorySearchPanelProps> = ({
                   size="small"
                   onClick={() => {
                     form.setFieldsValue({
-                      dateRange: [dayjs().subtract(30, 'day'), dayjs()]
+                      dateRange: [dayjs().subtract(30, 'day'), dayjs()],
                     });
                     handleSearch();
                   }}

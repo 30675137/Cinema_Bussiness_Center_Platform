@@ -1,73 +1,284 @@
-# React + TypeScript + Vite
+# 影院商务中心平台 - 前端
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 React 18 + TypeScript + Ant Design 的现代化影院商务管理系统前端应用。
 
-Currently, two official plugins are available:
+## 📋 项目概述
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+影院商务中心平台是一个综合性的影院业务管理系统，涵盖库存管理、价格管理、审核管理等核心业务模块。本系统采用现代化的前端技术栈，提供优秀的用户体验和强大的功能支持。
 
-## React Compiler
+### 核心功能
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 📦 **库存管理** - 商品库存、入库、出库、调拨、盘点
+- 💰 **价格管理** - 价格配置、价格规则、价格历史、价格变更审批
+- ✅ **审核管理** - 业务流程审核、批量审核、审核历史
+- 📊 **数据分析** - 丰富的数据可视化图表
+- 🌐 **多语言支持** - 中英文双语切换
+- 🎨 **主题系统** - 明暗主题、自定义主题
+- 📱 **响应式设计** - 完美适配桌面、平板、移动设备
 
-## Expanding the ESLint configuration
+## 🚀 技术栈
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 核心框架
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **React 18.2** - 现代化前端框架
+- **TypeScript 5.0** - 类型安全的JavaScript
+- **Vite 5.0** - 快速构建工具
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### UI组件库
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Ant Design 6.1** - 企业级UI设计语言
+- **@ant-design/icons** - 图标库
+- **@ant-design/charts** - 数据可视化
+
+### 状态管理
+
+- **Zustand 4.4** - 轻量级状态管理
+- **TanStack Query 5.0** - 服务端状态管理
+
+### 路由管理
+
+- **React Router 6.8** - 声明式路由
+
+### 工具库
+
+- **Axios** - HTTP客户端
+- **Dayjs** - 日期处理
+- **Lodash** - 实用工具函数
+- **ahooks** - React Hooks库
+
+### 开发工具
+
+- **ESLint** - 代码质量检查
+- **Prettier** - 代码格式化
+- **Husky** - Git钩子
+- **Lint-staged** - 暂存文件检查
+- **Vitest** - 单元测试框架
+- **Testing Library** - React测试工具
+
+## 📦 环境要求
+
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+## 🛠️ 快速开始
+
+### 1. 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. 初始化 Mock Service Worker
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run mock:init
 ```
+
+### 3. 启动开发服务器
+
+```bash
+npm run dev
+```
+
+应用将在 http://localhost:3000 启动
+
+### 4. 构建生产版本
+
+```bash
+npm run build
+```
+
+### 5. 预览生产版本
+
+```bash
+npm run preview
+```
+
+## 📜 脚本命令
+
+| 命令                   | 描述                 |
+| ---------------------- | -------------------- |
+| `npm run dev`          | 启动开发服务器       |
+| `npm run build`        | 构建生产版本         |
+| `npm run preview`      | 预览生产版本         |
+| `npm run lint`         | 运行 ESLint 检查     |
+| `npm run lint:fix`     | 自动修复 ESLint 问题 |
+| `npm run format`       | 格式化代码           |
+| `npm run format:check` | 检查代码格式         |
+| `npm run mock:init`    | 初始化 MSW Mock 服务 |
+| `npm run test:unit`    | 运行单元测试         |
+| `npm run test:unit:ui` | 运行测试 UI          |
+| `npm run test`         | 运行端到端测试       |
+
+## 📁 项目结构
+
+```
+frontend/
+├── public/                     # 静态资源
+│   └── mockServiceWorker.js   # MSW 工作线程
+├── src/
+│   ├── components/             # 可复用组件
+│   │   ├── common/            # 通用组件
+│   │   ├── forms/             # 表单组件
+│   │   ├── layout/            # 布局组件
+│   │   ├── SPU/               # SPU 相关组件
+│   │   ├── Category/          # 分类组件
+│   │   ├── Brand/             # 品牌组件
+│   │   └── ...
+│   ├── pages/                 # 页面组件
+│   │   ├── SPUList/           # SPU 列表页
+│   │   ├── SPUDetail/         # SPU 详情页
+│   │   ├── SPUCreate/         # SPU 创建页
+│   │   └── ...
+│   ├── hooks/                 # 自定义 Hooks
+│   ├── services/              # API 服务层
+│   │   └── mock/              # Mock 服务
+│   ├── store/                 # 状态管理 (Zustand)
+│   ├── stores/                # 状态管理 (旧版)
+│   ├── types/                 # TypeScript 类型定义
+│   ├── utils/                 # 工具函数
+│   ├── mocks/                 # Mock 数据和处理器
+│   │   ├── handlers/          # MSW 处理器
+│   │   └── data/              # Mock 数据生成器
+│   ├── test/                  # 测试配置
+│   ├── styles/                # 样式文件
+│   ├── App.tsx               # 根组件
+│   └── main.tsx              # 应用入口
+├── tests/                     # 测试文件
+├── package.json
+├── vite.config.ts
+├── vitest.config.ts
+├── tsconfig.json
+├── .prettierrc.json
+└── README.md
+```
+
+## 🧪 Mock 数据
+
+项目使用 MSW (Mock Service Worker) 提供完整的 Mock API 支持，包括：
+
+- **SPU 管理**: 增删改查、批量操作、筛选搜索
+- **分类管理**: 三级分类体系的完整管理
+- **品牌管理**: 品牌信息的维护和查询
+- **业务场景**: 基于影院业务的真实数据模拟
+
+Mock 数据特点：
+
+- 🎬 影院行业特色商品数据
+- 📊 多种业务场景覆盖
+- 🔍 完整的筛选和搜索支持
+- 📄 分页和批量操作
+- ⚡ 真实网络延迟模拟
+
+## 🧪 测试
+
+### 运行单元测试
+
+```bash
+npm run test:unit
+```
+
+### 运行测试 UI
+
+```bash
+npm run test:unit:ui
+```
+
+### 生成覆盖率报告
+
+```bash
+npm run test:unit -- --coverage
+```
+
+## 🔧 开发规范
+
+### 代码风格
+
+- 使用 ESLint + Prettier 进行代码格式化
+- 遵循 TypeScript 严格模式
+- 组件使用函数式组件 + Hooks
+
+### Git 提交规范
+
+- feat: 新功能
+- fix: 修复 bug
+- docs: 文档更新
+- style: 代码格式化
+- refactor: 重构
+- test: 测试相关
+- chore: 构建过程或辅助工具的变动
+
+### 分支管理
+
+- `main`: 主分支，用于生产环境
+- `dev`: 开发分支，用于功能开发
+- `feature/*`: 功能分支，用于新功能开发
+- `hotfix/*`: 热修复分支
+
+## 🚀 部署
+
+### 环境变量
+
+创建 `.env.production` 文件：
+
+```env
+VITE_API_BASE_URL=https://api.your-domain.com
+VITE_MOCK_ENABLED=false
+```
+
+### 构建部署
+
+```bash
+# 构建生产版本
+npm run build
+
+# 部署到服务器
+# 将 dist/ 目录内容部署到 Web 服务器
+```
+
+## 📖 开发指南
+
+### 添加新功能模块
+
+1. 在 `src/components/` 下创建组件
+2. 在 `src/pages/` 下创建页面
+3. 在 `src/types/` 下定义类型
+4. 在 `src/services/` 下创建 API 服务
+5. 在 `src/mocks/handlers/` 下添加 Mock 处理器
+6. 编写测试用例
+
+### Mock 数据扩展
+
+```typescript
+// src/mocks/data/generators.ts
+export const generateCustomData = (count: number) => {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `ID${index + 1}`,
+    // ... 其他字段
+  }));
+};
+```
+
+## 🤝 贡献指南
+
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 📞 支持
+
+如有问题或建议，请通过以下方式联系：
+
+- 项目 Issues: [GitHub Issues](https://github.com/your-repo/issues)
+- 邮箱: support@cinema-platform.com
+
+---
+
+**开发团队**: 影院商品管理中台开发组
+**最后更新**: 2025-12-12

@@ -1,0 +1,937 @@
+openapi: 3.0.3
+info:
+  title: 库存调整管理 API
+  description: |
+    P004-inventory-adjustment 功能的 API 规范。
+
+    包含以下功能模块：
+    - 库存调整录入、查询、撤回
+    - 调整审批（通过/拒绝）
+    - 库存流水查询
+    - 安全库存阈值编辑
+    - 调整原因字典查询
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform
+
+servers:
+  - url: /api
+    description: API Base Path
+
+tags:
+  - name: Adjustments
+    description: 库存调整管理
+  - name: Approvals
+    description: 调整审批管理
+  - name: Transactions
+    description: 库存流水查询
+  - name: SafetyStock
+    description: 安全库存管理
+  - name: Reasons
+    description: 调整原因字典
+
+paths:
+  # ==================== 调整管理 ====================
+  /adjustments:
+    post:
+      tags:
+        - Adjustments
+      summary: 创建库存调整
+      description: |
+        创建库存调整记录。
+        - 如果调整金额 >= 审批阈值（1000元），记录进入待审批状态
+        - 如果不需要审批，立即执行库存更新并生成流水
+      operationId: createAdjustment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAdjustmentRequest'
+            example:
+              skuId: "550e8400-e29b-41d4-a716-446655440001"
+              storeId: "550e8400-e29b-41d4-a716-446655440002"
+              adjustmentType: "surplus"
+              quantity: 10
+              reasonCode: "STOCK_DIFF"
+              reasonText: "季度盘点发现实际数量多于系统记录"
+              remarks: "盘点编号: INV-2025-Q4-001"
+      responses:
+        '201':
+          description: 调整记录创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjustmentResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: SKU或门店不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Adjustments
+      summary: 查询调整列表
+      description: 分页查询库存调整记录列表，支持多条件筛选
+      operationId: listAdjustments
+      parameters:
+        - name: skuId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: 按SKU筛选
+        - name: storeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: 按门店筛选
+        - name: status
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/AdjustmentStatus'
+          description: 按状态筛选（支持多选）
+        - name: adjustmentType
+          in: query
+          schema:
+            $ref: '#/components/schemas/AdjustmentType'
+          description: 按调整类型筛选
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 开始日期
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 结束日期
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 页码
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: 每页条数
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjustmentListResponse'
+      security:
+        - bearerAuth: []
+
+  /adjustments/{id}:
+    get:
+      tags:
+        - Adjustments
+      summary: 获取调整详情
+      description: 获取单条调整记录的详细信息，包含审批历史
+      operationId: getAdjustment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 调整记录ID
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjustmentDetailResponse'
+        '404':
+          description: 调整记录不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  /adjustments/{id}/withdraw:
+    post:
+      tags:
+        - Adjustments
+      summary: 撤回调整申请
+      description: |
+        撤回待审批状态的调整申请。
+        - 仅限申请人本人操作
+        - 仅限待审批状态的记录
+      operationId: withdrawAdjustment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 调整记录ID
+      responses:
+        '200':
+          description: 撤回成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjustmentResponse'
+        '400':
+          description: 状态不允许撤回
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无权撤回（非本人创建）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 调整记录不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  # ==================== 审批管理 ====================
+  /approvals/pending:
+    get:
+      tags:
+        - Approvals
+      summary: 获取待审批列表
+      description: 获取当前用户可审批的待审批调整列表
+      operationId: listPendingApprovals
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdjustmentListResponse'
+      security:
+        - bearerAuth: []
+
+  /approvals/{adjustmentId}:
+    post:
+      tags:
+        - Approvals
+      summary: 执行审批操作
+      description: |
+        对待审批的调整记录执行审批操作。
+        - 仅限运营总监角色
+        - 通过后立即更新库存并生成流水
+      operationId: processApproval
+      parameters:
+        - name: adjustmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 调整记录ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+            example:
+              action: "approve"
+              comments: "已核实盘点数据，准予调整"
+      responses:
+        '200':
+          description: 审批成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalResponse'
+        '400':
+          description: 状态不允许审批
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: 无审批权限
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 调整记录不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - bearerAuth: []
+
+  # ==================== 流水查询 ====================
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: 查询库存流水
+      description: |
+        分页查询库存流水记录。
+        - 支持按SKU、门店、时间范围筛选
+        - 支持按交易类型筛选
+      operationId: listTransactions
+      parameters:
+        - name: skuId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: 按SKU筛选
+        - name: storeId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: 按门店筛选
+        - name: transactionTypes
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TransactionType'
+          description: 按交易类型筛选（支持多选）
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 开始日期
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 结束日期
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+      security:
+        - bearerAuth: []
+
+  # ==================== 安全库存管理 ====================
+  /inventory/{id}/safety-stock:
+    put:
+      tags:
+        - SafetyStock
+      summary: 更新安全库存阈值
+      description: |
+        更新指定SKU+门店的安全库存阈值。
+        - 使用乐观锁防止并发冲突
+        - 更新后立即影响库存状态计算
+      operationId: updateSafetyStock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 库存记录ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSafetyStockRequest'
+            example:
+              safetyStock: 50
+              version: 1
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryResponse'
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 库存记录不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 并发冲突（已被他人修改）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "CONCURRENT_MODIFICATION"
+                message: "该记录已被他人修改，请刷新后重试"
+      security:
+        - bearerAuth: []
+
+  # ==================== 原因字典 ====================
+  /adjustment-reasons:
+    get:
+      tags:
+        - Reasons
+      summary: 获取调整原因字典
+      description: 获取所有启用的调整原因选项
+      operationId: listAdjustmentReasons
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReasonListResponse'
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth JWT Token
+
+  schemas:
+    # ==================== 枚举类型 ====================
+    AdjustmentType:
+      type: string
+      enum:
+        - surplus
+        - shortage
+        - damage
+      description: |
+        调整类型:
+        - surplus: 盘盈（增加库存）
+        - shortage: 盘亏（减少库存）
+        - damage: 报损（减少库存并标记损耗）
+
+    AdjustmentStatus:
+      type: string
+      enum:
+        - draft
+        - pending_approval
+        - approved
+        - rejected
+        - withdrawn
+      description: |
+        调整状态:
+        - draft: 草稿
+        - pending_approval: 待审批
+        - approved: 已审批通过
+        - rejected: 已拒绝
+        - withdrawn: 已撤回
+
+    ApprovalAction:
+      type: string
+      enum:
+        - approve
+        - reject
+      description: |
+        审批操作:
+        - approve: 通过
+        - reject: 拒绝
+
+    TransactionType:
+      type: string
+      enum:
+        - purchase_in
+        - sale_out
+        - transfer_in
+        - transfer_out
+        - adjustment_in
+        - adjustment_out
+        - return_in
+        - return_out
+        - damage_out
+        - production_in
+        - expired_out
+      description: 库存流水类型
+
+    # ==================== 请求体 ====================
+    CreateAdjustmentRequest:
+      type: object
+      required:
+        - skuId
+        - storeId
+        - adjustmentType
+        - quantity
+        - reasonCode
+      properties:
+        skuId:
+          type: string
+          format: uuid
+          description: SKU ID
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        adjustmentType:
+          $ref: '#/components/schemas/AdjustmentType'
+        quantity:
+          type: integer
+          minimum: 1
+          description: 调整数量（始终为正数）
+        reasonCode:
+          type: string
+          minLength: 1
+          description: 原因代码
+        reasonText:
+          type: string
+          maxLength: 500
+          description: 原因补充说明
+        remarks:
+          type: string
+          maxLength: 500
+          description: 备注
+
+    ApprovalRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          $ref: '#/components/schemas/ApprovalAction'
+        comments:
+          type: string
+          maxLength: 1000
+          description: 审批意见
+
+    UpdateSafetyStockRequest:
+      type: object
+      required:
+        - safetyStock
+        - version
+      properties:
+        safetyStock:
+          type: integer
+          minimum: 0
+          description: 新的安全库存阈值
+        version:
+          type: integer
+          minimum: 1
+          description: 乐观锁版本号（用于并发控制）
+
+    # ==================== 响应体 ====================
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: false
+            error:
+              type: string
+              description: 错误代码
+            message:
+              type: string
+              description: 错误信息
+            details:
+              type: object
+              description: 错误详情
+
+    # ==================== 调整相关 ====================
+    Adjustment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        adjustmentNumber:
+          type: string
+          description: 调整单号
+        skuId:
+          type: string
+          format: uuid
+        sku:
+          $ref: '#/components/schemas/SkuInfo'
+        storeId:
+          type: string
+          format: uuid
+        store:
+          $ref: '#/components/schemas/StoreInfo'
+        adjustmentType:
+          $ref: '#/components/schemas/AdjustmentType'
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+          format: decimal
+        adjustmentAmount:
+          type: number
+          format: decimal
+        reasonCode:
+          type: string
+        reasonText:
+          type: string
+        remarks:
+          type: string
+        status:
+          $ref: '#/components/schemas/AdjustmentStatus'
+        stockBefore:
+          type: integer
+        stockAfter:
+          type: integer
+        availableBefore:
+          type: integer
+        availableAfter:
+          type: integer
+        requiresApproval:
+          type: boolean
+        operatorId:
+          type: string
+          format: uuid
+        operatorName:
+          type: string
+        approvedAt:
+          type: string
+          format: date-time
+        approvedBy:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AdjustmentResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              $ref: '#/components/schemas/Adjustment'
+
+    AdjustmentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Adjustment'
+            total:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+
+    AdjustmentDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              allOf:
+                - $ref: '#/components/schemas/Adjustment'
+                - type: object
+                  properties:
+                    approvalHistory:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ApprovalRecord'
+
+    # ==================== 审批相关 ====================
+    ApprovalRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        adjustmentId:
+          type: string
+          format: uuid
+        approverId:
+          type: string
+          format: uuid
+        approverName:
+          type: string
+        action:
+          type: string
+          enum:
+            - approve
+            - reject
+            - withdraw
+        statusBefore:
+          $ref: '#/components/schemas/AdjustmentStatus'
+        statusAfter:
+          $ref: '#/components/schemas/AdjustmentStatus'
+        comments:
+          type: string
+        actionTime:
+          type: string
+          format: date-time
+
+    ApprovalResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              $ref: '#/components/schemas/Adjustment'
+            message:
+              type: string
+              example: "审批成功"
+
+    # ==================== 流水相关 ====================
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+        sku:
+          $ref: '#/components/schemas/SkuInfo'
+        storeId:
+          type: string
+          format: uuid
+        store:
+          $ref: '#/components/schemas/StoreInfo'
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        quantity:
+          type: integer
+          description: 变动数量（正数为入库，负数为出库）
+        stockBefore:
+          type: integer
+        stockAfter:
+          type: integer
+        availableBefore:
+          type: integer
+        availableAfter:
+          type: integer
+        sourceType:
+          type: string
+        sourceId:
+          type: string
+          format: uuid
+        operatorId:
+          type: string
+          format: uuid
+        operatorName:
+          type: string
+        remarks:
+          type: string
+        transactionTime:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    TransactionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+            total:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+
+    # ==================== 库存相关 ====================
+    InventoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                skuId:
+                  type: string
+                  format: uuid
+                storeId:
+                  type: string
+                  format: uuid
+                onHandQty:
+                  type: integer
+                availableQty:
+                  type: integer
+                safetyStock:
+                  type: integer
+                version:
+                  type: integer
+                updatedAt:
+                  type: string
+                  format: date-time
+
+    # ==================== 原因字典 ====================
+    AdjustmentReason:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+            - surplus
+            - shortage
+            - damage
+        isActive:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    ReasonListResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            success:
+              type: boolean
+              example: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdjustmentReason'
+
+    # ==================== 关联实体 ====================
+    SkuInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        unit:
+          type: string
+        unitPrice:
+          type: number
+          format: decimal
+
+    StoreInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string

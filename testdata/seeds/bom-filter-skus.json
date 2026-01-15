@@ -1,0 +1,96 @@
+[
+  {
+    "key": "bom-filter-test",
+    "expected_sku_count": 3,
+    "finished_product_skus": [
+      {
+        "code": "FIN-WHISKEY-COLA-001",
+        "name": "威士忌可乐鸡尾酒",
+        "type": "finished_product",
+        "category": "饮品 > 鸡尾酒",
+        "price": "3200",
+        "unit": "份"
+      },
+      {
+        "code": "FIN-MOJITO-001",
+        "name": "薄荷威士忌鸡尾酒",
+        "type": "finished_product",
+        "category": "饮品 > 鸡尾酒",
+        "price": "3500",
+        "unit": "份"
+      },
+      {
+        "code": "FIN-COLA-ICE-001",
+        "name": "冰镇可乐",
+        "type": "finished_product",
+        "category": "饮品 > 软饮",
+        "price": "1500",
+        "unit": "份"
+      }
+    ],
+    "packaging_skus": [
+      {
+        "code": "PKG-CUP-001",
+        "name": "杯子",
+        "type": "packaging",
+        "category": "包材 > 容器",
+        "price": "50",
+        "unit": "个"
+      },
+      {
+        "code": "PKG-STRAW-001",
+        "name": "吸管",
+        "type": "packaging",
+        "category": "包材 > 餐具",
+        "price": "5",
+        "unit": "根"
+      },
+      {
+        "code": "PKG-NAPKIN-001",
+        "name": "餐巾纸",
+        "type": "packaging",
+        "category": "包材 > 餐具",
+        "price": "3",
+        "unit": "张"
+      },
+      {
+        "code": "PKG-COASTER-001",
+        "name": "杯垫",
+        "type": "packaging",
+        "category": "包材 > 配件",
+        "price": "10",
+        "unit": "个"
+      },
+      {
+        "code": "PKG-LID-001",
+        "name": "杯盖",
+        "type": "packaging",
+        "category": "包材 > 容器",
+        "price": "8",
+        "unit": "个"
+      }
+    ],
+    "raw_material_skus": [
+      {
+        "code": "RAW-WHISKEY-001",
+        "name": "威士忌原液",
+        "type": "raw_material",
+        "category": "原料 > 酒精",
+        "price": "5000",
+        "unit": "毫升"
+      },
+      {
+        "code": "RAW-COLA-001",
+        "name": "可乐浓缩液",
+        "type": "raw_material",
+        "category": "原料 > 饮料",
+        "price": "500",
+        "unit": "毫升"
+      }
+    ],
+    "admin_credentials": {
+      "username": "admin",
+      "password": "admin123"
+    }
+  }
+]

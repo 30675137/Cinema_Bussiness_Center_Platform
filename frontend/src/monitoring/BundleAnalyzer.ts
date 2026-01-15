@@ -56,11 +56,11 @@ export class BundleAnalyzer {
     try {
       // 尝试获取webpack的stats数据
       this.getWebpackStats()
-        .then(stats => {
+        .then((stats) => {
           this.analysis = this.processStats(stats);
           this.reportAnalysis();
         })
-        .catch(error => {
+        .catch((error) => {
           console.warn('无法获取webpack stats:', error);
           this.fallbackAnalysis();
         });
@@ -122,8 +122,8 @@ export class BundleAnalyzer {
         modules.push(moduleInfo);
 
         // 将模块添加到对应的chunks
-        moduleInfo.chunks.forEach(chunkId => {
-          const chunk = chunks.find(c => c.id === chunkId.toString());
+        moduleInfo.chunks.forEach((chunkId) => {
+          const chunk = chunks.find((c) => c.id === chunkId.toString());
           if (chunk) {
             chunk.modules.push(moduleInfo);
           }
@@ -136,7 +136,7 @@ export class BundleAnalyzer {
 
     // 找出大模块
     const largeModules = modules
-      .filter(module => module.size > 50000) // 大于50KB
+      .filter((module) => module.size > 50000) // 大于50KB
       .sort((a, b) => b.size - a.size);
 
     // 计算压缩比
@@ -160,7 +160,7 @@ export class BundleAnalyzer {
     let totalSize = 0;
     const chunks: BundleChunk[] = [];
 
-    scripts.forEach(script => {
+    scripts.forEach((script) => {
       const src = script.getAttribute('src');
       if (src && src.includes('chunk')) {
         // 这是一个估计值，实际大小需要从网络请求获取
@@ -194,11 +194,9 @@ export class BundleAnalyzer {
   }> {
     const moduleMap = new Map<string, BundleModule[]>();
 
-    modules.forEach(module => {
+    modules.forEach((module) => {
       // 简化模块名用于比较
-      const simplifiedName = module.name
-        .split('/')
-        .pop() || module.name;
+      const simplifiedName = module.name.split('/').pop() || module.name;
 
       if (!moduleMap.has(simplifiedName)) {
         moduleMap.set(simplifiedName, []);
@@ -211,7 +209,7 @@ export class BundleAnalyzer {
       totalSize: number;
     }> = [];
 
-    moduleMap.forEach(moduleList => {
+    moduleMap.forEach((moduleList) => {
       if (moduleList.length > 1) {
         const totalSize = moduleList.reduce((sum, module) => sum + module.size, 0);
         duplicates.push({
@@ -257,7 +255,10 @@ export class BundleAnalyzer {
       return;
     }
 
-    console.group('%c📦 Bundle Analysis Report', 'color: #1890ff; font-weight: bold; font-size: 16px;');
+    console.group(
+      '%c📦 Bundle Analysis Report',
+      'color: #1890ff; font-weight: bold; font-size: 16px;'
+    );
 
     console.log(`Total Size: ${this.formatBytes(this.analysis.totalSize)}`);
     console.log(`Compression Ratio: ${(this.analysis.compressionRatio * 100).toFixed(1)}%`);
@@ -266,7 +267,7 @@ export class BundleAnalyzer {
 
     if (this.analysis.largeModules.length > 0) {
       console.group('%c⚠️ Large Modules (>50KB)', 'color: #faad14;');
-      this.analysis.largeModules.slice(0, 10).forEach(module => {
+      this.analysis.largeModules.slice(0, 10).forEach((module) => {
         console.log(`${this.formatBytes(module.size)} - ${module.name}`);
       });
       console.groupEnd();
@@ -274,8 +275,10 @@ export class BundleAnalyzer {
 
     if (this.analysis.duplicates.length > 0) {
       console.group('%c🔄 Duplicate Modules', 'color: #ff7a45;');
-      this.analysis.duplicates.slice(0, 5).forEach(dup => {
-        console.log(`${dup.modules.map(m => m.name).join(', ')} - ${this.formatBytes(dup.totalSize)}`);
+      this.analysis.duplicates.slice(0, 5).forEach((dup) => {
+        console.log(
+          `${dup.modules.map((m) => m.name).join(', ')} - ${this.formatBytes(dup.totalSize)}`
+        );
       });
       console.groupEnd();
     }
@@ -304,7 +307,8 @@ export class BundleAnalyzer {
       console.log('• 启用更好的压缩配置（gzip, brotli）');
     }
 
-    if (this.analysis.totalSize > 1024 * 1024) { // > 1MB
+    if (this.analysis.totalSize > 1024 * 1024) {
+      // > 1MB
       console.log('• 考虑使用tree shaking移除未使用的代码');
       console.log('• 评估是否需要所有第三方库');
     }
@@ -329,7 +333,7 @@ export class BundleAnalyzer {
 
     const total = this.analysis.totalSize;
     return this.analysis.chunks
-      .map(chunk => ({
+      .map((chunk) => ({
         name: chunk.name,
         size: chunk.size,
         percentage: total > 0 ? (chunk.size / total) * 100 : 0,
@@ -342,9 +346,9 @@ export class BundleAnalyzer {
 
     const graph: Array<{ from: string; to: string; weight: number }> = [];
 
-    this.analysis.chunks.forEach(chunk => {
-      chunk.children.forEach(childId => {
-        const child = this.analysis!.chunks.find(c => c.id === childId);
+    this.analysis.chunks.forEach((chunk) => {
+      chunk.children.forEach((childId) => {
+        const child = this.analysis!.chunks.find((c) => c.id === childId);
         if (child) {
           graph.push({
             from: chunk.name,
@@ -358,7 +362,10 @@ export class BundleAnalyzer {
     return graph;
   }
 
-  public async analyzeNewChunk(chunkName: string, modulePath: string): Promise<{
+  public async analyzeNewChunk(
+    chunkName: string,
+    modulePath: string
+  ): Promise<{
     size: number;
     dependencies: string[];
     recommendations: string[];
@@ -405,7 +412,8 @@ export class BundleAnalyzer {
   private generateChunkRecommendations(size: number, dependencies: string[]): string[] {
     const recommendations: string[] = [];
 
-    if (size > 200000) { // > 200KB
+    if (size > 200000) {
+      // > 200KB
       recommendations.push('考虑进一步分割这个模块');
     }
 
@@ -413,8 +421,8 @@ export class BundleAnalyzer {
       recommendations.push('依赖过多，考虑重构以减少耦合');
     }
 
-    const hasLargeDependency = dependencies.some(dep =>
-      dep.includes('lodash') || dep.includes('moment') || dep.includes('antd')
+    const hasLargeDependency = dependencies.some(
+      (dep) => dep.includes('lodash') || dep.includes('moment') || dep.includes('antd')
     );
 
     if (hasLargeDependency) {
@@ -437,7 +445,9 @@ export const bundleAnalyzer = BundleAnalyzer.getInstance();
 
 // React Hook for Bundle Analysis
 export const useBundleAnalysis = () => {
-  const [analysis, setAnalysis] = useState<BundleAnalysis | null>(() => bundleAnalyzer.getAnalysis());
+  const [analysis, setAnalysis] = useState<BundleAnalysis | null>(() =>
+    bundleAnalyzer.getAnalysis()
+  );
   const [chunkSizes, setChunkSizes] = useState(() => bundleAnalyzer.getChunkSizes());
 
   useEffect(() => {

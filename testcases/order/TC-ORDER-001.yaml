@@ -1,0 +1,72 @@
+# @spec T007-e2e-test-management
+# Example Manual Test Case YAML
+
+testcase_id: TC-ORDER-001
+title: 验证用户能够成功创建饮品订单并完成支付
+module: order
+feature: 饮品订单创建
+priority: P0
+
+preconditions:
+  account: 已登录的普通用户账号
+  permissions: 普通用户权限
+  environment: staging
+  dependencies:
+    - 门店已开业
+    - 商品已上架
+    - 库存充足
+
+test_data:
+  testdata_ref: orderTestData.beverage_order_001
+  inline:
+    store_name: "测试门店A"
+    product_name: "可乐"
+    quantity: 2
+    expected_total: 12.00
+
+steps:
+  - step_no: 1
+    action: 打开门店页面
+    input: 点击首页门店入口
+    expected: 显示门店列表页，包含测试门店A
+
+  - step_no: 2
+    action: 选择门店
+    input: 点击"测试门店A"
+    expected: 进入门店商品页，显示商品分类
+
+  - step_no: 3
+    action: 选择商品
+    input: 在饮品分类中点击"可乐"
+    expected: 显示商品详情页，包含价格6.00元
+
+  - step_no: 4
+    action: 添加到购物车
+    input: 点击"+"按钮增加数量到2
+    expected: 购物车图标显示数量2，小计12.00元
+
+  - step_no: 5
+    action: 确认订单
+    input: 点击"去结算"按钮
+    expected: 显示订单确认页，总金额12.00元
+
+  - step_no: 6
+    action: 完成支付
+    input: 点击"确认支付"按钮
+    expected: 显示支付成功页面
+
+assertions:
+  - 订单状态变为"已支付"
+  - 库存扣减正确（可乐库存-2）
+  - 订单详情页显示正确的商品信息
+
+metadata:
+  created_at: "2025-12-31T00:00:00Z"
+  created_by: QA-张三
+  version: "1.0.0"
+  tags:
+    - smoke
+    - regression
+    - payment
+
+executions: []

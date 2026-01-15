@@ -1,0 +1,515 @@
+openapi: 3.0.3
+info:
+  title: Consumer Order API
+  description: |
+    @spec O013-order-channel-migration
+    
+    消费订单 API - 使用渠道商品体系
+    
+    ## 变更说明
+    
+    - API 路径从 `/api/client/beverage-orders` 改为 `/api/client/orders`
+    - 订单项使用 `channelProductId` 替代 `skuId`/`beverageId`
+    - 支持完整的商品快照存储
+  version: 2.0.0
+  contact:
+    name: Cinema Platform Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local Development
+
+tags:
+  - name: Consumer Orders
+    description: C端消费订单接口
+  - name: Admin Orders
+    description: B端订单管理接口
+
+paths:
+  /api/client/orders:
+    post:
+      tags:
+        - Consumer Orders
+      summary: 创建订单
+      description: |
+        使用渠道商品 ID 创建消费订单。
+        
+        **业务规则**:
+        1. 验证商品状态为 ACTIVE
+        2. 从 channel_product_config 获取商品信息并保存快照
+        3. 通过 sku_id 关联 BOM 进行库存预占
+      operationId: createOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+            example:
+              storeId: "00000000-0000-0000-0000-000000000099"
+              items:
+                - channelProductId: "550e8400-e29b-41d4-a716-446655440001"
+                  quantity: 2
+                  selectedSpecs:
+                    SIZE:
+                      optionId: "opt-001"
+                      optionName: "大杯"
+                      priceAdjust: 300
+                    TEMPERATURE:
+                      optionId: "opt-002"
+                      optionName: "热"
+                      priceAdjust: 0
+              customerNote: "少冰"
+      responses:
+        '201':
+          description: 订单创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: 库存不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsufficientInventoryError'
+
+  /api/client/orders/{id}:
+    get:
+      tags:
+        - Consumer Orders
+      summary: 获取订单详情
+      operationId: getOrderById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+        '404':
+          description: 订单不存在
+
+  /api/client/orders/{id}/pay:
+    post:
+      tags:
+        - Consumer Orders
+      summary: 支付订单 (Mock)
+      operationId: payOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 支付成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+
+  /api/client/orders/{id}/cancel:
+    post:
+      tags:
+        - Consumer Orders
+      summary: 取消订单
+      description: 取消订单并释放库存预占
+      operationId: cancelOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: reason
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "用户取消"
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+
+  /api/client/orders/my:
+    get:
+      tags:
+        - Consumer Orders
+      summary: 我的订单列表
+      operationId: getMyOrders
+      parameters:
+        - name: X-User-Id
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PagedOrders'
+
+  /api/client/orders/by-number/{orderNumber}:
+    get:
+      tags:
+        - Consumer Orders
+      summary: 通过订单号查询订单
+      operationId: getOrderByNumber
+      parameters:
+        - name: orderNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/OrderDTO'
+
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0000"
+        message:
+          type: string
+          example: "success"
+        data:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "ORD_VAL_001"
+        message:
+          type: string
+        details:
+          type: object
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - storeId
+        - items
+      properties:
+        storeId:
+          type: string
+          format: uuid
+          description: 门店 ID
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CreateOrderItemRequest'
+        customerNote:
+          type: string
+          maxLength: 500
+          description: 顾客备注
+
+    CreateOrderItemRequest:
+      type: object
+      required:
+        - channelProductId
+        - quantity
+        - selectedSpecs
+      properties:
+        channelProductId:
+          type: string
+          format: uuid
+          description: 渠道商品配置 ID
+        quantity:
+          type: integer
+          minimum: 1
+          description: 数量
+        selectedSpecs:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SelectedSpecOption'
+          description: |
+            选中的规格，key 为规格类型 (SIZE, TEMPERATURE 等)
+        customerNote:
+          type: string
+          maxLength: 200
+          description: 商品备注
+
+    SelectedSpecOption:
+      type: object
+      required:
+        - optionId
+        - optionName
+        - priceAdjust
+      properties:
+        optionId:
+          type: string
+          description: 规格选项 ID
+        optionName:
+          type: string
+          description: 规格选项名称
+        priceAdjust:
+          type: integer
+          description: 价格调整（分）
+
+    OrderDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderNumber:
+          type: string
+          description: 订单号
+        userId:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+          format: uuid
+        totalPrice:
+          type: number
+          format: double
+          description: 订单总价（元）
+        status:
+          type: string
+          enum:
+            - PENDING_PAYMENT
+            - PENDING_PRODUCTION
+            - PRODUCING
+            - COMPLETED
+            - DELIVERED
+            - CANCELLED
+        paymentMethod:
+          type: string
+        transactionId:
+          type: string
+        paidAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        cancelledAt:
+          type: string
+          format: date-time
+        customerNote:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemDTO'
+        queueNumber:
+          type: string
+          description: 取餐号
+        reservationStatus:
+          type: string
+          enum:
+            - RESERVED
+            - RELEASED
+            - CANCELLED
+          description: 库存预占状态
+
+    OrderItemDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        channelProductId:
+          type: string
+          format: uuid
+          description: 渠道商品配置 ID
+        skuId:
+          type: string
+          format: uuid
+          description: SKU ID
+        productName:
+          type: string
+          description: 商品名称
+        productImageUrl:
+          type: string
+          description: 商品图片 URL
+        productSnapshot:
+          $ref: '#/components/schemas/ProductSnapshot'
+        selectedSpecs:
+          type: object
+          description: 选中的规格
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+          format: double
+          description: 单价（元）
+        subtotal:
+          type: number
+          format: double
+          description: 小计（元）
+        customerNote:
+          type: string
+
+    ProductSnapshot:
+      type: object
+      description: 商品快照，记录下单时的商品信息
+      properties:
+        channelProductId:
+          type: string
+        displayName:
+          type: string
+        mainImage:
+          type: string
+        channelPrice:
+          type: integer
+          description: 渠道价格（分）
+        channelCategory:
+          type: string
+        description:
+          type: string
+        sku:
+          type: object
+          properties:
+            id:
+              type: string
+            code:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+        selectedSpecs:
+          type: array
+          items:
+            type: object
+            properties:
+              specType:
+                type: string
+              specName:
+                type: string
+              optionId:
+                type: string
+              optionName:
+                type: string
+              priceAdjust:
+                type: integer
+        snapshotAt:
+          type: string
+          format: date-time
+
+    PagedOrders:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDTO'
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        number:
+          type: integer
+        size:
+          type: integer
+
+    InsufficientInventoryError:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "ORD_BIZ_002"
+        message:
+          type: string
+          example: "库存不足，无法创建订单"
+        details:
+          type: object
+          properties:
+            shortageItems:
+              type: array
+              items:
+                type: object
+                properties:
+                  skuId:
+                    type: string
+                  skuName:
+                    type: string
+                  requiredQty:
+                    type: number
+                  availableQty:
+                    type: number
+                  unit:
+                    type: string

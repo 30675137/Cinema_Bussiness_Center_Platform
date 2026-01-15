@@ -1,0 +1,419 @@
+openapi: 3.0.3
+info:
+  title: SPU 批量删除 API
+  description: |
+    修复 SPU 批量删除功能的 API 规范。本 API 支持批量删除多个 SPU 商品,
+    并返回删除结果统计(成功数量、失败数量、详细结果)。
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform
+    url: https://github.com/your-repo
+
+servers:
+  - url: http://localhost:3000/api
+    description: 本地开发环境 (MSW Mock)
+  - url: http://localhost:8080/api
+    description: 本地后端服务 (Spring Boot)
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: SPU
+    description: SPU (标准商品单元) 管理
+
+paths:
+  /spu/batch:
+    post:
+      summary: 批量操作 SPU
+      description: |
+        支持批量删除、批量更新状态、批量复制等操作。
+        本次 bug 修复专注于批量删除功能(operation: "delete")。
+      operationId: batchOperateSPU
+      tags:
+        - SPU
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/BatchDeleteRequest'
+                - $ref: '#/components/schemas/BatchUpdateStatusRequest'
+              discriminator:
+                propertyName: operation
+            examples:
+              batchDelete:
+                summary: 批量删除示例
+                value:
+                  operation: delete
+                  ids:
+                    - SPU001
+                    - SPU002
+                    - SPU003
+              batchUpdateStatus:
+                summary: 批量更新状态示例
+                value:
+                  operation: updateStatus
+                  ids:
+                    - SPU001
+                    - SPU002
+                  status: disabled
+      responses:
+        '200':
+          description: 操作成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchOperationResponse'
+              examples:
+                allSuccess:
+                  summary: 全部成功
+                  value:
+                    success: true
+                    data:
+                      processedCount: 3
+                      failedCount: 0
+                    message: 成功删除 3 个 SPU
+                    code: 200
+                    timestamp: 1736419200000
+                partialSuccess:
+                  summary: 部分成功
+                  value:
+                    success: true
+                    data:
+                      processedCount: 2
+                      failedCount: 1
+                      results:
+                        - id: SPU001
+                          success: true
+                        - id: SPU002
+                          success: true
+                        - id: INVALID_ID
+                          success: false
+                          error: SPU 不存在
+                    message: 成功删除 2 个 SPU,失败 1 个
+                    code: 200
+                    timestamp: 1736419200000
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidOperation:
+                  summary: 无效的操作类型
+                  value:
+                    success: false
+                    message: 无效的操作类型,支持的操作: delete, updateStatus, copy
+                    code: 400
+                    timestamp: 1736419200000
+                emptyIds:
+                  summary: IDs 列表为空
+                  value:
+                    success: false
+                    message: ids 参数不能为空数组
+                    code: 400
+                    timestamp: 1736419200000
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: 服务器内部错误,请稍后重试
+                code: 500
+                timestamp: 1736419200000
+
+  /spu/list:
+    get:
+      summary: 获取 SPU 列表
+      description: |
+        获取 SPU 列表,支持分页、筛选、搜索。
+        批量删除后会调用此接口刷新列表数据。
+      operationId: getSPUList
+      tags:
+        - SPU
+      parameters:
+        - name: page
+          in: query
+          description: 页码(从 1 开始)
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: keyword
+          in: query
+          description: 搜索关键词(SPU 名称或编码)
+          schema:
+            type: string
+        - name: brandId
+          in: query
+          description: 品牌 ID 筛选
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          description: 分类 ID 筛选
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态筛选
+          schema:
+            type: string
+            enum: [draft, enabled, disabled]
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SPUListResponse'
+
+components:
+  schemas:
+    # 批量删除请求
+    BatchDeleteRequest:
+      type: object
+      required:
+        - operation
+        - ids
+      properties:
+        operation:
+          type: string
+          enum: [delete]
+          description: 操作类型,固定为 "delete"
+        ids:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 100
+          description: 待删除的 SPU ID 列表,最多 100 个
+          example:
+            - SPU001
+            - SPU002
+            - SPU003
+
+    # 批量更新状态请求 (未来扩展)
+    BatchUpdateStatusRequest:
+      type: object
+      required:
+        - operation
+        - ids
+        - status
+      properties:
+        operation:
+          type: string
+          enum: [updateStatus]
+          description: 操作类型,固定为 "updateStatus"
+        ids:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 100
+          description: 待更新的 SPU ID 列表
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          description: 新状态
+
+    # 批量操作响应
+    BatchOperationResponse:
+      type: object
+      required:
+        - success
+        - data
+        - message
+        - code
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          description: 操作是否成功
+        data:
+          type: object
+          required:
+            - processedCount
+            - failedCount
+          properties:
+            processedCount:
+              type: integer
+              minimum: 0
+              description: 成功处理的数量
+            failedCount:
+              type: integer
+              minimum: 0
+              description: 失败的数量
+            results:
+              type: array
+              description: 详细结果列表(可选,仅在 failedCount > 0 时返回)
+              items:
+                $ref: '#/components/schemas/BatchOperationResult'
+        message:
+          type: string
+          description: 提示消息
+        code:
+          type: integer
+          description: HTTP 状态码
+        timestamp:
+          type: integer
+          format: int64
+          description: 时间戳(毫秒)
+
+    # 批量操作单项结果
+    BatchOperationResult:
+      type: object
+      required:
+        - id
+        - success
+      properties:
+        id:
+          type: string
+          description: SPU ID
+        success:
+          type: boolean
+          description: 该项是否成功
+        error:
+          type: string
+          description: 错误原因(仅在 success: false 时存在)
+
+    # SPU 实体
+    SPUItem:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - brandId
+        - categoryId
+        - status
+        - createdAt
+        - updatedAt
+        - creator
+        - modifier
+      properties:
+        id:
+          type: string
+          description: SPU 唯一标识符
+          example: SPU001
+        code:
+          type: string
+          description: SPU 编码
+          example: SPU20250109001
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: SPU 名称
+          example: 可口可乐 500ml 瓶装
+        description:
+          type: string
+          description: 商品描述
+          example: 经典碳酸饮料,清爽解渴
+        brandId:
+          type: string
+          description: 品牌 ID
+          example: BRAND001
+        categoryId:
+          type: string
+          description: 分类 ID
+          example: CAT001
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+          description: 状态(草稿/启用/停用)
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间(ISO 8601)
+          example: 2026-01-09T10:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间(ISO 8601)
+          example: 2026-01-09T11:30:00Z
+        creator:
+          type: string
+          description: 创建人
+          example: admin
+        modifier:
+          type: string
+          description: 修改人
+          example: admin
+
+    # SPU 列表响应
+    SPUListResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          required:
+            - list
+            - pagination
+          properties:
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/SPUItem'
+            pagination:
+              type: object
+              required:
+                - current
+                - pageSize
+                - total
+                - totalPages
+              properties:
+                current:
+                  type: integer
+                  description: 当前页码
+                pageSize:
+                  type: integer
+                  description: 每页数量
+                total:
+                  type: integer
+                  description: 总记录数
+                totalPages:
+                  type: integer
+                  description: 总页数
+
+    # 错误响应
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - message
+        - code
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+          description: 固定为 false
+        message:
+          type: string
+          description: 错误信息
+        code:
+          type: integer
+          description: HTTP 状态码
+        timestamp:
+          type: integer
+          format: int64
+          description: 时间戳(毫秒)

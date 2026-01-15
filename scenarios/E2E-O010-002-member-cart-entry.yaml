@@ -1,0 +1,130 @@
+# @spec T001-e2e-scenario-author
+# E2E 测试场景：会员中心购物车入口验证
+scenario_id: E2E-O010-002
+spec_ref: O010-shopping-cart
+title: 会员中心购物车入口验证
+tags:
+  module: [order, cart, member]
+  channel: [h5, weapp]
+  deploy: [saas]
+  priority: p2
+  smoke: false
+
+description: |
+  验证会员中心页面的购物车快捷入口功能，确保点击后能正确打开购物车抽屉
+  并显示购物车内容。
+
+preconditions:
+  role: user
+  testdata_ref: shoppingCartTestData.scenario_002
+  initial_state:
+    - 用户已登录
+    - 购物车中已有商品
+    - 在会员中心页 (/pages/member/index)
+
+steps:
+  # Step 1: 准备测试数据 - 添加商品到购物车
+  - action: navigate
+    system: c-end
+    params:
+      url: /pages/menu/index
+    description: 打开商品列表页
+
+  - action: click
+    system: c-end
+    params:
+      selector: .product-card:nth-child(1) .add-button
+    description: 添加第一个商品到购物车
+
+  # Step 2: 导航到会员中心
+  - action: navigate
+    system: c-end
+    params:
+      url: /pages/member/index
+    description: 打开会员中心页
+
+  # Step 3: 验证购物车快捷入口存在
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .quick-actions
+    description: 验证快捷入口区域显示
+
+  # Step 4: 查找购物车入口（根据实际实现调整选择器）
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .quick-action-item  # 实际选择器可能需要调整
+    description: 验证购物车快捷入口存在
+
+  # Step 5: 点击购物车入口
+  - action: click
+    system: c-end
+    params:
+      selector: .quick-action-item  # 实际选择器可能需要调整
+    description: 点击购物车快捷入口
+
+  # Step 6: 验证购物车抽屉打开（如果已集成）
+  - action: check_element_visible
+    system: c-end
+    params:
+      selector: .cart-drawer
+    description: 验证购物车抽屉打开
+
+  # Step 7: 验证购物车内容显示
+  - action: check_element_count
+    system: c-end
+    params:
+      selector: .cart-item
+      expected: 1
+    description: 验证购物车中有 1 个商品
+
+  # Step 8: 验证可以关闭抽屉
+  - action: click
+    system: c-end
+    params:
+      selector: .close-button
+    description: 点击关闭按钮
+
+  - action: check_element_not_visible
+    system: c-end
+    params:
+      selector: .cart-drawer
+    description: 验证购物车抽屉关闭
+
+assertions:
+  # UI 断言
+  - type: ui
+    check: element_visible
+    params:
+      selector: .quick-actions
+    description: 快捷入口区域显示
+
+  - type: ui
+    check: element_visible
+    params:
+      selector: .cart-drawer
+    description: 购物车抽屉可以打开
+
+  # 状态断言
+  - type: state
+    check: cart_drawer_open
+    params:
+      expected: false
+    description: 抽屉关闭后状态正确
+
+postconditions:
+  - 购物车抽屉已关闭
+  - 用户仍在会员中心页
+  - 购物车状态未变化
+
+testdata:
+  scenario_002:
+    h5BaseUrl: http://localhost:10086
+    member_page: /pages/member/index
+    menu_page: /pages/menu/index
+    product:
+      id: "product-001"
+      name: "威士忌可乐鸡尾酒"
+      price: 4800  # 48.00 元，单位：分
+      image: "/assets/products/whiskey-cola.jpg"

@@ -1,0 +1,6 @@
+scenario,store_id,sku_id_1,quantity_1,sku_id_2,quantity_2,expected_status,expected_reservation_status,description
+test1,00000000-0000-0000-0000-000000000099,80430c51-3fb0-4de6-be29-23bc24ac748b,2,,,201,RESERVED,single item order
+test2,00000000-0000-0000-0000-000000000099,80430c51-3fb0-4de6-be29-23bc24ac748b,2,550e8400-e29b-41d4-a716-446655440026,1,201,RESERVED,multiple items order
+test3,00000000-0000-0000-0000-000000000099,80430c51-3fb0-4de6-be29-23bc24ac748b,9999,,,409,FAILED,insufficient inventory
+test4,00000000-0000-0000-0000-000000000099,550e8400-e29b-41d4-a716-446655440026,1,,,201,RESERVED,small quantity order
+test5,00000000-0000-0000-0000-000000000099,80430c51-3fb0-4de6-be29-23bc24ac748b,5,550e8400-e29b-41d4-a716-446655440026,3,201,RESERVED,medium quantity order

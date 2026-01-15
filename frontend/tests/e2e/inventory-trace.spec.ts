@@ -111,7 +111,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
 
     // 查找交易记录
     const transactionRows = page.locator('[data-testid="transaction-row"]');
-    if (await transactionRows.count() > 0) {
+    if ((await transactionRows.count()) > 0) {
       const firstRow = transactionRows.first();
 
       // 验证交易记录信息
@@ -131,7 +131,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
 
     // 查找交易记录
     const transactionRows = page.locator('[data-testid="transaction-row"]');
-    if (await transactionRows.count() > 0) {
+    if ((await transactionRows.count()) > 0) {
       // 点击第一条交易记录
       await transactionRows.first().click();
 
@@ -156,7 +156,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
     // Then 系统更新显示对应时间段内的库存变动情况
 
     // 切换到交易历史标签
-    await page.click('[data-testid="tab-transactions']');
+    await page.click('[data-testid="tab-transactions"]');
 
     // 测试日期范围筛选
     const dateFilter = page.locator('[data-testid="date-range-filter"]');
@@ -189,10 +189,12 @@ test.describe('用户故事5: 库存追溯查询', () => {
     // 验证筛选结果
     await page.waitForTimeout(1000);
     const filteredRows = page.locator('[data-testid="transaction-row"]');
-    if (await filteredRows.count() > 0) {
+    if ((await filteredRows.count()) > 0) {
       // 验证筛选后的记录符合条件
       const firstRow = filteredRows.first();
-      const transactionType = await firstRow.locator('[data-testid="transaction-type"]').textContent();
+      const transactionType = await firstRow
+        .locator('[data-testid="transaction-type"]')
+        .textContent();
       expect(transactionType).toContain('入库');
     }
   });
@@ -219,7 +221,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
     // 验证热门商品TOP榜单
     await expect(page.locator('[data-testid="top-products-list"]')).toBeVisible();
     const topProducts = page.locator('[data-testid="top-product-item"]');
-    if (await topProducts.count() > 0) {
+    if ((await topProducts.count()) > 0) {
       await expect(topProducts.first().locator('[data-testid="product-rank"]')).toBeVisible();
       await expect(topProducts.first().locator('[data-testid="product-name"]')).toBeVisible();
       await expect(topProducts.first().locator('[data-testid="stock-quantity"]')).toBeVisible();
@@ -283,7 +285,7 @@ test.describe('用户故事5: 库存追溯查询', () => {
 
     // 验证警报列表
     const alertItems = page.locator('[data-testid="alert-item"]');
-    if (await alertItems.count() > 0) {
+    if ((await alertItems.count()) > 0) {
       const firstAlert = alertItems.first();
 
       // 验证警报信息

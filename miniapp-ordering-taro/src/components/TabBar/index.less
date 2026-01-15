@@ -1,0 +1,51 @@
+/**
+ * @spec O007-miniapp-menu-api
+ * 底部导航栏样式 - 深色主题
+ */
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background: rgba(24, 24, 27, 0.95);
+  backdrop-filter: blur(20rpx);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 40rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 24rpx;
+  transition: all 0.2s ease;
+
+  // 控制图标大小
+  .icon {
+    width: 36rpx !important;
+    height: 36rpx !important;
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.tab-text {
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #71717a;
+  margin-top: 4rpx;
+}
+
+.tab-text.active {
+  color: #f5a623;
+}

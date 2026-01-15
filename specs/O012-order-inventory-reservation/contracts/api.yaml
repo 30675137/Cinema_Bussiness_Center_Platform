@@ -1,0 +1,576 @@
+openapi: 3.0.3
+info:
+  title: O012 - 订单创建时库存预占 API
+  version: 1.0.0
+  description: |
+    订单创建时库存预占机制的API契约定义。
+    
+    **核心功能**:
+    - 下单时自动预占库存（集成到订单创建流程）
+    - 订单取消时自动释放预占
+    - 超时自动释放（定时任务）
+    - 预占记录审计查询
+    
+    **复用P005基础设施**:
+    - `InventoryReservationService.reserveInventory()`
+    - `InventoryReservationService.releaseReservation()`
+    - `BomExpansionService.expandBomBatch()`
+
+servers:
+  - url: https://ops.cfilmcloud.com/api/v1
+    description: 测试环境
+  - url: http://localhost:8080/api/v1
+    description: 本地开发环境
+
+tags:
+  - name: Order Inventory Reservation
+    description: 订单库存预占相关接口
+
+paths:
+  /orders:
+    post:
+      tags:
+        - Order Inventory Reservation
+      summary: 创建订单（集成库存预占）
+      description: |
+        创建饮品订单或场次预订订单，自动执行库存预占流程。
+        
+        **业务流程**:
+        1. 验证订单数据（门店ID、商品ID、数量等）
+        2. 调用 `InventoryReservationService.reserveInventory()` 预占库存
+        3. 创建订单记录
+        4. 更新预占记录的 `order_id`
+        5. 创建BOM快照
+        6. 返回订单创建结果（含预占状态）
+        
+        **库存预占逻辑（P005已实现）**:
+        - BOM展开：成品SKU → 原料SKU清单
+        - 行级锁：`SELECT FOR UPDATE` 防止并发超卖
+        - 原子操作：`reserved_qty += qty`, `available_qty -= qty`
+        - 事务保证：订单创建失败则预占自动回滚
+        
+        **错误处理**:
+        - 库存不足：返回 `ORD_BIZ_002` 错误码和缺货清单
+        - BOM缺失：返回 `ORD_BIZ_004` 错误码
+        - 门店未配置：返回 `ORD_BIZ_003` 错误码
+      operationId: createOrderWithReservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreationRequest'
+            examples:
+              beverageOrder:
+                summary: 饮品订单示例
+                value:
+                  storeId: "123e4567-e89b-12d3-a456-426614174000"
+                  customerId: "456e7890-e89b-12d3-a456-426614174001"
+                  items:
+                    - skuId: "789e0123-e89b-12d3-a456-426614174002"
+                      quantity: 2
+                      unit: "杯"
+                    - skuId: "012e3456-e89b-12d3-a456-426614174003"
+                      quantity: 1
+                      unit: "份"
+                  orderType: "BEVERAGE"
+                  channel: "MINIAPP"
+      responses:
+        '201':
+          description: 订单创建成功（库存预占成功）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreationResponse'
+              examples:
+                success:
+                  value:
+                    code: "0000"
+                    message: "订单创建成功"
+                    data:
+                      orderId: "abcd1234-e89b-12d3-a456-426614174004"
+                      orderNo: "ORD20260114123456"
+                      status: "PENDING_PAYMENT"
+                      totalAmount: 58.00
+                      reservationStatus: "RESERVED"
+                      reservedItems:
+                        - skuId: "789e0123-e89b-12d3-a456-426614174002"
+                          skuName: "拿铁咖啡"
+                          reservedQty: 2
+                          unit: "杯"
+                        - skuId: "012e3456-e89b-12d3-a456-426614174003"
+                          skuName: "芝士蛋糕"
+                          reservedQty: 1
+                          unit: "份"
+                      reservationExpiry: "2026-01-14T13:04:56Z"
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidParams:
+                  value:
+                    code: "ORD_BIZ_001"
+                    message: "订单参数验证失败"
+                    details:
+                      - field: "items[0].quantity"
+                        message: "商品数量必须大于0"
+        '409':
+          description: 库存不足（预占失败）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficientStock:
+                  value:
+                    code: "ORD_BIZ_002"
+                    message: "库存不足，无法完成下单"
+                    details:
+                      shortageItems:
+                        - skuId: "789e0123-e89b-12d3-a456-426614174002"
+                          skuName: "拿铁咖啡"
+                          requiredQty: 2
+                          availableQty: 1
+                          unit: "杯"
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{orderId}/cancel:
+    post:
+      tags:
+        - Order Inventory Reservation
+      summary: 取消订单（释放预占库存）
+      description: |
+        取消订单并自动释放已预占的库存。
+        
+        **业务流程**:
+        1. 验证订单状态（只能取消未支付或已支付未出品的订单）
+        2. 调用 `InventoryReservationService.releaseReservation(orderId)` 释放库存
+        3. 更新订单状态为 `CANCELLED`
+        4. 更新预占记录状态为 `CANCELLED`
+        
+        **释放逻辑（P005已实现）**:
+        - 查询订单的所有预占记录（`status = 'ACTIVE'`）
+        - 行级锁：`SELECT FOR UPDATE store_inventory`
+        - 原子操作：`reserved_qty -= qty`, `available_qty += qty`
+        - 更新预占记录：`status = 'CANCELLED'`, `cancelled_at = now()`
+      operationId: cancelOrderWithRelease
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "abcd1234-e89b-12d3-a456-426614174004"
+      responses:
+        '200':
+          description: 订单取消成功（库存已释放）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCancellationResponse'
+              examples:
+                success:
+                  value:
+                    code: "0000"
+                    message: "订单取消成功"
+                    data:
+                      orderId: "abcd1234-e89b-12d3-a456-426614174004"
+                      status: "CANCELLED"
+                      cancelledAt: "2026-01-14T12:45:00Z"
+                      releasedItems:
+                        - skuId: "789e0123-e89b-12d3-a456-426614174002"
+                          releasedQty: 2
+                          unit: "杯"
+        '400':
+          description: 订单状态不允许取消
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidStatus:
+                  value:
+                    code: "ORD_BIZ_005"
+                    message: "订单状态不允许取消"
+                    details:
+                      currentStatus: "FULFILLED"
+                      allowedStatuses: ["PENDING_PAYMENT", "PAID"]
+        '404':
+          description: 订单不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reservations:
+    get:
+      tags:
+        - Order Inventory Reservation
+      summary: 查询库存预占记录（审计）
+      description: |
+        查询指定条件的库存预占记录，用于审计和问题排查。
+        
+        **查询维度**:
+        - 按订单ID查询：获取某订单的所有预占记录
+        - 按门店ID查询：获取某门店的所有预占记录
+        - 按状态查询：获取特定状态的预占记录
+        - 按时间范围查询：获取某时间段内创建的预占记录
+        
+        **典型场景**:
+        - 订单详情页展示预占明细
+        - 库存管理后台审计预占记录
+        - 排查预占未释放问题
+      operationId: queryReservations
+      parameters:
+        - name: orderId
+          in: query
+          description: 订单ID（精确匹配）
+          schema:
+            type: string
+            format: uuid
+          example: "abcd1234-e89b-12d3-a456-426614174004"
+        - name: storeId
+          in: query
+          description: 门店ID（精确匹配）
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: 预占状态（精确匹配）
+          schema:
+            type: string
+            enum: [ACTIVE, CANCELLED, EXPIRED, FULFILLED]
+        - name: createdAfter
+          in: query
+          description: 创建时间起始（ISO 8601格式）
+          schema:
+            type: string
+            format: date-time
+          example: "2026-01-14T00:00:00Z"
+        - name: createdBefore
+          in: query
+          description: 创建时间截止（ISO 8601格式）
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: 页码（从1开始）
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页记录数
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationListResponse'
+              examples:
+                success:
+                  value:
+                    code: "0000"
+                    message: "查询成功"
+                    data:
+                      total: 5
+                      page: 1
+                      pageSize: 20
+                      items:
+                        - id: "res-001"
+                          orderId: "abcd1234-e89b-12d3-a456-426614174004"
+                          storeId: "123e4567-e89b-12d3-a456-426614174000"
+                          skuId: "789e0123-e89b-12d3-a456-426614174002"
+                          skuName: "拿铁咖啡"
+                          reservedQty: 2
+                          unit: "杯"
+                          status: "ACTIVE"
+                          createdAt: "2026-01-14T12:34:56Z"
+                          notes: null
+
+components:
+  schemas:
+    OrderCreationRequest:
+      type: object
+      required:
+        - storeId
+        - customerId
+        - items
+        - orderType
+      properties:
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        customerId:
+          type: string
+          format: uuid
+          description: 顾客ID
+        items:
+          type: array
+          description: 订单商品清单
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+          minItems: 1
+        orderType:
+          type: string
+          enum: [BEVERAGE, HALL_RESERVATION]
+          description: 订单类型（饮品订单 | 场次预订）
+        channel:
+          type: string
+          enum: [MINIAPP, WEB, POS]
+          description: 下单渠道
+          default: MINIAPP
+        notes:
+          type: string
+          description: 订单备注
+          maxLength: 500
+      example:
+        storeId: "123e4567-e89b-12d3-a456-426614174000"
+        customerId: "456e7890-e89b-12d3-a456-426614174001"
+        items:
+          - skuId: "789e0123-e89b-12d3-a456-426614174002"
+            quantity: 2
+            unit: "杯"
+        orderType: "BEVERAGE"
+        channel: "MINIAPP"
+
+    OrderItemRequest:
+      type: object
+      required:
+        - skuId
+        - quantity
+        - unit
+      properties:
+        skuId:
+          type: string
+          format: uuid
+          description: 商品SKU ID
+        quantity:
+          type: number
+          format: decimal
+          description: 商品数量
+          minimum: 0.001
+          example: 2
+        unit:
+          type: string
+          description: 商品单位
+          example: "杯"
+
+    OrderCreationResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 业务响应码
+          example: "0000"
+        message:
+          type: string
+          description: 响应消息
+          example: "订单创建成功"
+        data:
+          $ref: '#/components/schemas/OrderCreationData'
+
+    OrderCreationData:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: 订单ID
+        orderNo:
+          type: string
+          description: 订单号
+        status:
+          type: string
+          enum: [PENDING_PAYMENT, PAID, FULFILLED, CANCELLED]
+          description: 订单状态
+        totalAmount:
+          type: number
+          format: decimal
+          description: 订单金额
+        reservationStatus:
+          type: string
+          enum: [RESERVED, PARTIAL_RESERVED, FAILED]
+          description: 库存预占状态
+        reservedItems:
+          type: array
+          description: 已预占商品清单
+          items:
+            $ref: '#/components/schemas/ReservedItem'
+        reservationExpiry:
+          type: string
+          format: date-time
+          description: 预占过期时间（创建后30分钟）
+
+    ReservedItem:
+      type: object
+      properties:
+        skuId:
+          type: string
+          format: uuid
+        skuName:
+          type: string
+        reservedQty:
+          type: number
+          format: decimal
+        unit:
+          type: string
+
+    OrderCancellationResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0000"
+        message:
+          type: string
+          example: "订单取消成功"
+        data:
+          $ref: '#/components/schemas/OrderCancellationData'
+
+    OrderCancellationData:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [CANCELLED]
+        cancelledAt:
+          type: string
+          format: date-time
+        releasedItems:
+          type: array
+          description: 已释放库存清单
+          items:
+            $ref: '#/components/schemas/ReleasedItem'
+
+    ReleasedItem:
+      type: object
+      properties:
+        skuId:
+          type: string
+          format: uuid
+        releasedQty:
+          type: number
+          format: decimal
+        unit:
+          type: string
+
+    ReservationListResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/ReservationListData'
+
+    ReservationListData:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: 总记录数
+        page:
+          type: integer
+          description: 当前页码
+        pageSize:
+          type: integer
+          description: 每页记录数
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationDetail'
+
+    ReservationDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 预占记录ID
+        orderId:
+          type: string
+          format: uuid
+          description: 订单ID
+        storeId:
+          type: string
+          format: uuid
+          description: 门店ID
+        skuId:
+          type: string
+          format: uuid
+          description: SKU ID
+        skuName:
+          type: string
+          description: SKU名称
+        reservedQty:
+          type: number
+          format: decimal
+          description: 预占数量
+        unit:
+          type: string
+          description: 单位
+        status:
+          type: string
+          enum: [ACTIVE, CANCELLED, EXPIRED, FULFILLED]
+          description: 预占状态
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+        cancelledAt:
+          type: string
+          format: date-time
+          description: 取消时间
+        fulfilledAt:
+          type: string
+          format: date-time
+          description: 履约时间
+        notes:
+          type: string
+          description: 备注
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: 错误码
+          example: "ORD_BIZ_002"
+        message:
+          type: string
+          description: 错误消息
+          example: "库存不足，无法完成下单"
+        details:
+          type: object
+          description: 错误详情
+          additionalProperties: true
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

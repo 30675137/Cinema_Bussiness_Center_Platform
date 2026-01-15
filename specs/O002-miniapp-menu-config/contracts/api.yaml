@@ -1,0 +1,1015 @@
+openapi: 3.0.3
+info:
+  title: 小程序菜单分类配置 API
+  version: 1.0.0
+  description: |
+    **@spec O002-miniapp-menu-config**
+
+    小程序菜单分类的完整 CRUD API，整合原 `ChannelCategory` 枚举为动态可配置的分类系统。
+
+    **核心变更**:
+    - 新增 `menu_category` 表替代 `ChannelCategory` 枚举
+    - 商品表 `channel_product_config` 的 `channel_category` 字段改为外键 `category_id`
+    - 新增分类管理 API（B端）和分类列表 API（C端）
+
+    **API 分类**:
+    - **B端管理 API**: `/api/admin/menu-categories/*` - 管理员使用
+    - **C端查询 API**: `/api/client/menu-categories` - 小程序使用
+
+    **相关规格**:
+    - O007-miniapp-menu-api（商品列表 API）
+    - O005-channel-product-config（渠道商品配置）
+
+  contact:
+    name: Cinema Business Center Platform Team
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+  - url: https://api.cinema-platform.com
+    description: 生产环境
+
+tags:
+  - name: Admin - Menu Categories
+    description: 管理后台 - 菜单分类管理
+  - name: Client - Menu Categories
+    description: 小程序端 - 菜单分类查询
+
+# =============================================================================
+# B端管理 API
+# =============================================================================
+
+paths:
+  /api/admin/menu-categories:
+    get:
+      summary: 获取分类列表（管理后台）
+      description: |
+        获取所有菜单分类，包括隐藏的分类和关联商品数量。
+
+        **排序规则**: 按 `sortOrder` 升序排列
+
+        **权限要求**: 需要管理员登录
+      operationId: getAdminMenuCategories
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: includeHidden
+          in: query
+          description: 是否包含隐藏分类
+          required: false
+          schema:
+            type: boolean
+            default: true
+          example: true
+
+        - name: includeProductCount
+          in: query
+          description: 是否包含关联商品数量
+          required: false
+          schema:
+            type: boolean
+            default: true
+          example: true
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryListResponse'
+              examples:
+                success:
+                  summary: 成功返回分类列表
+                  value:
+                    success: true
+                    data:
+                      - id: "uuid-001"
+                        code: "ALCOHOL"
+                        displayName: "经典特调"
+                        sortOrder: 1
+                        isVisible: true
+                        isDefault: false
+                        iconUrl: "https://cdn.example.com/icons/alcohol.png"
+                        description: "鸡尾酒、威士忌、啤酒等"
+                        productCount: 15
+                        createdAt: "2026-01-01T10:00:00Z"
+                        updatedAt: "2026-01-03T08:30:00Z"
+                      - id: "uuid-002"
+                        code: "COFFEE"
+                        displayName: "精品咖啡"
+                        sortOrder: 2
+                        isVisible: true
+                        isDefault: false
+                        iconUrl: "https://cdn.example.com/icons/coffee.png"
+                        description: "拿铁、美式、卡布奇诺等"
+                        productCount: 20
+                        createdAt: "2026-01-01T10:00:00Z"
+                        updatedAt: "2026-01-01T10:00:00Z"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: 创建分类
+      description: |
+        创建新的菜单分类。
+
+        **业务规则**:
+        - `code` 必须唯一，格式为大写字母开头
+        - `displayName` 长度 1-50 字符
+        - 新分类默认排序值为当前最大值 + 1
+
+        **权限要求**: 需要管理员登录
+      operationId: createMenuCategory
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMenuCategoryRequest'
+            examples:
+              createCategory:
+                summary: 创建新分类
+                value:
+                  code: "SEASONAL"
+                  displayName: "季节限定"
+                  sortOrder: 3
+                  isVisible: true
+                  iconUrl: "https://cdn.example.com/icons/seasonal.png"
+                  description: "季节性特别推荐商品"
+
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryResponse'
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '409':
+          description: 分类编码已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateCode:
+                  summary: 编码重复
+                  value:
+                    success: false
+                    error: "CAT_DUP_001"
+                    message: "分类编码已存在: SEASONAL"
+                    details:
+                      code: "SEASONAL"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+  /api/admin/menu-categories/{id}:
+    get:
+      summary: 获取分类详情
+      operationId: getMenuCategoryById
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: 更新分类
+      description: |
+        更新菜单分类信息。
+
+        **业务规则**:
+        - 默认分类（`isDefault=true`）不可隐藏
+        - `code` 字段不可修改
+
+        **权限要求**: 需要管理员登录
+      operationId: updateMenuCategory
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMenuCategoryRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: 删除分类
+      description: |
+        删除菜单分类，关联商品自动迁移到默认分类。
+
+        **业务规则**:
+        - 默认分类（`isDefault=true`）不可删除
+        - 删除前需要确认（`confirm=true`）
+        - 关联商品自动迁移到"其他"分类
+        - 记录审计日志
+
+        **权限要求**: 需要管理员登录
+      operationId: deleteMenuCategory
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+        - name: confirm
+          in: query
+          description: 确认删除（必须为 true）
+          required: true
+          schema:
+            type: boolean
+          example: true
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteCategoryResponse'
+              examples:
+                deleteSuccess:
+                  summary: 删除成功
+                  value:
+                    success: true
+                    data:
+                      deletedCategoryId: "uuid-001"
+                      deletedCategoryName: "季节限定"
+                      affectedProductCount: 15
+                      targetCategoryId: "uuid-other"
+                      targetCategoryName: "其他商品"
+                    message: "分类已删除，15 个商品已迁移到"其他商品"分类"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+        '400':
+          description: 操作被拒绝
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                cannotDeleteDefault:
+                  summary: 不可删除默认分类
+                  value:
+                    success: false
+                    error: "CAT_BIZ_001"
+                    message: "默认分类不能删除"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+  /api/admin/menu-categories/batch-sort:
+    put:
+      summary: 批量更新排序
+      description: |
+        批量更新分类排序，用于拖拽排序功能。
+
+        **业务规则**:
+        - 请求中必须包含所有分类的排序值
+        - 排序值从 1 开始递增
+
+        **权限要求**: 需要管理员登录
+      operationId: batchUpdateSortOrder
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpdateSortOrderRequest'
+            examples:
+              batchSort:
+                summary: 批量更新排序
+                value:
+                  items:
+                    - id: "uuid-002"
+                      sortOrder: 1
+                    - id: "uuid-001"
+                      sortOrder: 2
+                    - id: "uuid-003"
+                      sortOrder: 3
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryListResponse'
+
+  /api/admin/menu-categories/{id}/visibility:
+    patch:
+      summary: 切换分类可见性
+      description: |
+        切换分类的可见性状态。
+
+        **业务规则**:
+        - 默认分类不可隐藏
+        - 隐藏分类后，小程序不显示该分类标签
+
+        **权限要求**: 需要管理员登录
+      operationId: toggleCategoryVisibility
+      tags:
+        - Admin - Menu Categories
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CategoryId'
+        - name: isVisible
+          in: query
+          description: 是否可见
+          required: true
+          schema:
+            type: boolean
+          example: false
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuCategoryResponse'
+        '400':
+          description: 业务规则错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                cannotHideDefault:
+                  summary: 不可隐藏默认分类
+                  value:
+                    success: false
+                    error: "CAT_BIZ_002"
+                    message: "默认分类不能隐藏"
+                    timestamp: "2026-01-03T10:00:00Z"
+
+# =============================================================================
+# C端小程序 API
+# =============================================================================
+
+  /api/client/menu-categories:
+    get:
+      summary: 获取分类列表（小程序）
+      description: |
+        获取所有可见的菜单分类，供小程序渲染分类标签栏。
+
+        **业务规则**:
+        - 仅返回 `isVisible=true` 的分类
+        - 按 `sortOrder` 升序排列
+        - 包含每个分类的商品数量
+
+        **缓存策略**:
+        - 建议客户端缓存 5 分钟（staleTime）
+        - 支持 1 分钟后台轮询刷新
+      operationId: getClientMenuCategories
+      tags:
+        - Client - Menu Categories
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientMenuCategoryListResponse'
+              examples:
+                success:
+                  summary: 成功返回可见分类
+                  value:
+                    success: true
+                    data:
+                      - id: "uuid-001"
+                        code: "ALCOHOL"
+                        displayName: "经典特调"
+                        iconUrl: "https://cdn.example.com/icons/alcohol.png"
+                        productCount: 15
+                      - id: "uuid-002"
+                        code: "COFFEE"
+                        displayName: "精品咖啡"
+                        iconUrl: "https://cdn.example.com/icons/coffee.png"
+                        productCount: 20
+                      - id: "uuid-003"
+                        code: "BEVERAGE"
+                        displayName: "经典饮品"
+                        iconUrl: "https://cdn.example.com/icons/beverage.png"
+                        productCount: 12
+                      - id: "uuid-004"
+                        code: "SNACK"
+                        displayName: "主厨小食"
+                        iconUrl: "https://cdn.example.com/icons/snack.png"
+                        productCount: 8
+                    timestamp: "2026-01-03T10:00:00Z"
+
+  /api/client/channel-products/mini-program:
+    get:
+      summary: 获取商品列表（支持分类筛选）
+      description: |
+        获取小程序商品列表，支持通过分类 ID 或分类编码筛选。
+
+        **变更说明** (O002 整合后):
+        - 新增 `categoryId` 参数（UUID，推荐使用）
+        - 保留 `category` 参数（枚举编码，向后兼容）
+        - 返回数据中包含 `category` 对象（嵌套分类信息）
+
+        **排序规则**:
+        - 推荐商品优先（`isRecommended=true`）
+        - 按 `sortOrder` 升序
+        - 按创建时间降序
+      operationId: getMiniProgramProducts
+      tags:
+        - Client - Menu Categories
+      parameters:
+        - name: categoryId
+          in: query
+          description: 分类 ID（UUID，推荐使用）
+          required: false
+          schema:
+            type: string
+            format: uuid
+          example: "uuid-002"
+
+        - name: category
+          in: query
+          description: |
+            分类编码（向后兼容，如 `COFFEE`）
+            建议使用 `categoryId` 替代
+          required: false
+          schema:
+            type: string
+          example: "COFFEE"
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+              examples:
+                success:
+                  summary: 按分类查询商品
+                  value:
+                    success: true
+                    data:
+                      - id: "cp-001"
+                        skuId: "sku-001"
+                        displayName: "美式咖啡"
+                        basePrice: 2500
+                        mainImage: "https://cdn.example.com/coffee.jpg"
+                        isRecommended: true
+                        sortOrder: 1
+                        status: "ACTIVE"
+                        stockStatus: "IN_STOCK"
+                        categoryId: "uuid-002"
+                        category:
+                          id: "uuid-002"
+                          code: "COFFEE"
+                          displayName: "精品咖啡"
+                    total: 20
+                    timestamp: "2026-01-03T10:00:00Z"
+
+# =============================================================================
+# 组件定义
+# =============================================================================
+
+components:
+  parameters:
+    CategoryId:
+      name: id
+      in: path
+      description: 分类 ID
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: "uuid-001"
+
+  schemas:
+    # =========================================================================
+    # 菜单分类 DTO
+    # =========================================================================
+
+    MenuCategoryDTO:
+      type: object
+      required:
+        - id
+        - code
+        - displayName
+        - sortOrder
+        - isVisible
+        - isDefault
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 分类 ID
+          example: "uuid-001"
+
+        code:
+          type: string
+          pattern: "^[A-Z][A-Z0-9_]*$"
+          minLength: 1
+          maxLength: 50
+          description: 分类编码（唯一，大写字母开头）
+          example: "ALCOHOL"
+
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 显示名称（中文）
+          example: "经典特调"
+
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序序号（数字越小越靠前）
+          example: 1
+
+        isVisible:
+          type: boolean
+          description: 是否可见
+          example: true
+
+        isDefault:
+          type: boolean
+          description: 是否为默认分类（不可删除）
+          example: false
+
+        iconUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 图标 URL
+          example: "https://cdn.example.com/icons/alcohol.png"
+
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 分类描述
+          example: "鸡尾酒、威士忌、啤酒等"
+
+        productCount:
+          type: integer
+          minimum: 0
+          description: 关联商品数量
+          example: 15
+
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2026-01-01T10:00:00Z"
+
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2026-01-03T08:30:00Z"
+
+    ClientMenuCategoryDTO:
+      type: object
+      description: 小程序端分类 DTO（精简版）
+      required:
+        - id
+        - code
+        - displayName
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 分类 ID
+          example: "uuid-001"
+
+        code:
+          type: string
+          description: 分类编码
+          example: "ALCOHOL"
+
+        displayName:
+          type: string
+          description: 显示名称
+          example: "经典特调"
+
+        iconUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 图标 URL
+          example: "https://cdn.example.com/icons/alcohol.png"
+
+        productCount:
+          type: integer
+          minimum: 0
+          description: 商品数量
+          example: 15
+
+    # =========================================================================
+    # 请求体
+    # =========================================================================
+
+    CreateMenuCategoryRequest:
+      type: object
+      required:
+        - code
+        - displayName
+      properties:
+        code:
+          type: string
+          pattern: "^[A-Z][A-Z0-9_]*$"
+          minLength: 1
+          maxLength: 50
+          description: 分类编码（唯一）
+          example: "SEASONAL"
+
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 显示名称
+          example: "季节限定"
+
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序序号（默认为最后）
+          example: 3
+
+        isVisible:
+          type: boolean
+          default: true
+          description: 是否可见
+          example: true
+
+        iconUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 图标 URL
+          example: "https://cdn.example.com/icons/seasonal.png"
+
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 分类描述
+          example: "季节性特别推荐商品"
+
+    UpdateMenuCategoryRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 显示名称
+          example: "精品咖啡"
+
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: 排序序号
+          example: 2
+
+        isVisible:
+          type: boolean
+          description: 是否可见
+          example: true
+
+        iconUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 图标 URL
+
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: 分类描述
+
+    BatchUpdateSortOrderRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - sortOrder
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: 分类 ID
+              sortOrder:
+                type: integer
+                minimum: 0
+                description: 新的排序序号
+
+    # =========================================================================
+    # 响应体
+    # =========================================================================
+
+    MenuCategoryResponse:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/MenuCategoryDTO'
+        timestamp:
+          type: string
+          format: date-time
+
+    MenuCategoryListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuCategoryDTO'
+        timestamp:
+          type: string
+          format: date-time
+
+    ClientMenuCategoryListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientMenuCategoryDTO'
+        timestamp:
+          type: string
+          format: date-time
+
+    DeleteCategoryResponse:
+      type: object
+      required:
+        - success
+        - data
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            deletedCategoryId:
+              type: string
+              format: uuid
+            deletedCategoryName:
+              type: string
+            affectedProductCount:
+              type: integer
+            targetCategoryId:
+              type: string
+              format: uuid
+            targetCategoryName:
+              type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ProductListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelProductDTO'
+        total:
+          type: integer
+          minimum: 0
+        timestamp:
+          type: string
+          format: date-time
+
+    ChannelProductDTO:
+      type: object
+      description: 渠道商品 DTO（整合分类信息）
+      properties:
+        id:
+          type: string
+          format: uuid
+        skuId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        basePrice:
+          type: integer
+          description: 价格（分）
+        mainImage:
+          type: string
+          format: uri
+          nullable: true
+        isRecommended:
+          type: boolean
+        sortOrder:
+          type: integer
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE]
+        stockStatus:
+          type: string
+          enum: [IN_STOCK, OUT_OF_STOCK, LOW_STOCK]
+        categoryId:
+          type: string
+          format: uuid
+          description: 分类 ID
+        category:
+          type: object
+          description: 分类信息（嵌套）
+          properties:
+            id:
+              type: string
+              format: uuid
+            code:
+              type: string
+            displayName:
+              type: string
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误代码
+        message:
+          type: string
+          description: 错误消息
+        details:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    Unauthorized:
+      description: 未授权
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized:
+              value:
+                success: false
+                error: "UNAUTHORIZED"
+                message: "请先登录"
+                timestamp: "2026-01-03T10:00:00Z"
+
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            notFound:
+              value:
+                success: false
+                error: "CAT_NTF_001"
+                message: "分类不存在"
+                timestamp: "2026-01-03T10:00:00Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer Token 认证
+
+security:
+  - BearerAuth: []
+
+x-additional-info:
+  spec-id: O002-miniapp-menu-config
+  integration-with: O007-miniapp-menu-api
+  migration-required: true
+  migration-steps:
+    - 创建 menu_category 表
+    - 插入初始分类数据
+    - 更新 channel_product_config.category_id 外键
+    - 部署新 API 端点
+    - 前端切换到新 API
+
+x-error-codes:
+  description: |
+    菜单分类模块错误码规范
+    格式: CAT_<类别>_<序号>
+
+  codes:
+    CAT_NTF_001:
+      httpStatus: 404
+      message: "分类不存在"
+      description: "请求的分类 ID 在数据库中未找到"
+
+    CAT_DUP_001:
+      httpStatus: 409
+      message: "分类编码已存在"
+      description: "创建分类时 code 字段重复"
+
+    CAT_VAL_001:
+      httpStatus: 400
+      message: "分类编码格式错误"
+      description: "code 必须以大写字母开头，只能包含大写字母、数字和下划线"
+
+    CAT_BIZ_001:
+      httpStatus: 400
+      message: "默认分类不能删除"
+      description: "isDefault=true 的分类不允许删除操作"
+
+    CAT_BIZ_002:
+      httpStatus: 400
+      message: "默认分类不能隐藏"
+      description: "isDefault=true 的分类不允许设置 isVisible=false"

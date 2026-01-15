@@ -1,0 +1,222 @@
+/**
+ * @spec O010-shopping-cart
+ * 购物车抽屉样式
+ */
+
+/* 遮罩层 */
+.cart-drawer-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8); /* bg-black/80 */
+  backdrop-filter: blur(16rpx); /* backdrop-blur-md */
+  z-index: 999;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* 抽屉主体 */
+.cart-drawer {
+  width: 100%;
+  height: 90vh;
+  background-color: #18181b; /* zinc-900 */
+  border-radius: 40rpx 40rpx 0 0; /* rounded-t-[2.5rem] */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 标题栏 */
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 48rpx 32rpx 32rpx; /* 24px 16px 16px */
+  border-bottom: 2rpx solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-size: 48rpx; /* text-2xl */
+  font-weight: 900; /* font-black */
+  color: #ffffff;
+  line-height: 1;
+}
+
+.close-button {
+  width: 64rpx; /* 32px */
+  height: 64rpx;
+  background-color: #27272a; /* zinc-800 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.9);
+    background-color: #3f3f46; /* zinc-700 */
+  }
+}
+
+.close-icon {
+  font-size: 32rpx; /* 16px */
+  color: #a1a1aa; /* zinc-400 */
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* 商品列表区域（可滚动） */
+.product-list {
+  flex: 1;
+  padding: 24rpx 20rpx; /* 减小左右内边距，给控制器留出更多空间 */
+  overflow-y: auto;
+}
+
+/* 商品项 */
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0; /* 减小垂直间距：10px */
+  border-bottom: 2rpx solid rgba(255, 255, 255, 0.05);
+  gap: 10rpx; /* 再次减小间距，给控制器更多空间 */
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.item-image {
+  width: 88rpx; /* 进一步减小图片：44px */
+  height: 88rpx;
+  border-radius: 12rpx; /* 6px */
+  background-color: #27272a; /* zinc-800 */
+  flex-shrink: 0;
+}
+
+.item-info {
+  flex: 1;
+  max-width: 50%;      /* 最多占一半 */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.item-name {
+  font-size: 28rpx; /* 14px */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
+  /* 最多显示2行 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-options {
+  font-size: 22rpx; /* 11px - text-xs */
+  color: #71717a; /* zinc-500 */
+  line-height: 1.3;
+}
+
+.item-price {
+  font-size: 28rpx; /* 14px */
+  font-weight: 600;
+  color: #f59e0b; /* amber-500 */
+}
+
+.item-controller {
+  flex-shrink: 0;
+   margin-left: auto;   /* 推到右边 */
+   margin-right: 24rpx; /* 距离右边缘 16rpx */
+}
+
+/* 空购物车状态 */
+.empty-cart {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24rpx; /* 12px */
+}
+
+.empty-icon {
+  font-size: 128rpx; /* 64px */
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: 32rpx; /* 16px */
+  color: #71717a; /* zinc-500 */
+  font-weight: 500;
+}
+
+/* 结算区域 */
+.checkout-section {
+  padding: 32rpx; /* 16px */
+  border-top: 2rpx solid rgba(255, 255, 255, 0.05);
+  background-color: #18181b; /* zinc-900 */
+  flex-shrink: 0;
+}
+
+.subtotal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx; /* 8px */
+}
+
+.subtotal-label {
+  font-size: 22rpx; /* text-xs */
+  color: #71717a; /* zinc-500 */
+}
+
+.subtotal-amount {
+  font-size: 22rpx;
+  color: #71717a;
+}
+
+.total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32rpx; /* 16px */
+}
+
+.total-label {
+  font-size: 28rpx; /* 14px */
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.total-amount {
+  font-size: 56rpx; /* text-3xl */
+  font-weight: 900; /* font-black */
+  color: #f59e0b; /* amber-500 */
+}
+
+.pay-button {
+  width: 100%;
+  height: 100rpx; /* py-5 */
+  background-color: #f59e0b; /* amber-500 */
+  border-radius: 24rpx; /* rounded-[1.5rem] */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background-color: #d97706; /* amber-600 */
+  }
+}
+
+.pay-button-text {
+  font-size: 32rpx; /* 16px */
+  font-weight: 900; /* font-black */
+  color: #18181b; /* zinc-950 */
+}

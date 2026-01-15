@@ -1,0 +1,149 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cinema.com/schemas/orchestrator-config.schema.json",
+  "title": "RunConfig",
+  "description": "E2E 测试编排器运行配置",
+  "type": "object",
+  "required": [
+    "run_id",
+    "environment",
+    "base_urls",
+    "workers",
+    "retries",
+    "timeout",
+    "project",
+    "selected_scenarios",
+    "skip_flags",
+    "artifacts",
+    "output_dir"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{8}-\\d{6}-[a-f0-9]{8}$",
+      "description": "唯一运行 ID（格式：YYYYMMDD-HHMMSS-uuid）",
+      "examples": ["20251230-143052-a3f8b921"]
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["dev", "staging", "prod"],
+      "description": "测试环境"
+    },
+    "base_urls": {
+      "type": "object",
+      "required": ["c-end", "b-end"],
+      "properties": {
+        "c-end": {
+          "type": "string",
+          "format": "uri",
+          "description": "C端 baseURL"
+        },
+        "b-end": {
+          "type": "string",
+          "format": "uri",
+          "description": "B端 baseURL"
+        }
+      }
+    },
+    "workers": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "并行 worker 数量"
+    },
+    "retries": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 3,
+      "description": "失败重试次数"
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 1000,
+      "description": "测试超时时间（毫秒）"
+    },
+    "project": {
+      "type": "string",
+      "const": "chromium",
+      "description": "浏览器项目（固定为 chromium）"
+    },
+    "selected_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scenario_id", "file_path"],
+        "properties": {
+          "scenario_id": {
+            "type": "string",
+            "pattern": "^E2E-[A-Z]+-\\d{3}$",
+            "description": "场景 ID"
+          },
+          "file_path": {
+            "type": "string",
+            "description": "场景 YAML 文件路径"
+          }
+        }
+      },
+      "minItems": 1,
+      "description": "选中的场景列表"
+    },
+    "skip_flags": {
+      "type": "object",
+      "required": [
+        "scenario_validation",
+        "data_validation",
+        "generation",
+        "report_config",
+        "artifacts_config"
+      ],
+      "properties": {
+        "scenario_validation": {
+          "type": "boolean",
+          "description": "是否跳过场景验证"
+        },
+        "data_validation": {
+          "type": "boolean",
+          "description": "是否跳过数据验证"
+        },
+        "generation": {
+          "type": "boolean",
+          "description": "是否跳过测试生成"
+        },
+        "report_config": {
+          "type": "boolean",
+          "description": "是否跳过报告配置"
+        },
+        "artifacts_config": {
+          "type": "boolean",
+          "description": "是否跳过工件配置"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": ["trace", "video", "screenshot"],
+      "properties": {
+        "trace": {
+          "type": "string",
+          "enum": ["on-failure", "always", "off"],
+          "description": "Trace 捕获策略"
+        },
+        "video": {
+          "type": "string",
+          "enum": ["on-failure", "always", "off"],
+          "description": "视频录制策略"
+        },
+        "screenshot": {
+          "type": "string",
+          "enum": ["on-failure", "always", "off"],
+          "description": "截图策略"
+        }
+      }
+    },
+    "output_dir": {
+      "type": "string",
+      "description": "输出目录路径",
+      "examples": ["test-results/run-20251230-143052-a3f8b921"]
+    }
+  }
+}

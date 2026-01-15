@@ -55,8 +55,16 @@ export const useAppStore = create<AppStore>()(
         config: {
           apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
           uploadUrl: import.meta.env.VITE_UPLOAD_URL || 'http://localhost:8080/api/v1/upload',
-          maxFileSize: import.meta.env.VITE_MAX_FILE_SIZE ? parseInt(import.meta.env.VITE_MAX_FILE_SIZE) : 10 * 1024 * 1024, // 10MB
-          supportedImageFormats: import.meta.env.VITE_SUPPORTED_IMAGE_FORMATS?.split(',') || ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+          maxFileSize: import.meta.env.VITE_MAX_FILE_SIZE
+            ? parseInt(import.meta.env.VITE_MAX_FILE_SIZE)
+            : 10 * 1024 * 1024, // 10MB
+          supportedImageFormats: import.meta.env.VITE_SUPPORTED_IMAGE_FORMATS?.split(',') || [
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+            'webp',
+          ],
         },
 
         // User actions
@@ -188,7 +196,11 @@ export const useUserLoading = () => useAppStore((state) => state.user.loading);
 export const useSidebarCollapsed = () => useAppStore((state) => state.ui.sidebarCollapsed);
 export const useTheme = () => useAppStore((state) => state.ui.theme);
 export const useLocale = () => useAppStore((state) => state.ui.locale);
-export const useBreadcrumbs = () => useAppStore((state) => state.ui.breadcrumbs);
+export const useBreadcrumbs = () => {
+  const breadcrumbs = useAppStore((state) => state.ui.breadcrumbs);
+  // 确保始终返回数组，避免 undefined 错误
+  return Array.isArray(breadcrumbs) ? breadcrumbs : [];
+};
 export const useGlobalLoading = () => useAppStore((state) => state.ui.loading);
 
 export const useApiConfig = () => useAppStore((state) => state.config);
@@ -196,20 +208,18 @@ export const useApiConfig = () => useAppStore((state) => state.config);
 // 权限检查函数
 export const useHasPermission = (permissionCode: string) => {
   const permissions = useUserPermissions();
-  return permissions.some(permission => permission.code === permissionCode);
+  return permissions.some((permission) => permission.code === permissionCode);
 };
 
 export const useHasAnyPermission = (permissionCodes: string[]) => {
   const permissions = useUserPermissions();
-  return permissionCodes.some(code =>
-    permissions.some(permission => permission.code === code)
-  );
+  return permissionCodes.some((code) => permissions.some((permission) => permission.code === code));
 };
 
 export const useHasAllPermissions = (permissionCodes: string[]) => {
   const permissions = useUserPermissions();
-  return permissionCodes.every(code =>
-    permissions.some(permission => permission.code === code)
+  return permissionCodes.every((code) =>
+    permissions.some((permission) => permission.code === code)
   );
 };
 

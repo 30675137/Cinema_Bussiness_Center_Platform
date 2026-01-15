@@ -1,0 +1,118 @@
+/**
+ * Profile 页面样式
+ */
+.profile-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 用户信息区域 */
+.user-section {
+  display: flex;
+  align-items: center;
+  padding: 40px 32px;
+  background: linear-gradient(135deg, #ff2e4d 0%, #ff6b6b 100%);
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    flex: 1;
+    margin-left: 24px;
+
+    .nickname {
+      font-size: 36px;
+      font-weight: 600;
+      color: #fff;
+      display: block;
+    }
+
+    .login-hint {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 8px;
+      display: block;
+    }
+  }
+
+  .arrow {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* 功能菜单区域 */
+.menu-section {
+  background-color: #fff;
+  margin: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px 24px;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:active {
+      background-color: #f5f5f5;
+    }
+
+    .menu-left {
+      display: flex;
+      align-items: center;
+
+      .menu-icon {
+        font-size: 40px;
+        margin-right: 20px;
+      }
+
+      .menu-title {
+        font-size: 30px;
+        color: #333;
+      }
+
+      .badge {
+        margin-left: 12px;
+        background-color: #ff2e4d;
+        border-radius: 20px;
+        padding: 4px 12px;
+        min-width: 36px;
+        text-align: center;
+
+        .badge-text {
+          font-size: 22px;
+          color: #fff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .menu-arrow {
+      font-size: 36px;
+      color: #ccc;
+    }
+  }
+}
+
+/* 版本信息 */
+.version-info {
+  text-align: center;
+  padding: 48px 0;
+
+  .version-text {
+    font-size: 24px;
+    color: #999;
+  }
+}

@@ -11,7 +11,7 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
@@ -25,12 +25,14 @@
       "@/features/*": ["src/features/*"],
       "@/stores/*": ["src/stores/*"],
       "@/services/*": ["src/services/*"],
+      "@/services/mock/*": ["src/services/mock/*"],
       "@/types/*": ["src/types/*"],
       "@/utils/*": ["src/utils/*"],
       "@/constants/*": ["src/constants/*"],
       "@/monitoring/*": ["src/monitoring/*"],
       "@/optimization/*": ["src/optimization/*"],
-      "@/hooks/*": ["src/hooks/*"]
+      "@/hooks/*": ["src/hooks/*"],
+      "@/mocks/*": ["src/mocks/*"]
     },
 
     /* Linting */
@@ -40,5 +42,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/__tests__/**", "src/test/**"]
 }

@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { inventoryService } from '@/services/inventoryService';
-import {
+import inventoryService from '@/services/inventoryService';
+import type {
   InventoryTransaction,
   InventoryQueryParams,
   InventoryStatistics,
@@ -17,7 +17,7 @@ import {
   InventoryStatus,
   TransactionType,
   SourceType,
-  InventoryTraceState
+  InventoryTraceState,
 } from '@/types/inventory';
 
 // 库存列表状态接口
@@ -99,7 +99,31 @@ interface InventoryStore extends InventoryListState, InventoryDetailState, Inven
 }
 
 // 初始状态
-const initialState: Omit<InventoryStore, 'setFilters' | 'clearFilters' | 'setSelectedTransactionIds' | 'setSelectedSKUs' | 'setSelectedStores' | 'clearSelection' | 'setPagination' | 'setAlerts' | 'setSelectedTransaction' | 'setSelectedInventory' | 'setBatchInfo' | 'setTransferHistory' | 'setActionLoading' | 'setBatchActionLoading' | 'setExportLoading' | 'setImportLoading' | 'setSyncLoading' | 'setLastAction' | 'setActionError' | 'reset' | 'resetDetail' | 'resetAction'> = {
+const initialState: Omit<
+  InventoryStore,
+  | 'setFilters'
+  | 'clearFilters'
+  | 'setSelectedTransactionIds'
+  | 'setSelectedSKUs'
+  | 'setSelectedStores'
+  | 'clearSelection'
+  | 'setPagination'
+  | 'setAlerts'
+  | 'setSelectedTransaction'
+  | 'setSelectedInventory'
+  | 'setBatchInfo'
+  | 'setTransferHistory'
+  | 'setActionLoading'
+  | 'setBatchActionLoading'
+  | 'setExportLoading'
+  | 'setImportLoading'
+  | 'setSyncLoading'
+  | 'setLastAction'
+  | 'setActionError'
+  | 'reset'
+  | 'resetDetail'
+  | 'resetAction'
+> = {
   transactions: [],
   currentInventory: [],
   loading: false,
@@ -108,12 +132,12 @@ const initialState: Omit<InventoryStore, 'setFilters' | 'clearFilters' | 'setSel
     page: 1,
     pageSize: 20,
     sortBy: 'transactionTime',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   },
   pagination: {
     current: 1,
     pageSize: 20,
-    total: 0
+    total: 0,
   },
   selectedTransactionIds: [],
   selectedSKUs: [],
@@ -132,7 +156,7 @@ const initialState: Omit<InventoryStore, 'setFilters' | 'clearFilters' | 'setSel
   importLoading: false,
   syncLoading: false,
   lastAction: null,
-  actionError: null
+  actionError: null,
 };
 
 // 创建库存存储
@@ -155,7 +179,7 @@ export const useInventoryStore = create<InventoryStore>()(
               page: 1,
               pageSize: 20,
               sortBy: 'transactionTime',
-              sortOrder: 'desc'
+              sortOrder: 'desc',
             };
             state.pagination.current = 1;
           }),
@@ -273,7 +297,7 @@ export const useInventoryStore = create<InventoryStore>()(
             state.syncLoading = false;
             state.lastAction = null;
             state.actionError = null;
-          })
+          }),
       })),
       {
         name: 'inventory-store',
@@ -281,12 +305,12 @@ export const useInventoryStore = create<InventoryStore>()(
           filters: state.filters,
           pagination: state.pagination,
           selectedSKUs: state.selectedSKUs,
-          selectedStores: state.selectedStores
-        })
+          selectedStores: state.selectedStores,
+        }),
       }
     ),
     {
-      name: 'inventory-store'
+      name: 'inventory-store',
     }
   )
 );
@@ -303,7 +327,7 @@ export const useInventoryTransactionsQuery = (params?: InventoryQueryParams) => 
       setPagination({
         current: data.pagination.current,
         pageSize: data.pagination.pageSize,
-        total: data.pagination.total
+        total: data.pagination.total,
       });
     },
     staleTime: 2 * 60 * 1000, // 2分钟
@@ -327,7 +351,7 @@ export const useCurrentInventoryQuery = (params?: {
       setPagination({
         current: data.pagination.current,
         pageSize: data.pagination.pageSize,
-        total: data.pagination.total
+        total: data.pagination.total,
       });
     },
     staleTime: 5 * 60 * 1000, // 5分钟
@@ -471,7 +495,7 @@ export const useCreateInventoryTransactionMutation = () => {
         type: 'create_transaction',
         timestamp: new Date().toISOString(),
         success: true,
-        message: `库存交易记录创建成功`
+        message: `库存交易记录创建成功`,
       });
       queryClient.invalidateQueries({ queryKey: ['inventory-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['current-inventory'] });
@@ -483,7 +507,7 @@ export const useCreateInventoryTransactionMutation = () => {
         type: 'create_transaction',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `创建失败: ${error.message}`
+        message: `创建失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -508,7 +532,7 @@ export const useBatchCreateInventoryTransactionsMutation = () => {
         type: 'batch_create_transactions',
         timestamp: new Date().toISOString(),
         success: true,
-        message: `批量创建完成: 成功${data.success}条，失败${data.failed}条`
+        message: `批量创建完成: 成功${data.success}条，失败${data.failed}条`,
       });
       queryClient.invalidateQueries({ queryKey: ['inventory-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['current-inventory'] });
@@ -519,7 +543,7 @@ export const useBatchCreateInventoryTransactionsMutation = () => {
         type: 'batch_create_transactions',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `批量创建失败: ${error.message}`
+        message: `批量创建失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -544,7 +568,7 @@ export const useUpdateInventoryMutation = () => {
         type: 'update_inventory',
         timestamp: new Date().toISOString(),
         success: true,
-        message: '库存信息更新成功'
+        message: '库存信息更新成功',
       });
       queryClient.invalidateQueries({ queryKey: ['current-inventory'] });
       queryClient.invalidateQueries({ queryKey: ['single-inventory'] });
@@ -555,7 +579,7 @@ export const useUpdateInventoryMutation = () => {
         type: 'update_inventory',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `更新失败: ${error.message}`
+        message: `更新失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -569,8 +593,12 @@ export const useCreateInventoryTransferMutation = () => {
   const { setActionLoading, setActionError, setLastAction } = useInventoryStore();
 
   return useMutation({
-    mutationFn: (data: Omit<InventoryTransfer, 'id' | 'transferNumber' | 'createdAt' | 'updatedAt' | 'requestedAt' | 'status'>) =>
-      inventoryService.createInventoryTransfer(data),
+    mutationFn: (
+      data: Omit<
+        InventoryTransfer,
+        'id' | 'transferNumber' | 'createdAt' | 'updatedAt' | 'requestedAt' | 'status'
+      >
+    ) => inventoryService.createInventoryTransfer(data),
     onMutate: () => {
       setActionLoading(true);
       setActionError(null);
@@ -580,7 +608,7 @@ export const useCreateInventoryTransferMutation = () => {
         type: 'create_transfer',
         timestamp: new Date().toISOString(),
         success: true,
-        message: '库存转移单创建成功'
+        message: '库存转移单创建成功',
       });
       queryClient.invalidateQueries({ queryKey: ['inventory-transfers'] });
       queryClient.invalidateQueries({ queryKey: ['inventory-transactions'] });
@@ -591,7 +619,7 @@ export const useCreateInventoryTransferMutation = () => {
         type: 'create_transfer',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `创建转移单失败: ${error.message}`
+        message: `创建转移单失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -604,11 +632,8 @@ export const useExportInventoryMutation = () => {
   const { setExportLoading, setActionError, setLastAction } = useInventoryStore();
 
   return useMutation({
-    mutationFn: (params: {
-      format: 'excel' | 'csv';
-      reportType: string;
-      filters?: any;
-    }) => inventoryService.exportInventoryData(params),
+    mutationFn: (params: { format: 'excel' | 'csv'; reportType: string; filters?: any }) =>
+      inventoryService.exportInventoryData(params),
     onMutate: () => {
       setExportLoading(true);
       setActionError(null);
@@ -618,13 +643,14 @@ export const useExportInventoryMutation = () => {
         type: 'export_inventory',
         timestamp: new Date().toISOString(),
         success: true,
-        message: `库存数据导出成功 (${variables.format.toUpperCase()}格式)`
+        message: `库存数据导出成功 (${variables.format.toUpperCase()}格式)`,
       });
       // 处理文件下载
       const blob = new Blob([_ as any], {
-        type: variables.format === 'excel'
-          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          : 'text/csv'
+        type:
+          variables.format === 'excel'
+            ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            : 'text/csv',
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -641,7 +667,7 @@ export const useExportInventoryMutation = () => {
         type: 'export_inventory',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `导出失败: ${error.message}`
+        message: `导出失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -666,7 +692,7 @@ export const useImportInventoryMutation = () => {
         type: 'import_inventory',
         timestamp: new Date().toISOString(),
         success: true,
-        message: `导入完成: 成功${data.imported}条，失败${data.failed}条`
+        message: `导入完成: 成功${data.imported}条，失败${data.failed}条`,
       });
       queryClient.invalidateQueries({ queryKey: ['inventory-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['current-inventory'] });
@@ -677,7 +703,7 @@ export const useImportInventoryMutation = () => {
         type: 'import_inventory',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `导入失败: ${error.message}`
+        message: `导入失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -691,11 +717,8 @@ export const useSyncInventoryMutation = () => {
   const { setSyncLoading, setActionError, setLastAction } = useInventoryStore();
 
   return useMutation({
-    mutationFn: (params: {
-      sourceSystem: string;
-      syncType: string;
-      storeIds?: string[];
-    }) => inventoryService.syncInventoryData(params),
+    mutationFn: (params: { sourceSystem: string; syncType: string; storeIds?: string[] }) =>
+      inventoryService.syncInventoryData(params),
     onMutate: () => {
       setSyncLoading(true);
       setActionError(null);
@@ -705,7 +728,7 @@ export const useSyncInventoryMutation = () => {
         type: 'sync_inventory',
         timestamp: new Date().toISOString(),
         success: true,
-        message: `库存同步已启动 (ID: ${data.syncId})`
+        message: `库存同步已启动 (ID: ${data.syncId})`,
       });
     },
     onError: (error: Error) => {
@@ -714,7 +737,7 @@ export const useSyncInventoryMutation = () => {
         type: 'sync_inventory',
         timestamp: new Date().toISOString(),
         success: false,
-        message: `同步失败: ${error.message}`
+        message: `同步失败: ${error.message}`,
       });
     },
     onSettled: () => {
@@ -729,7 +752,7 @@ export const useInventorySelectors = () => {
 
   return {
     // 过滤后的交易记录
-    filteredTransactions: store.transactions.filter(transaction => {
+    filteredTransactions: store.transactions.filter((transaction) => {
       const filters = store.filters;
 
       if (filters.transactionType && filters.transactionType.length > 0) {
@@ -753,10 +776,12 @@ export const useInventorySelectors = () => {
 
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
-        if (!transaction.sku.skuCode.toLowerCase().includes(keyword) &&
-            !transaction.sku.name.toLowerCase().includes(keyword) &&
-            !transaction.store.code.toLowerCase().includes(keyword) &&
-            !transaction.store.name.toLowerCase().includes(keyword)) {
+        if (
+          !transaction.sku.skuCode.toLowerCase().includes(keyword) &&
+          !transaction.sku.name.toLowerCase().includes(keyword) &&
+          !transaction.store.code.toLowerCase().includes(keyword) &&
+          !transaction.store.name.toLowerCase().includes(keyword)
+        ) {
           return false;
         }
       }
@@ -765,54 +790,56 @@ export const useInventorySelectors = () => {
     }),
 
     // 选中的交易记录
-    selectedTransactions: store.transactions.filter(transaction =>
+    selectedTransactions: store.transactions.filter((transaction) =>
       store.selectedTransactionIds.includes(transaction.id)
     ),
 
     // 低库存警报
-    lowStockAlerts: store.alerts.filter(alert =>
-      alert.alertType === 'low_stock' && alert.isEnabled
+    lowStockAlerts: store.alerts.filter(
+      (alert) => alert.alertType === 'low_stock' && alert.isEnabled
     ),
 
     // 过期库存警报
-    expiringSoonAlerts: store.alerts.filter(alert =>
-      alert.alertType === 'expiring_soon' && alert.isEnabled
+    expiringSoonAlerts: store.alerts.filter(
+      (alert) => alert.alertType === 'expiring_soon' && alert.isEnabled
     ),
 
     // 高优先级警报
-    highPriorityAlerts: store.alerts.filter(alert =>
-      alert.isEnabled && ['low_stock', 'out_of_stock'].includes(alert.alertType)
+    highPriorityAlerts: store.alerts.filter(
+      (alert) => alert.isEnabled && ['low_stock', 'out_of_stock'].includes(alert.alertType)
     ),
 
     // 库存总价值
-    totalInventoryValue: store.currentInventory.reduce((sum, inventory) =>
-      sum + (inventory.totalValue || 0), 0
+    totalInventoryValue: store.currentInventory.reduce(
+      (sum, inventory) => sum + (inventory.totalValue || 0),
+      0
     ),
 
     // 总可用库存
-    totalAvailableQuantity: store.currentInventory.reduce((sum, inventory) =>
-      sum + inventory.availableQty, 0
+    totalAvailableQuantity: store.currentInventory.reduce(
+      (sum, inventory) => sum + inventory.availableQty,
+      0
     ),
 
     // 低库存商品数量
-    lowStockItemsCount: store.currentInventory.filter(inventory =>
-      inventory.availableQty <= inventory.reorderPoint
+    lowStockItemsCount: store.currentInventory.filter(
+      (inventory) => inventory.availableQty <= inventory.reorderPoint
     ).length,
 
     // 缺货商品数量
-    outOfStockItemsCount: store.currentInventory.filter(inventory =>
-      inventory.availableQty === 0
-    ).length,
+    outOfStockItemsCount: store.currentInventory.filter((inventory) => inventory.availableQty === 0)
+      .length,
 
     // 活跃转移单数量
-    activeTransfersCount: store.transferHistory.filter(transfer =>
+    activeTransfersCount: store.transferHistory.filter((transfer) =>
       ['pending', 'in_transit'].includes(transfer.status)
     ).length,
 
     // 是否有选中的记录
-    hasSelection: store.selectedTransactionIds.length > 0 ||
-                  store.selectedSKUs.length > 0 ||
-                  store.selectedStores.length > 0,
+    hasSelection:
+      store.selectedTransactionIds.length > 0 ||
+      store.selectedSKUs.length > 0 ||
+      store.selectedStores.length > 0,
 
     // 当前页的交易记录
     currentPageTransactions: store.transactions.slice(
@@ -821,7 +848,7 @@ export const useInventorySelectors = () => {
     ),
 
     // 最近7天的交易数量
-    recentTransactionsCount: store.transactions.filter(transaction => {
+    recentTransactionsCount: store.transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.transactionTime);
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -829,10 +856,10 @@ export const useInventorySelectors = () => {
     }).length,
 
     // 今日交易数量
-    todayTransactionsCount: store.transactions.filter(transaction => {
+    todayTransactionsCount: store.transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.transactionTime);
       const today = new Date();
       return transactionDate.toDateString() === today.toDateString();
-    }).length
+    }).length,
   };
 };

@@ -1,0 +1,85 @@
+# E2E Scenario: 库存调整审批流程
+# Generated for e2e-admin testing
+# Date: 2025-12-30
+
+scenario_id: E2E-INVENTORY-003
+spec_ref: P005
+title: 库存调整审批流程
+description: 验证管理员提交库存调整单后，需要审批流程才能生效
+
+tags:
+  module:
+    - inventory
+  channel:
+    - web
+  deploy:
+    - saas
+  priority: p1
+  smoke: true
+
+preconditions:
+  role: admin
+
+steps:
+  - action: login
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.admin_user
+    description: 管理员登录 B端系统
+
+  - action: navigate
+    system: b-end
+    params:
+      path: /inventory/adjustment
+    description: 导航到库存调整页面
+
+  - action: create_adjustment
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.adjustment_data
+    description: 创建库存调整单（盘盈 +50）
+
+  - action: submit_for_approval
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.adjustment_data
+    description: 提交审批
+
+  - action: approve_adjustment
+    system: b-end
+    params:
+      testdata_ref: inventoryTestData.approver_user
+    description: 审批通过
+
+assertions:
+  - type: ui
+    check: element_visible
+    params:
+      selector: .success-message
+      text: "审批成功"
+    timeout: 5000
+
+  - type: api
+    check: response_status_is
+    params:
+      endpoint: /api/inventory/adjustment
+      expected: 200
+    timeout: 3000
+
+  - type: api
+    check: database_field_equals
+    params:
+      table: inventory_adjustments
+      field: status
+      expected: "approved"
+    timeout: 3000
+
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: on-failure
+
+metadata:
+  created_at: "2025-12-30T10:00:00Z"
+  created_by: e2e-admin-skill
+  version: "1.0.0"

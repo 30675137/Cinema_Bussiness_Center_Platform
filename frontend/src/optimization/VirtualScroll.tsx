@@ -57,12 +57,15 @@ const VirtualScroll = <T,>({
   const [itemHeights, setItemHeights] = useState<Map<number, number>>(new Map());
 
   // 动态高度计算
-  const getItemHeightCalculated = useCallback((index: number): number => {
-    if (getItemHeight) {
-      return itemHeights.get(index) || getItemHeight(index) || estimatedItemHeight;
-    }
-    return itemHeight;
-  }, [getItemHeight, itemHeight, estimatedItemHeight, itemHeights]);
+  const getItemHeightCalculated = useCallback(
+    (index: number): number => {
+      if (getItemHeight) {
+        return itemHeights.get(index) || getItemHeight(index) || estimatedItemHeight;
+      }
+      return itemHeight;
+    },
+    [getItemHeight, itemHeight, estimatedItemHeight, itemHeights]
+  );
 
   // 计算可见范围
   const visibleRange = useMemo(() => {
@@ -104,7 +107,15 @@ const VirtualScroll = <T,>({
 
       return { startIndex, endIndex };
     }
-  }, [scrollTop, itemHeight, containerHeight, data.length, overscan, getItemHeight, getItemHeightCalculated]);
+  }, [
+    scrollTop,
+    itemHeight,
+    containerHeight,
+    data.length,
+    overscan,
+    getItemHeight,
+    getItemHeightCalculated,
+  ]);
 
   // 计算总高度
   const totalHeight = useMemo(() => {
@@ -119,60 +130,66 @@ const VirtualScroll = <T,>({
   }, [data.length, itemHeight, getItemHeight, getItemHeightCalculated]);
 
   // 计算项目位置
-  const getItemStyle = useCallback((index: number): React.CSSProperties => {
-    if (getItemHeight) {
-      // 动态高度模式
-      let top = 0;
-      for (let i = 0; i < index; i++) {
-        top += getItemHeightCalculated(i);
+  const getItemStyle = useCallback(
+    (index: number): React.CSSProperties => {
+      if (getItemHeight) {
+        // 动态高度模式
+        let top = 0;
+        for (let i = 0; i < index; i++) {
+          top += getItemHeightCalculated(i);
+        }
+        return {
+          position: 'absolute',
+          top,
+          left: 0,
+          right: 0,
+          height: getItemHeightCalculated(index),
+        };
+      } else {
+        // 固定高度模式
+        return {
+          position: 'absolute',
+          top: index * itemHeight,
+          left: 0,
+          right: 0,
+          height: itemHeight,
+        };
       }
-      return {
-        position: 'absolute',
-        top,
-        left: 0,
-        right: 0,
-        height: getItemHeightCalculated(index),
-      };
-    } else {
-      // 固定高度模式
-      return {
-        position: 'absolute',
-        top: index * itemHeight,
-        left: 0,
-        right: 0,
-        height: itemHeight,
-      };
-    }
-  }, [itemHeight, getItemHeight, getItemHeightCalculated]);
+    },
+    [itemHeight, getItemHeight, getItemHeightCalculated]
+  );
 
   // 处理滚动事件
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const newScrollTop = e.currentTarget.scrollTop;
-    setScrollTop(newScrollTop);
-    setIsScrolling(true);
+  const handleScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const newScrollTop = e.currentTarget.scrollTop;
+      setScrollTop(newScrollTop);
+      setIsScrolling(true);
 
-    // 清除之前的定时器
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-
-    // 设置新的定时器，滚动结束后重置状态
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsScrolling(false);
-    }, 150);
-
-    onScroll?.(newScrollTop);
-
-    // 检查是否到达底部
-    const { scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - newScrollTop - clientHeight < threshold) {
-      onEndReached?.();
-
-      if (hasNextPage && !isFetchingNextPage && fetchNextPage) {
-        fetchNextPage();
+      // 清除之前的定时器
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
-    }
-  }, [onScroll, onEndReached, hasNextPage, isFetchingNextPage, fetchNextPage, threshold]);
+
+      // 设置新的定时器，滚动结束后重置状态
+      scrollTimeoutRef.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 150);
+
+      onScroll?.(newScrollTop);
+
+      // 检查是否到达底部
+      const { scrollHeight, clientHeight } = e.currentTarget;
+      if (scrollHeight - newScrollTop - clientHeight < threshold) {
+        onEndReached?.();
+
+        if (hasNextPage && !isFetchingNextPage && fetchNextPage) {
+          fetchNextPage();
+        }
+      }
+    },
+    [onScroll, onEndReached, hasNextPage, isFetchingNextPage, fetchNextPage, threshold]
+  );
 
   // 观察元素高度变化（动态高度模式）
   useEffect(() => {
@@ -183,7 +200,7 @@ const VirtualScroll = <T,>({
         const index = parseInt(entry.target.getAttribute('data-index') || '0');
         if (!isNaN(index)) {
           const newHeight = entry.contentRect.height;
-          setItemHeights(prev => {
+          setItemHeights((prev) => {
             if (prev.get(index) !== newHeight) {
               const newMap = new Map(prev);
               newMap.set(index, newHeight);
@@ -241,19 +258,19 @@ const VirtualScroll = <T,>({
       }}
       onScroll={handleScroll}
     >
-      <div style={{ height: totalHeight, position: 'relative' }}>
-        {visibleItems}
-      </div>
+      <div style={{ height: totalHeight, position: 'relative' }}>{visibleItems}</div>
 
       {isFetchingNextPage && (
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '20px',
-          textAlign: 'center',
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '20px',
+            textAlign: 'center',
+          }}
+        >
           {loadingComponent}
         </div>
       )}
@@ -315,7 +332,10 @@ export const VirtualGrid = <T,>({
           }
           return (
             <div key={colIndex} style={{ width: itemWidth }}>
-              {renderItem(item, rowIndex * actualColumns + colIndex, { width: itemWidth, height: itemHeight })}
+              {renderItem(item, rowIndex * actualColumns + colIndex, {
+                width: itemWidth,
+                height: itemHeight,
+              })}
             </div>
           );
         })}

@@ -24,7 +24,7 @@ test.describe('用户故事2: 商品创建与编辑', () => {
       category: formInputs.product.category,
       materialType: formInputs.product.materialType,
       description: formInputs.product.description,
-      price: formInputs.product.price
+      price: formInputs.product.price,
     });
 
     // 验证必填字段验证
@@ -36,7 +36,7 @@ test.describe('用户故事2: 商品创建与编辑', () => {
       title: formInputs.product.name + ' - 标题',
       shortTitle: formInputs.product.name,
       description: formInputs.product.description,
-      shortDescription: '简短描述'
+      shortDescription: '简短描述',
     });
 
     // 保存商品
@@ -291,7 +291,9 @@ test.describe('用户故事2: 商品创建与编辑', () => {
       await expect(page.locator('[data-testid="preview-modal"]')).toBeVisible();
 
       // 验证不同渠道的预览内容
-      await expect(page.locator('[data-testid="preview-miniprogram"]')).toContainText('小程序专用短标题');
+      await expect(page.locator('[data-testid="preview-miniprogram"]')).toContainText(
+        '小程序专用短标题'
+      );
       await expect(page.locator('[data-testid="preview-app"]')).toContainText('APP专用短描述');
     }
   });

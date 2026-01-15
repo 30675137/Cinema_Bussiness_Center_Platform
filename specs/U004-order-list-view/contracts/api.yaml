@@ -1,0 +1,929 @@
+# U004 Order List & Status View - API Contract
+# OpenAPI 3.0 Specification
+
+openapi: 3.0.3
+info:
+  title: Cinema Reservation Order Management API
+  description: |
+    API contract for U004-order-list-view feature.
+
+    **Key Integration Points**:
+    - U004 **reuses existing U001 APIs** without modification
+    - This document serves as a reference contract for frontend integration
+    - All endpoints are implemented in U001-reservation-order-management
+  version: 1.0.0
+  contact:
+    name: Cinema Backend Team
+    email: backend@cinema.com
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  - url: https://api.cinema.com/api
+    description: Production server
+
+tags:
+  - name: admin-reservations
+    description: B端 管理后台订单管理接口
+  - name: client-reservations
+    description: C端 用户订单接口 (not used in U004)
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ========================================
+  # Admin Order Management (B端)
+  # ========================================
+
+  /admin/reservations:
+    get:
+      tags:
+        - admin-reservations
+      summary: 查询订单列表 (with filtering, pagination, sorting)
+      description: |
+        **Feature**: U001-reservation-order-management (reused by U004)
+
+        **Key Capabilities**:
+        - Multi-status filtering (OR logic)
+        - Phone number partial match search
+        - Time range filtering (reservation date or creation date)
+        - Pagination with configurable page size
+        - Sorting by any field
+
+        **Performance**:
+        - Response time: < 1s for 100 orders
+        - Supports 10,000+ orders with proper indexing
+      operationId: getReservationList
+      security:
+        - bearerAuth: []
+      parameters:
+        # Search filters
+        - name: orderNumber
+          in: query
+          description: 订单号精确搜索
+          required: false
+          schema:
+            type: string
+            example: "ORD20251227001"
+
+        - name: contactPhone
+          in: query
+          description: 客户手机号模糊搜索 (包含匹配)
+          required: false
+          schema:
+            type: string
+            pattern: '^\d{1,11}$'
+            example: "13800138000"
+
+        - name: statuses
+          in: query
+          description: 订单状态筛选 (多选,OR逻辑)
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReservationStatus'
+            example: ["PENDING", "CONFIRMED"]
+
+        - name: scenarioPackageId
+          in: query
+          description: 场景包ID筛选
+          required: false
+          schema:
+            type: string
+            format: uuid
+
+        # Time range filters
+        - name: reservationDateStart
+          in: query
+          description: 预订日期范围 (开始)
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-01"
+
+        - name: reservationDateEnd
+          in: query
+          description: 预订日期范围 (结束)
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-12-31"
+
+        - name: createdAtStart
+          in: query
+          description: 创建时间范围 (开始)
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2025-12-01T00:00:00Z"
+
+        - name: createdAtEnd
+          in: query
+          description: 创建时间范围 (结束)
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2025-12-31T23:59:59Z"
+
+        # Pagination
+        - name: page
+          in: query
+          description: 页码 (1-based)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+
+        - name: size
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            enum: [10, 20, 50, 100]
+            example: 20
+
+        # Sorting
+        - name: sortBy
+          in: query
+          description: 排序字段
+          required: false
+          schema:
+            type: string
+            default: "createdAt"
+            enum: ["createdAt", "updatedAt", "totalAmount", "reservationDate"]
+            example: "createdAt"
+
+        - name: sortDirection
+          in: query
+          description: 排序方向
+          required: false
+          schema:
+            type: string
+            default: "desc"
+            enum: ["asc", "desc"]
+            example: "desc"
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationListResponse'
+              examples:
+                success:
+                  summary: 成功返回订单列表
+                  value:
+                    success: true
+                    data:
+                      - id: "123e4567-e89b-12d3-a456-426614174000"
+                        orderNumber: "ORD20251227001"
+                        contactName: "张三"
+                        contactPhone: "13800138000"
+                        scenarioPackageName: "商务团建套餐"
+                        packageTierName: "标准版"
+                        reservationDate: "2025-12-30"
+                        reservationTime: "14:00-16:00"
+                        totalAmount: 3500
+                        status: "PENDING"
+                        requiresPayment: true
+                        createdAt: "2025-12-27T10:00:00Z"
+                        updatedAt: "2025-12-27T10:00:00Z"
+                    total: 100
+                    page: 1
+                    size: 20
+                    totalPages: 5
+                    message: "查询成功"
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/reservations/{id}:
+    get:
+      tags:
+        - admin-reservations
+      summary: 查询订单详情
+      description: |
+        **Feature**: U001-reservation-order-management (reused by U004)
+
+        **Returns**:
+        - Complete order information
+        - All reservation items (package + addons)
+        - Operation logs (status change history)
+      operationId: getReservationDetail
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 订单ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReservationOrder'
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/reservations/{id}/confirm:
+    post:
+      tags:
+        - admin-reservations
+      summary: 确认订单
+      description: |
+        **Feature**: U001-reservation-order-management (reused by U004)
+
+        **Business Rules**:
+        - Only PENDING orders can be confirmed
+        - `requiresPayment: true` → status becomes CONFIRMED (待支付)
+        - `requiresPayment: false` → status becomes COMPLETED (直接完成)
+
+        **Side Effects**:
+        - Generates operation log (CONFIRM)
+        - Invalidates order list cache (TanStack Query)
+      operationId: confirmReservation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 订单ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmReservationRequest'
+            examples:
+              requirePayment:
+                summary: 要求客户支付
+                value:
+                  requiresPayment: true
+              noPayment:
+                summary: 直接完成(无需支付)
+                value:
+                  requiresPayment: false
+
+      responses:
+        '200':
+          description: 确认成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReservationOrder'
+              examples:
+                success:
+                  summary: 确认成功
+                  value:
+                    success: true
+                    data:
+                      id: "123e4567-e89b-12d3-a456-426614174000"
+                      orderNumber: "ORD20251227001"
+                      status: "CONFIRMED"
+                      requiresPayment: true
+                      updatedAt: "2025-12-27T10:30:00Z"
+                    message: "订单确认成功"
+
+        '400':
+          description: 订单状态不允许确认
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                alreadyConfirmed:
+                  summary: 订单已确认
+                  value:
+                    success: false
+                    error: "ORDER_ALREADY_CONFIRMED"
+                    message: "订单已确认，无法重复操作"
+                    timestamp: "2025-12-27T10:30:00Z"
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/reservations/{id}/cancel:
+    post:
+      tags:
+        - admin-reservations
+      summary: 取消订单
+      description: |
+        **Feature**: U001-reservation-order-management (reused by U004)
+
+        **Business Rules**:
+        - Only PENDING or CONFIRMED orders can be cancelled
+        - Cancel reason is **required**
+        - Cancel reason type is optional (defaults to OTHER)
+
+        **Side Effects**:
+        - Generates operation log (CANCEL)
+        - Invalidates order list cache (TanStack Query)
+      operationId: cancelReservation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 订单ID (UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelReservationRequest'
+            examples:
+              customerRequest:
+                summary: 客户要求取消
+                value:
+                  cancelReasonType: "CUSTOMER_REQUEST"
+                  cancelReason: "客户临时有事，要求取消预约"
+              packageUnavailable:
+                summary: 场景包不可用
+                value:
+                  cancelReasonType: "PACKAGE_UNAVAILABLE"
+                  cancelReason: "场景包设备故障，无法提供服务"
+
+      responses:
+        '200':
+          description: 取消成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ReservationOrder'
+              examples:
+                success:
+                  summary: 取消成功
+                  value:
+                    success: true
+                    data:
+                      id: "123e4567-e89b-12d3-a456-426614174000"
+                      orderNumber: "ORD20251227001"
+                      status: "CANCELLED"
+                      updatedAt: "2025-12-27T10:30:00Z"
+                    message: "订单取消成功"
+
+        '400':
+          description: 订单状态不允许取消
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                alreadyCompleted:
+                  summary: 订单已完成
+                  value:
+                    success: false
+                    error: "ORDER_ALREADY_COMPLETED"
+                    message: "订单已完成，无法取消"
+                    timestamp: "2025-12-27T10:30:00Z"
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+# ========================================
+# Components
+# ========================================
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Bearer Token authentication.
+
+        **Token Storage**: localStorage.getItem('auth_token')
+        **Header Format**: Authorization: Bearer <token>
+
+  schemas:
+    # ========================================
+    # Core Domain Models
+    # ========================================
+
+    ReservationOrder:
+      type: object
+      description: 预约订单实体 (完整信息,包含items和logs)
+      required:
+        - id
+        - orderNumber
+        - userId
+        - contactName
+        - contactPhone
+        - scenarioPackageId
+        - scenarioPackageName
+        - packageTierId
+        - packageTierName
+        - timeSlotTemplateId
+        - reservationDate
+        - reservationTime
+        - totalAmount
+        - status
+        - requiresPayment
+        - items
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 订单ID
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        orderNumber:
+          type: string
+          description: 订单号 (唯一)
+          example: "ORD20251227001"
+        userId:
+          type: string
+          format: uuid
+          description: 用户ID
+        contactName:
+          type: string
+          description: 联系人姓名
+          example: "张三"
+        contactPhone:
+          type: string
+          pattern: '^\d{11}$'
+          description: 联系人手机号 (11位数字)
+          example: "13800138000"
+        notes:
+          type: string
+          description: 备注
+          nullable: true
+        scenarioPackageId:
+          type: string
+          format: uuid
+          description: 场景包ID
+        scenarioPackageName:
+          type: string
+          description: 场景包名称
+          example: "商务团建套餐"
+        packageTierId:
+          type: string
+          format: uuid
+          description: 套餐ID
+        packageTierName:
+          type: string
+          description: 套餐名称
+          example: "标准版"
+        timeSlotTemplateId:
+          type: string
+          format: uuid
+          description: 时段模板ID
+        reservationDate:
+          type: string
+          format: date
+          description: 预订日期
+          example: "2025-12-30"
+        reservationTime:
+          type: string
+          description: 预订时段
+          example: "14:00-16:00"
+        totalAmount:
+          type: number
+          format: int64
+          description: 订单总金额 (分)
+          minimum: 0
+          example: 3500
+        status:
+          $ref: '#/components/schemas/ReservationStatus'
+        requiresPayment:
+          type: boolean
+          description: 是否需要支付
+          example: true
+        items:
+          type: array
+          description: 订单明细 (套餐 + 加购项)
+          items:
+            $ref: '#/components/schemas/ReservationItem'
+        operationLogs:
+          type: array
+          description: 操作日志 (可选,仅详情接口返回)
+          nullable: true
+          items:
+            $ref: '#/components/schemas/OperationLog'
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+          example: "2025-12-27T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新时间
+          example: "2025-12-27T10:00:00Z"
+
+    ReservationItem:
+      type: object
+      description: 订单明细项 (套餐或加购项)
+      required:
+        - id
+        - reservationOrderId
+        - itemType
+        - itemId
+        - itemName
+        - quantity
+        - unitPrice
+        - totalPrice
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 明细ID
+        reservationOrderId:
+          type: string
+          format: uuid
+          description: 所属订单ID
+        itemType:
+          type: string
+          enum: ["package", "addon"]
+          description: 项目类型
+          example: "package"
+        itemId:
+          type: string
+          format: uuid
+          description: 套餐ID 或 加购项ID
+        itemName:
+          type: string
+          description: 项目名称
+          example: "标准版套餐"
+        quantity:
+          type: integer
+          minimum: 1
+          description: 数量
+          example: 1
+        unitPrice:
+          type: number
+          format: int64
+          description: 单价 (分)
+          example: 3000
+        totalPrice:
+          type: number
+          format: int64
+          description: 小计 (分) = quantity * unitPrice
+          example: 3000
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+
+    OperationLog:
+      type: object
+      description: 订单操作日志
+      required:
+        - id
+        - reservationOrderId
+        - operationType
+        - operatorName
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 日志ID
+        reservationOrderId:
+          type: string
+          format: uuid
+          description: 所属订单ID
+        operationType:
+          $ref: '#/components/schemas/OperationType'
+        operatorId:
+          type: string
+          format: uuid
+          description: 操作人ID (系统操作时为空)
+          nullable: true
+        operatorName:
+          type: string
+          description: 操作人名称
+          example: "张三"
+        operatorRole:
+          type: string
+          description: 操作人角色
+          nullable: true
+          example: "admin"
+        previousStatus:
+          $ref: '#/components/schemas/ReservationStatus'
+        newStatus:
+          $ref: '#/components/schemas/ReservationStatus'
+        details:
+          type: string
+          description: 操作详情
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: 操作时间
+
+    ReservationStatus:
+      type: string
+      enum:
+        - PENDING     # 待确认
+        - CONFIRMED   # 已确认
+        - COMPLETED   # 已完成
+        - CANCELLED   # 已取消
+      description: |
+        订单状态枚举:
+        - PENDING: 待确认
+        - CONFIRMED: 已确认 (等待支付或无需支付)
+        - COMPLETED: 已完成
+        - CANCELLED: 已取消
+
+    OperationType:
+      type: string
+      enum:
+        - CREATE
+        - CONFIRM
+        - CANCEL
+        - COMPLETE
+        - UPDATE
+        - REFUND
+      description: |
+        操作类型枚举:
+        - CREATE: 创建订单
+        - CONFIRM: 确认订单
+        - CANCEL: 取消订单
+        - COMPLETE: 完成订单
+        - UPDATE: 更新订单
+        - REFUND: 退款
+
+    # ========================================
+    # Request/Response DTOs
+    # ========================================
+
+    ConfirmReservationRequest:
+      type: object
+      required:
+        - requiresPayment
+      properties:
+        requiresPayment:
+          type: boolean
+          description: |
+            是否需要支付:
+            - true: 要求客户支付 (status → CONFIRMED)
+            - false: 直接完成,无需支付 (status → COMPLETED)
+          example: true
+
+    CancelReservationRequest:
+      type: object
+      required:
+        - cancelReason
+      properties:
+        cancelReasonType:
+          type: string
+          enum:
+            - CUSTOMER_REQUEST      # 客户要求取消
+            - PACKAGE_UNAVAILABLE   # 场景包不可用
+            - TIME_CONFLICT         # 时段冲突
+            - OTHER                 # 其他原因
+          description: 取消原因类型 (可选,默认OTHER)
+          example: "CUSTOMER_REQUEST"
+        cancelReason:
+          type: string
+          description: 取消原因描述 (必填)
+          minLength: 1
+          maxLength: 500
+          example: "客户临时有事，要求取消预约"
+
+    ReservationListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - total
+        - page
+        - size
+        - totalPages
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationOrder'
+        total:
+          type: integer
+          description: 总记录数
+          example: 100
+        page:
+          type: integer
+          description: 当前页码 (1-based)
+          example: 1
+        size:
+          type: integer
+          description: 每页数量
+          example: 20
+        totalPages:
+          type: integer
+          description: 总页数
+          example: 5
+        message:
+          type: string
+          description: 响应消息 (可选)
+          example: "查询成功"
+
+    # ========================================
+    # Common Response Types
+    # ========================================
+
+    ApiResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: 操作是否成功
+        data:
+          description: 响应数据 (类型根据接口而定)
+          nullable: true
+        message:
+          type: string
+          description: 响应消息 (可选)
+          nullable: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间戳
+          example: "2025-12-27T10:30:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - timestamp
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误编号 (用于前端根据编号处理错误)
+          example: "ORDER_NOT_FOUND"
+        message:
+          type: string
+          description: 错误描述 (用户友好)
+          example: "未找到指定的订单"
+        details:
+          type: object
+          description: 错误详情 (可选,调试信息)
+          nullable: true
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: 错误时间戳
+          example: "2025-12-27T10:30:00Z"
+
+  # ========================================
+  # Common Responses
+  # ========================================
+
+  responses:
+    BadRequest:
+      description: 请求参数错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidParam:
+              summary: 参数验证失败
+              value:
+                success: false
+                error: "INVALID_PARAMETER"
+                message: "请求参数验证失败"
+                details:
+                  field: "contactPhone"
+                  error: "手机号格式错误"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    Unauthorized:
+      description: 未认证 (Token缺失或无效)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unauthorized:
+              summary: Token无效
+              value:
+                success: false
+                error: "UNAUTHORIZED"
+                message: "未认证，请先登录"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    Forbidden:
+      description: 无权限
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            forbidden:
+              summary: 无权限访问
+              value:
+                success: false
+                error: "FORBIDDEN"
+                message: "无权限访问此资源"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            orderNotFound:
+              summary: 订单不存在
+              value:
+                success: false
+                error: "ORDER_NOT_FOUND"
+                message: "未找到指定的订单"
+                details:
+                  orderId: "123e4567-e89b-12d3-a456-426614174000"
+                timestamp: "2025-12-27T10:30:00Z"
+
+    InternalServerError:
+      description: 服务器内部错误
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            internalError:
+              summary: 服务器错误
+              value:
+                success: false
+                error: "INTERNAL_SERVER_ERROR"
+                message: "服务器内部错误，请稍后重试"
+                timestamp: "2025-12-27T10:30:00Z"

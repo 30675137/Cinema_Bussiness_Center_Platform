@@ -1,9 +1,14 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
+import axios, {
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type AxiosError,
+} from 'axios';
 import type { ApiResponse, ErrorResponse } from '@/types';
 
 // API基础配置
 const API_CONFIG = {
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 30000,
   withCredentials: true,
 };
@@ -47,10 +52,13 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // 开发环境下打印响应信息
     if (import.meta.env.DEV) {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
-        status: response.status,
-        data: response.data,
-      });
+      console.log(
+        `[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`,
+        {
+          status: response.status,
+          data: response.data,
+        }
+      );
     }
 
     return response;
@@ -62,6 +70,11 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // 服务器响应错误
       handleServerError(error.response);
+      // 提取服务器返回的错误消息
+      const errorData = error.response.data as ErrorResponse;
+      const serverMessage = errorData?.message || error.message;
+      const enhancedError = new Error(serverMessage);
+      return Promise.reject(enhancedError);
     } else if (error.request) {
       // 网络错误
       handleNetworkError(error);
@@ -87,8 +100,9 @@ const handleServerError = (response: AxiosResponse) => {
       window.location.href = '/login';
       break;
     case 403:
-      // 权限不足
-      console.error('权限不足:', errorData.message);
+      // 权限不足 - 暂时禁用权限检查
+      // TODO: 后续统一添加权限管理 (spec 待定)
+      console.warn('[权限检查已禁用] 403 响应:', errorData.message);
       break;
     case 404:
       // 资源不存在
@@ -125,10 +139,7 @@ const generateRequestId = (): string => {
 // API方法封装
 class ApiService {
   // GET请求
-  async get<T = any>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await apiClient.get<ApiResponse<T>>(url, config);
     return response.data;
   }
@@ -164,10 +175,7 @@ class ApiService {
   }
 
   // DELETE请求
-  async delete<T = any>(
-    url: string,
-    config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await apiClient.delete<ApiResponse<T>>(url, config);
     return response.data;
   }

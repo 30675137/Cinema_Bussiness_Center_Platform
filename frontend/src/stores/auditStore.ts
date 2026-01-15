@@ -14,8 +14,11 @@ import {
   CreateAuditRequest,
   UpdateAuditRequest,
   AuditStatus,
-  AuditType
+  AuditType,
 } from '@/types/audit';
+
+// 重新导出 AuditStatus 和 AuditType 供其他模块使用（枚举需要直接导出，不能使用 export type）
+export { AuditStatus, AuditType } from '@/types/audit';
 
 // 审核列表状态接口
 interface AuditListState {
@@ -74,7 +77,23 @@ interface AuditStore extends AuditListState, AuditDetailState, AuditActionState 
 }
 
 // 初始状态
-const initialState: Omit<AuditStore, 'setFilters' | 'clearFilters' | 'setSelectedAuditIds' | 'clearSelection' | 'setPagination' | 'setCurrentAudit' | 'setHistory' | 'setActionLoading' | 'setBatchActionLoading' | 'setLastAction' | 'setActionError' | 'reset' | 'resetDetail' | 'resetAction'> = {
+const initialState: Omit<
+  AuditStore,
+  | 'setFilters'
+  | 'clearFilters'
+  | 'setSelectedAuditIds'
+  | 'clearSelection'
+  | 'setPagination'
+  | 'setCurrentAudit'
+  | 'setHistory'
+  | 'setActionLoading'
+  | 'setBatchActionLoading'
+  | 'setLastAction'
+  | 'setActionError'
+  | 'reset'
+  | 'resetDetail'
+  | 'resetAction'
+> = {
   audits: [],
   loading: false,
   error: null,
@@ -82,12 +101,12 @@ const initialState: Omit<AuditStore, 'setFilters' | 'clearFilters' | 'setSelecte
     page: 1,
     pageSize: 20,
     sortBy: 'createdAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   },
   pagination: {
     current: 1,
     pageSize: 20,
-    total: 0
+    total: 0,
   },
   selectedAuditIds: [],
   statistics: null,
@@ -96,7 +115,7 @@ const initialState: Omit<AuditStore, 'setFilters' | 'clearFilters' | 'setSelecte
   actionLoading: false,
   batchActionLoading: false,
   lastAction: null,
-  actionError: null
+  actionError: null,
 };
 
 // 创建审核存储
@@ -119,7 +138,7 @@ export const useAuditStore = create<AuditStore>()(
               page: 1,
               pageSize: 20,
               sortBy: 'createdAt',
-              sortOrder: 'desc'
+              sortOrder: 'desc',
             };
             state.pagination.current = 1;
           }),
@@ -191,18 +210,18 @@ export const useAuditStore = create<AuditStore>()(
             state.batchActionLoading = false;
             state.lastAction = null;
             state.actionError = null;
-          })
+          }),
       })),
       {
         name: 'audit-store',
         partialize: (state) => ({
           filters: state.filters,
-          pagination: state.pagination
-        })
+          pagination: state.pagination,
+        }),
       }
     ),
     {
-      name: 'audit-store'
+      name: 'audit-store',
     }
   )
 );
@@ -219,7 +238,7 @@ export const useAuditsQuery = (params?: AuditQueryParams) => {
       setPagination({
         current: data.pagination.current,
         pageSize: data.pagination.pageSize,
-        total: data.pagination.total
+        total: data.pagination.total,
       });
     },
     staleTime: 5 * 60 * 1000, // 5分钟
@@ -430,7 +449,7 @@ export const useAuditSelectors = () => {
 
   return {
     // 过滤后的审核列表
-    filteredAudits: store.audits.filter(audit => {
+    filteredAudits: store.audits.filter((audit) => {
       const filters = store.filters;
 
       if (filters.status && filters.status.length > 0) {
@@ -443,9 +462,11 @@ export const useAuditSelectors = () => {
 
       if (filters.keyword) {
         const keyword = filters.keyword.toLowerCase();
-        if (!audit.title.toLowerCase().includes(keyword) &&
-            !audit.description?.toLowerCase().includes(keyword) &&
-            !audit.submitterName.toLowerCase().includes(keyword)) {
+        if (
+          !audit.title.toLowerCase().includes(keyword) &&
+          !audit.description?.toLowerCase().includes(keyword) &&
+          !audit.submitterName.toLowerCase().includes(keyword)
+        ) {
           return false;
         }
       }
@@ -458,22 +479,21 @@ export const useAuditSelectors = () => {
     }),
 
     // 选中的审核记录
-    selectedAudits: store.audits.filter(audit =>
-      store.selectedAuditIds.includes(audit.id)
-    ),
+    selectedAudits: store.audits.filter((audit) => store.selectedAuditIds.includes(audit.id)),
 
     // 待审核数量
-    pendingCount: store.audits.filter(audit => audit.status === AuditStatus.PENDING).length,
+    pendingCount: store.audits.filter((audit) => audit.status === AuditStatus.PENDING).length,
 
     // 高优先级待审核数量
-    highPriorityPendingCount: store.audits.filter(audit =>
-      audit.status === AuditStatus.PENDING &&
-      (audit.priority === 'high' || audit.priority === 'urgent')
+    highPriorityPendingCount: store.audits.filter(
+      (audit) =>
+        audit.status === AuditStatus.PENDING &&
+        (audit.priority === 'high' || audit.priority === 'urgent')
     ).length,
 
     // 我提交的审核数量
-    mySubmittedCount: store.audits.filter(audit =>
-      audit.submitterId === 'current-user-id' // 这里应该从用户状态获取
+    mySubmittedCount: store.audits.filter(
+      (audit) => audit.submitterId === 'current-user-id' // 这里应该从用户状态获取
     ).length,
 
     // 是否有选中的审核记录
@@ -483,6 +503,6 @@ export const useAuditSelectors = () => {
     currentPageAudits: store.audits.slice(
       (store.pagination.current - 1) * store.pagination.pageSize,
       store.pagination.current * store.pagination.pageSize
-    )
+    ),
   };
 };

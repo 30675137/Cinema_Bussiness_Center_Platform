@@ -1,0 +1,92 @@
+### P005 E2E Test Data Setup
+### This file contains HTTP requests to set up test data via backend API
+### Use: Can be executed with REST Client VS Code extension or manually with curl
+
+@baseUrl = http://localhost:8080
+
+### Step 1: Create Test Store
+POST {{baseUrl}}/api/stores
+Content-Type: application/json
+
+{
+  "name": "Test Store P005",
+  "code": "TS-P005",
+  "province": "Shanghai",
+  "city": "Shanghai",
+  "district": "Pudong",
+  "address": "Test Address 123",
+  "phone": "13800138000",
+  "status": "ACTIVE"
+}
+
+### Step 2: Create Raw Material SKUs
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Whiskey",
+  "code": "RM-WHISKEY",
+  "unit": "ml",
+  "is_finished_product": false
+}
+
+###
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Cola",
+  "code": "RM-COLA",
+  "unit": "ml",
+  "is_finished_product": false
+}
+
+###
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Cup",
+  "code": "RM-CUP",
+  "unit": "pcs",
+  "is_finished_product": false
+}
+
+###
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Straw",
+  "code": "RM-STRAW",
+  "unit": "pcs",
+  "is_finished_product": false
+}
+
+### Step 3: Create Finished Product SKUs
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Cocktail",
+  "code": "FP-COCKTAIL",
+  "unit": "cup",
+  "is_finished_product": true
+}
+
+###
+POST {{baseUrl}}/api/skus
+Content-Type: application/json
+
+{
+  "name": "Combo Set A",
+  "code": "FP-COMBO-A",
+  "unit": "set",
+  "is_finished_product": true
+}
+
+### Step 4: Create BOM Components (will be done via SQL as it requires UUIDs)
+### See setup-test-data.sql for BOM setup
+
+### Step 5: Create Inventory (will be done via SQL)
+### See setup-test-data.sql for inventory setup

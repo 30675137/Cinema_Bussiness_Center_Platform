@@ -8,7 +8,7 @@ import type {
   PriceChangeRequest,
   PriceFilters,
   PriceCalculationParams,
-  PriceCalculationResult
+  PriceCalculationResult,
 } from '@/types/price';
 
 // 价格API服务
@@ -79,7 +79,10 @@ export const priceService = {
     await apiClient.delete(`/price-rules/${id}`);
   },
 
-  async applyPriceRule(ruleId: string, productIds: string[]): Promise<{
+  async applyPriceRule(
+    ruleId: string,
+    productIds: string[]
+  ): Promise<{
     applied: number;
     failed: number;
     errors: string[];
@@ -136,11 +139,13 @@ export const priceService = {
       memberLevel?: string;
       channel?: string;
     }>
-  ): Promise<Array<{
-    productId: string;
-    result: PriceCalculationResult;
-    error?: string;
-  }>> {
+  ): Promise<
+    Array<{
+      productId: string;
+      result: PriceCalculationResult;
+      error?: string;
+    }>
+  > {
     const response = await apiClient.post('/prices/bulk-calculate', { requests });
     return response.data;
   },
@@ -193,13 +198,15 @@ export const priceService = {
   async getPriceTrends(
     productId: string,
     period: 'week' | 'month' | 'quarter' | 'year' = 'month'
-  ): Promise<Array<{
-    date: string;
-    price: number;
-    changeType: string;
-  }>> {
+  ): Promise<
+    Array<{
+      date: string;
+      price: number;
+      changeType: string;
+    }>
+  > {
     const response = await apiClient.get(`/products/${productId}/price-trends`, {
-      params: { period }
+      params: { period },
     });
     return response.data;
   },
@@ -226,7 +233,7 @@ export const priceService = {
   }> {
     const response = await apiClient.post(`/products/${productId}/simulate-price-change`, {
       newPrice,
-      ...options
+      ...options,
     });
     return response.data;
   },
@@ -251,13 +258,15 @@ export const priceService = {
   },
 
   // 价格模板相关API
-  async getPriceTemplates(): Promise<Array<{
-    id: string;
-    name: string;
-    description: string;
-    template: Partial<PriceFormData>;
-    usage: number;
-  }>> {
+  async getPriceTemplates(): Promise<
+    Array<{
+      id: string;
+      name: string;
+      description: string;
+      template: Partial<PriceFormData>;
+      usage: number;
+    }>
+  > {
     const response = await apiClient.get('/price-templates');
     return response.data;
   },
@@ -274,12 +283,15 @@ export const priceService = {
     return response.data;
   },
 
-  async applyPriceTemplate(templateId: string, productIds: string[]): Promise<{
+  async applyPriceTemplate(
+    templateId: string,
+    productIds: string[]
+  ): Promise<{
     applied: number;
     failed: number;
     errors: string[];
   }> {
     const response = await apiClient.post(`/price-templates/${templateId}/apply`, { productIds });
     return response.data;
-  }
+  },
 };

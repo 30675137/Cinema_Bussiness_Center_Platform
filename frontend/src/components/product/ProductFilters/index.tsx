@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  Form,
-  Select,
-  InputNumber,
-  Row,
-  Col,
-  Button,
-  Space,
-  Tag,
-  DatePicker,
-} from 'antd';
+import { Card, Form, Select, InputNumber, Row, Col, Button, Space, Tag, DatePicker } from 'antd';
 import { SearchOutlined, ClearOutlined } from '@ant-design/icons';
 import type { ProductFilters as ProductFiltersType } from '@/types';
 
@@ -23,11 +12,7 @@ interface ProductFiltersProps {
   onClear?: () => void;
 }
 
-const ProductFilters: React.FC<ProductFiltersProps> = ({
-  filters,
-  onFilter,
-  onClear,
-}) => {
+const ProductFilters: React.FC<ProductFiltersProps> = ({ filters, onFilter, onClear }) => {
   const [form] = Form.useForm();
   const [localFilters, setLocalFilters] = useState<ProductFiltersType>(filters);
 
@@ -95,12 +80,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
 
           <Col span={6}>
             <Form.Item label="商品状态" name="status">
-              <Select
-                mode="multiple"
-                placeholder="请选择状态"
-                allowClear
-                style={{ width: '100%' }}
-              >
+              <Select mode="multiple" placeholder="请选择状态" allowClear style={{ width: '100%' }}>
                 <Option value="draft">草稿</Option>
                 <Option value="pending_review">待审核</Option>
                 <Option value="approved">已审核</Option>
@@ -157,17 +137,10 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
           <Col span={24}>
             <Form.Item>
               <Space>
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={handleApply}
-                >
+                <Button type="primary" icon={<SearchOutlined />} onClick={handleApply}>
                   应用筛选
                 </Button>
-                <Button
-                  icon={<ClearOutlined />}
-                  onClick={handleReset}
-                >
+                <Button icon={<ClearOutlined />} onClick={handleReset}>
                   重置
                 </Button>
               </Space>
@@ -195,8 +168,8 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                   value === 'raw_material'
                     ? '原材料'
                     : value === 'semi_finished'
-                    ? '半成品'
-                    : '成品';
+                      ? '半成品'
+                      : '成品';
                 break;
               case 'status':
                 label = '状态';
@@ -209,7 +182,7 @@ const ProductFilters: React.FC<ProductFiltersProps> = ({
                     disabled: '已禁用',
                     archived: '已归档',
                   };
-                  displayValue = value.map(s => statusMap[s]).join('、');
+                  displayValue = value.map((s) => statusMap[s]).join('、');
                 }
                 break;
               case 'priceRange':

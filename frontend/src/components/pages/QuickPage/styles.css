@@ -1,0 +1,190 @@
+/**
+ * 快速页面占位组件样式
+ */
+
+.quick-page-content {
+  padding: 24px;
+  text-align: center;
+}
+
+.quick-page-header {
+  margin-bottom: 32px;
+}
+
+.quick-page-icon {
+  font-size: 64px;
+  color: #d9d9d9;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.quick-page-details {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.details-card {
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-item .ant-typography {
+  margin-bottom: 0;
+  min-width: 80px;
+}
+
+/* 状态徽章 */
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.status-planning {
+  background: #f0f0f0;
+  color: #8c8c8c;
+  border: 1px solid #d9d9d9;
+}
+
+.status-developing {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.status-testing {
+  background: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+/* 优先级徽章 */
+.priority-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.priority-low {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.priority-medium {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.priority-high {
+  background: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.priority-urgent {
+  background: #fff2f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
+}
+
+/* 开发提示 */
+.development-alert {
+  text-align: left;
+  margin-top: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .quick-page-content {
+    padding: 16px;
+  }
+
+  .quick-page-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .quick-page-header .ant-typography h4 {
+    font-size: 18px !important;
+  }
+
+  .quick-page-details {
+    max-width: 100%;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .detail-item .ant-typography {
+    min-width: auto;
+  }
+}
+
+/* 深色主题支持 */
+.quick-page-content.dark-theme .quick-page-icon {
+  color: #434343;
+}
+
+.quick-page-content.dark-theme .status-planning {
+  background: #262626;
+  color: #8c8c8c;
+  border-color: #434343;
+}
+
+.quick-page-content.dark-theme .status-developing {
+  background: #111b26;
+  color: #1890ff;
+  border-color: #003a8c;
+}
+
+.quick-page-content.dark-theme .status-testing {
+  background: #2a2115;
+  color: #fa8c16;
+  border-color: #613400;
+}
+
+.quick-page-content.dark-theme .status-completed {
+  background: #162312;
+  color: #52c41a;
+  border-color: #274916;
+}
+
+/* 打印样式 */
+@media print {
+  .quick-page-icon {
+    color: #d9d9d9 !important;
+  }
+
+  .status-badge,
+  .priority-badge {
+    border: 1px solid #000 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

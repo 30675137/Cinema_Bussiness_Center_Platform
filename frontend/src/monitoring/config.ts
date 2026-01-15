@@ -2,7 +2,8 @@
 export const PERFORMANCE_CONFIG = {
   // 监控开关
   monitoring: {
-    enabled: process.env.NODE_ENV === 'development' || process.env.REACT_APP_PERF_MONITORING === 'true',
+    enabled:
+      process.env.NODE_ENV === 'development' || process.env.REACT_APP_PERF_MONITORING === 'true',
     samplingRate: 1.0, // 采样率：1.0表示100%采样
     reportToConsole: true,
     reportToAnalytics: false,
@@ -10,49 +11,49 @@ export const PERFORMANCE_CONFIG = {
 
   // 页面加载性能阈值
   thresholds: {
-    pageLoadTime: 3000,        // 页面加载时间 < 3秒
+    pageLoadTime: 3000, // 页面加载时间 < 3秒
     firstContentfulPaint: 1800, // 首次内容绘制 < 1.8秒
     largestContentfulPaint: 2500, // 最大内容绘制 < 2.5秒
-    firstInputDelay: 100,      // 首次输入延迟 < 100ms
+    firstInputDelay: 100, // 首次输入延迟 < 100ms
     cumulativeLayoutShift: 0.1, // 累积布局偏移 < 0.1
-    timeToFirstByte: 800,      // 首字节时间 < 800ms
+    timeToFirstByte: 800, // 首字节时间 < 800ms
   },
 
   // API性能阈值
   api: {
-    responseTime: 500,         // API响应时间 < 500ms
-    timeout: 10000,           // API超时时间 10秒
-    retryAttempts: 3,         // 最大重试次数
-    batchSize: 100,           // 批量请求大小
+    responseTime: 500, // API响应时间 < 500ms
+    timeout: 10000, // API超时时间 10秒
+    retryAttempts: 3, // 最大重试次数
+    batchSize: 100, // 批量请求大小
   },
 
   // 组件性能阈值
   components: {
-    renderTime: 100,          // 组件渲染时间 < 100ms
-    mountTime: 500,           // 组件挂载时间 < 500ms
-    reRenderLimit: 10,        // 最大重渲染次数
-    staleThreshold: 30000,    // 组件stale阈值 30秒
+    renderTime: 100, // 组件渲染时间 < 100ms
+    mountTime: 500, // 组件挂载时间 < 500ms
+    reRenderLimit: 10, // 最大重渲染次数
+    staleThreshold: 30000, // 组件stale阈值 30秒
   },
 
   // 内存使用阈值
   memory: {
-    usageThreshold: 0.8,      // 内存使用阈值 80%
-    monitorInterval: 10000,   // 监控间隔 10秒
-    gcTriggerThreshold: 0.9,  // GC触发阈值 90%
+    usageThreshold: 0.8, // 内存使用阈值 80%
+    monitorInterval: 10000, // 监控间隔 10秒
+    gcTriggerThreshold: 0.9, // GC触发阈值 90%
   },
 
   // 缓存配置
   cache: {
     defaultTTL: 5 * 60 * 1000, // 默认TTL 5分钟
-    maxSize: 200,              // 最大缓存条目数
-    strategy: 'lru' as const,  // 淘汰策略
-    compressionEnabled: true,  // 启用压缩
+    maxSize: 200, // 最大缓存条目数
+    strategy: 'lru' as const, // 淘汰策略
+    compressionEnabled: true, // 启用压缩
   },
 
   // 代码分割配置
   codeSplitting: {
     enabled: true,
-    chunkSizeLimit: 150000,   // chunk大小限制 150KB
+    chunkSizeLimit: 150000, // chunk大小限制 150KB
     preloadCriticalChunks: true,
     prefetchOnIdle: true,
     prefetchOnHover: true,
@@ -75,9 +76,9 @@ export const PERFORMANCE_CONFIG = {
   // 虚拟滚动配置
   virtualScroll: {
     enabled: true,
-    overscan: 5,              // 预渲染项目数
-    threshold: 50,            // 触发加载更多阈值
-    itemHeightEstimate: 50,   // 估计项目高度
+    overscan: 5, // 预渲染项目数
+    threshold: 50, // 触发加载更多阈值
+    itemHeightEstimate: 50, // 估计项目高度
   },
 
   // Bundle分析配置
@@ -90,11 +91,11 @@ export const PERFORMANCE_CONFIG = {
 
   // 性能报告配置
   reporting: {
-    interval: 30000,          // 报告间隔 30秒
-    maxReports: 100,          // 最大报告数量
-    aggregateStats: true,     // 聚合统计
-    exportEnabled: true,      // 导出功能
-    exportFormat: 'json',     // 导出格式
+    interval: 30000, // 报告间隔 30秒
+    maxReports: 100, // 最大报告数量
+    aggregateStats: true, // 聚合统计
+    exportEnabled: true, // 导出功能
+    exportFormat: 'json', // 导出格式
   },
 };
 

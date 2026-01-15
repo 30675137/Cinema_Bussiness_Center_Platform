@@ -1,0 +1,446 @@
+{
+  "info": {
+    "name": "O003 饮品订单管理 API",
+    "_postman_id": "o003-beverage-order-collection",
+    "description": "饮品订单创建与出品管理 API 测试集合\n\n包含:\n- C端饮品菜单 API\n- C端订单创建与支付 API\n- B端订单管理 API\n- 订单统计 API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "C端 - 饮品菜单",
+      "item": [
+        {
+          "name": "获取饮品菜单列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverages"]
+            },
+            "description": "获取所有启用的饮品，按分类分组"
+          },
+          "response": []
+        },
+        {
+          "name": "获取饮品详情",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverages/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverages", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{beverageId}}",
+                  "description": "饮品ID (UUID)"
+                }
+              ]
+            },
+            "description": "获取饮品详情，包含规格信息"
+          },
+          "response": []
+        },
+        {
+          "name": "获取饮品规格列表",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverage-specs?beverageId={{beverageId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverage-specs"],
+              "query": [
+                {
+                  "key": "beverageId",
+                  "value": "{{beverageId}}",
+                  "description": "饮品ID"
+                }
+              ]
+            },
+            "description": "获取指定饮品的规格列表"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "C端 - 订单管理",
+      "item": [
+        {
+          "name": "创建订单",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"storeId\": \"{{storeId}}\",\n  \"items\": [\n    {\n      \"beverageId\": \"{{beverageId}}\",\n      \"selectedSpecs\": {\n        \"SIZE\": \"大杯\",\n        \"TEMPERATURE\": \"热\",\n        \"SWEETNESS\": \"五分糖\"\n      },\n      \"quantity\": 1,\n      \"customerNote\": \"少冰\"\n    }\n  ],\n  \"orderNote\": \"请尽快制作\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverage-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverage-orders"]
+            },
+            "description": "创建饮品订单，返回订单号"
+          },
+          "response": []
+        },
+        {
+          "name": "Mock支付",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverage-orders/:id/pay",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverage-orders", ":id", "pay"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}",
+                  "description": "订单ID"
+                }
+              ]
+            },
+            "description": "Mock支付，500ms后自动成功"
+          },
+          "response": []
+        },
+        {
+          "name": "获取订单详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverage-orders/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverage-orders", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}",
+                  "description": "订单ID"
+                }
+              ]
+            },
+            "description": "获取订单详情"
+          },
+          "response": []
+        },
+        {
+          "name": "获取我的订单列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/beverage-orders/my?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "beverage-orders", "my"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "页码（从0开始）"
+                },
+                {
+                  "key": "size",
+                  "value": "10",
+                  "description": "每页条数"
+                }
+              ]
+            },
+            "description": "获取当前用户的订单列表"
+          },
+          "response": []
+        },
+        {
+          "name": "获取取餐号",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/client/queue-numbers/:orderId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "client", "queue-numbers", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "{{orderId}}",
+                  "description": "订单ID"
+                }
+              ]
+            },
+            "description": "获取订单的取餐号"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "B端 - 订单管理",
+      "item": [
+        {
+          "name": "获取待处理订单列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", "pending"]
+            },
+            "description": "获取待处理的订单列表（轮询接口，8s刷新）"
+          },
+          "response": []
+        },
+        {
+          "name": "获取订单列表（带筛选）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders?status=PENDING_PRODUCTION&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING_PRODUCTION",
+                  "description": "订单状态筛选"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "获取订单列表，支持状态筛选"
+          },
+          "response": []
+        },
+        {
+          "name": "获取订单详情（含BOM）",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "获取订单详情，包含BOM配方信息"
+          },
+          "response": []
+        },
+        {
+          "name": "更新订单状态",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PRODUCING\",\n  \"reason\": \"开始制作\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "更新订单状态（状态机验证）"
+          },
+          "response": []
+        },
+        {
+          "name": "BOM扣料",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/:id/deduct-inventory",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", ":id", "deduct-inventory"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "执行BOM扣料（在状态变更为PRODUCING时自动触发）"
+          },
+          "response": []
+        },
+        {
+          "name": "叫号",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/:id/call",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", ":id", "call"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{orderId}}"
+                }
+              ]
+            },
+            "description": "叫号通知顾客取餐"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "B端 - 统计报表",
+      "item": [
+        {
+          "name": "获取订单统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/statistics?period=TODAY",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", "statistics"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "TODAY",
+                  "description": "统计周期: TODAY, WEEK, MONTH"
+                }
+              ]
+            },
+            "description": "获取订单统计数据"
+          },
+          "response": []
+        },
+        {
+          "name": "导出销售报表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/beverage-orders/export?startDate=2025-12-01&endDate=2025-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "beverage-orders", "export"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-12-01",
+                  "description": "开始日期"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-12-31",
+                  "description": "结束日期"
+                }
+              ]
+            },
+            "description": "导出Excel销售报表"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -98,37 +95,46 @@ export default {
 
       // 字体系统
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif'],
+        sans: [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          '"Noto Sans"',
+          'sans-serif',
+        ],
       },
 
       // 间距系统
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '120': '30rem',
+        18: '4.5rem',
+        88: '22rem',
+        120: '30rem',
       },
 
       // 圆角系统
       borderRadius: {
-        '4': '0.25rem',
-        '6': '0.375rem',
-        '8': '0.5rem',
+        4: '0.25rem',
+        6: '0.375rem',
+        8: '0.5rem',
       },
 
       // 阴影系统
       boxShadow: {
-        'card': '0 2px 8px rgba(0, 0, 0, 0.15)',
+        card: '0 2px 8px rgba(0, 0, 0, 0.15)',
         'card-hover': '0 6px 16px rgba(0, 0, 0, 0.12)',
       },
 
       // 动画时长
       transitionDuration: {
-        '250': '250ms',
-        '350': '350ms',
+        250: '250ms',
+        350: '350ms',
       },
     },
   },
   plugins: [
     // 可以在这里添加插件
   ],
-}
+};

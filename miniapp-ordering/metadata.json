@@ -1,0 +1,9 @@
+
+{
+  "name": "CineLounge Multi-Entertainment Ordering",
+  "description": "A high-end cinema lounge ordering system for drinks, coffee, and snacks, featuring a multi-entertainment hall experience inspired by modern bar aesthetics.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}

@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Card,
-  Statistic,
-  Row,
-  Col,
-  Progress,
-  Space,
-  Typography,
-  Tag,
-  Tooltip
-} from 'antd';
+import { Card, Statistic, Row, Col, Progress, Space, Typography, Tag, Tooltip } from 'antd';
 import {
   StockOutlined,
   ShopOutlined,
@@ -17,7 +7,7 @@ import {
   DollarOutlined,
   WarningOutlined,
   CheckCircleOutlined,
-  BarChartOutlined
+  BarChartOutlined,
 } from '@ant-design/icons';
 import type { InventoryStatistics } from '@/types/inventory';
 
@@ -56,37 +46,59 @@ const mockStatisticsData: InventoryStatistics = {
     return_out: 32,
     damage_out: 12,
     production_in: 8,
-    expired_out: 4
+    expired_out: 4,
   },
   transactionsByStore: {
-    'STORE001': 342,
-    'STORE002': 289,
-    'STORE003': 267,
-    'STORE004': 198
+    STORE001: 342,
+    STORE002: 289,
+    STORE003: 267,
+    STORE004: 198,
   },
   topMovingSKUs: [
-    { skuId: 'SKU001', skuCode: 'SKU001', skuName: '可口可乐330ml', transactionCount: 156, totalQuantity: 2340 },
-    { skuId: 'SKU002', skuCode: 'SKU002', skuName: '爆米花中份', transactionCount: 134, totalQuantity: 1890 },
-    { skuId: 'SKU003', skuCode: 'SKU003', skuName: '3D眼镜', transactionCount: 89, totalQuantity: 670 }
+    {
+      skuId: 'SKU001',
+      skuCode: 'SKU001',
+      skuName: '可口可乐330ml',
+      transactionCount: 156,
+      totalQuantity: 2340,
+    },
+    {
+      skuId: 'SKU002',
+      skuCode: 'SKU002',
+      skuName: '爆米花中份',
+      transactionCount: 134,
+      totalQuantity: 1890,
+    },
+    {
+      skuId: 'SKU003',
+      skuCode: 'SKU003',
+      skuName: '3D眼镜',
+      transactionCount: 89,
+      totalQuantity: 670,
+    },
   ],
   inventoryValueByStore: [
     { storeId: 'STORE001', storeName: '万达影城CBD店', totalValue: 342000, totalSKUs: 89 },
     { storeId: 'STORE002', storeName: '万达影城三里屯店', totalValue: 289000, totalSKUs: 76 },
-    { storeId: 'STORE003', storeName: '万达影城五道口店', totalValue: 267000, totalSKUs: 72 }
-  ]
+    { storeId: 'STORE003', storeName: '万达影城五道口店', totalValue: 267000, totalSKUs: 72 },
+  ],
 };
 
 const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
   data,
   loading = false,
-  title = '库存统计'
+  title = '库存统计',
 }) => {
   const statistics = data || mockStatisticsData;
 
   // 计算库存健康度
-  const healthScore = Math.round(((statistics.totalAvailable - statistics.totalReserved) / statistics.totalAvailable) * 100);
-  const stockTurnoverRate = statistics.totalTransactions > 0 ?
-    Math.round((statistics.totalAvailable / statistics.totalTransactions) * 100) : 0;
+  const healthScore = Math.round(
+    ((statistics.totalAvailable - statistics.totalReserved) / statistics.totalAvailable) * 100
+  );
+  const stockTurnoverRate =
+    statistics.totalTransactions > 0
+      ? Math.round((statistics.totalAvailable / statistics.totalTransactions) * 100)
+      : 0;
 
   // 计算库存分布比例
   const inventoryDistribution = [
@@ -94,12 +106,16 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
     { name: '预留库存', value: statistics.totalReserved, color: '#faad14' },
     { name: '在途库存', value: statistics.totalInTransit, color: '#1890ff' },
     { name: '损坏库存', value: statistics.totalDamaged, color: '#ff4d4f' },
-    { name: '过期库存', value: statistics.totalExpired, color: '#f5222d' }
+    { name: '过期库存', value: statistics.totalExpired, color: '#f5222d' },
   ];
 
   // 计算警报比例
-  const alertPercentage = statistics.totalSKUs > 0 ?
-    Math.round(((statistics.lowStockItems + statistics.outOfStockItems) / statistics.totalSKUs) * 100) : 0;
+  const alertPercentage =
+    statistics.totalSKUs > 0
+      ? Math.round(
+          ((statistics.lowStockItems + statistics.outOfStockItems) / statistics.totalSKUs) * 100
+        )
+      : 0;
 
   return (
     <Card
@@ -140,9 +156,8 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
             <Statistic
               title="总库存价值"
               value={statistics.totalValue}
-              prefix="¥"
-              precision={0}
               prefix={<DollarOutlined />}
+              precision={0}
               valueStyle={{ color: '#cf1322' }}
             />
           </Card>
@@ -176,7 +191,9 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
               value={healthScore}
               suffix="%"
               prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: healthScore >= 80 ? '#52c41a' : healthScore >= 60 ? '#faad14' : '#ff4d4f' }}
+              valueStyle={{
+                color: healthScore >= 80 ? '#52c41a' : healthScore >= 60 ? '#faad14' : '#ff4d4f',
+              }}
             />
           </Card>
         </Col>
@@ -189,7 +206,13 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
             <Space direction="vertical" style={{ width: '100%' }}>
               {inventoryDistribution.map((item, index) => (
                 <div key={index}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: '4px',
+                    }}
+                  >
                     <Text style={{ fontSize: '12px' }}>{item.name}</Text>
                     <Text style={{ fontSize: '12px', fontWeight: 'bold' }}>{item.value}</Text>
                   </div>
@@ -246,7 +269,13 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
                     type="circle"
                     percent={alertPercentage}
                     size={60}
-                    strokeColor={alertPercentage >= 20 ? '#f5222d' : alertPercentage >= 10 ? '#faad14' : '#52c41a'}
+                    strokeColor={
+                      alertPercentage >= 20
+                        ? '#f5222d'
+                        : alertPercentage >= 10
+                          ? '#faad14'
+                          : '#52c41a'
+                    }
                   />
                 </Space>
               </Col>
@@ -261,7 +290,10 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
           <Card size="small" title="热门商品 (按交易次数)">
             <Space direction="vertical" style={{ width: '100%' }}>
               {statistics.topMovingSKUs.map((sku, index) => (
-                <div key={sku.skuId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div
+                  key={sku.skuId}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Space>
                     <Tag color={index === 0 ? 'gold' : index === 1 ? 'blue' : 'green'}>
                       {index + 1}
@@ -286,7 +318,10 @@ const InventoryStatisticsCard: React.FC<InventoryStatisticsCardProps> = ({
           <Card size="small" title="门店库存价值TOP3">
             <Space direction="vertical" style={{ width: '100%' }}>
               {statistics.inventoryValueByStore.map((store, index) => (
-                <div key={store.storeId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div
+                  key={store.storeId}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <Space>
                     <Tag color={index === 0 ? 'gold' : index === 1 ? 'blue' : 'green'}>
                       {index + 1}

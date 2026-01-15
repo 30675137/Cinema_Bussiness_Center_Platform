@@ -1,0 +1,139 @@
+---
+# @spec O005-channel-product-config
+# E2E Test Scenario: SKU Info Loading
+# Tests: Backend SKU data loading, price conversion, image URL
+
+scenarioId: E2E-CHANNEL-PRODUCT-003
+title: SKU 信息加载与价格转换测试
+module: channel-product-config
+priority: high
+tags:
+  - channel-product
+  - sku-loading
+  - price-conversion
+  - backend
+
+description: |
+  验证后端正确加载 SKU 信息并填充到 ChannelProductConfig 的 transient 字段，
+  测试价格从元（BigDecimal）到分（Long）的转换，以及图片 URL 的正确来源。
+
+preconditions:
+  - ChannelProductService 已实现 loadSkuInfo 方法
+  - SkuRepository 可以通过 ID 查询 SKU
+  - 数据库中存在测试数据
+
+testData:
+  - skuId: "23ba9c9b-58a7-4b19-86b4-b4c65a21c189"
+    skuCode: "SKU1766642685681"
+    skuName: "威士忌可乐鸡尾酒"
+    price: 0.00 (元)
+    expectedPriceCents: 0 (分)
+
+  - skuId: "test-sku-001"
+    skuCode: "SKU002"
+    skuName: "测试商品"
+    price: 29.90 (元)
+    expectedPriceCents: 2990 (分)
+
+testSteps:
+  - step: 1
+    action: 创建测试渠道商品配置（不含 SKU 信息）
+    method: POST /api/channel-products
+    requestBody:
+      skuId: "23ba9c9b-58a7-4b19-86b4-b4c65a21c189"
+      channelType: "MINI_PROGRAM"
+      displayName: "威士忌可乐鸡尾酒"
+      channelCategory: "ALCOHOL"
+      mainImage: "https://example.com/image.jpg"
+    expectedResult: 创建成功，返回 ID
+
+  - step: 2
+    action: 查询单个渠道商品配置
+    method: GET /api/channel-products/{id}
+    expectedResponse:
+      data:
+        id: string
+        skuId: "23ba9c9b-58a7-4b19-86b4-b4c65a21c189"
+        sku:
+          id: "23ba9c9b-58a7-4b19-86b4-b4c65a21c189"
+          skuCode: "SKU1766642685681"
+          skuName: "威士忌可乐鸡尾酒"
+          price: 0
+          imageUrl: "https://example.com/image.jpg"
+    notes: |
+      - sku 字段已自动填充
+      - price 已从元转换为分
+      - imageUrl 来自 ChannelProductConfig.mainImage
+
+  - step: 3
+    action: 验证价格转换逻辑
+    testCases:
+      - input: BigDecimal("0.00")
+        expected: 0L
+      - input: BigDecimal("29.90")
+        expected: 2990L
+      - input: BigDecimal("100.00")
+        expected: 10000L
+      - input: null
+        expected: null
+    code: |
+      long priceInCents = sku.getPrice() != null
+        ? sku.getPrice().multiply(new BigDecimal("100")).longValue()
+        : null;
+
+  - step: 4
+    action: 验证图片 URL 来源
+    expectedBehavior: |
+      - imageUrl 应该使用 config.getMainImage()
+      - NOT sku.getImageUrl() (因为 SKU 表没有此字段)
+      - 如果 mainImage 为 null，imageUrl 也应该为 null
+
+  - step: 5
+    action: 查询列表并验证批量加载
+    method: GET /api/channel-products?channelType=MINI_PROGRAM&page=1&size=20
+    expectedBehavior: |
+      - 列表中每个 item 都包含 sku 信息
+      - 使用循环调用 skuRepository.findById() 加载
+      - 所有价格都已转换为分
+
+  - step: 6
+    action: 验证 SKU 不存在的情况
+    testCase:
+      skuId: "non-existent-sku-id"
+      expectedBehavior: |
+        - skuRepository.findById() 返回 Optional.empty()
+        - config.sku 应该为 null
+        - 不应抛出异常
+
+  - step: 7
+    action: 后端日志验证
+    expectedLogs:
+      - level: DEBUG
+        message: "Loading SKU info for channel product"
+      - level: ERROR
+        notExpected: true
+        message: "SKU not found"
+
+backendCodeReferences:
+  - file: ChannelProductService.java
+    method: loadSkuInfoForSingle
+    lines: ~200-220
+
+  - file: ChannelProductService.java
+    method: loadSkuInfo
+    lines: ~222-245
+
+  - file: ChannelProductConfig.java
+    field: skuInfo
+    annotation: "@Transient"
+    notes: 不持久化到数据库
+
+expectedResults:
+  - SKU 信息正确加载到 transient 字段
+  - 价格从元（BigDecimal）正确转换为分（Long）
+  - 图片 URL 来自 ChannelProductConfig.mainImage
+  - SKU 不存在时不抛异常，sku 字段为 null
+  - 列表查询时所有商品的 SKU 信息都已加载
+
+regressionRisk: high
+estimatedDuration: 15分钟

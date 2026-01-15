@@ -1,0 +1,174 @@
+# @spec O004-beverage-sku-reuse
+# E2E Test Scenario: 饮品配方只能关联成品SKU（SKU选择器过滤）
+# User Story 2 - Priority: P2
+
+scenario_id: E2E-PRODUCT-003
+spec_ref: O004
+title: 饮品配方配置时SKU选择器仅显示finished_product类型SKU
+description: |
+  验证运营人员在配置饮品配方（BOM）时，SKU选择器自动过滤掉packaging和raw_material类型的SKU，
+  仅显示finished_product类型的选项，确保不会误选包材作为饮品。
+
+tags:
+  module: [product, beverage, bom]
+  channel: [web]
+  deploy: [saas]
+  priority: p2
+  smoke: false
+  user_story: [US2]
+
+preconditions:
+  role: admin
+  testdata_ref: TD-BOM-COCKTAIL-001
+  description: |
+    - 系统中已存在3个finished_product类型的饮品SKU（威士忌可乐、薄荷威士忌、冰镇可乐）
+    - 系统中已存在5个packaging类型的包材SKU（杯子、吸管、餐巾纸等）
+    - 系统中已存在2个raw_material类型的原料SKU（威士忌、可乐）
+    - 管理员账号已登录B端系统
+    - 测试数据将通过 e2e-testdata-planner 生成的 fixtures 准备
+
+steps:
+  # Step 1: 管理员登录B端系统
+  - action: login
+    system: b-end
+    description: 运营人员使用管理员账号登录B端系统
+    params:
+      testdata_ref: TD-BOM-COCKTAIL-001.adminCredentials
+
+  # Step 2: 导航到BOM配方管理页面
+  - action: navigate
+    system: b-end
+    description: 导航到商品管理 > BOM配方管理页面
+    params:
+      url: '/products/bom'
+
+  # Step 3: 点击新增配方按钮
+  - action: click
+    system: b-end
+    description: 点击"新增配方"按钮
+    params:
+      selector: '[data-testid="add-bom-button"]'
+
+  # Step 4: 打开SKU选择器
+  - action: click
+    system: b-end
+    description: 点击"选择饮品SKU"按钮打开SKU选择器弹窗
+    params:
+      selector: '[data-testid="select-beverage-sku-button"]'
+
+  # Step 5: 等待SKU选择器加载
+  - action: wait_for_load
+    system: b-end
+    description: 等待SKU选择器数据加载完成（≤1秒）
+    params:
+      timeout: 1000
+
+  # Step 6: 验证选择器中只有finished_product SKU
+  - action: count_elements
+    system: b-end
+    description: 统计选择器中显示的SKU数量
+    params:
+      selector: '[data-testid="sku-selector-option"]'
+      testdata_ref: TD-BOM-COCKTAIL-001.expectedSkuCount
+
+assertions:
+  # Assertion 1: SKU选择器弹窗可见
+  - type: ui
+    check: element_visible
+    description: SKU选择器弹窗应该可见
+    params:
+      selector: '[data-testid="sku-selector-modal"]'
+
+  # Assertion 2: 只显示3个finished_product SKU
+  - type: ui
+    check: element_count_equals
+    description: SKU选择器中应只显示3个finished_product类型的选项
+    params:
+      selector: '[data-testid="sku-selector-option"]'
+      expected: 3
+
+  # Assertion 3: packaging类型SKU不显示
+  - type: ui
+    check: element_not_visible
+    description: packaging类型的SKU（如"杯子"）不应显示在选择器中
+    params:
+      selector: '[data-testid="sku-selector-option"]:has-text("杯子")'
+
+  # Assertion 4: raw_material类型SKU不显示
+  - type: ui
+    check: element_not_visible
+    description: raw_material类型的SKU（如"威士忌原液"）不应显示在选择器中
+    params:
+      selector: '[data-testid="sku-selector-option"]:has-text("威士忌原液")'
+
+  # Assertion 5: finished_product SKU正确显示
+  - type: ui
+    check: element_visible
+    description: finished_product类型的饮品SKU应显示在选择器中
+    params:
+      selector: '[data-testid="sku-selector-option"]:has-text("威士忌可乐鸡尾酒")'
+
+  # Assertion 6: 搜索功能正常
+  - type: ui
+    check: search_filter_works
+    description: 在搜索框输入"威士忌"应只显示包含"威士忌"的finished_product SKU
+    params:
+      search_input_selector: '[data-testid="sku-search-input"]'
+      search_keyword: '威士忌'
+      result_selector: '[data-testid="sku-selector-option"]'
+      expected_results: ['威士忌可乐鸡尾酒', '薄荷威士忌鸡尾酒']
+
+  # Assertion 7: 手动输入packaging类型SKU编码被拒绝
+  - type: ui
+    check: input_validation_error_shown
+    description: 手动输入packaging类型SKU编码应显示错误提示
+    params:
+      input_selector: '[data-testid="sku-code-input"]'
+      input_value: 'PKG-CUP-001'  # packaging类型的杯子SKU编码
+      error_message: '只能选择成品类型的SKU'
+
+edge_cases:
+  # Edge Case 1: SKU类型后期修改
+  - scenario: 已关联的finished_product SKU后来被修改为packaging类型
+    testdata_ref: TD-BOM-COCKTAIL-001.skuTypeChanged
+    expected_behavior: 系统应保留历史关联但标记为"无效关联"，提示运营人员更新配方
+
+  # Edge Case 2: 选择器中无可选SKU
+  - scenario: 系统中不存在任何finished_product类型的饮品SKU
+    testdata_ref: TD-BOM-COCKTAIL-001.noFinishedProductSku
+    expected_behavior: SKU选择器应显示"暂无可选饮品SKU，请先创建成品饮品"提示
+
+  # Edge Case 3: 搜索结果为空
+  - scenario: 搜索关键词无匹配结果
+    testdata_ref: TD-BOM-COCKTAIL-001.noSearchResults
+    expected_behavior: SKU选择器应显示"未找到匹配的饮品SKU"提示
+
+success_criteria:
+  - SKU选择器在1秒内加载完成
+  - SKU选择器过滤准确率达到100%（所有显示的选项均为finished_product类型）
+  - packaging和raw_material类型SKU完全不显示
+  - 搜索功能正常工作，支持按SKU名称和编码模糊搜索
+  - 手动输入非finished_product类型SKU编码时显示明确的错误提示
+
+test_data_requirements:
+  # Finished Product SKUs (应显示)
+  - SKU编码: FIN-WHISKEY-COLA-001, 名称: 威士忌可乐鸡尾酒, 类型: finished_product
+  - SKU编码: FIN-MOJITO-001, 名称: 薄荷威士忌鸡尾酒, 类型: finished_product
+  - SKU编码: FIN-COLA-ICE-001, 名称: 冰镇可乐, 类型: finished_product
+
+  # Packaging SKUs (不应显示)
+  - SKU编码: PKG-CUP-001, 名称: 杯子, 类型: packaging
+  - SKU编码: PKG-STRAW-001, 名称: 吸管, 类型: packaging
+  - SKU编码: PKG-NAPKIN-001, 名称: 餐巾纸, 类型: packaging
+  - SKU编码: PKG-COASTER-001, 名称: 杯垫, 类型: packaging
+  - SKU编码: PKG-LID-001, 名称: 杯盖, 类型: packaging
+
+  # Raw Material SKUs (不应显示)
+  - SKU编码: RAW-WHISKEY-001, 名称: 威士忌原液, 类型: raw_material
+  - SKU编码: RAW-COLA-001, 名称: 可乐浓缩液, 类型: raw_material
+
+  # Admin Credentials
+  - 管理员账号: admin / admin123
+
+  # Test Data Blueprint
+  - 测试数据蓝图: TD-BOM-COCKTAIL-001（通过 e2e-testdata-planner 生成）

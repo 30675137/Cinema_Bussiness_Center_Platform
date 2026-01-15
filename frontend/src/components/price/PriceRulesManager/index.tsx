@@ -18,7 +18,7 @@ import {
   Badge,
   Form,
   Switch,
-  Alert
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -27,7 +27,7 @@ import {
   PlayCircleOutlined,
   SettingOutlined,
   CopyOutlined,
-  EyeOutlined
+  EyeOutlined,
 } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,14 +37,14 @@ import {
   useCreatePriceRuleMutation,
   useUpdatePriceRuleMutation,
   useDeletePriceRuleMutation,
-  useApplyPriceRuleMutation
+  useApplyPriceRuleMutation,
 } from '@/stores/priceStore';
 import {
   PriceRule,
   PriceRuleType,
   PriceRuleTypeConfig,
   PriceRuleSchema,
-  PriceRuleInput
+  PriceRuleInput,
 } from '@/types/price';
 import PriceRuleForm from './PriceRuleForm';
 
@@ -60,11 +60,7 @@ const PriceRulesManager: React.FC = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
-  const {
-    data: priceRules = [],
-    isLoading,
-    refetch
-  } = usePriceRulesQuery();
+  const { data: priceRules = [], isLoading, refetch } = usePriceRulesQuery();
 
   const createMutation = useCreatePriceRuleMutation();
   const updateMutation = useUpdatePriceRuleMutation();
@@ -109,7 +105,7 @@ const PriceRulesManager: React.FC = () => {
     try {
       const result = await applyMutation.mutateAsync({
         ruleId: selectedRule.id,
-        productIds: selectedProductIds
+        productIds: selectedProductIds,
       });
 
       message.success(`成功应用规则到 ${result.applied} 个商品`);
@@ -128,7 +124,7 @@ const PriceRulesManager: React.FC = () => {
     try {
       await updateMutation.mutateAsync({
         id: rule.id,
-        data: { isActive: !rule.isActive }
+        data: { isActive: !rule.isActive },
       });
       message.success(`规则已${rule.isActive ? '停用' : '启用'}`);
       refetch();
@@ -142,7 +138,7 @@ const PriceRulesManager: React.FC = () => {
     const newRule = {
       ...rule,
       name: `${rule.name} (副本)`,
-      isActive: false
+      isActive: false,
     };
     delete (newRule as any).id;
     delete (newRule as any).createdAt;
@@ -173,14 +169,14 @@ const PriceRulesManager: React.FC = () => {
             </Text>
           )}
         </Space>
-      )
+      ),
     },
     {
       title: '规则类型',
       dataIndex: 'type',
       key: 'type',
       width: 120,
-      render: (type: PriceRuleType) => getRuleTypeTag(type)
+      render: (type: PriceRuleType) => getRuleTypeTag(type),
     },
     {
       title: '折扣配置',
@@ -194,16 +190,14 @@ const PriceRulesManager: React.FC = () => {
             {record.config.discountType === 'percentage' ? '%' : '元'}
           </Text>
         </div>
-      )
+      ),
     },
     {
       title: '优先级',
       dataIndex: 'priority',
       key: 'priority',
       width: 80,
-      render: (priority: number) => (
-        <Tag color={priority > 5 ? 'red' : 'blue'}>{priority}</Tag>
-      )
+      render: (priority: number) => <Tag color={priority > 5 ? 'red' : 'blue'}>{priority}</Tag>,
     },
     {
       title: '状态',
@@ -217,14 +211,14 @@ const PriceRulesManager: React.FC = () => {
           checkedChildren="启用"
           unCheckedChildren="停用"
         />
-      )
+      ),
     },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 150,
-      render: (date: string) => new Date(date).toLocaleString()
+      render: (date: string) => new Date(date).toLocaleString(),
     },
     {
       title: '操作',
@@ -264,22 +258,17 @@ const PriceRulesManager: React.FC = () => {
             okText="确定"
             cancelText="取消"
           >
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-            />
+            <Button type="text" size="small" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 统计信息
   const renderStatistics = () => {
-    const activeRules = priceRules.filter(rule => rule.isActive).length;
-    const inactiveRules = priceRules.filter(rule => !rule.isActive).length;
+    const activeRules = priceRules.filter((rule) => rule.isActive).length;
+    const inactiveRules = priceRules.filter((rule) => !rule.isActive).length;
 
     return (
       <Row gutter={16} style={{ marginBottom: 16 }}>
@@ -330,9 +319,7 @@ const PriceRulesManager: React.FC = () => {
           </Col>
           <Col>
             <Space>
-              <Button icon={<SettingOutlined />}>
-                规则设置
-              </Button>
+              <Button icon={<SettingOutlined />}>规则设置</Button>
               <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
                 新建规则
               </Button>
@@ -355,11 +342,7 @@ const PriceRulesManager: React.FC = () => {
             />
           </Col>
           <Col>
-            <Select
-              placeholder="规则类型"
-              style={{ width: 150 }}
-              allowClear
-            >
+            <Select placeholder="规则类型" style={{ width: 150 }} allowClear>
               <Option value={PriceRuleType.FIXED_DISCOUNT}>固定折扣</Option>
               <Option value={PriceRuleType.PERCENTAGE_DISCOUNT}>百分比折扣</Option>
               <Option value={PriceRuleType.FIXED_AMOUNT}>固定金额</Option>
@@ -394,8 +377,7 @@ const PriceRulesManager: React.FC = () => {
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
           }}
           scroll={{ x: 1000 }}
         />

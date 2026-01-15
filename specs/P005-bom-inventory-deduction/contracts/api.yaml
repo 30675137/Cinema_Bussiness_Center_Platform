@@ -1,0 +1,729 @@
+openapi: 3.0.3
+info:
+  title: BOM Inventory Reservation & Deduction API
+  description: |
+    API for BOM-based inventory reservation and deduction.
+    Supports two-phase inventory management: reservation on order placement,
+    deduction on fulfillment, with comprehensive transaction logging.
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+  - url: https://api.example.com/api
+    description: Production server
+
+tags:
+  - name: inventory-reservation
+    description: Inventory reservation operations
+  - name: inventory-deduction
+    description: Inventory deduction operations
+  - name: inventory-transactions
+    description: Inventory transaction log operations
+
+paths:
+  /inventory/reservations:
+    post:
+      tags:
+        - inventory-reservation
+      summary: Reserve inventory for order
+      description: |
+        Creates inventory reservations for an order by expanding BOM formulas
+        and locking required raw materials and packaging components.
+        Returns success if all components can be reserved, otherwise returns
+        detailed shortage information.
+      operationId: reserveInventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRequest'
+            examples:
+              singleProduct:
+                summary: Single product order
+                value:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  storeId: "store-001"
+                  items:
+                    - skuId: "sku-cocktail-001"
+                      quantity: 1
+                      unit: "杯"
+              multipleProducts:
+                summary: Multiple products order
+                value:
+                  orderId: "550e8400-e29b-41d4-a716-446655440001"
+                  storeId: "store-001"
+                  items:
+                    - skuId: "sku-cocktail-001"
+                      quantity: 2
+                      unit: "杯"
+                    - skuId: "sku-popcorn-001"
+                      quantity: 1
+                      unit: "份"
+      responses:
+        '200':
+          description: Reservation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+              example:
+                success: true
+                data:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  reservationIds:
+                    - "res-001"
+                    - "res-002"
+                    - "res-003"
+                  reservedComponents:
+                    - skuId: "raw001"
+                      skuName: "威士忌"
+                      quantity: 45
+                      unit: "ml"
+                    - skuId: "raw002"
+                      skuName: "可乐"
+                      quantity: 150
+                      unit: "ml"
+                timestamp: "2025-12-29T10:30:00Z"
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INV_VAL_001"
+                message: "Invalid reservation request"
+                details:
+                  field: "items"
+                  reason: "Items array cannot be empty"
+                timestamp: "2025-12-29T10:30:00Z"
+        '422':
+          description: Insufficient inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsufficientInventoryError'
+              example:
+                success: false
+                error: "INV_BIZ_001"
+                message: "Insufficient inventory for order"
+                details:
+                  shortages:
+                    - skuId: "raw002"
+                      skuName: "可乐"
+                      available: 100
+                      required: 150
+                      shortage: 50
+                      unit: "ml"
+                timestamp: "2025-12-29T10:30:00Z"
+
+  /inventory/reservations/{orderId}:
+    delete:
+      tags:
+        - inventory-reservation
+      summary: Release reservation for order
+      description: |
+        Releases inventory reservations when an order is cancelled.
+        Updates reservation status to CANCELLED and releases locked inventory.
+      operationId: releaseReservation
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Order ID
+      responses:
+        '200':
+          description: Reservation released successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReleaseResponse'
+              example:
+                success: true
+                data:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  releasedReservations: 3
+                  releasedComponents:
+                    - skuId: "raw001"
+                      skuName: "威士忌"
+                      quantity: 45
+                      unit: "ml"
+                timestamp: "2025-12-29T10:35:00Z"
+        '404':
+          description: Order not found or no active reservations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INV_NTF_001"
+                message: "No active reservations found for order"
+                details:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                timestamp: "2025-12-29T10:35:00Z"
+
+  /inventory/deductions:
+    post:
+      tags:
+        - inventory-deduction
+      summary: Deduct inventory on order fulfillment
+      description: |
+        Deducts actual inventory when order is fulfilled (e.g., bartender confirms drink preparation).
+        Uses BOM snapshot stored at reservation time to ensure correct quantities.
+        Atomically deducts current_quantity, releases reserved_quantity, and generates transaction logs.
+      operationId: deductInventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeductionRequest'
+            examples:
+              standard:
+                summary: Standard deduction
+                value:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  operatorId: "user-001"
+              adjusted:
+                summary: Deduction with manual adjustment
+                value:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  operatorId: "user-001"
+                  adjustments:
+                    - skuId: "raw001"
+                      actualQuantity: 50
+                      reason: "实际使用量略多于标准配方"
+      responses:
+        '200':
+          description: Deduction successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeductionResponse'
+              example:
+                success: true
+                data:
+                  orderId: "550e8400-e29b-41d4-a716-446655440000"
+                  deductedComponents:
+                    - skuId: "raw001"
+                      skuName: "威士忌"
+                      quantity: 45
+                      unit: "ml"
+                      quantityBefore: 100
+                      quantityAfter: 55
+                    - skuId: "raw002"
+                      skuName: "可乐"
+                      quantity: 150
+                      unit: "ml"
+                      quantityBefore: 500
+                      quantityAfter: 350
+                  transactionIds:
+                    - "txn-001"
+                    - "txn-002"
+                timestamp: "2025-12-29T10:40:00Z"
+        '422':
+          description: Insufficient current inventory for deduction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "INV_BIZ_002"
+                message: "Insufficient current inventory for deduction"
+                details:
+                  skuId: "raw001"
+                  skuName: "威士忌"
+                  currentQuantity: 30
+                  requiredQuantity: 45
+                  shortage: 15
+                timestamp: "2025-12-29T10:40:00Z"
+
+  /inventory/transactions:
+    get:
+      tags:
+        - inventory-transactions
+      summary: Query inventory transaction logs
+      description: |
+        Retrieves inventory transaction logs with filtering support.
+        Supports pagination and filtering by transaction type, SKU, date range, and order ID.
+      operationId: getInventoryTransactions
+      parameters:
+        - name: storeId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Store ID
+        - name: transactionType
+          in: query
+          schema:
+            type: string
+            enum:
+              - BOM_RESERVATION
+              - BOM_DEDUCTION
+              - RESERVATION_RELEASE
+              - ADJUSTMENT_SURPLUS
+              - ADJUSTMENT_SHORTAGE
+              - DAMAGE
+          description: Filter by transaction type
+        - name: skuId
+          in: query
+          schema:
+            type: string
+          description: Filter by SKU ID
+        - name: orderId
+          in: query
+          schema:
+            type: string
+          description: Filter by related order ID
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Start date (ISO 8601)
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: End date (ISO 8601)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Page size
+      responses:
+        '200':
+          description: Transaction logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionListResponse'
+              example:
+                success: true
+                data:
+                  - id: "txn-001"
+                    storeId: "store-001"
+                    skuId: "raw001"
+                    skuName: "威士忌"
+                    transactionType: "BOM_DEDUCTION"
+                    quantity: -45
+                    quantityBefore: 100
+                    quantityAfter: 55
+                    relatedOrderId: "order-123"
+                    operatorId: "user-001"
+                    operatorName: "张三"
+                    operatedAt: "2025-12-29T10:40:00Z"
+                    notes: "扣减45ml威士忌用于鸡尾酒制作"
+                total: 150
+                page: 1
+                pageSize: 20
+                message: "查询成功"
+                timestamp: "2025-12-29T11:00:00Z"
+
+  /inventory/transactions/{transactionId}:
+    get:
+      tags:
+        - inventory-transactions
+      summary: Get transaction detail with BOM components
+      description: |
+        Retrieves detailed information for a specific transaction.
+        For BOM_DEDUCTION transactions, includes full BOM component breakdown.
+      operationId: getTransactionDetail
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Transaction ID
+      responses:
+        '200':
+          description: Transaction detail retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDetailResponse'
+              example:
+                success: true
+                data:
+                  id: "txn-001"
+                  storeId: "store-001"
+                  skuId: "raw001"
+                  skuName: "威士忌"
+                  transactionType: "BOM_DEDUCTION"
+                  quantity: -45
+                  quantityBefore: 100
+                  quantityAfter: 55
+                  relatedOrderId: "order-123"
+                  bomSnapshot:
+                    formulaId: "f001"
+                    skuId: "sku-cocktail-001"
+                    skuName: "威士忌可乐鸡尾酒"
+                    components:
+                      - skuId: "raw001"
+                        skuName: "威士忌"
+                        quantity: 45
+                        unit: "ml"
+                        wastageRate: 0.05
+                      - skuId: "raw002"
+                        skuName: "可乐"
+                        quantity: 150
+                        unit: "ml"
+                        wastageRate: 0.02
+                  operatorId: "user-001"
+                  operatorName: "张三"
+                  operatedAt: "2025-12-29T10:40:00Z"
+                  notes: "扣减45ml威士忌用于鸡尾酒制作"
+                timestamp: "2025-12-29T11:00:00Z"
+
+components:
+  schemas:
+    ReservationRequest:
+      type: object
+      required:
+        - orderId
+        - storeId
+        - items
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: Order ID
+        storeId:
+          type: string
+          description: Store ID
+        items:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - skuId
+              - quantity
+              - unit
+            properties:
+              skuId:
+                type: string
+                description: SKU ID
+              quantity:
+                type: number
+                minimum: 0
+                description: Order quantity
+              unit:
+                type: string
+                description: Unit of measurement
+
+    ReservationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+            reservationIds:
+              type: array
+              items:
+                type: string
+            reservedComponents:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComponentQuantity'
+        timestamp:
+          type: string
+          format: date-time
+
+    ReleaseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+            releasedReservations:
+              type: integer
+            releasedComponents:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComponentQuantity'
+        timestamp:
+          type: string
+          format: date-time
+
+    DeductionRequest:
+      type: object
+      required:
+        - orderId
+        - operatorId
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: Order ID
+        operatorId:
+          type: string
+          description: Operator user ID
+        adjustments:
+          type: array
+          description: Optional manual quantity adjustments
+          items:
+            type: object
+            required:
+              - skuId
+              - actualQuantity
+            properties:
+              skuId:
+                type: string
+              actualQuantity:
+                type: number
+              reason:
+                type: string
+
+    DeductionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+            deductedComponents:
+              type: array
+              items:
+                type: object
+                properties:
+                  skuId:
+                    type: string
+                  skuName:
+                    type: string
+                  quantity:
+                    type: number
+                  unit:
+                    type: string
+                  quantityBefore:
+                    type: number
+                  quantityAfter:
+                    type: number
+            transactionIds:
+              type: array
+              items:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    TransactionListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InventoryTransaction'
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    TransactionDetailResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          allOf:
+            - $ref: '#/components/schemas/InventoryTransaction'
+            - type: object
+              properties:
+                bomSnapshot:
+                  $ref: '#/components/schemas/BomSnapshot'
+        timestamp:
+          type: string
+          format: date-time
+
+    InventoryTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+        skuId:
+          type: string
+        skuName:
+          type: string
+        transactionType:
+          type: string
+          enum:
+            - BOM_RESERVATION
+            - BOM_DEDUCTION
+            - RESERVATION_RELEASE
+            - ADJUSTMENT_SURPLUS
+            - ADJUSTMENT_SHORTAGE
+            - DAMAGE
+        quantity:
+          type: number
+          description: Positive for increase, negative for decrease
+        quantityBefore:
+          type: number
+        quantityAfter:
+          type: number
+        relatedOrderId:
+          type: string
+          format: uuid
+        operatorId:
+          type: string
+        operatorName:
+          type: string
+        operatedAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+
+    BomSnapshot:
+      type: object
+      properties:
+        formulaId:
+          type: string
+        skuId:
+          type: string
+        skuName:
+          type: string
+        components:
+          type: array
+          items:
+            type: object
+            properties:
+              skuId:
+                type: string
+              skuName:
+                type: string
+              quantity:
+                type: number
+              unit:
+                type: string
+              wastageRate:
+                type: number
+
+    ComponentQuantity:
+      type: object
+      properties:
+        skuId:
+          type: string
+        skuName:
+          type: string
+        quantity:
+          type: number
+        unit:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error code (e.g., INV_VAL_001, INV_NTF_001)
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+
+    InsufficientInventoryError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "INV_BIZ_001"
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            shortages:
+              type: array
+              items:
+                type: object
+                properties:
+                  skuId:
+                    type: string
+                  skuName:
+                    type: string
+                  available:
+                    type: number
+                  required:
+                    type: number
+                  shortage:
+                    type: number
+                  unit:
+                    type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

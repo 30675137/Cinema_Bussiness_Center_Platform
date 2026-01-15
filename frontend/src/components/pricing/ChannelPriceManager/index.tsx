@@ -19,7 +19,7 @@ import {
   Col,
   Statistic,
   Upload,
-  Progress
+  Progress,
 } from 'antd';
 import {
   PlusOutlined,
@@ -30,7 +30,7 @@ import {
   SyncOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -68,10 +68,7 @@ interface ChannelPriceManagerProps {
   onPriceUpdate?: (price: ChannelPrice) => void;
 }
 
-const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
-  productId,
-  onPriceUpdate
-}) => {
+const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({ productId, onPriceUpdate }) => {
   const [prices, setPrices] = useState<ChannelPrice[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -79,7 +76,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
   const [selectedChannel, setSelectedChannel] = useState<string>();
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
     dayjs().subtract(30, 'day'),
-    dayjs()
+    dayjs(),
   ]);
   const [statusFilter, setStatusFilter] = useState<string>();
   const [form] = Form.useForm();
@@ -94,9 +91,9 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         productId: 'PROD001',
         productName: '爆米花-中份',
         productSku: 'POPCORN-M',
-        basePrice: 25.00,
-        channelPrice: 22.50,
-        discountRate: 0.10,
+        basePrice: 25.0,
+        channelPrice: 22.5,
+        discountRate: 0.1,
         effectiveDate: '2024-01-01',
         expiryDate: '2024-12-31',
         status: 'active',
@@ -105,7 +102,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         createdBy: '李四',
         createdAt: '2023-12-28T15:20:00',
         updatedBy: '李四',
-        updatedAt: '2024-01-01T10:30:00'
+        updatedAt: '2024-01-01T10:30:00',
       },
       {
         id: '2',
@@ -114,8 +111,8 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         productId: 'PROD001',
         productName: '爆米花-中份',
         productSku: 'POPCORN-M',
-        basePrice: 25.00,
-        channelPrice: 25.00,
+        basePrice: 25.0,
+        channelPrice: 25.0,
         discountRate: 0,
         effectiveDate: '2024-01-01',
         expiryDate: '2024-12-31',
@@ -125,7 +122,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         createdBy: '张三',
         createdAt: '2023-12-25T09:00:00',
         updatedBy: '王经理',
-        updatedAt: '2024-01-01T11:15:00'
+        updatedAt: '2024-01-01T11:15:00',
       },
       {
         id: '3',
@@ -134,16 +131,16 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         productId: 'PROD002',
         productName: '电影票-标准',
         productSku: 'TICKET-STD',
-        basePrice: 45.00,
-        channelPrice: 36.00,
-        discountRate: 0.20,
+        basePrice: 45.0,
+        channelPrice: 36.0,
+        discountRate: 0.2,
         effectiveDate: '2024-02-01',
         expiryDate: '2024-06-30',
         status: 'pending',
         createdBy: '赵六',
         createdAt: '2024-01-20T14:30:00',
         updatedBy: '赵六',
-        updatedAt: '2024-01-20T14:30:00'
+        updatedAt: '2024-01-20T14:30:00',
       },
       {
         id: '4',
@@ -152,20 +149,20 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         productId: 'PROD003',
         productName: '可乐-大杯',
         productSku: 'COKE-L',
-        basePrice: 15.00,
-        channelPrice: 13.50,
-        discountRate: 0.10,
+        basePrice: 15.0,
+        channelPrice: 13.5,
+        discountRate: 0.1,
         effectiveDate: '2024-01-15',
         expiryDate: '2024-03-15',
         status: 'expired',
         createdBy: '钱七',
         createdAt: '2024-01-10T16:45:00',
         updatedBy: '钱七',
-        updatedAt: '2024-01-10T16:45:00'
-      }
+        updatedAt: '2024-01-10T16:45:00',
+      },
     ];
 
-    const filteredData = mockData.filter(price => {
+    const filteredData = mockData.filter((price) => {
       if (productId && price.productId !== productId) return false;
       if (selectedChannel && price.channelCode !== selectedChannel) return false;
       if (statusFilter && price.status !== statusFilter) return false;
@@ -182,12 +179,11 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
   // 计算统计数据
   const stats = {
     total: prices.length,
-    active: prices.filter(p => p.status === 'active').length,
-    pending: prices.filter(p => p.status === 'pending').length,
-    expired: prices.filter(p => p.status === 'expired').length,
-    avgDiscount: prices.length > 0
-      ? prices.reduce((sum, p) => sum + p.discountRate, 0) / prices.length
-      : 0
+    active: prices.filter((p) => p.status === 'active').length,
+    pending: prices.filter((p) => p.status === 'pending').length,
+    expired: prices.filter((p) => p.status === 'expired').length,
+    avgDiscount:
+      prices.length > 0 ? prices.reduce((sum, p) => sum + p.discountRate, 0) / prices.length : 0,
   };
 
   // 渠道选项
@@ -197,7 +193,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
     { label: '企业采购', value: 'ENTERPRISE' },
     { label: '美团渠道', value: 'MEITUAN' },
     { label: '饿了么', value: 'ELEME' },
-    { label: '抖音小店', value: 'DOUYIN' }
+    { label: '抖音小店', value: 'DOUYIN' },
   ];
 
   // 表格列配置
@@ -210,7 +206,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
           <div style={{ fontWeight: 'bold' }}>{record.channelName}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>{record.channelCode}</div>
         </div>
-      )
+      ),
     },
     {
       title: '商品信息',
@@ -220,7 +216,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
           <div style={{ fontWeight: 'bold' }}>{record.productName}</div>
           <div style={{ fontSize: '12px', color: '#666' }}>SKU: {record.productSku}</div>
         </div>
-      )
+      ),
     },
     {
       title: '价格信息',
@@ -231,13 +227,16 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
             基础价: <span style={{ color: '#666' }}>¥{record.basePrice.toFixed(2)}</span>
           </div>
           <div>
-            渠道价: <span style={{ color: '#f50', fontWeight: 'bold' }}>¥{record.channelPrice.toFixed(2)}</span>
+            渠道价:{' '}
+            <span style={{ color: '#f50', fontWeight: 'bold' }}>
+              ¥{record.channelPrice.toFixed(2)}
+            </span>
           </div>
           <div style={{ fontSize: '12px', color: '#666' }}>
             折扣: {record.discountRate > 0 ? `${(record.discountRate * 100).toFixed(1)}%` : '无'}
           </div>
         </div>
-      )
+      ),
     },
     {
       title: '有效期',
@@ -252,14 +251,12 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         return (
           <div>
             <div>{start.format('YYYY-MM-DD')}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              至 {end.format('YYYY-MM-DD')}
-            </div>
+            <div style={{ fontSize: '12px', color: '#666' }}>至 {end.format('YYYY-MM-DD')}</div>
             {isExpired && <Tag color="red">已过期</Tag>}
             {isPending && <Tag color="orange">未生效</Tag>}
           </div>
         );
-      }
+      },
     },
     {
       title: '状态',
@@ -270,7 +267,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
           active: { color: 'green', text: '已生效', icon: <CheckCircleOutlined /> },
           pending: { color: 'orange', text: '待审核', icon: <ClockCircleOutlined /> },
           expired: { color: 'red', text: '已过期', icon: <ExclamationCircleOutlined /> },
-          draft: { color: 'default', text: '草稿', icon: null }
+          draft: { color: 'default', text: '草稿', icon: null },
         };
 
         const config = statusConfig[status as keyof typeof statusConfig];
@@ -280,7 +277,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
             <span>{config.text}</span>
           </Space>
         );
-      }
+      },
     },
     {
       title: '审批信息',
@@ -298,7 +295,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
             <span style={{ color: '#999' }}>待审批</span>
           )}
         </div>
-      )
+      ),
     },
     {
       title: '操作',
@@ -330,8 +327,8 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
             </Button>
           </Popconfirm>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 处理编辑
@@ -339,14 +336,14 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
     setEditingPrice(price);
     form.setFieldsValue({
       ...price,
-      dateRange: [dayjs(price.effectiveDate), dayjs(price.expiryDate)]
+      dateRange: [dayjs(price.effectiveDate), dayjs(price.expiryDate)],
     });
     setModalVisible(true);
   };
 
   // 处理删除
   const handleDelete = (price: ChannelPrice) => {
-    setPrices(prices.filter(p => p.id !== price.id));
+    setPrices(prices.filter((p) => p.id !== price.id));
     message.success('删除成功');
   };
 
@@ -364,11 +361,11 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
       createdAt: editingPrice?.createdAt || dayjs().format('YYYY-MM-DDTHH:mm:ss'),
       updatedBy: '当前用户',
       updatedAt: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
-      status: editingPrice?.status || 'pending'
+      status: editingPrice?.status || 'pending',
     };
 
     if (editingPrice) {
-      setPrices(prices.map(p => p.id === editingPrice.id ? newPrice : p));
+      setPrices(prices.map((p) => (p.id === editingPrice.id ? newPrice : p)));
       message.success('更新成功');
     } else {
       setPrices([...prices, newPrice]);
@@ -394,13 +391,14 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
       }
     },
     beforeUpload(file) {
-      const isExcel = file.type === 'application/vnd.ms-excel' ||
-                     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      const isExcel =
+        file.type === 'application/vnd.ms-excel' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       if (!isExcel) {
         message.error('只能上传 Excel 文件!');
       }
       return isExcel || Upload.LIST_IGNORE;
-    }
+    },
   };
 
   return (
@@ -460,7 +458,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
               allowClear
               style={{ width: '100%' }}
             >
-              {channelOptions.map(option => (
+              {channelOptions.map((option) => (
                 <Option key={option.value} value={option.value}>
                   {option.label}
                 </Option>
@@ -527,7 +525,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total) => `共 ${total} 条记录`
+            showTotal: (total) => `共 ${total} 条记录`,
           }}
         />
       </Card>
@@ -544,11 +542,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
         footer={null}
         width={800}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -557,7 +551,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
                 rules={[{ required: true, message: '请选择渠道' }]}
               >
                 <Select placeholder="请选择渠道">
-                  {channelOptions.map(option => (
+                  {channelOptions.map((option) => (
                     <Option key={option.value} value={option.label}>
                       {option.label}
                     </Option>
@@ -642,9 +636,7 @@ const ChannelPriceManager: React.FC<ChannelPriceManagerProps> = ({
 
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
             <Space>
-              <Button onClick={() => setModalVisible(false)}>
-                取消
-              </Button>
+              <Button onClick={() => setModalVisible(false)}>取消</Button>
               <Button type="primary" htmlType="submit">
                 {editingPrice ? '更新' : '创建'}
               </Button>

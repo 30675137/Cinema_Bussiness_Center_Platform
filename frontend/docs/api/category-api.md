@@ -14,12 +14,12 @@
 
 **请求参数**:
 
-| 参数名 | 类型 | 必填 | 说明 | 示例 |
-|--------|------|------|------|------|
-| level | number | 否 | 分类级别 | 1 |
-| parentId | string | 否 | 父分类ID | "cat_001" |
-| status | string | 否 | 分类状态 | "active" |
-| includeChildren | boolean | 否 | 是否包含子分类 | true |
+| 参数名          | 类型    | 必填 | 说明           | 示例      |
+| --------------- | ------- | ---- | -------------- | --------- |
+| level           | number  | 否   | 分类级别       | 1         |
+| parentId        | string  | 否   | 父分类ID       | "cat_001" |
+| status          | string  | 否   | 分类状态       | "active"  |
+| includeChildren | boolean | 否   | 是否包含子分类 | true      |
 
 **响应示例**:
 

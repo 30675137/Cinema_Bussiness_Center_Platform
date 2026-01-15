@@ -1,0 +1,6 @@
+dist
+node_modules
+coverage
+*.config.js
+babel.config.js
+package-lock.json

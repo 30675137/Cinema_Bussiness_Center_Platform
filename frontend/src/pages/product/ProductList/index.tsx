@@ -17,9 +17,9 @@ import {
   Avatar,
   Badge,
   Dropdown,
-  MenuProps,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import type { MenuProps } from 'antd';
 import {
   PlusOutlined,
   SearchOutlined,
@@ -63,7 +63,7 @@ const ProductList: React.FC = () => {
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 20,
-    total: 0
+    total: 0,
   });
 
   // 排序状态
@@ -77,7 +77,7 @@ const ProductList: React.FC = () => {
     keyword: searchKeyword,
     ...filters,
     sortBy: sortField,
-    sortOrder
+    sortOrder,
   };
 
   const { data: productsData, isLoading, refetch } = useProductsQuery(queryParams);
@@ -85,10 +85,7 @@ const ProductList: React.FC = () => {
 
   // 设置面包屑
   useEffect(() => {
-    setBreadcrumbs([
-      { title: t('menu.product') },
-      { title: t('product.list') }
-    ]);
+    setBreadcrumbs([{ title: t('menu.product') }, { title: t('product.list') }]);
   }, [setBreadcrumbs, t]);
 
   // 处理分页变化
@@ -96,7 +93,7 @@ const ProductList: React.FC = () => {
     setPagination({
       ...pagination,
       current: paginationInfo.current,
-      pageSize: paginationInfo.pageSize
+      pageSize: paginationInfo.pageSize,
     });
 
     if (sorter.field) {
@@ -156,7 +153,7 @@ const ProductList: React.FC = () => {
       inactive: { color: 'red', text: '下架' },
       pending: { color: 'blue', text: '待审核' },
       rejected: { color: 'volcano', text: '已驳回' },
-      discontinued: { color: 'default', text: '已停产' }
+      discontinued: { color: 'default', text: '已停产' },
     };
     const config = statusMap[status] || { color: 'default', text: status };
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -169,7 +166,7 @@ const ProductList: React.FC = () => {
       semi_finished: { color: 'cyan', text: '半成品' },
       finished_goods: { color: 'blue', text: '成品' },
       consumable: { color: 'green', text: '消耗品' },
-      packaging: { color: 'orange', text: '包装材料' }
+      packaging: { color: 'orange', text: '包装材料' },
     };
     const config = typeMap[type] || { color: 'default', text: type };
     return <Tag color={config.color}>{config.text}</Tag>;
@@ -182,19 +179,19 @@ const ProductList: React.FC = () => {
         key: 'copy',
         label: '复制商品',
         icon: <CopyOutlined />,
-        onClick: () => handleCopy(record)
+        onClick: () => handleCopy(record),
       },
       {
-        type: 'divider'
+        type: 'divider',
       },
       {
         key: 'delete',
         label: '删除商品',
         icon: <DeleteOutlined />,
         danger: true,
-        onClick: () => handleDelete(record.id)
-      }
-    ]
+        onClick: () => handleDelete(record.id),
+      },
+    ],
   });
 
   // 表格列定义
@@ -205,12 +202,7 @@ const ProductList: React.FC = () => {
       width: 300,
       render: (_, record) => (
         <Space>
-          <Avatar
-            size={48}
-            shape="square"
-            src={record.images?.[0]?.url}
-            icon={<EditOutlined />}
-          />
+          <Avatar size={48} shape="square" src={record.images?.[0]?.url} icon={<EditOutlined />} />
           <div>
             <div style={{ fontWeight: 500, marginBottom: 4 }} data-testid="cell-name">
               {record.name}
@@ -218,12 +210,10 @@ const ProductList: React.FC = () => {
             <div style={{ fontSize: 12, color: '#8c8c8c' }} data-testid="cell-sku">
               SKU: {record.skuId}
             </div>
-            <div style={{ marginTop: 4 }}>
-              {getMaterialTypeTag(record.materialType)}
-            </div>
+            <div style={{ marginTop: 4 }}>{getMaterialTypeTag(record.materialType)}</div>
           </div>
         </Space>
-      )
+      ),
     },
     {
       title: <span data-testid="table-header-category">类目</span>,
@@ -232,7 +222,7 @@ const ProductList: React.FC = () => {
       width: 120,
       render: (_, record) => (
         <Text data-testid="cell-category">{record.category?.name || '-'}</Text>
-      )
+      ),
     },
     {
       title: <span data-testid="table-header-price">价格</span>,
@@ -241,31 +231,33 @@ const ProductList: React.FC = () => {
       width: 100,
       sorter: true,
       render: (price: number) => (
-        <Text strong data-testid="cell-price">¥{(price || 0).toFixed(2)}</Text>
-      )
+        <Text strong data-testid="cell-price">
+          ¥{(price || 0).toFixed(2)}
+        </Text>
+      ),
     },
     {
       title: <span data-testid="table-header-status">状态</span>,
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: ProductStatus) => <span data-testid="cell-status">{getStatusTag(status)}</span>
+      render: (status: ProductStatus) => (
+        <span data-testid="cell-status">{getStatusTag(status)}</span>
+      ),
     },
     {
       title: <span data-testid="table-header-stock">库存</span>,
       dataIndex: 'stock',
       key: 'stock',
       width: 100,
-      render: (stock: number) => (
-        <Text data-testid="cell-stock">{stock || 0}</Text>
-      )
+      render: (stock: number) => <Text data-testid="cell-stock">{stock || 0}</Text>,
     },
     {
       title: '品牌',
       dataIndex: 'brand',
       key: 'brand',
       width: 100,
-      render: (brand: string) => brand || '-'
+      render: (brand: string) => brand || '-',
     },
     {
       title: '创建时间',
@@ -273,7 +265,7 @@ const ProductList: React.FC = () => {
       key: 'createdAt',
       width: 150,
       sorter: true,
-      render: (date: string) => new Date(date).toLocaleDateString()
+      render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
       title: '操作',
@@ -299,15 +291,11 @@ const ProductList: React.FC = () => {
             />
           </Tooltip>
           <Dropdown menu={getMoreMenu(record)} trigger={['click']}>
-            <Button
-              type="text"
-              size="small"
-              icon={<MoreOutlined />}
-            />
+            <Button type="text" size="small" icon={<MoreOutlined />} />
           </Dropdown>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   // 表格选择配置
@@ -315,7 +303,7 @@ const ProductList: React.FC = () => {
     selectedRowKeys,
     onChange: (newSelectedRowKeys: React.Key[]) => {
       setSelectedRowKeys(newSelectedRowKeys as string[]);
-    }
+    },
   };
 
   const products = productsData?.data || [];
@@ -341,10 +329,15 @@ const ProductList: React.FC = () => {
               <Button icon={<ReloadOutlined />} onClick={() => refetch()}>
                 刷新
               </Button>
-              <Button icon={<ExportOutlined />} onClick={handleExport} data-testid="batch-export">        
+              <Button icon={<ExportOutlined />} onClick={handleExport} data-testid="batch-export">
                 导出
               </Button>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate} data-testid="create-product-button">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreate}
+                data-testid="create-product-button"
+              >
                 新建商品
               </Button>
             </Space>
@@ -354,7 +347,11 @@ const ProductList: React.FC = () => {
           <Row style={{ marginTop: 16 }}>
             <Space>
               <Text data-testid="selected-count">已选择 {selectedRowKeys.length} 项</Text>
-              <Button danger data-testid="batch-delete" onClick={() => message.info('批量删除功能开发中...')}>
+              <Button
+                danger
+                data-testid="batch-delete"
+                onClick={() => message.info('批量删除功能开发中...')}
+              >
                 批量删除
               </Button>
             </Space>
@@ -386,11 +383,21 @@ const ProductList: React.FC = () => {
                 onChange={(value) => setFilters({ ...filters, materialType: value })}
                 data-testid="material-type-filter"
               >
-                <Option value="raw_material" data-value="原材料">原材料</Option>
-                <Option value="semi_finished" data-value="半成品">半成品</Option>
-                <Option value="finished_goods" data-value="成品">成品</Option>
-                <Option value="consumable" data-value="消耗品">消耗品</Option>
-                <Option value="packaging" data-value="包装材料">包装材料</Option>
+                <Option value="raw_material" data-value="原材料">
+                  原材料
+                </Option>
+                <Option value="semi_finished" data-value="半成品">
+                  半成品
+                </Option>
+                <Option value="finished_goods" data-value="成品">
+                  成品
+                </Option>
+                <Option value="consumable" data-value="消耗品">
+                  消耗品
+                </Option>
+                <Option value="packaging" data-value="包装材料">
+                  包装材料
+                </Option>
               </Select>
 
               <Select
@@ -398,32 +405,56 @@ const ProductList: React.FC = () => {
                 style={{ width: 120 }}
                 allowClear
                 value={filters.status?.[0]}
-                onChange={(value) => setFilters({
-                  ...filters,
-                  status: value ? [value] : undefined
-                })}
+                onChange={(value) =>
+                  setFilters({
+                    ...filters,
+                    status: value ? [value] : undefined,
+                  })
+                }
                 data-testid="status-filter"
               >
-                <Option value="draft" data-value="draft">草稿</Option>
-                <Option value="active" data-value="active">上架</Option>
-                <Option value="inactive" data-value="inactive">下架</Option>
-                <Option value="pending" data-value="pending">待审核</Option>
-                <Option value="rejected" data-value="rejected">已驳回</Option>
-                <Option value="discontinued" data-value="discontinued">已停产</Option>
+                <Option value="draft" data-value="draft">
+                  草稿
+                </Option>
+                <Option value="active" data-value="active">
+                  上架
+                </Option>
+                <Option value="inactive" data-value="inactive">
+                  下架
+                </Option>
+                <Option value="pending" data-value="pending">
+                  待审核
+                </Option>
+                <Option value="rejected" data-value="rejected">
+                  已驳回
+                </Option>
+                <Option value="discontinued" data-value="discontinued">
+                  已停产
+                </Option>
               </Select>
-              
+
               <Select
                 placeholder="商品类目"
                 style={{ width: 120 }}
                 allowClear
                 data-testid="category-filter"
               >
-                <Option value="food" data-value="食品">食品</Option>
-                <Option value="beverage" data-value="饮料">饮料</Option>
-                <Option value="snack" data-value="零食">零食</Option>
+                <Option value="food" data-value="食品">
+                  食品
+                </Option>
+                <Option value="beverage" data-value="饮料">
+                  饮料
+                </Option>
+                <Option value="snack" data-value="零食">
+                  零食
+                </Option>
               </Select>
-              
-              <Button icon={<FilterOutlined />} data-testid="mobile-filter-toggle" style={{ display: 'none' }}>
+
+              <Button
+                icon={<FilterOutlined />}
+                data-testid="mobile-filter-toggle"
+                style={{ display: 'none' }}
+              >
                 筛选
               </Button>
             </Space>
@@ -441,19 +472,18 @@ const ProductList: React.FC = () => {
           rowSelection={{
             ...rowSelection,
             getCheckboxProps: (record: Product) => ({
-              'data-testid': 'select-checkbox'
-            })
+              'data-testid': 'select-checkbox',
+            }),
           }}
           onRow={(record) => ({
-            'data-testid': 'product-row'
+            'data-testid': 'product-row',
           })}
           pagination={{
             ...pagination,
             total: totalCount,
             showSizeChanger: true,
             showQuickJumper: true,
-            showTotal: (total, range) =>
-              `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+            showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
             className: 'pagination',
             itemRender: (page, type, originalElement) => {
               if (type === 'page') {
@@ -463,7 +493,7 @@ const ProductList: React.FC = () => {
                 return <span data-testid="next-page">{originalElement}</span>;
               }
               return originalElement;
-            }
+            },
           }}
           onChange={handleTableChange}
           scroll={{ x: 1200 }}

@@ -1,0 +1,442 @@
+{
+  "info": {
+    "_postman_id": "019-store-association",
+    "name": "019 Store Association API Tests",
+    "description": "API tests for scenario package store association feature (019-store-association)\n\nThis collection covers:\n- Store list retrieval\n- Scenario package CRUD with store associations\n- Store association validation\n\nPer constitution v1.5.0 API Testing Standards",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Get Stores List (Setup)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T054: Verify GET /api/stores returns valid response",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has data array', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Store objects have required fields', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.data.length > 0) {",
+                  "        const store = jsonData.data[0];",
+                  "        pm.expect(store).to.have.property('id');",
+                  "        pm.expect(store).to.have.property('name');",
+                  "        pm.expect(store).to.have.property('status');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save first two store IDs for later tests",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.environment.set('storeId1', jsonData.data[0].id);",
+                  "    if (jsonData.data.length > 1) {",
+                  "        pm.environment.set('storeId2', jsonData.data[1].id);",
+                  "    }",
+                  "    console.log('Saved storeId1:', jsonData.data[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/stores",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["stores"]
+            },
+            "description": "Get all available stores for association selection.\n\nExpected: 200 OK with array of store objects containing id, name, region, status fields."
+          },
+          "response": []
+        }
+      ],
+      "description": "Setup requests to prepare test data and environment variables"
+    },
+    {
+      "name": "Scenario Package CRUD",
+      "item": [
+        {
+          "name": "Create Package with Store Association",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// T058: Pre-request Script for test data setup",
+                  "const timestamp = Date.now();",
+                  "pm.environment.set('testPackageName', 'Postman Test Package ' + timestamp);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T056: Verify POST /api/scenario-packages with storeIds",
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains package data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    pm.expect(jsonData.data).to.have.property('name');",
+                  "});",
+                  "",
+                  "pm.test('Package has storeIds field', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    // storeIds may be in response or need to be fetched via GET",
+                  "    if (jsonData.data.storeIds) {",
+                  "        pm.expect(jsonData.data.storeIds).to.be.an('array');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Save created package ID for subsequent tests",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.environment.set('testPackageId', jsonData.data.id);",
+                  "    pm.environment.set('testPackageVersionLock', jsonData.data.versionLock || 0);",
+                  "    console.log('Created test package:', jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{testPackageName}}\",\n  \"description\": \"Test package created by Postman for API testing\",\n  \"rule\": {\n    \"durationHours\": 2,\n    \"minPeople\": 2,\n    \"maxPeople\": 10\n  },\n  \"storeIds\": [\"{{storeId1}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages"]
+            },
+            "description": "Create a new scenario package with store association.\n\nRequest body includes storeIds array with at least one store.\n\nExpected: 201 Created with package data including id and name."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Package Detail (Verify storeIds)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T055: Verify GET /api/scenario-packages/{id} includes storeIds",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains package data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('Package contains storeIds field', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.have.property('storeIds');",
+                  "    pm.expect(jsonData.data.storeIds).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('storeIds contains associated store', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const storeId1 = pm.environment.get('storeId1');",
+                  "    if (storeId1 && jsonData.data.storeIds) {",
+                  "        pm.expect(jsonData.data.storeIds).to.include(storeId1);",
+                  "    }",
+                  "});",
+                  "",
+                  "// Update versionLock for next update request",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.versionLock !== undefined) {",
+                  "    pm.environment.set('testPackageVersionLock', jsonData.data.versionLock);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages/{{testPackageId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages", "{{testPackageId}}"]
+            },
+            "description": "Get scenario package detail to verify storeIds are included in response.\n\nExpected: 200 OK with package data containing storeIds array."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Package Store Association",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T057: Verify PUT /api/scenario-packages/{id} with updated storeIds",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains updated package', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "});",
+                  "",
+                  "pm.test('Update succeeded', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.name).to.include('Updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versionLock\": {{testPackageVersionLock}},\n  \"name\": \"{{testPackageName}} - Updated\",\n  \"storeIds\": [\"{{storeId1}}\", \"{{storeId2}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages/{{testPackageId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages", "{{testPackageId}}"]
+            },
+            "description": "Update scenario package with new store associations.\n\nRequest includes versionLock for optimistic locking.\n\nExpected: 200 OK with updated package data."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Updated Store Association",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('storeIds updated correctly', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const storeId1 = pm.environment.get('storeId1');",
+                  "    const storeId2 = pm.environment.get('storeId2');",
+                  "    ",
+                  "    pm.expect(jsonData.data.storeIds).to.be.an('array');",
+                  "    if (storeId1) {",
+                  "        pm.expect(jsonData.data.storeIds).to.include(storeId1);",
+                  "    }",
+                  "    if (storeId2) {",
+                  "        pm.expect(jsonData.data.storeIds).to.include(storeId2);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages/{{testPackageId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages", "{{testPackageId}}"]
+            },
+            "description": "Verify the store association was updated correctly."
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD operations for scenario packages with store associations"
+    },
+    {
+      "name": "Validation Tests",
+      "item": [
+        {
+          "name": "Create Package without storeIds (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test that creating package without storeIds fails validation",
+                  "pm.test('Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates storeIds required', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    const responseText = JSON.stringify(jsonData).toLowerCase();",
+                  "    // Check for validation error about stores",
+                  "    const hasStoreError = responseText.includes('store') || ",
+                  "                          responseText.includes('门店') ||",
+                  "                          responseText.includes('required');",
+                  "    pm.expect(hasStoreError).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Package Without Stores\",\n  \"description\": \"This should fail validation\",\n  \"rule\": {\n    \"durationHours\": 2\n  },\n  \"storeIds\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages"]
+            },
+            "description": "Attempt to create a package with empty storeIds array.\n\nExpected: 400 Bad Request with validation error message."
+          },
+          "response": []
+        }
+      ],
+      "description": "Validation and edge case tests"
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "Delete Test Package",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// T059: Cleanup - delete test package",
+                  "pm.test('Status code is 204 No Content or 200 OK', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
+                  "});",
+                  "",
+                  "// Clear environment variables",
+                  "pm.environment.unset('testPackageId');",
+                  "pm.environment.unset('testPackageName');",
+                  "pm.environment.unset('testPackageVersionLock');",
+                  "console.log('Cleaned up test package');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/scenario-packages/{{testPackageId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["scenario-packages", "{{testPackageId}}"]
+            },
+            "description": "Delete the test package created during this test run.\n\nExpected: 204 No Content or 200 OK."
+          },
+          "response": []
+        }
+      ],
+      "description": "Cleanup requests to remove test data"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Running request:', pm.info.requestName);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "default"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api",
+      "type": "default"
+    }
+  ]
+}

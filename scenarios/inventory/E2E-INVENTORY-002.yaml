@@ -1,0 +1,134 @@
+scenario_id: E2E-INVENTORY-002
+spec_ref: P005
+title: 成品下单BOM库存预占与出品实扣流程验证
+description: 验证完整BOM扣料流程：下单时预占库存，出品时实际扣减现存库存并释放预占，确保库存数据一致性
+tags:
+  module:
+  - inventory
+  - order
+  channel:
+  - miniapp
+  - web
+  deploy:
+  - saas
+  priority: p1
+  smoke: true
+preconditions:
+  role: normal_user
+  testdata_ref: bomTestData.scenario_001
+steps:
+- action: login
+  system: c-end
+  description: 用户登录
+- action: navigate
+  system: c-end
+  params:
+    testdata_ref: bomTestData.products_page
+  description: 导航到商品页面
+- action: browse_product
+  system: c-end
+  params:
+    testdata_ref: bomTestData.product_whiskey_cola
+  description: 浏览成品SKU（威士忌可乐鸡尾酒）
+- action: add_to_cart
+  system: c-end
+  params:
+    testdata_ref: bomTestData.product_whiskey_cola
+    quantity: 1
+  description: 添加到购物车（数量：1）
+- action: checkout
+  system: c-end
+  description: 结账
+- action: create_order
+  system: c-end
+  params:
+    testdata_ref: bomTestData.order_params
+  description: 创建订单（触发预占）
+- action: click
+  system: b-end
+  params:
+    testdata_ref: bomTestData.confirm_production_btn
+  description: 吧台点击确认出品按钮（触发实扣）
+assertions:
+- type: api
+  check: response_status_is
+  params:
+    expected: 200
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: on_hand
+    testdata_ref: bomTestData.whiskey_after_reserve
+    expected: 100
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: reserved
+    testdata_ref: bomTestData.whiskey_after_reserve
+    expected: 45
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: on_hand
+    testdata_ref: bomTestData.cola_after_reserve
+    expected: 500
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: reserved
+    testdata_ref: bomTestData.cola_after_reserve
+    expected: 150
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: on_hand
+    testdata_ref: bomTestData.whiskey_after_deduct
+    expected: 55
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: reserved
+    testdata_ref: bomTestData.whiskey_after_deduct
+    expected: 0
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: on_hand
+    testdata_ref: bomTestData.cola_after_deduct
+    expected: 350
+- type: api
+  check: database_field_equals
+  params:
+    table: inventory
+    field: reserved
+    testdata_ref: bomTestData.cola_after_deduct
+    expected: 0
+- type: api
+  check: database_record_exists
+  params:
+    table: inventory_transactions
+    testdata_ref: bomTestData.whiskey_transaction
+- type: api
+  check: database_record_exists
+  params:
+    table: inventory_transactions
+    testdata_ref: bomTestData.cola_transaction
+- type: ui
+  check: toast_message_shown
+  params:
+    message: 出品成功
+artifacts:
+  trace: on-failure
+  video: on-failure
+  screenshot: only-on-failure
+metadata:
+  created_at: '2025-12-29T22:57:16.548070+00:00'
+  created_by: test-scenario-author
+  version: 1.0.0

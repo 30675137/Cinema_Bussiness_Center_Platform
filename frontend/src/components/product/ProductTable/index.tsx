@@ -12,12 +12,7 @@ import {
   Modal,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {
-  EditOutlined,
-  EyeOutlined,
-  DeleteOutlined,
-  CopyOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import type { Product } from '@/types';
 
 const { Text } = Typography;
@@ -93,7 +88,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   // 获取主图URL
   const getMainImage = (product: Product) => {
     if (product.images && product.images.length > 0) {
-      const mainImage = product.images.find(img => img.type === 'main');
+      const mainImage = product.images.find((img) => img.type === 'main');
       return mainImage ? mainImage.url : product.images[0].url;
     }
     return undefined;
@@ -149,9 +144,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             <div style={{ fontSize: '12px', color: '#666', marginBottom: 2 }}>
               SKU: {record.skuId}
             </div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              条码: {record.barcode || '-'}
-            </div>
+            <div style={{ fontSize: '12px', color: '#666' }}>条码: {record.barcode || '-'}</div>
           </div>
         </div>
       ),
@@ -203,9 +196,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 120,
-      render: (date) => (
-        <Text>{formatDate(date)}</Text>
-      ),
+      render: (date) => <Text>{formatDate(date)}</Text>,
     },
     {
       title: '操作',
@@ -244,12 +235,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               okText="确定"
               cancelText="取消"
             >
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-              />
+              <Button type="text" size="small" danger icon={<DeleteOutlined />} />
             </Popconfirm>
           </Tooltip>
         </Space>
@@ -267,8 +253,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         ...pagination,
         showSizeChanger: true,
         showQuickJumper: true,
-        showTotal: (total, range) =>
-          `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+        showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
       }}
       rowSelection={{
         selectedRowKeys,

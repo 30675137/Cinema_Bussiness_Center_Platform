@@ -1,0 +1,528 @@
+/**
+ * @spec O003-beverage-order
+ * @spec O012-order-inventory-reservation
+ * @spec O013-order-channel-migration
+ * 饮品订单业务逻辑层
+ */
+package com.cinema.beverage.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cinema.beverage.dto.BeverageOrderDTO;
+import com.cinema.beverage.dto.CreateBeverageOrderRequest;
+import com.cinema.beverage.entity.BeverageOrder;
+import com.cinema.beverage.entity.BeverageOrderItem;
+import com.cinema.beverage.entity.QueueNumber;
+import com.cinema.beverage.exception.OrderNotFoundException;
+import com.cinema.beverage.repository.BeverageOrderRepository;
+import com.cinema.beverage.util.ProductSnapshotBuilder;
+import com.cinema.channelproduct.domain.ChannelProductConfig;
+import com.cinema.channelproduct.domain.enums.ChannelProductStatus;
+import com.cinema.channelproduct.repository.ChannelProductRepository;
+import com.cinema.hallstore.domain.Sku;
+import com.cinema.hallstore.domain.enums.SkuType;
+import com.cinema.hallstore.repository.SkuJpaRepository;
+import com.cinema.inventory.entity.InventoryReservation;
+import com.cinema.inventory.exception.InsufficientInventoryException;
+import com.cinema.inventory.service.InventoryReservationService;
+import com.cinema.product.exception.SkuNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * 饮品订单服务类
+ *
+ * 对应 spec: O003-beverage-order, O012-order-inventory-reservation, O013-order-channel-migration
+ * 提供订单创建、支付、查询等业务逻辑
+ * 
+ * O012 集成:
+ * - 订单创建时自动调用库存预占服务
+ * - 处理库存不足异常
+ * - 预占失败时回滚订单创建
+ * 
+ * O013 集成:
+ * - 支持通过 channelProductId 下单
+ * - 从渠道商品配置获取价格和商品信息
+ * - 创建商品快照用于订单历史查询
+ */
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class BeverageOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BeverageOrderService.class);
+
+    private final BeverageOrderRepository orderRepository;
+    private final SkuJpaRepository skuRepository; // @clarification 2026-01-14: 使用SKU表替代Beverage表
+    private final ChannelProductRepository channelProductRepository; // @spec O013: 渠道商品配置仓库
+    private final OrderNumberGenerator orderNumberGenerator;
+    private final QueueNumberGenerator queueNumberGenerator;
+    private final ObjectMapper objectMapper;
+    private final ProductSnapshotBuilder productSnapshotBuilder; // @spec O013: 商品快照构建器
+    private final InventoryReservationService inventoryReservationService; // O012 integration
+
+    /**
+     * Mock支付延迟(毫秒)
+     */
+    @Value("${beverage.payment.mock-delay-ms:500}")
+    private long mockPaymentDelayMs;
+
+    /**
+     * 创建订单
+     *
+     * O012 集成:
+     * 1. 计算订单总价
+     * 2. 调用库存预占服务(BOM展开 + 库存检查 + 预占)
+     * 3. 创建订单记录
+     * 4. 更新预占记录的order_id
+     *
+     * @param request 创建订单请求
+     * @param userId 用户ID
+     * @return 订单DTO
+     * @throws InsufficientInventoryException 库存不足时抛出
+     */
+    @Transactional(timeout = 30) // O012: 预占需要更长超时时间
+    public BeverageOrderDTO createOrder(CreateBeverageOrderRequest request, UUID userId) {
+        // Structured logging for order creation (FR-027)
+        logger.info("OrderCreation - START: userId={}, storeId={}, itemCount={}, operation=CREATE_ORDER",
+                userId, request.getStoreId(), request.getItems().size());
+
+        // 1. 生成订单号
+        String orderNumber = orderNumberGenerator.generate();
+
+        // 2. 计算订单总价
+        BigDecimal totalPrice = calculateOrderTotal(request);
+
+        // 3. 创建订单对象
+        BeverageOrder order = BeverageOrder.builder()
+                .orderNumber(orderNumber)
+                .userId(userId)
+                .storeId(request.getStoreId())
+                .totalPrice(totalPrice)
+                .status(BeverageOrder.OrderStatus.PENDING_PAYMENT)
+                .customerNote(request.getCustomerNote())
+                .build();
+
+        // 4. 创建订单项
+        for (CreateBeverageOrderRequest.OrderItemRequest itemRequest : request.getItems()) {
+            BeverageOrderItem orderItem = createOrderItem(order, itemRequest);
+            order.addItem(orderItem);
+        }
+
+        // 5. 保存订单（获得orderId）
+        BeverageOrder savedOrder = orderRepository.save(order);
+        
+        // 6. O012: 调用库存预占服务（传入真实的orderId）
+        // 2026-01-14: 重构 - 先创建订单再预占库存，确保预占记录始终有正确的order_id
+        Map<UUID, BigDecimal> skuQuantities = extractSkuQuantities(request);
+        List<InventoryReservation> reservations;
+        
+        try {
+            reservations = inventoryReservationService.reserveInventory(
+                savedOrder.getId(),  // 传入真实的orderId
+                request.getStoreId(), 
+                skuQuantities
+            );
+            
+            logger.info("OrderCreation - INVENTORY_RESERVED: orderNumber={}, orderId={}, reservationCount={}",
+                    orderNumber, savedOrder.getId(), reservations.size());
+                    
+        } catch (InsufficientInventoryException e) {
+            // 库存不足,记录日志并抛出异常(事务会自动回滚，包括已保存的订单)
+            logger.warn("OrderCreation - FAILED: orderNumber={}, orderId={}, reason=INSUFFICIENT_INVENTORY, shortageCount={}",
+                    orderNumber, savedOrder.getId(), e.getShortages().size());
+            throw e; // 传递给Controller层处理，事务回滚
+        }
+
+        // Structured logging for order creation success (FR-027)
+        logger.info("OrderCreation - SUCCESS: orderNumber={}, totalPrice={}, orderId={}, itemCount={}, reservationCount={}, operation=CREATE_ORDER, status=PENDING_PAYMENT",
+                orderNumber, totalPrice, savedOrder.getId(), savedOrder.getItems().size(), reservations.size());
+
+        return BeverageOrderDTO.fromEntity(savedOrder);
+    }
+
+    /**
+     * 计算订单总价
+     * @spec O013-order-channel-migration: 支持通过 channelProductId 获取价格
+     * @clarification 2026-01-14: 使用SKU ID查询SKU表获取价格
+     * @clarification 2026-01-14: 验证SKU类型，仅成品和套餐可下单
+     *
+     * @param request 创建订单请求
+     * @return 订单总价
+     */
+    public BigDecimal calculateOrderTotal(CreateBeverageOrderRequest request) {
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (CreateBeverageOrderRequest.OrderItemRequest item : request.getItems()) {
+            BigDecimal itemPrice;
+            
+            // @spec O013: 优先使用 channelProductId
+            if (item.getChannelProductId() != null) {
+                ChannelProductConfig channelProduct = channelProductRepository.findById(item.getChannelProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("渠道商品不存在: " + item.getChannelProductId()));
+                
+                // 验证商品状态
+                if (channelProduct.getStatus() != ChannelProductStatus.ACTIVE) {
+                    throw new IllegalArgumentException("商品已下架: " + channelProduct.getDisplayName());
+                }
+                
+                // 获取 SKU 验证类型
+                Sku sku = skuRepository.findById(channelProduct.getSkuId())
+                        .orElseThrow(() -> new SkuNotFoundException(channelProduct.getSkuId()));
+                
+                // 验证SKU类型
+                if (sku.getSkuType() != SkuType.FINISHED_PRODUCT && sku.getSkuType() != SkuType.COMBO) {
+                    logger.error("OrderCreation - VALIDATION_FAILED: channelProductId={}, skuId={}, skuType={}, reason=INVALID_SKU_TYPE",
+                            item.getChannelProductId(), sku.getId(), sku.getSkuType());
+                    throw new IllegalArgumentException("商品类型不支持下单: " + sku.getName());
+                }
+                
+                // 使用渠道价格（分），如果为空则使用 SKU 价格（元）
+                if (channelProduct.getChannelPrice() != null) {
+                    itemPrice = new BigDecimal(channelProduct.getChannelPrice()).divide(new BigDecimal("100"));
+                } else {
+                    itemPrice = sku.getPrice();
+                }
+                
+                // 加上规格调整价格
+                itemPrice = addSpecPriceAdjustments(itemPrice, item.getSelectedSpecs());
+                
+            } else if (item.getSkuId() != null) {
+                // 向后兼容：使用 skuId
+                Sku sku = skuRepository.findById(item.getSkuId())
+                        .orElseThrow(() -> new SkuNotFoundException(item.getSkuId()));
+
+                // 验证SKU类型：只有成品(FINISHED_PRODUCT)和套餐(COMBO)可以下单
+                if (sku.getSkuType() != SkuType.FINISHED_PRODUCT && sku.getSkuType() != SkuType.COMBO) {
+                    String errorMsg = String.format(
+                        "SKU [%s] 类型为 [%s]，不能用于创建订单。只有成品(FINISHED_PRODUCT)和套餐(COMBO)可以下单",
+                        sku.getName(),
+                        sku.getSkuType()
+                    );
+                    logger.error("OrderCreation - VALIDATION_FAILED: skuId={}, skuType={}, reason=INVALID_SKU_TYPE",
+                            sku.getId(), sku.getSkuType());
+                    throw new IllegalArgumentException(errorMsg);
+                }
+
+                itemPrice = sku.getPrice();
+            } else {
+                throw new IllegalArgumentException("订单项必须指定 channelProductId 或 skuId");
+            }
+
+            // 乘以数量
+            BigDecimal itemTotal = itemPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
+            total = total.add(itemTotal);
+        }
+
+        return total;
+    }
+    
+    /**
+     * @spec O013-order-channel-migration
+     * 添加规格价格调整
+     */
+    private BigDecimal addSpecPriceAdjustments(BigDecimal basePrice, Map<String, Object> selectedSpecs) {
+        if (selectedSpecs == null || selectedSpecs.isEmpty()) {
+            return basePrice;
+        }
+        
+        BigDecimal adjustedPrice = basePrice;
+        for (Object specValue : selectedSpecs.values()) {
+            if (specValue instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> specOption = (Map<String, Object>) specValue;
+                Object priceAdjust = specOption.get("priceAdjust");
+                if (priceAdjust instanceof Number) {
+                    // priceAdjust 单位是分，转换为元
+                    BigDecimal adjustment = new BigDecimal(((Number) priceAdjust).toString())
+                            .divide(new BigDecimal("100"));
+                    adjustedPrice = adjustedPrice.add(adjustment);
+                }
+            }
+        }
+        return adjustedPrice;
+    }
+
+    /**
+     * 创建订单项
+     * @spec O013-order-channel-migration: 支持通过 channelProductId 创建订单项
+     * 2026-01-14: 使用现有的beverage_id字段，存储SKU ID
+     */
+    private BeverageOrderItem createOrderItem(BeverageOrder order, CreateBeverageOrderRequest.OrderItemRequest itemRequest) {
+        Sku sku;
+        UUID channelProductIdValue = null;
+        UUID skuId;
+        String productName;
+        String productImageUrl;
+        String productSnapshot = null;
+        BigDecimal unitPrice;
+        
+        // @spec O013: 优先使用 channelProductId
+        if (itemRequest.getChannelProductId() != null) {
+            channelProductIdValue = itemRequest.getChannelProductId();
+            final UUID cpId = channelProductIdValue; // 用于 lambda 引用
+            ChannelProductConfig channelProduct = channelProductRepository.findById(cpId)
+                    .orElseThrow(() -> new IllegalArgumentException("渠道商品不存在: " + cpId));
+            
+            skuId = channelProduct.getSkuId();
+            sku = skuRepository.findById(skuId)
+                    .orElseThrow(() -> new SkuNotFoundException(skuId));
+            
+            // 使用渠道商品的展示名称和图片
+            productName = channelProduct.getDisplayName() != null 
+                    ? channelProduct.getDisplayName() 
+                    : sku.getName();
+            productImageUrl = channelProduct.getMainImage();
+            
+            // 计算单价（分 -> 元）
+            if (channelProduct.getChannelPrice() != null) {
+                unitPrice = new BigDecimal(channelProduct.getChannelPrice()).divide(new BigDecimal("100"));
+            } else {
+                unitPrice = sku.getPrice();
+            }
+            
+            // 加上规格调整价格
+            unitPrice = addSpecPriceAdjustments(unitPrice, itemRequest.getSelectedSpecs());
+            
+            // 构建商品快照
+            productSnapshot = productSnapshotBuilder.buildSnapshot(
+                    channelProduct, sku, itemRequest.getSelectedSpecs());
+                    
+        } else if (itemRequest.getSkuId() != null) {
+            // 向后兼容：使用 skuId
+            skuId = itemRequest.getSkuId();
+            sku = skuRepository.findById(skuId)
+                    .orElseThrow(() -> new SkuNotFoundException(skuId));
+            
+            productName = sku.getName();
+            productImageUrl = null; // SKU无图片字段
+            unitPrice = sku.getPrice();
+        } else {
+            throw new IllegalArgumentException("订单项必须指定 channelProductId 或 skuId");
+        }
+
+        // 计算小计
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+
+        // 序列化规格
+        String selectedSpecsJson;
+        try {
+            selectedSpecsJson = objectMapper.writeValueAsString(itemRequest.getSelectedSpecs());
+        } catch (JsonProcessingException e) {
+            logger.error("序列化规格失败", e);
+            selectedSpecsJson = "{}";
+        }
+
+        return BeverageOrderItem.builder()
+                .channelProductId(channelProductIdValue) // @spec O013: 渠道商品ID
+                .skuId(sku.getId()) // @spec O013: SKU ID
+                .beverageId(sku.getId()) // 向后兼容: 使用beverage_id字段存储SKU ID
+                .productName(productName) // @spec O013: 商品名称
+                .productImageUrl(productImageUrl) // @spec O013: 商品图片
+                .productSnapshot(productSnapshot) // @spec O013: 商品快照
+                .selectedSpecs(selectedSpecsJson)
+                .quantity(itemRequest.getQuantity())
+                .unitPrice(unitPrice)
+                .subtotal(subtotal)
+                .customerNote(itemRequest.getCustomerNote())
+                .build();
+    }
+
+    /**
+     * Mock支付
+     *
+     * @param orderId 订单ID
+     * @return 订单DTO（包含取餐号）
+     */
+    @Transactional
+    public BeverageOrderDTO mockPay(UUID orderId) {
+        // Structured logging for payment start (FR-027)
+        logger.info("Payment - START: orderId={}, operation=PAY_ORDER",
+                orderId);
+
+        // 1. 查询订单
+        BeverageOrder order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
+
+        // 2. 检查订单状态
+        if (order.getStatus() != BeverageOrder.OrderStatus.PENDING_PAYMENT) {
+            // Structured error logging (FR-027)
+            logger.error("Payment - FAILED: orderId={}, orderNumber={}, currentStatus={}, expectedStatus=PENDING_PAYMENT, operation=PAY_ORDER, reason=INVALID_STATUS",
+                    orderId, order.getOrderNumber(), order.getStatus());
+            throw new IllegalStateException("订单状态不正确，无法支付: " + order.getStatus());
+        }
+
+        // 3. Mock支付延迟
+        try {
+            Thread.sleep(mockPaymentDelayMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warn("Mock支付延迟被中断", e);
+        }
+
+        // 4. 更新订单状态
+        order.setStatus(BeverageOrder.OrderStatus.PENDING_PRODUCTION);
+        order.setPaymentMethod("MOCK_PAYMENT");
+        order.setTransactionId("MOCK_TXN_" + System.currentTimeMillis());
+        order.setPaidAt(LocalDateTime.now());
+
+        // 5. 生成取餐号
+        QueueNumber queueNumber = queueNumberGenerator.generate(order.getStoreId(), order.getId());
+
+        // 6. 保存订单
+        BeverageOrder savedOrder = orderRepository.save(order);
+
+        // Structured logging for payment success (FR-027 audit requirements)
+        logger.info("Payment - SUCCESS: orderId={}, orderNumber={}, userId={}, storeId={}, amount={}, method={}, txnId={}, queueNumber={}, operation=PAY_ORDER, newStatus=PENDING_PRODUCTION",
+                orderId, order.getOrderNumber(), order.getUserId(), order.getStoreId(),
+                order.getTotalPrice(), order.getPaymentMethod(), order.getTransactionId(),
+                queueNumber.getQueueNumber());
+
+        return BeverageOrderDTO.fromEntity(savedOrder, queueNumber.getQueueNumber());
+    }
+
+    /**
+     * 根据ID查询订单
+     */
+    public BeverageOrderDTO findById(UUID orderId) {
+        logger.debug("查询订单: orderId={}", orderId);
+
+        BeverageOrder order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
+
+        return BeverageOrderDTO.fromEntity(order);
+    }
+
+    /**
+     * 根据订单号查询订单
+     */
+    public BeverageOrderDTO findByOrderNumber(String orderNumber) {
+        logger.debug("查询订单: orderNumber={}", orderNumber);
+
+        BeverageOrder order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new OrderNotFoundException(orderNumber, true));
+
+        return BeverageOrderDTO.fromEntity(order);
+    }
+
+    /**
+     * 查询用户订单列表
+     */
+    public Page<BeverageOrderDTO> findByUserId(UUID userId, Pageable pageable) {
+        logger.debug("查询用户订单列表: userId={}", userId);
+
+        Page<BeverageOrder> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+
+        return orders.map(BeverageOrderDTO::fromEntity);
+    }
+
+    /**
+     * 查询订单历史（支持筛选）
+     *
+     * US3: FR-019
+     * 用户能够查看历史订单列表，按时间倒序排列
+     *
+     * @param userId 用户ID（可选，C端用，B端可为null查询全部）
+     * @param storeId 门店ID（可选）
+     * @param status 订单状态（可选）
+     * @param startDate 起始日期（可选）
+     * @param endDate 截止日期（可选）
+     * @param pageable 分页参数
+     * @return 订单历史列表（分页）
+     */
+    public Page<BeverageOrderDTO> findOrderHistory(
+            UUID userId,
+            UUID storeId,
+            BeverageOrder.OrderStatus status,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            Pageable pageable) {
+
+        logger.debug("查询订单历史: userId={}, storeId={}, status={}, startDate={}, endDate={}",
+                userId, storeId, status, startDate, endDate);
+
+        Page<BeverageOrder> orders;
+
+        // 根据过滤条件组合查询
+        if (userId != null && status != null) {
+            // 用户 + 状态筛选
+            orders = orderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status, pageable);
+        } else if (userId != null && startDate != null && endDate != null) {
+            // 用户 + 时间范围
+            orders = orderRepository.findByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    userId, startDate, endDate, pageable);
+        } else if (userId != null) {
+            // 仅用户筛选
+            orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+        } else if (storeId != null && status != null) {
+            // 门店 + 状态
+            orders = orderRepository.findByStoreIdAndStatusOrderByCreatedAtDesc(storeId, status, pageable);
+        } else if (storeId != null && startDate != null && endDate != null) {
+            // 门店 + 时间范围
+            orders = orderRepository.findByStoreIdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    storeId, startDate, endDate, pageable);
+        } else if (storeId != null) {
+            // 仅门店筛选
+            orders = orderRepository.findByStoreIdOrderByCreatedAtDesc(storeId, pageable);
+        } else if (status != null && startDate != null && endDate != null) {
+            // 状态 + 时间范围
+            orders = orderRepository.findByStatusAndCreatedAtBetweenOrderByCreatedAtDesc(
+                    status, startDate, endDate, pageable);
+        } else {
+            // 无筛选条件，查询全部（B端场景）
+            orders = orderRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+
+        return orders.map(BeverageOrderDTO::fromEntity);
+    }
+
+    /**
+     * O012: 提取SKU数量映射表
+     * @spec O013-order-channel-migration: 支持从 channelProductId 提取 SKU ID
+     * @clarification 2026-01-14: 前端直接传入SKU ID，无需再查询转换
+     *
+     * @param request 订单创建请求
+     * @return SKU ID到数量的映射
+     */
+    private Map<UUID, BigDecimal> extractSkuQuantities(CreateBeverageOrderRequest request) {
+        Map<UUID, BigDecimal> skuQuantities = new HashMap<>();
+        
+        for (CreateBeverageOrderRequest.OrderItemRequest item : request.getItems()) {
+            UUID skuId;
+            
+            // @spec O013: 优先从 channelProductId 获取 skuId
+            if (item.getChannelProductId() != null) {
+                ChannelProductConfig channelProduct = channelProductRepository.findById(item.getChannelProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("渠道商品不存在: " + item.getChannelProductId()));
+                skuId = channelProduct.getSkuId();
+            } else if (item.getSkuId() != null) {
+                // 向后兼容：直接使用传入的SKU ID
+                skuId = item.getSkuId();
+            } else {
+                throw new IllegalArgumentException("订单项必须指定 channelProductId 或 skuId");
+            }
+            
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            
+            // 如果同SKU多次出现,累加数量
+            skuQuantities.merge(skuId, quantity, BigDecimal::add);
+        }
+        
+        return skuQuantities;
+    }
+}

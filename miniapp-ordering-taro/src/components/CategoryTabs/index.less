@@ -1,0 +1,83 @@
+/**
+ * @spec O007-miniapp-menu-api
+ * 分类侧边栏样式 - 深色主题
+ */
+
+.category-sidebar {
+  width: 160rpx;
+  height: 100%;
+  background-color: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.tab-list {
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx 0;
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 16rpx;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.tab-item.active {
+  background-color: rgba(245, 166, 35, 0.1);
+}
+
+.tab-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 60rpx;
+  background-color: #f5a623;
+  border-radius: 0 3rpx 3rpx 0;
+}
+
+.icon-wrapper {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8rpx;
+  transition: all 0.3s ease;
+
+  // 强制控制图标大小
+  .icon {
+    width: 36rpx !important;
+    height: 36rpx !important;
+  }
+}
+
+.icon-wrapper.active {
+  /* No special background for active state */
+}
+
+.tab-text {
+  font-size: 22rpx;
+  color: #888888;
+  text-align: center;
+  line-height: 1.2;
+  transition: all 0.3s ease;
+}
+
+.tab-text.active {
+  color: #f5a623;
+  font-weight: 500;
+}

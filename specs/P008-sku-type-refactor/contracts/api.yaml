@@ -1,0 +1,515 @@
+openapi: 3.0.3
+info:
+  title: P008 SKU 类型重构 API
+  description: |
+    SKU 类型管理 API 规范
+    - 移除 SPU 的 productType 字段
+    - SKU 创建时必须指定 skuType
+    - SKU 更新时禁止修改 skuType
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: SKU
+    description: SKU 管理接口
+  - name: SPU
+    description: SPU 管理接口 (移除 productType)
+
+paths:
+  /skus:
+    post:
+      tags:
+        - SKU
+      summary: 创建 SKU
+      description: |
+        创建新的 SKU，skuType 为必填字段。
+        根据 skuType 不同，需要填写不同的必填字段：
+        - RAW_MATERIAL/PACKAGING: standardCost 必填
+        - FINISHED_PRODUCT: bomComponents 必填
+        - COMBO: comboItems 必填
+      operationId: createSku
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuResponse'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingSkuType:
+                  summary: 缺少 SKU 类型
+                  value:
+                    success: false
+                    error: SKU_VAL_001
+                    message: SKU类型不能为空
+                    timestamp: "2026-01-10T10:00:00Z"
+                missingStandardCost:
+                  summary: 原料/包材类型缺少标准成本
+                  value:
+                    success: false
+                    error: SKU_VAL_002
+                    message: 原料和包材类型必须填写标准成本
+                    timestamp: "2026-01-10T10:00:00Z"
+
+    get:
+      tags:
+        - SKU
+      summary: 查询 SKU 列表
+      operationId: listSkus
+      parameters:
+        - name: skuType
+          in: query
+          description: SKU 类型筛选
+          schema:
+            type: string
+            enum: [raw_material, packaging, finished_product, combo]
+        - name: spuId
+          in: query
+          description: SPU ID 筛选
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuListResponse'
+
+  /skus/{id}:
+    get:
+      tags:
+        - SKU
+      summary: 获取 SKU 详情
+      operationId: getSku
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuResponse'
+        '404':
+          description: SKU 不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - SKU
+      summary: 更新 SKU
+      description: |
+        更新 SKU 信息。**注意：skuType 字段不可修改**。
+        如果请求中包含 skuType 字段且与现有值不同，将返回 400 错误。
+      operationId: updateSku
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SkuUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SkuResponse'
+        '400':
+          description: 请求参数错误或尝试修改 skuType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                skuTypeImmutable:
+                  summary: SKU 类型不可修改
+                  value:
+                    success: false
+                    error: SKU_BIZ_001
+                    message: SKU类型创建后不可修改
+                    timestamp: "2026-01-10T10:00:00Z"
+
+  /spu/create:
+    post:
+      tags:
+        - SPU
+      summary: 创建 SPU
+      description: |
+        创建新的 SPU。**注意：不再支持 productType 字段**。
+        产品类型由关联的 SKU 单独管理。
+      operationId: createSpu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpuCreateRequest'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpuResponse'
+
+  /spu/{id}:
+    get:
+      tags:
+        - SPU
+      summary: 获取 SPU 详情
+      description: |
+        获取 SPU 详情。**注意：响应中不再包含 productType 字段**。
+      operationId: getSpu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpuResponse'
+
+    put:
+      tags:
+        - SPU
+      summary: 更新 SPU
+      description: |
+        更新 SPU 信息。**注意：不再支持 productType 字段**。
+      operationId: updateSpu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpuUpdateRequest'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpuResponse'
+
+components:
+  schemas:
+    SkuType:
+      type: string
+      description: SKU 类型枚举
+      enum:
+        - raw_material
+        - packaging
+        - finished_product
+        - combo
+      x-enum-descriptions:
+        - 原料 - 需手动输入标准成本
+        - 包材 - 需手动输入标准成本
+        - 成品 - 需配置 BOM，成本自动计算
+        - 套餐 - 需配置套餐子项
+
+    SkuCreateRequest:
+      type: object
+      required:
+        - spuId
+        - name
+        - skuType
+      properties:
+        spuId:
+          type: string
+          description: 关联的 SPU ID
+        name:
+          type: string
+          description: SKU 名称
+        skuType:
+          $ref: '#/components/schemas/SkuType'
+        standardCost:
+          type: number
+          format: decimal
+          description: |
+            标准成本。
+            - 原料/包材类型：必填
+            - 成品/套餐类型：自动计算，忽略此字段
+        bomComponents:
+          type: array
+          description: BOM 组件列表（成品类型必填）
+          items:
+            $ref: '#/components/schemas/BomComponent'
+        comboItems:
+          type: array
+          description: 套餐子项列表（套餐类型必填）
+          items:
+            $ref: '#/components/schemas/ComboItem'
+
+    SkuUpdateRequest:
+      type: object
+      description: |
+        SKU 更新请求。**skuType 字段不在此请求中，因为创建后不可修改**。
+      properties:
+        name:
+          type: string
+          description: SKU 名称
+        standardCost:
+          type: number
+          format: decimal
+          description: 标准成本（仅原料/包材类型可修改）
+        bomComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/BomComponent'
+        comboItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComboItem'
+
+    SkuResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Sku'
+        timestamp:
+          type: string
+          format: date-time
+
+    Sku:
+      type: object
+      properties:
+        id:
+          type: string
+        spuId:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        skuType:
+          $ref: '#/components/schemas/SkuType'
+        standardCost:
+          type: number
+          format: decimal
+        status:
+          type: string
+          enum: [draft, enabled, disabled]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SkuListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            list:
+              type: array
+              items:
+                $ref: '#/components/schemas/Sku'
+            total:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    SpuCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: SPU 名称
+        description:
+          type: string
+          description: 商品描述
+        brandId:
+          type: string
+          description: 品牌 ID
+        categoryId:
+          type: string
+          description: 分类 ID
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              alt:
+                type: string
+        # 注意：不再包含 productType 字段
+
+    SpuUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        brandId:
+          type: string
+        categoryId:
+          type: string
+        images:
+          type: array
+          items:
+            type: object
+        # 注意：不再包含 productType 字段
+
+    SpuResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Spu'
+        timestamp:
+          type: string
+          format: date-time
+
+    Spu:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+        brandId:
+          type: string
+        brandName:
+          type: string
+        categoryId:
+          type: string
+        categoryName:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, inactive]
+        images:
+          type: array
+          items:
+            type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        # 注意：不再包含 productType 字段
+
+    BomComponent:
+      type: object
+      properties:
+        skuId:
+          type: string
+          description: 原料/包材 SKU ID
+        quantity:
+          type: number
+          description: 用量
+        unit:
+          type: string
+          description: 单位
+        lossRate:
+          type: number
+          description: 损耗率 (0-1)
+
+    ComboItem:
+      type: object
+      properties:
+        skuId:
+          type: string
+          description: 套餐子项 SKU ID
+        quantity:
+          type: integer
+          description: 数量
+        isRequired:
+          type: boolean
+          description: 是否必选
+        maxQuantity:
+          type: integer
+          description: 最大可选数量
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误编号
+        message:
+          type: string
+          description: 错误信息
+        details:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time

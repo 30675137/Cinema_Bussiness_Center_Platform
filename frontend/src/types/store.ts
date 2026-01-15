@@ -17,13 +17,13 @@ export enum StoreType {
   CINEMA = 'cinema',
   THEATER = 'theater',
   CONCERT_HALL = 'concert_hall',
-  MIXED = 'mixed'
+  MIXED = 'mixed',
 }
 
 export enum StoreStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
-  MAINTENANCE = 'maintenance'
+  MAINTENANCE = 'maintenance',
 }
 
 export interface StoreAddress {

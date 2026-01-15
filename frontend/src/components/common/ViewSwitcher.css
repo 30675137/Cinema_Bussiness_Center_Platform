@@ -1,0 +1,27 @@
+/**
+ * @spec D002-process-flow-map
+ * 视图切换组件样式
+ */
+.view-switcher {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.view-switcher button {
+  min-width: 120px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.view-switcher button.active {
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.view-switcher button:not(.active):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}

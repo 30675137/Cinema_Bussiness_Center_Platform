@@ -1,0 +1,548 @@
+openapi: 3.0.3
+info:
+  title: Material & Unit Conversion API
+  description: |
+    物料单位体系统一 API 文档
+
+    提供以下功能:
+    - 物料主数据管理 (Material CRUD)
+    - 单位主数据管理 (Unit CRUD)
+    - 单位换算服务 (Conversion Service)
+    - 全局换算规则管理 (Global Conversion Rules)
+  version: 1.0.0
+  contact:
+    name: Cinema Business Center Platform Team
+  x-spec: M001-material-unit-system
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api.cinema-platform.com/api
+    description: 生产环境
+
+tags:
+  - name: Material
+    description: 物料管理
+  - name: Unit
+    description: 单位管理
+  - name: Conversion
+    description: 单位换算
+  - name: UnitConversion
+    description: 全局换算规则
+
+paths:
+  /materials:
+    get:
+      tags: [Material]
+      summary: 查询物料列表
+      description: 支持按分类筛选物料
+      parameters:
+        - name: category
+          in: query
+          description: 物料分类筛选
+          schema:
+            $ref: '#/components/schemas/MaterialCategory'
+      responses:
+        '200':
+          description: 成功返回物料列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MaterialResponse'
+    post:
+      tags: [Material]
+      summary: 创建物料
+      description: 创建新物料，编码自动生成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialCreateRequest'
+      responses:
+        '201':
+          description: 物料创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MaterialResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /materials/{id}:
+    get:
+      tags: [Material]
+      summary: 查询单个物料
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      responses:
+        '200':
+          description: 成功返回物料详情
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MaterialResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Material]
+      summary: 更新物料
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialUpdateRequest'
+      responses:
+        '200':
+          description: 物料更新成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MaterialResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Material]
+      summary: 删除物料
+      description: 如果物料被 BOM 引用，删除将失败
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+      responses:
+        '204':
+          description: 物料删除成功
+        '409':
+          description: 物料被引用，无法删除
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /units:
+    get:
+      tags: [Unit]
+      summary: 查询单位列表
+      parameters:
+        - name: category
+          in: query
+          description: 单位分类筛选
+          schema:
+            $ref: '#/components/schemas/UnitCategory'
+      responses:
+        '200':
+          description: 成功返回单位列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UnitResponse'
+    post:
+      tags: [Unit]
+      summary: 创建单位
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitCreateRequest'
+      responses:
+        '201':
+          description: 单位创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UnitResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /conversions/convert:
+    post:
+      tags: [Conversion]
+      summary: 执行单位换算
+      description: |
+        支持物料级和全局换算:
+        - 如果提供 materialId 且物料使用物料级换算，优先使用物料级换算率
+        - 否则使用全局换算规则（支持双向）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversionRequest'
+      responses:
+        '200':
+          description: 换算成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ConversionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /conversions/can-convert:
+    get:
+      tags: [Conversion]
+      summary: 检查是否可换算
+      parameters:
+        - name: fromUnitCode
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: toUnitCode
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: materialId
+          in: query
+          description: 物料ID（可选）
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 返回是否可换算
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: boolean
+
+  /unit-conversions:
+    get:
+      tags: [UnitConversion]
+      summary: 查询全局换算规则列表
+      responses:
+        '200':
+          description: 成功返回换算规则列表
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UnitConversionResponse'
+    post:
+      tags: [UnitConversion]
+      summary: 创建全局换算规则
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitConversionCreateRequest'
+      responses:
+        '201':
+          description: 换算规则创建成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UnitConversionResponse'
+
+components:
+  parameters:
+    MaterialId:
+      name: id
+      in: path
+      required: true
+      description: 物料ID
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    ApiResponse:
+      type: object
+      required: [success, timestamp]
+      properties:
+        success:
+          type: boolean
+          description: 请求是否成功
+        data:
+          type: object
+          description: 响应数据
+        error:
+          type: string
+          description: 错误编号
+        message:
+          type: string
+          description: 错误消息
+        timestamp:
+          type: string
+          format: date-time
+          description: 响应时间
+
+    MaterialCategory:
+      type: string
+      enum: [RAW_MATERIAL, PACKAGING]
+      description: |
+        物料分类:
+        - RAW_MATERIAL: 原料
+        - PACKAGING: 包装材料
+
+    UnitCategory:
+      type: string
+      enum: [VOLUME, WEIGHT, COUNT]
+      description: |
+        单位分类:
+        - VOLUME: 体积
+        - WEIGHT: 重量
+        - COUNT: 计数
+
+    MaterialCreateRequest:
+      type: object
+      required: [name, category, inventoryUnitId, purchaseUnitId, conversionRate, useGlobalConversion]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: 物料名称
+        category:
+          $ref: '#/components/schemas/MaterialCategory'
+        specification:
+          type: string
+          maxLength: 200
+          description: 规格说明
+        inventoryUnitId:
+          type: string
+          format: uuid
+          description: 库存单位ID
+        purchaseUnitId:
+          type: string
+          format: uuid
+          description: 采购单位ID
+        conversionRate:
+          type: number
+          minimum: 0.000001
+          description: 换算率（仅 useGlobalConversion=false 时有效）
+        useGlobalConversion:
+          type: boolean
+          description: 是否使用全局换算
+
+    MaterialUpdateRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        specification:
+          type: string
+          maxLength: 200
+        conversionRate:
+          type: number
+          minimum: 0.000001
+        useGlobalConversion:
+          type: boolean
+
+    MaterialResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+          pattern: '^MAT-(RAW|PKG)-\d{3}$'
+          description: 物料编码（自动生成）
+        name:
+          type: string
+        category:
+          $ref: '#/components/schemas/MaterialCategory'
+        specification:
+          type: string
+        inventoryUnitId:
+          type: string
+          format: uuid
+        purchaseUnitId:
+          type: string
+          format: uuid
+        conversionRate:
+          type: number
+        useGlobalConversion:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UnitCreateRequest:
+      type: object
+      required: [code, name, category]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: 单位代码
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 单位名称
+        category:
+          $ref: '#/components/schemas/UnitCategory'
+
+    UnitResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        category:
+          $ref: '#/components/schemas/UnitCategory'
+
+    ConversionRequest:
+      type: object
+      required: [fromUnitCode, toUnitCode, quantity]
+      properties:
+        fromUnitCode:
+          type: string
+          description: 源单位代码
+        toUnitCode:
+          type: string
+          description: 目标单位代码
+        quantity:
+          type: number
+          minimum: 0.000001
+          description: 数量
+        materialId:
+          type: string
+          format: uuid
+          description: 物料ID（可选，用于物料级换算）
+
+    ConversionResponse:
+      type: object
+      properties:
+        convertedQuantity:
+          type: number
+          description: 换算后数量
+        fromUnitCode:
+          type: string
+        toUnitCode:
+          type: string
+        originalQuantity:
+          type: number
+          description: 原始数量
+        source:
+          type: string
+          enum: [MATERIAL, GLOBAL]
+          description: 换算来源
+        conversionPath:
+          type: string
+          description: 换算路径说明
+
+    UnitConversionCreateRequest:
+      type: object
+      required: [fromUnitCode, toUnitCode, rate]
+      properties:
+        fromUnitCode:
+          type: string
+        toUnitCode:
+          type: string
+        rate:
+          type: number
+          minimum: 0.000001
+          description: 换算率（1 fromUnit = rate * toUnit）
+
+    UnitConversionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromUnitCode:
+          type: string
+        toUnitCode:
+          type: string
+        rate:
+          type: number
+
+  responses:
+    BadRequest:
+      description: 请求参数验证失败
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example:
+            success: false
+            error: "VAL_001"
+            message: "请求参数验证失败"
+            timestamp: "2026-01-11T10:00:00Z"
+
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example:
+            success: false
+            error: "NTF_001"
+            message: "资源不存在"
+            timestamp: "2026-01-11T10:00:00Z"
